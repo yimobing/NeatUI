@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>NeatUI | 国内开源HTML5前端框架</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+    <link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.css"><!--图标库-->
+    <link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <!--<script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>-->
+    <!--[if lt IE 9]>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/html5shiv/r29/html5.min.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/rem/1.3.4/js/rem.min.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/json2/20160511/json2.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <style>
+        body{ max-width: 800px; margin: 0 auto; }
+        .wrap{ padding: 15px 20px; }
+        header{ margin: 15px auto; text-align: center; }
+        h1{ color: #08ba61; }
+        h3{margin: 50px auto 15px auto; border-bottom: 3px solid #f25824; padding: 0;}
+        h3>span{ padding: 5px 10px; border: 2px solid #f25824; color: #f25824; border-radius: 4px; }
+        .grid-module{ margin-top: 20px; }
+        .grid-module-block{ margin-top: 15px; margin-right: 15px; }
+        .grid-module-caption{ font-size: 18px; font-weight: bold;}
+        .grid-module-content{ margin-top: 5px;}
+        .grid-module-content>input[type="checkbox"]{ margin-left: 10px; }
+    </style>
+
+    <div class="wrap">
+        <header>
+            <h1>NeatUI</h1>
+            <h3>国内开源HTML5前端框架，小巧又好用</h3>
+        </header>
+        <main>
+
+            <h3><span>CSS命名规范</span></h3>
+            <section class="grid-module grid-layout">
+                <div class="grid-module-block">
+                    <div class="grid-module-caption">NEC规范</div>
+                    <div class="grid-module-content">
+<pre>
+    ----------------------------------------
+    【公共命名】
+    wrap(用于最外层)
+    wrapper(页面外围控制整体布局宽度) 、container(容器,用于最外层)、layout(布局)
+
+    ----------------------------------------
+    【class关键词】
+    grid(布局) > module(模块) > block(区块) > list(列表) > unit(元件) + box(盒子) > item(选项) > function(功能) > skin(皮肤) + z(状态)
+    panel(面板, 可以由几个模块或区域组成)
+
+    ----------------------------------------
+    【模块关键词】
+
+    ----------------------------------------
+    【示例】
+    &lt;header&gt; &lt;/header&gt;
+    &lt;main&gt;
+        &lt;section class="grid-news"&gt;
+            &lt;div class="news-caption"&gt;新闻标题&lt;/div&gt;
+            &lt;div class="news-content"&gt;
+                &lt;div class="module-news-search"&gt;
+                    &lt;div class="block-news-search-input"&gt;
+                        &lt;input type="text" placeholder="请输入关键词"&gt;
+                    &lt;/div&gt;
+                    &lt;div class="block-news-search-button"&gt;
+                        &lt;button type="button"&gt;搜索&lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;!--/.module-news-search--&gt;
+                &lt;div class="module-news-list"&gt;
+                    &lt;div class="block-news-list-recommand"&gt;
+                        &lt;ul class="list"&gt;
+                            &lt;li&gt;
+                                &lt;div class="unit-news-list-thumb"&gt;&lt;img src="" alt=""&gt;&lt;/div&gt;
+                                &lt;div class="unit-news-list-text"&gt;&lt;span&gt;今天美国发生一起校园枪击案&lt;/span&gt;&lt;em&gt;美国华盛顿大学发生一起校园枪击案，事件发生在周二下午，...&lt;/em&gt;&lt;/div&gt;
+                            &lt;/li&gt;
+                        &lt;/ul&gt;
+                    &lt;/div&gt;&lt;!--/.block-news-list-recommand--&gt;
+                    &lt;div class="block-news-list-hot"&gt;&lt;/div&gt;
+                &lt;/div&gt;&lt;!--/.module-news-list--&gt;
+            &lt;/div&gt;&lt;!--/.news-content--&gt;
+        &lt;/section&gt;&lt;!--/.grid-news--&gt;
+    &lt;/main&gt;
+    &lt;footer&gt;&lt;/footer&gt;
+    &lt;nav&gt;&lt;/nav&gt;
+    &lt;aside&gt;&lt;/aside&gt;
+</pre> 
+                    </div><!--/.module-content-->
+                </div><!--/.grid-module-block-->
+
+
+                <div class="grid-module-block">
+                    <div class="grid-module-caption">BEM规范</div>
+                    <div class="grid-module-content">
+<pre>
+    ----------------------------------------
+    【BEM语法】
+    先看看 BEM 的语法：
+    .block {} //块（block）
+    .block__element {} //元素（element）
+    .block--modifier {} //修饰符（modifier）
+    运用在实际项目中是这个样子的：
+    .article {} // 文章块
+    .article__header {} // 文章头部元素
+    .article__header .title {} // 文章头部元素 的标题
+    .article__footer {} // 文章尾部元素
+    .article--project {} // 文章修饰符 project 页面
+    .article--about {} // 文章修饰符 about 页面
+    嗯，果然是战斗名族 (yandex) 的味道。换做以前啊，看到一个 CSS class 如 article-header 是分不清楚这是否有上下文的，很可能就是即兴命名。
+    再看看 BEM 命名 。。article__header，应为有了 BEM 约定，明确可以知道 article 是一个模块，而 header 是他的元素（子类）。
+
+    ----------------------------------------
+    【说明】
+    - 元素之间可以彼此嵌套
+    - 你可以拥有任意层次的嵌套级别
+    - 一个元素总是一个模块的一部分，而不是另一个元素的一部分，这意味着元素的名称不能被定义为 block__elem1__elem2 这样的层次结构。
+    
+    &lt;!--
+         正确的。完整的元素名的结构符合如下模式：
+         'block-name__element-name'
+     --&gt;
+    &lt;form class="search-form"&gt;
+        &lt;div class="search-form__content"&gt;
+            &lt;input class="search-form__input"/&gt;
+            &lt;button class="search-form__button"&gt;&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/form&gt;
+    
+     &lt;!--
+         不正确的。完整的元素名的结构不符合如下模式：
+         'block-name__element-name'
+     --&gt;
+    &lt;form class="search-form"&gt;
+        &lt;div class="search-form__content"&gt;
+            &lt;!-- 推荐：'search-form__input' 或者 'search-form__content-input' --&gt;
+            &lt;input class="search-form__content__input"/&gt;
+            &lt;!-- 推荐：'search-form__button' 或者 'search-form__content-button' --&gt;
+            &lt;button class="search-form__content__button"&gt;&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/form&gt;
+
+</pre>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+            </section>
+
+            <h3><span>按钮</span></h3>
+            <section class="grid-module grid-buttons">
+
+                <div class="grid-module-block grid-buttons-text">
+                    <div class="grid-module-caption">无背景色按钮</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn only-text">默认文字</button>
+                        <button type="button" class="ne-btn only-text blue">蓝色文字</button>
+                        <button type="button" class="ne-btn only-text green">绿色文字</button>
+                        <button type="button" class="ne-btn only-text red">红色文字</button>
+                        <button type="button" class="ne-btn only-text orange">橙色文字</button>
+                        <button type="button" class="ne-btn only-text pink">粉色文字</button>
+                        <button type="button" class="ne-btn only-text purple">紫色文字</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block grid-neat-buttons-size">
+                    <div class="grid-module-caption">按钮大小</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn l-1x">1倍大小(高32px)</button>
+                        <button type="button" class="ne-btn l-2x">2倍大小(高40px)</button>
+                        <button type="button" class="ne-btn l-3x">3倍大小(高45px)</button>
+                        <button type="button" class="ne-btn l-4x">4倍大小(高50px)</button>
+                        <button type="button" class="ne-btn l-5x">5倍大小(高55px)</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block grid-neat-buttons-bg">
+                    <div class="grid-module-caption">按钮图标、背景等</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn blue has-bg-square">有方格背景</button>
+                        <button type="button" class="ne-btn green has-bg-img">有前置图标</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+
+                <div class="grid-module-block grid-buttons-color">
+                    <div class="grid-module-caption">按钮颜色(深色调)</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn">默认色</button>
+                        <button type="button" class="ne-btn info blue">Info信息（蓝）</button>
+                        <button type="button" class="ne-btn success green">Success成功（绿）</button>
+                        <button type="button" class="ne-btn error red">Error错误（红）</button>
+                        <button type="button" class="ne-btn warn orange">Warn警告（橙）</button>
+                        <button type="button" class="ne-btn danger pink">Danger危险（粉）</button>
+                        <button type="button" class="ne-btn purple">紫色</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block grid-buttons-color">
+                    <div class="grid-module-caption">按钮颜色(浅蓝)</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn light-blue">浅蓝</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block grid-buttons-color">
+                    <div class="grid-module-caption">按钮颜色(浅绿)</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn light-green">浅绿</button>
+                        <button type="button" class="ne-btn light-green2">浅绿2</button>
+                        <button type="button" class="ne-btn light-green3">浅绿3</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block grid-buttons-color">
+                    <div class="grid-module-caption">按钮颜色(浅红)</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn light-red">浅红</button>
+                        <button type="button" class="ne-btn light-red2">浅红2</button>
+                        <button type="button" class="ne-btn light-red3">浅红3</button>
+                        <button type="button" class="ne-btn light-red4">浅红4</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+
+                <div class="grid-module-block grid-buttons-color">
+                    <div class="grid-module-caption">按钮颜色(浅橙)</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn light-orange">浅橙</button>
+                        <button type="button" class="ne-btn light-orange2">浅橙2</button>
+                        <button type="button" class="ne-btn light-orange3">浅橙3</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block grid-buttons-color">
+                    <div class="grid-module-caption">按钮颜色(其它浅色)</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn light-pink">浅粉</button>
+                        <button type="button" class="ne-btn light-purple">浅紫色</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+
+                <div class="grid-module-block grid-neat-buttons-size">
+                    <div class="grid-module-caption">有质感的按钮</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn has-texture">默认质感</button>
+                        <button type="button" class="ne-btn has-texture blue">蓝色质感</button>
+                        <button type="button" class="ne-btn has-texture green">绿色质感</button>
+                        <button type="button" class="ne-btn has-texture red">红色质感</button>
+                        <button type="button" class="ne-btn has-texture orange">橙色质感</button>
+                        <button type="button" class="ne-btn has-texture gray">灰色质感</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+                <div class="grid-module-block grid-buttons-color">
+                    <div class="grid-module-caption">渐变按钮</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn linear">默认渐变</button>
+                        <button type="button" class="ne-btn linear blue">蓝色渐变</button>
+                        <button type="button" class="ne-btn linear green">绿色渐变</button>
+                        <button type="button" class="ne-btn linear red">红色渐变</button>
+                        <button type="button" class="ne-btn linear orange">橙色渐变</button>
+                        <button type="button" class="ne-btn linear gray">灰色渐变</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+             
+            </section><!--/.grid-buttons-->
+
+
+
+            <h3><span>复选框 CHECKBOX</span></h3>
+            <section class="grid-module grid-checkbox">
+                <div class="grid-module-block grid-neat-checkbox">
+                    <div class="grid-module-caption">圆形打勾</div>
+                    <div class="grid-module-content">
+                        <input type="checkbox" class="ne-checkbox circle-tick" checked>
+                        <input type="checkbox" class="ne-checkbox circle-tick green" checked>
+                        <input type="checkbox" class="ne-checkbox circle-tick red" checked>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+                <div class="grid-module-block grid-neat-checkbox">
+                    <div class="grid-module-caption">开关</div>
+                    <div class="grid-module-content">
+                        <input type="checkbox" class="ne-checkbox on-off" checked>
+                        <input type="checkbox" class="ne-checkbox on-off green" checked>
+                        <input type="checkbox" class="ne-checkbox on-off red" checked>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+                <div class="grid-module-block grid-neat-checkbox">
+                    <div class="grid-module-caption">方形打勾</div>
+                    <div class="grid-module-content">
+                        <input type="checkbox" class="ne-checkbox square-tick" checked>
+                        <input type="checkbox" class="ne-checkbox square-tick green" checked>
+                        <input type="checkbox" class="ne-checkbox square-tick red" checked>
+                        <input type="checkbox" class="ne-checkbox square-tick white" checked>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+                <div class="grid-module-block grid-neat-checkbox">
+                    <div class="grid-module-caption">方块</div>
+                    <div class="grid-module-content">
+                        <input type="checkbox" class="ne-checkbox square" checked>
+                        <input type="checkbox" class="ne-checkbox square green" checked>
+                        <input type="checkbox" class="ne-checkbox square red" checked>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+            </section>
+
+
+
+            <h3><span>单选 RADIO</span></h3>
+            <section class="grid-module grid-checkbox">
+                <div class="grid-module-block grid-neat-checkbox">
+                    <div class="grid-module-caption">单个</div>
+                    <div class="grid-module-content">
+                        <div class="radio">
+                            <label for="sex-male">蓝色</label>
+                            <input type="radio" class="ne-radio">
+                        </div>
+                        <div class="radio">
+                            <label for="sex-male">绿色</label>
+                            <input type="radio" class="ne-radio green">
+                        </div>
+                        <div class="radio">
+                            <label for="sex-male">红色</label>
+                            <input type="radio" class="ne-radio red">
+                        </div>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+                <div class="grid-module-block grid-neat-checkbox">
+                    <div class="grid-module-caption">组合</div>
+                    <div class="grid-module-content">
+                        <div class="ne-radio-group">
+                            <div class="radio-title">性别：</div>
+                            <div class="radio-group">
+                                <div class="radio">
+                                    <input type="radio" name="sex" id="sex-male" class="ne-radio" value="男" checked="true">
+                                    <label for="sex-male">男</label>
+                                </div>
+                                <div class="radio">
+                                    <input type="radio" name="sex" id="sex-female" class="ne-radio" value="女">
+                                    <label for="sex-female">女</label>
+                                </div>
+                            </div>
+                        </div><!--/.ne-radio-group-->
+
+                        <div class="ne-radio-group">
+                            <div class="radio-title">加锁：</div>
+                            <div class="radio-group">
+                                <div class="radio">
+                                    <input type="radio" name="lock" id="lock-yes" class="ne-radio green" value="1" checked="true">
+                                    <label for="lock-yes">是</label>
+                                </div>
+                                <div class="radio">
+                                    <input type="radio" name="lock" id="lcok-no" class="ne-radio green" value="0">
+                                    <label for="lock-no">否</label>
+                                </div>
+                            </div>
+                        </div><!--/.ne-radio-group-->
+
+                        <div class="ne-radio-group">
+                            <div class="radio-title">开通：</div>
+                            <div class="radio-group">
+                                <div class="radio">
+                                    <input type="radio" name="open" id="open-yes" class="ne-radio red" value="0" checked="true">
+                                    <label for="open-ye">已开通</label>
+                                </div>
+                                <div class="radio">
+                                    <input type="radio" name="open" id="open-no" class="ne-radio red" value="1">
+                                    <label for="open-no">未开通</label>
+                                </div>
+                            </div>
+                        </div><!--/.ne-radio-group-->
+
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+            </section>
+
+
+            <h3><span>开关按钮  SWITCH</span></h3>
+            <section class="grid-module grid-checkbox">
+                <div class="grid-module-block grid-neat-checkbox">
+                    <div class="grid-module-caption">开关按钮样式1</div>
+                    <div class="grid-module-content">
+                        <p>自动跳过片头片尾：  <input type="checkbox" class="ne-switch" checked></p>
+                        <p>播放时启用硬件加速：<input type="checkbox" class="ne-switch green" checked></p>
+                        <p>运营商网络自动播放：<input type="checkbox" class="ne-switch red" checked></p>
+                        <p>禁用的开关(关状态)：<input type="checkbox" class="ne-switch" disabled></p>
+                        <p>禁用的开关(开状态)：<input type="checkbox" class="ne-switch" checked disabled></p>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+            </section>
+            
+            <h3><span>小部件</span></h3>
+            <section class="grid-module grid-widget">
+                <div class="grid-module-block">
+                    <div class="grid-module-caption">侧栏(弹出窗)</div>
+                    <div class="grid-module-content">
+                        <button type="button" id="btn-aside-default" class="ne-btn linear">默认侧栏</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+                
+                <div class="grid-module-block">
+                    <div class="grid-module-caption">IFRAME嵌入页面</div>
+                    <div class="grid-module-content">
+                        <button type="button" id="btn-iframe-default" class="ne-btn linear">默认嵌入</button>
+                        <button type="button" id="btn-iframe-back" class="ne-btn linear">嵌入可返回</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+            </section>
+
+        </main>
+    </div><!--/.wrap-->
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-form.js"></script><!--表单布局-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
+	<!--<script type="text/javascript" href="highlight/highlight.min.js"></script>--><!--代码高亮-->
+    <script type="text/javascript">
+        /*+----------------全局变量----------------+*/
+        /*+----------------FUNCTION----------------+*/
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                     初始化事件
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            /*+----------------------------------------+*/
+            //=====代码块高亮
+            hljs.initHighlightingOnLoad()
+            hljs.configure({
+                languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
+            });
+            document.querySelectorAll('pre').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                侧栏弹出窗事件
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            /*+----------------------------------------+*/
+            //=====默认侧栏按钮 
+            $('#btn-aside-default').on('click', function(){
+
+                /**
+                 * 自定义数据源参数说明：
+                    · type 搜索类型. input 单行输入框(默认), textarea 多行输入框, drop 下拉, radio 单选, checkbox 多选
+                    · label 搜索项文本
+                    · name 搜索项(或输入框)ID(可选)
+                    · class 搜索项(或输入框)Class(可选)
+                    · hid 	默认隐藏值(可选). 只当搜索类型为单选时有效
+                    · value 默认显示值(可选). 只当搜索类型为单行、多行输入、单选、下拉时有效.
+                    · readonly 是否只读(可选). true 是, false 否(默认)
+                    · placeholder 提示文字(可选). 只当搜索类型为单行、多行输入时有效.
+                    · group 复合型输入框,即多个输入框组合的数组(可选). 常见于开始日期、结束日期组合
+                        label 文本描述(可选)
+                        name 输入框ID(可选)
+                        class 输入框Class(可选)
+                        value 默认值(可选)
+                        placeholder 提示文字(可选)
+                        readonly 是否只读(可选). true 是, false 否(默认)
+                    · data 内层循环数组(可选). 只当搜索类型为单选、多选时有效.
+                        value 显示值
+                        id 隐藏值(可选)
+                        checked 是否默认选中(可选), 只当搜索类型为单选或多选时有效. true 是, false 否(默认). 注意:单选时如果有多条记录是选中的,则系统会强制只有第一个选中,其它皆不选中
+                */
+                var _contentHtml = neuiSearchBox.getForm({
+                    enableLocale: false, //是否启用本地演示数据源. true 是(默认), false 否
+                    source: [  //自定义数据源
+                        {"type":"input", "label":"精准搜索", "name":"s-user", "placeholder":"输入会员ID搜索"},
+                        {"type":"input", "label":"负责人", "name":"s-person", "placeholder":"请选择负责人", "readonly":true},
+                        {"type":"textarea", "label":"备注", "name":"s-notes"},
+                        {"type":"input", "label":"咨询日期", "group": [
+                            {"label":"自", "name":"s-startDate", "class":"nedate", "value":"2021-03-06", "placeholder":"开始日期", "readonly": true},
+                            {"label":"至", "name":"s-endDate", "class":"nedate", "value":"2021-03-31", "placeholder":"结束日期", "readonly": true}
+                        ]},
+                        {"type":"drop", "label":"所在地区(下拉)", "name":"s-area" , "value":"福建省-泉州市-丰泽区"},
+                        {"type":"radio", "label":"职业(单选)", "name":"s-duty", "hid":"1001", "value":"白领", "data":[
+                            {"id":"1000", "value":"不限"},
+                            {"id":"1001", "value":"医生"},
+                            {"id":"1002", "value":"教师"},
+                            {"id":"1003", "value":"白领"},
+                            {"id":"1003", "value":"蓝领"},
+                            {"id":"1003", "value":"工人"}
+                        ]},
+                        {"type":"radio", "label":"年级(单选)", "name":"s-grade", "data":[
+                            {"id":"1000", "value":"不限", "checked": true},
+                            {"id":"1001", "value":"一年级"},
+                            {"id":"1002", "value":"二年级"},
+                            {"id":"1003", "value":"三年级"},
+                            {"id":"1003", "value":"四年级"},
+                            {"id":"1003", "value":"五年级"}
+                        ]},
+                        {"type":"checkbox", "label":"年龄(多选)", "name":"s-age", "data":[
+                            {"id":"1001", "value":"0-6岁", "checked": true},
+                            {"id":"1002", "value":"7-16岁", "checked": true},
+                            {"id":"1003", "value":"17-25岁", "checked": true},
+                            {"id":"1004", "value":"26-40岁"},
+                            {"id":"1005", "value":"40-50岁"},
+                            {"id":"1006", "value":"50-70岁"},
+                            {"id":"1007", "value":"70岁以上"},
+                        ]}
+                    ]
+                });
+
+
+                neui.openAside({
+                    caption: "侧栏搜索", // 标题,可自定义HTML(可选)
+                    
+                    content: _contentHtml, // 内容,可自定义HTML(可选)
+                    toper: "", //顶部,自定义HTML(可选).
+                    footer: "", //底部,自定义HTML(可选).
+
+                    cross: true, //是否显示关闭图标(可选),默认false
+			        back: true, //是否显示返回按钮(可选),默认false
+                    showBackText: false, // 是否显示返回按钮的文字(可选),默认false
+                    capwrap: false, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+                    adaptive: false, //窗口是否自适应内容大小(可选). true 是, false 否(默认)
+                    frozen: true, //是否冻结顶部、中间及底部,即各部分是否使用绝对定位(可选). true 是(默认), false 否. false时控件大小自适应内容
+
+                    //按钮参数有两种格式
+                    buttons: ["重置", "完成", "提交"],  // 按钮(可选)
+                    /* buttons: [ // 按钮(可选)
+                    	{text: "重置", name: "btn-reset", width: "100%", class: "ne-btn", backColor: "", foreColor: "", radius: "0"},
+                    	{text: "完成", name: "btn-complete", width: "100%", class: "ne-btn info", backColor: "", foreColor: "", radius: "0"}
+                    ], */
+                    showButton: true, //是否显示按钮(可选),默认true
+    
+                    offset: { //位置偏移,由此可设置窗口位置(可选)
+                        left: 50,
+                        right: 0,
+                        top: 0,
+                        bottom: 0
+                    },
+                    radius: 0, //圆角边框值(可选)
+                    zindex: 4, //层级z-index(可选)
+                    animate: { //动画(可选)
+                        enable: true, //是否启用
+                        direction: 'left' //动画方向(可选). left 向左(默认), right 向右, top 向上, bottom 向下
+                    },
+                    //noneSelfClickClose: true, //是否点击窗口以外区域就关闭窗口(可选),默认true. 值为false时常用于多个侧栏嵌套时,除第1个侧栏外其它侧栏要求点击非窗口区域就关闭窗口
+                    //btnClickClose: false, //是否一点击按钮就关闭窗口(可选),默认false. 值为true时用于无须校验数据等其它操作,此时须前台手动调用函数才会关闭窗口
+                    //供前台调用
+                    //closeAside: function(){ }, //关闭当前窗口, 供btnCallBack等回调函数调用,用来关闭窗口(可选)
+                    //closeAll: function(){ }, //关闭所有窗口, 供btnCallBack等回调函数调用,用来关闭窗口(可选)
+                    //回调
+                    openCallBack: function(e){ //创建完成后的回调. e格式: {eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
+                        //console.log('e:', e);
+                        neuiSearchBox.doneEvent(); //加载搜索框事件
+                    },
+                    btnCallBack: function(ret, e){ //按钮回调(可选). ret 按钮索引值+1, e 同openCallBack()的e参数
+                        //console.log('e:', e);
+                        var self = this;
+                        if(ret == 1){ }
+                        if(ret == 2){
+                            alert('这里会执行一系列事件，最后调用内置函数以关闭窗口');
+                            //..
+                        }
+
+                        self.closeAside(); //关闭当前窗口
+                        //self.closeAll(); //关闭所有窗口
+                    } 
+                })
+            });
+
+
+            //=====[弹出窗口]负责人下拉
+            $(document).on('click', '#s-person', function(){
+                var html = [
+                    '<div class="block-person">',
+                        '<div class="person__table person__head">',
+                            '<div class="person__column person__column-choice">选择</div>',
+                            '<div class="person__column person__column-name">姓名</div>',
+                            '<div class="person__column person__column-phone">电话</div>',
+                        '<div><!--/.person__head-->',
+                        '<div class="person__table person__list">',
+                            '<div class="person__row flex">',
+                                '<div class="person__column person__column-choice">',
+                                    '<input type="checkbox" class="meui-checkbox square-tick white">',
+                                '</div>',
+                                '<div class="person__column person__column-name">张三</div>',
+                                '<div class="person__column person__column-phone">15860831524</div>',
+                            '</div><!--/.person__row-->',
+                            '<div class="person__row flex">',
+                                '<div class="person__column person__column-choice">',
+                                    '<input type="checkbox" class="meui-checkbox square-tick white">',
+                                '</div>',
+                                '<div class="person__column person__column-name">李四</div>',
+                                '<div class="person__column person__column-phone">1735018523456</div>',
+                            '</div><!--/.person__row-->',
+                        '</div><!--/.person__list-->',
+                    '</div><!--/.block-person-->'
+                ].join('\r\n');
+
+                neui.openAside({
+                    caption: "选择负责人",
+                    content: html, 
+                    cross: true,
+			        back: false,
+                    adaptive: true,
+                    frozen: false,
+                    buttons: ["确定"], 
+                    offset: { 
+                        left: 50,
+                        right: 0,
+                        top: 0,
+                        bottom: 0
+                    },
+                    noneSelfClickClose: false,
+                    openCallBack: function(e){ },
+                    btnCallBack: function(ret, e){
+                        //console.log('e:', e);
+                        var self = this;
+                        self.closeAside(); //关闭当前窗口
+                    } 
+                })
+            });
+
+
+
+
+        
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                IFRAME嵌入页面事件
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            /*+----------------------------+*/
+            //=====iframe默认嵌入
+            $('#btn-iframe-default').on('click', function(){
+                var linkUrl = 'aaa.html';
+                neui.openIframe({
+                    url: linkUrl, //链接地址
+                    caption: '日历控件', //窗口标题(可选)
+                    top: '2.5%', //窗口距离顶部的距离(可选)（数字或百分比，eg.25%)
+                    width: '98%', //窗口宽度(可选)（数字或百分比，eg1.1200, eg2.98%）
+                    titleHeight: 45, //标题栏高度(可选)
+                    titleFontSize:'18px', //标题文字大小(可选), 默认18px
+                    showCross: true, //是否显示右上角打叉图标(可选), 默认true
+                    crossDirection: 'left', // 打叉图标位置(可选). left 左上角, right 右上角(默认)
+                    buttons: ['确定', '取消'], //操作按钮(可选)
+                    //btnTheme: '', //按钮主题(可选). 默认空. 其它值: back 返回主题
+                    btnBgColor: ['#04BE02', '#888'], //自定义按钮背景色(可选). 英文单词或颜色值. eg. green, #1296db
+                    btnDirection: 'horizontal', //按钮方向(可选).水平|horizontal(默认),垂直|vertical
+                    btnClickClose: false, //是否一点击按钮就关闭窗口(可选),默认false. 值为true时用于无须校验数据等其它操作,此时须前台手动调用函数才会关闭窗口
+                    btnCallBack: function(ret){ //按钮点击回调函数(可选). ret 为按钮索引值+1
+                        this.closeFrame(); //关闭本窗口(closeFrame是内置函数)
+                    },
+                    params: { //自定义其它参数(可选)
+                        //frameId: 'ne-frame-id', //ifame的ID属性(可选)
+                        //frameName: 'ne-frame-name', //iframe的Name属性(可选)
+                        //frameZindex: 51, //iframe层级z-index(可选)
+                        //frameRadius: true,  //iframe四个角是否圆角(可选),默认true
+                        //frameBorder: true, //iframe是否有边框(可选),默认true
+                        //maskId: 'ne-frame-mask', //遮罩id(可选)
+                        //maskZindex: 50, //遮罩层级z-index(可选)
+                        animation: { //iframe打开时是否启用动画效果(可选)
+                            enable: false, //默认false不开启(可选)
+                            direction: 'left' //动画方向(可选). left 向左(默认), top 向上
+                        }
+                    }, 
+                    closeCallBack: function(){ } //关闭时的回调函数(可选)
+                })
+            });
+
+
+
+            /*+----------------------------+*/
+            //=====iframe嵌入可返回
+            $('#btn-iframe-back').on('click', function(){
+                var linkUrl = 'aaa.html';
+                neui.openIframe({
+                    url: linkUrl,
+                    top: '0%',
+                    width: '100%',
+                    showCross: false,
+                    buttons: ['返回'],
+                    btnTheme: 'back', 
+                    btnCallBack: function(ret){
+                        this.closeFrame();
+                    },
+                    params: { //自定义其它参数(可选)
+                        frameRadius: false,
+                        frameBorder: false,
+                        animation: {
+                            enable: true,
+                            direction: 'left' 
+                        }
+                    }
+                })
+            });
+
+
+            
+        }); //$(function(){});
+
+    </script>
+</body>
+</html>

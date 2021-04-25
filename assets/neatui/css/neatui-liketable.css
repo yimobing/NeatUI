@@ -1,0 +1,401 @@
+@charset "utf-8";
+
+/**---------------------
+* [类表格控件]样式-
+* Author：ChenMufeng
+* Update：2020.11.11
+* ----------------------
+*/
+/*body{overflow-y: hidden!important;} /*禁止垂直方向出现滚动条,已在插件中用参数进行控制*/
+/*+-----------Table Styles 表格样式------------------+*/
+.ne-like-nodata{margin-top: 15px; text-align: center; color: #f64c59; font-size: 18px; font-weight: bold;}
+.ne-like-table{position:relative; display:inline-block; *display:inline; _display:inline; *zoom:1;}
+.ne-like-table .inner{}
+/*全局class*/
+.like-table .cursor-normal{cursor:auto!important;}
+.like-table .no-border{background:none!important;}
+
+/*=====表标题*/
+.table-caption{margin:10px auto 10px auto; text-align:center;}
+/*=====表主体*/
+.table-content{
+	position:relative;
+	/* border:1px solid #ddd; */
+	overflow-y:hidden;
+	overflow-x:auto;
+	-webkit-overflow-scrolling:touch;
+	/*ie滚动条样式*/
+	crollbar-base-color: #134087;
+	scrollbar-3dlight-color:rgb(173, 165, 165);
+	scrollbar-highlight-color: #fff; /*整体颜色*/
+	scrollbar-track-color: #f4f4f4; /*轨道颜色*/
+	scrollbar-face-color:#c0c3c9; /*滑块及按钮颜色*/
+	scrollbar-arrow-color: #011433; /*按钮箭头颜色*/
+	scrollbar-shadow-color:#e5e7eb; /*阴影颜色*/
+	/*scrollbar-dark-shadow-color: #011433;*/	
+}
+/*假滚动条*/
+.table-scrollbar{position:absolute; z-index:1; right:0; width:20px; background-color:#fafafa; overflow-y: auto; overflow-y:scroll\9; -webkit-overflow-scrolling:touch; } 
+.table-scrollbar>div{position:absolute; top:0; left:0; right:0; width:17px; }
+/*.table-scrollbar .thumb{background-color: #718096;}*/
+.thumb{background-color: #718096;} /*testing5*/
+
+/*表内部*/
+.table-inner{position:relative; display: inline-block; *display:inline; _display:inline; *zoom:1;}
+.like-table .block-info{}
+.like-table .block-list{
+	position:relative;
+	padding:4px 0px;
+	border:1px solid #ddd;
+	border-radius:2px;
+	font-size:12px;
+	color:#666;
+}
+/*表头*/
+.like-table .list-title{
+	position:absolute;
+	z-index:5;
+	top:0;
+	left:0;
+	right:0;
+	margin: 0 auto;
+	/* padding:5px 0; */
+	background-color:#fff;
+	box-shadow:0 1px 3px #ebe6e6;
+	border-bottom:1px solid #ddd;
+	color:#333;
+	font-size: 14px;
+}
+.like-table .list-title.has-bg-color{
+	background-color:#eaeaea;
+	/*
+	background-image: -webkit-gradient(linear,left 0,left 100%,from(#f8f8f8),to(#ececec));
+    background-image: -webkit-linear-gradient(top,#f8f8f8,0%,#ececec,100%);
+    background-image: -moz-linear-gradient(top,#f8f8f8 0,#ececec 100%);
+    background-image: linear-gradient(to bottom,#f8f8f8 0,#ececec 100%);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff8f8f8',endColorstr='#ffececec',GradientType=0);	
+    */
+}
+
+.like-table .list-title:after{content:''; display:block; clear:both;}
+.like-table .list-title>div{
+	justify-content:center;
+	padding:10px 8px!important;
+	cursor:pointer;
+}
+.like-table .list-title em{color:#888; font-size:10px; }
+
+/*副标题换行时*/
+.like-table .list-title.has-sub-wrap>div{padding:4px 8px!important;}
+.like-table .list-title.has-sub-wrap span{width:100%;}
+.like-table .list-title.has-sub-wrap em{display:block; width:100%;}
+
+
+/*表身*/
+.like-table .list-content{ margin-top:35px; font-size:12px; overflow-y:auto; -webkit-overflow-scrolling:touch;}
+.like-table .list-one{
+	position:relative; 
+	/*margin:2px auto;*/
+	margin:0 auto;
+	padding-top:2px;
+	border-top:1px solid #f9faf9;
+	display:-webkit-box;  
+	display:-moz-box; 
+	display:-ms-flexbox; 
+	display:-webkit-flex; 
+	display:flex;
+	display:box;
+	align-items:center;
+}
+.like-table .list-one:first-child{margin-top:0; padding-top:0; border:0;}
+.like-table .list-one:after{content:''; display:block; clear:both;}
+
+/*隔行变色*/
+.like-table .list-one.interlacing{background-color:#f9faf9;}
+
+/*小计行、合计行*/
+.like-table .list-summary{background-color: #f9faf9;font-weight: bold;border-style: solid;border-color: #f0ecec;border-width: 1px 0 1px 0;}
+.like-table .col-summary{}
+
+
+/*内容输入框*/
+.like-table .list-one input[type="text"],
+.like-table .list-one textarea{width:100%; padding:3px 5px; background-color:#fff; border:1px solid #ddd; border-radius:2px;}
+.like-table .list-one input[type="text"]{max-height:100%; *width:85%; _width:85%; zoom: 1; }
+.like-table .list-one textarea{height:100%;  *width:90%; _width:90%; zoom: 1; overflow-y:auto;-webkit-overflow-scrolling:touch; }
+
+/*内容按钮*/
+.like-table .list-one button{cursor: pointer;}
+.like-table .list-one button.border-zero{border: 0;}
+.like-table .list-one button i.fa{margin-right: 4px;}
+
+/*输入框readonly disabled样式*/
+.like-table .list-one input:disabled, 
+.like-table .list-one input[disabled], 
+.like-table .list-one textarea:disabled{color:#777!important; -webkit-opacity:1;opacity:1;filter:alpha(opacity=100);filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);}
+.like-table .list-one input:read-only,
+.like-table .list-one input[readonly],
+.like-table .list-one span[readonly],
+.like-table .list-one textarea[readonly]{background-color:#fff;-webkit-text-fill-color:inherit;-webkit-text-stroke:1px solid #d6e9c6;cursor:pointer;}
+.like-table .list-one input.red:disabled, 
+.like-table .list-one input.red[disabled], 
+.like-table .list-one textarea.red:disabled{color:#ff0000!important;}
+
+/*输入框滚动条样式*/
+.like-table .list-one textarea::-webkit-scrollbar{width:2px;} /*整体样式*/
+.like-table .list-one textarea::-webkit-scrollbar-thumb{ border-radius:5px;-webkit-box-shadow:inset 0 0 5px rgba(0,0,0,.2); background:rgba(0,0,0,.2); } /*里面小方块*/
+.like-table .list-one textarea::-webkit-scrollbar-track{-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,.1);border-radius:0;background:rgba(0,0,0,.1); } /*里面轨道*/
+/*单元格内容*/
+.like-table .list-one span{width:100%;}
+.like-table .list-one .em-info{margin-top:2px; color:#aaa;} /*补充信息*/
+.like-table .list-one .em-unit{ /*右侧单位*/
+	position:absolute;
+	right:4px;
+	top:50%;
+	-webkit-transform:translateY(-50%);
+	-moz-transform:translateY(-50%);
+	-o-transform:translateY(-50%);
+	transform:translateY(-50%);
+	color:#999;
+	font-size:10px;
+	font-style:italic;
+	top:5px\9;
+}
+/*单元格左右图标*/
+.like-table .list-one .i-icon{position:absolute; right:5px; top: 50%; -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%);  -o-transform: translateY(-50%); -ms-transform: translateY(-50%); font-size:12px; color:#b3aeae;}
+
+/*各列*/
+.like-table .column>div{
+	float:left;
+	position:relative;
+	display:inline-block;
+	*display:inline;
+	_display:inline;
+	*zoom:1;
+	_zoom:1;
+	vertical-align:middle;
+	width:60px;
+	margin-left:10px;
+	height:100%;
+	text-align:center;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:normal;
+	word-wrap:break-word;
+	word-break:break-all;
+	
+	display:-webkit-box;  
+	display:-moz-box; 
+	display:-ms-flexbox; 
+	display:-webkit-flex; 
+	display:flex;
+	display:box;
+	align-items:center;
+	-webkit-flex-wrap:wrap;
+	-moz-flex-wrap:wrap;
+	-o-flex-wrap:wrap;
+	-ms-flex-wrap:wrap;
+	flex-wrap:wrap;
+}
+.like-table .column>div>*{vertical-align:middle\9;}
+.like-table .column>div:first-child{margin-left:0; border:0;}
+
+/*列对齐*/
+.like-table .column>div.center,
+.like-table .column>div.center *{text-align:center!important;}
+.like-table .column>div.right,
+.like-table .column>div.right *{text-align:right!important;}
+.like-table .column>div>span{display:inline-block; _display:inline; *display:inline; *zoom:1; }
+.like-table .column>div.left button,
+.like-table .column>div.center button,
+.like-table .column>div.right button{margin:0 auto; text-align:center!important;}
+
+/*列之间没有margin值时*/
+.like-table.no-col-margin .column>div{margin:0;}
+/*单元格有边线*/
+.like-table.has-border .column>div{margin-left:0; padding:0 5px; border-style:solid;border-color:#f7efef;border-width:0 0 0 1px;}
+.like-table.has-border .column>div:first-child{border:0;}
+.like-table.has-border.ceil-pad-5 .column>div{padding:0 5px;}
+.like-table.has-border.ceil-pad-8 .column>div{padding:0 8px;}
+.like-table.has-border.ceil-pad-10 .column>div{padding:0 10px;}
+.like-table.has-border .list-one .i-icon{right: 12px;}
+/*表头有背景色时表头单元格边线颜色*/
+.like-table.has-border .list-title.has-bg-color>div{border-color:#e3dcdc;}
+
+
+/*表头排序*/
+.like-table .list-title>div>.arrow-svg-wrap{
+	position:absolute; 
+	z-index:2;
+	right:5px; 
+	top:50%;
+	-webkit-transform:translateY(-50%);
+	-moz-transform:translateY(-50%);
+	-o-transform:translateY(-50%);
+	transform:translateY(-50%);
+	top:5px\9;
+	-ms-transform:translateY(0%);
+	
+}
+.like-table .list-title>div>.arrow-svg-wrap>i{
+	display:block;
+	width:8px;
+	height:4.8px;
+	margin-bottom:1px;
+	-webkit-opacity:0.15;
+	opacity:0.15;
+	filter:alpha(opacity=15);
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=15);
+	font-size:12px;
+}
+.like-table .list-title>div[data-sort=raise]>.arrow-svg-wrap>i.fa-caret-up{
+	-webkit-opacity:0.8;
+	opacity:0.8;
+	filter:alpha(opacity=80);
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+}
+.like-table .list-title>div[data-sort=down]>.arrow-svg-wrap>i.fa-caret-down{
+	-webkit-opacity:0.8;
+	opacity:0.8;
+	filter:alpha(opacity=80);
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+}
+
+
+/*+-------------单元格内置元素----------------+*/
+/*radio单选*/
+.cell-radio-single{
+	display: -webkit-box;  
+	display: -moz-box; 
+	display: -ms-flexbox; 
+	display: -webkit-flex; 
+	display: flex; 
+	display: box;
+	align-items: center;
+	margin: 0 auto;
+}
+.cell-radio-group{
+	display: -webkit-box;  
+	display: -moz-box; 
+	display: -ms-flexbox; 
+	display: -webkit-flex; 
+	display: flex; 
+	display: box;
+	align-items: center;
+	margin: 0 auto;
+}
+.cell-radio-group .group{
+	display: -webkit-box;  
+	display: -moz-box; 
+	display: -ms-flexbox; 
+	display: -webkit-flex; 
+	display: flex; 
+	display: box;
+	align-items: center;
+	display:inline-block\9; 
+	*display: inline; 
+	_display: inline;
+	zoom: 1; 
+	vertical-align: top; 
+	margin-right: 10px;
+}
+.cell-radio-group .group label{ display:inline-block; vertical-align:top; margin-left:5px;}
+
+.cell-radio-single input[type="checkbox"],
+.cell-radio-single input[type="radio"],
+.cell-radio-group input[type="checkbox"],
+.cell-radio-group input[type="radio"]{margin-top: 0;}
+
+
+
+/*+-------------customize column width 自定义各列宽----------------+*/
+/*.like-table .column> .col-order{width:50px;}*/ /*序号列*/
+
+
+
+
+/*+-------------Pagination Styles 分页布局----------------+*/
+#ne-pager-foot{/*position:fixed;left:0;right:0;bottom:0;*/width:100%;padding:0px;/* background-color:#f5f5f5; */}
+.pagelist{position:fixed;z-index:15; left:0;right:0;bottom:0;width:100%;margin:0 auto;padding:8px;background-color:#f5f5f5;text-align: center;font-size:12px; box-shadow:0 2px 8px #7e7878;}
+.pagelist>div,
+.page-num>ul>li{min-width:30px;width:auto;height:32px; line-height:32px; margin-left:5px;border:1px solid #ddd; border-radius:3px;text-align:center;}
+.pagelist>div{display:inline-block; *display:inline; _display:inline; *zoom:1; vertical-align:top;}
+.page-num>ul>li{float:left;}
+.page-num>ul>li.dotted{border:0;}
+.pagelist>div{min-width: 80px;cursor:pointer;}
+.pagelist>div i{color:#1296db;}
+.pagelist>div.page-toexcel{background-color:#faf877;padding:0 8px;border:1px solid #ecc21b;color:#353b4b;}
+.pagelist>div.page-toexcel>i{color:#353b4b;}
+.pagelist>div.page-toexcel:hover{background-color:#f60;color:#fff;border-width:0;}
+.pagelist>div.page-toexcel:hover>i{color:#fff;}
+.pagelist>div.page-num{min-width:40px;}
+.page-num{border:0!important;}
+.page-num>ul>li{cursor:pointer;}
+.page-num>ul>li.on{background-color:#428bca;color:#fff;border:1px solid #428bca;}
+.page-goto{min-width:auto!important;margin-left:15px!important;border:0!important;}
+.page-goto>select{width:auto;height:99%;margin:0 5px;padding:0 5px;text-align:center;border:1px solid #eee;}
+.page-goto>select>option{width:100%;text-align:center;}
+.page-infos{min-width:50px!important;border:0!important;}
+.page-infos>em{margin:3px;}
+.page-every,
+.page-record{ min-width: auto!important; border: 0!important; }
+.page-every em{ font-weight: bold; }
+.page-record em{ margin: 0 5px; color: #f47a20; font-weight: bold; }
+.pagelist>div.on,
+.page-all:hover,
+.page-home:hover,
+.page-prev:hover,
+.page-next:hover,
+.page-end:hover{background-color:#428bca;color:#fff;border:1px solid #428bca;}
+.pagelist>div.on i,
+.page-all:hover i,
+.page-home:hover i,
+.page-prev:hover i,
+.page-next:hover i,
+.page-end:hover i{color:#fff;}
+.page-excel{padding:0 10px;background-color:#faf877;}
+.page-excel:hover{background-color:#f60;color:#fff;}
+.page-excel:hover i{color:#fff;}
+
+
+
+
+
+/*+-------------Media Query 媒体查询----------------+*/
+@media screen and (max-width:1920px){
+}
+@media screen and (max-width:1680px){
+}
+@media screen and (max-width:1600px){
+}
+@media screen and (max-width:1440px){
+}
+@media screen and (max-width:1400px){
+}
+@media screen and (max-width:1366px){
+}
+@media screen and (max-width:1360px){
+}
+@media screen and (max-width:1280px){	
+}
+@media screen and (max-width:1152px){
+}
+@media screen and (max-width:1024px){
+}
+@media screen and (max-width:800px){
+}
+@media screen and (max-width:640px){
+	/*滚动条样式*/
+	.table-content::-webkit-scrollbar{width:2px; height:5px;}/*整体样式*/
+	.table-content::-webkit-scrollbar-thumb{/*里面小方块*/
+		border-radius:5px;
+		-webkit-box-shadow:inset 0 0 5px rgba(0,0,0,.2);
+		background:rgba(0,0,0,.2);
+	}
+	.table-content::-webkit-scrollbar-track{ /*里面轨道*/
+		-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,.1);
+		border-radius:0;
+		background:rgba(0,0,0,.1);
+	}
+}

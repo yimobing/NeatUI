@@ -1,0 +1,242 @@
+<pre>
+
+
+/*+----------------单页能用CSS----------------+*/
+body,html{ width:100%; margin:0 auto; padding:0; -webkit-text-size-adjust:none; -webkit-tap-highlight-color:transparent; }
+*:not(input,textarea) { -webkit-touch-callout: none; -webkit-user-select: none; }
+html{font-size: 20px;}
+@media only screen and (min-width:400px){html{font-size:21.33333333px!important}}
+@media only screen and (min-width:414px){html{font-size:21px!important}}
+@media only screen and (min-width:480px){html{font-size:25.6px!important}}
+body{background-color:#fff;line-height:1.5;font-family:'Hiragino Sans GB W3','Hiragino Sans GB','microsoft yahei','Sim sun','Helvetica Neue','Helvetica,sans-serif';font-size:.7rem;color:#212121;overflow-x:hidden;overflow-y:auto}
+body.mobile{ max-width: 640px; margin: 0 auto; }
+body.transparent{ background-color: #f4f4f4; }
+*{margin:0;padding:0;-moz-box-sizing:border-box;-o-box-sizing:border-box;-webkit-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;outline:0;-webkit-tap-highlight-color:transparent}
+header, footer, main, section, menu, nav, article, aside, hgroup, summary, details, figcaption, figure{display: block;}
+
+
+
+/*+----------------对话框----------------+*/
+//======普通对话框
+neuiDialog.alert({
+    animate: true,
+    caption: '提示',
+    message: '保存成功',
+    buttons: ['确定']
+})
+
+
+//=====有回调的对话框
+neuiDialog.alert({
+    animate: true,
+    caption: '提示',
+    message: msg,
+    buttons: ['确定'],
+    callBack: function(ret){
+    }
+})
+
+
+//=====确认对话框
+neuiDialog.alert({
+    animate: true,
+    caption: '提示',
+    message: '确认删除',
+    buttons: ['确定', '取消'],
+    callBack: function(ret){
+        if(ret == 1){
+
+        }
+    }
+})
+
+
+
+
+
+
+
+/*+----------------自定义AJAX----------------+*/
+
+//=====AJAX内部几种中断并提醒
+if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } //空值或空对象提醒(轻微级别 NOTICE)
+if(toolTip.zeroLengthTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } //数组长度为零提醒(警告级别 WARNING)
+if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } //犯错就提醒(严格级别 STRICT)
+if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } //接口不通ERROR提醒(致命错误 ERROR)
+
+
+//=====获取数据时
+
+/*
+//START AJAX
+var json = {}
+var isHoldOn = true;
+ajax({
+    heading: "获取XX数据",
+    debug: false,
+    url: "",
+    data: {
+        "action": "",
+        "user": "<%=s_user%>",
+        
+        "city_bh": ps_city_bh,
+        "lpbh": ps_lpbh
+    },
+    success: function(res){
+        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+        json = JSON.parse(res);
+    },
+    error: function(res){
+        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+    },
+    beforeSend: function(XMLHttpRequest){ },
+    complete: function(XMLHttpRequest, textStatus){ }
+})
+if(!isHoldOn){
+    neui.destroyAnimate();
+    return {};
+}
+//END AJAX
+*/
+
+
+
+
+//=====增、删、改操作
+
+//开始执行
+var flag = '', msg = '保存成功';
+neui.showAnimate();
+setTimeout(function(){
+    //后台返回
+    /*
+    //START AJAX
+    var isHoldOn = true;
+    ajax({
+        heading: "保存XX数据",
+        debug: false,
+        url: "",
+        data: {
+            "action": "",
+            "user": "<%=s_user%>",
+            
+            "city_bh": g_city_bh,
+            "lpbh": g_lpbh
+        },
+        success: function(res){
+            if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+            var json = JSON.parse(res);
+            flag = json.return == 'ok' ? 1 : 0;
+            if(!flag) msg = json.data;
+        },
+        error: function(res){
+            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+        },
+        beforeSend: function(XMLHttpRequest){ },
+        complete: function(XMLHttpRequest, textStatus){ }
+    })
+    if(!isHoldOn){
+        neui.destroyAnimate();
+        return;
+    }
+    //END AJAX
+    */
+    flag = parseInt(1); //1 成功, 0 失败
+    if(!flag) msg = '保存失败';
+
+    neuiDialog.alert({
+        caption: '提示',
+        message: msg,
+        buttons: ['确定'],
+        callBack: function(){
+            if(flag){ //成功
+                //..
+            }
+        }
+    })
+
+    neui.destroyAnimate();
+}, 100)
+
+
+
+
+
+
+
+/*+----------------原始AJAX----------------+*/
+//
+/*
+//START AJAX
+var json = {}
+$.ajax({
+    async: false,
+    type: "GET",
+    dataType: "html",
+    cache: false,
+    url: "",
+    data: {
+        "action": "",
+        "user": "<%=s_user%>",
+        
+    },
+    success: function(res){
+        if(!res || $.isEmptyObject(res)) return;
+        json = JSON.parse(res);
+    },
+    error: function(res){ },
+    beforeSend: function(XMLHttpRequest){ },
+    complete: function(XMLHttpRequest, textStatus){ }
+})
+//END AJAX
+*/
+
+
+
+
+
+/*+----------------原始AJAX----------------+*/
+
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-select.css"><!--下拉联动-->
+<script type="text/javascript" src="assets/neatui/js/neatui-select.js"></script><!--下拉联动-->
+
+
+//单个下拉
+neuiSelect.singleJson({
+    title: '单个下拉',
+    object: $this,
+    jsonData: source,
+    jsonFormat: ['bh','mc'], 
+    callBack: function(e){
+        
+    }
+})
+
+
+//省市区县三级联动下拉
+neuiSelect.multistageJson({
+    title: '地区',
+    object: $this,
+    jsonData: source, 
+    callBack: function(e){
+        
+    }
+    //jsonData:[iosProvinces, iosCitys,iosCountys], //使用省市区数据源
+    //jsonFormat: ['province', 'city', 'county'], //显示值JSON格式(可缺省)
+    //keyFormat: ['provinceId', 'cityId', 'countyId'], //隐藏值JSON格式(可缺省)
+    //showAnimate: false, //是否动画效果(可缺省),默认false
+    //itemHeight: 35,	//每个选项高度(可缺省),默认35px
+    //itemShowCount:7, //下拉可视范围内的个数(可缺省),默认7个
+    //oneLevelId:null 	//初始值,下拉默认定位在第几个选项(可缺省),默认中间那个或中间上一个
+    //返回的系列参数(只为兼容旧版用,新版已在回调中返回). 取值方式：this.value
+    //oldValue:null, //旧值(未选中下拉前输入框中的值)
+    //value:null, //新值(选择下拉后输入框中的值)
+    //newValue:null, //新值(选择下拉后输入框中的值)
+})
+
+
+
+
+
+
+</pre>

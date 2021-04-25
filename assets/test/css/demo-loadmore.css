@@ -1,0 +1,35 @@
+@charset "utf-8";
+/*+---------公用外层样式------------+*/
+html{font-family:'Hiragino Sans GB W3','Hiragino Sans GB','microsoft yahei','Sim sun','Helvetica Neue',Helvetica,sans-serif;font-size:20px;}
+body{font-size:.7rem;color:#333;background-color:#f4f4f4;}
+html,body{width:100%;margin:0 auto;overflow-x:hidden;}
+*{-moz-box-sizing: border-box;-webkit-box-sizing: border-box;box-sizing: border-box;-webkit-tap-highlight-color: transparent;outline: none;}
+div,p,ul,li,h1,h2,h3,h4,h5{margin:0;padding:0;}
+ul,li{list-style-type:none;}
+header,main,footer,section,aside,article,menu,nav,hgroup{display:block;}
+
+/*+-------demo样式--------------+*/
+.section-demo{width:500px;margin:0 auto;padding:25px 0;background-color:#000;}
+.demo-content{height:auto;max-height: 400px;overflow-y: auto;}
+.demo-content>ul{}
+.demo-content>ul>li{position:relative;width:100%;height:auto;margin-bottom:10px;padding:10px;background-color:#1a1c24;cursor:pointer;}
+.demo-content>ul>li.on{border:1px solid rgba(255,141,31,.95);}
+.demo-content>ul>li:after{content:'';display:block;clear:both;}
+.demo-content>ul>li>.img{float:left;width:auto;max-width:20%;margin-right:5%;}
+.demo-content>ul>li>.txt{max-width:100%;color:#fff;text-overflow:hidden;word-break:break-all;}
+.demo-content>ul>li>a{position:absolute;z-index:0;top:0;left:0;right:0;width:100%;height:100%;background-color:#fff;opacity:0;filter:alpha(opacity=80);filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0); /*透明兼容ie8及以下*/}
+.demo-content>ul>li>.txt>span{display:block;}
+.demo-content>ul>li>.txt>span+span{color:#828692;}
+.demo-content>ul>li img{width:100%;border-radius:3px;}
+.demo-content>ul>li.on{border-color:rgba(255,141,31,.95);}
+
+
+/*+-------PC端下拉更多样式--------------+*/
+/*点击加载更多*/
+.loadmore{margin-bottom:15px;color:#fff;text-align:center;font-size:12px;cursor:pointer;}
+.loadmore img{width:18px;height:18px;vertical-align:top;margin-right:5px;}
+.loadmore.cursor-normal{cursor:inherit;}
+.load_animate{margin:0 auto;text-align:center;width:24px;height:24px;}
+.load_animate>img{display:block;width:100%;height:100%;}
+/*加载完或无数据时*/
+.noDataTips{margin-bottom:15px;color: #a19e9e;text-align:center;}

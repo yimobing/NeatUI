@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="application-name" content="快评">
+	<meta name="applicable-device" content="pc,mobile">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Cache-Control" content="no-transform">
+	<meta http-equiv="Cache-Control" content="no-siteapp">
+	<title>LikeTable | 类表格精简Demo(增删改查)</title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css" /><!--下拉联动控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"><!--输入下拉控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-searchbox.css" /><!--搜索框控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-liketable.css" /><!--类表格控件-->
+	<link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.min.css" /><!--图标库-->
+	<link type="text/css" rel="stylesheet" href="assets/test/css/common.css" /><!--通用布局样式-->
+	<!--[if lt IE 9]>
+		<script type="text/javascript" src="assets/style/js/html5shiv.min.js"></script>
+		<script type="text/javascript" src="assets/style/js/respond.min.js"></script>
+		<script type="text/javascript" src="assets/style/js/rem.min.js"></script>
+		<script type="text/javascript" src="assets/style/js/json2.js"></script>
+	<![endif]-->
+	<!--json2.js支持IE8-以下版本json与字符串互转h函数:JSON.Stringify()、 JSON.Parse()-->
+	<!--防止被iframe嵌套-->
+	<!--<script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>-->
+	<base target="_blank">
+</head>
+<body>
+	<style>
+		body{font-size: 14px; overflow-y: hidden;}
+		/*+搜索区域+*/
+		.section-search{position: relative; width: 98%; margin: 0 auto;  /*text-align: center;*/}
+		.section-search i.fa{position: absolute; left: 8px; top: 50%; -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%); -o-transform: translateY(-50%); transform: translateY(-50%); color: #999;}
+		.block-search{display: inline-block; *display: inline; _display: inline; zoom: 1; margin: 0 auto; padding: 10px 15px; border: 1px solid #ddd; border-radius: 4px;}
+		.block-search .eform-one{display: inline-block; *display: inline; _display: inline; zoom: 1; vertical-align: middle; margin-left: 15px;}
+		.block-search .eform-one:first-child{margin-left: 0;}
+		.block-search .eform-l,
+		.block-search .eform-r{display: inline-block; *display: inline; _display: inline; width: auto; vertical-align: middle;}
+		.block-search .eform-r{margin-top: -5px;}
+		.block-search .eform-r i.fa{margin-top: 0; -ms-transform: translateY(-50%);}
+		.block-search label{width: auto;}
+		.search-one{margin-top: 10px; text-align: left;}
+        .search-one:first-child{margin-top: 0;}
+        .search-one #s-groupNo, 
+        .search-one #s-groupName{width: 250px;}
+		/*操作区域*/
+		.section-operation{margin-top: 10px;}
+		.section-operation button{width: auto!important; min-width: 90px; margin-left: 10px; padding: 0 5px;}
+		.section-operation button:first-child{margin-left: 0;}
+		.section-operation i.fa{margin-right: 5px; font-size: 12px;}
+		/*列表区域*/
+		.section-history{margin-top: 15px;}
+	</style>
+	<div class="wrap">
+		<main>
+			<section class="section-search"></section><!--/.section-search-->
+			<section class="section-operation">
+				<button type="button" class="ne-btn green" id="btn-add-one"><i class="fa fa-plus"></i>新增</button>
+				<button type="button" class="ne-btn blue" id="btn-save-all"><i class="fa fa-save"></i>全部保存</button>
+			</section>
+			<section class="section-history"></section><!--/.section-history-->
+		</main>
+	</div><!--/.wrap-->
+
+	<script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="assets/style/js/jquery.table2excel.min.js"></script><!--表格导出EXCEL-->
+	<script type="text/javascript" src="assets/style/js/jquery.chineseDistricts.js"></script><!--省市区数据源-->
+	<script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-dropdown.js"></script><!--下拉联动控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-searchbox.js"></script><!--搜索框控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-loadmore.js"></script><!--上拉加载更多控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-liketable.js"></script><!--类表格控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义封装AJAX-->
+	
+	<script type="text/javascript">
+		/*+-------------全局变量---------------+*/
+		var $rootNode = $('.section-history'); //列表根节点
+		
+		//=====接收地址栏参数 (后台返回 ajax({}) )
+		var g_menu_bh = ''; //getQueryVariable("m"); //菜单编号
+		//var g_menu_bh = '<%=s_menu_bh%>';
+
+		//=====页面url (后台返回 ajax({}) )
+		var g_source_pawnCategory = 'dywlbfzmx-抵押物类别分组明细.html'; //抵押物类别分组明细地址
+
+		//=====搜索条件
+		var g_dyw_type_fz_bh = ''; //分组编号
+		var g_dyw_type_fz_mc = ''; //分组名称
+
+		//=====列表及分页
+		var g_pageSize = 30; //每页几条记录
+		var g_setJson = { //表格列字段配置
+			headHeight:50, //表头高度. auto 自动(默认). 其它大于0的数字如：50 表示高50px. (可缺省)
+			headHasBgColor:true, //表头是否有背景色(可缺省),默认true
+			tbodyHeight:"auto", //自定义表格内容高度. auto 自动(默认). 其它大于0的数字如：300 表示高300px. (可缺省)
+			topHeight: "auto", //表格以外上面部分高度(如header部分(可选). auto 自动(默认)，系统会自动计算表格距离顶部的距离; 其它大于0的数字如：150 表示高150px.
+			botHeight:"auto", //表格以外下面部分高度（不含分页部分）(如footer部分).  auto 自动,即高度为0 (默认), 其它大于0的数字如：100 表示高100px. (可缺省)
+			isSerialCol:true, //是否显示序号列. 默认true(可缺省)
+			isSorted:true, //是否启用列排序. 默认true.(可缺省)
+			isCeilLine:true, //单元格是否有边线(可缺省),默认false
+			emptyDataTips:'抱歉，没有找到相应数据..', //无数据时的提示文(可选)
+			customize:{ //自定义属性(可缺省)
+				serialColumnWidth:45, //序号列宽(可缺省),默认50
+				discoloration:true, //是否隔行变色(可缺省),默认false
+				retainIllegalChar:false //单元格内容是否保留非法字符(防止向数据库写入非法字符)(可缺省). true 是, false 否(默认). false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
+			},
+			columns:[{
+					title:"分组编号",
+					field:"dyw_type_fz_bh",
+					mode:"input",
+					width:150,
+					must:true,
+					disabled:true,
+					unique:true, //是否唯一值(该列在每一行的值是否唯一). true 是(即该列每一行的值都应该不同), false 否(默认)
+				},{
+					title:"分组名称",
+                    field:"dyw_type_fz_mc",
+					mode:"textarea",
+					width:150,
+					must:true
+				},{
+					title:"描述",
+                    field:"dyw_type_fz_bz", //dyw_type_fz_bz
+					mode:"textarea",
+                    width:150
+				},{
+					title:"评估公司",
+					field:"pggs_mc", //显示值
+					hide:"pggs_bh", //隐藏值
+					mode:"textarea",
+					width:350,
+					must:true,
+					readonly:true
+				},{
+					title:"加锁",
+					field:"lock",
+					mode:"radio[tick][circle][green]",
+					width:80
+				},{
+					title:"操作", 
+					width:100,
+					mode:"button",
+					name:"btn-save ne-btn has-texture blue no-bg-img",
+					align:"center",
+					label:"保存",
+					b_icon:"save",
+					merge:{
+						direction:"next",
+						numeral:2
+					},
+					callBack:function(e){
+						saveOneRow(e);
+					}
+				},{
+					title:"操作", 
+					width:100,
+					mode:"button",
+					name:"btn-delete ne-btn has-texture red no-bg-img",
+					align:"center",
+					label:"删除",
+					b_icon:"trash",
+					callBack:function(e){
+						deleteOneRow(e);
+					}
+				},
+				{
+					title:"操作", 
+					width:100,
+					mode:"button",
+					name:"btn-link-details ne-btn has-texture no-bg-img",
+					align:"center",
+					label:"分组明细",
+					b_icon:"external-link",
+					callBack:function(e){
+						openLinkOfDetails(e);
+					}
+				}
+			]
+		}
+
+	
+		
+		
+
+		/*+-------------FUNCTION---------------+*/
+		/**
+		 * 函数：加载数据
+		 */
+		 function loadData(){
+			neui.showAnimate();
+			setTimeout(function(){
+				var source = get_data_list(1); 
+				var pages = get_data_pages();
+				createTableList(source, pages);
+				neui.destroyAnimate();
+			}, 100)
+		}
+
+	
+
+		/**
+		* 函数：创建列表及分页
+		* @param {object} dataJson 列表数据源
+		* @param {number} pageCount 分页总页数
+		*/
+		function createTableList(dataJson, pageCount){
+			$rootNode.neuiLikeTable({
+				setJson: g_setJson, //列字段配置json
+				dataJson: dataJson, //表格数据json
+				pagination: {
+					enable: true, //是否启用分页
+					pageMode: 'select', //分页方式（可缺省）。list 数字列表形式（默认），select 选择形式
+					pageSize: g_pageSize, //每页几条记录，默认25（可缺省）
+					pageCount: pageCount, //总页数
+					recordCount: '', //总记录数(可选), 默认空(此时界面不显示总记录数)
+					pageSelect:{ //pageMode='select'时(可缺省)
+						allPage: false, //全部按钮（即：通过此按钮可一次性加载全部数据）(可缺省)
+						homePage: true, //首页按钮(可缺省)
+						prevPage: true, //上一页按钮(可缺省)
+						nextPage: true, //下一页按钮(可缺省)
+						lastPage: true, //最后一页（尾页）按钮(可缺省)
+						dropPage: true //下拉页码（一页页显示）按钮(可缺省)
+					},
+					callback:function(e){ //回调函数（必须）.参数e格式: {curpage:1, pagesize:20, pageCount:3}
+						//console.log('回调信息，e：',e);
+						//var curpage = e.curpage;  //当前页码
+						g_pageSize = e.pagesize; //全局赋值
+						var json = get_data_list(e.curpage);
+						return json;
+					}
+				},
+				exportExcel: { //导出EXCEL
+					enable: false, //是否启用
+					filename:'抵押物类别分组', //文件名
+					fileAutoTime:true, //导出的文件自动添加时间(hh:mm:ss)作为文件名的一部分
+					extension: '.xls' //拓展名。 .xls(excel 2003)(默认), .xlsx (excel 2007,2010)
+				}
+			})
+
+			if($rootNode.is(':visible')) $('.section-operation').show();
+			else $rootNode.hide();
+		}
+
+
+		/**
+		 * 创建搜索表单
+		 * @returns {HTML} 返回表单html
+		 */
+		function createSearchForom(){
+			var _html = ['<div class="block-search">',
+							'<div class="search-one">',
+								'<div class="eform-one">',
+									'<div class="eform-l"><label>分组编号</label></div>',
+									'<div class="eform-r"><i class="fa fa-flask"></i><input type="text" id="s-groupNo" placeholder="分组编号" onblur="this.placeholder=\'分组编号\'" onfocus="this.placeholder=\'\'"></div>',
+								'</div>',
+								'<div class="eform-one">',
+									'<div class="eform-l"><label>分组名称</label></div>',
+									'<div class="eform-r"><i class="fa fa-folder-open-o"></i><input type="text" id="s-groupName" placeholder="分组名称" onblur="this.placeholder=\'分组名称\'" onfocus="this.placeholder=\'\'"></div>',
+								'</div>',
+                                '<div class="eform-one">',
+									'<button type="button" class="ne-btn has-texture no-bg-img" id="btn-query">查询</button>',
+								'</div>',
+							'</div><!--/.search-one-->',
+						'</div>'
+					].join('\r\n');
+			$('.section-search').empty().append(_html);
+		}
+
+
+		
+
+		//========================================================
+		/**
+		 * 函数：获取分页总页数
+		 * @returns {Number} 返回页数
+		 */
+		function get_data_pages(){
+			var ls_every_page_count = g_pageSize;
+			var pages = 5;
+			/*
+			//START AJAX
+			var pages = 1;
+			var isHoldOn = true;
+			ajax({
+				heading: "获取分页总页码",
+				debug: "<%=s_debug %>",
+				url: "../../kp3_jk/jk_pggs/jk_pub.ashx",
+				data: {
+					"action": "sel_v3_pub_dyw_type_fz_page_count",
+					"user": "<%=s_user %>",
+					"menu_bh": g_menu_bh,
+					"every_page_count": ls_every_page_count, //每页记录数
+					"dyw_type_fz_bh": g_dyw_type_fz_bh,
+					"dyw_type_fz_mc": g_dyw_type_fz_mc
+				},
+				success: function(res){
+					//if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+					pages = res;
+				},
+				error: function(res){
+					if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+				},
+				beforeSend: function(XMLHttpRequest) { },
+				complete: function(XMLHttpRequest, textStatus) { }
+			})
+			if(!isHoldOn) {
+				neui.destroyAnimate();
+				return 1;
+			}
+			//END AJAX
+			*/
+			return utilities.isNaN(parseInt(pages)) ? 1 : parseInt(pages);
+		}
+
+
+
+		/**
+		 * 函数：获取列表数据
+		 * @param {string} ps_curpage 当前页码
+		 * @returns {object} 返回json数组
+		 */
+		 function get_data_list(ps_curpage){
+			var ls_open_page_num = typeof ps_curpage == 'undefined' ? 1 : ps_curpage;
+			var ls_every_page_count = g_pageSize;
+			//后台返回
+			var listJson = {
+                "data":[    
+					{"dyw_type_fz_bh":"F1001", "dyw_type_fz_mc":"第一组", "dyw_type_fz_bz":"暂无备注", "pggs_bh":"P1001", "pggs_mc":"福建华审房地产土地评估公限公司", "lock":"0"},
+					{"dyw_type_fz_bh":"F1002", "dyw_type_fz_mc":"第二组", "dyw_type_fz_bz":"暂无备注", "pggs_bh":"P1002", "pggs_mc":"福建仁达房地产土地评估公限公司", "lock":"0"},
+					{"dyw_type_fz_bh":"F1003", "dyw_type_fz_mc":"第三组", "dyw_type_fz_bz":"暂无备注", "pggs_bh":"P1003", "pggs_mc":"福建钟康房地产土地评估公限公司", "lock":"0"}
+                ]
+			}
+
+
+			/*
+			//START AJAX
+			var listJson = {}
+			var isHoldOn = true;
+			ajax({
+				heading: "获取列表数据",
+				debug: "<%=s_debug %>",
+				url: "../../kp3_jk/jk_pggs/jk_pub.ashx",
+				data: {
+					"action": "sel_v3_pub_dyw_type_fz_list",
+					"user": "<%=s_user %>",
+					"menu_bh": g_menu_bh,
+					"open_page_num": ls_open_page_num, //当前页码
+					"every_page_count": ls_every_page_count, //每页记录数
+					"dyw_type_fz_bh": g_dyw_type_fz_bh,
+					"dyw_type_fz_mc": g_dyw_type_fz_mc
+				},
+				success: function(res){
+					if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+					listJson = JSON.parse(res);
+				},
+				error: function(res){
+					if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+				},
+				beforeSend: function(XMLHttpRequest) { },
+				complete: function(XMLHttpRequest, textStatus) { }
+			})
+			if(!isHoldOn) {
+				neui.destroyAnimate();
+				return {};
+			}
+			//END AJAX
+			*/
+			return listJson;
+		}
+		
+
+		
+		//========================================================
+		/**
+		* 打开明细页面
+		* @param {object} e 某一行的json数据
+		*/
+		function openLinkOfDetails(e){
+			//console.log('单行数据e:', e);
+			var ls_dyw_type_fz_bh = e["dyw_type_fz_bh"].value,
+				ls_dyw_type_fz_mc = e["dyw_type_fz_mc"].value;
+			var arr = [ls_dyw_type_fz_bh, ls_dyw_type_fz_mc];
+			//console.log('数组：',arr);
+			if(ls_dyw_type_fz_bh == ''){
+				neuiDialog.alert({
+					caption: '提示',
+					message: '请先保存数据',
+					buttons: ['确定']
+				})
+				return;
+			}
+			var srcUrl = g_source_pawnCategory + '?m='+ g_menu_bh + '&dyw_type_fz_bh='+ ls_dyw_type_fz_bh + '&dyw_type_fz_mc='+ ls_dyw_type_fz_mc;
+			neui.openIframe({
+				url: srcUrl,
+				caption: '抵押物类别分组明细',
+				top: '0.5%', //窗口距离顶部的距离(可缺省)（数字或百分比，eg.25%)
+       		 	width: '99%', //窗口宽度(可缺省)（数字或百分比，eg1.1200, eg2.98%）
+				closeCallBack: function(){}
+			})
+		}
+
+
+
+		//========================================================
+		/**
+		 * 函数：单个保存按钮
+		 * @param {object} e 某一行的json数据
+		 */
+		function saveOneRow(e){
+			//console.log('单行数据：', e);
+			var ls_row_index = e["row"] - 1; //行索引值		
+			//校验完整性
+			var tips = neuiLikeTable.checkEmptyRow(ls_row_index); //只校验当前行
+			if(tips != ''){
+				neuiDialog.alert({
+					caption: '提示',
+					message: tips,
+					buttons: ['确定']
+				})
+				return;
+			}
+		
+			//校验重复行
+			var tips = neuiLikeTable.checkRepeatRow();
+			if(tips != ''){
+				neuiDialog.alert({
+					caption: '提示',
+					message: tips,
+					buttons: ['确定']
+				})
+				return;
+			}
+			//开始执行
+			var saveArr = {data:[e]}
+			saveFunc(saveArr);
+		}
+
+
+
+
+		/**
+		 * 函数：保存操作 / 保存按钮
+		 * @param {Array} ps_arr JSON数组
+		 */
+		function saveFunc(ps_arr){
+			//开始执行
+			var flag = '', msg = '保存成功';
+			neui.showAnimate();
+			setTimeout(function(){
+				for(var i = 0; i < ps_arr.data.length; i++){
+					var row = ps_arr.data[i];
+					var ls_row_index = row["row"] - 1; //行索引值
+					var ls_dyw_type_fz_bh = row["dyw_type_fz_bh"].value,
+						ls_dyw_type_fz_mc = row["dyw_type_fz_mc"].value, 
+						ls_dyw_type_fz_bz = row["dyw_type_fz_bz"].value, 
+						ls_pggs_bh = row["pggs_mc"].bh,
+						ls_pggs_mc = row["pggs_mc"].value,
+						ls_lock = row["lock"].value;
+					var oneArr = [ls_dyw_type_fz_bh, ls_dyw_type_fz_mc, ls_dyw_type_fz_bz, ls_pggs_bh, ls_pggs_mc, ls_lock];
+					//console.log('保存arr',oneArr);
+	
+					//后台返回
+					/*
+					//START AJAX
+					var isHoldOn = true;
+					ajax({
+						heading: "保存数据",
+						debug: "<%=s_debug %>",
+						url: "../../kp3_jk/jk_pggs/jk_pub.ashx",
+						data: {
+							"action": "save_v3_pub_dyw_type_fz",
+                            "user": "<%=s_user %>",
+							"menu_bh": g_menu_bh,
+							"dyw_type_fz_bh": ls_dyw_type_fz_bh,
+							"dyw_type_fz_mc": ls_dyw_type_fz_mc,
+							"dyw_type_fz_bz": ls_dyw_type_fz_bz,
+							"pggs_bh": ls_pggs_bh,
+							"lock": ls_lock
+						},
+						success:function(msg){
+							if(toolTip.emptyTips(msg, this.url, this.heading, this.debug))  { isHoldOn = false; return; }
+							var json = JSON.parse(msg);
+							flag = json.result == 'ok' ? 1 : 0;
+							if(!flag) msg = json.result;
+						},
+						error: function(res){
+							if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+						},
+						beforeSend: function(XMLHttpRequest) { },
+						complete: function(XMLHttpRequest, textStatus) { }
+					})
+					if(!isHoldOn) {
+						neui.destroyAnimate();
+						return;
+					}
+					//END AJAX
+					*/
+					flag = parseInt(1); //1 成功, 0 失败
+					if(!flag) msg = '保存失败';
+
+					if(!flag){
+						break;
+					}else{
+						neuiLikeTable.changeRowStatus(ls_row_index); //更改“状态列”文本
+					}
+				}
+				neuiDialog.alert({
+					caption: '提示',
+					message: msg,
+					buttons: ['确定'],
+					callBack:function(){
+						if(flag){
+							loadData(); //刷新数据
+						}
+					}
+				})
+				neui.destroyAnimate();
+			}, 100)
+		}
+
+
+		/**
+		 * 函数：单个删除按钮
+		 * @param {object} e 某一行的json数据
+		 */
+		function deleteOneRow(e){
+			//console.log('单行数据：', e);
+			var ls_row_index = e["row"] - 1, //行索引值
+				ls_dyw_type_fz_bh = e["dyw_type_fz_bh"].value;
+			var arr = [ls_dyw_type_fz_bh];
+			//console.log('arr:', arr);
+			neuiDialog.alert({
+				caption: '提示',
+				message: '确认删除？',
+				buttons: ['确定', '取消'],
+				callBack: function(ret){
+					if(ret == 1){
+						//开始执行
+						var flag = '', msg = '删除成功';
+						neui.showAnimate();
+						setTimeout(function(){
+							if(ls_dyw_type_fz_bh == ''){ //新插入未保存的记录
+								flag = 1;
+							}else{
+								//后台返回
+								/*
+								//START AJAX
+								var isHoldOn = true;
+								ajax({
+									heading: "删除数据",
+									debug: false,
+									url: "../../kp3_jk/jk_pggs/jk_pub.ashx",
+									data: {
+										"action": "del_v3_pub_dyw_type_fz",
+										"user": "<%=s_user %>",
+										"menu_bh": g_menu_bh,
+										"dyw_type_fz_bh": ls_dyw_type_fz_bh
+									},
+									success: function(res){
+										if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+										var json = JSON.parse(res);
+										flag = json.result == 'ok' ? 1 : 0;
+										if(!flag) msg = json.result;
+									},
+									error: function(res){
+										if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+									},
+									beforeSend: function(XMLHttpRequest) { },
+									complete: function(XMLHttpRequest, textStatus) { }
+								})
+								if(!isHoldOn) {
+									neui.destroyAnimate();
+									return;
+								}
+								//END AJAX
+								*/
+								flag = parseInt(1); //1成功, 0 失败
+								if(!flag) msg = '删除失败';
+							}
+
+							neuiDialog.alert({
+								caption: '提示',
+								message: msg,
+								buttons: ['确定'],
+								callBack: function(){
+									if(flag){ //成功
+										neuiLikeTable.deleteOneRow(ls_row_index);
+									}
+								}
+							})
+
+							neui.destroyAnimate();
+						}, 100)
+					}
+				}
+			})
+		}
+
+
+		
+		
+
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$(function(){
+			//+------------------------------------------------------------------------------------------------------------------------
+            //+                                                      +初始化系列事件+
+			//+------------------------------------------------------------------------------------------------------------------------
+			/*+--------------------------------------------------------+*/
+			//=====加载搜索表单
+			createSearchForom();
+
+
+			/*+--------------------------------------------------------+*/
+			//=====加载列表
+			loadData();
+			
+
+			//+------------------------------------------------------------------------------------------------------------------------
+            //+                                                      +搜索事件+
+			//+------------------------------------------------------------------------------------------------------------------------
+			/*+--------------------------------------------------------+*/
+			//=====查询按钮
+			$(document).on('click', '#btn-query', function(){
+                var ls_dyw_type_fz_bh = $('#s-groupNo').val(),
+                    ls_dyw_type_fz_mc = $('#s-groupName').val();
+				//全局赋值
+				g_dyw_type_fz_bh = ls_dyw_type_fz_bh;
+				g_dyw_type_fz_mc = ls_dyw_type_fz_mc;
+
+                loadData(); //加载数据
+			});
+
+
+			//+------------------------------------------------------------------------------------------------------------------------
+            //+                                                      +系列事件+
+			//+------------------------------------------------------------------------------------------------------------------------
+			/*+--------------------------------------------------------+*/
+			//=====新增按钮
+			$('#btn-add-one').on('click', function(){
+                var tableDom = $rootNode.find('.ne-like-table');
+                if(tableDom.length == 0){
+                    $rootNode.neuiLikeTable({
+                        pureRow: true,
+                        setJson: g_setJson,
+                        dataJson: {}
+                    })
+                }else{
+					neuiLikeTable.insertOneRow({});
+				}
+				neuiLikeTable.setSomeColumnCanWrite(["dyw_type_fz_bh"], 0); //指定第N行(索引值)中某些列(英文字段)为可写状态
+			});
+			
+
+
+			/*+--------------------------------------------------------+*/
+			//======[列表]评估公司下拉
+			$(document).on('click', '.i-t-pggs_mc', function(){
+				var $this = $(this);
+				neui.showAnimate();
+				setTimeout(function(){	
+					var companyJson = {
+						"data":[
+							{"bh":"P1001", "mc":"福建华审房地产土地评估有限公司"},
+							{"bh":"P1002", "mc":"福建仁达房地产土地评估有限公司"},
+							{"bh":"P1003", "mc":"福建钟康房地产土地评估有限公司"}
+						]
+					}
+					/*
+					//START AJAX
+					var companyJson = {}
+					var isHoldOn = true;
+					ajax({
+						heading: "获取评估公司下拉数据",
+						debug: false,
+						url: "../../kp3_jk/jk_pggs/jk_pub.ashx",
+						data: {
+							"action": "sel_v3_pub_pggs_mc",
+							"user": "<%=s_user %>",
+							"menu_bh": g_menu_bh
+						},
+						success: function(res){
+							if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+							companyJson = JSON.parse(res);
+						},
+						error: function(res){
+							if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+						},
+						beforeSend: function(XMLHttpRequest) { },
+						complete: function(XMLHttpRequest, textStatus) { }
+					})
+					if(!isHoldOn) {
+						neui.destroyAnimate();
+						return {};
+					}
+					//END AJAX
+					*/
+					neuiDropdown({
+						json:companyJson,
+						format:['bh', 'mc']
+					},$this)
+					neui.destroyAnimate();
+				}, 100)
+			});
+			
+			
+
+
+			/*+--------------------------------------------------------+*/
+			//======全部保存按钮 / 批量保存
+			$('#btn-save-all').on('click', function(){
+				var saveArr = neuiLikeTable.getTableListData();
+				//console.log('所有行数据:', arr);
+				//校验完整性
+				var tips = neuiLikeTable.checkEmptyRow('all'); //校验所有行
+				if(tips != ''){
+					neuiDialog.alert({
+						caption: '提示',
+						message: tips,
+						buttons: ['确定']
+					})
+					return;
+				}	
+				//校验重复行
+				var tips = neuiLikeTable.checkRepeatRow();
+				if(tips != ''){
+					neuiDialog.alert({
+						caption: '提示',
+						message: tips,
+						buttons: ['确定']
+					})
+					return;
+				}
+
+				//开始执行
+				neuiDialog.alert({
+					animate: true,
+					caption: '提示',
+					message: '确认全部保存？',
+					buttons: ['确定', '取消'],
+					callBack: function(ret){
+						if(ret == 1){
+							saveFunc(saveArr);
+						}
+					}
+				})	
+			});
+
+		}); //$(function(){})
+	</script>
+</body>
+</html>

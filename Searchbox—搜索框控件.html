@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="application-name" content="网站名称">
+	<meta name="applicable-device" content="pc,mobile">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Cache-Control" content="no-transform">
+	<meta http-equiv="Cache-Control" content="no-siteapp">
+	<title>搜索框控件演示示例</title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css">
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css"><!--日历控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"><!--下拉联动控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-searchbox.css"><!--搜索框控件-->
+	<link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.min.css"><!--图标库-->
+	<script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+	<base target="_blank">
+</head>
+<body>
+	<style>
+		h1{text-align: center;}
+		/*搜索*/
+		.section-search{margin-top: 15px;}
+		.collist .label label{width: 90px;}
+	</style>
+
+	<div class="wrap">
+		<header>
+			<h1>搜索框控件演示示例</h1>
+		</header>
+		<main>
+			<section class="section-search"></section>
+		</main>
+	</div><!--/.wrap-->
+
+	<script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="assets/neatui/js/neatui-searchbox.js"></script><!--搜索框控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-dropdown.js"></script><!--下拉联动控件-->
+	<script type="text/javascript">
+		/*+-------------全局变量---------------+*/
+		//=====
+
+
+		/*+---------------搜索控件配置-----------------+*/
+		//=====[搜索区域参数JSON]
+		var searchJson = {
+			putInHead:false, //是否自动创建header标签,并把搜索区域放在该标签中,默认false.(可缺省)
+			inputBox:{ //搜索框组
+				column:5, //一行有几个，默认3
+				group:[{
+						title:"性别",
+						field:"sex",
+						type:"radio[green]", //类型为：单选, 颜色为绿色
+						option:["男", "女"], //单选文字：男、女
+						value:"男", //默认选中“男”
+						width:180
+					},{
+						title:"姓名",
+						field:"username",
+						icon:"user-o"
+						//width:150, //输入框宽
+						//must:true //是否必填,默认true
+					},{
+						title:"年龄",
+						field:"age",
+						icon:"lemon-o",
+						width:130
+					},{
+						title:"开始日期",
+						field:"startDate",
+						type: "date", //类型为：日期
+						date:"本月初", //日期默认值为“本月初”
+						icon:"calendar-minus-o",
+						wrap:true //强制换行
+					},{
+						title:"结束日期",
+						field:"endDate",
+						type: "date",
+						date:"当天",
+						icon:"calendar-plus-o"
+					},{
+						title:"开票申请单号",
+						field:"oddNumber",
+						textWidth:180, //指定title文本宽
+						icon:"genderless",
+						must:false
+					},{
+						title:"最小开票金额",
+						field:"amountMin",
+						icon:"rmb",
+						value: '50', //输入框初始值
+						must:false
+					},{
+						title:"最大开票金额",
+						field:"amountMax",
+						icon:"rmb",
+						value: '25000', 
+						must:false
+					},{
+						title:"收件人姓名",
+						field:"receiver",
+						icon:"user-circle-o",
+						must:false
+					},{
+						title:"收件人电话",
+						field:"fa-tel",
+						icon:"mobile",
+						must:false
+					},{
+						title:"发票接收方式",
+						field:"method",
+						type:"drop", //类型为：下拉
+						source:{ //下拉数据源
+							"data":[
+								{"id":"1001","value":"顺丰快递"},
+								{"id":"1002","value":"圆通快递"}
+							]
+						},
+						format:["id", "value"], //下拉数据字段格式
+						icon:"navicon",
+						must:false
+					},{
+						title:"是否已受理",
+						field:"checkAccept",	
+						type:"checkbox", //类型为：复选框
+						//value:"0", //1 勾选, 0 不勾选(默认)
+						//textAlign:"left", //文字放在复选框左边
+						must:false
+					},{
+						title:"是否已开票",
+						field:"checkInvoice",
+						type:"checkbox[circle-tick][red]", //类型为：复选框. 形状为圆形，颜色为红色
+						//textAlign:"right", //文字放在复选框右边
+						value:"1", //1 勾选, 0 不勾选(默认)
+						must:false
+					}
+				]
+			},
+			searchButton:{ //按钮组
+				wrap:true, //按钮组是否换行显示,默认true(可缺省)
+				compacted: true, //按钮组是否紧接着搜索框组(即按钮组紧接在搜索框组后面，不换行）,默认false(可缺省)
+				sticky:false, //按钮组是否置顶,即是否置于搜索框组前面,默认false (可缺省).
+				group:[ //按钮组
+					{
+						title:"查询", 
+						field:"btn_query-area",
+						width:70,
+						relation:["性别", "姓名", "年龄"], //指定按钮与哪些输入框关联
+						callback:function(e1, e2){ 
+							//console.log("查询按钮，e值：",e);
+							refreshDataByClickSearchButton(e1, e2);
+						}
+					},{
+						title:"导出EXCEL", 
+						field:"btn-export-excel",
+						width:80,
+						//color: '#fff', //按钮前景色
+						bgColor:"#f64c59", //按钮背景色
+						callback:function(e1, e2){ 
+							//neuiLikeTable.export2Excel();
+							refreshDataByClickSearchButton(e1, e2);
+						}
+					},{
+						title:"无价格", 
+						field:"btn-query-noPirce",
+						width:80,
+						theme:"diamond",
+						callback:function(e1, e2){ 
+							refreshDataByClickSearchButton(e1, e2);
+						}
+					},{
+						title:"有价格", 
+						field:"btn-query-hasPrice",
+						width:80,
+						bgColor:"#888",
+						//theme:"diamond",
+						callback:function(e1, e2){ 
+							refreshDataByClickSearchButton(e1, e2);
+						}
+					},{
+						title:"无关联区域的楼盘", 
+						field:"btn-query-noAreae",
+						width:150,
+						bgColor:"#7b72e9",
+						//theme:"diamond",
+						callback:function(e1, e2){ 
+							refreshDataByClickSearchButton(e1, e2);
+						}
+					},{
+						title:"全部", 
+						field:"btn-query-all",
+						bgColor:"#1b9af7",
+						//theme:"diamond",
+						callback:function(e1, e2){
+							refreshDataByClickSearchButton(e1, e2);
+						}
+					}
+				]
+			}
+		}
+
+		$('.section-search').neuiSearchBox(searchJson);
+
+
+
+		
+
+		/*+--------------FUNCTION-----------------+*/
+		/**
+		 * 函数: 根据搜索按钮刷新数据
+		 */
+		function refreshDataByClickSearchButton(e1, e2){
+			alert('请按F12查看控制台打印信息！')
+			console.log('搜索按钮e1:', e1);
+			console.log('搜索按钮e2:', e2);
+		}
+
+
+
+
+		//+------------------------------------------------------------------------------------------------------------------------
+		//+                                                      +搜索框控制使用说明+
+		//+------------------------------------------------------------------------------------------------------------------------
+	
+		/*-----------------------------------------------------------
+		· 调用控件
+		-----------------------------------------------------------*/
+		/*
+		$("#panel-search").neuiSearchBox({
+			inputBox:{
+				putInHead:false,
+				column:3,
+				group:[{
+						title:"姓名",
+						id:"username",
+						...
+					},{
+						title:"年龄",
+						id:"age",
+						...
+					}
+				]
+			},
+			searchButton:{
+				wrap:true, 
+				sticky:false, 
+				group:[{
+						title:"查询",
+						field:"btn_search", 
+						width:70, 
+						..
+						relation:["出生年月","区县"],
+						callback:function(e1, e2){ //回调函数.e1, e2 基本相同, e1 中json字段名用英文, e2 中json字段名用中文
+							//e.data 全部或关联搜索框数据组成的json. eg.{}
+						}
+					}
+				]
+			}
+		});
+
+		*/
+
+
+
+
+		/*-----------------------------------------------------------
+		· 参数说明
+		-----------------------------------------------------------*/
+		/*
+		。inputBox 搜索框
+			· putInHead 是否自动创建header标签,并把搜索区域放在该标签中,默认false.(可缺省)
+			· column 一行有几个,默认3
+			· group 搜索框组
+				--------------------------------
+					//1.公用参数
+					· title 名称
+					· field 元素ID(即自定义一个ID)
+					· type 类型（可缺省）。
+						string 输入文字（默认）
+						date 日期
+						drop 下拉
+						react 联动类型（如：省市区三级联动下拉,react[province] 省份下拉,react[city] 城市下拉,react[county] 区县下拉）
+						radio 单选. 格式. radio[颜色]。 其中，中括号用于指定单选按钮颜色(需引入前端框架样式)（可缺省）.
+							颜色值如下：
+							蓝色	blue(默认)
+							绿色	green
+							红色	red
+
+						checkbox 复选(默认不勾选,可设置value="1"则为勾选状态). 格式：checkbox[形状][颜色]。其中，两个中括号分别用于指定单选按钮的形状及颜色(需引入前端框架样式)（可缺省）.
+							①形状值如下：
+							方形打勾	square-tick(默认)
+							圆形打勾	circle-tick
+							方块		square 		
+							开关		on-off		
+							②颜色值如下：
+							蓝色	blue(默认)
+							绿色	green
+							红色	red
+							-------------
+
+					· width 宽度（可缺省）。1x 一倍宽（默认), 2x 2倍宽, 3x 3倍宽, 数字 150 或"150" 宽150px
+					· textAlign 文字水平对齐(可缺省). left 左（默认）,right 右(利用此属性可用来改变checkbox文字在左侧还是右侧)
+					· textWidth 文字自定义宽度px(可缺省),默认60
+					· icon 修饰用的图标（可缺省）
+					· must 是否必填(可缺省),默认true
+					· value 初始值(可缺省), 当type="radio"时,value就是默认选中的选项, 当type="checkbox"时, value="1", 则为勾选状态
+					· wrap 是否强制换行（可缺省）。true 是, false 否（默认）。true 时本搜索框将与下一个搜索框在同一行内显示
+					· readonly 是否只读(可缺省), 默认false
+					· disabled 是否禁用(可缺省), 默认false
+
+					--------------------------------
+
+					//2.其它参数
+					type="date"时
+					· date 本参数可缺省。指定某个日期(value与本参数同时存在时将忽略本参数）。本参数优先权大于 value 属性
+						值：当天（默认）, 本月初, 本月末, 本季初, 本季末, 本年初, 本年末, 本年度, 本月份, 本日
+
+					type="drop"或 type="react"时
+					· id 初始值value属性对应的隐藏值,即输入框属性data-bh值（可缺省)(当type="drop"或type="react"时有效)
+					· entire 指定下拉中新增一项的值为本参数的值,默认全部（可缺省）
+					· source 指定下拉或联动类数据源JSON(可缺省). eg. {"data":[{"id":"1001","value":"顺丰快递"},{"id":"1002","value":"圆通快递"}]}
+					· callback:function(e){console.log("e:",e);} 回调函数（下拉选中后）(可缺省). e 下拉后原值、新值组合成的json
+
+					type="drop"时
+					· format 自定义json字段格式(数组)（可缺省）。本参数仅当参数source不为空时有效,格式：eg. ["dyw_bh","dyw_mc"]
+
+					type="radio"时
+					· option 指定单选组合界面上显示的文本,默认值：:["是","否"],即默认文本为“是”、“否”（可缺省）
+
+				
+
+		。searchButton 搜索按钮
+			· wrap 按钮是否换行显示（可缺省）。true 是（默认）,false 否。若只有一个搜索按钮,将wrap=false按钮将紧接着最后一个搜索框
+			· compacted 按钮组是否紧接着搜索框组(即按钮组紧接在搜索框组后面，不换行）,默认false(可缺省)
+			· sticky 按钮组是否置顶,即是否置于搜索框组前面,默认false (可缺省).
+			· group 按钮组
+					· title 名称（文本）
+					· field ID
+					· width 宽（可缺省）,默认70px
+					· color 颜色（可缺省）。参数theme存在时本参数失效。
+					· bgColor 背景色（可缺省）。参数theme存在时本参数失效。
+					· icon 修饰用的前置图标（可缺省）
+					· theme 按钮主题(可缺省）。default 无背景, primary 原始（蓝色）（默认）, success 成功（绿色）, info 信息（浅蓝色）,warning 警告（黄色）, danger 危险（红色）, diamond 3d立体;
+					· relation:["出生年月","区县"], //关联搜索框（可缺省）。默认点击该按钮,会读取全部搜索框数据,但如果本参数有进行设置,则只会读取指定搜索框的数据。eg.["出生年月","区县"]
+					· checkForm:true, //点击按钮时是否启用表单完整性验证。默认true。（在启用导出excel功能时,将本参数设置为false可跳过表单完整性校验）
+					· callback:function(e1, e2){} 回调函数（可缺省）。e1, e2基本相同，值为全部或关联搜索框数据组成的一维嵌套json。
+						其中：e1 中json字段名用英文, e2 中json字段名用中文.
+						格式: {button:"", name:{title:"", field:"", bh:"", value:""}, sex:{title:"", field:"", bh:"", value:""}} 
+						其中：button 按钮名称, name “姓名”的字段名称, sex “性别”的字段名。 
+						eg1. 取name的value属性：e.name.value, eg2. 取sex的bh属性: e.sex.bh
+					
+		*/
+
+
+
+
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$(function(){
+
+
+
+			
+			
+
+		}); //$(function(){})
+	</script>
+</body>
+</html>

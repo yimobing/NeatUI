@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,initial-scale=1.0,user-scalable=no,width=device-width">
+<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<title>Calendar | 日历控件</title>
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css"><!--日历控件-->
+<style>
+*{box-sizing:border-box;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;}
+html,body{width:100%;margin:0 auto;font-size:14px;}
+.content{width:100%;margin:0 auto;}
+h1{font-size:20px;text-align:center;color:#f60;}
+h5{font-size:20px;color:#0ce;border-bottom:1px solid #0ce;padding-bottom:8px;}
+.panel-demo{width:80%;margin:0 auto;padding:5px;}
+.demo-one{margin-bottom:8px;}
+.demo-one>span{display:inline-block;min-width:80px;}
+.demo-one>input{margin-left:8px;width:200px;height:30px;line-height:30px;padding:0 8px;border:1px solid #ddd;border-radius:4px;}
+</style>
+<body>
+</head>
+	
+	<div class="content">
+  	<h1>日历控件<br>适应PC、移动端</h1>
+    
+		<section class="panel-demo"><!--调用日历控件，初始值为默认-->
+    	<h5>调用日历控件，初始值为默认</h5>
+      <div class="demo-one"><span>默认绿色日期（初始值为空）</span><input type="text" id="defaultDate1" readonly></div><!--demo-one-->
+			<div class="demo-one"><span>默认绿色日期（年-月-日）</span><input type="text" id="defaultDate2" readonly></div><!--demo-one-->
+			<div class="demo-one"><span>蓝色主题日期（年-月-日 时:分:秒，有限制可选的最小日期、最大日期、有回调函数）</span><input type="text" id="blueDate" readonly></div><!--demo-one-->
+    </section><!--/panel-demo-->
+
+    <section class="panel-demo"><!--调用日历控件，初始值自定义-->
+    	<h5>调用日历控件，初始值自定义</h5>
+    	<div class="demo-one"><span>当前日期</span><input type="text" class="jedate" id="nowTime" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>当前日期前N天(eg.前7天)</span><input type="text" class="jedate" id="prevNDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本月第一天</span><input type="text" class="jedate" id="monthFirstDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本月最后一天</span><input type="text" class="jedate" id="monthLastDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本季度第一天</span><input type="text" class="jedate" id="quarterStartDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本季度最后一天</span><input type="text" class="jedate" id="quarterEndDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本年度第一天</span><input type="text" class="jedate" id="yearFirstDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本年度最后一天</span><input type="text" class="jedate" id="yearLastDay" readonly></div><!--demo-one-->
+    </section><!--/panel-demo-->
+			
+    <section class="panel-demo"><!--不调用日历控件-->
+    	<h5>不调用日历控件</h5>
+      <div class="demo-one"><span>当前年份</span><input type="text" id="nowYear"></div><!--demo-one-->
+      <div class="demo-one"><span>当前月份</span><input type="text" id="nowMonth"></div><!--demo-one-->
+      <div class="demo-one"><span>当前日</span><input type="text" id="nowDay"></div><!--demo-one-->
+    </section><!--/panel-demo-->
+    
+	</div><!--/content-->
+	
+	<script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
+	<script type="text/javascript">
+	$(function(){
+		
+		/*日期控件调用方法
+		*	方法1：neuiCalendar.neDate(obj,json,callBack); 
+		* 方法2（兼容旧版）：neuiCalendar.neDate(obj,false); 
+		*	@param obj 当前所在标签对象或#ID或.className(必须).eg. $('#date') 或 '#date' 或 '.date'
+		*	@param json json对象(可缺省)，格式：{"empty":false,"theme":"green","format":"YYYY-MM-DD hh:mm:ss"} 
+			empty 标签默认日期是否为空(可缺省),true|空,false|不空(默认当天日期); 
+			theme 日历控件主题(可缺省), green|绿色,blue|蓝色，默认green 
+			format 日期格式(可缺省), 一般有几个值:"YYYY-MM-DD"、 "YYYY-MM-DD hh:mm:ss"、 "YYYY-MM-DD hh:mm"，默认 "YYYY-MM-DD"(eg.2018-07-25)
+			minDate 最小日期(可缺省),格式必须与format参数一样,否则会出错!
+			maxDate 最大日期(可缺省),格式必须与format参数一样,否则会出错!
+			其中 YYYY 年, MM 月, DD 天, hh 小时(24小时制), mm 分, ss 秒
+		* @param callBack 回调函数(可缺省)
+		
+		注意：调用日历控件的标签如input标签不能有value属性，如：<input type="text" value="2018-07-25">，不然会报错
+		eg1. 多个标签调用日历控件<=>含有class="jedate"的标签都调用日历控件
+		$('.jedate').each(function(){
+			//neuiCalendar.neDate($(this)); //默认日期为当天，如：2018-07-25
+			//neuiCalendar.neDate($(this),false); //默认日期为空
+			//neuiCalendar.neDate($(this),{"empty":true,"theme":"blue"}); //默认日期为当天，主题为蓝色
+
+			neuiCalendar.neDate($(this),{},callBack); //默认日期当天，主题为默认主题，且选择完日期后有回调函数
+			neuiCalendar.neDate($(this),{"empty":false,"theme":"blue"},callBack); //默认日期为空，主题为蓝色，且选择完日期后有回调函数
+			function callBack(e){
+				//console.log('返回日期值：',e.value);
+				alert('我是日历回调函数');
+			}
+		})
+		
+		eg2. 单个标签调用日历控件
+			neuiCalendar.neDate('#endDate',{"empty":false,"theme":"blue",format:"YYYY-MM-DD hh:mm:ss"},blueCallBackFunc);
+				 function blueCallBackFunc(){
+						alert('我是【蓝色主题-年-月-日 时:分:秒】回调函数');
+				 }
+		
+		*/
+		
+		
+		/*+-------------1.调用日历控件，初始值为默认--------------+*/
+		neuiCalendar.neDate($('#defaultDate1'),false);  // 或 neuiCalendar.neDate($('#defaultDate1'),{"empty":true});  默认日期为空
+		neuiCalendar.neDate($('#defaultDate2'));  //默认日期当天
+		neuiCalendar.neDate('#blueDate',{"empty":false,"theme":"blue",format:"YYYY-MM-DD hh:mm:ss",minDate:'2018-09-30 00:00:00',maxDate:'2050-12-31 23:59:59'},blueCallBackFunc);
+		function blueCallBackFunc(e){
+			alert('我是【蓝色主题-年-月-日 时:分:秒】回调函数，选择的日期为：'+e.value);
+		}
+		
+		
+		/*+------------2.调用日历控件，初始值自定义----------------+*/
+		//=====调用日历控件（多个标签调用）
+		$('.jedate').each(function(){
+			neuiCalendar.neDate($(this));
+		});
+		//=====当前日期
+		$('#nowTime').val(neuiCalendar.getNowtime()); //eg.2018-09-30
+		//$('#nowTime').val(neuiCalendar.getNowtime({"format":"YYYY-MM-DD"}));  //eg.2018-09-30
+		//$('#nowTime').val(neuiCalendar.getNowtime({"format":"YYYY-MM-DD hh:mm"}));  //eg.2018-09-30 14:25
+		//$('#nowTime').val(neuiCalendar.getNowtime({"format":"YYYY-MM-DD hh:mm:ss"})); //eg.2018-09-30 14:25:31
+		//=====当前日历前N天
+		$('#prevNDay').val(neuiCalendar.getPrevNDay(7)); //昨天写2， 前7天写8
+		//=====本月第一天
+		$('#monthFirstDay').val(neuiCalendar.getMonthFirstDay()); //neuiCalendar.getMonthFirstDay(false); 月/日小于10的前面不加0
+		//=====本月最后一天
+		$('#monthLastDay').val(neuiCalendar.getMonthLastDay());  //neuiCalendar.getMonthLastDay(false); 月/日小于10的前面不加0
+		//=====本季度第一天
+		$('#quarterStartDay').val(neuiCalendar.getQuarterStartDay()); //neuiCalendar.getQuarterStartDay(false); 月/日小于10的前面不加0
+		//=====本季度最后一天
+		$('#quarterEndDay').val(neuiCalendar.getQuarterEndDay()); //neuiCalendar.getQuarterEndDay(false); 月/日小于10的前面不加0
+		//=====本年度第一天
+		$('#yearFirstDay').val(neuiCalendar.getYearFirstDay()); //neuiCalendar.getYearFirstDay(false); 月/日小于10的前面不加0
+		//=====本年度最后一天
+		$('#yearLastDay').val(neuiCalendar.getYearLastDay());
+		
+		
+		
+		
+		
+		/*+------------3.不调用日历控件---------------+*/
+		//=====当前年份
+		$('#nowYear').val(neuiCalendar.getYear());
+		//=====当前月份
+		$('#nowMonth').val(neuiCalendar.getMonth()); //neuiCalendar.getMonth(false); 小于10的月份前面不加0
+		//=====当前日
+		$('#nowDay').val(neuiCalendar.getDay());  //neuiCalendar.getDay(false); 小于10的天数前面不加0
+		
+		
+
+	}); //END $(function(){})
+
+	</script>
+</body>
+</html>

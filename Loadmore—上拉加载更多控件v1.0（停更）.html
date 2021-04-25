@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,initial-scale=1.0,user-scalable=no,width=device-width">
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Loadmore | 上拉加载更多控件v1.0</title>
+<meta name="keywords" content="">
+<meta name="description" content="">
+<link type="text/css" rel="stylesheet" href="assets/test/css/demo-loadmore.css">
+</head>
+<body>
+
+<section class="section-demo">
+	<div class="demo-content"><ul></ul></div><!--/demo-content-->
+</section><!--section-demo-->
+
+<script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="assets/neatui/js/neatui-loadmore_v1.0.js"></script><!--上拉加载更多-->
+<script type="text/javascript">
+/*/////////////////////////////////////////////////////////////////////////*/
+
+//函数：判断json对象中的data数组是否有数据(数组或单个数据),有 返回 true; 无 返回 false
+function checkJsonHasData(json){
+	 var flag = true;
+	 if(typeof(json)!='object') flag = false; //不是json对象
+	 if(typeof(json)=='object' && typeof(json.data)=='undefined') flag = false; //是json对象,但不存在数组
+	 if(typeof(json)=='object' && typeof(json.data)!='undefined' && json.data.length<=0) flag = false; //是json对象，也存在数组，但数组长度为0(没数据)
+	 return flag;
+}
+	
+
+
+/**
+* 创建历史列表
+* @param {object} ps_source 数据源
+* @param {object} ps_params 分页等信息组成的一维JSON对象
+*/
+function generateNovelList(ps_source, ps_params){
+	var parameter = typeof ps_params == 'undefined' ? {} : ps_params;
+	var nowpage = typeof parameter.curpage == 'undefined' ? 1 : (parameter.curpage == '' ? 1 : parameter.curpage); //!!!页码标记
+	var node = '.demo-content>ul';
+	
+	if(checkJsonHasData(ps_source)){
+		var _html = '';
+		$.each(ps_source.data,function(i,items){
+			_html+='<li>'+
+            '	<div class="img"><img src="'+items.img+'"></div>'+
+            '	<div class="txt"><span class="title">'+items.title+'</span><span class="price">'+items.description+'</span></div>'+
+						'	<a href="'+items.url+'"></a>'+
+          	'</li>';
+		})
+		if($(node).length > 0) {
+			if(nowpage == 1) $(node).empty(); //!!!只有当第1页时才清空拼接节点内所有内容
+			$(node).append(_html);
+		}
+	}
+}
+
+
+/*/////////////////////////////////////////////////////////////////////////*/
+$(function(){
+	
+	
+	
+	/*+-----------------------------------+*/
+	
+	/*
+	//=====不使用插件
+	var $novelJson = {
+		data:[
+			{img:'assets/test/img/1.jpg',title:'三国演义1',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+			{img:'assets/test/img/1.jpg',title:'三国演义3',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+			{img:'assets/test/img/1.jpg',title:'三国演义4',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+			{img:'assets/test/img/1.jpg',title:'三国演义5',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'}
+		]
+	}
+	generateNovelList($novelJson);
+	*/
+	
+	
+	/*+-----------------------------------+*/
+	//=====上拉更多加载列表
+	$('.demo-content').neuiLoadMore({
+		loadMethod: 'scroll', //数据加载方式(可缺省), click 手动点击加载(默认), scroll 滚动加载
+		scrollRegion: 'locale', //滚动方式(可缺省). locale “局部滚动”(默认), window “全局滚动(整个窗口滚动)”. (仅当loadMethod='scroll'时有效)
+		pagesize: 5, //每页数量(可缺省,默认20条)（demo演示时，请设置pagesize值小于第1页json的的长度)
+		//scrollHeight: '500', //滚动区域高度,默认单位:px(可缺省,请在css中限制滚动高度)
+		//animate: true, //是否转圈(可缺省)，默认true
+		noDataTips: '抱歉，暂无小说数据！', //无数据时提示文字
+		moreText: '点击加载更多', //加载更多的文字提示文字
+		overText: '没有更多了', //所有数据加载完后的提示文字
+		getHTML: function(){ //滚动节点内部HTML
+			var params = {"curpage":this.curpage}
+			var json = this.getJson();
+			generateNovelList(json, params); //创建拼接节点的函数,第2个参数params是插件传给前台的,必须!
+		},
+		getJson: function(){ //调用json
+			var dataJson = {}
+			var curpage = this.curpage; //当前页码(插件自动传给前端)
+			//根据分页加载json (json为空时写成 dataJson = {}或 dataJson = '';)
+			//...
+			if(curpage==1){
+				dataJson = {
+					data:[
+						{img:'assets/test/img/1.jpg',title:'三国演义1',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+						{img:'assets/test/img/1.jpg',title:'三国演义2',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+						{img:'assets/test/img/1.jpg',title:'三国演义3',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+						{img:'assets/test/img/1.jpg',title:'三国演义4',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+						{img:'assets/test/img/1.jpg',title:'三国演义5',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'}
+					]
+				}
+				//dataJson = {}
+			} //IF
+			
+			if(curpage==2){
+			
+				dataJson = {
+					data:[
+						{img:'assets/test/img/2.jpg',title:'三国演义6',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+						{img:'assets/test/img/2.jpg',title:'三国演义7',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+						{img:'assets/test/img/2.jpg',title:'三国演义8',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+						{img:'assets/test/img/2.jpg',title:'三国演义9',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+						{img:'assets/test/img/2.jpg',title:'三国演义10',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'}
+					]
+				}
+
+				
+			} //IF
+			
+			if(curpage>=3){
+
+				dataJson = {
+					data:[
+						{img:'assets/test/img/3.jpg',title:'三国演义11',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+						{img:'assets/test/img/3.jpg',title:'三国演义12',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'},
+						{img:'assets/test/img/3.jpg',title:'三国演义13',description:'中国古典小说名著，章回体小说经典。',url:'javascript:void(0)'}
+					]
+				}
+			} //IF
+			
+			return dataJson; //返回json以供调用
+			
+		} //END FUNCTION getJson
+		
+	});
+	
+	
+	
+	
+	
+});
+</script>
+
+</body>
+</html>

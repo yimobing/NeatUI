@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,initial-scale=1.0,user-scalable=no,width=device-width">
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta http-equiv="Cache-Control" content="no-transform">
+	<meta http-equiv="Cache-Control" content="no-siteapp">
+	<title>Dropdown | 下拉联动控件V2.1</title>
+  	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"><!--下拉联动控件-->
+</head>
+<body>
+<style>
+		body{background:#f4f4f4;}
+		.wrap{position:relative;max-width: 800px;margin:10px auto;background-color:#fff;padding:10px 15px;}
+		.eform-item{height:45px;}
+		.radio{margin-top:0;}
+		.item-l label{width:70px;}
+		.eform-button-group{width:100%;margin:15px auto 0 auto;text-align:center;}
+		#btn-save{width: 91%;margin-left: 45px;}
+		.panel-form{margin-top:25px;}
+		.title {position: absolute; top: 0; left: 0; font-size: 12px; background-color: #0ce; color: #fff; padding: 5px 10px; }
+		.panel-list{margin-top:35px;}
+		.panel-list li{position:relative; width:98%; margin:0 auto; height:40px; line-height:40px; border-top:1px dotted #ddd; list-style-type:disc; overflow:hidden; white-space:pre-wrap; word-wrap:break-word; word-break:break-all; }
+		.panel-list li:first-child{border-top:0;}
+		.panel-list li:before{content:'';display:inline-block; vertical-align:middle; width:3px;height:3px;margin-right:8px;border-radius:100%;background-color:#999;}
+		.panel-list li span{display:inline-block;width:90%;height:100%;}
+		.panel-list li .fa{
+				color:#f60;
+				font-size:22px;
+				cursor:pointer;
+				position:absolute;
+				right:5px;
+				top:50%;
+				-webkit-transform:translateY(-50%);
+				-moz-transform:translateY(-50%);
+				-o-transform:translateY(-50%);
+				-ms-transform:translateY(-50%);
+				transform:translateY(-50%);
+				transform:translateY(-0%)\9;
+				margin-top:-5px\9;
+		}
+		.panel-list li .fa:hover{color:#f20d0d;}
+		.panel-list li:hover{color:#4cd764;}
+		@media screen and (max-width:640px){
+				.wrap{width: 96%;border-radius:4px;}
+		}
+</style>
+<div class="wrap">
+		 <!--[==========表单==========]-->
+    <section class="panel-webname title">下拉联动控件V2.1——适用于PC、移动端</section>
+    
+		<section class="panel-form item-layout">
+    		<div class="eform-caption">单个下拉</div><!--/.eform-caption-->
+				<div class="eform-content">
+            <div class="eform-item">
+                <div class="eform-box">
+                    <div class="item-l"><label>单个下拉</label></div>
+                    <div class="item-r item-full"><i class="fa fa-bank"></i><input type="text" id="i-single-format" readonly></div>
+                    <div class="item-supply">（标准json）</div>
+                </div><!--/.eform-box-->
+            </div><!--/.eform-item-->
+            <div class="eform-item">
+                <div class="eform-box">
+                    <div class="item-l"><label>单个下拉</label></div>
+                    <div class="item-r item-full"><i class="fa fa-bank"></i><input type="text" id="i-single-noformat" readonly></div>
+                    <div class="item-supply">（非标准json）</div>
+                </div><!--/.eform-box-->
+            </div><!--/.eform-item-->
+            <div class="eform-item">
+                <div class="eform-box">
+                    <div class="item-l"><label>百家姓</label></div>
+                    <div class="item-r item-full"><i class="fa fa-bank"></i><input type="text" id="i-single-default" readonly></div>
+                    <div class="item-supply">（输入框有默认值和默认ID）</div>
+                </div><!--/.eform-box-->
+            </div><!--/.eform-item-->
+            <div class="eform-item">
+                <div class="eform-box">
+                    <div class="item-l"><label>书籍</label></div>
+                    <div class="item-r item-full"><i class="fa fa-bank"></i><input type="text" id="i-single-call-noClose" readonly></div>
+                    <div class="item-supply">（有回调函数，无关闭按钮）</div>
+                </div><!--/.eform-box-->
+            </div><!--/.eform-item-->
+            <div class="eform-item">
+                <div class="eform-box">
+                    <div class="item-l"><label>皇帝</label></div>
+                    <div class="item-r item-full"><i class="fa fa-bank"></i><input type="text" id="i-single-drop-all" readonly></div>
+                     <div class="item-supply">（默认下拉列表新增一个选项：全部）</div>
+                </div><!--/.eform-box-->
+            </div><!--/.eform-item-->
+				</div><!--/.eform-content-->
+		</section><!--/.panel-form-->
+    
+ 		<section class="panel-form item-layout has-border">
+    		<div class="eform-caption">省市区同框联动下拉：一个下拉框里有三个联动</div><!--/.eform-caption-->
+				<div class="eform-content">
+            <div class="eform-item">
+								<div class="eform-box">
+										<div class="item-l"><label>省市区同框联动下拉</label></div>
+										<div class="item-r item-full"><i class="fa fa-map-o"></i><input type="text" id="i-three-link" readonly></div>
+								</div><!--/.eform-box-->
+						</div><!--/.eform-item-->
+				</div><!--/.eform-content-->
+		</section><!--/.panel-form-->
+    
+    <section class="panel-form item-layout has-border">
+    		<div class="eform-caption">省市区三级联动下拉：使用系统数据源</div><!--/.eform-caption-->
+				<div class="eform-content">
+						<div class="eform-item">
+								<div class="eform-box">
+										<div class="item-l"><label>省份</label></div>
+										<div class="item-r item-full"><i class="fa fa-map-o"></i><input type="text" id="i-province" readonly></div>
+								</div><!--/.eform-box-->
+						</div><!--/.eform-item-->
+						<div class="eform-item">
+								<div class="eform-box">
+										<div class="item-l"><label>城市</label></div>
+										<div class="item-r item-full"><i class="fa fa-location-arrow"></i><input type="text" id="i-city" readonly></div>
+								</div><!--/.eform-box-->
+						</div><!--/.eform-item-->
+            <div class="eform-item">
+								<div class="eform-box">
+										<div class="item-l"><label>区县</label></div>
+										<div class="item-r item-full"><i class="fa fa-location-arrow"></i><input type="text" id="i-county" readonly></div>
+								</div><!--/.eform-box-->
+						</div><!--/.eform-item-->
+				</div><!--/.eform-content-->
+		</section><!--/.panel-form-->
+
+    <section class="panel-form item-layout has-border">
+    		<div class="eform-caption">省市区三级联动下拉：使用自定义数据源</div><!--/.eform-caption-->
+				<div class="eform-content">
+            <div class="eform-item">
+								<div class="eform-box">
+										<div class="item-l"><label>省份</label></div>
+										<div class="item-r item-full"><i class="fa fa-map-o"></i><input type="text" id="i-sheng" readonly></div>
+								</div><!--/.eform-box-->
+						</div><!--/.eform-item-->
+						<div class="eform-item">
+								<div class="eform-box">
+										<div class="item-l"><label>城市</label></div>
+										<div class="item-r item-full"><i class="fa fa-location-arrow"></i><input type="text" id="i-shi" readonly></div>
+								</div><!--/.eform-box-->
+						</div><!--/.eform-item-->
+            <div class="eform-item">
+								<div class="eform-box">
+										<div class="item-l"><label>区县</label></div>
+										<div class="item-r item-full"><i class="fa fa-location-arrow"></i><input type="text" id="i-qu" readonly></div>
+								</div><!--/.eform-box-->
+						</div><!--/.eform-item-->
+				</div><!--/.eform-content-->
+		</section><!--/.panel-form-->
+    
+     
+    
+</div><!--/.wrap-->
+
+
+<script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="assets/style/js/jquery.chineseDistricts.js"></script><!--省市区数据源-->
+<script type="text/javascript" src="assets/neatui/js/neatui-dropdown.js"></script><!--下拉联动控件-->
+<script type="text/javascript">
+
+$(function(){
+		
+		///////////////////////////////////////////////////////////////////////////////////////////////////////
+		///																					控件调用方法
+		///////////////////////////////////////////////////////////////////////////////////////////////////////
+		/*---------------------------------------------------------------------------
+		调用方法有两种:
+		①.在click事件中调用
+		$('#test').on('click',function(){
+			var $this = $(this);
+			neuiDropdown(options,this); //this等同于$this,都是指输入框jq对象
+		});
+		
+		当下拉json需要依靠表单中某一栏选择后的值时，适合用此法。
+		
+		②.不在click事件中调用（即在页面一加载就调用）
+		$('#test').neuiDropdown(options);
+		
+		当下拉json不依靠表单中某一栏选择后的值时，适合用此法。
+		
+		++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		【说明】
+		1.test是某个id="test"的节点.eg.<div class="test"></div>
+		2.options是一个json对象.格式如下：
+			var options = {
+				//参数：公用
+				caption: '', //下拉标题(可缺省).默认空.一般只在position='fixed'时使用
+				position: 'absolute', //定位方式(可缺省). absolute 相对(默认), fixed 绝对
+				json: {}, //json数据（可缺省）。当react=true时，本参数前台传递的值失效，json自动调用省市区三级联动的数据
+				format: ["bh","mc"], //自定义json字段格式(数组)（可缺省）。eg.{"bh":"1001","mc":"张三"}。当react=true时，本参数前台传递的值失效，系统将默认使用：["bh","mc"]. 
+				//如果下拉项中要有说明性文字,则可在json的非编号字段中添加em或span添加.eg {"bh":"1001", "mc":"张三<em>一个大好人</em>"}, 那么"一个大好人"就是说明性文字了.
+				//explained: true, //下拉项是否含说明性文字(可缺省), 默认true. 值为true时选中下拉项后将自动过滤掉这些说明性文字,即输入框不会包含说明性文字)
+	
+				//·参数：省市区三级联动下拉
+				react: false, //是否开启省市区三级联动下拉(可缺省)
+				region: 'province', //省市区三级联动下拉类型(可缺省)。province 省份（默认）, city 城市， county 区县。（仅当react=true时有效）
+				relatedNode:{}, //省市区三级联动下拉关联节点（即省市区3个节点的ID或ClassName)(可缺省,系统会自动调用).格式.eg.{"province":"#i-t-province", "city":"#i-t-city", "county":"#i-t-county"}
+	
+				//·参数：省市区同框联动下拉
+				chain: false, //是否开启省市区同框联动下拉(可缺省).默认false
+				level: 3, //省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
+				delimiter:'-', //省市区同框联动结果值使用的分隔符(可缺省)。默认短横线-
+				
+				isCnClose:true, //当省市区同框联动,是否点了"全部"选项后就马上填充值并关闭控件(可缺省),默认true
+				isCnPartEmpty:true, //当省市区同框联动,选中下拉值后当城市或区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省", eg3. "全部-全部-全部" 变成 "全部"
+				isCnAllEmpty:false, //当省市区同框联动, 选中下拉值后当省份、城市、区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省"， eg3. "全部-全部-全部" 变成 ""
+				//说明：isCnAllEmpty=true 具有 isCnPartEmpty=true 的功能，并且还能将省份值为"全部"时也替换成空
+
+
+				//·参数：公用
+				id:'', //选择框默认值（隐藏的ID等键值)（可缺省）
+				value:'', //选择框默认值（显示值）（可缺省）
+				entire:'', //默认下拉值（即：默认下拉列表新增一个选项），当本参数不为空时，则默认输入框的值为entire的值，且系统将会在下拉中自动新增一项（且为第一项）值为本参数的值
+				showCloseButton: true, //是否显示关闭按钮(可缺省)。默认true
+				closeButtonAppearance: 'text', //关闭按钮的外观(可缺省). text 文字（默认），image 图片.
+				callback: function(e){}, //回调函数（小写的b或大写的B皆可）。
+				//格式：{id:"新值ID", value:"新值文本", explanation:"下拉项中的说明性文字", oldId:"", oldValue:"老值文本", prevId:"上一个值ID", prevValue:"上一个值文本", object:"当前输入框对象"}
+				//如果是省市区联动，则e的格式在上面的基础上还新增了几个属性：{provinceId:"省隐藏值", cityId:"市隐藏值", countyId:"区县隐藏值"}
+				//callBack: function(e){}, //回调函数（大写的B，兼容旧版）
+				zIndex:0, //自定义z-index(可缺省).默认0(不起作用)
+				height: 32, //下拉项高度
+				
+				
+				responseEvent:'click' //响应的事件.默认click（暂时未用到该参数）
+			}
+			
+			--------------
+			options对象说明
+			--------------
+			当参数react=true时，可使用参数json传入自定义的省市区数据源，如不指定数据源，则默认使用chineseDistrict.js中的数据源。
+			自定义的省市区数据源格式如下：
+			var $districtJson = {
+				data:[
+					{province:'福建省',data:[{city:'泉州市',data:[{county:'丰泽区'},{county:'鲤城区'},{county:'洛江区'},{county:'泉港区'},{county:'惠安县'},{county:'安溪县'},{county:'永春县'},{county:'德化县'},{county:'石狮市'},{county:'晋江市'},{county:'南安市'}]},{city:'福州市',data:[{county:'鼓楼区'},{county:'台江区'},{county:'仓山区'}]}]},
+					{province:'浙江省',data:[{city:'杭州市',data:[{county:'西湖区'},{county:'上城区'},{county:'下城区'}]},{city:'嘉兴市',data:[{county:'南湖区'},{county:'秀洲区'}]}]
+					},{province:'山东省',data:[{city:'烟台市',data:[{county:'小烟区'},{county:'大烟区'}]},{city:'济南市',data:[{county:'小济区'},{county:'大济区'}]}]}
+				]
+			}
+			
+		++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		
+		---------------------------------------------------------------------------
+		*/
+		
+		
+		
+				
+		
+		
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////
+		///												演示示例
+		///////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		
+		
+		//=======================================================================================================//
+		//											一、单个下拉
+		//=======================================================================================================//	
+		/*+--------------------------------------------------------+*/
+		//=====单个下拉（标准json）
+		$('#i-single-format').on('click',function(){
+				var $this = $(this);
+				var $singleJson = {"data":[
+						{"value":"张三"}, 
+						{"value":"李四"}, 
+						{"value":"王五"}
+					]
+				}
+				neuiDropdown({
+					caption: '单个下拉',
+					json: $singleJson,
+					format:["value"]
+				},this)
+		});
+		
+		
+		
+		/*+--------------------------------------------------------+*/
+		//=====单个下拉（非标准json）
+		$('#i-single-noformat').on('click',function(){
+				var $this = $(this);
+				var $singleJson = {"data":[
+						{"user_bh":"1001","user_name":"张三"}, 
+						{"user_bh":"1002","user_name":"李四"}, 
+						{"user_bh":"1003","user_name":"王五"}
+					]
+				}
+				neuiDropdown({
+					json: $singleJson,
+					format: ['user_bh','user_name']
+				},this)
+		});
+		
+		
+		
+		
+		/*+--------------------------------------------------------+*/
+		//=====百家姓下拉（输入框有默认值和默认ID）
+		//因为输入框要有默认值，故不能使用调用方法1，而只能使用调用方法2
+		var $nameJson = {"data":[
+				{"user_bh":"1001","user_name":"赵钱孙李"}, 
+				{"user_bh":"1002","user_name":"周吴郑王"}, 
+				{"user_bh":"1003","user_name":"冯陈褚卫"}
+			]
+		}
+		$('#i-single-default').	neuiDropdown({
+			json: $nameJson,
+			format: ['user_bh','user_name'],
+			id:'1002',
+			value: '周吴郑王'
+		});
+		
+		
+		
+		
+		
+		/*+--------------------------------------------------------+*/
+		//=====书籍下拉（有回调函数，无关闭按钮）
+		var $bookJson = {"data":[
+				{"user_bh":"1001","user_name":"红楼梦"}, 
+				{"user_bh":"1002","user_name":"水浒传"},
+				{"user_bh":"1003","user_name":"西游记"},
+				{"user_bh":"1004","user_name":"三国演义"},
+				{"user_bh":"1005","user_name":"醒世恒言"},
+				{"user_bh":"1006","user_name":"预世恒言"},
+				{"user_bh":"1007","user_name":"初刻拍案惊奇"},
+				{"user_bh":"1008","user_name":"二刻拍案惊奇"},
+				{"user_bh":"1009","user_name":"三遂平妖传"},
+				{"user_bh":"1010","user_name":"大唐狄公案"}
+			]
+		}
+		$('#i-single-call-noClose').neuiDropdown({
+			json: $bookJson,
+			format: ['user_bh','user_name'],
+			id:'1002',
+			value: '水浒传',
+
+			//caption: '选择书籍',
+			//position: 'fixed',
+			showCloseButton: true,
+			closeButtonAppearance: 'image', //关闭按钮的外观. text 文字（默认），image 图片.
+
+			callback: function(e){
+				console.log('选中后回调e值：',e);
+				alert('你选中了名著\n新编号：'+e.id+'，新书名：'+e.value+'\n旧编号：'+e.oldId+'，旧书名：'+e.oldValue);
+			}
+		});
+		
+		
+		
+		
+		/*+--------------------------------------------------------+*/
+		//=====皇帝下拉（默认下拉列表新增一个选项：全部）
+		var $empireJson = {"data":[
+				{"user_bh":"1001","user_name":"秦始皇"}, 
+				{"user_bh":"1002","user_name":"李世民"}, 
+				{"user_bh":"1003","user_name":"赵匡胤"}
+			]
+		}
+		$('#i-single-drop-all').neuiDropdown({
+			json: $empireJson,
+			format: ['user_bh','user_name'],
+			caption: '选择皇帝',
+			//position: 'fixed',
+			showCloseButton: true,
+			closeButtonAppearance: 'image', //关闭按钮的外观. text 文字（默认），image 图片.
+			value: '全部',
+			entire: '全部',
+			callBack:function(e){
+				console.log('单个下拉回调：', e);
+			}
+		})
+	
+		
+		
+		
+		
+		/*+--------------------------------------------------------+*/
+		//=====自定义省市区json
+		// var $districtJson = {
+		// 	data:[
+		// 		{province:'福建省',data:[{city:'泉州市',data:[{county:'丰泽区'},{county:'鲤城区'},{county:'洛江区'},{county:'泉港区'},{county:'惠安县'},{county:'安溪县'},{county:'永春县'},{county:'德化县'},{county:'石狮市'},{county:'晋江市'},{county:'南安市'}]},{city:'福州市',data:[{county:'鼓楼区'},{county:'台江区'},{county:'仓山区'}]}]},
+		// 		{province:'浙江省',data:[{city:'杭州市',data:[{county:'西湖区'},{county:'上城区'},{county:'下城区'}]},{city:'嘉兴市',data:[{county:'南湖区'},{county:'秀洲区'}]}]
+		// 		},{province:'山东省',data:[{city:'烟台市',data:[{county:'小烟区'},{county:'大烟区'}]},{city:'济南市',data:[{county:'小济区'},{county:'大济区'}]}]}
+		// 	]
+		// }
+		var $districtJson = {
+			data:[
+				{province:'福建省', provinceId:"P1001",  data:[
+						{city:'泉州市', cityId:"C1001", data:[
+								{county:'丰泽区', countyId:"Q1001"}, {county:'鲤城区', countyId:"Q1002"}, {county:'洛江区', countyId:"Q1003"}, 
+								{county:'泉港区', countyId:"Q1004"}, {county:'惠安县', countyId:"Q1005"}, {county:'安溪县', countyId:"Q1006"}, 
+								{county:'永春县', countyId:"Q1007"}, {county:'德化县', countyId:"Q1008"}, {county:'石狮市', countyId:"Q1009"}, {county:'晋江市', countyId:"Q1010"}, {county:'南安市', countyId:"Q1011"}
+							]
+						},
+						{city:'福州市', cityId:"C1002", data:[
+								{county:'鼓楼区', countyId:"Q2001"}, {county:'台江区', countyId:"Q2002"}, {county:'仓山区', countyId:"Q2003"}
+							]
+						}
+					]
+				},
+				{province:'浙江省', provinceId:"P1002", data:[
+						{city:'杭州市', cityId:"C2001", data:[
+								{county:'西湖区', countyId:"Q3001"}, {county:'上城区', countyId:"Q3002"}, {county:'下城区', countyId:"Q3003"}, 
+								{county:'保姆区', countyId:"Q3004"}, {county:'电商区', countyId:"Q3005"}
+							]
+						},
+						{city:'嘉兴市', cityId:"C2002", data:[
+							{county:'南湖区', countyId:"Q4001"}, {county:'秀洲区', countyId:"Q4002"}, {county:'北岛区', countyId:"Q4003"}, 
+							{county:'莆路区', countyId:"Q4004"}, {county:'方舟区', countyId:"Q4005"}
+							]
+						},{city:'义乌市',cityId:"C2003", data:[
+							{county:'好鞋区', countyId:"Q5001"}, {county:'坏鞋子', countyId:"Q5002"}
+							]
+						}
+					]
+				}
+			]
+		}
+
+		
+		//=======================================================================================================//
+		//									二、省市区同框联动下拉：一个下拉框里有3个联动
+		//=======================================================================================================//
+		/*+--------------------------------------------------------+*/
+		//=====省市区同框联动下拉
+		$('#i-three-link').neuiDropdown({
+			//position: 'fixed',
+			caption: '地区',
+			chain: true, //是否省市区同框联动.默认false
+			level: 3, //省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
+			json: $districtJson,
+			//areaFormat: [province', 'city', 'county'], //地区显示值JSON格式(可缺省)
+			//keyFormat: ['provinceId', 'cityId', 'countyId'], //地区隐藏值JSON格式(可缺省)
+			
+			//id: '350000-350500-350503',
+			entire:'全部',
+			value: '福建省-泉州市-丰泽区',
+
+			isCnClose:true, //当省市区同框联动,是否点了"全部"选项后就马上填充值并关闭控件(可缺省),默认true
+			isCnPartEmpty:true, //当省市区同框联动,选中下拉值后当城市或区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省", eg3. "全部-全部-全部" 变成 "全部"
+			isCnAllEmpty:false, //当省市区同框联动, 选中下拉值后当省份、城市、区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省"， eg3. "全部-全部-全部" 变成 ""
+			//说明：isCnAllEmpty=true 具有 isCnPartEmpty=true 的功能，并且还能将省份值为"全部"时也替换成空
+
+			showCloseButton: true,
+			//closeButtonAppearance: 'image', //关闭按钮的外观. text 文字（默认），image 图片.
+			callBack:function(e){
+				console.log('三级联动下拉回调：', e);
+			}
+		});
+		
+		
+			
+			
+		//=======================================================================================================//
+		//							三、省市区三级联动1：系统数据源
+		//=======================================================================================================//	
+		/*+--------------------------------------------------------+*/
+		//=====省市区联动关联节点绑定
+		var $relatedNode1 = {"province":"#i-province", "city":"#i-city", "county":"#i-county"}
+		
+		/*+--------------------------------------------------------+*/
+		//=====省份下拉
+		$('#i-province').neuiDropdown({
+			react:true,
+			region:'province',
+			relatedNode:$relatedNode1, //联动关联节点
+			//id:'350000', //选择框默认值（隐藏的ID等键值)（可缺省）
+			value:'青海省', //选择框默认值（显示值）（可缺省）
+			showCloseButton: false
+		});
+	
+		
+		/*+--------------------------------------------------------+*/
+		//=====城市下拉
+		$('#i-city').neuiDropdown({
+			react: true,
+			region: 'city',
+			relatedNode: $relatedNode1,
+			id: '350500', 
+			value: '泉州市',
+			showCloseButton: false
+		});
+		
+		
+		/*+--------------------------------------------------------+*/
+		//=====区县下拉
+		$('#i-county').neuiDropdown({
+			react: true,
+			region: 'county',
+			relatedNode: $relatedNode1,
+			//id: '350503', 
+			//value: '永春县',
+			value: '丰泽区',
+			showCloseButton: false
+		});
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		//=======================================================================================================//
+		//							四、省市区三级联动2：自定义数据源
+		//=======================================================================================================//
+		/*+--------------------------------------------------------+*/
+		//=====省市区联动关联节点绑定
+		var $relatedNode2 = {"province":"#i-sheng", "city":"#i-shi", "county":"#i-qu"}
+		
+		
+		/*+--------------------------------------------------------+*/
+		//=====省份下拉
+		$('#i-sheng').neuiDropdown({
+			react: true,
+			region: 'province',
+			json: $districtJson,
+			relatedNode: $relatedNode2,
+			//id: '350000', //使用自定义数据源时输入框有默认值时不用指定id
+			value: '福建省',
+			showCloseButton: false
+		});
+	
+		
+		/*+--------------------------------------------------------+*/
+		//=====城市下拉
+		$('#i-shi').neuiDropdown({
+			react: true,
+			region: 'city',
+			json: $districtJson,
+			relatedNode: $relatedNode2,
+			//id: '350500', //使用自定义数据源时输入框有默认值时不用指定id
+			value: '泉州市',
+			showCloseButton: false
+		});
+		
+		
+		/*+--------------------------------------------------------+*/
+		//=====区县下拉
+		$('#i-qu').neuiDropdown({
+				react: true,
+				region: 'county',
+				json: $districtJson,
+				relatedNode: $relatedNode2,
+				//id: '350503', //使用自定义数据源时输入框有默认值时不用指定id
+				value: '丰泽区',
+				showCloseButton: false
+		});
+	
+	
+	
+	
+	
+	
+	
+
+
+}); //$(function(){});
+</script>
+</body>
+</html>

@@ -1,0 +1,976 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="maximum-scale=1.0,minimum-scale=1.0,initial-scale=1.0,user-scalable=no,width=device-width">
+	<meta name="author" content="ChenHairui">
+	<meta name="application-device" content="mobile">
+	<meta name="application-name" content="">
+	<meta name="format-detection" content="telephone=yes,email=no,date=no,address=no">
+	<!--检测电话、不检测邮箱、日期及地址-->
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<!--控制状态栏显示样式-->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<!--是否删除苹果默认的菜单栏和工具栏-->
+	<meta http-equiv="Cache-Control" content="no-transform">
+	<meta http-equiv="Cache-Control" content="no-siteapp">
+	<title>Dialog | 对话框插件</title>
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-keyboard.css"><!--数字键盘控件-->
+	<link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
+	<link type="text/css" rel="stylesheet" href="assets/test/css/demo-dialog.css"><!--本页demo样式-->
+</head>
+
+<body>
+	<div class="panel-grid-demo">
+
+		<h1>对话框插件</h1>
+
+		<section class="grid-demo-tips">内容提示窗类型</section>
+		<section class="grid-demo-dialog flex">
+			<button type="button" class="ne-btn l-2x" id="btn_dialog_tips1">提示窗1</button>
+		</section>
+		<!--/grid-demo-opetate-->
+
+		<section class="grid-demo-tips">对话框类型</section>
+		<section class="grid-demo-dialog flex">
+			<button type="button" class="ne-btn l-2x" id="btn_dialog_message1">消息窗(无回调)</button>
+			<button type="button" class="ne-btn darkblue l-2x" id="btn_dialog_message2">消息窗(有回调)</button>
+			<button type="button" class="ne-btn lightblue l-2x"
+				id="btn_dialog_btnVertical">委托事件(3个按钮竖直排列,颜色各异,右上角打叉图标)</button>
+		</section>
+		<!--/grid-demo-opetate-->
+		<section class="grid-demo-dialog flex">
+			<button type="button" class="ne-btn darkblack l-2x" id="btn_dialog_btnForbid">禁用按钮</button>
+		</section>
+		<!--/grid-demo-opetate-->
+
+		<table class="grid-demo-table">
+			<tbody>
+				<tr>
+					<td>序号</td>
+					<td>姓名</td>
+					<td>年龄</td>
+					<td>性别</td>
+					<td>操作1</td>
+					<td>操作2</td>
+					<td>操作3</td>
+					<td>操作4</td>
+					<td>操作5</td>
+				</tr>
+				<tr>
+					<td>1</td>
+					<td>小刚</td>
+					<td>22</td>
+					<td class="sex">男</td>
+					<td class="td_save"><button type="button" class="save btn_save1">保存1</button><em>成功、失败都弹窗</em></td>
+					<td class="td_save"><button type="button" class="save btn_save2">保存2</button><em>成功不弹窗，失败才弹窗</em>
+					</td>
+					<td class="td_delete"><button type="button" class="del btn_delete1">删除1</button><em>成功、失败都弹窗</em>
+					</td>
+					<td class="td_delete"><button type="button" class="del btn_delete2">删除2</button><em>成功不弹窗，失败才弹窗</em>
+					</td>
+					<td class="td_delete"><button type="button" class="intrust btn_intrust">暂无!</button><em></em></td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>小李</td>
+					<td>23</td>
+					<td class="sex">女</td>
+					<td class="td_save"><button type="button" class="save btn_save1">保存1</button><em>成功、失败都弹窗</em></td>
+					<td class="td_save"><button type="button" class="save btn_save2">保存2</button><em>成功不弹窗，失败才弹窗</em>
+					</td>
+					<td class="td_delete"><button type="button" class="del btn_delete1">删除1</button><em>成功、失败都弹窗</em>
+					</td>
+					<td class="td_delete"><button type="button" class="del btn_delete2">删除2</button><em>成功不弹窗，失败才弹窗</em>
+					</td>
+					<td class="td_delete"><button type="button" class="intrust btn_intrust">暂无!</button><em></em></td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>小王</td>
+					<td>24</td>
+					<td class="sex">男</td>
+					<td class="td_save"><button type="button" class="save btn_save1">保存1</button><em>成功、失败都弹窗</em></td>
+					<td class="td_save"><button type="button" class="save btn_save2">保存2</button><em>成功不弹窗，失败才弹窗</em>
+					</td>
+					<td class="td_delete"><button type="button" class="del btn_delete1">删除1</button><em>成功、失败都弹窗</em>
+					</td>
+					<td class="td_delete"><button type="button" class="del btn_delete2">删除2</button><em>成功不弹窗，失败才弹窗</em>
+					</td>
+					<td class="td_delete"><button type="button" class="intrust btn_intrust">暂无!</button><em></em></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<section class="grid-demo-tips">对话框主题</section>
+		<section class="grid-demo-dialog flex">
+			<button type="button" class="ne-btn blue l-1x" id="btn_theme_blue">蓝色主题消息窗</button>
+			<button type="button" class="ne-btn black l-1x" id="btn_theme_black">黑色主题消息窗</button>
+			<button type="button" class="ne-btn green l-1x" id="btn_theme_green">绿色主题消息窗</button>
+			<button type="button" class="ne-btn red l-1x" id="btn_theme_red">红色主题消息窗</button>
+			<button type="button" class="ne-btn orange l-1x" id="btn_theme_orange">橙色主题消息窗</button>
+			<button type="button" class="ne-btn purple l-1x" id="btn_theme_purple">紫色主题消息窗</button>
+		</section>
+		<!--/grid-demo-opetate-->
+
+
+		<section class="grid-demo-tips">输入框</section>
+		<section class="grid-demo-feedback">
+			<button type="button" class="ne-btn blue l-2x" id="btn_feedback1">单行输入框</button>
+			<button type="button" class="ne-btn lightblue l-2x" id="btn_feedback2">多行输入框</button>
+			<button type="button" class="ne-btn purple l-2x" id="btn_feedback3">自定义输入框内容</button>
+		</section>
+		<!--/grid-demo-feedback-->
+
+
+		<section class="grid-demo-tips">事件说明</section>
+		<section class="grid-demo-statement">
+			<!-- <p><span class="title">删除1：</span>两个弹窗事件，2个按钮选项，失败、成功都弹窗</p>
+   			<p><span class="title">删除2：</span>两个弹窗事件，3个按钮选项，失败、成功都弹窗</p>-->
+		</section><!--/.grid-demo-statement-->
+
+
+		<section class="grid-demo-tips">快捷代码</section>
+		<section class="grid-demo-code flex">
+			<div class="doc">
+				<div class="doc-action">普通对话框</div>
+				<div class="doc-code">
+					<pre>
+						neuiDialog.alert({
+							animate: true,
+							caption: '提示',
+							message: '保存成功',
+							buttons: ['确定']
+						})
+					</pre>
+				</div>
+			</div><!--.doc-->
+			<div class="doc">
+				<div class="doc-action">有回调的对话框</div>
+				<div class="doc-code">
+					<pre>
+						neuiDialog.alert({
+							animate: true,
+							caption: '提示',
+							message: msg,
+							buttons: ['确定'],
+							callBack: function(ret){
+							}
+						})						
+					</pre>
+				</div>
+			</div><!--.doc-->
+			<div class="doc">
+				<div class="doc-action">确认对话框</div>
+				<div class="doc-code">
+					<pre>
+						neuiDialog.alert({
+							animate: true,
+							caption: '提示',
+							message: '确认删除',
+							buttons: ['确定', '取消'],
+							callBack: function(ret){
+								if(ret == 1){
+						
+								}
+							}
+						})											
+					</pre>
+				</div>
+			</div><!--.doc-->
+		</section><!--/.grid-demo-code-->
+
+
+	</div><!--/panel-grid-demo-->
+
+	<script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框插件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-keyboard.js"></script><!--数字键盘控件-->
+	<script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
+	<!--<script type="text/javascript" href="highlight/highlight.min.js"></script>--><!--代码高亮-->
+	<!--[if lt IE 9]>
+		<script type="text/javascript" src="js/html5shiv.min.js"></script>
+		<script type="text/javascript" src="js/respond.min.js"></script>
+		<script type="text/javascript" src="js/rem.min.js"></script>
+		<script type="text/javascript" src="js/json2.js"></script>
+	<![endif]-->
+	<!--其实移动端大部分顶级版本浏览器不需要html5shiv.min.js | respond.min.js|rem.min.js这3个，因为这3个一般是用于ie浏览器的-->
+	<!--json2.js应用于：[JSon对象转化成字符串IE7/IE6兼容js]-->
+
+	<script type="text/javascript">
+
+
+
+
+		/*▦✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚参数说明✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚▦*/
+
+		/*--------------------
+		1、neui内容提示窗配置：
+		--------------------
+		neuiDialog.notice({
+			message: '内容提示窗', //提示信息
+			//nodeID:'', //自定义弹出窗口根节点ID(可选),默认空
+			//animate: false, //是否启用转圈(可选),默认false
+			//loadTxt: '', //转圈文字(可选),默认空
+			//loadDelay: 100, //转圈延迟时间(animate=true时有效)(可选).默认100,单位：毫秒
+			//delay: 1000, //关闭窗口延时时间(可选),默认1秒,单位：毫秒
+			//zIndex: '', //自定义窗口层级(可选), 默认空(系统会自动分配层级)
+			//width: 'auto', //自定义宽度(可选). 默认auto. 其它值eg. 30, 30px
+			//height: 'auto', //自定义高度(可选). 默认auto. 其它值eg. 30, 30px
+			//fontSize: '14px', //文字大小(可选). 默认14px. 其它值eg. 12, 12px
+			//shadow: false, //是否有阴影及边框, 仅当 showMask=false时有效(可选). 默认true
+			//showMask: true, //是否启用遮罩(可选), 默认true
+			//maskOpacity: '', //遮罩透明度(可选), 默认85. 若该值大于1, 则将该值除以100即得到真正的透明度: eg. 100 即透明度1, 80 即透明度0.80, 1 即透明度0.01, 0.5 即透明度0.5
+			//location: 'center', //位置(可选). 值：center 水平垂直居中(默认), top 顶部, bottom 底部。当值为top、bottom时(一般移动端才如此设置),窗口会沾满屏幕
+			//theme: 'default', //主题(可选). 值： default 默认, primary 首选(深蓝色), black 黑色, success 成功(绿色), info 信息(浅蓝色), warn 警告(橙色), danger 错误(红色), black 黑色
+			//backColor: '', //自定义背景色(可选). 默认空. 值不为空时优先权高于参数theme
+			//foreColor: '', //自定义前景色(文字颜色)(可选). 默认空. 值不为空时优先权高于参数theme
+			//callBack: function(){} //回调(可选)
+		})
+
+
+
+		/*--------------------
+		2、neui弹出窗配置：
+		--------------------
+		neuiDialog.alert({
+			//nodeID:'weui-awards-result', //自定义弹出窗口根节点ID(可选),默认空
+			//animate:false, //是否开启转圈特效.是|true,否|false,默认false
+			//loadTxt:'', //转圈文字(animate=true时有效).默认空
+			//loadDelay:2000, //转圈延迟时间(animate=true时有效).默认100(单位：毫秒)
+			//popup:true, //是否允许弹出窗口. 是|true,否|false,默认true
+			//bubbleRet:2, //popup=false时,指定默认执行第几个按钮事件(默认值1). eg. popup=false,bubbleRet=2,表示不弹出窗口,但默认执行第2个按钮里的事件
+			caption:'温馨提醒', //标题.默认"提示"
+			message:msg, //提示信息.默认"欢迎使用neui对话框插件！"
+			buttons:['确认','取消'], //按钮名称.默认['确定','取消']
+			//theme:'', //插件主题(可选). 蓝色|blue,黑色|black,绿色|green,红色|red,橙色|orange,紫色|purple.默认空''
+			//btnColor:['purple','red'], //按钮颜色.蓝色|blue,黑色|black,绿色|green,红色|red,橙色|orange,紫色|purple.默认绿色
+			//btnFont:{size:18,bold:true}, //按钮字体. size|文字大小(默认16号), bold|文字是否加粗(默认false)
+			//btnDirection:'vertical', //按钮方向	.水平|horizontal,垂直|vertical,默认水平.
+			//zIndex:'', //自定义窗口层级(可选)(新版用), 默认空(系统会自己添加层级).
+			//maskOpacity: '', //遮罩透明度(可选), 默认85. 若该值大于1, 则将该值除以100即得到真正的透明度: eg. 100 即透明度1, 80 即透明度0.80, 1 即透明度0.01, 0.5 即透明度0.5
+			//maskZindex: '', //自定义窗口层级(可选)(兼容旧版), 默认空(系统会自己添加层级).
+			//showCross:true, //是否显示右上角打叉图标(关闭按钮). 显示|true,不显示|false,默认不显示
+			//closeWindow:true, //是否禁用按钮(是否一点击按钮就关闭窗口,默认true)
+			//closeAll:false, //是否强制关闭所有窗口(默认false)。在on('input')事件中可能出现多个弹窗，通过设置此参数可一键关闭所有窗口。
+			callBack:function(ret){ //回调函数 -> ret按钮索引值(ret=1|第1个按钮,ret=2|第2个按钮,...) 当只有一个按钮时,ret可选！if(ret)的判断亦可选
+				if(ret==1){
+					alert('我是第1个按钮');
+				}
+				if(ret==2){
+					alert('我是第2个按钮');
+				}
+			}
+		})
+
+
+
+		--------------------
+		 3、neui输入框配置
+		--------------------
+		neuiDialog.feedback({
+			//animate: true, //是否显示转圈.默认true
+			//loadTxt:'', //转圈文字(animate=true时有效).默认空
+			//loadDelay:100, //转圈延迟时间(animate=true时有效).默认100(单位：秒)
+			//zIndex: '', //自定义窗口层级(可选), 默认空(系统会自己添加层级).
+			//maskOpacity: '', //遮罩透明度(可选), 默认85. 若该值大于1, 则将该值除以100即得到真正的透明度: eg. 100 即透明度1, 80 即透明度0.80, 1 即透明度0.01, 0.5 即透明度0.5
+			//popup:true, //是否允许弹出窗口. 是|true,否|false,默认true
+			//bubbleRet:1, //popup=false时,指定默认执行第几个按钮事件(默认值1). eg. popup=false,bubbleRet=2,表示不弹出窗口,但默认执行第2个按钮里的事件
+			//caption:'', //左侧标题.默认空
+			//textAlign:'left', //左侧标题文字水平位置, left 居左(默认), center 居中, right 居右
+			//fontWeight: 'normal', //左侧标题是否加粗(可选). normal 不加粗(默认), bold 加粗
+			//fontSize: '18px', //左侧标题字体大小(可选), 默认18px
+			value:'', //输入框初始化值,默认空
+			tips:'', //输入框提示文字,默认空
+			notes:'', //输入框右侧内容,默认空
+			type:'input', //输入框类型.input|单行文本,textarea|多行文本,默认input
+			buttons:['确定'], //按钮(数组类型),默认['确定']
+			btnBgColor:[''], //按钮背景颜色(可选).蓝色|blue,黑色|black, 灰色|gray,绿色|green,红色|red,橙色|orange,紫色|purple.默认绿色
+			btnWidth:['100%'], //按钮大小(默认80px左右). 格式：单个字符串或数组(多个按钮时可设置不同按钮宽)。 eg1. 100% eg2.100px eg3.['40%', '50%']
+			showButton:true, //是否显示按钮,默认true
+			btnAign:'', //按钮水平位置(默认居右). left 居左, center 居中, right 居右
+			btnDirection: 'horizontal', //按钮方向(可选)	.水平|horizontal,垂直|vertical,默认水平.
+			keyboard:false, //是否启用数字键盘,默认false
+			numcNode:null, //当参数html不等于空时,自定义要调用"数字键盘控件"的节点(值为数组形式 eg.['#ID1','#ID2']),默认null.
+			html:'', //自定义输入框内容(自定义HTML).默认空,插件调用默认html来填充;非空时将使用自定义的html来填充，此时caption/content/tips/notes/type参数将自动失效.
+			conMargin:'15px auto', //中间内容margin值 (可选),默认15px auto
+			conPadding:'', //中间内容padding (可选),默认空
+			minWidth:-1, //窗口最小宽度(必须为正整数)(可选)
+			maxWidth:-1, //窗口最大宽度(必须为正整数)(可选)
+			showCross:true, //是否显示右上角打叉图标(关闭按钮). 显示|true,不显示|false,默认显示
+			closeWindow:false, //是否一点击按钮就关闭窗口,默认false
+			closeFeed: function(){} //关闭窗口, 供callBack等函数调用,用来关闭窗口(可选)
+			openBack:function(){}, //窗口加载完成后的回调函数(常用于动态元素加载完成后,做一些其它的事)
+			callBack:function(ret){ //点按钮后的回调函数(可选) ret 按钮索引值
+				var _this = this;
+				_this.closeFeed(); //_this.closeWindow = true //关闭当前输入框窗口
+				//neuiDialog.closeFeedWindow(); //关闭所有输入框窗口
+			} 
+			
+		})
+		--------------------
+		*/
+
+
+		
+
+
+		/*▦✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚演示Demo✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚▦*/
+
+		/*+----------------------------------------+*/
+        //=====代码块高亮
+        hljs.initHighlightingOnLoad()
+        hljs.configure({
+            languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
+        });
+        document.querySelectorAll('pre').forEach((block) => {
+            hljs.highlightBlock(block);
+        });
+
+
+
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//------------------------------------------------内容提示窗类型-----------------------------------------------------//
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/*+------------------------+*/
+		//=====内容提示窗1事件
+		$('#btn_dialog_tips1').on('click', function () {
+			neuiDialog.notice({
+				message: '再按一下退出',
+				delay: 1000, //关闭窗口延时时间(可选),默认1秒,单位：毫秒
+
+				//animate: true,
+				//loadTxt: '很好',
+				//loadDelay: 100,
+				//zIndex: 112,
+
+				//width: 'auto', //自定义宽度(可选). 默认auto. 其它值eg. 30, 30px
+				//height: 'auto', //自定义高度(可选). 默认auto. 其它值eg. 30, 30px
+				//shadow: false, //是否有阴影及边框, 仅当 showMask=false时有效(可选). 默认true
+				//showMask: true, //是否启用遮罩(可选), 默认true。 true值只有当属性location='center'时起作用
+				//maskOpacity: 0.85,
+				//location: 'bottom',
+				//theme: 'default', //主题(可选). 值： default 默认, primary 首选(深蓝色), black 黑色, success 成功(绿色), info 信息(浅蓝色), warn 警告(橙色), danger 错误(红色), black 黑色
+				//backColor: '', //自定义背景色(可选). 默认空. 值不为空时优先权高于参数theme
+				//foreColor: '', //自定义前景色(文字颜色)(可选). 默认空. 值不为空时优先权高于参数theme
+				
+				//callBack: function(){} //回调(可选)
+			})
+		});
+
+
+
+
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//------------------------------------------------对话框类型-----------------------------------------------------//
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/*+------------------------+*/
+		//=====消息窗1事件(无回调函数)
+		$('#btn_dialog_message1').on('click', function () {
+			neuiDialog.alert({
+				//animate: true,
+				//loadTxt: '你好',
+				//loadDelay: 5000,
+				caption: '提示',
+				message: '查询次数超过5次，已被系统封号！',
+				buttons: ['确定']
+			})
+		});
+
+		/*+------------------------+*/
+		//=====消息窗2事件(有回调函数)
+		$('#btn_dialog_message2').on('click', function () {
+			neuiDialog.alert({
+				caption: '提示',
+				message: '文章严重抄袭，请立即删除！',
+				buttons: ['确定'],
+				callBack: function () {
+					neuiDialog.alert({
+						animate: true,
+						loadDelay: 500,
+						caption: '提示',
+						message: 'Hello,我是回调函数！',
+						buttons: ['确定']
+					})
+				}
+			})
+		});
+
+
+		/*+------------------------+*/
+		//=====委托事件
+		$('#btn_dialog_btnVertical').on('click', function () {
+			var $this = $(this);
+			neuiDialog.alert({
+				animate: true,
+				loadTxt: '加载中..',
+				caption: '提示',
+				message: '是否提交？',
+				buttons: ['提交并委托评估', '提交并委托贷款', '取消'],
+				btnColor: ['orange', 'green', 'black'],
+				btnDirection: 'vertical',
+				showCross: true,
+				callBack: function (ret) {
+					if (ret == 1) {
+
+						var flag = '',
+							msg = '委托评估成功！';
+						neui.showAnimate('系统评估中..')
+						setTimeout(function () {
+							//..以下4行代码模拟后端操作(项目实战时请删除)
+							var numc = 1;
+							for (var i = 0; i < 100000000; i++) {
+								numc++;
+							}
+
+							//返回状态标记flag. 成功1,失败0
+							flag = 1;
+							if (!flag) {
+								msg = '委托评估失败，请稍侯再试！';
+							}
+
+							neuiDialog.alert({
+								caption: '提示',
+								message: msg,
+								buttons: ['确定'],
+								callBack: function () {
+									if (flag) { //成功
+										//..
+
+									}
+								}
+							})
+
+							neui.destroyAnimate();
+						}, 100) 
+
+					}
+
+					if (ret == 2) {
+
+						var flag = '',
+							msg = '委托贷款成功！';
+						neui.showAnimate('贷款办理中..')
+						setTimeout(function () {
+							//..以下4行代码模拟后端操作(项目实战时请删除)
+							var numc = 1;
+							for (var i = 0; i < 100000000; i++) {
+								numc++;
+							}
+
+							//返回状态标记flag. 成功1,失败0
+							flag = 1;
+							if (!flag) {
+								msg = '委托贷款失败，请稍侯再试！';
+							}
+
+							neuiDialog.alert({
+								caption: '提示',
+								message: msg,
+								buttons: ['确定'],
+								callBack: function () {
+									if (flag) { //成功
+										//..
+
+									}
+								}
+							})
+
+							neui.destroyAnimate();
+						}, 100) 
+
+					}
+					if (ret == 3) {
+						//alert('取消中');
+					}
+				} 
+			}) 
+
+		});
+
+
+		/*+------------------------+*/
+		//=====禁用按钮
+		$('#btn_dialog_btnForbid').on('click', function () {
+			neuiDialog.alert({
+				caption: '提示',
+				message: '哈哈~ 任你怎么点都关闭不了弹窗<br>确定按钮被禁用了!',
+				buttons: ['确定'],
+				closeWindow: false
+			})
+		});
+
+
+		/*+------------------------+*/
+		//=====保存1事件(成功、失败都弹窗)
+		$('.btn_save1').on('click', function () {
+			var $this = $(this);
+			var flag = '',
+				msg = '保存成功！';
+			neui.showAnimate('保存中..'); //打开转圈
+			setTimeout(function () {
+
+				//..以下4行代码模拟后端操作(项目实战时请删除)
+				var numc = 1;
+				for (var i = 0; i < 100000000; i++) {
+					numc++;
+				}
+
+				//返回状态标记flag. 成功1,失败0
+				flag = 1;
+				if (!flag) {
+					msg = '保存失败，请稍侯再试！';
+				}
+
+				//调用插件弹出窗口
+				neuiDialog.alert({
+					caption: '温馨提醒',
+					message: msg,
+					buttons: ['确认'],
+					callBack: function (ret) {
+						if (ret == 1) {
+							if (flag) { //成功
+								//...
+								var clone = $this.parents('tr').clone();
+								var index = $this.parents('tr').index() + 1;
+								var obj = $('.grid-demo-table tr:nth-child(' + index + ')');
+								clone.find('td:first-child').text('');
+								$.each(clone.find('td').not('.sex,.td_save,.td_delete'), function () {
+									$(this).html('<strong>X—</strong>' + $(this).text());
+								});
+								$(obj).before(clone.removeClass('active').addClass('gray'));
+							}
+						}	
+					} 
+				}) 
+
+				neui.destroyAnimate(); //销毁转圈
+			}, 100) 
+
+		});
+
+
+		/*+------------------------+*/
+		//=====保存2事件(成功不弹窗，失败才弹窗)
+		$('.btn_save2').on('click', function () {
+			var $this = $(this);
+			var flag = '',
+				popup = false,
+				msg = '保存成功！';
+			neui.showAnimate('保存中..'); //打开转圈
+			setTimeout(function () {
+
+				//..以下4行代码模拟后端操作(项目实战时请删除)
+				var numc = 1;
+				for (var i = 0; i < 100000000; i++) {
+					numc++;
+				}
+
+				//返回状态标记flag. 成功1,失败0
+				flag = 1;
+				if (!flag) {
+					popup = true;
+					msg = '保存失败，请稍侯再试！';
+				}
+
+				//调用插件弹出窗口
+				neuiDialog.alert({
+					caption: '温馨提醒',
+					popup: popup,
+					message: msg,
+					buttons: ['确认'],
+					callBack: function (ret) {
+						if (ret == 1) {
+							if (flag) { //成功
+								//...
+								var clone = $this.parents('tr').clone();
+								var index = $this.parents('tr').index() + 1;
+								var obj = $('.grid-demo-table tr:nth-child(' + index + ')');
+								clone.find('td:first-child').text('');
+								$.each(clone.find('td').not('.sex,.td_save,.td_delete'), function () {
+									$(this).html('<strong>X—</strong>' + $(this).text());
+								});
+								$(obj).before(clone.removeClass('active').addClass('gray'));
+							}
+						}	
+					} 
+				}) 
+
+				neui.destroyAnimate(); //销毁转圈
+			}, 100) 
+
+		});
+
+
+		/*+------------------------+*/
+		//=====删除1事件(成功、失败都弹窗)
+		$('.btn_delete1').on('click', function () {
+			var $this = $(this);
+
+			neuiDialog.alert({
+				caption: '提示',
+				message: '是否确认删除？',
+				buttons: ['确认', '取消'],
+				callBack: function (ret) {
+					if (ret == 1) {
+						var flag = '',
+							msg = '删除成功！';
+
+						neui.showAnimate('删除中..')
+						setTimeout(function () {
+							//..以下4行代码模拟后端操作(项目实战时请删除)
+							var numc = 1;
+							for (var i = 0; i < 100000000; i++) {
+								numc++;
+							}
+
+							//返回状态标记flag. 成功1,失败0
+							flag = 1;
+							if (!flag) {
+								msg = '删除失败，请稍侯再试！';
+							}
+
+							neuiDialog.alert({
+								caption: '提示',
+								message: msg,
+								buttons: ['确定'],
+								callBack: function () {
+									if (flag) { //成功
+										//..
+										$this.parents('tr').remove();
+									}
+								}
+							})
+
+							neui.destroyAnimate();
+						}, 100) 
+
+
+
+					}
+
+					if (ret == 2) {
+						//alert('取消中');
+					}
+				} 
+			}) 
+
+		});
+
+
+
+		/*+------------------------+*/
+		//=====删除2事件(成功不弹窗，失败才弹窗)
+		$('.btn_delete2').on('click', function () {
+			var $this = $(this);
+
+			neuiDialog.alert({
+				caption: '提示',
+				message: '是否确认删除？',
+				buttons: ['确认', '取消'],
+				callBack: function (ret) {
+					if (ret == 1) {
+						var flag = '',
+							popup = false,
+							msg = '删除成功！';
+
+						neui.showAnimate('删除中..')
+						setTimeout(function () {
+							//..以下4行代码模拟后端操作(项目实战时请删除)
+							var numc = 1;
+							for (var i = 0; i < 100000000; i++) {
+								numc++;
+							}
+
+							//返回状态标记flag. 成功1,失败0
+							flag = 1;
+							if (!flag) {
+								popup = true;
+								msg = '删除失败，请稍侯再试！';
+							}
+
+							neuiDialog.alert({
+								popup: popup,
+								caption: '提示',
+								message: msg,
+								buttons: ['确定'],
+								callBack: function () {
+									if (flag) { //成功
+										//..
+										$this.parents('tr').remove();
+									}
+								}
+							})
+
+							neui.destroyAnimate();
+						}, 100) 
+
+
+
+					}
+
+					if (ret == 2) {
+						//alert('取消中');
+					}
+				} 
+			}) 
+
+		});
+
+
+
+
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//------------------------------------------------对话框主题-----------------------------------------------------//
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//=====蓝色主题对话框
+		$('#btn_theme_blue').on('click', function () {
+			neuiDialog.alert({
+				caption: '提示',
+				message: '蓝色主题！',
+				buttons: ['确定'],
+				theme: 'blue'
+			})
+		});
+		//=====黑色色主题对话框
+		$('#btn_theme_black').on('click', function () {
+			neuiDialog.alert({
+				caption: '提示',
+				message: '黑色主题！',
+				buttons: ['确定'],
+				theme: 'black'
+			})
+		});
+		//=====绿色主题对话框
+		$('#btn_theme_green').on('click', function () {
+			neuiDialog.alert({
+				caption: '提示',
+				message: '绝色主题！',
+				buttons: ['确定'],
+				theme: 'green'
+			})
+		});
+		//=====红色主题对话框
+		$('#btn_theme_red').on('click', function () {
+			neuiDialog.alert({
+				caption: '提示',
+				message: '红色主题！',
+				buttons: ['确定'],
+				theme: 'red'
+			})
+		});
+		//=====橙色主题对话框
+		$('#btn_theme_orange').on('click', function () {
+			neuiDialog.alert({
+				caption: '提示',
+				message: '橙色主题！',
+				buttons: ['确定'],
+				theme: 'orange'
+			})
+		});
+		//=====紫色主题对话框
+		$('#btn_theme_purple').on('click', function () {
+			neuiDialog.alert({
+				caption: '提示',
+				message: '紫色主题！',
+				buttons: ['确定'],
+				theme: 'purple'
+			})
+		});
+
+
+
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//------------------------------------------------分隔线-----------------------------------------------------//
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/*+------------------------+*/
+		//=====单行输入框
+		$('#btn_feedback1').on('click', function () {
+			var $this = $(this);
+			neuiDialog.feedback({
+				caption: '留言',
+				value: '你好',
+				tips: '请输入留言！',
+				notes: '平方米',
+				type: 'input',
+				keyboard: true, //启用数字键盘
+				buttons: ['提交'],
+				callBack: function (ret) {
+					var _this = this;
+					if (ret == 1) {
+						var txt = $('.feedback-input').val();
+						var tips = '';
+						if (txt.length < 10) tips = '留言必须10个字以上！';
+						//检验内容是否符合要求
+						neui.showAnimate('留言提交中..');
+						setTimeout(function () {
+							if (tips != '') {
+								neuiDialog.alert({
+									caption: '提示',
+									message: tips,
+									buttons: ['确定']
+								})
+							} else {
+								//..
+								var flag = '',
+									msg = '留言成功！';
+								//..以下4行代码模拟后端操作(项目实战时请删除)
+								var numc = 1;
+								for (var i = 0; i < 100000000; i++) {
+									numc++;
+								}
+								//返回状态标记flag. 成功1,失败0
+								flag = 1;
+								if (!flag) {
+									msg = '留言失败，请稍侯再试！';
+								}
+								neuiDialog.alert({
+									caption: '提示',
+									message: msg,
+									buttons: ['确认'],
+									callBack: function (ret) {
+										if (ret == 1) {
+											if (flag) { //成功
+												//...
+
+												//neuiDialog.closeFeedWindow(); //关闭所有输入框窗口
+												_this.closeWindow = true; //关闭当前输入框窗口
+											}
+										}	
+									} 
+								}) 
+							}
+
+							neui.destroyAnimate();
+						}, 100) 
+					}//ret
+
+				} //callBack
+			})
+		});
+
+
+		/*+------------------------+*/
+		//=====多行输入框
+		$('#btn_feedback2').on('click', function () {
+			var $this = $(this);
+			neuiDialog.feedback({
+				caption: '备注',
+				tips: '请填写备注！',
+				type: 'textarea',
+				buttons: ['提交'],
+				btnAlign: 'center', //按钮水平位置
+				callBack: function (ret) {
+					var _this = this;
+					if (ret == 1) {
+						var txt = $('.feedback-textarea').val();
+						var tips = '';
+						if (txt.length < 10) tips = '备注必须10个字以上';
+						//检验内容是否符合要求
+						neui.showAnimate('备注提交中..');
+						setTimeout(function () {
+							if (tips != '') {
+								neuiDialog.alert({
+									caption: '提示',
+									message: tips,
+									buttons: ['确定']
+								})
+							} else {
+								//..
+								var flag = '',
+									msg = '提交成功！';
+								//..以下4行代码模拟后端操作(项目实战时请删除)
+								var numc = 1;
+								for (var i = 0; i < 100000000; i++) {
+									numc++;
+								}
+								//返回状态标记flag. 成功1,失败0
+								flag = 1;
+								if (!flag) {
+									msg = '提交失败，请稍侯再试！';
+								}
+								neuiDialog.alert({
+									caption: '提示',
+									message: msg,
+									buttons: ['确认'],
+									callBack: function (ret) {
+										if (ret == 1) {
+											if (flag) { //成功
+												//...
+
+												neuiDialog.closeFeedWindow(); //关闭输入框窗口
+												//_this.closeWindow = true; //关闭当前输入框窗口
+											}
+										}	
+									} 
+								}) 
+							}
+
+							neui.destroyAnimate();
+						}, 100) 
+					}//ret
+
+				} //callBack
+			})
+
+		});
+
+		/*+------------------------+*/
+		//=====自定义输入框内容
+		$('#btn_feedback3').on('click', function () {
+			var $this = $(this);
+
+			var $setJson = { "data": [{ "dyw_type_bh": "101", "dyw_type_mc": "住宅", "dyl": "70" }, { "dyw_type_bh": "102", "dyw_type_mc": "车位", "dyl": "80" }] };
+			var _html = '<ul class="diyalv">';
+			_html += '<li class="diyalv-title"><span>抵押物类型</span><span>抵押率(%)</span></li>';
+			for (var i = 0; i < $setJson.data.length; i++) {
+				_html += '<li class="diyalv-li" data-bh="' + $setJson.data[i].dyw_type_bh + '"><span>' + $setJson.data[i].dyw_type_mc + '</span><input class="input-diyalv" type="text" value="' + $setJson.data[i].dyl + '"></li>';
+			}
+			_html += '<li class="diyalv-li"><span>备注</span><textarea></textarea></li>';
+			_html += '</ul>';
+
+			neuiDialog.feedback({
+				//animate:true,
+				caption: '抵押情况',
+				//textAlign:'center', //标题位置
+				html: _html,
+				//conMargin:'5px auto',
+				//conPadding:'5px',
+				keyboard: true, //启用数字键盘
+				numcNode: ['.input-diyalv'], //设置要调用数字键盘的元素
+				buttons: ['提交'],
+				btnDirection: 'horizontal', //按钮方向
+				//btnWidth:['100%'], //按钮大小100%
+				showCross: true, //是否显示右上角打叉图标(关闭按钮)
+				//minWidth:310, //最小宽度
+				//maxWidth:500, //最大宽度
+				//showButton:false, //不显示按钮
+				closeWindow: false, //一点击按钮就关闭窗口(不用校验数据)，默认false
+				openBack: function () { }, //窗口加载完成的回调函数
+				callBack: function () {
+					var _this = this;
+					_this.closeFeed(); //_this.closeWindow = true //关闭当前输入框窗口
+					//neuiDialog.closeFeedWindow(); //关闭所有输入框窗口
+					alert('请注意：我什么都没执行\n若要点我之后马上关闭提示窗口');
+				}
+			})
+		});
+
+
+
+	</script>
+
+</body>
+
+</html>

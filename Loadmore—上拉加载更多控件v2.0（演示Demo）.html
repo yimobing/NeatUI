@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Loadmore | 上拉加载更多、下拉刷新控件v2.0</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-loadmore.css"><!--上拉加载更多-->
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <!--<script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>-->
+</head>
+<body>
+    <style>
+        * {margin: 0; padding: 0; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); -webkit-text-size-adjust: none; } html {font-size: 10px; } body {background-color: #f5f5f5; font-size: 1.2em; } .header {height: 44px; line-height: 44px; border-bottom: 1px solid #ccc; background-color: #eee; } .header h1 {text-align: center; font-size: 2rem; font-weight: normal; } .content {padding-bottom: 40px; background-color: #fff; } .content .item {display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -ms-flex-align: center; -webkit-box-align: center; box-align: center; -webkit-align-items: center; align-items: center; padding: 3.125%; border-bottom: 1px solid #ddd; color: #333; text-decoration: none; } .content .item img {display: block; width: 40px; height: 40px; border: 1px solid #ddd; } .content .item h3 {display: block; -webkit-box-flex: 1; -webkit-flex: 1; -ms-flex: 1; flex: 1; width: 100%; max-height: 40px; overflow: hidden; line-height: 20px; margin: 0 10px; font-size: 1.2rem; } .content .item .date {display: block; height: 20px; line-height: 20px; color: #999; } .opacity {-webkit-animation: opacity 0.3s linear; animation: opacity 0.3s linear; } @-webkit-keyframes opacity {0% {opacity: 0; } 100% {opacity: 1; } } @keyframes opacity {0% {opacity: 0; } 100% {opacity: 1; } } .footer {position: fixed; left: 0; bottom: 0; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; width: 100%; height: 40px; } .footer a {position: relative; display: block; -webkit-box-flex: 1; -webkit-flex: 1; -ms-flex: 1; flex: 1; line-height: 40px; text-align: center; color: #666; background-color: #eee; text-decoration: none; } .footer a:before {content: ''; position: absolute; left: 0; top: 10px; width: 1px; height: 20px; background-color: #ccc; } .footer a:first-child:before {display: none; }
+    </style>
+
+    <div class="wrap">
+        <div class="header">
+            <h1>就当我是新闻页吧</h1>
+        </div>
+        <div class="content">
+            <div class="lists">
+                <a class="item" href="#">
+                    <img src="https://inews.gtimg.com/newsapp_bt/0/13039858001/1000" alt="">
+                    <h3>1文字描述文字描述</h3>
+                    <span class="date">2014-14-14</span>
+                </a>
+                <a class="item" href="#">
+                    <img src="https://inews.gtimg.com/newsapp_bt/0/13039858001/1000" alt="">
+                    <h3>2文字描述文字描述文字描述4文字描述文字描述文字描述文字描述文字描述</h3>
+                    <span class="date">2014-14-14</span>
+                </a>
+                <a class="item" href="#">
+                    <img src="https://inews.gtimg.com/newsapp_bt/0/13039858001/1000" alt="">
+                    <h3>3文字描述文字描述文字描述4文字描述文字描述文字描述文字描述文字描述</h3>
+                    <span class="date">2014-14-14</span>
+                </a>
+                <a class="item" href="#">
+                    <img src="https://inews.gtimg.com/newsapp_bt/0/13039858001/1000" alt="">
+                    <h3>4文字描述文字描述文字描述文字描述文字描述</h3>
+                    <span class="date">2014-14-14</span>
+                </a>
+                <a class="item" href="#">
+                    <img src="https://inews.gtimg.com/newsapp_bt/0/13039858001/1000" alt="">
+                    <h3>5文字描述文字描述文字描述4文字描述文字描述文字描述文字描述文字描述</h3>
+                    <span class="date">2014-14-14</span>
+                </a>
+                <a class="item" href="#">
+                    <img src="https://inews.gtimg.com/newsapp_bt/0/13039858001/1000" alt="">
+                    <h3>6文字描述文字描述文字描述4文字描述文字描述文字描述文字描述文字描述</h3>
+                    <span class="date">2014-14-14</span>
+                </a>
+                <a class="item" href="#">
+                    <img src="https://inews.gtimg.com/newsapp_bt/0/13039858001/1000" alt="">
+                    <h3>7文字描述文字描述文字描述4文字描述文字描述文字描述文字描述文字描述</h3>
+                    <span class="date">2014-14-14</span>
+                </a>
+                <a class="item" href="#">
+                    <img src="https://inews.gtimg.com/newsapp_bt/0/13039858001/1000" alt="">
+                    <h3>8文字描述文字描述文字描述4文字描述文字描述文字描述文字描述文字描述</h3>
+                    <span class="date">2014-14-14</span>
+                </a>
+                <a class="item" href="#">
+                    <img src="https://inews.gtimg.com/newsapp_bt/0/13039858001/1000" alt="">
+                    <h3>9文字描述文字描述文字描述4文字描述文字描述文字描述文字描述文字描述</h3>
+                    <span class="date">2014-14-14</span>
+                </a>
+                <a class="item" href="#">
+                    <img src="https://inews.gtimg.com/newsapp_bt/0/13039858001/1000" alt="">
+                    <h3>10文字描述文字描述文字描述4文字描述文字描述文字描述文字描述文字描述</h3>
+                    <span class="date">2014-14-14</span>
+                </a>
+            </div>
+        </div>
+        <div class="footer">
+            <a href="#1" class="item">测试菜单</a>
+            <a href="#2" class="item">只做展示</a>
+            <a href="#3" class="item">无功能</a>
+            <a href="#4" class="item">不用点</a>
+        </div>
+    </div><!--/.wrap-->
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui-loadmore.js"></script><!--上拉加载更多-->
+    <script type="text/javascript">
+        /*+----------------全局变量----------------+*/
+        var PAGESIZE = 10; //每页数量
+
+        /*+----------------FUNCTION----------------+*/
+        /**
+         * 获取历史数据
+         * @param {number} ps_curpage 当前页码
+         * @returns {Promise} 返回第N页对应的Promise对象. 其中resolve(res)中的res为数据源
+         */
+        var count = 0; //count 模拟请求次数
+        function get_data_history(ps_curpage){
+            //异步返回Promise对象
+            return new Promise(function(resolve, reject){
+                // · 前台模拟异步
+                setTimeout(function(){
+                    count++;
+                    if(count < 2)
+                        //后台返回
+                        var json = {
+                            data:[
+                                        
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx1", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx2", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx3", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx4", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx5", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx6", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx7", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx8", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx9", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx10", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"}
+                                ,{"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx11", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx12", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"}
+                            ]
+                        }
+                    //else var json = {}
+                    else if(count < 3) 
+                        var json = {
+                            data:[           
+                                {"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy1", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy2", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy3", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"}
+                                ,{"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy4", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy5", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy6", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy7", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy8", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy9", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy10", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"}
+                                ,{"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy11", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"周瑜，字公瑾，庐江舒人，东汉末年名将，出身庐江周氏yyy12", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"}
+                            ]
+                        }
+                    else 
+                        var json = {
+                            data:[
+                                {"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz1", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz2", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                {"title":"Over！！！班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz3", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"}
+                                // ,{"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz4", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                // {"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz5", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                // {"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz6", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                // {"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz7", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                // {"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz8", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                // {"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz9", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                // {"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz10", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"}
+                                // ,{"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz11", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+                                // {"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz12", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"}
+                            ]
+                        }
+
+                    
+                    resolve(json);  // 成功，使用resolve()返回所有数据
+                    // reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+
+                }, 1000)
+
+                // ·后台返回
+                /*
+                //START AJAX
+                var json = {}
+                var isHoldOn = true;
+                ajax({
+                    heading: "获取历史数据",
+                    debug: false,
+                    type: "POST",
+                    async: false, // false 同步取数, true 异步取数
+                    url: "",
+                    data: {
+                        "action": "",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk %>"
+                    },
+                    success: function(res){
+                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        //if(res == '') return;
+                        json = JSON.parse(res);
+                        resolve(json); // 成功，使用resolve()返回所有数据
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    return {}
+                }
+                //END AJAX
+                */
+            })
+                    
+        }
+
+        /**
+         * 创建历史列表
+         * @param {object} ps_source 数据源
+         */
+        function create_list_history(ps_source, ps_nowpage){
+            if(!ps_source || $.isEmptyObject(ps_source)) return;
+            if(typeof ps_source.data == 'undefined') return;
+            var node = '.lists';
+            var _html = '';
+            $.each(ps_source.data, function(i, items){
+                var j = i + 1;
+                var xuhao = PAGESIZE * (ps_nowpage - 1) + j;
+                _html += '<a class="item" href="#">'+
+                            '<img src="' + items["img"] + '">'+
+                            '<h3>' + xuhao + ' ' + items["title"] + '</h3>'+
+                            '<span class="date">' + items["date"] + '</span>'+
+                        '</a>';
+            })
+            if($(node).length > 0) $(node).append(_html);
+        }
+
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+
+            /*+----------------------------------------+*/
+            /**
+             * 由于部分Android中UC和QQ浏览器头部有地址栏，并且一开始滑动页面隐藏地址栏时，无法触发scroll和resize，所以会导致部分情况无法使用。解决方案1：增加distance距离，例如DEMO2中      distance:50；解决方案2：加meta使之全屏显示
+                <meta name="full-screen" content="yes">
+                <meta name="x5-fullscreen" content="true">
+             */
+            //=====上拉加载更多、下拉刷新
+            $('.lists').neuiLoadmore({
+                 // 【名词解释】移动端中,
+                // 下滚(下方)：滚动条向下滚动↓, 手按按住屏幕向上滑动↑
+                // 上滚(上方)：滚动条向上滚动↑, 手按钮住屏幕向下滑动↓
+                scrollArea: window, // 滑动区域, 默认绑定元素自身(可选). 可选时也默认绑定元素自身. 值: window(全局滚动), 'self' 绑定元素自身(局部滚动)
+                scrollHeight: 0, // 自定义滑动区域高度,默认0(可选). 当scrollArea绑定的元素不是window时,则必须手动设置本参数值,否则控件不会执行.
+
+                // 拼接节点
+                // 列拼接节点有多个时,写成数组的形式.eg.['.dom1', '.dom2']
+                // 列表拼接节点有只有一个时填空
+                pingSelector: '', // 自定义列表拼接节点,默认空(可选). 一般用于TAB选项卡且列表拼接根节点有多个时. 
+
+                // 注①：当 autoLoad=true, cleanUp=true 时, 则：页面一打开就会清空滑动区域已有数据,且马上加载第1页数据
+                autoLoad: true, // 是否自动加载,默认true(可选). true时如果文档高度小于可视高度则无须下滚就会自动加载第1页数据, false时须下滚才加载第1页数据
+                cleanUp: false, // 是否先清空滑动区域已有数据,默认true(可选). true时只对第1页有效
+                
+                pagesize: PAGESIZE, // 每页记录数(可选), 默认20
+                threshold: 50, // 提前加载距离(正整数,可选),默认加载区高度2/3. 比如到底部边缘上方50px时提前加载
+                distance: 50, // 拉动距离,默认50(可选). 用于解决“由于部分Android中UC和QQ浏览器头部有地址栏，并且一开始滑动页面隐藏地址栏时，无法触发scroll和resize”的Bug
+                delay: 0, // 转圈延迟时间,单位:毫秒(可选),默认0。本地调试用，只为看到转圈效果.
+                labelDown: { // 下滚文本(可选)
+                    more: '↑上拉加载更多', // 底部时默认文字(可选)
+                    load: '加载中', // 加载(可选)
+                    empty: '没有更多了'// 无数据(可选)
+                },
+                labelUp: { // 上滚文本(可选)
+                    more: '↓下拉刷新',
+                    update: '↑释放更新',
+                    load: '加载中'
+                },
+                getData: function(e){ //从前台获取并返回数据源. 参数e为当前页码等组成的一维对象. 注意：返回格式为Object对象或Promise对象, 即若AJAX为同步则返回消息数据Object一维对象; 若AJAX为异步,则返回消息数据写在resolve()中的Promise对象
+                    // console.log('当前页码：', e.curpage)
+                    return get_data_history(e.curpage);
+                },
+
+                loadDownFn: function (e) { // 下方函数,默认空(可选). 参数e为数据源、当前页码等组成的一维对象
+                    create_list_history(e.source, e.curpage);
+                },    
+                loadUpFn : function(e){ // 上方函数,默认空(可选). 参数e为数据源、当前页码等组成的一维对象
+                    //console.log('e:', e)
+                    create_list_history(e.source, e.curpage);
+                }
+                
+            });
+            
+            
+        
+        }); //$(function(){})
+    </script>
+</body>
+</html>

@@ -1,0 +1,807 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,initial-scale=1.0,user-scalable=no,width=device-width">
+<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<title>LikeTable | 多表多分页</title>
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框控件-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css" /><!--下拉联动控件-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"><!--输入下拉控件-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-searchbox.css" /><!--搜索框控件-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css" /><!--日历控件-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-liketable.css" /><!--类表格控件-->
+<link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.min.css" /><!--图标库-->
+<link type="text/css" rel="stylesheet" href="assets/test/css/common.css" /><!--通用布局样式-->
+<!--[if lt IE 9]>
+    <script type="text/javascript" src="assets/style/js/html5shiv.min.js"></script>
+    <script type="text/javascript" src="assets/style/js/respond.min.js"></script>
+    <script type="text/javascript" src="assets/style/js/rem.min.js"></script>
+    <script type="text/javascript" src="assets/style/js/json2.js"></script>
+<![endif]-->
+ <!--json2.js支持IE8-以下版本json与字符串互转h函数:JSON.Stringify()、 JSON.Parse()-->
+</head>
+<body>
+  <style>
+    /*+-------------------------------+*/
+    .wrap{padding:0;}
+    .ne-like-table{margin-bottom:15px;padding-top:15px;border-top: 5px solid #f4f4f4;padding: 0 15px;}
+    .ne-like-table:first-child{padding-top:0; border-top:0;}
+    .block-caption{text-align:left;}
+    .cap-one{display:inline-block; *display:inline; _display:inline; *zoom:1; margin-right:25px;}
+    .cap-one label{color:#777;}
+    .cap-one em{margin-left:3px;}
+    /*+-------------------------------+*/
+    #container{margin-top: 60px;/* padding:0px 15px; */}
+    #main{padding-bottom:55px;}
+    .section-tab{position:fixed;z-index:15;top:0;left:0;right:0;margin:0 auto 35px auto;height:50px;text-align:center;/* box-shadow:0 1px 6px #c8c5c5; */}
+    .section-tab>div{float:left;width:50%;line-height:50px; background-color:#f5f5f5; border:1px solid #d9d5d5; border-top:0; font-size:18px; cursor:pointer; }
+    .section-tab>div:first-child{border-right:0; border-left:0;}
+    .section-tab>div.on{background-color:#fff; border-bottom:0; font-weight:bold;}
+    .section-operate span{position:absolute; z-index:20; top:18px; color:#888; cursor: pointer;}
+    .section-operate span:hover{color:#1296db;}
+    .section-operate span:first-child{left:30%;}
+    .section-operate span+span{right:20%;}
+    .section-operate span em{display:none;}
+
+    .section-search{padding:0 15px;}
+    .section-subtotal{position:fixed; z-index:16; left:0; right:0; bottom:45px; width:100%; margin:0 auto; padding:10px 15px; background-color:#f7f7f7; border:1px solid #ddd; border-left:0; border-right:0; box-shadow:0 -2px 8px 0 #e6dfdf; text-align: left; font-size:18px; }
+    .section-subtotal.empty{background-color:#fff; border:0; box-shadow:none;}
+    .section-subtotal-1{bottom:0;}
+    .section-subtotal .title{font-weight: bold; color:#ff0000;}
+    .section-subtotal em{margin:0 8px; font-style:italic; font-weight: bold;}
+  </style>
+  <div class="wrap">
+    <div class="section-tab">
+        <div class="tab tab-one on" data-click-times="1">未回复</div>
+        <div class="tab tab-two" data-click-times="0">已回复</div>
+    </div><!--/.section-tab-->
+
+    <div id="header">
+        <div class="section-search"></div><!--/.section-search-->
+    </div><!--/#header-->
+    <div id="main">
+        <div class="section-unreply"></div><!--/.section-unreply-->
+        <div class="section-replyed" style="display: none;"></div><!--/.section-replyed-->
+    </div><!--/#main-->
+  </div><!--/.wrap--> 
+  
+  
+<script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="assets/style/js/jquery.table2excel.min.js"></script><!--表格导出EXCEL-->
+<script type="text/javascript" src="assets/style/js/jquery.chineseDistricts.js"></script><!--省市区数据源-->
+<script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+<script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-dropdown.js"></script><!--下拉联动控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-searchbox.js"></script><!--搜索框控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-loadmore.js"></script><!--上拉加载更多控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-liketable.js"></script><!--类表格控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+<script type="text/javascript" src="assets/neatui/js/neatui-batchLoadData.js"></script><!--分批加载数据-->
+<script type="text/javascript">
+    /*+--------------------------------------------------------+*/
+    //全局变量
+    var $g_tab_index = 1; //选项卡标记. 1 未回复, 2 已回复
+    
+    var $g_setJson_unreply = {} //表格列字段json(未回复)
+    var $g_tableJson_unreply = {} //表格列表数据json(未回复)
+    var $g_setJson_replyed = {} //表格列字段json(已回复)
+    var $g_tableJson_replyed = {} //表格列表数据json(已回复)
+    var $g_pageJson = {}; //表格分页参数json
+	var $g_pagination = true; //表格是否分页
+    var $g_pageCount = 100; //表格分页总页数
+    var $pagesize = 5; //表格分页每页记录数
+	var $g_exportExcel = { //导出EXCEL
+		enable: true, //是否启用(可缺省).默认true
+		filename:'快评数据统计', //文件名（可缺省）.系统默认的excel文件名为：'导出报表-'
+		fileAutoTime:true, //导出的文件自动添加时间(hh:mm:ss)作为文件名的一部分。默认true
+		extension: '.xls' //拓展名。 .xls(excel 2003)(默认), .xlsx (excel 2007,2010)
+    } 
+    
+
+    /*+===============================================================+*/
+    /*                      搜索控件配置                           
+    /*+===============================================================+*/
+    /*+--------------------------------+*/
+    //=====[搜索区域参数JSON]
+    var $searchJson = {
+        inputBox:{ //搜索框
+            column:5, //一行有几个，默认3
+            group:[
+                {
+                    title:'开始日期',
+                    field:'startDate',
+                    type:'date',
+                    date:'本月初',
+                    icon:'fa-calendar'
+                },{
+                    title:'结束日期',
+                    field:'endDate',
+                    type:'date',
+                    date:'本月末',
+                    icon:'fa-calendar'
+                },{
+                    title:'客户姓名', 
+                    field:'inquiryClientName',
+                    type:'string',
+                    must:false,
+                    width:'1x',
+                    icon:'fa-user-circle-o'
+                },{
+                    title:'客户电话', 
+                    field:'inquiryClientTel',
+                    type:'string',
+                    must:false,
+                    icon:'fa-user-o'
+                },{
+                    title:'询价单号', 
+                    field:'inquiryNo',
+                    must:false
+                },{
+                    title:'询价人', 
+                    field:'inquiryPerson',
+                    type:'string',
+                    must:false,
+                    width:'2x',
+                    icon:'fa-address-book-o'
+                },{
+                    title:'询价对象', 
+                    field:'inquiryObject',
+                    type:'string',
+                    must:false,
+                    width:'2x',
+                    icon:'fa-cubes'
+                },{
+                    title:'回复人', 
+                    field:'inquiryReplyPerson',
+                    type:'string',
+                    must:false,
+                    icon:'fa-user-o'
+                }
+            ]
+        },
+        searchButton:{ //按钮
+            wrap:true, //按钮是否换行显示。true 是（默认），false 否。若只有一个搜索按钮，将wrap=false按钮将紧接着最后一个搜索框
+            group:[ //按钮组
+                {
+                    title:'查询', 
+                    field:'btn_search',
+                    width:70,
+                    theme:'diamond',
+                    callback:function(e){ 
+                        //console.log('查询按钮，e值：',e);
+                        refreshDataByClickSearchButton(e);
+                    }
+                },{
+                    title:'本日', 
+                    field:'btn_today',
+                    icon:'fa-calendar',
+                    theme:'diamond',
+                    callback:function(e){ 
+                        refreshDataByClickSearchButton(e);
+                    }
+                },{
+                    title:'本月', 
+                    field:'btn_month',
+                    icon:'fa-calendar',
+                    theme:'diamond',
+                    callback:function(e){ 
+                        refreshDataByClickSearchButton(e);
+                    }
+                },{
+                    title:'本季', 
+                    field:'btn_quarter',
+                    icon:'fa-calendar',
+                    theme:'diamond',
+                    callback:function(e){ 
+                        refreshDataByClickSearchButton(e);
+                    }
+                },{
+                    title:'本年', 
+                    field:'btn_year',
+                    icon:'fa-calendar',
+                    theme:'diamond',
+                    callback:function(e){
+                        refreshDataByClickSearchButton(e);
+                    }
+                },{
+                    title:'导出EXCEL', 
+                    field:'btn-excel',
+                    icon:'fa-file-excel-o',
+                    width:110,
+                    theme:'diamond',
+                    checkForm:false,
+                    callback:function(e){
+                        neui.export2Excel($g_exportExcel)
+                    }
+                }
+            ]
+        }
+    }
+
+    
+
+
+    /*+===============================================================+*/
+    /*                      表格控件配置                           
+    /*+===============================================================+*/
+    /*+--------------------------------+*/
+    //=====[表格列字段json](未回复)
+    $g_setJson_unreply = {
+        caption:"未回复列表", //标题
+        capHTML:"", //自定义标题HTML.(可缺省)
+        headHeight:"auto", //表头高度. auto 自动(默认). 其它大于0的数字如：50 表示高50px. (可缺省)
+        headWrap:true, //表头是否换行（一般用于有副标题时才设为true),默认true. (可缺省)(该属性暂时无效,不起作用)
+        rowHeight:"auto", //表身行高, auto 自动（默认）, 其它大于0的数字如：30 表示高30px. （可缺省）
+        tbodyHeight:"auto", //自定义表格内容高度. auto 自动(浏览器一屏高). 其它大于0的数字如：300 表示高300px. (可缺省)
+        topHeight:"auto", //表格以外上面部分高度(如header部分. auto 自动(浏览器一屏高). 其它大于0的数字如：150 表示高150px. (可缺省)
+        botHeight:"auto", //表格以外下面部分高度(如footer部分).  auto 自动(浏览器一屏高). 其它大于0的数字如：100 表示高100px. (可缺省)
+        nestDepth:2, //表格列表数据json嵌套层次.默认1.(有几个Data就是几层嵌套). (可缺省)
+        pendMethod: "empty", //数据添加方式(可缺省). empty 清空(默认), insert 追加并插入到最后面
+        customize:{ //自定义属性 
+           
+        },
+        primaryKey:{ //主键列 (可缺省)
+            field:["dyw_xh"],  //可多个字段. eg. [":lsh_id1","lsh_id2"]
+            show:false //是否显示,默认false. (可缺省)
+        },
+        isSerialCol:true, //是否显示序号列. 默认true(可缺省)
+        stateColumn:{ //状态列（可缺省）
+            show:false, //是否显示, 默认false. (可缺省)
+            value:"", //初始值,默认空.（可缺省）
+            unsaveText:"未保存", //数据有更改时的文字(可缺省)
+            savedText:"已保存" //数据无更改时的文字(可缺省)
+        },
+        isSorted:true, //是否启用列排序. 默认true.(可缺省)
+        columns:[{
+                title:"查看",
+                width:50,
+                mode:"button",
+                label:"查看",
+                name:"btn-view ne-btn linear green",
+                align:"center"
+            },
+            {
+                title:"抵押物序号",
+                field:"dyw_xh",
+                width:90,
+                mode:"input",
+                readonly:true,
+                disabled:true,
+                border:"none"
+            },{
+                title:"楼盘名称",
+                field:"lpmc",
+                width:160,
+                mode:"input",
+                readonly:true,
+                disabled:true,
+                border:"none"
+            },{
+                title:"抵押物所在地", 
+                field:"area",
+                width:140,
+                mode:"input",
+                readonly:true,
+                disabled:true,
+                border:"none"
+            },{
+                title:"抵押物信息", 
+                field:"dyw_add",
+                width:400,
+                mode:"input",
+                readonly:true,
+                disabled:true,
+                border:"none"
+            },{
+                title:"建筑面积",
+                subtitle:"(㎡)", 
+                field:"jzmj",
+                type:"float",
+                width:100,
+                mode:"input",
+                readonly:true,
+                disabled:true,
+                border:"none"
+            },{
+                title:"询价时间", 
+                field:"time_xj",
+                width:130,
+                mode:"input",
+                readonly:true,
+                disabled:true,
+                border:"none"
+            }
+        ]
+    }
+
+
+
+    /*+--------------------------------+*/
+    //=====[表格列字段json](已回复)
+    var tempJson = JSON.parse(JSON.stringify($g_setJson_unreply)); //解决“对象、数组直接赋值变成引用”的问题
+    var addedArr = [{
+            title:"询价单价", 
+            subtitle:"(元/㎡)",
+            field:"xjhf_dyjz_dj",
+            width:130,
+            mode:"input",
+            readonly:true,
+            disabled:true,
+            border:"none"
+        },{
+            title:"询价总价", 
+            subtitle:"(万元)",
+            field:"xjhf_dyjz_zj",
+            width:100,
+            mode:"input",
+            readonly:true,
+            disabled:true,
+            border:"none"
+        },{
+            title:"正式评估单价", 
+            subtitle:"(元/㎡)",
+            field:"pgjg_dyjz_dj",
+            width:100,
+            mode:"input",
+            readonly:true,
+            disabled:true,
+            border:"none"
+        },{
+            title:"正式评估总价", 
+            subtitle:"(万元)",
+            field:"pgjg_dyjz_zj",
+            width:100,
+            mode:"input",
+            readonly:true,
+            disabled:true,
+            border:"none"
+        },{
+            title:"抵押率", 
+            field:"dyl",
+            width:100,
+            mode:"input",
+            readonly:true,
+            disabled:true,
+            border:"none"
+        },{
+            title:"预计贷款额度", 
+            subtitle:"(万元)",
+            field:"xjjg_dked",
+            width:100,
+            mode:"input",
+            readonly:true,
+            disabled:true,
+            border:"none"
+        },{
+            title:"可贷款额度", 
+            subtitle:"(万元)",
+            field:"zspgjg_dked",
+            width:100,
+            mode:"input",
+            readonly:true,
+            disabled:true,
+            border:"none"
+        },{
+            title:"询价回复人", 
+            field:"user_xjhf",
+            width:130,
+            mode:"input",
+            readonly:true,
+            disabled:true,
+            border:"none"
+        },{
+            title:"询价回复时间", 
+            field:"time_xjhf",
+            width:130,
+            mode:"input",
+            readonly:true,
+            disabled:true,
+            border:"none"
+        },{
+            title:"回复说明", 
+            field:"xjhf_sm",
+            width:160,
+            mode:"input",
+            readonly:true,
+            disabled:true,
+            border:"none"
+        }
+    ]
+
+    for(var i = 0; i < addedArr.length; i++){
+        tempJson.columns.push(addedArr[i]);
+    }
+    tempJson.caption = '已回复列表';
+    $g_setJson_replyed = tempJson;
+
+
+    /*+--------------------------------+*/
+    //=====[表格分页参数json]
+    $g_pageJson = {
+        enable:$g_pagination, //是否启用分页（可缺省）。true 是（默认），false 否
+        pageSize:$pagesize, //每页几条记录，默认25（可缺省）
+        pageCount:$g_pageCount, //总页数（必须）
+        pageMode:'select', //分页方式（可缺省）。list 列表形式（默认），select下拉形式
+        pageInfos:true, //是否显示分页统计信息，默认true（可缺省）
+        pageList:{ //pageMode='list'时(可缺省)
+            listSize:5  //显示几个页码，默认5(可缺省），litSize>pageCount时显示所有页码.
+        },
+        pageSelect:{ //pageMode='select'时（可缺省）
+            allPage:true, //全部按钮（即：通过此按钮可一次性加载全部数据）（可缺省）
+            homePage:true, //首页按钮（可缺省）
+            prevPage:true, //上一页按钮（可缺省）
+            nextPage:true, //下一页按钮（可缺省）
+            lastPage:true, //最后一页（尾页）按钮（可缺省）
+            dropPage:true //下拉页码（一页页显示）按钮（可缺省）
+        },
+        callback:function(e){ //回调函数（必须）.e是一个包含当前页码、每页记录数、总页数等信息的json.eg {curpage:1, pagesize:20, pageCount:3}
+            //console.log('回调信息，e：',e);
+            //var curpage = e.curpage;  //当前页码
+            if(e.button == '全部') $pagesize = e.pagesize; //全局赋值
+            var json = refreshDataByClickPageButton(e);
+            return json;
+        }
+    }
+
+
+
+
+    /*+===============================================================+*/
+    /*                                 函数                          
+    /*+===============================================================+*/
+    /*
+    * 函数：获取表头HTML
+    * @param {*} json
+    */
+    function getTitleHtml(json){
+        var _html = '<div class="block-caption">'+
+                '<div class="cap-one"><label>询价单号：</label><em>' + json["xjdh"] + '</em></div>'+
+                '<div class="cap-one"><label>客户姓名：</label><em>' + json["kh_name"] + '</em></div>'+
+                '<div class="cap-one"><label>客户电话：</label><em>' + json["kh_tel"] + '</em></div>'+
+                '<div class="cap-one"><label>评估目的：</label><em>' + json["pgmd_mc"] + '</em></div>'+
+                '<div class="cap-one"><label>贷款品种：</label><em>' + json["dkpz"] + '</em></div>'+
+                '<div class="cap-one"><label>建单时间：</label><em>' + json["create_time"] + '</em></div>'+
+            '</div>';
+        return _html;
+    }
+
+    
+    /**
+     * 函数：加载表格数据及分页（未回复）
+     * @param {*} setJson 列字段参数json
+     * @param {*} dataJson 列表数据json
+     * @param {*} subJson 小计合计行json
+     * @param {*} pagerJson 分页参数json
+     * @param {*} pagerJson 分页总页数
+     */
+    function createTableData(setJson,dataJson,pagerJson,pageCount){
+        /*var node = $g_tab_index == 1 ? '.section-unreply' : '.section-replyed';
+        pagerJson.pageCount = pageCount; //改变分页页码
+        for(var i=0; i<dataJson.data.length; i++){
+            var datasource = dataJson.data[i];
+            setJson.capHTML = getTitleHtml(datasource);
+            $(node).neuiLikeTable({
+                setJson:setJson, //列字段
+                dataJson:datasource, //列表数据
+                pagination:pagerJson, //分页
+                exportExcel:$g_exportExcel //导出
+            })
+        }*/
+        var node = $g_tab_index == 1 ? '.section-unreply' : '.section-replyed';
+        pagerJson.pageCount = pageCount; //改变分页页码
+        //表头HTML
+        var htmlArr = [];
+        if(typeof dataJson.data != 'undefined'){
+            for(var i=0; i<dataJson.data.length; i++){
+                var datasource = dataJson.data[i];
+                var _html = getTitleHtml(datasource);
+                htmlArr.push(_html);         
+            }
+            setJson.capHTML = htmlArr;
+        }
+        //调用插件
+        $(node).neuiLikeTable({
+            setJson:setJson, //列字段
+            dataJson:dataJson, //列表数据
+            pagination:pagerJson, //分页
+            exportExcel:$g_exportExcel //导出
+        }) 
+    }
+
+
+
+    
+    
+	/**
+	 * 函数：点击分页按钮刷新表格数据
+	 * @param pageData 搜索框数据json
+	 */
+	function refreshDataByClickPageButton(e){	
+        var ls_curpage = e.curpage; //当前页码
+        var ls_pages = e.pageCount; //总页数. 总页数=1,表示调用全部数据, 总页数>1,调用当前分页对应数据
+        console.log('分页按钮e:',e, ' ,当前页码:',ls_curpage);
+        
+       
+        if($g_tab_index == 1)
+            $g_tableJson_unreply = {"data":[
+                    {"xjdh": "X1001aa", "kh_name": "欧阳修", "kh_tel": "18050135231", "pgmd_bh": "P1001", "pgmd_mc": "房产抵押", "dkpz": "信用贷", "create_time": "2020-03-25 16:10:15", 
+                        "data": [
+                            {"dyw_xh": "D1001aa", "lpmc": "晋江SM广场1", "area": "福建省-泉州市-晋江市", "dyw_add": "住宅/晋江SM广场/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"},
+                            {"dyw_xh": "D1002aa", "lpmc": "晋江SM广场2", "area": "福建省-泉州市-晋江市", "dyw_add": "住宅/晋江SM广场/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"} 
+                        ] 
+                    },
+                    {"xjdh": "X1002bb", "kh_name": "王安石", "kh_tel": "18050135231", "pgmd_bh": "P1001", "pgmd_mc": "房产抵押", "dkpz": "信用贷", "create_time": "2020-03-25 16:10:15", 
+                        "data": [
+                            {"dyw_xh": "D1001bb", "lpmc": "晋江时代广场1", "area": "福建省-泉州市-晋江市", "dyw_add": "住宅/晋江时代广场（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"},
+                            {"dyw_xh": "D1002bb", "lpmc": "晋江时代广场2", "area": "福建省-泉州市-晋江市", "dyw_add": "住宅/晋江时代广场（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"} 
+                        ] 
+                    } 
+                ] 
+            }
+        
+        else
+            $g_tableJson_replyed = {"data":[
+                    {"xjdh": "X1001aa", "kh_name": "苏东坡", "kh_tel": "18050135231", "pgmd_bh": "P1001", "pgmd_mc": "房产抵押", "dkpz": "信用贷", "create_time": "2020-03-25 16:10:15", 
+                        "data": [
+                            {"dyw_xh": "D1001aa", "lpmc": "洛江四季公园1", "area": "福建省-泉州市-洛江区", "dyw_add": "住宅/洛江四季公园/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"},
+                            {"dyw_xh": "D1002aa", "lpmc": "洛江四季公园2", "area": "福建省-泉州市-洛江区", "dyw_add": "住宅/洛江四季公园/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"} 
+                        ] 
+                    },
+                    {"xjdh": "X1002bb", "kh_name": "范仲淹", "kh_tel": "18050135231", "pgmd_bh": "P1001", "pgmd_mc": "房产抵押", "dkpz": "信用贷", "create_time": "2020-03-25 16:10:15", 
+                        "data": [
+                            {"dyw_xh": "D1001bb", "lpmc": "泉港三盛花园1", "area": "福建省-泉州市-泉港区", "dyw_add": "住宅/泉港三盛花园（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"},
+                            {"dyw_xh": "D1002bb", "lpmc": "泉港三盛花园2", "area": "福建省-泉州市-泉港区", "dyw_add": "住宅/泉港三盛花园（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"} 
+                        ] 
+                    } 
+                ] 
+            }
+        
+        //把json数据传给插件
+        /**
+         *返回格式：
+            1.单个json 
+                eg. return tableJson
+            2.json或函数名组成的数组或嵌套数组:
+                eg. return [tableJson, getXXHTML] 
+                eg. return [tableJson, [subJson]]
+                eg. return [tableJson, [subJson, totalJson]]
+                eg. return [tableJson, [subJson], getXXHTML]
+                eg. return [tableJson, [subJson, totalJson], getXXHTML]        
+                其中:
+                tableJson  表格列表数据json
+                getXXHTML 获取表格标题自定义HTML的函数(这里只需要传递函数名)
+                subJson    小计json
+                totalJson  合计json
+        */
+
+        var tableJson = $g_tab_index == 1 ? $g_tableJson_unreply : $g_tableJson_replyed;
+        return [tableJson, getTitleHtml]; 
+    }
+    
+
+
+    /**
+     * 函数：点击搜索按钮刷新表格数据
+     * @param queryData 搜索框数据json
+     */
+    function refreshDataByClickSearchButton(e){
+        console.log('搜索按钮e:',e);
+        $g_pageCount = 3;
+        $g_tableJson_unreply = {"data":[{"xjdh": "X1001", "kh_name": "卢照邻", "kh_tel": "18050135231", "pgmd_bh": "P1001", "pgmd_mc": "房产抵押", "dkpz": "信用贷", "create_time": "2020-03-25 16:10:15", "data": [{"dyw_xh": "D1001", "lpmc": "上石海上海1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/上石海上海（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"}, {"dyw_xh": "D1002", "lpmc": "上石海上海2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/上石海上海（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"} ] },{"xjdh": "X1002bb", "kh_name": "李太白", "kh_tel": "18050135231", "pgmd_bh": "P1001", "pgmd_mc": "房产抵押", "dkpz": "信用贷", "create_time": "2020-03-25 16:10:15", "data": [{"dyw_xh": "D1001bb", "lpmc": "惠安宝龙城市广场1", "area": "福建省-泉州市-泉港区", "dyw_add": "住宅/惠安宝龙城市广场（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"}, {"dyw_xh": "D1002bb", "lpmc": "惠安宝龙城市广场2", "area": "福建省-泉州市-泉港区", "dyw_add": "住宅/惠安宝龙城市广场（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"} ] }] }
+        createTableData($g_setJson_unreply, $g_tableJson_unreply, $g_pageJson, $g_pageCount);
+    }
+
+
+
+    
+    /*+===============================================================+*/
+    /*                                 JS主体                          
+    /*+===============================================================+*/
+    ////////////////////////////////////////////////////////////////////
+    $(function(){
+
+        /*+--------------------------------------------------------+*/
+        //=====加载搜索区域(调用搜索框插件)
+        $('.section-search').neuiSearchBox($searchJson);
+
+
+        /*+--------------------------------------------------------+*/
+        //======初始化加载数据
+        //后台返回未回复json
+        $g_tableJson_unreply = {
+            "data":[
+                {"xjdh": "X1001", "kh_name": "张三", "kh_tel": "18050135231", "pgmd_bh": "P1001", "pgmd_mc": "房产抵押", "dkpz": "信用贷", "create_time": "2020-03-25 16:10:15", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "泉州万科城1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州万科城（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "泉州万科城2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州万科城（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "90.15", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "泉州万科城3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州万科城（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "120.70", "time_xj": "2020-03-25 16:42:37"}
+                    ] 
+                },
+                {"xjdh": "X1002", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1003", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1004", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1005", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1006", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1007", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1008", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1009", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1010", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1011", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1012", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1013", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1014", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },{"xjdh": "X1015", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                },
+                {"xjdh": "X1016", "kh_name": "李四", "kh_tel": "15005613523", "pgmd_bh": "P1001", "pgmd_mc": "贷款抵押", "dkpz": "小微贷", "create_time": "2020-01-23 09:30:16", 
+                    "data": [
+                        {"dyw_xh": "D1001", "lpmc": "东海泰广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "185.37", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1002", "lpmc": "东海泰广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "120.46", "time_xj": "2020-03-25 16:42:37"},
+                        {"dyw_xh": "D1003", "lpmc": "东海泰广场3", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/泉州东海太禾广场（二期）/13号楼/2/201/126.09平方米/已满2年", "jzmj": "95.60", "time_xj": "2020-01-23 09:15:27"}
+                    ] 
+                }
+            ]
+        }
+
+
+            
+        
+        
+
+        /*+--------------------------------------------------------+*/
+        //=====选项卡切换
+        $('.section-tab>div').on('click',function(){
+            var clickTimes = parseInt($(this).attr('data-click-times')) + 1;
+            $(this).attr('data-click-times', clickTimes).addClass('on').siblings().removeClass('on');
+            var index = $(this).index() + 1; //选项卡索引
+            $('#main').children().eq(index-1).show().siblings().hide();
+            $g_tab_index = index; //全局赋值
+
+        
+            if(index == 1){
+                //$g_pageCount = 3;
+                //createTableData($g_setJson_unreply, $g_tableJson_unreply, $g_pageJson, $g_pageCount);
+            }
+            //加载数据, index 1 未回复, 2 已回复
+            if(index == 2 && clickTimes == 1){
+                $g_pageCount = 8;
+                //后台返回已回复json
+                $g_tableJson_replyed= {
+                    "data":[
+                        {"xjdh": "X1001", "kh_name": "武松", "kh_tel": "18050135231", "pgmd_bh": "P1001", "pgmd_mc": "房产抵押", "dkpz": "信用贷", "create_time": "2020-03-25 16:10:15", 
+                        "data": 
+                            [   
+                                {"dyw_xh": "D1001", "lpmc": "晋江宝龙广场1", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/晋江宝龙广场（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37", "xjhf_dyjz_dj":"12000", "xjhf_dyjz_zj":"185", "pgjg_dyjz_dj":"11000", "pgjg_dyjz_zj":"170", "dyl":"0.95", "xjjg_dked":"120", "zspgjg_dked":"115", "user_xjhf":"系统自动回复", "time_xjhf":"2020-03-15 16:12:37", "xjhf_sm":"客户希望贷款到120万，目前银行只给110万"},
+                                {"dyw_xh": "D1002", "lpmc": "晋江宝龙广场2", "area": "福建省-泉州市-丰泽区", "dyw_add": "住宅/晋江宝龙广场（一期）/1号楼/2/201/126.09平方米/已满2年", "jzmj": "80.52", "time_xj": "2020-03-25 16:42:37", "xjhf_dyjz_dj":"12000", "xjhf_dyjz_zj":"185", "pgjg_dyjz_dj":"11000", "pgjg_dyjz_zj":"170", "dyl":"0.95", "xjjg_dked":"120", "zspgjg_dked":"115", "user_xjhf":"系统自动回复", "time_xjhf":"2020-03-15 16:12:37", "xjhf_sm":"客户希望贷款到120万，目前银行只给110万"}
+                            ]
+                        }    
+                    ]
+                }
+                createTableData($g_setJson_replyed, $g_tableJson_replyed, $g_pageJson, $g_pageCount);
+            }
+
+            //切换分页显示
+            //var bindTNode = $('#main').children().eq(index-1)[0].className;
+            //$('*[data-bind-table=".' + bindTNode + '"]').show().siblings().hide();
+
+
+            neuiLikeTable.switchPageState(); //分页自动跟随切片显示隐藏(必须!!)
+        });
+
+        
+
+        
+
+
+
+        /*+--------------------------------+*/
+		//=====将大量数据分批次展示(防止卡顿)
+        var scrbar = new BatchLoadData();
+        scrbar.setOptions({
+            datasource: $g_tableJson_unreply, 
+            itemSize: $pagesize
+        });
+        scrbar.createDom(window);
+        showData(scrbar.getData());
+        scrbar.onScroll = function(pos){
+            showData(scrbar.getData());
+        }
+        /**
+         * 根据滚动分批次展示数据
+         * param {*} json 当前要加载的"未回复列表"数据
+         */
+        function showData(tableJson){
+            neui.showAnimate();
+            setTimeout(function(){
+                var setJson = JSON.parse(JSON.stringify($g_setJson_unreply)); //解决“对象、数组直接赋值变成引用”的问题
+                var pageJson = JSON.parse(JSON.stringify($g_pageJson));
+                var pageCount = 1;
+                setJson["pendMethod"] = 'insert'; //更改数据添加方式为:追加插入到最后面
+                createTableData(setJson, tableJson, pageJson, pageCount);
+                neui.destroyAnimate();
+            },100)
+        }
+
+    }); //$(function(){})
+</script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,initial-scale=1.0,user-scalable=no,width=device-width">
+<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<title>Select | 下拉联动控件（移动端）</title>
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-select.css"><!--下拉联动控件-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框控件-->
+<style>
+*{box-sizing:border-box;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;}
+html,body{width:100%;margin:0 auto;font-size:14px;}
+h1,h2{text-align:center;}
+h1{font-size:20px;color:#f60;}
+h2{font-size:18px;color:#0ae;}
+.blue{color:#0ae;}
+.red{color:#f60;font-weight:bold;}
+.r-unit{position:absolute;right:15px;top:8px;font-size:12px;color:gray;}
+
+#wrap{width:100%;margin:0 auto;}
+.panel-demo{width:98%;margin:0 auto 15px auto;padding:5px 20px;border:1px solid #aaa;border-radius:3px;}
+.demo-title{margin:5px auto 15px auto;padding-bottom:8px;border-bottom:1px dashed #ddd;font-weight:bold;font-size:18px;text-align:center;}
+.demo-tips{margin:5px auto;font-size:12px;color:#e69617;}
+.demo-one{position:relative;margin-bottom:15px;}
+.demo-one>span{display:inline-block;min-width:100px;}
+.demo-one>input{margin-left:8px;width:250px;height:30px;line-height:30px;padding:0 8px;border:1px solid #ddd;border-radius:4px;}
+</style>
+</head>
+<body>
+	<div id="wrap">
+
+		<h1>下拉联动控件<br>仅支持移动端</h1>
+		<section class="panel-demo">
+		<div class="demo-title">单个下拉经典Demo</div>
+			<div class="demo-one">
+				<span>单个下拉</span><input type="text" id="select_single" value="普通下拉4" readonly>
+			</div><!--demo-one-->
+		</section><!--/panel-demo-->
+	
+		<section class="panel-demo">
+			<div class="demo-title">单个下拉更多Demo</div>
+			<div class="demo-one">
+					<span>楼盘</span><input type="text" class="click-relation click-search" value="万达广场" readonly>
+				</div><!--demo-one-->
+			<div class="demo-one">
+					<span>幢号</span>
+					<!--<input type="text" class="click-relation click-build" value="3幢" readonly>-->
+					<textarea class="click-relation click-build" value="3幢" readonly></textarea>
+				</div><!--demo-one-->
+			<div class="demo-one">
+					<span>楼层</span><input type="text" class="click-relation click-floor" value="4楼" readonly>
+				</div><!--demo-one-->
+			<div class="demo-one">
+					<span>房号</span><input type="text" class="click-relation click-room" value="303号" readonly>
+				</div><!--demo-one-->
+			<div class="demo-tips">
+				楼盘下拉，如果新值和旧值不一样，则清空幢号、楼层、房号<br>
+				幢号下拉，如果新值和旧值不一样，则清空楼层、房号<br>
+			楼层下拉，如果新值和旧值不一样，则清空房号<br>
+			房号下拉，如果新值和旧值不一样，什么也不执行！
+			</div><!--/demo-tips-->
+		</section><!--/panel-demo-->
+	
+		<section class="panel-demo">
+			<div class="demo-title">省市区县分别下拉（联动下拉）</div>
+			<div class="demo-one">
+				<span>省份</span><input type="text" id="s-province" value="福建省" data-bh="350000" readonly>
+			</div><!--demo-one-->
+			<div class="demo-one">
+				<span>城市</span><input type="text" id="s-city" value="泉州市" data-bh="350500" readonly>
+			</div><!--demo-one-->
+			<div class="demo-one">
+				<span>区县</span><input type="text" id="s-county" readonly>
+			</div><!--demo-one-->
+		</section><!--/panel-demo-->
+
+		<section class="panel-demo"> 
+			<div class="demo-one">
+				<span>省市区联动下拉-自定义数据源</span><input type="text" class="area" id="select_three_1" value="浙江省-杭州市-上城区" readonly placeholder="请选择地区" onfocus="this.placeholder=''" onblur="this.placeholder='请选择地区'">
+			</div><!--demo-one--> 
+		</section><!--/panel-demo-->
+
+		<section class="panel-demo"> 
+			<div class="demo-one">
+				<span>省市区联动下拉-系统数据源</span><input type="text" class="area" id="select_three_2" value="福建省-泉州市-泉港区" readonly placeholder="请选择地区" onfocus="this.placeholder=''" onblur="this.placeholder='请选择地区'">
+			</div><!--demo-one--> 
+		</section><!--/panel-demo-->
+	</div><!--/wrap-->
+  
+  
+  
+	<script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="assets/style/js/jquery.chineseDistricts.js"></script><!--省市区数据源-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-select.js"></script><!--下拉联动控件(移动端)-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框控件-->
+	<script type="text/javascript">
+
+		$(function(){
+			
+			/*+---------------------------------------------------------------------+*/
+			//=====单个下拉事件(普通下拉)
+			$('#select_single').on('click',function(){
+				var $this = $(this);
+				var $dropDownJson = {data:[{bh:'1001',mc:'普通下拉1'},{bh:'1002',mc:'普通下拉2'},{bh:'1003',mc:'普通下拉3'},{bh:'1004',mc:'普通下拉4'},{bh:'1005',mc:'普通下拉5'}]}
+				neuiSelect.singleJson({
+					//主要参数
+					title: '单个下拉', //下拉标题(可缺省),默认空
+					object: $this,	//当前下拉对象(必须)
+					jsonData: $dropDownJson, //json数据(必须)
+					jsonFormat: ['bh','mc'], //json格式,标准json为 {bh:'',mc:''} 或 {id:'',value:''}时本参数可缺省(默认["id","value"])，否则填写json中的参数，格式：[编号参数,值参数]
+					callBack: function(e){ //回调(可缺省). e为json,格式：{id: "新下拉值id", value: "新下拉值", oldId: "旧下拉值id", oldValue: "旧下拉值"}
+						console.log('单个下拉回调e:',e);
+						alert('Hello,我是单个下拉经典Demo回调函数！');
+					}, 
+					
+					//次要参数
+					//showAnimate:false, 	//是否动画效果(可缺省),默认false
+					//itemHeight: 35,		//每个选项高度(可缺省),默认35px
+					//itemShowCount:7, //下拉可视范围内的个数(可缺省),默认7个
+					//oneLevelId:null, 	//初始值,下拉默认定位在第几个选项(可缺省),默认中间那个或中间上一个
+					
+					//返回的系列参数(只为兼容旧版用,新版已在回调中返回). 取值方式：this.id, this.value
+					oldId:null,  		  //旧ID
+					oldValue:null, 	 //旧值(未选中下拉前输入框中的值)
+					id:null,
+					value:null,
+					newId:null,  		//新ID
+					newValue:null, //新值(选择下拉后输入框中的值)
+				})
+			});
+			
+
+			
+			
+			/*+----------------+*/
+			//=====楼盘下拉
+			$('.click-search').on('click',function(){
+				var $this = $(this);
+				var $json = {data:[{value:'中骏四季家园'},{value:'万达广场'},{value:'四季家园'},{value:'四季康城'},{value:'财富中心'}]}
+				neuiSelect.singleJson({
+					title: '楼盘名称',
+					object: $this,	
+					jsonData: $json, 
+					jsonFormat: [],
+					callBack: function(){
+						clearSearchNext($this,this.oldValue,this.newValue);
+					}
+				})
+			});
+			
+			//=====楼盘下拉回调,若新值与旧值不一样,则清空后面相关元素数据
+			function clearSearchNext(obj,oldValue,newValue){
+				if(oldValue!=newValue)  $(obj).parent().nextAll().find('input').val('');
+			}
+			
+			
+			/*+----------------+*/
+			//=====幢号下拉
+			$('.click-build').on('click',function(){
+				var $this = $(this);
+				var $json = {
+					data:[
+						{dong:'1幢'},{dong:'2幢'},{dong:'3幢'},{dong:'4幢'},{dong:'5幢'},
+						{dong:'6幢'},{dong:'7幢'},{dong:'8幢'},{dong:'9幢'},{dong:'10幢'}
+					]
+				}
+				neuiSelect.singleJson({
+					title: '幢号',
+					object: $this,	
+					jsonData: $json, 
+					jsonFormat: ['dong'], 
+					callBack: function(){
+						clearBuildNext($this,this.oldValue,this.newValue);
+					}
+				})
+			});
+			
+			//=====幢号下拉回调,若新值与旧值不一样,则清空后面相关元素数据
+			function clearBuildNext(obj,oldValue,newValue){
+				if(oldValue!=newValue)  $(obj).parent().nextAll().find('input').val('');
+			}
+			
+			
+			
+			/*+----------------+*/
+			//=====楼层下拉
+			$('.click-floor').on('click',function(){
+				var $this = $(this);
+				var $json = {data:[{mc:'1楼'},{mc:'2楼'},{mc:'3楼'},{mc:'4楼'},{mc:'5楼'},{mc:'6楼'}]}
+				neuiSelect.singleJson({
+					title: '楼层',
+					object: $this,	
+					jsonData: $json, 
+					jsonFormat: ['mc'], 
+					callBack: function(){
+						clearFloorNext($this,this.oldValue,this.newValue);
+					}
+				})
+			});
+			
+			//=====楼层下拉回调,若新值与旧值不一样,则清空后面相关元素数据
+			function clearFloorNext(obj,oldValue,newValue){
+				if(oldValue!=newValue)  $(obj).parent().nextAll().find('input').val('');
+			}
+			
+			
+			
+			/*+----------------+*/
+			//=====房号下拉
+			$('.click-room').on('click',function(){
+				var $this = $(this);
+				var $json = {data:[{room:'101号'},{room:'202号'},{room:'303号'}]}
+				neuiSelect.singleJson({
+					title: '房号',
+					object: $this,	
+					jsonData: $json, 
+					jsonFormat: ['room']
+				})
+			});
+			
+			
+			
+			
+			
+
+
+
+			/*+---------------------------------------------------------------------+*/
+			/*							省市区县分别下拉(联动下拉)
+			/*+---------------------------------------------------------------------+*/
+			/*+----------------+*/
+			//=====省份下拉
+			$('#s-province').on('click', function(){
+				var $this = $(this);
+				var provinceJson = neuiSelect.getProvinceJson();
+				neuiSelect.singleJson({
+					title: '省份',
+					object: $this,	
+					jsonData: provinceJson,
+					callBack: function(){
+						$('#s-city, #s-county').val('').attr('data-bh', ''); //清空市、区县
+					}
+				})
+			});
+
+			/*+----------------+*/
+			//=====城市下拉
+			$('#s-city').on('click', function(){
+				var $this = $(this);
+				var provinceId = $('#s-province').attr('data-bh');
+				if(typeof provinceId == 'undefined' || provinceId == ''){
+					neuiDialog.alert({
+						animate: true,
+						caption: '提示',
+						message: '请先选择省份',
+						buttons: ['确定']
+					})
+					return;
+				}
+				var cityJson = neuiSelect.getCityJson(provinceId);
+				neuiSelect.singleJson({
+					title: '城市',
+					object: $this,	
+					jsonData: cityJson, 
+					callBack: function(){
+						$('#s-county').val('').attr('data-bh', ''); //清空区县
+					}
+				})
+			});
+
+
+			/*+----------------+*/
+			//=====区县下拉
+			$('#s-county').on('click', function(){
+				var $this = $(this);
+				var cityId = $('#s-city').attr('data-bh');
+				if(typeof cityId == 'undefined' || cityId == ''){
+					neuiDialog.alert({
+						animate: true,
+						caption: '提示',
+						message: '请先选择城市',
+						buttons: ['确定']
+					})
+					return;
+				}
+				var countyJson = neuiSelect.getCountyJson(cityId);
+				neuiSelect.singleJson({
+					title: '区县',
+					object: $this,	
+					jsonData: countyJson
+				})
+			});
+
+
+			
+			/*+---------------------------------------------------------------------+*/
+			/*							省市区三级联动下拉
+			/*+---------------------------------------------------------------------+*/
+			//=====使用自定义数据源
+			$('#select_three_1').on('click',function(){
+				var $this = $(this);
+				//注：JSON字段中
+				// · province, city, county 3个字段是显示值（必须）
+				// · provinceId, cityId, countyId 3个字段是隐藏值（可缺省），常用于标记省、市、区（县）对应的键值。
+				var $locateJson = {
+					data:[
+						{province:'福建省', provinceId:"P1001",  data:[
+								{city:'泉州市', cityId:"C1001", data:[
+										{county:'丰泽区', countyId:"Q1001"}, {county:'鲤城区', countyId:"Q1002"}, {county:'洛江区', countyId:"Q1003"}, 
+										{county:'泉港区', countyId:"Q1004"}, {county:'惠安县', countyId:"Q1005"}, {county:'安溪县', countyId:"Q1006"}, 
+										{county:'永春县', countyId:"Q1007"}, {county:'德化县', countyId:"Q1008"}, {county:'石狮市', countyId:"Q1009"}, {county:'晋江市', countyId:"Q1010"}, {county:'南安市', countyId:"Q1011"}
+									]
+								},
+								{city:'福州市', cityId:"C1002", data:[
+										{county:'鼓楼区', countyId:"Q2001"}, {county:'台江区', countyId:"Q2002"}, {county:'仓山区', countyId:"Q2003"}
+									]
+								}
+							]
+						},
+						{province:'浙江省', provinceId:"P1002", data:[
+								{city:'杭州市', cityId:"C2001", data:[
+										{county:'西湖区', countyId:"Q3001"}, {county:'上城区', countyId:"Q3002"}, {county:'下城区', countyId:"Q3003"}, 
+										{county:'保姆区', countyId:"Q3004"}, {county:'电商区', countyId:"Q3005"}
+									]
+								},
+								{city:'嘉兴市', cityId:"C2002", data:[
+									{county:'南湖区', countyId:"Q4001"}, {county:'秀洲区', countyId:"Q4002"}, {county:'北岛区', countyId:"Q4003"}, 
+									{county:'莆路区', countyId:"Q4004"}, {county:'方舟区', countyId:"Q4005"}
+									]
+								},{city:'义乌市',cityId:"C2003", data:[
+									{county:'好鞋区', countyId:"Q5001"}, {county:'坏鞋子', countyId:"Q5002"}
+									]
+								}
+							]
+						}
+					]
+				}
+				
+				neuiSelect.multistageJson({
+					title: '省市区县三级联动下拉', //下拉标题(可缺省),默认空
+					object: $this,	//当前下拉对象
+					//jsonData:[iosProvinces,iosCitys,iosCountys], //使用省市区数据源
+					jsonData: $locateJson, //使用自定义数据源
+					//jsonFormat: ['province', 'city', 'county'], //显示值JSON格式(可缺省)
+					//keyFormat: ['provinceId', 'cityId', 'countyId'], //隐藏值JSON格式(可缺省)
+					callBack: function(e){ //回调(可缺省). 格式：{value: "新下拉值", oldValue: "旧下拉值", provinceId:"省隐藏值", cityId:"市隐藏值", countyId:"区县隐藏值"}
+						console.log('联动下拉回调e:',e);
+						alert('Hello,我是三级联动下拉回调函数！\n'+'新老值不一样时，我将清空楼盘、幢号、楼层、房号！');
+						if(e.value != e.oldValue) $('.click-relation').val('');
+					}, 
+					//showAnimate: false, //是否动画效果(可缺省),默认false
+					//itemHeight: 35,	//每个选项高度(可缺省),默认35px
+					//itemShowCount:7, //下拉可视范围内的个数(可缺省),默认7个
+					//返回的系列参数(只为兼容旧版用,新版已在回调中返回). 取值方式：this.value
+					//oldValue:null, //旧值(未选中下拉前输入框中的值)
+					//value:null, //新值(选择下拉后输入框中的值)
+					//newValue:null, //新值(选择下拉后输入框中的值)
+				})
+			});
+			
+			
+			
+
+			//=====使用系统数据源
+			$('#select_three_2').on('click',function(){
+				var $this = $(this);
+				neuiSelect.multistageJson({
+					object: $this,
+					jsonData:[iosProvinces,iosCitys,iosCountys],
+					callBack: function(e){
+						alert('Hello,我是三级联动下拉回调函数！\n'+'新老值不一样时，我将清空楼盘、幢号、楼层、房号！');
+						if(e.value != e.oldValue) $('.click-relation').val('');
+					}
+				})
+			});
+			
+			
+
+		}); //END $(function(){})
+
+	</script>
+</body>
+</html>

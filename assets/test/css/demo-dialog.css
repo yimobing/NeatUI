@@ -1,0 +1,133 @@
+@charset "utf-8";
+/*************
+*Demo页面基本样式
+*************/
+html{width:100%;margin:0 auto;padding:0;font-family:'Hiragino Sans GB W3','Hiragino Sans GB','microsoft yahei','Sim sun','Helvetica Neue','Helvetica,sans-serif';}
+html,body {
+    -webkit-text-size-adjust:none;
+    -webkit-tap-highlight-color:rgba(0, 0, 0, 0);
+    width: 100%;
+}
+body {
+    line-height: 1.5;
+    font-size:14px;
+    color: #212121;
+    background:#f5f5f5;
+    outline: 0;
+}
+html,body,header,section,footer,div,ul,ol,li,img,a,span,em,del,legend,center,strong,var,fieldset,form,label,dl,dt,dd,cite,input,hr,time,mark,code,figcaption,figure,textarea,h1,h2,h3,h4,h5,h6,p{
+    margin:0;
+    border:0;
+    padding:0;
+    font-style:normal;
+}
+* {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+   /*touch-action:none;*/
+}
+header,footer,nav,menu,article,aside,section,dialog,figure{display:block;}
+
+/*===input placehoder font-size 文字大小*/
+::-webkit-input-placeholder{font-size:0.6rem}
+::-moz-placeholder{font-size:0.6rem}
+:-moz-placeholder{font-size:0.6rem}
+:-ms-input-placeholder{font-size:0.6rem}
+
+/*===ios input outer appearance 元素外观(ios苹果、安卓都有默认的,故需重定义)*/
+button,input,select,textarea {font: inherit;color: inherit;outline:0;appearance:none;-webkit-appearance:none;-moz-appearance:none;}
+button {overflow: visible;}
+button,select {text-transform: none;}
+textarea {overflow: hidden;resize: none;}
+
+/*===常用元素样式*/
+ul,li {list-style: none;}
+a {color:inherit;text-decoration: none;background-color: transparent;}
+i,em{font-style:normal;}
+
+/*===公用classname*/
+.hide{display:none;}
+.show{display:block;}
+.clear{clear:both;}
+.clearL{clear:left;}
+.clearR{clear:right;}
+.relative{position:relative;}
+.flex{
+	display:-webkit-box;  
+    display:-moz-box; 
+    display:-ms-flexbox; 
+    display:-webkit-flex; 
+    display:flex; 
+    display:box; 
+}
+.flex-grow{
+	flex-grow:1; 
+	-webkit-flex-grow:1; 
+	-moz-flex-grow:1; 
+	-ms-flex-grow:1;
+}
+
+
+
+.panel-grid-demo{width:98%;background:#fff;margin:10px auto 0 auto;padding:5px 15px;}
+/*table*/
+.grid-demo-table{border-collapse:collapse; margin-bottom:25px;}
+.grid-demo-table td{border:1px solid #ddd; padding:8px 5px; text-align:center;}
+.grid-demo-table tr.active td{background:#9585bf;}
+.grid-demo-table tr.gray td{background:#bfb2b2;}
+/*tips*/
+.grid-demo-tips{border-bottom:1px dotted #ff0000; padding-bottom:15px; margin:10px 0; color:#ff0000; font-weight:bold; font-size:1rem;}
+.grid-demo-tips:before{content:'·';padding-right:10px;}
+/*按钮*/
+.panel-grid-demo td>button,.panel-grid-demo td>button:hover{cursor:pointer;}
+.panel-grid-demo td>button{padding:4px 6px;background:#ff4351;color:#fff;border:0;border-radius:3px;font-size:12px;cursor:pointer;}
+.panel-grid-demo td>button:hover{background:#ff7680;}
+.panel-grid-demo td>button.save{background:#1b9af7}
+.panel-grid-demo td>button.save:hover{background:#4cb0f9;}
+.panel-grid-demo td>button.intrust{background:#a5de37;}
+.panel-grid-demo td>button.intrust:hover{background:#b9e563;}
+.panel-grid-demo td>em{display:block;margin-top:8px;font-size:12px;color:gray;}
+
+
+.grid-demo-dialog{margin:10px 0 10px;}
+.grid-demo-dialog>button{ margin-right: 10px; }
+.grid-demo-feedback{}
+
+/*自定义输入框内容*/
+.feedback-content .diyalv{display:block;width:100%;border:1px solid #f4f1f1;border-bottom:0;}
+.feedback-content .diyalv li{
+	display:flex;
+	display:-webkit-box;
+	display:-webkit-flex;
+	display:-moz-box;
+	display:-ms-flexbox;
+	display:box;
+	align-items:center;
+	list-style-type:none; 
+	padding:0 8px;
+	border-bottom:1px solid #f4f1f1;
+}
+.feedback-content .diyalv li span:first-child,
+.feedback-content .diyalv li input,
+.feedback-content .diyalv li textarea{padding:8px 0;}
+.feedback-content .diyalv li span:first-child{width:100px;}
+.feedback-content .diyalv li span+span,
+.feedback-content .diyalv li input,
+.feedback-content .diyalv li textarea{
+	width:100%;
+	flex:1;
+	-webkit-flex:1;
+	-moz-flex:1;
+	padding:8px 5px;
+	border-left:1px solid  #f4f1f1;
+}
+
+.feedback-content .diyalv li span:nth-child(2n){border-right:0;}
+.feedback-content .diyalv li input{height:90%;}
+
+/**/
+.doc-action{ text-align: center; font-weight: bold; font-size: 16px; }
+.doc-code{ margin-left: 10px; }

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PHP与AJAX实现数据交互——示例</title>
+</head>
+<body>
+    <div>用户姓名：<input type="text" id="username"></div>
+    <div>密码：<input type="text" id="password"></div>
+    <div><button id="sub">查询</button></div>
+    <div class="result">
+        <span id="text"></span><!-- 用以显示返回来的数据，只刷新这部分地方 -->
+    </div>
+    
+</body>
+<script type="text/javascript" src="../assets/style/js/jquery-1.8.3.min.js"></script>
+
+<script>
+    $(function(){
+        $('#sub').click(function(){
+          var username=$('#username').val();
+          var password=$('#password').val();
+          $.ajax({
+            type: "POST",
+            dataType: "json", // 这个很重要,一定要指定为JSON格式
+            url: "demo.php",
+            data: 
+            {
+                username: username,
+                password: password
+            },
+            success: function(msg){
+              $('#text').empty();
+              //var userJson = eval("(" + msg + ")");
+              var userJson = JSON.parse(msg);
+              console.log('userJson:', userJson)
+              $('#text').html("用户名：" + userJson.username + "，密码：" + userJson.password);    //在#text中输出
+            },
+            error:function(msg){
+              console.log('出错啦:', msg);
+            }
+          });
+        });
+
+
+    }); $(function(){})
+  </script>
+</html>

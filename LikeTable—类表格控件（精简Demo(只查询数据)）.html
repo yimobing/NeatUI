@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="application-name" content="快评">
+	<meta name="applicable-device" content="pc,mobile">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Cache-Control" content="no-transform">
+	<meta http-equiv="Cache-Control" content="no-siteapp">
+	<title>LikeTable | 类表格精简Demo(只查询数据)</title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css" /><!--下拉联动控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"><!--输入下拉控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-searchbox.css" /><!--搜索框控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css" /><!--日历控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-liketable.css" /><!--类表格控件-->
+	<link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.min.css" /><!--图标库-->
+	<link type="text/css" rel="stylesheet" href="assets/test/css/common.css" /><!--通用布局样式-->
+	<!--[if lt IE 9]>
+		<script type="text/javascript" src="assets/style/js/html5shiv.min.js"></script>
+		<script type="text/javascript" src="assets/style/js/respond.min.js"></script>
+		<script type="text/javascript" src="assets/style/js/rem.min.js"></script>
+		<script type="text/javascript" src="assets/style/js/json2.js"></script>
+	<![endif]-->
+	<!--json2.js支持IE8-以下版本json与字符串互转h函数:JSON.Stringify()、 JSON.Parse()-->
+	<!--防止被iframe嵌套-->
+	<!--<script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>-->
+	<base target="_blank">
+</head>
+<body>
+	<style>
+		body{overflow-y: hidden;}
+		/*+搜索区域+*/
+		.section-search{position: relative; width: 98%; margin: 0 auto;}
+		.section-search i.fa{position: absolute; left: 8px; top: 50%; -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%); -o-transform: translateY(-50%); transform: translateY(-50%); color: #999;}
+		.section-history{margin-top: 15px;}
+		.block-search .eform-one{width: 15%; display: inline-block; *display: inline; _display: inline; zoom: 1; vertical-align: middle;}
+		.block-search .eform-l,
+		.block-search .eform-r{float: left;}
+		.block-search .eform-l{width: 30%; margin-top: 5px;}
+		.block-search .eform-r{width: 65%;}
+		.block-search .eform-r i.fa{margin-top: 0; -ms-transform: translateY(-50%);}
+	</style>
+	<div class="wrap">
+		<main>
+			<section class="section-search"></section><!--/.section-search-->
+			<section class="section-history"></section><!--/.section-history-->
+		</main>
+	</div><!--/.wrap-->
+
+	<script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="assets/style/js/jquery.table2excel.min.js"></script><!--表格导出EXCEL-->
+	<script type="text/javascript" src="assets/style/js/jquery.chineseDistricts.js"></script><!--省市区数据源-->
+	<script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-dropdown.js"></script><!--下拉联动控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-searchbox.js"></script><!--搜索框控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-loadmore.js"></script><!--上拉加载更多控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-liketable.js"></script><!--类表格控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义封装AJAX-->
+	<script type="text/javascript">
+		/*+-------------全局变量---------------+*/
+		//默认值
+		var d_start_date = neuiCalendar.getMonthFirstDay(); //开始日期. 默认本月1号
+		var d_end_date = neuiCalendar.getNowtime(); //结束日期. 默认当天
+		var d_inclue_subordinate = '1'; //是否包含下级. 1 是(默认勾选), 0 否
+		var d_bank_bh = ''; //银行编号
+		var d_bank_mc = ''; //银行名称
+		var d_company_bh = ''; //默认评估公司编号
+		var d_company_mc = ''; //默认评估公司名称
+		//搜索表单
+		var g_ksrq = d_start_date; //开始日期
+		var g_jsrq = d_end_date; //结束日期
+		var g_bank_bh = d_bank_bh; //银行编号
+		var g_bank_mc = d_bank_mc; //银行名称
+		var g_check_bhxj = d_inclue_subordinate; //是否包含下级
+		var g_pggs_bh = d_company_bh; //评估公司编号
+		var g_pggs_mc = d_company_mc; //评估公司名称
+		var g_xjdh = ''; //询价单号
+		var g_xjr_xm = ''; //询价人
+		var g_kh_name = ''; //借款人
+		var g_cqr = ''; //产权人
+		var g_pgdx = ''; //评估对象
+		var g_bglx_no = ''; //报告编号
+
+		//=====列表及分页
+		var g_pageSize = 30; //每页几条记录
+		var g_setJson = { //配置表格列字段
+			headHeight:50, //表头高度. auto 自动(默认). 其它大于0的数字如：50 表示高50px. (可缺省)
+			headHasBgColor:true, //表头是否有背景色(可缺省),默认true
+			tbodyHeight:"auto", //自定义表格内容高度. auto 自动(默认). 其它大于0的数字如：300 表示高300px. (可缺省)
+			topHeight: "auto", //表格以外上面部分高度(如header部分(可选). auto 自动(默认)，系统会自动计算表格距离顶部的距离; 其它大于0的数字如：150 表示高150px.
+			botHeight:"auto", //表格以外下面部分高度（不含分页部分）(如footer部分).  auto 自动,即高度为0 (默认), 其它大于0的数字如：100 表示高100px. (可缺省)
+			isSerialCol:true, //是否显示序号列. 默认true(可缺省)
+			isSorted:true, //是否启用列排序. 默认true.(可缺省)
+			isCeilLine:true, //单元格是否有边线(可缺省),默认false
+			emptyDataTips:'抱歉，没有找到相应数据..', //无数据时的提示文(可选)
+			primaryKey:{ //主键列 (可缺省)
+				field:["xjdh"],  //可多个字段. eg. [":lsh_id1","lsh_id2"]
+				show:false //是否显示,默认false. (可缺省)
+			},
+			customize:{ //自定义属性(可缺省)
+				serialColumnWidth:45, //序号列宽(可缺省),默认50
+				discoloration:true, //是否隔行变色(可缺省),默认false
+				retainIllegalChar:false //单元格内容是否保留非法字符(防止向数据库写入非法字符)(可缺省). true 是, false 否(默认). false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
+			},
+			columns:[{
+					title:"询价单号",
+					field:"xjdh",
+					mode:"span",
+					width:130
+				},{
+					title:"抵押物序号",
+					field:"dyw_xh",
+					mode:"span",
+					width:60
+				},{
+					title:"询价人",
+					field:"xjr_xm",
+					mode:"span",
+					width:60
+				},{
+					title:"询价人单位",
+					field:"xjr_dw",
+					mode:"span",
+					width:100
+				},{
+					title:"评估公司",
+					field:"pggs_mc",
+					mode:"span",
+					width:100
+				},{
+					title:"借款人",
+					field:"kh_name",
+					mode:"span",
+					width:60
+				},{
+					title:"借款人电话",
+					field:"kh_tel",
+					mode:"span",
+					width:100
+				},{
+					title:"产权人",
+					field:"cqr",
+					mode:"span",
+					width:100
+				},{
+					title:"评估对象",
+					field:"pgdx",
+					mode:"span",
+					width:100
+				},{
+					title:"抵押物类型",
+					field:"dyw_type_mc",
+					mode:"span",
+					width:100
+				},{
+					title:"行政区域",
+					field:"area",
+					mode:"span",
+					width:100
+				},{
+					title:"市场单价",
+					subtitle:"(元/m²)",
+					field:"pgjg_scjz_dj",
+					mode:"span",
+					width:80
+				},{
+					title:"市场总价",
+					subtitle:"(万元)",
+					field:"pgjg_scjz_zj",
+					mode:"span",
+					width:80
+				},{
+					title:"抵押单价",
+					subtitle:"(元/m²)",
+					field:"pgjg_dyjz_dj",
+					mode:"span",
+					width:80
+				},{
+					title:"抵押总价",
+					subtitle:"(万元)",
+					field:"pgjg_dyjz_zj",
+					mode:"span",
+					width:80
+				},{
+					title:"报告编号",
+					field:"bglx_no",
+					mode:"span",
+					width:150
+				},{
+					title:"土地面积",
+					subtitle:"(m²)",
+					field:"tdmj",
+					mode:"span",
+					width:80
+				},{
+					title:"建筑面积",
+					subtitle:"(m²)",
+					field:"fwjzmj",
+					mode:"span",
+					width:80
+				},{
+					title:"电子版提交日期",
+					field:"time_wc",
+					mode:"span",
+					width:80
+				}
+			]
+		}
+
+	
+		
+
+		/*+-------------FUNCTION---------------+*/
+		/**
+		 * 函数：加载数据
+		 */
+		 function loadData(){
+			neui.showAnimate();
+			setTimeout(function(){
+				var listJson = getListData(1); 
+				var pages = getListPage();
+				createTableList(listJson, pages);
+				neui.destroyAnimate();
+			}, 100)
+		}
+
+
+
+		/**
+		* 函数：创建列表及分页
+		* @param {object} dataJson 列表数据源
+		* @param {number} pageCount 分页总页数
+		*/
+		function createTableList(dataJson, pageCount){
+			$('.section-history').neuiLikeTable({
+				setJson: g_setJson, //列字段配置json
+				dataJson: dataJson, //表格数据json
+				pagination: {
+					enable: true, //是否启用分页
+					pageMode: 'select', //分页方式（可缺省）。list 数字列表形式（默认），select 选择形式
+					pageSize: g_pageSize, //每页几条记录，默认25（可缺省）
+					pageCount: pageCount, //总页数
+					recordCount: '', //总记录数(可选), 默认空(此时界面不显示总记录数)
+					pageSelect:{ //pageMode='select'时(可缺省)
+						allPage: false, //全部按钮（即：通过此按钮可一次性加载全部数据）(可缺省)
+						homePage: true, //首页按钮(可缺省)
+						prevPage: true, //上一页按钮(可缺省)
+						nextPage: true, //下一页按钮(可缺省)
+						lastPage: true, //最后一页（尾页）按钮(可缺省)
+						dropPage: true //下拉页码（一页页显示）按钮(可缺省)
+					},
+					callback:function(e){ //回调函数（必须）.参数e格式: {curpage:1, pagesize:20, pageCount:3}
+						//console.log('回调信息，e：',e);
+						//var curpage = e.curpage;  //当前页码
+						g_pageSize = e.pagesize; //全局赋值
+						var json = getListData(e.curpage);
+						return json;
+					}
+				},
+				exportExcel: { //导出EXCEL
+					enable: false, //是否启用
+					filename:'电子报告查询', //文件名
+					fileAutoTime:true, //导出的文件自动添加时间(hh:mm:ss)作为文件名的一部分
+					extension: '.xls' //拓展名。 .xls(excel 2003)(默认), .xlsx (excel 2007,2010)
+				}
+			})
+		}
+
+
+		/**
+		 * 创建搜索表单
+		 * @returns {HTML} 返回表单html
+		 */
+		function createSearchForom(){
+			var _checkbhxjStr = parseInt(g_check_bhxj) != 1 ? '' : ' checked';
+			var _html = ['<div class="block-search">',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>开始日期</label></div>',
+								'<div class="eform-r"><i class="fa fa-calendar-minus-o"></i><input type="text" class="jedate" id="s-startDate" value="' + g_ksrq + '" readonly></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>结束日期</label></div>',
+								'<div class="eform-r"><i class="fa fa-calendar-plus-o"></i><input type="text" class="jedate" id="s-endDate" value="' + g_jsrq + '" readonly></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>银行</label></div>',
+								'<div class="eform-r"><i class="fa fa-university"></i><input type="text" id="s-bank" value="' + g_bank_mc + '" data-bh="' + g_bank_bh + '" readonly></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>包含下级</label></div>',
+								'<div class="eform-r"><input type="checkbox" class="ne-checkbox square-tick white" id="s-subordinate"' + _checkbhxjStr + '></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>评估公司</label></div>',
+								'<div class="eform-r"><i class="fa fa-building-o"></i><input type="text" id="s-company" value="' + g_pggs_mc + '" data-bh="' + g_pggs_bh + '" readonly></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>询价单号</label></div>',
+								'<div class="eform-r"><i class="fa fa-cube"></i><input type="text" id="s-oddNumber" value="' + g_xjdh + '"></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>询价人</label></div>',
+								'<div class="eform-r"><i class="fa fa-user-o"></i><input type="text" id="s-quiryer" value="' + g_xjr_xm + '"></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>借款人</label></div>',
+								'<div class="eform-r"><i class="fa fa-user"></i><input type="text" id="s-loaner" value="' + g_kh_name + '"></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>产权人</label></div>',
+								'<div class="eform-r"><i class="fa fa-vcard-o"></i><input type="text" id="s-owner" value="' + g_cqr + '"></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>评估对象</label></div>',
+								'<div class="eform-r"><i class="fa fa-shield"></i><input type="text" id="s-assessObject" value="' + g_pgdx + '"></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<div class="eform-l"><label>报告编号</label></div>',
+								'<div class="eform-r"><i class="fa fa-file-pdf-o"></i><input type="text" id="s-reportNo" value="' + g_bglx_no + '"></div>',
+							'</div>',
+							'<div class="eform-one">',
+								'<button type="button" class="ne-btn has-texture no-bg-img" id="btn-query">查询</button>',
+							'</div>',
+						'</div>'
+					].join('\r\n');
+			$('.section-search').empty().append(_html);
+		}
+
+
+		/**
+		 * 给搜索表单中的评估公司一栏赋值
+		 * @param {object} ps_company_source 评估公司数据源
+		 * @param {object} ps_initialize 是否初始化(即是否第一次打开搜索框), true 是, false 否
+		 */
+		function giveValue2CompanyRow(ps_company_source, ps_initialize){
+			//评估公司个数默认选中第1个
+			if(typeof ps_company_source.data != 'undefined'){
+				if(ps_company_source.data.length > 0){
+					var row = ps_company_source.data[0];
+					var ls_pggs_bh = typeof row["id"] == 'undefined' ? '0' : row["id"],
+						ls_pggs_mc = row["value"];
+					$('#s-company').val(ls_pggs_mc).attr('data-bh', ls_pggs_bh);
+					if(ps_initialize){
+						//全局赋值
+						d_company_bh = ls_pggs_bh;
+						d_company_mc = ls_pggs_mc;
+					}
+				}
+			}
+		}
+
+	
+
+		//========================================
+		/**
+		 * 获取银行下拉数据
+		 * @returns {object} 返回JSON数组
+		 */
+		 function get_data_bank(){
+			//后台返回
+			var json = {
+				"data":[
+					{"id":"1001", "value":"泉州银行丰泽支行"},
+					{"id":"1002", "value":"民生银行丰泽支行"},
+					{"id":"1003", "value":"中国银行丰泽支行"},
+					{"id":"1004", "value":"广发银行丰泽支行"},
+					{"id":"1005", "value":"邮政储蓄丰泽支行"}
+				]
+			}
+			/*
+			//START AJAX
+			var json = {}
+			var isHoldOn = true;
+			ajax({
+				heading: "获取银行下拉数据",
+				debug: false,
+				url: "../../kp3_jk/jk_bank/jk_xjd_report.ashx",
+				data: {
+					"action": "sel_v3_pub_bank_mc",
+					"user": "<%=s_user%>",
+					"menu_bh": "<%=s_menu_bh%>"
+				},
+				success: function(res){
+					//if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+					json = JSON.parse(res);
+				},
+				error: function(res){
+					if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+				},
+				beforeSend: function(XMLHttpRequest) { },
+				complete: function(XMLHttpRequest, textStatus) { }
+			})
+			if(!isHoldOn) {
+				neui.destroyAnimate();
+				return {};
+			}
+			//END AJAX
+			*/
+			return json;
+		}
+
+
+
+		/**
+		 * 根据银行编号等获取评估公司下拉数据
+		 * @param {string} ps_bank_bh 银行编号
+		 * @param {string} ps_check_bhxj 是否包含下级
+		 * @returns {object} 返回JSON数组
+		 */
+		function get_data_company(ps_bank_bh, ps_check_bhxj){
+			//后台返回
+			var json = {
+				"data":[
+					{"id":"1001", "value":"福建华审评估公司"},
+					{"id":"1002", "value":"广东华审评估公司"},
+					{"id":"1003", "value":"北京华审评估公司"},
+					{"id":"1004", "value":"上海华审评估公司"},
+					{"id":"1005", "value":"深圳华审评估公司"}
+				]
+			}
+			/*
+			//START AJAX
+			var json = {}
+			var isHoldOn = true;
+			ajax({
+				heading: "获取评估公司下拉数据",
+				debug: false,
+				url: "../../kp3_jk/jk_bank/jk_xjd_report.ashx",
+				data: {
+					"action": "sel_v3_pub_pggs_mc",
+					"user": "<%=s_user%>",
+					"menu_bh": "<%=s_menu_bh%>",
+					"bank_bh": ps_bank_bh,
+					"check_bhxj": ps_check_bhxj
+				},
+				success: function(res){
+					//if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+					json = JSON.parse(res);
+				},
+				error: function(res){
+					if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+				},
+				beforeSend: function(XMLHttpRequest) { },
+				complete: function(XMLHttpRequest, textStatus) { }
+			})
+			if(!isHoldOn) {
+				neui.destroyAnimate();
+				return {};
+			}
+			//END AJAX
+			*/
+			return json;
+		}
+
+
+
+		/**
+		 * 函数：获取分页总页数
+		 * @returns {Number} 返回页数
+		 */
+		 function getListPage(){
+			var ls_every_page_count = g_pageSize;
+			//后台返回
+			var pages = 10;
+			/*
+			//START AJAX
+			var pages = 1;
+			var isHoldOn = true;
+			ajax({
+				heading: "获取页码(分页总页数)",
+				debug: false,
+				url: "../../kp3_jk/jk_bank/jk_xjd_report.ashx",
+				data: {
+					"action": "sel_v3_xjd_bgcx_page_count",
+                    "user": "<%=s_user%>",
+					"menu_bh": "<%=s_menu_bh%>",
+					"every_page_count": ls_every_page_count, //每页记录数
+					"cxzt": "1", //1 电子报告, 2 纸质报告, 3 通知待出报告
+					"ksrq": g_ksrq,
+					"jsrq": g_jsrq,
+					"bank_bh": g_bank_bh,
+					"check_bhxj": g_check_bhxj,
+					"pggs_bh": g_pggs_bh,
+					"xjdh": g_xjdh,
+					"xjr_xm": g_xjr_xm,
+					"kh_name": g_kh_name,
+					"cqr": g_cqr,
+					"pgdx": g_pgdx,
+					"bglx_no": g_bglx_no
+				},
+				success: function(res){
+					//if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+					pages = res;
+				},
+				error: function(res){
+					if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+				},
+				beforeSend: function(XMLHttpRequest) { },
+				complete: function(XMLHttpRequest, textStatus) { }
+			})
+			if(!isHoldOn) {
+				neui.destroyAnimate();
+				return;
+			}
+			//END AJAX
+			*/
+			return utilities.isNaN(parseInt(pages)) ? 1 : parseInt(pages);
+		}
+
+
+
+		/**
+		 * 函数：获取列表数据
+		 * @param {string} ps_curpage 当前页码
+		 * @returns {object} 返回json数组
+		 */
+		 function getListData(ps_curpage){
+			var ls_open_page_num = typeof ps_curpage == 'undefined' ? 1 : ps_curpage;
+			 var ls_every_page_count = g_pageSize;
+			//后台返回
+			var listJson = {
+				"data":[
+					{"xjdh":"2010240150-237809", "dyw_xh":"D1001", "xjr_xm":"张三", "xjr_dw":"泉州银行丰泽支行", "pggs_mc":"福建华审评估公司", "kh_name":"李小东", "kh_tel":"180501859132", "cqr":"赵小五", "pgdx":"泉州市丰泽区浦西万达广场", "dyw_type_mc":"住宅(有储藏间)", "area":"福建省-泉州市-丰泽区", "pgjg_scjz_dj":"12000", "pgjg_scjz_zj":"90", "pgjg_dyjz_dj":"11000", "pgjg_dyjz_zj":"85", "bglx_no":"闽华审询报泉字（2020）00012号", "tdmj":"110.50", "fwjzmj":"90.30", "time_wc":"2020-10-15 21:32:40"},
+					{"xjdh":"2010240151-237809", "dyw_xh":"D1001", "xjr_xm":"张三", "xjr_dw":"泉州银行丰泽支行", "pggs_mc":"福建华审评估公司", "kh_name":"李小东", "kh_tel":"180501859132", "cqr":"赵小五", "pgdx":"泉州市丰泽区浦西万达广场", "dyw_type_mc":"住宅(有储藏间)", "area":"福建省-泉州市-丰泽区", "pgjg_scjz_dj":"12000", "pgjg_scjz_zj":"90", "pgjg_dyjz_dj":"11000", "pgjg_dyjz_zj":"85", "bglx_no":"闽华审询报泉字（2020）00012号", "tdmj":"110.50", "fwjzmj":"90.30", "time_wc":"2020-10-15 21:32:40"},
+					{"xjdh":"2010240152-237809", "dyw_xh":"D1001", "xjr_xm":"张三", "xjr_dw":"泉州银行丰泽支行", "pggs_mc":"福建华审评估公司", "kh_name":"李小东", "kh_tel":"180501859132", "cqr":"赵小五", "pgdx":"泉州市丰泽区浦西万达广场", "dyw_type_mc":"住宅(有储藏间)", "area":"福建省-泉州市-丰泽区", "pgjg_scjz_dj":"12000", "pgjg_scjz_zj":"90", "pgjg_dyjz_dj":"11000", "pgjg_dyjz_zj":"85", "bglx_no":"闽华审询报泉字（2020）00012号", "tdmj":"110.50", "fwjzmj":"90.30", "time_wc":"2020-10-15 21:32:40"},
+					{"xjdh":"2010240153-237809", "dyw_xh":"D1001", "xjr_xm":"张三", "xjr_dw":"泉州银行丰泽支行", "pggs_mc":"福建华审评估公司", "kh_name":"李小东", "kh_tel":"180501859132", "cqr":"赵小五", "pgdx":"泉州市丰泽区浦西万达广场", "dyw_type_mc":"住宅(有储藏间)", "area":"福建省-泉州市-丰泽区", "pgjg_scjz_dj":"12000", "pgjg_scjz_zj":"90", "pgjg_dyjz_dj":"11000", "pgjg_dyjz_zj":"85", "bglx_no":"闽华审询报泉字（2020）00012号", "tdmj":"110.50", "fwjzmj":"90.30", "time_wc":"2020-10-15 21:32:40"}
+				]
+			}
+
+			/*
+			//START AJAX
+			var listJson = {}
+			var isHoldOn = true;
+			ajax({
+				heading: "获取列表数据",
+				debug: false,
+				url: "../../kp3_jk/jk_bank/jk_xjd_report.ashx",
+				data: {
+					"action": "sel_v3_xjd_bgcx_lssj",
+					"user": "<%=s_user%>",
+					"menu_bh": "<%=s_menu_bh%>",
+					"open_page_num": ls_open_page_num, //当前页码
+					"every_page_count": ls_every_page_count, //每页记录数
+					"cxzt": "1", //1 电子报告, 2 纸质报告, 3 通知待出报告
+					"ksrq": g_ksrq,
+					"jsrq": g_jsrq,
+					"bank_bh": g_bank_bh,
+					"check_bhxj": g_check_bhxj,
+					"pggs_bh": g_pggs_bh,
+					"xjdh": g_xjdh,
+					"xjr_xm": g_xjr_xm,
+					"kh_name": g_kh_name,
+					"cqr": g_cqr,
+					"pgdx": g_pgdx,
+					"bglx_no": g_bglx_no
+				},
+				success: function(res){
+					//if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+					listJson = JSON.parse(res);
+				},
+				error: function(res){
+					if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+				},
+				beforeSend: function(XMLHttpRequest) { },
+				complete: function(XMLHttpRequest, textStatus) { }
+			})
+			if(!isHoldOn) {
+				neui.destroyAnimate();
+				return;
+			}
+			//END AJAX
+			*/
+			return listJson;
+		}
+
+		
+		
+
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$(function(){
+			//+------------------------------------------------------------------------------------------------------------------------
+            //+                                                      +初始化系列事件+
+			//+------------------------------------------------------------------------------------------------------------------------
+			/*+--------------------------------------------------------+*/
+			//=====加载搜索表单
+			createSearchForom();
+
+			/*+--------------------------------------------------------+*/
+			//=====加载日历控件
+			$(document).find('.jedate').each(function(){
+			 neuiCalendar.neDate($(this));
+			});
+
+
+			/*+--------------------------------------------------------+*/
+			//=====银行默认选中第1个
+			var bankJson = get_data_bank();
+			if(typeof bankJson.data != 'undefined'){
+				if(bankJson.data.length > 0){
+					var one = bankJson.data[0];
+					var ls_bank_bh = typeof one["id"] == 'undefined' ? '0' : one["id"],
+						ls_bank_mc = one["value"],
+						ls_check_bhxj = $('#s-subordinate').prop('checked') ? '1' : '0';
+					$('#s-bank').val(ls_bank_mc).attr('data-bh', ls_bank_bh);
+					//全局赋值
+					d_bank_bh = ls_bank_bh;
+					d_bank_mc = ls_bank_mc;
+					var companyJson = get_data_company(ls_bank_bh, ls_check_bhxj);
+					giveValue2CompanyRow(companyJson, true); //给评估公司一栏赋值
+				}
+			}
+
+
+			/*+--------------------------------------------------------+*/
+			//=====加载列表
+			//loadData();
+			
+			
+
+
+			//+------------------------------------------------------------------------------------------------------------------------
+            //+                                                      +系列事件+
+            //+------------------------------------------------------------------------------------------------------------------------
+			/*+--------------------------------------------------------+*/
+			//=====银行下拉
+			$(document).on('click', '#s-bank', function(){
+				var $this = $(this);
+				neui.showAnimate();
+				setTimeout(function(){
+					var bankJson = get_data_bank();
+					neuiDropdown({
+						//caption: '银行',
+						json: bankJson,
+						format:["id", "value"],
+						callBack: function(e){
+							//console.log('e:', e);
+							var ls_bank_bh = e.id,
+								ls_bank_mc = e.value,
+								ls_check_bhxj = $('#s-subordinate').prop('checked') ? '1' : '0';
+							var companyJson = get_data_company(ls_bank_bh, ls_check_bhxj);
+							giveValue2CompanyRow(companyJson, false); //给评估公司一栏赋值
+						}
+					}, $this)
+					neui.destroyAnimate();
+				}, 100)
+			});
+
+
+
+			/*+--------------------------------------------------------+*/
+			//=====评估公司下拉
+			$(document).on('click', '#s-company', function(){
+				var $this = $(this);
+				neui.showAnimate();
+				setTimeout(function(){
+					var ls_bank_bh = typeof $('#s-bank').attr('data-bh') == 'undefined' ? '' : $('#s-bank').attr('data-bh'),
+						ls_bank_mc = $('#s-bank').val(),
+						ls_check_bhxj = $('#s-subordinate').prop('checked') ? '1' : '0';
+					//console.log('银行编号：', ls_bank_bh, '-银行名称：', ls_bank_mc, '-是否包含下级：', ls_check_bhxj);
+					if(ls_bank_mc == ''){
+						neuiDialog.alert({
+							caption: '提示',
+							message: '请先选择银行',
+							buttons: ['确定']
+						})
+						neui.destroyAnimate();
+						return;
+					}
+					var companyJson = get_data_company(ls_bank_bh, ls_check_bhxj);
+					neuiDropdown({
+						//caption: '评估公司',
+						json: companyJson,
+						format:["id", "value"]
+					}, $this)
+					neui.destroyAnimate();
+				}, 100)
+			});
+
+
+
+			
+			
+			/*+--------------------------------------------------------+*/
+			//=====查询按钮
+			$(document).on('click', '#btn-query', function(){
+				//全局赋值
+				g_ksrq = $('#s-startDate').val();
+				g_jsrq = $('#s-endDate').val();
+				g_bank_bh = $('#s-bank').attr('data-bh');
+				if(typeof g_bank_bh == 'undefined') g_bank_bh = '';
+				g_bank_mc = $('#s-bank').val();
+				g_check_bhxj = $('#s-subordinate').prop('checked') ? '1' : '0';
+				g_pggs_bh = $('#s-company').attr('data-bh');
+				if(typeof g_pggs_bh == 'undefined') g_pggs_bh = '';
+				g_pggs_mc = $('#s-company').val();
+				g_xjdh = $('#s-oddNumber').val();
+				g_xjr_xm = $('#s-quiryer').val();
+				g_kh_name = $('#s-loaner').val();
+				g_cqr = $('#s-owner').val();
+				g_pgdx = $('#s-assessObject').val();
+				g_bglx_no = $('#s-reportNo').val();
+				//校验数据是否为空
+				var tips = '';
+				if(g_bank_mc == '') tips += '银行、';
+				if(g_pggs_mc == '') tips += '评估公司、';
+				if(tips != ''){
+					neuiDialog.alert({
+						caption: '提示',
+						message: '请选择：' + tips.substr(0, tips.length - 1),
+						buttons: ['确定']
+					})
+					return;
+				}
+				//刷新数据
+				loadData(); 
+			});
+
+
+		
+
+		}); //$(function(){})
+
+
+	</script>
+</body>
+</html>
