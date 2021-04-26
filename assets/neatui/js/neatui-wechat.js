@@ -289,8 +289,12 @@
 		$('#btn_talk_send').off('click').on('click', function(){
 			me.sendMessage(); //这个滚动条要弄到最底部，且html是拼接到最后面的即append，而非prepend
 		})
-		// 点相册, 上传图片
+		// 点相册, 上传图片 test5
 		$('.chit__item-album').off('click').on('click', function(){
+			if(!checkMobileDevice()){
+				me.utilities.openToast('电脑端(PC)无法上传图片，请在手机上进行操作');
+				return;
+			}
 			me.uploadImage();
 		})
 		// 点击冒泡消息
@@ -1545,6 +1549,25 @@
 
 	};
 
+
+	/**
+	 * 检测是否移动端，判断是否手机端设备
+	 * @returns {boolean} 返回布尔值. true 是, false 否
+	 */
+	function checkMobileDevice(){
+		var userAgentInfo = navigator.userAgent.toLowerCase();
+		//console.log(userAgentInfo);
+		var Agents = ["mobile","android","iphone","sysbian","windows phone","iPad","ipod","blackberry"];
+		var flag = false;
+		for(var i=0; i<Agents.length; i++){
+			if(userAgentInfo.indexOf(Agents[i])>=0){
+				flag = true;
+				break;
+			}
+		}
+		return flag;
+	};
+    
 
 
 	/**
