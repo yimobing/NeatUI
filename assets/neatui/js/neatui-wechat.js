@@ -20,7 +20,6 @@
 		me.rollRoot = '.as-lay-main'; // 滚动根节点
 		me.timer = null; // 消息定时器
 		me.state = true; // 消息是否发送成功,默认true
-		me.messageContent = ''; // 消息内容. 当消息发送失败时赋值给本属性
 		me.$element = element;
 		me.init(options);
 	};
@@ -299,9 +298,11 @@
 			$(this).text(0).hide();
 			me.fnScrollToBottom(); // 强制滚动条滚动到底部	
 		})
-		// 重新发送消息（发送失败，重试）
+		// 重新发送消息（发送失败，重试） test5
 		$(me.messageRoot).off('click', '.cose__text-fail').on('click', '.cose__text-fail', function(){
-			me.sendMessage();
+			var index = $(this).parents('.cose__one').index();
+			var value = $(this).parent().siblings('.cose__text-content').html();
+			me.sendMessage(index, value);
 		})
 		// 消息图片预览事件
 		$(me.messageRoot).off('click', '.cose__text img').on('click', '.cose__text img', function(){ // 部分ios中事件委托为document时不执行
@@ -336,12 +337,15 @@
 
 	//================================================================
 	/**
-	 * 发送按钮, 发送聊天消息
+	 * 发送按钮, 发送聊天消息 test5
+	 * @param {string} ps_index 消息所在行索引值(可选)
+	 * @param {string} ps_str 消息内容(可选)
 	 */
-	MyChat.prototype.sendMessage = function(){
+	MyChat.prototype.sendMessage = function(ps_index, ps_str){
 		var me = this;
 		var $eleInputBox = $('#c-chat-touch');
-		var value = me.state ? htmlEncode($eleInputBox.html()) : me.messageContent;
+		var value = typeof ps_str == 'undefined' ? htmlEncode($eleInputBox.html()) :  htmlEncode(ps_str);
+		me.state = typeof ps_str == 'undefined' ? true : false;
 		if(filterEmptyStr(value) == ''){
 			me.utilities.openToast('请输入聊天内容');
 			return;
@@ -350,15 +354,22 @@
 		// 调用事件
 		if(me.opts.events){
 			if(me.opts.events.send){
-				if(me.state){		
+				if(me.state){
 					var dataJson = me.fnAtonceMessage(value, '', '1', '0', '0');
 					me.createData(dataJson, me.messageRoot, 'append');
 					me.fnScrollToBottom(); // 强制滚动条滚动到底部
 				}else{
-					$('.cose__one:last-child').find('.cose__text-fail').hide();
+					typeof ps_index == 'undefined' ? 
+					$('.cose__one:last-child').find('.cose__text-fail').hide()
+					:
+					$('.cose__one').eq(ps_index).find('.cose__text-fail').hide();
 				}
-				var eleTextStatus = $('.cose__one:last-child').find('.cose__text-status'); // 消息状态节点
-					eleTextLoad = eleTextStatus.children('.cose__text-load');
+				var eleTextStatus = 
+					typeof ps_index == 'undefined' ? 
+					$('.cose__one:last-child').find('.cose__text-status') // 消息状态节点
+					:
+					$('.cose__one').eq(ps_index).find('.cose__text-status');
+				var eleTextLoad = eleTextStatus.children('.cose__text-load');
 					eleTextFail = eleTextStatus.children('.cose__text-fail');
 				 // 显示消息转圈状态
 				 eleTextStatus.show();
@@ -367,16 +378,11 @@
 				var result = me.opts.events.send({ "type":"word", "content":value}); // type 消息类型(word 文字, voice 语音), content 消息内容
 				//console.log('result:', result);
 				if(result == 'ok'){ // 成功
-					me.state = true;
-					me.messageContent = '';
 					setTimeout(function(){
 						eleTextStatus.hide();
-						eleTextLoad.hide();
-						
+						eleTextLoad.hide();	
 					}, 100)
 				}else{ // 失败
-					me.state = false;
-					me.messageContent = value;
 					setTimeout(function(){
 						eleTextLoad.hide();
 						eleTextFail.show();	
@@ -462,14 +468,24 @@
 		}
 	};
 
-	// 强制滚动条滚动到底部
+	// 强制滚动条滚动到底部 test5
 	MyChat.prototype.fnScrollToBottom = function(){
 		var me = this;
 		var y = $(me.rollRoot)[0].scrollHeight - $(me.rollRoot).height();
-		$(me.rollRoot)[0].scrollTo({
-			top: y, //y轴
-			behavior: "instant" //smooth 平滑滚动, instant 瞬间滚动,默认值auto
-		})
+		if($(me.rollRoot)[0].scrollTo){
+			$(me.rollRoot)[0].scrollTo({
+				top: y, //y轴
+				behavior: "instant" //smooth 平滑滚动, instant 瞬间滚动,默认值auto
+			})
+			// alert('支持scrollTo')
+		}else{
+			$('.cose__one:last-child')[0].scrollIntoView({
+				behavior: "smooth",
+				block: "end",
+				inline: "nearest"
+			})
+			// alert('支持scrollIntoView')
+		}
 		$('.bubbling').text(0).hide(); // 消息不再冒泡
 	};
 
@@ -1593,6 +1609,7 @@
 		   })//处理粘贴
 	   }
 	};
+	
 	
 
 })(jQuery);
