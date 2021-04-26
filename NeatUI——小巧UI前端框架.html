@@ -547,6 +547,7 @@
                     	{text: "重置", name: "btn-reset", width: "100%", class: "ne-btn", backColor: "", foreColor: "", radius: "0"},
                     	{text: "完成", name: "btn-complete", width: "100%", class: "ne-btn info", backColor: "", foreColor: "", radius: "0"}
                     ], */
+                    buttonAutoWidth: false, //当只有一个按钮时按钮是否根据内容自动调整宽度(可选),默认false. 值为true时,buttons参数中设置的按钮宽度将不起作用
                     showButton: true, //是否显示按钮(可选),默认true
     
                     offset: { //位置偏移,由此可设置窗口位置(可选)
@@ -673,7 +674,7 @@
                     adaptive: true,
                     frozen: false,
                     buttons: ["确定"],
-                    buttonAutoWidth: true, //当只有一个按钮时按钮是否根据内容自动调整宽度(可选),默认false. 值为true时,buttons参数中设置的按钮宽度将不起作用
+                    buttonAutoWidth: true,
                     openCallBack: function(e){ },
                     btnCallBack: function(ret, e){
                         //console.log('e:', e);
