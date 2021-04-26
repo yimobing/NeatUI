@@ -1335,7 +1335,7 @@ pre, pre code {
 /*标题不单独一行时*/
 .ne-aside .as-lay-header.has-cap-nowrap .lay-header-caption{
 	position: absolute;
-	top: 0;
+	top: 5px;
 	left: 70px;
 	width: 60%;
 	text-align: center;
@@ -1343,7 +1343,8 @@ pre, pre code {
 .ne-aside .as-lay-header.has-cap-nobacktext .lay-header-caption{ left: 35px; text-align: left; }
 .ne-aside .as-lay-header.has-cap-noback .lay-header-caption{ left: 15px; margin: 0 auto; text-align: left; }
 .ne-aside .as-lay-header.has-cap-nothick .lay-header-caption{ font-weight: normal; }
-.ne-aside .as-lay-header.has-cap-nowrap + .as-lay-main{margin-top: 12px;}
+.ne-aside .as-lay-header.has-cap-nowrap + .as-lay-main{ margin-top: 20px; }
+.ne-aside .as-lay-header.has-cap-nowrap-empty + .as-lay-main{ margin-top: 8px; }
 .ne-aside .as-lay-header.has-cap-noback.has-cap-nocross + .as-lay-main{ margin-top: 35px; }
 
 /*+-----------动画-------------+*/
