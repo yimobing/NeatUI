@@ -1280,9 +1280,10 @@ pre, pre code {
 
 /*顶部标题*/
 .ne-aside .lay-header-caption{
-	width: 60%;
+	width: 100%;
 	/* margin: 10px auto; */
-	padding: 2px 0;
+	margin: 0 10px;
+	padding: 6px 0;
 	border-style: solid;
 	border-color: #f9f4f4;
 	border-width: 0 0 0 0;
@@ -1324,6 +1325,7 @@ pre, pre code {
 	display: box;
 	justify-content: center;
 }
+.ne-aside .lay-footer-button.has-btn-align-right{ justify-content: flex-end; }
 .ne-aside .as-lay-footer button[type="button"]{ width: 100%; margin-left: 4px; }
 .ne-aside .as-lay-footer button[type="button"]:first-child{ margin-left: 0; }
 
@@ -1335,11 +1337,14 @@ pre, pre code {
 	position: absolute;
 	top: 0;
 	left: 70px;
+	width: 60%;
 	text-align: center;
 }
 .ne-aside .as-lay-header.has-cap-nobacktext .lay-header-caption{ left: 35px; text-align: left; }
-.ne-aside .as-lay-header.has-cap-noback .lay-header-caption{ left: 15px; text-align: left; }
-.ne-aside .as-lay-header.has-cap-nowrap + .as-lay-main{ margin-top: 15px; }
+.ne-aside .as-lay-header.has-cap-noback .lay-header-caption{ left: 15px; margin: 0 auto; text-align: left; }
+.ne-aside .as-lay-header.has-cap-nothick .lay-header-caption{ font-weight: normal; }
+.ne-aside .as-lay-header.has-cap-nowrap + .as-lay-main{margin-top: 12px;}
+.ne-aside .as-lay-header.has-cap-noback.has-cap-nocross + .as-lay-main{ margin-top: 35px; }
 
 /*+-----------动画-------------+*/
 .ne-aside .aside-layer.cartoon-right{
@@ -1361,7 +1366,7 @@ pre, pre code {
     position: initial;
 }
 .ne-aside .aside-layer.unfreeze .as-lay-footer{
-	margin: 20px auto;
+	margin: 15px auto;
 	padding: 0 10px;
 }
 

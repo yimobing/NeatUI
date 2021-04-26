@@ -410,6 +410,7 @@
                     <div class="grid-module-caption">侧栏(弹出窗)</div>
                     <div class="grid-module-content">
                         <button type="button" id="btn-aside-default" class="ne-btn linear">默认侧栏</button>
+                        <button type="button" id="btn-aside-adaptive" class="ne-btn linear">自适应大小侧栏</button>
                     </div><!--/.grid-module-content-->
                 </div><!--/.grid-module-block-->
                 
@@ -444,7 +445,7 @@
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //+                                                     初始化事件
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            /*+----------------------------------------+*/
+             //——————————————————————————————————————————
             //=====代码块高亮
             hljs.initHighlightingOnLoad()
             hljs.configure({
@@ -459,10 +460,9 @@
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //+                                                侧栏弹出窗事件
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            /*+----------------------------------------+*/
+             //——————————————————————————————————————————
             //=====默认侧栏按钮 
             $('#btn-aside-default').on('click', function(){
-
                 /**
                  * 自定义数据源参数说明：
                     · type 搜索类型. input 单行输入框(默认), textarea 多行输入框, drop 下拉, radio 单选, checkbox 多选
@@ -532,11 +532,13 @@
                     toper: "", //顶部,自定义HTML(可选).
                     footer: "", //底部,自定义HTML(可选).
 
-                    cross: true, //是否显示关闭图标(可选),默认false
-			        back: true, //是否显示返回按钮(可选),默认false
+                    cross: true, //是否显示关闭图标(可选),默认true
+			        back: false, //是否显示返回按钮(可选),默认false
                     showBackText: false, // 是否显示返回按钮的文字(可选),默认false
-                    capwrap: false, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+                    capwrap: false, //标题是否单独一行(可选),默认false. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+                    capthick: false, //标题文字是否加粗(可选),默认false.
                     adaptive: false, //窗口是否自适应内容大小(可选). true 是, false 否(默认)
+                    adapWidth: 'auto', //窗口自适应大小时的最大宽度(可选). 默认auto. (此参数一般用于pc端自定义窗口大小)
                     frozen: true, //是否冻结顶部、中间及底部,即各部分是否使用绝对定位(可选). true 是(默认), false 否. false时控件大小自适应内容
 
                     //按钮参数有两种格式
@@ -585,7 +587,9 @@
             });
 
 
-            //=====[弹出窗口]负责人下拉
+
+            //——————————————————————————————————————————
+            //=====默认侧栏按钮 -> [弹出窗口]负责人下拉
             $(document).on('click', '#s-person', function(){
                 var html = [
                     '<div class="block-person">',
@@ -620,7 +624,7 @@
 			        back: false,
                     adaptive: true,
                     frozen: false,
-                    buttons: ["确定"], 
+                    buttons: ["确定"],
                     offset: { 
                         left: 50,
                         right: 0,
@@ -628,6 +632,48 @@
                         bottom: 0
                     },
                     noneSelfClickClose: false,
+                    openCallBack: function(e){ },
+                    btnCallBack: function(ret, e){
+                        //console.log('e:', e);
+                        var self = this;
+                        self.closeAside(); //关闭当前窗口
+                    } 
+                })
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====自适应大小侧栏
+            $('#btn-aside-adaptive').on('click', function(){
+                var html = [
+                    '<div class="block-over">',
+                        '<div class="eform-row">',
+                            '<div class="item-l" style="width: 40px"><label>标题</label></div>',
+                            '<div class="item-r">',
+                                '<input type="text" id="c-title" placeholder="标题" onblur="this.placeholder=\'标题\'" onfocus="this.placeholder=\'\'">',
+                            '</div>',
+                        '</div><!--/.eform-row-->',
+                        '<div class="eform-row">',
+                            '<div class="item-l" style="width: 40px"><label>备注</label></div>',
+                            '<div class="item-r">',
+                                '<i class="fa fa-text-height"></i>',
+                                '<textarea id="c-notes" placeholder="处理备注" onblur="this.placeholder=\'处理备注\'" onfocus="this.placeholder=\'\'"></textarea>',
+                            '</div>',
+                        '</div><!--/.eform-row-->',
+                    '</div>'
+                ].join('\r\n');
+                neui.openAside({
+                    caption: '标记为已处理',
+                    content: html, 
+                    cross: true,
+			        back: false,
+                    adaptive: true,
+                    frozen: false,
+                    buttons: ["确定"],
+                    buttonAutoWidth: true, //当只有一个按钮时按钮是否根据内容自动调整宽度(可选),默认false. 值为true时,buttons参数中设置的按钮宽度将不起作用
                     openCallBack: function(e){ },
                     btnCallBack: function(ret, e){
                         //console.log('e:', e);
