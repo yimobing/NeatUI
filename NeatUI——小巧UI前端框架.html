@@ -410,7 +410,8 @@
                     <div class="grid-module-caption">侧栏(弹出窗)</div>
                     <div class="grid-module-content">
                         <button type="button" id="btn-aside-default" class="ne-btn linear">默认侧栏</button>
-                        <button type="button" id="btn-aside-adaptive" class="ne-btn linear">自适应大小侧栏</button>
+                        <button type="button" id="btn-aside-adaptive" class="ne-btn linear">自定义窗口大小的侧栏</button>
+                        <button type="button" id="btn-aside-adaptive2" class="ne-btn linear">按钮自动调整宽度的侧栏</button>
                     </div><!--/.grid-module-content-->
                 </div><!--/.grid-module-block-->
                 
@@ -538,7 +539,7 @@
                     capwrap: false, //标题是否单独一行(可选),默认false. 值为false时,标题将与顶部的关闭、返回按钮在同一行
                     capthick: false, //标题文字是否加粗(可选),默认false.
                     adaptive: false, //窗口是否自适应内容大小(可选). true 是, false 否(默认)
-                    adapWidth: 'auto', //窗口自适应大小时的最大宽度(可选). 默认auto. (此参数一般用于pc端自定义窗口大小)
+                    adapWidth: 'auto', //窗口自适应大小时的最大宽度(可选). 默认auto. (本参数仅在pc端时有效). 格式：数值或带px或带百分号的字符串, eg.200, '200px, '80%'
                     frozen: true, //是否冻结顶部、中间及底部,即各部分是否使用绝对定位(可选). true 是(默认), false 否. false时控件大小自适应内容
 
                     //按钮参数有两种格式
@@ -645,43 +646,88 @@
 
 
 
-
             //——————————————————————————————————————————
-            //=====自适应大小侧栏
+            //=====自定义窗口大小的侧栏
             $('#btn-aside-adaptive').on('click', function(){
                 var html = [
                     '<div class="block-over">',
                         '<div class="eform-row">',
                             '<div class="item-l" style="width: 40px"><label>标题</label></div>',
                             '<div class="item-r">',
-                                '<input type="text" id="c-title" placeholder="标题" onblur="this.placeholder=\'标题\'" onfocus="this.placeholder=\'\'">',
+                                '<input type="text" id="c-title">',
                             '</div>',
                         '</div><!--/.eform-row-->',
                         '<div class="eform-row">',
                             '<div class="item-l" style="width: 40px"><label>备注</label></div>',
                             '<div class="item-r">',
                                 '<i class="fa fa-text-height"></i>',
-                                '<textarea id="c-notes" placeholder="处理备注" onblur="this.placeholder=\'处理备注\'" onfocus="this.placeholder=\'\'"></textarea>',
-                            '</div>',
-                        '</div><!--/.eform-row-->',
-                        '<div class="eform-row">',
-                            '<div class="item-l" style="width: 40px"><label>顺序号</label></div>',
-                            '<div class="item-r">',
-                                '<i class="fa fa-text-height"></i>',
-                                '<input type="text" id="c-order" placeholder="顺序号" onblur="this.placeholder=\'顺序号\'" onfocus="this.placeholder=\'\'">',
+                                '<textarea id="c-notes"></textarea>',
                             '</div>',
                         '</div><!--/.eform-row-->',
                     '</div>'
                 ].join('\r\n');
                 neui.openAside({
-                    caption: '标记为已处理',
+                    caption: '自定义窗口大小',
+                    content: html, 
+                    cross: true,
+			        back: false,
+                    adaptive: true,
+                    adapWidth: 300, //自定义窗口大小
+                    frozen: false,
+                    buttons: ["确定"],
+                    buttonAutoWidth: true,
+                    openCallBack: function(e){ },
+                    btnCallBack: function(ret, e){
+                        //console.log('e:', e);
+                        var self = this;
+                        self.closeAside(); //关闭当前窗口
+                    } 
+                })
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====按钮自动调整宽度的侧栏
+            $('#btn-aside-adaptive2').on('click', function(){
+                var html = [
+                    '<div class="block-over">',
+                        '<div class="eform-content">',
+                            '<div class="eform-row">',
+                                '<div class="item-l" style="width: 40px"><label>标题</label></div>',
+                                '<div class="item-r">',
+                                    '<input type="text" id="c-title">',
+                                '</div>',
+                                '<div class="item-cell" data-type="must">*</div>',
+                            '</div><!--/.eform-row-->',
+                            '<div class="eform-row">',
+                                '<div class="item-l" style="width: 40px"><label>内容</label></div>',
+                                '<div class="item-r">',
+                                    '<i class="fa fa-text-height"></i>',
+                                    '<textarea id="c-notes"></textarea>',
+                                '</div>',
+                                '<div class="item-cell" data-type="must">*</div>',
+                            '</div><!--/.eform-row-->',
+                            '<div class="eform-row">',
+                                '<div class="item-l" style="width: 40px"><label>备注</label></div>',
+                                '<div class="item-r">',
+                                    '<i class="fa fa-file-text-o"></i>',
+                                    '<textarea></textarea>',
+                                '</div>',
+                                '<div class="item-cell" data-type="tip">最多50个字</div>',
+                            '</div><!--/.eform-row-->',
+                        '</div><!---/.eform-content-->',
+                    '</div>'
+                ].join('\r\n');
+                neui.openAside({
+                    caption: '按钮自动调整宽度',
                     content: html, 
                     cross: true,
 			        back: false,
                     adaptive: true,
                     frozen: false,
                     buttons: ["确定"],
-                    buttonAutoWidth: true,
+                    buttonAutoWidth: true, // 按钮自动调整宽度
                     openCallBack: function(e){ },
                     btnCallBack: function(ret, e){
                         //console.log('e:', e);
