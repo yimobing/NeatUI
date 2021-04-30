@@ -573,8 +573,8 @@
                         //console.log('e:', e);
                         neuiSearchBox.doneEvent(); //加载搜索框事件
                     },
-                    btnCallBack: function(ret, e){ //按钮回调(可选). ret 按钮索引值+1, e 同openCallBack()的e参数
-                        //console.log('e:', e);
+                    btnCallBack: function(ret, e){ //按钮回调(可选). ret 按钮索引值+1, e格式：{eleBtn:"当前按钮节点", eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
+                        // console.log('e:', e);
                         var self = this;
                         if(ret == 1){ }
                         if(ret == 2){
