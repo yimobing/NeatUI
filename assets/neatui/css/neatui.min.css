@@ -1335,11 +1335,22 @@ pre, pre code {
 /*标题不单独一行时*/
 .ne-aside .as-lay-header.has-cap-nowrap .lay-header-caption{
 	position: absolute;
-	top: 5px;
+	top: 0;
 	left: 70px;
-	width: 60%;
+	width: 75%;
+	padding: 3px 0;
 	text-align: center;
 }
+.ne-aside .as-lay-header.has-cap-nowrap.has-cap-nowrap.has-cap-nocross .lay-header-caption,
+.ne-aside .as-lay-header.has-cap-nowrap.has-cap-nowrap.has-cap-noback .lay-header-caption{
+	width: 85%;
+}
+
+.ne-aside .as-lay-header.has-cap-nowrap.has-cap-nowrap.has-cap-noback.has-cap-nocross .lay-header-caption{
+	width: 90%;
+}
+
+
 .ne-aside .as-lay-header.has-cap-nobacktext .lay-header-caption{ left: 35px; text-align: left; }
 .ne-aside .as-lay-header.has-cap-noback .lay-header-caption{ left: 15px; margin: 0 auto; text-align: left; }
 .ne-aside .as-lay-header.has-cap-nothick .lay-header-caption{ font-weight: normal; }
