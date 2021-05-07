@@ -134,7 +134,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 
 
 /*+--------左边--------+*/
-.item-l{ width: 70px; }
+.item-l{ width: 70px; margin-right: 8px; }
 .item-l label{
     display: block;
     width: 100%;
@@ -159,7 +159,6 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     -o-flex: 1;
     -ms-flex: 1;
     width: 100%;
-    margin-left: 8px;
 }
 /*多列*/
 .item-r .item-box{ position: relative; width: 100%; margin-left: 5px; color: #888; font-size: 14px; }
