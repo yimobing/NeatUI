@@ -496,6 +496,7 @@
              * 微信聊天上传图片操作
              */
             function fnChatUploadPicture(){
+                var allImgJson = {data:[]} // 这个要放外面,若放内部,则会出现undefined情况(把setTimeout去掉时)
                 return new Promise(function(resolve, reject){
                     // · 后台实际操作
                     // START
@@ -525,7 +526,6 @@
                     // ·发送单张图片给用户
                     // @param {string} msg 一维对象字符串
                     // @param {number} total 图片总数
-                    var allImgJson = {data:[]}
                     function sendOneImageToUser(msg, total){
                         var isGoOn = true;
                         var errors = '';

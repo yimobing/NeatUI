@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>JS实现菜单滚动到一定高度后固定</title>
+    <style type="text/css">
+        *{box-sizing: border-box; margin: 0; padding: 0;}
+        #menu{ width: 100%; }
+        #top{
+            height: 150px;
+            line-height: 150px;
+            border: 2px solid blue;
+            text-align: center;
+        }
+        #space{
+            height: 80px;
+            line-height: 1.75;
+            background-color: orange;
+            color: #fff;
+            text-align: center;
+        }
+        #nav{
+            width: 100%;
+            display: flex;
+            height: 80px;
+            background-color: blue;
+            color: #fff;
+        }
+        #nav>li{ 
+            width: 80px;
+            text-align: center;
+            height: 100%;
+            list-style-type: none;
+            width: 100%;  
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        #nav>li>a{
+            text-decoration: none;
+            color: #fff;
+        }
+    
+        .content{ 
+            margin-bottom: 5px;
+            height: 200px;
+            line-height: 200px;
+            border: 2px solid #0ce;
+            text-align: center;
+         }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div id="top">
+            顶部空间
+        </div>
+
+        <div id="menu">
+            <div id="space">当页面将我滚动到顶部国家级时<br>我自己+导航菜单将固定fixed在顶部</div>
+            <ul id="nav"> 
+               <li><a href="#content1">美食</a></li> 
+               <li><a href="#content2">娱乐</a></li> 
+               <li><a href="#content3">超市</a></li> 
+               <li><a href="#content4">出行</a></li> 
+               <li><a href="#content5">养车</a></li> 
+            </ul> 
+        </div><!--/#menu-->
+
+        <div id="container">
+            <div class="content" id="content1">内容区域一</div>
+            <div class="content" id="content2">内容区域二</div>
+            <div class="content" id="content3">内容区域三</div>
+            <div class="content" id="content4">内容区域四</div>
+            <div class="content" id="content5">内容区域五</div>
+        </div><!--/#container-->
+
+    </div><!--/.wrap-->
+    
+
+
+    <script type="text/javascript">
+        window.onscroll=function(){
+            var topScroll = document.body.scrollTop || document.documentElement.scrollTop;//滚动的距离,距离顶部的距离
+            var space  = document.getElementById("space");
+            var bignav  = document.getElementById('menu'); // document.getElementById("nav");//获取到导航栏id
+            var spaceOffsetHeight = space.offsetTop;    //以spce的滚动高度为参照
+            console.log('scrollTop：', topScroll, ' - offsetTop：', spaceOffsetHeight);
+            if(topScroll > spaceOffsetHeight){  
+                bignav.style.position = 'fixed';
+                bignav.style.top = '0';
+                bignav.style.zIndex = '9999';
+            } else {
+                bignav.style.position = 'static';
+            }
+        }
+    </script>
+</body>
+</html>
