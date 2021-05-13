@@ -569,6 +569,8 @@
                     //closeAside: function(){ }, //关闭当前窗口, 供btnCallBack等回调函数调用,用来关闭窗口(可选)
                     //closeAll: function(){ }, //关闭所有窗口, 供btnCallBack等回调函数调用,用来关闭窗口(可选)
                     //回调
+                    crossCallBack: function(e){ }, // 打叉关闭图标回调(可选). e格式: {eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
+			        backCallBack: function(e){ }, // 返回按钮回调(可选). e格式: {eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
                     openCallBack: function(e){ //创建完成后的回调. e格式: {eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
                         //console.log('e:', e);
                         neuiSearchBox.doneEvent(); //加载搜索框事件
@@ -584,7 +586,7 @@
 
                         self.closeAside(); //关闭当前窗口
                         //self.closeAll(); //关闭所有窗口
-                    } 
+                    }
                 })
             });
 
