@@ -52,6 +52,7 @@
                     var _mainClassName = '';
                     var _hidStr = hid == '' ? '' : ' data-bh="' + hid + '"';
                     var _readStr = readonly == true ? ' readonly' : '';
+                    var _blurStr = readonly == true ? ';this.blur()' : '';
                     var _nameStr = names == '' ? '' : ' id="' + names + '"';
                     var _classStr = aClass == '' ? '' : ' class="' + aClass + '"';
                     valueHtml = [
@@ -102,10 +103,10 @@
 
                         }else{ //单个输入框
                             if(type == 'input'){
-                                _mainStr += '<input type="text"' + _nameStr + _classStr + ' value="' + value + '" placeholder="' + placeholder + '" onblur="this.placeholder=\'' + placeholder + '\'" onfocus="this.placeholder=\'\'"' + _readStr + '>';
+                                _mainStr += '<input type="text"' + _nameStr + _classStr + ' value="' + value + '" placeholder="' + placeholder + '" onblur="this.placeholder=\'' + placeholder + '\'" onfocus="this.placeholder=\'\'' + _blurStr + '"' + _readStr + '>';
                             }
                             if(type == 'textarea'){
-                                _mainStr += '<textarea' + _nameStr + _classStr + ' placeholder="' + placeholder + '" onblur="this.placeholder=\'' + placeholder + '\'" onfocus="this.placeholder=\'\'"' + _readStr + '>' + value + '</textarea>';
+                                _mainStr += '<textarea' + _nameStr + _classStr + ' placeholder="' + placeholder + '" onblur="this.placeholder=\'' + placeholder + '\'" onfocus="this.placeholder=\'\'' + _blurStr + '"' + _readStr + '>' + value + '</textarea>';
                             }
                         }
                     }
