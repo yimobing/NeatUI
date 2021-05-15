@@ -1218,7 +1218,7 @@ pre, pre code {
 /*+----------- -------------+*/
 .ne-aside .as-lay-header{
 	position: absolute;
-	top: 6px;
+	top: 12px;
 	left: 0;
 	right: 0;
 }
