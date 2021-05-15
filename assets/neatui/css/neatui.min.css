@@ -1218,7 +1218,7 @@ pre, pre code {
 /*+----------- -------------+*/
 .ne-aside .as-lay-header{
 	position: absolute;
-	top: 0;
+	top: 6px;
 	left: 0;
 	right: 0;
 }
@@ -1233,23 +1233,24 @@ pre, pre code {
     display: block;
     clear: both;
 }
-.ne-aside .header-top-back{float: left;padding-left: 8px;}
-.ne-aside .header-top-cross{  float: right; }
 .ne-aside .header-top-back,
 .ne-aside .header-top-cross{
 	display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
     display: -webkit-flex;
+    display: box;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-width: 30px;
+    min-width: 40px;
     height: 30px;
     margin: 0 auto;
-	text-align: center;
+    text-align: center;
 	cursor: pointer;
 }
+.ne-aside .header-top-back{ float: left; }
+.ne-aside .header-top-cross{ float: right; }
 
 .ne-aside .header-top-back i{
 	background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAADOklEQVRoQ93bz2vUQBQH8Pdm3a2I4K5/hxcreFGEUrAI/kAFBdGD9qLCTpKTepEIHmop7MteVgrWgnrQikIRKVKpiPQiqBf/hb26RaRWcUaiu1CWzTommR9p7jPJJ9+XN5swi1CAw/O8mwAgoii6nfVyMesEusd7nncNEafi8yCi32g0oizndBocBIEnpaTNQCHElWazeTct2lnwIGwPKYS41Gw276dBOwn2fd8HgMYQ0Aci2rclwJzzy4yx1hDMp0qlcmh6evpr4cG6sX8aX5q7pGMM5/wiY2xOV7K9eZ0Ax1hEvIeISdeTqYw330TrYM75OUR8aAJrvaRjLGPsAQCwQaUspXw/MjIynrZBDZrTWsIq2HK5PDYzM/Mtz55hBex53mlEfDIsWR1YKyUdYwHgMSKWkspYF9Y4OAiCY0KI57awRsExVkr5DAC22UjW6DrsCtZIwp7nTSDiiyHJrpbL5cN5d+Okzq61S3exiwBQSSjj1bW1tfH5+fnveS49w+bSBuacjzHGllzCaivpGIuILxFxuyvJamtaLmNzT9j3/QNSymUXk8094S72FSLuSGgabzqdzhGTDUrby0MQBPuFECvDsNVqdSIMwx+murG2ZamLfY2IO5OSdQWb+RkuGjYTuF6v72WMvS1KspmaVowtlUorALCrCGWc6ZsW53wPY+xdEbGpSrqb7jIA7E74FbW0vr5+fHZ29qftjpzbslRkdOqXBxV0u90+urCw8MulpFODY4QCerHdbp9yCZ0JrIqu1WonwzAULiSdGayCBoCn1Wr1rAvoXMCqaCI6AwDSZtK5gRXRj4jogk10ruD/QJ+3lXLuYEX0HBFN2kBrAbuM1gZWRLeI6KrJpLWCXURrB7uGNgJWRBMRBbrL2xjYFbRRsApaSjkVRdENXUkbB6ugASAkols60FbAKmgp5fUoiu7kjbYGVkHnsT+6/4ZZBdtAWweroLNuCt+cshNgk2hnwKbQToEV0am3/8fzOwf+F1r+PSa31H8eYrTv+6Pd3QS1/qVFSvkxiqLRNGu0kwn3IAnfvT8DwEEi6mw58IDyzoR19hnuTy4ubwCgjY2NE61W60uaZHtjfgPIyulMPNxirAAAAABJRU5ErkJggg==') center/100% auto no-repeat scroll;
@@ -1276,6 +1277,35 @@ pre, pre code {
 }
 .ne-aside .header-top-back span{ margin-left: 5px; }
 .ne-aside .header-top-cross span{ margin-right: 5px; }
+/*标题栏不单独一行*/
+.ne-aside .as-lay-header.has-cap-nowrap .lay-header-top{
+	display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.ne-aside .as-lay-header.has-cap-nowrap .header-top-caption{
+	width: 100%;
+	-webkit-flex: 1;
+	-moz-flex: 1;
+	-o-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+	height: 30px;
+	line-height: 30px;
+	margin: 0 auto;
+	text-align: center;
+	font-weight: bold;
+	font-size: 18px;
+}
+.ne-aside .as-lay-header.has-cap-nothick .header-top-caption{ font-weight: normal; }
+.ne-aside .as-lay-header.has-cap-align-left .header-top-caption{ text-align: left; }
+.ne-aside .as-lay-header.has-cap-align-center .header-top-caption{ text-align: center; }
+.ne-aside .as-lay-header.has-cap-align-right .header-top-caption{ text-align: right; }
 
 
 /*顶部标题*/
@@ -1290,7 +1320,7 @@ pre, pre code {
 	color: #303b42;
 	font-size: 18px;
 	font-weight: bold;
-    overflow: hidden;
+	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	word-wrap: break-word;
@@ -1333,30 +1363,26 @@ pre, pre code {
 /*底部有padding*/
 .ne-aside .as-lay-footer.has-padding{ padding: 0 5px 3px; }
 /*标题不单独一行时*/
-.ne-aside .as-lay-header.has-cap-nowrap .lay-header-caption{
-	position: absolute;
-	top: 0;
-	left: 70px;
-	width: 75%;
-	padding: 3px 0;
-	text-align: center;
-}
-.ne-aside .as-lay-header.has-cap-nowrap.has-cap-nowrap.has-cap-nocross .lay-header-caption,
-.ne-aside .as-lay-header.has-cap-nowrap.has-cap-nowrap.has-cap-noback .lay-header-caption{
-	width: 85%;
-}
-
-.ne-aside .as-lay-header.has-cap-nowrap.has-cap-nowrap.has-cap-noback.has-cap-nocross .lay-header-caption{
-	width: 90%;
-}
-
-
-.ne-aside .as-lay-header.has-cap-nobacktext .lay-header-caption{ left: 35px; text-align: left; }
-.ne-aside .as-lay-header.has-cap-noback .lay-header-caption{ left: 15px; margin: 0 auto; text-align: left; }
-.ne-aside .as-lay-header.has-cap-nothick .lay-header-caption{ font-weight: normal; }
 .ne-aside .as-lay-header.has-cap-nowrap + .as-lay-main{ margin-top: 20px; }
 .ne-aside .as-lay-header.has-cap-nowrap-empty + .as-lay-main{ margin-top: 8px; }
+/*标题水平对齐*/
+.ne-aside .as-lay-header.has-cap-align-left .lay-header-caption{ text-align: left; }
+.ne-aside .as-lay-header.has-cap-align-center .lay-header-caption{ text-align: center; }
+.ne-aside .as-lay-header.has-cap-align-right .lay-header-caption{ padding-right: 25px; text-align: right; }
+/*标题其它设置*/
+.ne-aside .as-lay-header.has-cap-nothick .lay-header-caption{ font-weight: normal; }
 .ne-aside .as-lay-header.has-cap-noback.has-cap-nocross + .as-lay-main{ margin-top: 35px; }
+.ne-aside .as-lay-header.has-cap-botline{ 	
+    padding-bottom: 8px;
+	border-bottom: 1px solid #fafafa;
+}
+
+
+/*顶部自定义内容*/
+.ne-aside .lay-header-custom{
+	padding: 15px 12px;
+}
+
 
 /*+-----------动画-------------+*/
 .ne-aside .aside-layer.cartoon-right{
@@ -1377,10 +1403,30 @@ pre, pre code {
 .ne-aside .aside-layer.unfreeze .as-lay-footer{
     position: initial;
 }
+.ne-aside .aside-layer.unfreeze .as-lay-header{ }
+.ne-aside .aside-layer.unfreeze .header-top-back,
+.ne-aside .aside-layer.unfreeze .header-top-cross{
+	position: absolute;
+	top: 0;
+}
+.ne-aside .aside-layer.unfreeze .header-top-back{
+	left: 0;
+}
+.ne-aside .aside-layer.unfreeze .header-top-cross{
+	right: 0;
+}
+.ne-aside .aside-layer.unfreeze .header-top-caption{
+    margin: 12px auto;
+}
+.ne-aside .aside-layer.unfreeze .lay-header-caption{
+	padding: 12px 8px;
+}
+.ne-aside .aside-layer.unfreeze .as-lay-main{ margin: 0 auto!important; padding: 10px 15px; }
 .ne-aside .aside-layer.unfreeze .as-lay-footer{
 	margin: 15px auto;
 	padding: 0 10px;
 }
+
 
 /*+-----------active-------------+*/
 .ne-aside.active > .aside-mask{
