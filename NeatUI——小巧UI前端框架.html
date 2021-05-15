@@ -533,10 +533,19 @@
                     toper: "", //顶部,自定义HTML(可选).
                     footer: "", //底部,自定义HTML(可选).
 
+                    //关闭按钮 
                     cross: true, //是否显示关闭图标(可选),默认true
-			        back: true, //是否显示返回按钮(可选),默认false
-                    showBackText: false, // 是否显示返回按钮的文字(可选),默认false
+                    showCrossText: true, //是否显关闭按钮的文字(可选),默认false
+                    showCrossIcon: true, //是否显示关闭按钮的图标(可选),默认true
+                    crossTextWord: '完成', //关闭按钮的文字(可选),默认'完成'
 
+                    //返回按钮
+			        back: true, //是否显示返回按钮(可选),默认false
+                    showBackText: true, //是否显示返回按钮的文字(可选),默认false
+                    backTextWord: '返回', //自定义返回按钮的文字(可选),默认'返回'
+                    showBackIcon: true, //是否显示返回按钮的图标(可选),默认true
+                    
+                    //标题栏
                     capwrap: false, //标题是否单独一行(可选),默认false. 值为false时,标题将与顶部的关闭、返回按钮在同一行
                     capthick: false, //标题文字是否加粗(可选),默认false.
                     capline: true, //标题栏是否添加底部线条好与内容部分分隔开(可选),默认false
