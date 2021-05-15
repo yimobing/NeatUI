@@ -590,6 +590,55 @@
 					if(settings.openBack){
 						settings.openBack();
 					}
+
+					
+					//————————————————————————————————————————————————————————————————
+					// Bug解决：安卓时软键盘弹出导致背景色透明，输入框错位 add 20210515-1
+					//————————————————————————————————————————————————————————————————
+					//————————————————START 安卓设备时————————————————
+					var bottom = top;
+					var ua = navigator.userAgent.toLocaleLowerCase();
+					var isAndroid = ua.indexOf('android') > -1 || ua.indexOf('adr') > -1 ? true : false;
+					if(isAndroid){
+					    var softboardH = 0; // 软键盘高
+					 	var innerHeight = window.innerHeight;
+					 	var eleParent = document.getElementById(parentId.toString().replace(/[\#\.]/g, ''));
+						var style = window.getComputedStyle(eleParent, null);
+						var oldTop = Math.ceil(style.top.toString().replace(/px/g, ''));
+						var oldBot = Math.ceil(style.bottom.toString().replace(/px/g, ''));
+						 // alert('原Top：' + oldTop + '\n原Bot：' + oldBot);
+						window.addEventListener('resize', function(){
+						    var newInnerHeight = window.innerHeight;
+						    if (innerHeight > newInnerHeight) { // 键盘弹出事件处理
+
+							    softboardH = innerHeight - newInnerHeight; // 软键盘高
+								var curElement = document.activeElement;
+					 			var selfH = curElement.offsetHeight;
+								var distanceTop = $(curElement).offset().top;
+								var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+								var offsetTop = distanceTop - scrollTop;
+								var offsetBot = Math.ceil(winH - offsetTop - selfH);
+								var newTop = oldTop - (softboardH - offsetBot) - 10; //oldBot;
+								// alert('视窗口距离：' + winH + '\n顶部距离：' + distanceTop + '\n滚动距离：' + scrollTop + '\n相对顶部距离：' + offsetTop + '\n自身距离：' + selfH + '\n底部距离：' + offsetBot + '\n软键盘高：' + softboardH + '\n原Top：' + oldTop + '\n新Top：' + newTop);
+
+								if(offsetBot < softboardH){
+									$(parentId).css({
+										top: newTop + 'px' // 重置位置
+									})
+								}
+
+						    } else { // 键盘收起事件处理\
+
+					    		$(parentId).css({
+									top: oldTop  + 'px' // 还原位置
+								})
+
+						    }
+						})
+					}
+					//————————————————END 安卓设备时————————————————
+
+
 				}, 0)
 			}
 			
