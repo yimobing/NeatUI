@@ -546,14 +546,18 @@
                     showBackIcon: true, //是否显示返回按钮的图标(可选),默认true
                     
                     //标题栏
-                    capwrap: false, //标题是否单独一行(可选),默认false. 值为false时,标题将与顶部的关闭、返回按钮在同一行
-                    capthick: false, //标题文字是否加粗(可选),默认false.
-                    capline: true, //标题栏是否添加底部线条好与内容部分分隔开(可选),默认false
-                    adaptive: false, //窗口是否自适应内容大小(可选). true 是, false 否(默认)
-                    capalign: 'auto', //标题文字水平对齐方式(可选). 默认auto.其它值：left 左对齐, right 右对齐, center 居中对齐, auto 系统自动.
-                    adapWidth: 'auto', //窗口自适应大小时的最大宽度(可选). 默认auto. (本参数仅在pc端时有效). 格式：数值或带px或带百分号的字符串, eg.200, '200px, '80%'
-                    capfontsize: 'auto', //标题文字大小(可选),默认auto. eg. 18或18px
+                    capWrap: false, //标题是否单独一行(可选),默认false. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+                    capThick: false, //标题文字是否加粗(可选),默认false.
+                    capLine: false, //标题栏是否添加下边线条好与内容部分分隔开(可选),默认false
+                    capShadow: false, //标题栏是否有阴影(可选),默认false
+                    capAlign: 'auto', //标题文字水平对齐方式(可选). 默认auto.其它值：left 左对齐, right 右对齐, center 居中对齐, auto 系统自动.
+                    capFontSize: 'auto', //标题文字大小(可选),默认auto. eg. 18或18px
 
+                    botLine: false, //底部栏是否添加上边线条好与内容部分隔开(可选),默认false.
+                    botShadow: true, //底部栏是否有阴影(可选),默认false
+
+                    adaptive: false, //窗口是否自适应内容大小(可选). true 是, false 否(默认)
+                    adapWidth: 'auto', //窗口自适应大小时的最大宽度(可选). 默认auto. (本参数仅在pc端时有效). 格式：数值或带px或带百分号的字符串, eg.200, '200px, '80%'
                     frozen: true, //是否冻结顶部、中间及底部,即各部分是否使用绝对定位(可选). true 是(默认), false 否. false时控件大小自适应内容
                     //按钮参数有两种格式
                     buttons: ["重置", "完成", "提交"],  // 按钮(可选)
@@ -562,6 +566,7 @@
                     	{text: "完成", name: "btn-complete", width: "100%", class: "ne-btn info", backColor: "", foreColor: "", radius: "0"}
                     ], */
                     buttonAutoWidth: false, //当只有一个按钮时按钮是否根据内容自动调整宽度(可选),默认false. 值为true时,buttons参数中设置的按钮宽度将不起作用
+                    buttonClingFoot: false, //按钮是否紧帖底部(可选),默认true. false时按钮与底部将有一定的距离
                     showButton: true, //是否显示按钮(可选),默认true
     
                     offset: { //位置偏移,由此可设置窗口位置(可选)
@@ -571,7 +576,7 @@
                         bottom: 0
                     },
                     radius: 0, //圆角边框值(可选)
-                    zindex: 4, //层级z-index(可选)
+                    zIndex: 4, //层级z-index(可选)
                     animate: { //动画(可选)
                         enable: true, //是否启用
                         direction: 'left' //动画方向(可选). left 向左(默认), right 向右, top 向上, bottom 向下
@@ -637,7 +642,7 @@
                 neui.openAside({
                     caption: "选择负责人",
                     content: html, 
-                    capwrap: true,
+                    capWrap: true,
                     cross: true,
 			        back: false,
                     adaptive: true,

@@ -1249,8 +1249,8 @@ pre, pre code {
 	text-align: center;
 	cursor: pointer;
 }
-.ne-aside .header-top-back{ float: left; padding-left: 8px; }
-.ne-aside .header-top-cross{ float: right; padding-right: 8px; }
+.ne-aside .header-top-back{ float: left; padding: 0 8px; }
+.ne-aside .header-top-cross{ float: right; padding: 0 8px; }
 .ne-aside .header-top-cross span{ padding-right: 5px; color: #f60!important;  }
 
 .ne-aside .header-top-back i{
@@ -1302,6 +1302,9 @@ pre, pre code {
 	text-align: center;
 	font-weight: bold;
 	font-size: 18px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 .ne-aside .as-lay-header.has-cap-nothick .header-top-caption{ font-weight: normal; }
 .ne-aside .as-lay-header.has-cap-align-left .header-top-caption{ text-align: left; }
@@ -1345,7 +1348,10 @@ pre, pre code {
 	bottom: 0;
 	left: 0;
 	right: 0;
-	
+	background-color: #fff;
+}
+.ne-aside .lay-footer-custom{
+	padding: 15px 12px;
 }
 .ne-aside .lay-footer-button{
 	display: -webkit-box;
@@ -1356,15 +1362,12 @@ pre, pre code {
 	display: box;
 	justify-content: center;
 }
-.ne-aside .lay-footer-button.has-btn-align-right{ justify-content: flex-end; }
 .ne-aside .as-lay-footer button[type="button"]{ width: 100%; margin-left: 4px; }
 .ne-aside .as-lay-footer button[type="button"]:first-child{ margin-left: 0; }
 
-/*+-----------杂项-------------+*/
-/*底部有padding*/
-.ne-aside .as-lay-footer.has-padding{ padding: 0 5px 3px; }
+/*+-----------顶部杂项-------------+*/
 /*标题不单独一行时*/
-.ne-aside .as-lay-header.has-cap-nowrap + .as-lay-main{ margin-top: 20px; }
+.ne-aside .as-lay-header.has-cap-nowrap + .as-lay-main{ margin-top: 15px; }
 .ne-aside .as-lay-header.has-cap-nowrap-empty + .as-lay-main{ margin-top: 8px; }
 /*标题水平对齐*/
 .ne-aside .as-lay-header.has-cap-align-left .lay-header-caption{ text-align: left; }
@@ -1377,11 +1380,28 @@ pre, pre code {
     padding-bottom: 8px;
 	border-bottom: 1px solid #fafafa;
 }
-
+.ne-aside .as-lay-header.has-cap-shadow{
+	box-shadow: 0 2px 5px -4px #444;
+}
 
 /*顶部自定义内容*/
 .ne-aside .lay-header-custom{
 	padding: 15px 12px;
+}
+
+/*+-----------底部杂项-------------+*/
+/*底部有dding*/
+.ne-aside .as-lay-footer.has-padding{ padding: 0 5px 3px; }
+.ne-aside .as-lay-footer.has-foot-line{ 
+    padding-top: 8px;
+	border-top: 1px solid #fafafa; 
+}
+.ne-aside .as-lay-footer.has-foot-shadow{
+	box-shadow: 0 2px 5px 1px #000;
+}
+.ne-aside .lay-footer-button.has-btn-align-right{ justify-content: flex-end; }
+.ne-aside .lay-footer-button.has-btn-nocling{
+	padding: 10px;
 }
 
 
@@ -1408,6 +1428,7 @@ pre, pre code {
 .ne-aside .aside-layer.unfreeze .header-top-back,
 .ne-aside .aside-layer.unfreeze .header-top-cross{
 	position: absolute;
+	z-index: 1;
 	top: 0;
 }
 .ne-aside .aside-layer.unfreeze .header-top-back{
@@ -1417,7 +1438,7 @@ pre, pre code {
 	right: 0;
 }
 .ne-aside .aside-layer.unfreeze .header-top-caption{
-    margin: 12px auto;
+    margin: 12px 20px;
 }
 .ne-aside .aside-layer.unfreeze .lay-header-caption{
 	padding: 12px 8px;
