@@ -530,8 +530,8 @@
                     caption: "侧栏搜索", // 标题,可自定义HTML(可选)
                     
                     content: _contentHtml, // 内容,可自定义HTML(可选)
-                    toper: "", //顶部,自定义HTML(可选).
-                    footer: "", //底部,自定义HTML(可选).
+                    toper: '', //顶部,自定义HTML(可选).
+                    footer: '', //底部,自定义HTML(可选).
 
                     //关闭按钮 
                     cross: true, //是否显示关闭图标(可选),默认true
@@ -614,7 +614,7 @@
             //=====默认侧栏按钮 -> [弹出窗口]负责人下拉
             $(document).on('click', '#s-person', function(){
                 var html = [
-                    '<div class="block-person">',
+                    '<, class="block-person">',
                         '<div class="person__table person__head">',
                             '<div class="person__column person__column-choice">选择</div>',
                             '<div class="person__column person__column-name">姓名</div>',
@@ -636,7 +636,7 @@
                                 '<div class="person__column person__column-phone">1735018523456</div>',
                             '</div><!--/.person__row-->',
                         '</div><!--/.person__list-->',
-                    '</div><!--/.block-person-->'
+                    '</,><!--/.block-person-->'
                 ].join('\r\n');
 
                 neui.openAside({

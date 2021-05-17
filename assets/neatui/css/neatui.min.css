@@ -1351,7 +1351,7 @@ pre, pre code {
 	background-color: #fff;
 }
 .ne-aside .lay-footer-custom{
-	padding: 15px 12px;
+	padding: 10px 12px;
 }
 .ne-aside .lay-footer-button{
 	display: -webkit-box;
@@ -1376,9 +1376,12 @@ pre, pre code {
 /*标题其它设置*/
 .ne-aside .as-lay-header.has-cap-nothick .lay-header-caption{ font-weight: normal; }
 .ne-aside .as-lay-header.has-cap-noback.has-cap-nocross + .as-lay-main{ margin-top: 35px; }
-.ne-aside .as-lay-header.has-cap-botline{ 	
+.ne-aside .as-lay-header.has-cap-botline{
     padding-bottom: 8px;
-	border-bottom: 1px solid #fafafa;
+    border-bottom: 1px solid #fafafa;
+}
+.ne-aside .as-lay-header.has-cap-botline.has-head-custom{
+	padding-bottom: 0;
 }
 .ne-aside .as-lay-header.has-cap-shadow{
 	box-shadow: 0 2px 5px -4px #444;
@@ -1386,7 +1389,7 @@ pre, pre code {
 
 /*顶部自定义内容*/
 .ne-aside .lay-header-custom{
-	padding: 15px 12px;
+	padding: 10px 12px;
 }
 
 /*+-----------底部杂项-------------+*/
@@ -1395,6 +1398,9 @@ pre, pre code {
 .ne-aside .as-lay-footer.has-foot-line{ 
     padding-top: 8px;
 	border-top: 1px solid #fafafa; 
+}
+.ne-aside .as-lay-footer.has-foot-line.has-foot-custom{
+	padding-top: 0;
 }
 .ne-aside .as-lay-footer.has-foot-shadow{
 	box-shadow: 0 2px 5px 1px #000;
