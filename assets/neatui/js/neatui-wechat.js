@@ -39,7 +39,7 @@
 				cross: true, //是否显示关闭图标(可选),默认false
 				back: true, //是否显示返回按钮(可选),默认false
 				showBackText: true, // 是否显示返回按钮的文字(可选),默认true
-				capwrap: false, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+				capWrap: false, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
 
 				// 内部写死的变量
 				content: "", // 内容,可自定义HTML(可选)
@@ -53,7 +53,7 @@
 					top: 0,
 					bottom: 0
 				},
-				zindex: 999, //层级z-index,默认999(可选)
+				zIndex: 999, //层级z-index,默认999(可选)
 				openCallBack: function(e){
 					// 先往内部填充一个节点作为聊天消息区域的根节点
 					e.eleMain.append('<div class="' + me.messageRoot.toString().replace(/[\.\#]/g, '') + '"></div>');
@@ -721,7 +721,7 @@
 			cross: false, //是否显示关闭图标(可选),默认false
 			back: false, //是否显示返回按钮(可选),默认false
 			showBackText: true, // 是否显示返回按钮的文字(可选),默认true
-			capwrap: true, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+			capWrap: true, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
 			adaptive: false, //窗口是否自适应内容大小(可选). true 是, false 否(默认)
             frozen: true, //是否冻结顶部、中间及底部,即各部分是否使用绝对定位(可选). true 是(默认), false 否. false时控件大小自适应内容
 
@@ -740,7 +740,7 @@
 				bottom: 0
 			},
 			radius: 0, //圆角边框值(可选)
-			zindex: 3, //层级z-index(可选)
+			zIndex: 3, //层级z-index(可选)
 			animate: { //动画(可选)
 				enable: true, //是否启用
 				direction: 'left' //动画方向(可选). left 向左(默认), right 向右, top 向上, bottom 向下
@@ -759,7 +759,7 @@
 			}
 		}
 		var settings = $.extend(true, {}, defaults, opt || {});
-		var zindex = settings.zindex,
+		var zIndex = settings.zIndex,
 			animate = settings.animate,
 			offset = settings.offset,
 			radius = settings.radius,
@@ -775,7 +775,7 @@
 			offTop = offset.top,
 			offBottom = offset.bottom;		
 		// 多个侧栏嵌套时：z-index自动增加
-		var aZindex = parseInt(zindex); //默认z-index为3
+		var aZindex = parseInt(zIndex); //默认z-index为3
 		if($('.chat-aside').length != 0){
 			var basicZindex = parseInt($('.chat-aside').css('zIndex'));
 			aZindex = aZindex < basicZindex ? basicZindex + 3 : aZindex;
@@ -804,7 +804,7 @@
 
 		// 创建浮层
 		var captionHtml = settings.caption,
-			captionClass = settings.capwrap ? '' : ' has-cap-nowrap';
+			captionClass = settings.capWrap ? '' : ' has-cap-nowrap';
 			contentHtml = settings.content,
 			btnHtml = '',
 			topHtml = settings.toper,
