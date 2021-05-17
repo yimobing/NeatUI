@@ -1300,6 +1300,7 @@ pre, pre code {
 	line-height: 30px;
 	margin: 0 auto;
 	text-align: center;
+	color: #303b42;
 	font-weight: bold;
 	font-size: 18px;
 	overflow: hidden;
@@ -1378,13 +1379,13 @@ pre, pre code {
 .ne-aside .as-lay-header.has-cap-noback.has-cap-nocross + .as-lay-main{ margin-top: 35px; }
 .ne-aside .as-lay-header.has-cap-botline{
     padding-bottom: 8px;
-    border-bottom: 1px solid #fafafa;
+    border-bottom: 1px solid #f7f7f7;
 }
 .ne-aside .as-lay-header.has-cap-botline.has-head-custom{
 	padding-bottom: 0;
 }
 .ne-aside .as-lay-header.has-cap-shadow{
-	box-shadow: 0 2px 5px -4px #444;
+	box-shadow: 0 2px 4px -4px #000
 }
 
 /*顶部自定义内容*/
@@ -1397,13 +1398,13 @@ pre, pre code {
 .ne-aside .as-lay-footer.has-padding{ padding: 0 5px 3px; }
 .ne-aside .as-lay-footer.has-foot-line{ 
     padding-top: 8px;
-	border-top: 1px solid #fafafa; 
+	border-top: 1px solid #f7f7f7; 
 }
 .ne-aside .as-lay-footer.has-foot-line.has-foot-custom{
 	padding-top: 0;
 }
 .ne-aside .as-lay-footer.has-foot-shadow{
-	box-shadow: 0 2px 5px 1px #000;
+	box-shadow: 0 2px 3px 1px #000;
 }
 .ne-aside .lay-footer-button.has-btn-align-right{ justify-content: flex-end; }
 .ne-aside .lay-footer-button.has-btn-nocling{

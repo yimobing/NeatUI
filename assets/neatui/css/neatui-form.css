@@ -646,3 +646,9 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .search-box-main-group{ }
 .search-box-main-group .sgroup{ }
 .search-box-main-group .sgroup label{ margin: 0 5px; }
+
+
+/*+-------------------------+*/
+@media screen and (max-width: 374px){
+	.search-box-main-item .option{ width: 30%;}
+}
