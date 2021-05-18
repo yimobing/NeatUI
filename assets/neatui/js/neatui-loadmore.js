@@ -180,8 +180,9 @@
             }, 150)
         })
 
-        // 加载下滚
-        me.$scrollArea.on('scroll', function(){
+        // 加载下滚 
+        // 注意：一定要先off('scroll'),再on('scroll'), 否则在多个选项卡且每页记录数(比如20条)比较多时时,会出现在第2、3、4等选项卡中滚动多次加载,页码错乱,系统卡顿的bug
+        me.$scrollArea.off('scroll').on('scroll', function(){
             me._scrollTop = me.$scrollArea.scrollTop(); //滚动距离
             //console.log('me.loading:', me.loading); //test1
             //console.log('me.loading:', me.loading, '\nme.isLockDown:',me.isLockDown, '\n值是否小于：', (me._scrollContentHeight - me._threshold) <= (me._scrollWindowHeight + me._scrollTop)); //test1
