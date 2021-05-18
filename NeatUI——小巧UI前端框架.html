@@ -32,7 +32,7 @@
     <style>
         body{ max-width: 800px; margin: 0 auto; }
         .wrap{ padding: 15px 20px; }
-        header{ margin: 15px auto; text-align: center; }
+        .neat__header{ margin: 15px auto; text-align: center; }
         h1{ color: #08ba61; }
         h3{margin: 50px auto 15px auto; border-bottom: 3px solid #f25824; padding: 0;}
         h3>span{ padding: 5px 10px; border: 2px solid #f25824; color: #f25824; border-radius: 4px; }
@@ -44,7 +44,7 @@
     </style>
 
     <div class="wrap">
-        <header>
+        <header class="neat__header">
             <h1>NeatUI</h1>
             <h3>国内开源HTML5前端框架，小巧又好用</h3>
         </header>
@@ -614,7 +614,7 @@
             //=====默认侧栏按钮 -> [弹出窗口]负责人下拉
             $(document).on('click', '#s-person', function(){
                 var html = [
-                    '<, class="block-person">',
+                    '<div class="block-person">',
                         '<div class="person__table person__head">',
                             '<div class="person__column person__column-choice">选择</div>',
                             '<div class="person__column person__column-name">姓名</div>',

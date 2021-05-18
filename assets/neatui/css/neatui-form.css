@@ -183,7 +183,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 2px;
-    color: #555;
+    color: #586075;
     font-size: 14px;
 }
 .item-r input[type="text"]{
@@ -502,9 +502,14 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .search-box textarea{
 	width: 100%;
 	padding: 10px 10px;
-	border: 1px solid #f2f2f2;;
+	border: 1px solid #f2f2f2;
 	border-radius: 5px;
-	color: #afafaf;
+	/*color: #afafaf;*/
+	color: #586075;
+	font-size: 14px;
+}
+.search-box textarea{
+	line-height: 1.5;
 }
 .search-box-head,
 .search-box-main{

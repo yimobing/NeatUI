@@ -516,15 +516,15 @@
 
 			// --------------------------------------------------------------------------------
 			//  				BUG: ios 苹果系列产品设备问题解决
-			//			bug: 解决ios中“fixed弹层点击输入框无法输入文字(无法聚焦)”的bug add 20210407-1
+			//			bug: 解决“fixed弹层点击输入框无法输入文字(无法聚焦)”的bug add 20210407-1
 			// --------------------------------------------------------------------------------
-			// 总结：ios中
+			// 总结：
 			// click,focus事件虽然可使输入框正常输入文字,但聚焦时输入框会被遮挡住;
 			// blur事件刚好可使输入框正常输入文字,且聚焦时输入框不会被遮挡柱
-			var elements = (weuiParent + ' textarea') + ',' + (weuiParent + ' input:text') + ',' + (weuiParent + ' div[contenteditable=true]');
+			var elements = (weuiParent + ' textarea:not([readonly]):not([disabled])') + ',' + (weuiParent + ' input:text:not([readonly]):not([disabled])') + ',' + (weuiParent + ' div[contenteditable=true]');
 			$(document).off('blur', elements).on('blur', elements, function(){ //事件: focus, click, blur
 				var target = this;
-				//if(/iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase())){ //仅对ios设备起作用
+				//if(/iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase())){ //仅对苹果设备起作用
 					// 方法1：使用scrollTo
 					var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
 					// //window.scrollTo(0, scrollTop);
@@ -884,7 +884,7 @@
 	/**
 	 * [ios弹出层或遮罩滚动穿透问题] add 20210305-1
 	 * 即：web移动端浮层滚动时阻止window窗体滚动
-	 * 适用于：ios中 fixed 弹出层手在遮罩或弹出层内容中尝试进行滚动时，发现windows窗体也会跟随滚动
+	 * 适用于：fixed 弹出层手在遮罩或弹出层内容中尝试进行滚动时，发现windows窗体也会跟随滚动
 	 * @param {object | element} container 表示委托的浮层容器元素（$包装器对象），或者页面其他比较祖先的元素. eg. $('.layer')
 	    但是，非常不建议使用$(document)或者$(document.body)等对象作为委托容器，因为可能会出现类似下面这样的错误提示：Unable to preventDefault inside passive event listener due to target being treated as passive.
 	 * @param {string | selector} selectorScrollable 表示container中可以滚动的元素的选择器(不需要用$包装器对象)，表示真正的滚动的主体。 eg. '.scrollable'
