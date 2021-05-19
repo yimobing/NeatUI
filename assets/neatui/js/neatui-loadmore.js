@@ -335,19 +335,32 @@
         me.$domDown.show(); // 显示下方提示文字 test1
         me.$domDown.html(me.opts.domDown.load);
 
-        //从前台获取数据
+        // ·从前台获取数据
         // 使用setTimeout解决Bug：当获取数据时ajax为同步(async=false)请求时线程阻塞会使得代码前后改变元素的操作(如.append,.html)的UI线程也被阴塞掉(此时操作不起作用或效果被延迟出现). 这里如不使用setTimeout,loading效果将不会延迟显示,很诡异!!!
+        // 一般的，前台获取数据的AJAX使用异步取数(async=true)时,即可避免本Bug
         setTimeout(function(){
             var result = me.opts.getData({curpage: me.curpage});
-            if(result instanceof Promise){
+            if(typeof result == 'undefined'){
+                alert('前台写法错误，请检查获取数据的函数是否有返回值！');
+            }
+            if(result instanceof Promise){ // Promise对象
                 result.then(function(res){
                     runDown(res);
                 }).catch(function(err){
                     alert(err);
                 })
-            }else{
+            }
+            else if(typeof result.promise != 'undefined'){ // JQ Deferred对象
+                $.when(result).done(function(res){
+                    runDown(res);
+                }).fail(function(err){
+                    alert('ERROR，出错啦');
+                })
+            }
+            else{ // 普通JSON对象
                 runDown(result);
             }
+
         }, 0)
 
 

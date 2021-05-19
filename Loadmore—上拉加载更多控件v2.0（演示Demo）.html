@@ -107,7 +107,10 @@
          */
         var count = 0; //count 模拟请求次数
         function get_data_history(ps_curpage){
-            //异步返回Promise对象
+
+            //************************
+            // 方法1：异步返回Promise对象
+            //************************
             return new Promise(function(resolve, reject){
                 // · 前台模拟异步
                 setTimeout(function(){
@@ -182,7 +185,7 @@
                     heading: "获取历史数据",
                     debug: false,
                     type: "POST",
-                    async: false, // false 同步取数, true 异步取数
+                    async: true, // false 同步取数, true 异步取数. !!!注意：请使用异步取数,否则将出现阻塞线程使系统卡顿的情况
                     url: "",
                     data: {
                         "action": "",
@@ -208,8 +211,70 @@
                 //END AJAX
                 */
             })
-                    
+
+
+            //************************
+            // 方法2：异步返回JQ Deferred对象
+            //************************
+            // var defer = $.Deferred(); // 实例化对
+            // // 前台返回(模拟)
+            // var json = {
+            //     data:[
+            //         {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx1", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+            //         {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx2", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+            //         {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx3", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+            //         {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx4", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+            //         {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx5", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+            //         {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx6", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+            //         {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx7", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+            //         {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx8", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+            //         {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx9", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"},
+            //         {"title":"诸葛亮，字孔明，号卧龙，琅琊阳都人，三国蜀汉丞相xxx10", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"}
+            //     ]
+            // }
+            // defer.resolve(json); // 成功，使用defer.resolve()返回所有数据
+
+            // // 后台返回(实际)
+            // /*
+            // //START AJAX
+            // var json = {}
+            // var isHoldOn = true;
+            // ajax({
+            //     heading: "获取历史数据",
+            //     debug: false,
+            //     type: "POST",
+            //     async: true, // false 同步取数, true 异步取数. !!!注意：请使用异步取数,否则将出现阻塞线程使系统卡顿的情况
+            //     url: "",
+            //     data: {
+            //         "action": "",
+            //         "user": "<%=s_user%>",
+            //         "sjk": "<%=s_sjk %>"
+            //     },
+            //     success: function(res){
+            //         if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+            //         //if(res == '') return;
+            //         json = JSON.parse(res);
+            //         defer.resolve(json); // 成功，使用defer.resolve()返回所有数据
+            //     },
+            //     error: function(res){
+            //         if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+            //     },
+            //     beforeSend: function(XMLHttpRequest){ },
+            //     complete: function(XMLHttpRequest, textStatus){ }
+            // })
+            // if(!isHoldOn){
+            //     return {}
+            // }
+            // //END AJAX
+            // */
+            
+            // return defer.promise(); // 返回Deferred(延迟)的Promise对象
+
+
         }
+
+
+
 
         /**
          * 创建历史列表
