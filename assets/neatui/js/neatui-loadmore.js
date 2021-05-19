@@ -181,7 +181,7 @@
         })
 
         // 加载下滚 
-        // 注意：一定要先off('scroll'),再on('scroll'), 否则在多个选项卡且每页记录数(比如20条)比较多时时,会出现在第2、3、4等选项卡中滚动多次加载,页码错乱,系统卡顿的bug
+        // Bug注意: 要先off一下,否则在多个选项卡中当每页记录数数比较大(比如20条),会出现未滚动到底部就多次加载数据导致系统卡顿
         me.$scrollArea.off('scroll').on('scroll', function(){
             me._scrollTop = me.$scrollArea.scrollTop(); //滚动距离
             //console.log('me.loading:', me.loading); //test1
@@ -334,17 +334,23 @@
         me.curpage++; // 页码加1
         me.$domDown.show(); // 显示下方提示文字 test1
         me.$domDown.html(me.opts.domDown.load);
+
         //从前台获取数据
-        var result = me.opts.getData({curpage: me.curpage});
-        if(result instanceof Promise){
-            result.then(function(res){
-                runDown(res);
-            }).catch(function(err){
-                alert(err);
-            })
-        }else{
-            runDown(result);
-        }
+        // 使用setTimeout解决Bug：当获取数据时ajax为同步(async=false)请求时线程阻塞会使得代码前后改变元素的操作(如.append,.html)的UI线程也被阴塞掉(此时操作不起作用或效果被延迟出现). 这里如不使用setTimeout,loading效果将不会延迟显示,很诡异!!!
+        setTimeout(function(){
+            var result = me.opts.getData({curpage: me.curpage});
+            if(result instanceof Promise){
+                result.then(function(res){
+                    runDown(res);
+                }).catch(function(err){
+                    alert(err);
+                })
+            }else{
+                runDown(result);
+            }
+        }, 0)
+
+
         function runDown(source){
             if(!fnCheckHasData(source, me)){
                 me.lock();
