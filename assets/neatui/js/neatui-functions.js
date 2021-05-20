@@ -402,9 +402,29 @@ var utilities = {
     htmlEncode: function(ps_str){
         var temp = document.createElement("div");
         (temp.textContent != null) ? (temp.textContent = ps_str) : (temp.innerText = ps_str);
-        var output = temp.innerHTML.toString().replace(/\"/g, '&quot;').replace(/\'/g, '&apos;'); //单双引号转义
-        output = output.replace(/\r/g, '').replace(/\n/g, '').replace(/\t/g, ''); //回车、换行、制表符替换成空
-        output = output.replace(/\\/g, '/'); //反斜杠替换成斜杠
+        // 转义替换
+        var output = temp.innerHTML.toString().replace(/\'/g, '&apos;').replace(/\"/g, '&quot;') // 单双引号转义
+        // 回车换行替换成<br>
+        output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
+        output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
+        // <br>替换成<p>
+        if(output.indexOf('<br>') > -1){
+            // 让p标签成对出现
+            output = output.replace(/\<br\>/g, '</p><p>');
+            output = output.replace(/^(?!\<.*)/g, '<p>');
+            output = output.replace(/(?!\>.*)$/g, '</p>');
+            // 替换中间没有内容的空标签. eg.<p></p>
+            output = output.replace(/(\<p\>\<\/p\>)/g, '');
+        }
+        // 其它替换
+        output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
+        output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
+		output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');  // div标签换成p
+        // 字符串化+斜杠处理
+        output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
+        output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
+        output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
+        //
         temp = null;
         return output;
     },

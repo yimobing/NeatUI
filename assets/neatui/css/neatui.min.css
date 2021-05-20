@@ -275,6 +275,43 @@ pre, pre code {
 
 
 /*+================================================================================+*/
+/*+---------------输入框----------------+*/
+.ne-input,
+.ne-textarea,
+.ne-editbox{
+	width: 100%;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    color: #586075;
+    font-size: 14px;
+}
+.ne-input{
+    height: 35px;
+    line-height: 35px;
+    padding: 0 6px;
+}
+.ne-textarea,
+.ne-editbox{
+	height: 70px;
+    min-height: 70px;
+    padding: 6px 8px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.ne-textarea{
+   
+}
+.ne-editbox{
+	-webkit-user-select: text; /*ios可输入可换行*/
+}
+
+
+
+/*+================================================================================+*/
 /*+---------------单选 RADIO----------------+*/
 /*+单个radio+*/
 /*蓝色主题*/
@@ -893,6 +930,20 @@ pre, pre code {
 		background-color: #aba7dc!important;
 		border-color: #aba7dc!important;
 	}
+}
+
+/*+::::::::按钮属性::::::::+*/
+.ne-btn.readonly,
+.ne-btn[read-only]{
+    background-color: #f0f0f0;
+    color: #979797;
+}
+.ne-btn.disabled,
+.ne-btn[disabled]{
+    background-color: #f2f2f2;
+    color: rgba(0,0,0,0.2);
+    color: #cccccc\9;
+    cursor: not-allowed;
 }
 
 

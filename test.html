@@ -28,9 +28,19 @@
 <body>
     <div class="wrap">
         <header></header>
-        <main></main>
+        <main>
+            <div class="grid__form">
+                <textarea name="" id="c-notes" cols="30" rows="10"></textarea>
+                <div id="c-content"></div>
+            </div>
+            <div class="grid__operation">
+                <button type="button" class="ne-btn green" id="btn-submit">提交</button>
+                <button type="button" class="ne-btn blue" id="btn-convert">显示内容</button>
+            </div>
+        </main>
         <footer></footer>
         <button type="button" id="btn-test">测试</button>
+
     </div><!--/.wrap-->
 
 
@@ -39,9 +49,21 @@
     <!--================================================================================-->
     <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script src="assets/neatui/js/neatui.min.js"></script>
+    <script src="assets/neatui/js/neatui-functions.js"></script>
     <script type="text/javascript">
         $(function(){
            
+            $('#btn-submit').on('click', function(){
+                var ls_bz = utilities.htmlEncode($('#c-notes').val());
+                console.log('备注：', ls_bz)
+            });
+
+            $('#btn-convert').on('click', function(){
+                var ls_bz = "&lt;p&gt;新时代青年&lt;/p&gt;&lt;p&gt;儿童节快乐&lt;/p&gt;&lt;p&gt;小孩子&lt;/p&gt;&lt;p&gt;但是呢&lt;/p&gt;&lt;p&gt;a怎么了&lt;/p&gt;&lt;p&gt;bbbbb&lt;/p&gt;&lt;p&gt;xxx&nbsp;12323&lt;/p&gt;";
+
+                $('#c-content').html(utilities.htmlDecode(ls_bz));
+            });
+
 
             $('#btn-test').on('click', function(){
                 var linkUrl = 'Wechat—微信聊天控件.html';
