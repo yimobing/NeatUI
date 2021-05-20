@@ -1412,6 +1412,7 @@ var convert = {
     /**
      * 将不规范的JSON数据转化成规范的格式
      * @param {object} ps_source 数据源
+     * @param {boolean} ps_opts 其它参数
      * @returns {object} 返回规范的对象
      * 注：如果数据源是一维JSON对象,一般的,一维JSON对象不需要用中括号[]来包含,故把中括号的内容单独抽出来,并去掉data属性即可转成规范的格式
      * eg1.  不规范的一维对象 {data:[{name:"张三", sex:"男"}]}  
@@ -1419,16 +1420,21 @@ var convert = {
        eg2. 不规范的数组对象 {data:[{name:"张三", sex:"男"}, {name:"张三", sex:"男"}]}
             转成规范的数组对象  {return:"ok", data:[{name:"张三", sex:"男"}, {name:"张三", sex:"男"}]}
      */
-    nonstandardObjectToStandardData(ps_source){
+    nonstandardObjectToStandardData(ps_source, ps_opts){
+        var defaults = {
+            oneWiki: false // 是否强制转化成一维对象. true 是, false 否. true 时给的原始数据源必须是一维对象转化后才能返回标准格式的一维对象
+        }
+        var settings = $.extend(true, {}, defaults, ps_opts || {});
+        var isOneWiki = settings.oneWiki ? true : false;
         var newSource = {}
         if(typeof ps_source.data != 'undefined'){
-            if(ps_source.data.length == 1){ 
+            if(isOneWiki || ps_source.data.length == 1){ // 一维对象
                 var row = ps_source.data[0];
                 newSource["return"] = 'ok';
                 for(var v in row){
                     newSource[v] = row[v];
                 }
-            }else{
+            }else{ // 数组对象
                 newSource["return"] = 'ok';
                 newSource["data"] = ps_source.data;
             }
