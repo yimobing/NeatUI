@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>ASYNC | 同步异步取数的几种方式</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+</head>
+<body>
+    <style>
+        body{ max-width: 640px; margin: 0 auto; background-color: #f4f4f4; }
+        .wrap{ padding: 15px 20px; }
+        .panel-caption{ text-align: center; }
+        .panel-operation{ width: 100%; background-color: #fff; padding: 15px 20px; }
+        .panel-operation button{ margin-right: 10px; }
+        .panel-student{ margin-top: 25px; }
+        .list__one{ margin-bottom: 15px; background-color: #fff; padding: 15px 20px; }
+    </style>
+    <div class="wrap">
+        <main>
+            <div class="panel-caption">
+                <h1>显示示学生信息</h1>
+            </div><!--/.panel-caption-->
+            <div class="panel-operation flex flex-wrap">
+                <button class="ne-btn blue" id="btn-query-normal">同步取数</button>
+                <button class="ne-btn green" id="btn-query-promise">异步取数(Promise)</button>
+                <button class="ne-btn orange" id="btn-query-defer">异步取数(jQuery Deferred)</button>
+            </div><!--/.panel-operation-->
+            <div class="panel-student"></div><!--/.panel-student-->
+        </main>
+    </div><!--/.wrap-->
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定AJAx-->
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+        
+        /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 【说明】
+         * 1.同步取数(async=false)一般会因线程阻塞，使得浏览器渲染UI过程延迟(.append(), .html()操作最为明显)，从而导致系统卡顿
+         * 2.异步取数(async=true)可解决线程阻塞、系统卡顿的问题,但须改写取数的的函数.一般使用Promise,jQuery Deferred对象等方式解决异步的问题.
+         */
+
+        /**
+         * 示例1：同步取数
+         * 获取学生数据
+         * @param {number} 当前页码(可选),默认1
+         * @returns {object} 返回数组对象
+         */
+         function get_data_student_by_normal(ps_curpage){
+            var nowpage = typeof ps_curpage == 'undefined' ? 1 : ( isNaN(parseInt(ps_curpage)) ? 1 : ps_curpage );
+            // ·后台返回
+            var studentJson = {
+                "return":"ok", "data":[
+                    {"name":"曹操", "sex":"男", "grade":"三年级"},
+                    {"name":"孙权", "sex":"男", "grade":"四年级"},
+                    {"name":"刘备", "sex":"男", "grade":"五年级"},
+                    {"name":"小桥", "sex":"女", "grade":"六年级"},
+                    {"name":"大桥", "sex":"女", "grade":"七年级"}
+                ]
+            }
+ 
+            /*
+            //START AJAX
+            var studentJson = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取学生数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                url: "",
+                data: {
+                    "action": ""
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    //if(res == '') return;
+                    studentJson = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                return {}
+            }
+            //END AJAX
+            */
+
+            return studentJson;
+        }
+
+
+
+
+        /**
+         * 示例2：异步取数(使用Promise异步取数)
+         * 获取学生数据
+         * @param {number} 当前页码(可选),默认1
+         * @returns {object} 返回数组对象
+         */
+        function get_data_student_by_promise(ps_curpage){
+            var nowpage = typeof ps_curpage == 'undefined' ? 1 : ( isNaN(parseInt(ps_curpage)) ? 1 : ps_curpage );
+            return new Promise(function(resolve, reject){
+                // · 前台模拟异步
+                setTimeout(function(){
+                    var studentJson = {
+                        "return":"ok", "data":[
+                            {"name":"贾宝玉", "sex":"男", "grade":"三年级"},
+                            {"name":"贾演", "sex":"男", "grade":"四年级"},
+                            {"name":"薛宝钗", "sex":"女", "grade":"五年级"},
+                            {"name":"林黛玉", "sex":"女", "grade":"六年级"},
+                            {"name":"史湘云", "sex":"女", "grade":"七年级"}
+                        ]
+                    }
+                    resolve(studentJson);  // 成功，使用resolve()返回数据
+                    // reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+                }, 2000)
+
+                // ·后台返回
+                /*
+                //START AJAX
+                var studentJson = {}
+                var isHoldOn = true;
+                ajax({
+                    heading: "获取学生数据",
+                    debug: false,
+                    async: true, // 取数方式. true 异步, false 同步(默认)
+                    type: "POST",
+                    url: "",
+                    data: {
+                        "action": ""
+                    },
+                    success: function(res){
+                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        //if(res == '') return;
+                        studentJson = JSON.parse(res);
+                        resolve(studentJson); // 成功，使用resolve()返回所有数据
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    return {}
+                }
+                //END AJAX
+                */
+            })
+        }
+
+
+
+        /**
+         * 示例3：异步取数(使用jQuery Deferred对象异步取数)
+         * 获取学生数据
+         * @param {number} 当前页码(可选),默认1
+         * @returns {object} 返回数组对象
+         */
+        function get_data_student_by_defer(ps_curpage){
+            var nowpage = typeof ps_curpage == 'undefined' ? 1 : ( isNaN(parseInt(ps_curpage)) ? 1 : ps_curpage );
+            var defer = $.Deferred(); // 实例化一个Deferred对象
+            // · 前台模拟异步
+            setTimeout(function(){
+                var studentJson = {
+                    "return":"ok", "data":[
+                        {"name":"林冲", "sex":"男", "grade":"三年级"},
+                        {"name":"宋江", "sex":"男", "grade":"四年级"},
+                        {"name":"武松", "sex":"男", "grade":"五年级"},
+                        {"name":"顾大嫂", "sex":"女", "grade":"六年级"},
+                        {"name":"孙二娘", "sex":"女", "grade":"七年级"}
+                    ]
+                }
+                defer.resolve(studentJson); // 成功，使用defer.resolve()返回数据
+            }, 2000)
+
+            // ·后台返回
+            /*
+            //START AJAX
+            var studentJson = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取学生数据",
+                debug: false,
+                async: true, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                url: "",
+                data: {
+                    "action": ""
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    //if(res == '') return;
+                    studentJson = JSON.parse(res);
+                    defer.resolve(studentJson); // 成功，使用defer.resolve()返回数据
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                return {}
+            }
+            //END AJAX
+            */
+
+            // ·返回Deferred(延迟)的Promise对象
+            return defer.promise();
+        }
+
+
+
+
+        //========================================
+        /**
+         * 创建学生信息
+         * @param {object} ps_source 数据源
+         */
+        function create_list_student(ps_source){
+            var node = '.panel-student';
+            var _html = '<div class="block__student ne-form has-border theme-popular">';
+            $.each(ps_source.data, function(i, items){
+                _html += [
+                    '<div class="list__one">',
+                        '<div class="eform-row">',
+                            '<div class="item-l"><label>姓名</label></div>',
+                            '<div class="item-r"><span>' + items["name"] + '</span></div>',
+                        '</div><!--/.eform-row-->',
+                        '<div class="eform-row">',
+                            '<div class="item-l"><label>性别</label></div>',
+                            '<div class="item-r"><span>' + items["sex"] + '</span></div>',
+                        '</div><!--/.eform-row-->',
+                        '<div class="eform-row">',
+                            '<div class="item-l"><label>年级</label></div>',
+                            '<div class="item-r"><span>' + items["grade"] + '</span></div>',
+                        '</div><!--/.eform-row-->',
+                    '</div><!--/.list__one-->'
+                ].join('\r\n');
+            })
+            _html += '</div><!--/.block-student-->'
+            $(node).empty().append(_html);
+        }
+
+
+
+
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          显示学生信息                           
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====同步取数按钮
+            $('#btn-query-normal').on('click', function(){
+                neui.showAnimate();
+                setTimeout(function(){
+                    neui.doneAsyncEvent({
+                        getData: function(){
+                            return get_data_student_by_normal();
+                        },
+                        callBack: function(e){
+                            var studentJson = e.source;
+                            console.log('数据源1:', studentJson);
+                            create_list_student(studentJson);
+                        }
+                    })
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+             //——————————————————————————————————————————
+            //=====异步取数(Promise)按钮
+            $('#btn-query-promise').on('click', function(){
+                neui.showAnimate();
+                neui.doneAsyncEvent({
+                    getData: function(){
+                        return get_data_student_by_promise();
+                    },
+                    callBack: function(e){
+                        var studentJson = e.source;
+                        console.log('数据源2:', studentJson);
+                        create_list_student(studentJson);
+                        neui.destroyAnimate();
+                    }
+                })
+            });
+            
+
+            //——————————————————————————————————————————
+            //=====同步取数(jQuery Deferred)按钮
+            $('#btn-query-defer').on('click', function(){
+                neui.showAnimate();
+                neui.doneAsyncEvent({
+                    getData: function(){
+                        return get_data_student_by_defer();
+                    },
+                    callBack: function(e){
+                        var studentJson = e.source;
+                        console.log('数据源3:', studentJson);
+                        create_list_student(studentJson);
+                        neui.destroyAnimate();
+                    }
+                })
+            });
+            
+            
+ 
+            
+    
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>

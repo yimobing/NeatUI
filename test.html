@@ -51,15 +51,13 @@
     <script src="assets/neatui/js/neatui.min.js"></script>
     <script src="assets/neatui/js/neatui-functions.js"></script>
     <script type="text/javascript">
+
         $(function(){
            
+             //——————————————————————————————————————————
             $('#btn-submit').on('click', function(){
                 var ls_bz = utilities.htmlEncode($('#c-notes').val());
                 console.log('备注：', ls_bz)
-
-                var oldJson = {"return":"xxx", data:[{name:"张三", sex:"男"}, {name:"张三", sex:"男"}]} 
-                var newJson = convert.nonstandardObjectToStandardData(oldJson);
-                console.log('新数据：', newJson)
             });
 
             $('#btn-convert').on('click', function(){
@@ -69,6 +67,8 @@
             });
 
 
+
+            //——————————————————————————————————————————
             $('#btn-test').on('click', function(){
                 var linkUrl = 'Wechat—微信聊天控件.html';
                 neui.openIframe({

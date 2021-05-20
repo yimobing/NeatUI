@@ -260,6 +260,13 @@ pre, pre code {
 	-o-flex-grow: 1;
 	-ms-flex-grow: 1;
 }
+.flex-wrap{
+	-webkit-flex-wrap: wrap;
+	-moz-flex-wrap: wrap;
+	-ms-flex-wrap: wrap;
+	-o-flex-wrap: wrap;
+	flex-wrap: wrap;
+}
 
 /*+公用属性+*/
 .hide{ display: none; }
