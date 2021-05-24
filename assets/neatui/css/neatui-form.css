@@ -371,6 +371,10 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 }
 
 .eform-button>button{
+    -webkit-flex: auto;
+    -moz-flex: auto;
+    -o-flex: auto;
+    -ms-flex: auto;
 	flex: auto; /*按钮自适应宽度*/
 	margin-bottom: 2px;
 	margin-left: 2px;
