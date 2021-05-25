@@ -352,10 +352,12 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     left: 0;
     top: 0;
     padding: 2px 6px;
-    background-color: #d6e9c6;
-    color: #fff;
+    /*background-color: #d6e9c6;
+    color: #fff;*/
+    border: 1px dashed #e2dada;
+    color: #c3c3c3;
     font-size: 12px;
-    border-radius: 4px 0 2px 0;
+    border-radius: 4px 0 4px 0;
 }
 
 /*+--------按钮组--------+*/
