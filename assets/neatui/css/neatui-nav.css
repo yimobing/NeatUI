@@ -99,6 +99,8 @@ body{
     background-size: 100% auto;
     background-repeat: no-repeat;
     background-position: 50% 50%;
+    font-size: 32px;
+    text-align: center;
 }
 .nav-across .nav__text{
     margin-top: 8px;
