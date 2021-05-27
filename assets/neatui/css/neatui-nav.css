@@ -294,6 +294,11 @@ body{
 .nav__help i{ background-image: url('../../style/img/mod_icon_nav_help.png'); }
 
 
+/*+----------------媒体查询----------------+*/
+@media screen and (max-width: 374px){
+    .nav-across.column-3 .nav__item{ min-width: 20%; }
+    .nav-across.column-4 .nav__item{ min-width: 15%; }
+}
 
 
 
