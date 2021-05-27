@@ -39,9 +39,11 @@
                 if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } //接口不通ERROR提醒(致命错误 ERROR)
 
                 //=====获取数据时
+                // 后台返回
+                var userJson = { "name":"张三", "sex":"男", "age":"14"}
                 /*
                 //START AJAX
-                var json = {}
+                var userJson = {}
                 var isHoldOn = true;
                 ajax({
                     heading: "获取XX数据",
@@ -58,7 +60,8 @@
                     },
                     success: function(res){
                         if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        json = JSON.parse(res);
+                        // if(res == '') return;
+                        userJson = JSON.parse(res);
                     },
                     error: function(res){
                         if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -68,7 +71,8 @@
                 })
                 if(!isHoldOn){
                     neui.destroyAnimate();
-                    return {};
+                    return {}
+                    // return;
                 }
                 //END AJAX
                 */
@@ -78,7 +82,7 @@
 
                 //=====增、删、改操作
 
-                //开始执行
+                // 开始执行
                 var flag = '', msg = '保存成功';
                 neui.showAnimate();
                 setTimeout(function(){

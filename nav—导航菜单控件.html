@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="内评辅助系统">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Navigation | 导航菜单控件</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.css"><!--图标库-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-nav.css"><!--导航菜单-->
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+    <base target="_self">
+</head>
+<body>
+    <style>
+        h2{ 
+            margin-top: 50px;
+            border-bottom: 1px solid #f4f4f4;
+            text-align: center; 
+        }
+    </style>
+    <div class="wrap">
+        <main>
+
+            <!--[========系统信息========]-->
+            <section class="web"><!--ajax({})-->
+                <dvi class="web__caption">导航菜单控件</dvi>
+                <div class="web__publicize">几种常的菜单样式做成控件，直接生成调用</div>
+            </section>
+
+            <!--[========用户信息========]-->
+            <section class="user"><!--ajax({})-->
+                <div class="user__avatar"><img id="avatar" src="" alt="用户头像"></div>
+                <div class="user__text">
+                    <div class="user"><span>用户姓名：</span><em>张三</em></div>
+                    <div class="user"><span>用户编号：</span><em>23708</em></div>
+                    <div class="org">中国建设银行股份有限公司泉州分司</div>
+                </div><!--/.user-text-->
+                <div class="user__email"><i></i></div>
+            </section>
+
+            <!--[========横排菜单：导航栏型(自适应宽度、自动换行、默认每行3个)========]-->
+            <h2>横排菜单：导航栏型(自适应宽度、自动换行、默认每行3个)</h2>
+            <section class="nav nav-across column-3">
+                <div class="nav__item nav__enquiry" id="wyxj" runat="server">
+                    <div class="nav__icon"><i></i></div>
+                    <div class="nav__text">
+                        <span class="nav__title">我要询价</span>
+                        <em class="nav__subtitle">在线询价，系统自动回复或人工回复；在线委托评估，出具评估报告</em>
+                    </div>
+                    <div class="nav__link"><a href="javascript:void(0);"></a></div>
+                </div><!--/.nav__item-->
+                <div class="nav__item nav__history" id="pgjl" runat="server">
+                    <div class="nav__icon"><i></i></div>
+                    <div class="nav__text">
+                        <span class="nav__title">询价历史记录</span>
+                        <em class="nav__subtitle">查询询价过的楼盘，方便对过往询价单进行其它操作</em>
+                    </div>
+                    <div class="nav__link"><a href="javascript:void(0);"></a></div>
+                </div><!--/.nav__item-->
+                <div class="nav__item nav__receive" id="zzbgqs" runat="server">
+                    <div class="nav__icon"><i></i></div>
+                    <div class="nav__text">
+                        <span class="nav__title">纸质评估报告签收</span>
+                        <em class="nav__subtitle">在线签收评估公司寄来的纸质报告，及时反馈快件寄送结果</em>
+                    </div>
+                    <div class="nav__link"><a href=""></a></div>
+                </div><!--/.nav__item-->
+            </section>
+
+        
+            <!--[========竖排菜单：分隔型========]-->
+            <h2>竖排菜单：分隔型</h2>
+            <section class="nav nav-down">
+                <div class="nav__item nav__examine" id="bgsh" runat="server"><!--ajax({})-->
+                    <div class="nav__icon"><i></i></div>
+                    <div class="nav__text">
+                        <span class="nav__title">报告审核</span>
+                        <em class="nav__subtitle">在线报告签字，审核报告，查看电子版报告</em>
+                    </div>
+                    <div class="nav__link"><a href=""></a></div>
+                </div><!--/.nav__item-->
+                <div class="nav__item nav__mine" id="mine" runat="server">
+                    <div class="nav__icon"><i></i></div>
+                    <div class="nav__text">
+                        <span class="nav__title">个人中心</span>
+                        <em class="nav__subtitle">维护个人姓名、电话、邮箱、地址等信息</em>
+                    </div>
+                    <div class="nav__link"><a href=""></a></div>
+                </div><!--/.nav__item-->
+                <div class="nav__item nav__manage" id="admi_bank" runat="server">
+                    <div class="nav__icon"><i></i></div>
+                    <div class="nav__text">
+                        <span class="nav__title">管理员</span>
+                        <em class="nav__subtitle">管理本系统各类功能</em>
+                    </div>
+                    <div class="nav__link"><a href=""></a></div>
+                </div><!--/.nav__item-->
+                <div class="nav__item nav__help" id="help" runat="server">
+                    <div class="nav__icon"><i></i></div>
+                    <div class="nav__text">
+                        <span class="nav__title">帮助中心</span>
+                        <em class="nav__subtitle">遇到问题根据帮助手册操作，或咨询客服</em>
+                    </div>
+                    <div class="nav__link"><a href=""></a></div>
+                </div><!--/.nav__item-->
+            </section>
+
+
+            
+            <!--[========竖排菜单：紧凑型========]-->
+            <h2>竖排菜单：紧凑型</h2>
+            <section class="nav nav-down theme-tight">
+                <div class="nav__item nav__examine" id="bgsh" runat="server"><!--ajax({})-->
+                    <div class="nav__icon"><i></i></div>
+                    <div class="nav__text">
+                        <span class="nav__title">报告审核</span>
+                        <em class="nav__subtitle">在线报告签字，审核报告，查看电子版报告</em>
+                    </div>
+                    <div class="nav__link"><a href=""></a></div>
+                </div><!--/.nav__item-->
+                <div class="nav__item nav__manage" id="admi_bank" runat="server">
+                    <div class="nav__icon"><i></i></div>
+                    <div class="nav__text">
+                        <span class="nav__title">管理员</span>
+                        <em class="nav__subtitle">管理本系统各类功能</em>
+                    </div>
+                    <div class="nav__link"><a href=""></a></div>
+                </div><!--/.nav__item-->
+            </section>
+
+            <!--[========竖排菜单：宽松型(按组划分)========]-->
+            <h2>竖排菜单：宽松型(按组划分)</h2>
+            <section class="nav nav-down theme-loose">
+                <div class="nav__group">
+                    <div class="nav__group__cation">管理员可见</div>
+                    <div class="nav__group__content">
+                        <div class="nav__item nav__examine" id="bgsh" runat="server"><!--ajax({})-->
+                            <div class="nav__icon"><i></i></div>
+                            <div class="nav__text">
+                                <span class="nav__title">报告审核</span>
+                                <em class="nav__subtitle">在线报告签字，审核报告，查看电子版报告</em>
+                            </div>
+                            <div class="nav__link"><a href=""></a></div>
+                        </div><!--/.nav__item-->
+                        <div class="nav__item nav__manage" id="admi_bank" runat="server">
+                            <div class="nav__icon"><i></i></div>
+                            <div class="nav__text">
+                                <span class="nav__title">管理员</span>
+                                <em class="nav__subtitle">管理本系统各类功能</em>
+                            </div>
+                            <div class="nav__link"><a href=""></a></div>
+                        </div><!--/.nav__item-->
+                    </div><!--/.nav__group__content-->
+                </div><!--/.nav__group-->
+                <div class="nav__group">
+                    <div class="nav__group__cation">普通用户可见</div>
+                    <div class="nav__group__content">
+                        <div class="nav__item nav__mine" id="mine" runat="server">
+                            <div class="nav__icon"><i></i></div>
+                            <div class="nav__text">
+                                <span class="nav__title">个人中心</span>
+                                <em class="nav__subtitle">维护个人姓名、电话、邮箱、地址等信息</em>
+                            </div>
+                            <div class="nav__link"><a href=""></a></div>
+                        </div><!--/.nav__item-->
+                        <div class="nav__item nav__help" id="help" runat="server">
+                            <div class="nav__icon"><i></i></div>
+                            <div class="nav__text">
+                                <span class="nav__title">帮助中心</span>
+                                <em class="nav__subtitle">遇到问题根据帮助手册操作，或咨询客服</em>
+                            </div>
+                            <div class="nav__link"><a href=""></a></div>
+                        </div><!--/.nav__item-->
+                    </div><!--/.nav__group__content-->
+                </div><!--/.nav__group-->
+            </section>
+
+        </main>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义封装AJAX-->
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+       
+        
+        /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 获取在线沟通聊天消息数量
+         * @returns {promise} 返回promise对象，其中resolve(res)中res返回值为消息数量)
+         */
+        function get_data_message(){
+            return new Promise(function(resolve, reject){
+                // · 前台模拟异步
+                setTimeout(function(){
+                    var chatNum = 10;
+                    resolve(chatNum);  // 成功，使用resolve()返回数据
+                    // reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+                }, 2000)
+
+                // ·后台返回
+                /*
+                //START AJAX
+                var chatNum = 0;
+                var isHoldOn = true;
+                ajax({
+                    heading: "获取聊天消息数量",
+                    debug: false,
+                    async: true, // 取数方式. true 异步, false 同步(默认)
+                    type: "POST",
+                    dataType: "html",
+                    cache: false,
+                    url: "../../fwh_pub/jk_pic_chat.ashx",
+                    data: {
+                        "action": "sel_v2_xjd_chat_msgs_count",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk%>"
+                    },
+                    success: function(res){
+                        // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        //if(res == '') return;
+                        chatNum = res;
+                        resolve(chatNum); // 成功，使用resolve()返回所有数据
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        reject('ERROR，获取聊天消息数量时连接错误！'); // 错误，使用reject返回错误信息
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    return 0;
+                }
+                //END AJAX
+                */
+            })
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //                                                   初始化
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————       
+            //——————————————————————————————————————————
+            //=====获取用户头像
+            var userAvatar = 'assets/style/img/mod_icon_avatar.png';
+            // var userAvatar = '<%=s_yhtx %>'; // ajax({})
+            $('#avatar').attr('src', userAvatar);
+            if(userAvatar == '') $('.user__avatar').css({display: 'none'}); // 用户头像为空时,隐藏头像
+
+            //——————————————————————————————————————————
+            //=====定时读取在线聊天消息数量
+            var times = 15; // 定间隔时长(单位:秒)
+            var timer = setInterval(pushMessage(), Math.floor(times) * 1000);
+            /**
+             * 推送消息：根据消息数量闪动邮箱、并播放声音
+             */
+            function pushMessage(){
+                // ·邮箱消息闪动
+                get_data_message().then(function(res){
+                    var msgNum = parseInt(res); 
+                    var hasNewMsg = isNaN(msgNum) ? false : (msgNum > 0 ? true : false); // 是否有新消息. 大于0时表示有新消息
+                    var eleEmail = $('.user__email'),
+                        cnameEmail = 'animate';
+                    if(hasNewMsg) 
+                        eleEmail.addClass(cnameEmail);
+                    else 
+                        eleEmail.removeClass(cnameEmail);
+                }).catch(function(err){
+                    neuiDialog.alert({
+                        animate: true,
+                        caption: '提示',
+                        message: err,
+                        buttons: ['确定']
+                    })
+                })
+                // ·播放声音
+                //..
+            }
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //                                                   系列事件
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====我要询价菜单点击事件
+            $('.nav__enquiry').on('click', function(){
+                // alert('我要询价');
+                // 判断用户个人信息是否填写完整
+                // 后台返回
+                var isPersonalInfoCompletely = '0'; // 1 完整, 0 不完整
+                /*
+                //START AJAX
+                var isPersonalInfoCompletely = '1'; // 默认1
+                var isHoldOn = true;
+                ajax({
+                    heading: "检查个人信息完整性",
+                    debug: false,
+                    async: false, // 取数方式. true 异步, false 同步(默认)
+                    type: "GET",
+                    dataType: "html",
+                    cache: false,
+                    url: "../../fwh_pub/jk_wyxj.ashx",
+                    data: {
+                        "action": "sel_v2_fwh_user_xmadd",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk%>"
+                    },
+                    success: function(res){
+                        // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        // if(res == '') return;
+                        isPersonalInfoCompletely = res;
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    return;
+                }
+                //END AJAX
+                */
+               if(isPersonalInfoCompletely == '0'){
+                    neuiDialog.alert({
+                        animate: true,
+                        caption: '提示',
+                        message: '请先在个人中心维护您的姓名、地址和电子邮箱！',
+                        buttons: ['立即维护', '暂不维护'],
+                        callBack: function(ret){
+                            if(ret == 1) window.location.href = 'mine.aspx'; // 跳转到个人中心页面ajax({})
+                        }
+                    })
+                    return;
+               }
+               window.location.href = 'selpggs.aspx?t=1&bt=&q=1'; // 跳转到选择评估公司页面 ajax({})
+            });
+
+
+
+
+            //——————————————————————————————————————————
+            //=====询价历史记录菜单点击事件
+            $('.nav__history').on('click', function(){
+                // alert('询价历史记录');
+                // 判断用户个人信息是否填写完整
+                // 后台返回
+                var isPersonalInfoCompletely = '0'; // 1 完整, 0 不完整
+                /*
+                //START AJAX
+                var isPersonalInfoCompletely = '1'; // 默认1
+                var isHoldOn = true;
+                ajax({
+                    heading: "检查个人信息完整性",
+                    debug: false,
+                    async: false, // 取数方式. true 异步, false 同步(默认)
+                    type: "GET",
+                    dataType: "html",
+                    cache: false,
+                    url: "../../fwh_pub/jk_wyxj.ashx",
+                    data: {
+                        "action": "sel_v2_fwh_user_xmadd",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk%>"
+                    },
+                    success: function(res){
+                        // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        // if(res == '') return;
+                        isPersonalInfoCompletely = res;
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    return;
+                }
+                //END AJAX
+                */
+               if(isPersonalInfoCompletely == '0'){
+                    neuiDialog.alert({
+                        animate: true,
+                        caption: '提示',
+                        message: '请先在个人中心维护您的姓名、地址和电子邮箱！',
+                        buttons: ['立即维护', '暂不维护'],
+                        callBack: function(ret){
+                            if(ret == 1) window.location.href = 'mine.aspx'; // 跳转到个人中心页面ajax({})
+                        }
+                    })
+                    return;
+               }
+               window.location.href = 'selpggs.aspx?t=1&bt=&q=2'; // 跳转到选择评估公司页面 ajax({})
+            });
+
+
+
+
+
+        
+        }); //$(function(){})
+    </script>
+</body>
+</html>
