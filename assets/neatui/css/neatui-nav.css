@@ -392,7 +392,8 @@ body{
 }
 .user__text>div{ padding: 4px 0; border-bottom: 1px dotted #efeeee; }
 .user__text>div:first-child{  }
-.user__text>div>span{ font-weight: bold; }
+.user__text>div>span{ }
+.user__text>div>em{ font-weight: bold; }
 .user__text>.user{ }
 .user__text>div.org{  }
 .user__email{
