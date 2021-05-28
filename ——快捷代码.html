@@ -1,7 +1,8 @@
 <pre>
 
-
-/*+----------------单页能用CSS----------------+*/
+//================================================
+//                  单页通用CSS
+//================================================
 body,html{ width:100%; margin:0 auto; padding:0; -webkit-text-size-adjust:none; -webkit-tap-highlight-color:transparent; }
 *:not(input,textarea) { -webkit-touch-callout: none; -webkit-user-select: none; }
 html{font-size: 20px;}
@@ -16,7 +17,10 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 
 
 
-/*+----------------对话框----------------+*/
+
+//================================================
+//                  对话框
+//================================================
 //======普通对话框
 neuiDialog.alert({
     animate: true,
@@ -24,7 +28,6 @@ neuiDialog.alert({
     message: '保存成功',
     buttons: ['确定']
 })
-
 
 //=====有回调的对话框
 neuiDialog.alert({
@@ -60,12 +63,11 @@ neuiDialog.alert({
 
 
 
-
-
-/*+----------------下拉联动---------------+*/
+//================================================
+//                  下拉联动
+//================================================
 <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-select.css"><!--下拉联动-->
 <script type="text/javascript" src="assets/neatui/js/neatui-select.js"></script><!--下拉联动-->
-
 
 //单个下拉
 neuiSelect.singleJson({
