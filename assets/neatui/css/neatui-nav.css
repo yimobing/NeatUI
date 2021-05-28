@@ -271,11 +271,11 @@ body{
 
 /*+菜单分组+*/
 .nav-down .nav__group{ }
-.nav-down .nav__group__cation{
+.nav-down .nav__group_caption{
     margin: 20px 0 8px 0;
     font-size: .9rem;
 }
-.nav-down .nav__group__content{ }
+.nav-down .nav__group_content{ }
 .nav-down .nav__group .nav__item:first-child{
     border-radius: 4px 4px;
 }
