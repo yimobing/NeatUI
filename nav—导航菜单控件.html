@@ -30,7 +30,187 @@
             border-bottom: 1px solid #f4f4f4;
             text-align: center; 
         }
+        
+        /*+----------------------------------------+*/
+        body,html{ width:100%; margin:0 auto; padding:0; -webkit-text-size-adjust:none; -webkit-tap-highlight-color:transparent; }
+        *:not(input,textarea) { -webkit-touch-callout: none; -webkit-user-select: none; }
+        html{font-size: 20px;}
+        @media only screen and (min-width:400px){html{font-size:21.33333333px!important}}
+        @media only screen and (min-width:414px){html{font-size:21px!important}}
+        @media only screen and (min-width:480px){html{font-size:25.6px!important}}
+        body{background-color:#fff;line-height:1.5;font-family:'Hiragino Sans GB W3','Hiragino Sans GB','microsoft yahei','Sim sun','Helvetica Neue','Helvetica,sans-serif';font-size:.7rem;color:#212121;overflow-x:hidden;overflow-y:auto}
+        body.mobile{ max-width: 640px; margin: 0 auto; }
+        body.transparent{ background-color: #f4f4f4; }
+        *{margin:0;padding:0;-moz-box-sizing:border-box;-o-box-sizing:border-box;-webkit-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;outline:0;-webkit-tap-highlight-color:transparent}
+        header, footer, main, section, menu, nav, article, aside, hgroup, summary, details, figcaption, figure{display: block;}
+
+        /*+----------------------------------------+*/
+        body{
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #f2f2f2;
+        }
+
+        /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+        /*                                      导航菜单                                                        
+        /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+        /*+----------------菜单图标----------------+*/
+        .nav__enquiry i{ background-image: url('assets/style/img/mod_icon_nav_assess_green.png'); }
+        .nav__history i{ background-image: url('assets/style/img/mod_icon_nav_history_green.png'); }
+        .nav__receive i{ background-image: url('assets/style/img/mod_icon_nav_receive_green.png'); }
+        .nav__examine i{ background-image: url('assets/style/img/mod_icon_nav_examine_house.png'); background-size: 80% auto!important; }
+        .nav__mine i{background-image: url('assets/style/img/mod_icon_nav_mine.png');}
+        .nav__manage i{ background-image: url('assets/style/img/mod_icon_nav_manage.png'); }
+        .nav__help i{ background-image: url('assets/style/img/mod_icon_nav_help.png'); }
+
+        /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+        /*                                     顶部区域                                                         
+        /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+        /*+--------------------系统信息--------------------+*/
+        .web{
+            position: relative;
+            width: 100%;
+            margin: 0 auto;
+            height: 150px;
+            background: #88a7ff url('assets/style/img/mod_banner_index_neipingfuzhu.jpg') top center/100% auto no-repeat scroll;
+            color: #fff;
+            text-align: center;
+        }
+        .web:before{
+            content: '';
+            display: block;
+            width: 150px;
+            height: 2px;
+            background-color: rgba(255, 255, 255, .25);
+            position: absolute;
+            top: 25px;
+            left: -25px;
+            -webkit-transform: rotate(-45deg);
+            -moz-transform: rotate(-45deg);
+            -ms-transform: rotate(-45deg);
+            -o-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+            -webkit-animation: myWebMove ease-in 2s infinite;
+            -moz-animation: myWebMove ease-in 3s infinite;
+            animation: myWebMove ease-in 3s infinite;
+        }
+        .web__caption,
+        .web__publicize{
+            position: absolute;
+            left: 5%;
+        }
+        .web__caption{
+            top: 20%;
+            margin: 0 auto;
+            background-image: -webkit-linear-gradient(top left, #fff, #fff, #fff);
+            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            font-size: 1.5rem;
+            font-weight: bold; 
+
+        }
+        .web__publicize{
+            top: 55%;
+            font-size: .7rem;
+            text-shadow: 1px 4px 1px #797575;
+            letter-spacing: .25px;
+        }
+
+        /*+--------------------用户信息--------------------+*/
+        .user{ 
+            display: -webkit-box;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: box;
+            display: flex;
+            align-items: center;
+
+            position: relative;
+            padding: 10px 15px;
+            background-color: #fff; 
+        }
+        .user__avatar{
+            width: 70px;
+            height: 70px;
+            margin: 0 auto;
+            padding: 4px;
+            border: 1px solid #eaeaea;
+            border-radius: 100%;
+        }
+        .user__avatar img{
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .user__text{
+            -webkit-flex: 1;
+            -moz-flex: 1;
+            -ms-flex: 1;
+            -o-flex: 1;
+            flex: 1;
+            width: 100%;
+            margin-left: 10px;
+            color: #777;
+            font-size: .7rem;
+        }
+        .user__text>div{ padding: 4px 0; border-bottom: 1px dotted #efeeee; }
+        .user__text>div:first-child{  }
+        .user__text>div>span{ }
+        .user__text>div>em{ font-weight: bold; }
+        .user__text>.user{ }
+        .user__text>div.org{  }
+        .user__email{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+        .user__email i{
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: transparent url('assets/style/img/mod_icon_email_close_gray.png') center/100% auto no-repeat scroll;
+        }
+        .user__email.animate i{
+            background-image: url('assets/style/img/mod_icon_email_open_red.png');
+            -webkit-animation: myEmailMove 1s ease-in-out 1s infinite;
+            -moz-animation: myEmailMove 1s ease-in-out 1s infinite;
+            animation: myEmailMove 1s ease-in-out 1s infinite;
+        }
+
+        /*+--------------------Animation动画--------------------+*/
+        /*系统信息动画*/
+        @-webkit-keyframes myWebMove{
+            0% { left: -50px; top: -50px; }
+            100%{ left: 200px; top: 130px;}
+        }
+        @-moz-keyframes myWebMove{
+            0% { left: -50px; top: -50px; }
+            100%{ left: 200px; top: 130px;}
+        }
+        @keyframes myWebMove{
+            0% { left: -50px; top: -50px; }
+            100%{ left: 200px; top: 130px;}
+        }
+
+        /*邮箱动画*/
+        @-webkitkeyframes myEmailMove{
+            from{ opacity: 0; }
+            to{ opacity: 1; }
+        }
+        @-moz-keyframes myEmailMove{
+            from{ opacity: 0; }
+            to{ opacity: 1; }
+        }
+        @keyframes myEmailMove{
+            from{ opacity: 0; }
+            to{ opacity: 1; }
+        }
     </style>
+
     <div class="wrap">
         <main>
 
