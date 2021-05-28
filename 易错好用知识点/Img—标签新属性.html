@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>IMG标签新属性</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="../highlight/styles/monokai-sublime.css"><!--代码高亮-->
+</head>
+<body>
+    <style>
+        body,html{ width:100%; margin:0 auto; padding:0; -webkit-text-size-adjust:none; -webkit-tap-highlight-color:transparent; }
+        *:not(input,textarea) { -webkit-touch-callout: none; -webkit-user-select: none; }
+        html{font-size: 20px;}
+        @media only screen and (min-width:400px){html{font-size:21.33333333px!important}}
+        @media only screen and (min-width:414px){html{font-size:21px!important}}
+        @media only screen and (min-width:480px){html{font-size:25.6px!important}}
+        body{background-color:#fff;line-height:1.5;font-family:'Hiragino Sans GB W3','Hiragino Sans GB','microsoft yahei','Sim sun','Helvetica Neue','Helvetica,sans-serif';font-size:.7rem;color:#212121;overflow-x:hidden;overflow-y:auto}
+        body.mobile{ max-width: 640px; margin: 0 auto; }
+        body.transparent{ background-color: #f4f4f4; }
+        *{margin:0;padding:0;-moz-box-sizing:border-box;-o-box-sizing:border-box;-webkit-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;outline:0;-webkit-tap-highlight-color:transparent}
+        header, footer, main, section, menu, nav, article, aside, hgroup, summary, details, figcaption, figure{display: block;}
+
+        /*+----------------------------------------+*/
+        body{ max-width: 1280px; margin: 0 auto; }
+        .wrap{ padding: 15px 20px; }
+        .neat__header{ margin: 15px auto; text-align: center; }
+        h1{ color: #08ba61; }
+        h3{margin: 50px auto 15px auto; border-bottom: 3px solid #f25824; padding: 0;}
+        h3>span{ padding: 5px 10px; border: 2px solid #f25824; color: #f25824; border-radius: 4px; }
+        .grid-module{ margin-top: 20px; }
+        .grid-module-block{ margin-top: 15px; margin-right: 15px; }
+        .grid-module-caption{ font-size: 18px; font-weight: bold;}
+        .grid-module-content{ margin-top: 5px;}
+        .grid-module-content>input[type="checkbox"]{ margin-left: 10px; }
+        
+        .block{ }
+        .block__hd{ position: relative; display: inline-block; margin: 50px auto 15px auto; padding: 6px 12px; border: 3px solid #08ba61; border-bottom: 0;  border-radius: 8px 8px 0 0; color: #08ba61; font-size: 24px; font-weight: bold; }
+        .block__hd:after{ content: ''; position: absolute; left: 0; right: 0; bottom: 0; width: 800px; border-bottom: 3px solid #08ba61; }
+        .block__bd{ }
+        .block__bd_item .title{ margin-top: 25px; margin-bottom: 10px; font-size: 20px; font-weight: bold; }
+    
+    </style>
+
+    <div class="wrap">
+        <header class="neat__header">
+            <h1>IMG 标签新属性</h1>
+        </header>
+        <main>
+
+            <section class="block">
+                <div class="block__hd">IMG N倍（1倍、2倍、3倍）图的使用</div><!--/.block__hd-->
+                <div class="block__bd">
+                    <div class="block__bd_item">
+                        <div class="title">方法1：使用CSS媒体查询</div>
+                        <div class="content">
+<pre>
+/*默认1倍图*/
+.photo {
+    width: 100px; 
+    height: 100px;
+    background-image: url("../img/cat.png");
+    background-size: 30px auto;
+}
+/*2倍图*/
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+       only screen and (min--moz-device-pixel-ratio: 2),
+       only screen and (min-resolution: 240dpi) {
+    .photo{
+        background-image: url("../img/cat@2x.png");
+        background-size: 60px auto;
+    }
+}
+/*3倍图*/
+@media only screen and (-webkit-min-device-pixel-ratio: 3),
+       only screen and (min--moz-device-pixel-ratio: 3),
+       only screen and (min-resolution: 360dpi) {
+    .photo{
+        background-image: url("../img/cat@3x.png");
+        background-size: 90px auto;
+    }
+}
+
+</pre>
+                        </div><!--/.content-->
+                    </div><!--/.block__item-->
+
+                    <div class="block__bd_item">
+                        <div class="title">方法2：使用 IMG 的 SRCSET 属性</div>
+                        <div class="content">
+<pre>
+    &lt;img width="100" height="100" src="cat.png" srcset="cat@2x.png 2x,cat@3x.png 3x"&gt;
+</pre>
+                        </div><!--/.content-->
+                    </div><!--/.block__item-->
+                    
+                </div><!--/.block__bd-->
+            </section>
+
+
+        </main>
+    </div><!--/.wrap-->
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="../assets/style/js/jquery-1.8.3.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
+	<!--<script type="text/javascript" href="../highlight/highlight.min.js"></script>--><!--代码高亮-->
+    <script type="text/javascript">
+        $(function(){
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                     初始化事件
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+             //——————————————————————————————————————————
+            //=====代码块高亮
+            hljs.initHighlightingOnLoad()
+            hljs.configure({
+                languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
+            });
+            document.querySelectorAll('pre').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+
+            
+        }); //$(function(){});
+
+    </script>
+</body>
+</html>
