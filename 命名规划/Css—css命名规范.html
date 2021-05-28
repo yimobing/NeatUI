@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>CSS 命名规范</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="../assets/neatui/css/neatui.min.css">
+    <link type="text/css" rel="stylesheet" href="../highlight/styles/monokai-sublime.css"><!--代码高亮-->
+</head>
+<body>
+    <style>
+        body{ max-width: 800px; margin: 0 auto; }
+        .wrap{ padding: 15px 20px; }
+        .neat__header{ margin: 15px auto; text-align: center; }
+        h1{ color: #08ba61; }
+        h3{margin: 50px auto 15px auto; border-bottom: 3px solid #f25824; padding: 0;}
+        h3>span{ padding: 5px 10px; border: 2px solid #f25824; color: #f25824; border-radius: 4px; }
+        .grid-module{ margin-top: 20px; }
+        .grid-module-block{ margin-top: 15px; margin-right: 15px; }
+        .grid-module-caption{ font-size: 18px; font-weight: bold;}
+        .grid-module-content{ margin-top: 5px;}
+        .grid-module-content>input[type="checkbox"]{ margin-left: 10px; }
+    </style>
+
+    <div class="wrap">
+        <header class="neat__header">
+            <h1>CSS命名规范</h1>
+        </header>
+        <main>
+
+            <h3><span>CSS命名规范</span></h3>
+            <section class="grid-module grid-layout">
+                <div class="grid-module-block">
+                    <div class="grid-module-caption">NEC规范</div>
+                    <div class="grid-module-content">
+<pre>
+    ----------------------------------------
+    【公共命名】
+    wrap(用于最外层)
+    wrapper(页面外围控制整体布局宽度) 、container(容器,用于最外层)、layout(布局)
+
+    ----------------------------------------
+    【class关键词】
+    grid(布局) > module(模块) > block(区块) > list(列表) > unit(元件) + box(盒子) > item(选项) > function(功能) > skin(皮肤) + z(状态)
+    panel(面板, 可以由几个模块或区域组成)
+
+    ----------------------------------------
+    【模块关键词】
+
+    ----------------------------------------
+    【示例】
+    &lt;header&gt; &lt;/header&gt;
+    &lt;main&gt;
+        &lt;section class="grid-news"&gt;
+            &lt;div class="news-caption"&gt;新闻标题&lt;/div&gt;
+            &lt;div class="news-content"&gt;
+                &lt;div class="module-news-search"&gt;
+                    &lt;div class="block-news-search-input"&gt;
+                        &lt;input type="text" placeholder="请输入关键词"&gt;
+                    &lt;/div&gt;
+                    &lt;div class="block-news-search-button"&gt;
+                        &lt;button type="button"&gt;搜索&lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;!--/.module-news-search--&gt;
+                &lt;div class="module-news-list"&gt;
+                    &lt;div class="block-news-list-recommand"&gt;
+                        &lt;ul class="list"&gt;
+                            &lt;li&gt;
+                                &lt;div class="unit-news-list-thumb"&gt;&lt;img src="" alt=""&gt;&lt;/div&gt;
+                                &lt;div class="unit-news-list-text"&gt;&lt;span&gt;今天美国发生一起校园枪击案&lt;/span&gt;&lt;em&gt;美国华盛顿大学发生一起校园枪击案，事件发生在周二下午，...&lt;/em&gt;&lt;/div&gt;
+                            &lt;/li&gt;
+                        &lt;/ul&gt;
+                    &lt;/div&gt;&lt;!--/.block-news-list-recommand--&gt;
+                    &lt;div class="block-news-list-hot"&gt;&lt;/div&gt;
+                &lt;/div&gt;&lt;!--/.module-news-list--&gt;
+            &lt;/div&gt;&lt;!--/.news-content--&gt;
+        &lt;/section&gt;&lt;!--/.grid-news--&gt;
+    &lt;/main&gt;
+    &lt;footer&gt;&lt;/footer&gt;
+    &lt;nav&gt;&lt;/nav&gt;
+    &lt;aside&gt;&lt;/aside&gt;
+</pre> 
+                    </div><!--/.module-content-->
+                </div><!--/.grid-module-block-->
+
+
+                <div class="grid-module-block">
+                    <div class="grid-module-caption">BEM规范</div>
+                    <div class="grid-module-content">
+<pre>
+    ----------------------------------------
+    【BEM语法】
+    先看看 BEM 的语法：
+    .block {} //块（block）
+    .block__element {} //元素（element）
+    .block--modifier {} //修饰符（modifier）
+    运用在实际项目中是这个样子的：
+    .article {} // 文章块
+    .article__header {} // 文章头部元素
+    .article__header .title {} // 文章头部元素 的标题
+    .article__footer {} // 文章尾部元素
+    .article--project {} // 文章修饰符 project 页面
+    .article--about {} // 文章修饰符 about 页面
+    嗯，果然是战斗名族 (yandex) 的味道。换做以前啊，看到一个 CSS class 如 article-header 是分不清楚这是否有上下文的，很可能就是即兴命名。
+    再看看 BEM 命名 。。article__header，应为有了 BEM 约定，明确可以知道 article 是一个模块，而 header 是他的元素（子类）。
+
+    ----------------------------------------
+    【说明】
+    - 元素之间可以彼此嵌套
+    - 你可以拥有任意层次的嵌套级别
+    - 一个元素总是一个模块的一部分，而不是另一个元素的一部分，这意味着元素的名称不能被定义为 block__elem1__elem2 这样的层次结构。
+    
+    &lt;!--
+         正确的。完整的元素名的结构符合如下模式：
+         'block-name__element-name'
+     --&gt;
+    &lt;form class="search-form"&gt;
+        &lt;div class="search-form__content"&gt;
+            &lt;input class="search-form__input"/&gt;
+            &lt;button class="search-form__button"&gt;&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/form&gt;
+    
+     &lt;!--
+         不正确的。完整的元素名的结构不符合如下模式：
+         'block-name__element-name'
+     --&gt;
+    &lt;form class="search-form"&gt;
+        &lt;div class="search-form__content"&gt;
+            &lt;!-- 推荐：'search-form__input' 或者 'search-form__content-input' --&gt;
+            &lt;input class="search-form__content__input"/&gt;
+            &lt;!-- 推荐：'search-form__button' 或者 'search-form__content-button' --&gt;
+            &lt;button class="search-form__content__button"&gt;&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/form&gt;
+
+</pre>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+            </section>
+        </main>
+    </div><!--/.wrap-->
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="../assets/style/js/jquery-1.8.3.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
+	<!--<script type="text/javascript" href="../highlight/highlight.min.js"></script>--><!--代码高亮-->
+    <script type="text/javascript">
+        $(function(){
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                     初始化事件
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+             //——————————————————————————————————————————
+            //=====代码块高亮
+            hljs.initHighlightingOnLoad()
+            hljs.configure({
+                languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
+            });
+            document.querySelectorAll('pre').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+
+            
+        }); //$(function(){});
+
+    </script>
+</body>
+</html>
