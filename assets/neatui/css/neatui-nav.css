@@ -128,8 +128,8 @@ body{
 
 
 /*+----------------紧排菜单----------------+*/
-.nav-down{ 
-    margin-top: 15px; 
+.nav-down{
+    margin-top: 15px;
     margin-bottom: 10px;
 }
 .nav-down .nav__item{
@@ -204,6 +204,7 @@ body{
     display: block;
     margin-top: 4px;
     color: #878787;
+    font-style: normal;
     font-size: .6rem;
 }
 
@@ -275,6 +276,8 @@ body{
     margin: 20px 0 8px 0;
     font-size: .9rem;
 }
+
+
 .nav-down .nav__group_content{ }
 .nav-down .nav__group .nav__item:first-child{
     border-radius: 4px 4px;
