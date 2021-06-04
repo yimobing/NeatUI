@@ -13,7 +13,8 @@
 * 
 [rem基准大小]：20px 1rem | 16px 0.8rem | 14px 0.7rem | 13px 0.65rem |  12px 0.6rem
 [几个CSS特别属性讲解]
-· text-size-adjust 是否允许字体缩放. 值 auto 允许, none 禁用
+· pointer-events: none; 适应于：禁止点击、穿透效果、禁止系统弹窗、禁止a标签hover效果及跳转等.
+· text-size-adjust 是否允许字体缩放. 值 auto 允许, none 禁用, 百分比数值,比如100%
 · tap-highlight-color 去掉ios点击下的阴影. 一般用值 rgba(0, 0, 0, 0) 即可实现去掉阴影的目的
 · touch-callout 是否禁用系统默认菜单(ios). 值: default 允许, none 禁用, unset 未设置
 · user-select  禁止用户选择文本,选中元素. ios中将属性设置在input、textarea标签上会起到禁止输入作用的效果(光标将不能聚焦)
@@ -29,7 +30,7 @@ html,body{
 	width: 100%;
 	margin: 0 auto;
 	padding: 0;
-	-webkit-text-size-adjust: none;
+	-webkit-text-size-adjust: 100%;
 	-webkit-tap-highlight-color:rgba(0, 0, 0, 0); 
 	/*-webkit-touch-callout: none;*/
 	/*-webkit-user-select: none;
@@ -58,7 +59,7 @@ body{
 	background-color: #fff;
 	/*background-color: #f4f4f4;*/
 	line-height: 1.5;
-	font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', 'Helvetica Neue', 'Helvetica,sans-serif';
+	font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', '-apple-system-font', 'Helvetica Neue', 'sans-serif';
 	/*font-size: 14px;*/
 	font-size: .7rem;
 	color: #212121;
@@ -83,8 +84,8 @@ body.transparent{ background-color: #f4f4f4; }
 	-webkit-tap-highlight-color: transparent;
 }
 header, footer, main, section, menu, nav, article, aside, hgroup, summary, details, figcaption, figure{display: block;}
-
-
+a { text-decoration: none; -webkit-tap-highlight-color: rgba(0,0,0,0); }
+a img { border: 0 }
 
 
 /*+================================================================================+*/
