@@ -201,7 +201,7 @@
                     if(this.isStringInCludeArrayElement(ps_msg, overtimeArr)){ //直接使用返回的字符串作为错误信息. eg. {return:"登录超时"}
                         tips += ps_msg;
                     }else{ //自定义错误信息. eg. {return:"error", data:"保存失败"}
-                        tips += '操作失败！' + (msg == '' ? '' : '<br>' + msg);
+                        tips += (msg == '' ? '操作失败！' : msg);
                         tips += (action == '' ? '' : '<br>请检查' + description + '接口：' + action);
                     }
                 }else if(ps_type == "errors"){ //接口不通(即进入error)
