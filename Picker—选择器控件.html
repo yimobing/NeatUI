@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Picker | 选择器控件</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-picker.css">
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+    <base target="_self">
+</head>
+<body>
+    <style>
+        html, body{
+            height: 100%;
+            background-color: #f8f8f8;
+        }
+        body{ width: 98%; margin: 0 auto; padding: 15px 0; font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif; }
+        h2{ margin: 45px auto 5px 10px; color: #1aad19; font-size: 24px;  }
+
+        h2:first-child{ margin-top: 0; }
+        .group__title{ margin: 15px auto 5px auto; font-size: 14px; font-weight: bold; }
+        /*+------------------------+*/
+        .page_dropdown{ }
+        .page_dropdown p{ margin-bottom: 0px; padding: 15px 10px; background-color: #fff; border-top: 1px solid #fafafa;}
+        .page_dropdownp :first-child{ border-top: 0; }
+        .page_dropdown span{ margin-right: 8px; color: #999; }
+        .page_dropdown input[type="text"]{
+            padding: 0 10px;
+            height: 35px;
+            line-height: 35px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            color: #555;
+        }
+
+        /*+------------------------+*/
+        .page_feedback{
+            padding: 15px;
+            overflow: auto;
+            background-color: #FFFFFF;
+        }
+
+        .page_feedback a{
+            display: block;
+            width: 100%;
+            margin-top: 5px;
+            padding: 15px 12px;
+            background-color: #f4f4f4;
+            border-radius: 4px;
+            color: #777;
+        }
+        .item{
+            padding: 10px 0;
+        }
+        .item__title{
+            margin-bottom: 5px;
+            padding-left: 15px;
+            padding-right: 15px;
+            color: #999;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .item__ctn{
+            padding: 0 15px;
+        }
+
+       
+    </style>
+
+    <div class="wrap">
+        <div class="weui-tab" id="tab">
+            <div class="weui-tab__panel">
+                <h2>“自定义选择器组件”</h2>
+                <div class="page_dropdown">
+                    <div class="group">
+                        <div class="group__title">普通选择器</div>
+                        <div class="group__list">
+                            <p><span>普通选择器</span><input type="text" id="i-normal"></p>
+                        </div><!--/.group__list-->
+                    </div><!--/.group-->
+                    <div class="group">
+                        <div class="group__title">级联选择器</div>
+                        <div class="group__list">
+                            <p><span>两级级联选择器</span><input type="text" id="i-react2"></p>
+                            <p><span>三级级联选择器</span><input type="text" id="i-react3"></p>
+                        </div><!--/.group__list-->
+                    </div><!--/.group-->
+                    <div class="group">
+                        <div class="group__title">省市区县选择器(使用自定义数据源,即只有部分省市区县数据)</div>
+                        <div class="group__list">
+                            <p><span>省市两级联动选择器</span><input type="text" id="i-area2" value="福建省-泉州市"></p>
+                            <p><span>省市区县三级联动选择器</span><input type="text" id="i-area3" value="福建省-泉州市-鲤城区"></p>
+                        </div><!--/.group__list-->
+                    </div><!--/.group-->
+                    <div class="group">
+                        <div class="group__title">省市区县选择器(使用系统数据源,即拥有全国省市区县数据)</div>
+                        <div class="group__list">
+                            <p><span>省市区县三级联动选择器</span><input type="text" id="i-area4" value="福建省-泉州市-丰泽区"></p>
+                        </div><!--/.group__list-->
+                    </div><!--/.group-->
+                </div><!--/.page_feedback-->
+
+
+
+                <h2>“微信原始选择器组件”</h2>
+                <div class="page_feedback">
+                    <a href="javascript:;" id="pickerBtn">普通选择器</a>
+                    <a href="javascript:;" id="datePickerBtn">时间选择器</a>
+                    <a href="javascript:;" id="multiPickerBtn">多列选择器</a>
+                    <a href="javascript:;" id="cascadePickerBtn">级联选择器(如省市区县三级联动)</a>
+                </div><!--/.page_feedback-->
+            </div>
+        </div>
+    </div><!--/.wrap-->
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/style/js/jquery.chineseDistricts.js"></script><!--全国省市区数据源-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-picker.js"></script><!--Picker选择器-->
+    <script type="text/javascript">
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                                   “自定义选择器组件”
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        //=====普通选择器
+        $('#i-normal').on('click', function(){
+            var normalJson = {
+                "data":[
+                    {"bh":"1001", "mc":"中国银行"},
+                    {"bh":"1002", "mc":"建设银行"},
+                    {"bh":"1003", "mc":"民生银行"},
+                    {"bh":"1004", "mc":"农业银行"},
+                    {"bh":"1005", "mc":"工商银行"}
+                ]
+            }
+            $(this).neuiPicker({
+                source: normalJson,
+                format: { // 使用自定义数据源字段(Object对象)(可选)
+                    value: ["mc"], // 显示值字段(数组型)
+                    hid: ["bh"], // 隐藏值字段(数组型)(可选)
+                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                },
+                value: "民生银行",
+                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+					console.log('您点了确定', e);
+				}
+            })
+        });
+
+
+        //——————————————————————————————————————————
+        //=====两级级联选择器
+        $('#i-react2').on('click', function(){
+            var softJson = {
+                data:[
+                    {computer:"台式电脑", data:[
+                        {mobile:"联想"},
+                        {mobile:"华硕"},
+                        {mobile:"宏基"}
+                    ]},
+                    {computer:"手机", data:[
+                        {mobile:"华为"},
+                        {mobile:"小米"},
+                        {mobile:"魅族"}
+                    ]}
+                ]
+            }
+
+            $(this).neuiPicker({
+                source: softJson,
+                format: { // 使用自定义数据源字段(Object对象)(可选)
+                    value: ["computer", "mobile"], // 显示值字段(数组型)(可选)
+                    // hid: ["", "", ""], // 隐藏值字段(数组型)(可选)
+                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                },
+                value: "手机-魅族", //
+                joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
+                depth: 1,
+                cascade: true, // 是否级联选择器(可选)，默认false
+				district: true, // 是否省市区县联动选择器(可选)，默认false。
+                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+					console.log('您点了确定', e);
+				}
+            })
+        });
+
+
+
+        //——————————————————————————————————————————
+        //=====三级级联选择器
+        $('#i-react3').on('click', function(){
+            var personJson = {
+                data:[
+                    {grade:"六年级", data:[
+                        {classes:"北大班", data:[
+                            {student:"宋江"},
+                            {student:"曹晃"},
+                            {student:"吴用"}
+                        ]},
+                        {classes:"清华班", data:[
+                            {student:"秦明"},
+                            {student:"关胜"},
+                            {student:"张清"}
+                        ]}
+                    ]},
+                    {grade:"五年级", data:[
+                        {classes:"优秀班", data:[
+                            {student:"李逵"},
+                            {student:"卢俊义"},
+                            {student:"公孙胜"}
+                        ]},
+                        {classes:"中等班", data:[
+                            {student:"林冲"},
+                            {student:"花荣"},
+                            {student:"柴进"}
+                        ]}
+                    ]}
+                ]
+            }
+
+            $(this).neuiPicker({
+                source: personJson,
+                format: { // 使用自定义数据源字段(Object对象)(可选)
+                    value: ["grade", "classes", "student"], // 显示值字段(数组型)(可选)
+                    // hid: ["", "", ""], // 隐藏值字段(数组型)(可选)
+                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                },
+                value: "五年级-优秀班-卢俊义", //
+                joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
+                cascade: true, // 是否级联选择器(可选)，默认false
+				district: true, // 是否省市区县联动选择器(可选)，默认false。
+                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+					console.log('您点了确定', e);
+				}
+            })
+        });
+
+
+
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //+   省市区县选择器(使用自定义数据源,即只有部分省市区县数据)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //——————————————————————————————————————————
+        //=====省市两级联动选择器
+        $('#i-area2').on('click', function(){
+            var areaJson = {
+                data:[
+                    {province:"福建省", provinceId:"P1001",  data:[
+                            {city:"福州市", cityId:"C1001"},
+                            {city:"泉州市", cityId:"C1002"}
+                        ]
+                    },
+                    {province:"浙江省", provinceId:"P1002", data:[
+                            {city:"杭州市", cityId:"C2001"},
+                            {city:"嘉兴市", cityId:"C2002"}
+                        ]
+                    }
+                ]
+            }
+
+            $(this).neuiPicker({
+                source: areaJson,
+                format: { // 使用自定义数据源字段(Object对象)(可选)
+                    value: ["province", "city"], // 显示值字段(数组型)(可选)
+                    hid: ["provinceId", "cityId"], // 隐藏值字段(数组型)(可选)
+                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                },
+                value: "福建省-泉州市-鲤城区", //
+                joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
+                cascade: true, // 是否级联选择器(可选)，默认false
+				district: true, // 是否省市区县联动选择器(可选)，默认false。
+                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+					console.log('您点了确定', e);
+				}
+            })
+        });
+
+
+
+        //——————————————————————————————————————————
+        //=====省市区县三级联动选择器
+        $('#i-area3').on('click', function(){
+            var areaJson = {
+                data:[
+                    {province:"福建省", provinceId:"P1001",  data:[
+                            {city:"福州市", cityId:"C1001", data:[
+                                    {county:"鼓楼区", countyId:"Q2001"}, 
+                                    {county:"台江区", countyId:"Q2002"}, 
+                                    {county:"仓山区", countyId:"Q2003"},
+                                    {county:"马尾区", countyId:"Q2004"},
+                                    {county:"晋安区", countyId:"Q2005"},
+                                    {county:"长乐区", countyId:"Q2008"}
+                                ]
+                            },
+                            {city:"泉州市", cityId:"C1002", data:[
+                                    {county:"丰泽区", countyId:"Q1001"}, 
+                                    {county:"鲤城区", countyId:"Q1002"}, 
+                                    {county:"洛江区", countyId:"Q1003"}, 
+                                    {county:"泉港区", countyId:"Q1004"}, 
+                                    {county:"惠安县", countyId:"Q1005"}, 
+                                    {county:"安溪县", countyId:"Q1006"}, 
+                                    {county:"永春县", countyId:"Q1007"}, 
+                                    {county:"德化县", countyId:"Q1008"}, 
+                                    {county:"石狮市", countyId:"Q1009"}, 
+                                    {county:"晋江市", countyId:"Q1010"}, 
+                                    {county:"南安市", countyId:"Q1011"}
+                                ]
+                            }
+                        ]
+                    },
+                    {province:"浙江省", provinceId:"P1002", data:[
+                            {city:"杭州市", cityId:"C2001", data:[
+                                    {county:"上城区", countyId:"Q3001"}, 
+                                    {county:"拱墅区", countyId:"Q3004"}, 
+                                    {county:"西湖区", countyId:"Q3005"},
+                                    {county:"滨江区", countyId:"Q3006"},
+                                    {county:"萧山区", countyId:"Q3007"},
+                                    {county:"余杭区", countyId:"Q3008"},
+                                    {county:"富阳区", countyId:"Q3009"},
+                                    {county:"临安区", countyId:"Q3010"}
+                                ]
+                            },
+                            {city:"嘉兴市", cityId:"C2002", data:[
+                                    {county:"南湖区", countyId:"Q4001"}, 
+                                    {county:"秀洲区", countyId:"Q4002"}
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+
+            $(this).neuiPicker({
+                source: areaJson,
+                format: { // 使用自定义数据源字段(Object对象)(可选)
+                    value: ["province", "city", "county"], // 显示值字段(数组型)(可选)
+                    hid: ["provinceId", "cityId", "countyId"], // 隐藏值字段(数组型)(可选)
+                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                },
+                value: "福建省-泉州市-鲤城区", //
+                joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
+                cascade: true, // 是否级联选择器(可选)，默认false
+				district: true, // 是否省市区县联动选择器(可选)，默认false。
+                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+					console.log('您点了确定', e);
+				}
+            })
+        });
+
+
+
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //+    省市区县选择器(使用系统数据源,即拥有全国省市区县数据)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //——————————————————————————————————————————
+        //=====省市区县三级联动选择器
+        $('#i-area4').on('click', function(){
+            $(this).neuiPicker({
+                source: 'china',
+                format: { // 使用自定义数据源字段(Object对象)(可选)
+                    value: ["province", "city", "county"], // 显示值字段(数组型)(可选)
+                    hid: ["provinceId", "cityId", "countyId"], // 隐藏值字段(数组型)(可选)
+                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                },
+                value: "福建省-泉州市-丰泽区",
+                depth: 3, // 限制选择器深度(数值型)，默认值空(可选)。也就是选择器有多少列，取值为1-3。若为空则根据items项的深度自动调整(或取第一项的深度), 若不为空则将会按照参数设定的值显示N级数据(即使数据源中的级数比N大)
+                joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
+                cascade: true, // 是否级联选择器(可选)，默认false
+				district: true, // 是否省市区县联动选择器(可选)，默认false。
+                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+					console.log('您点了确定', e);
+				}
+            })
+        });
+
+
+
+
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                                   “微信原始选择器组件”
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        /* picker */
+        // 普通选择器
+        document.querySelector('#pickerBtn').addEventListener('click', function () {
+            weui.picker(
+                [{  // items 数据源，数组型。即用于生成选择器的数据，层级可自定义，建议最多三层，数据格式参考example
+                    label: '飞机票',
+                    value: 0
+                }, {
+                    label: '火车票(disabled)',
+                    disabled: true,
+                    value: 1
+                }, {
+                    label: '的士票(disabled)',
+                    disabled: true,
+                    value: 2
+                }, {
+                    label: '住宿费',
+                    value: 3
+                }, {
+                    label: '礼品费',
+                    value: 4
+                }, {
+                    label: '活动费',
+                    value: 5
+                }, {
+                    label: '通讯费',
+                    value: 6
+                }, {
+                    label: '补助',
+                    value: 7
+                }, {
+                    label: '通讯费',
+                    value: 8
+                }, {
+                    label: '其他',
+                    value: 9
+                }], 
+
+                {
+                    defaultValue: [8], // defaultValue 默认选项的值，数组型
+                    depth: 1, // depth 选择器深度，数值型，默认值空。 也就是选择器有多少列，取值为1-3，如果为空，则根据items项的深度自动调整(或取第一项的深度)
+
+                    className: 'custom-classname', // 自定义类名
+                    id: 'picker', // id 作为选择器的唯一标识，字符型，默认值"default"。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分）。
+                    // container: '#selector', // container 指定容器，字符型，无默认值。
+
+                    onChange: function (result) { // onChange 在选择器选中的值发生变化的时候回调，函数型。
+                        //console.log(item, index);
+                        console.log('您正在改变选项', result);
+                    },
+                    onConfirm: function (result) { // onConfirm 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+                        console.log('您点了确定', result);
+                    },
+                    onClose: function(result){ // onClose 选择器关闭后的回调，函数型。
+                        console.log('您选择了关闭我', result);
+                    }
+                }
+            );
+        });
+
+        // 时间选择器
+        document.querySelector('#datePickerBtn').addEventListener('click', function () {
+            weui.datePicker({
+                start: '2016-12-29',
+                end: '2030-12-29',
+                /**
+                 * https://zh.wikipedia.org/wiki/Cron
+                 * cron 表达式后三位
+                 * 示例：
+                 *  * * *                每天
+                 *  5 * *                每个月的5日
+                 *  1-10 * *             每个月的前10日
+                 *  1,5,10 * *           每个月的1号、5号、10号
+                 *  *\/2 * *             每个月的 1、3、5、7...日，注意写的时候斜杠“/”前面没有反斜杠“\”，这是因为是注释所以需要转义
+                 *  * 2 0                2月的每个周日
+                 *  * * 0,6              每个周末
+                 *  * * 3                每周三
+                 */
+                cron: '* */2 0',
+                defaultValue: [2017, 7, 9],
+                onChange: function (result) {
+                    console.log(result);
+                },
+                onConfirm: function (result) {
+                    console.log(result);
+                },
+                id: 'datePicker'
+            });
+        });
+
+        // 多列选择器
+        document.querySelector('#multiPickerBtn').addEventListener('click', function () {
+            weui.picker([
+                {
+                    label: '1',
+                    value: '1'
+                }, {
+                    label: '2',
+                    value: '2'
+                }, {
+                    label: '3',
+                    value: '3'
+                }
+            ], [
+                {
+                    label: 'A',
+                    value: 'A'
+                }, {
+                    label: 'B',
+                    value: 'B'
+                }, {
+                    label: 'C',
+                    value: 'C'
+                }
+            ], {
+                defaultValue: ['3', 'A'],
+                onChange: function (result) {
+                    console.log(result);
+                },
+                onConfirm: function (result) {
+                    console.log(result);
+                },
+                id: 'multiPickerBtn',
+                onClose: function(){
+                    console.log('onClose');
+                }
+            });
+        });
+
+        // 级联选择器
+        document.querySelector('#cascadePickerBtn').addEventListener('click', function () {
+            weui.picker([
+                {
+                    label: '广东',
+                    value: 0,
+                    children: [
+                        {
+                            label: '广州',
+                            value: 0,
+                            children: [
+                                {
+                                    label: '海珠',
+                                    value: 0
+                                }, {
+                                    label: '番禺',
+                                    value: 1
+                                }
+                            ]
+                        }, {
+                            label: '佛山',
+                            value: 1,
+                            children: [
+                                {
+                                    label: '禅城',
+                                    value: 0
+                                }, {
+                                    label: '南海',
+                                    value: 1
+                                }
+                            ]
+                        }
+                    ]
+                }, {
+                    label: '广西',
+                    value: 1,
+                    children: [
+                        {
+                            label: '南宁',
+                            value: 0,
+                            children: [
+                                {
+                                    label: '青秀',
+                                    value: 0
+                                }, {
+                                    label: '兴宁',
+                                    value: 1
+                                }
+                            ]
+                        }, {
+                            label: '桂林',
+                            value: 1,
+                            children: [
+                                {
+                                    label: '象山',
+                                    value: 0
+                                }, {
+                                    label: '秀峰',
+                                    value: 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ], {
+                depth: 3,
+                defaultValue: [0, 1, 1],
+                onChange: function (result) {
+                    console.log(result);
+                },
+                onConfirm: function (result) {
+                    console.log(result);
+                },
+                id: 'cascadePicker'
+            });
+        });
+
+
+
+
+
+    </script>
+</body>
+</html>

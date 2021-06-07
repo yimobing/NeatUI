@@ -1,681 +1,1150 @@
-/*======================================================
-************   Picker   ************
-* 还在测试中，源码源自 weui picker组件
-======================================================*/
-/* global $:true */
-/* jshint unused:false */
-/* jshint multistr:true */
-+ function($) {
-    "use strict";
-    var Picker = function (params) {
-        var p = this;
-        var defaults = {
-            updateValuesOnMomentum: false,
-            updateValuesOnTouchmove: true,
-            rotateEffect: false,
-            momentumRatio: 7,
-            freeMode: false,
-            // Common settings
-            scrollToInput: true,
-            inputReadOnly: true,
-            toolbar: true,
-            toolbarCloseText: '完成',
-            title: '请选择',
-            toolbarTemplate: '<div class="toolbar">\
-          <div class="toolbar-inner">\
-          <a href="javascript:;" class="picker-button close-picker">{{closeText}}</a>\
-          <h1 class="title">{{title}}</h1>\
-          </div>\
-          </div>',
-        };
-        params = params || {};
-        for (var def in defaults) {
-            if (typeof params[def] === 'undefined') {
-                params[def] = defaults[def];
-            }
-        }
-        p.params = params;
-        p.cols = [];
-        p.initialized = false;
-
-        // Inline flag
-        p.inline = p.params.container ? true : false;
-
-        // 3D Transforms origin bug, only on safari
-        var originBug = $.device.ios || (navigator.userAgent.toLowerCase().indexOf('safari') >= 0 && navigator.userAgent.toLowerCase().indexOf('chrome') < 0) && !$.device.android;
-
-        // Should be converted to popover
-        function isPopover() {
-            var toPopover = false;
-            if (!p.params.convertToPopover && !p.params.onlyInPopover) return toPopover;
-            if (!p.inline && p.params.input) {
-                if (p.params.onlyInPopover) toPopover = true;
-                else {
-                    if ($.device.ios) {
-                        toPopover = $.device.ipad ? true : false;
-                    }
-                    else {
-                        if ($(window).width() >= 768) toPopover = true;
-                    }
-                }
-            }
-            return toPopover;
-        }
-        function inPopover() {
-            if (p.opened && p.container && p.container.length > 0 && p.container.parents('.popover').length > 0) return true;
-            else return false;
-        }
-
-        // Value
-        p.setValue = function (arrValues, transition) {
-            var valueIndex = 0;
-            for (var i = 0; i < p.cols.length; i++) {
-                if (p.cols[i] && !p.cols[i].divider) {
-                    p.cols[i].setValue(arrValues[valueIndex], transition);
-                    valueIndex++;
-                }
-            }
-        };
-        p.updateValue = function () {
-            var newValue = [];
-            var newDisplayValue = [];
-            for (var i = 0; i < p.cols.length; i++) {
-                if (!p.cols[i].divider) {
-                    newValue.push(p.cols[i].value);
-                    newDisplayValue.push(p.cols[i].displayValue);
-                }
-            }
-            if (newValue.indexOf(undefined) >= 0) {
-                return;
-            }
-            p.value = newValue;
-            p.displayValue = newDisplayValue;
-            if (p.params.onChange) {
-                p.params.onChange(p, p.value, p.displayValue);
-            }
-            if (p.input && p.input.length > 0) {
-                $(p.input).val(p.params.formatValue ? p.params.formatValue(p, p.value, p.displayValue) : p.value.join(' '));
-                $(p.input).trigger('change');
-            }
-        };
-
-        // Columns Handlers
-        p.initPickerCol = function (colElement, updateItems) {
-            var colContainer = $(colElement);
-            var colIndex = colContainer.index();
-            var col = p.cols[colIndex];
-            if (col.divider) return;
-            col.container = colContainer;
-            col.wrapper = col.container.find('.picker-items-col-wrapper');
-            col.items = col.wrapper.find('.picker-item');
-
-            var i, j;
-            var wrapperHeight, itemHeight, itemsHeight, minTranslate, maxTranslate;
-            col.replaceValues = function (values, displayValues) {
-                col.destroyEvents();
-                col.values = values;
-                col.displayValues = displayValues;
-                var newItemsHTML = p.columnHTML(col, true);
-                col.wrapper.html(newItemsHTML);
-                col.items = col.wrapper.find('.picker-item');
-                col.calcSize();
-                col.setValue(col.values[0] || '', 0, true);
-                col.initEvents();
-            };
-            col.calcSize = function () {
-                if (!col.values.length) return;
-                if (p.params.rotateEffect) {
-                    col.container.removeClass('picker-items-col-absolute');
-                    if (!col.width) col.container.css({width:''});
-                }
-                var colWidth, colHeight;
-                colWidth = 0;
-                colHeight = col.container[0].offsetHeight;
-                wrapperHeight = col.wrapper[0].offsetHeight;
-                itemHeight = col.items[0].offsetHeight;
-                itemsHeight = itemHeight * col.items.length;
-                minTranslate = colHeight / 2 - itemsHeight + itemHeight / 2;
-                maxTranslate = colHeight / 2 - itemHeight / 2;
-                if (col.width) {
-                    colWidth = col.width;
-                    if (parseInt(colWidth, 10) === colWidth) colWidth = colWidth + 'px';
-                    col.container.css({width: colWidth});
-                }
-                if (p.params.rotateEffect) {
-                    if (!col.width) {
-                        col.items.each(function () {
-                            var item = $(this);
-                            item.css({width:'auto'});
-                            colWidth = Math.max(colWidth, item[0].offsetWidth);
-                            item.css({width:''});
-                        });
-                        col.container.css({width: (colWidth + 2) + 'px'});
-                    }
-                    col.container.addClass('picker-items-col-absolute');
-                }
-            };
-            col.calcSize();
-
-            col.wrapper.transform('translate3d(0,' + maxTranslate + 'px,0)').transition(0);
-
-
-            var activeIndex = 0;
-            var animationFrameId;
-
-            // Set Value Function
-            col.setValue = function (newValue, transition, valueCallbacks) {
-                if (typeof transition === 'undefined') transition = '';
-                var newActiveIndex = col.wrapper.find('.picker-item[data-picker-value="' + newValue + '"]').index();
-                if(typeof newActiveIndex === 'undefined' || newActiveIndex === -1) {
-                    col.value = col.displayValue = newValue;
-                    return;
-                }
-                var newTranslate = -newActiveIndex * itemHeight + maxTranslate;
-                // Update wrapper
-                col.wrapper.transition(transition);
-                col.wrapper.transform('translate3d(0,' + (newTranslate) + 'px,0)');
-
-                // Watch items
-                if (p.params.updateValuesOnMomentum && col.activeIndex && col.activeIndex !== newActiveIndex ) {
-                    $.cancelAnimationFrame(animationFrameId);
-                    col.wrapper.transitionEnd(function(){
-                        $.cancelAnimationFrame(animationFrameId);
-                    });
-                    updateDuringScroll();
-                }
-
-                // Update items
-                col.updateItems(newActiveIndex, newTranslate, transition, valueCallbacks);
-            };
-
-            col.updateItems = function (activeIndex, translate, transition, valueCallbacks) {
-                if (typeof translate === 'undefined') {
-                    translate = $.getTranslate(col.wrapper[0], 'y');
-                }
-                if(typeof activeIndex === 'undefined') activeIndex = -Math.round((translate - maxTranslate)/itemHeight);
-                if (activeIndex < 0) activeIndex = 0;
-                if (activeIndex >= col.items.length) activeIndex = col.items.length - 1;
-                var previousActiveIndex = col.activeIndex;
-                col.activeIndex = activeIndex;
-
-                //去掉 .picker-after-selected, .picker-before-selected 以提高性能
-                col.wrapper.find('.picker-selected').removeClass('picker-selected');
-                if (p.params.rotateEffect) {
-                    col.items.transition(transition);
-                }
-                var selectedItem = col.items.eq(activeIndex).addClass('picker-selected').transform('');
-
-                if (valueCallbacks || typeof valueCallbacks === 'undefined') {
-                    // Update values
-                    col.value = selectedItem.attr('data-picker-value');
-                    col.displayValue = col.displayValues ? col.displayValues[activeIndex] : col.value;
-                    // On change callback
-                    if (previousActiveIndex !== activeIndex) {
-                        if (col.onChange) {
-                            col.onChange(p, col.value, col.displayValue);
-                        }
-                        p.updateValue();
-                    }
-                }
-
-                // Set 3D rotate effect
-                if (!p.params.rotateEffect) {
-                    return;
-                }
-                var percentage = (translate - (Math.floor((translate - maxTranslate)/itemHeight) * itemHeight + maxTranslate)) / itemHeight;
-
-                col.items.each(function () {
-                    var item = $(this);
-                    var itemOffsetTop = item.index() * itemHeight;
-                    var translateOffset = maxTranslate - translate;
-                    var itemOffset = itemOffsetTop - translateOffset;
-                    var percentage = itemOffset / itemHeight;
-
-                    var itemsFit = Math.ceil(col.height / itemHeight / 2) + 1;
-
-                    var angle = (-18*percentage);
-                    if (angle > 180) angle = 180;
-                    if (angle < -180) angle = -180;
-                    // Far class
-                    if (Math.abs(percentage) > itemsFit) item.addClass('picker-item-far');
-                    else item.removeClass('picker-item-far');
-                    // Set transform
-                    item.transform('translate3d(0, ' + (-translate + maxTranslate) + 'px, ' + (originBug ? -110 : 0) + 'px) rotateX(' + angle + 'deg)');
-                });
-            };
-
-            function updateDuringScroll() {
-                animationFrameId = $.requestAnimationFrame(function () {
-                    col.updateItems(undefined, undefined, 0);
-                    updateDuringScroll();
-                });
-            }
-
-            // Update items on init
-            if (updateItems) col.updateItems(0, maxTranslate, 0);
-
-            var allowItemClick = true;
-            var isTouched, isMoved, touchStartY, touchCurrentY, touchStartTime, touchEndTime, startTranslate, returnTo, currentTranslate, prevTranslate, velocityTranslate, velocityTime;
-            function handleTouchStart (e) {
-                if (isMoved || isTouched) return;
-                e.preventDefault();
-                isTouched = true;
-                var position = $.getTouchPosition(e);
-                touchStartY = touchCurrentY = position.y;
-                touchStartTime = (new Date()).getTime();
-
-                allowItemClick = true;
-                startTranslate = currentTranslate = $.getTranslate(col.wrapper[0], 'y');
-            }
-            function handleTouchMove (e) {
-                if (!isTouched) return;
-                e.preventDefault();
-                allowItemClick = false;
-                var position = $.getTouchPosition(e);
-                touchCurrentY = position.y;
-                if (!isMoved) {
-                    // First move
-                    $.cancelAnimationFrame(animationFrameId);
-                    isMoved = true;
-                    startTranslate = currentTranslate = $.getTranslate(col.wrapper[0], 'y');
-                    col.wrapper.transition(0);
-                }
-                e.preventDefault();
-
-                var diff = touchCurrentY - touchStartY;
-                currentTranslate = startTranslate + diff;
-                returnTo = undefined;
-
-                // Normalize translate
-                if (currentTranslate < minTranslate) {
-                    currentTranslate = minTranslate - Math.pow(minTranslate - currentTranslate, 0.8);
-                    returnTo = 'min';
-                }
-                if (currentTranslate > maxTranslate) {
-                    currentTranslate = maxTranslate + Math.pow(currentTranslate - maxTranslate, 0.8);
-                    returnTo = 'max';
-                }
-                // Transform wrapper
-                col.wrapper.transform('translate3d(0,' + currentTranslate + 'px,0)');
-
-                // Update items
-                col.updateItems(undefined, currentTranslate, 0, p.params.updateValuesOnTouchmove);
-
-                // Calc velocity
-                velocityTranslate = currentTranslate - prevTranslate || currentTranslate;
-                velocityTime = (new Date()).getTime();
-                prevTranslate = currentTranslate;
-            }
-            function handleTouchEnd (e) {
-                if (!isTouched || !isMoved) {
-                    isTouched = isMoved = false;
-                    return;
-                }
-                isTouched = isMoved = false;
-                col.wrapper.transition('');
-                if (returnTo) {
-                    if (returnTo === 'min') {
-                        col.wrapper.transform('translate3d(0,' + minTranslate + 'px,0)');
-                    }
-                    else col.wrapper.transform('translate3d(0,' + maxTranslate + 'px,0)');
-                }
-                touchEndTime = new Date().getTime();
-                var velocity, newTranslate;
-                if (touchEndTime - touchStartTime > 300) {
-                    newTranslate = currentTranslate;
-                }
-                else {
-                    velocity = Math.abs(velocityTranslate / (touchEndTime - velocityTime));
-                    newTranslate = currentTranslate + velocityTranslate * p.params.momentumRatio;
-                }
-
-                newTranslate = Math.max(Math.min(newTranslate, maxTranslate), minTranslate);
-
-                // Active Index
-                var activeIndex = -Math.floor((newTranslate - maxTranslate)/itemHeight);
-
-                // Normalize translate
-                if (!p.params.freeMode) newTranslate = -activeIndex * itemHeight + maxTranslate;
-
-                // Transform wrapper
-                col.wrapper.transform('translate3d(0,' + (parseInt(newTranslate,10)) + 'px,0)');
-
-                // Update items
-                col.updateItems(activeIndex, newTranslate, '', true);
-
-                // Watch items
-                if (p.params.updateValuesOnMomentum) {
-                    updateDuringScroll();
-                    col.wrapper.transitionEnd(function(){
-                        $.cancelAnimationFrame(animationFrameId);
-                    });
-                }
-
-                // Allow click
-                setTimeout(function () {
-                    allowItemClick = true;
-                }, 100);
-            }
-
-            function handleClick(e) {
-                if (!allowItemClick) return;
-                $.cancelAnimationFrame(animationFrameId);
-                /*jshint validthis:true */
-                var value = $(this).attr('data-picker-value');
-                col.setValue(value);
-            }
-
-            col.initEvents = function (detach) {
-                var method = detach ? 'off' : 'on';
-                col.container[method]($.touchEvents.start, handleTouchStart);
-                col.container[method]($.touchEvents.move, handleTouchMove);
-                col.container[method]($.touchEvents.end, handleTouchEnd);
-                col.items[method]('click', handleClick);
-            };
-            col.destroyEvents = function () {
-                col.initEvents(true);
-            };
-
-            col.container[0].f7DestroyPickerCol = function () {
-                col.destroyEvents();
-            };
-
-            col.initEvents();
-
-        };
-        p.destroyPickerCol = function (colContainer) {
-            colContainer = $(colContainer);
-            if ('f7DestroyPickerCol' in colContainer[0]) colContainer[0].f7DestroyPickerCol();
-        };
-        // Resize cols
-        function resizeCols() {
-            if (!p.opened) return;
-            for (var i = 0; i < p.cols.length; i++) {
-                if (!p.cols[i].divider) {
-                    p.cols[i].calcSize();
-                    p.cols[i].setValue(p.cols[i].value, 0, false);
-                }
-            }
-        }
-        $(window).on('resize', resizeCols);
-
-        // HTML Layout
-        p.columnHTML = function (col, onlyItems) {
-            var columnItemsHTML = '';
-            var columnHTML = '';
-            if (col.divider) {
-                columnHTML += '<div class="picker-items-col picker-items-col-divider ' + (col.textAlign ? 'picker-items-col-' + col.textAlign : '') + ' ' + (col.cssClass || '') + '">' + col.content + '</div>';
-            }
-            else {
-                for (var j = 0; j < col.values.length; j++) {
-                    columnItemsHTML += '<div class="picker-item" data-picker-value="' + col.values[j] + '">' + (col.displayValues ? col.displayValues[j] : col.values[j]) + '</div>';
-                }
-                columnHTML += '<div class="picker-items-col ' + (col.textAlign ? 'picker-items-col-' + col.textAlign : '') + ' ' + (col.cssClass || '') + '"><div class="picker-items-col-wrapper">' + columnItemsHTML + '</div></div>';
-            }
-            return onlyItems ? columnItemsHTML : columnHTML;
-        };
-        p.layout = function () {
-            var pickerHTML = '';
-            var pickerClass = '';
-            var i;
-            p.cols = [];
-            var colsHTML = '';
-            for (i = 0; i < p.params.cols.length; i++) {
-                var col = p.params.cols[i];
-                colsHTML += p.columnHTML(p.params.cols[i]);
-                p.cols.push(col);
-            }
-            pickerClass = 'weui-picker-modal picker-columns ' + (p.params.cssClass || '') + (p.params.rotateEffect ? ' picker-3d' : '') + (p.params.cols.length === 1 ? ' picker-columns-single' : '');
-            pickerHTML =
-                '<div class="' + (pickerClass) + '">' +
-                (p.params.toolbar ? p.params.toolbarTemplate.replace(/{{closeText}}/g, p.params.toolbarCloseText).replace(/{{title}}/g, p.params.title) : '') +
-                '<div class="picker-modal-inner picker-items">' +
-                colsHTML +
-                '<div class="picker-center-highlight"></div>' +
-                '</div>' +
-                '</div>';
-
-            p.pickerHTML = pickerHTML;
-        };
-
-        // Input Events
-        function openOnInput(e) {
-            e.preventDefault();
-            if (p.opened) return;
-            p.open();
-            if (p.params.scrollToInput && !isPopover()) {
-                var pageContent = p.input.parents('.content');
-                if (pageContent.length === 0) return;
-
-                var paddingTop = parseInt(pageContent.css('padding-top'), 10),
-                    paddingBottom = parseInt(pageContent.css('padding-bottom'), 10),
-                    pageHeight = pageContent[0].offsetHeight - paddingTop - p.container.height(),
-                    pageScrollHeight = pageContent[0].scrollHeight - paddingTop - p.container.height(),
-                    newPaddingBottom;
-                var inputTop = p.input.offset().top - paddingTop + p.input[0].offsetHeight;
-                if (inputTop > pageHeight) {
-                    var scrollTop = pageContent.scrollTop() + inputTop - pageHeight;
-                    if (scrollTop + pageHeight > pageScrollHeight) {
-                        newPaddingBottom = scrollTop + pageHeight - pageScrollHeight + paddingBottom;
-                        if (pageHeight === pageScrollHeight) {
-                            newPaddingBottom = p.container.height();
-                        }
-                        pageContent.css({'padding-bottom': (newPaddingBottom) + 'px'});
-                    }
-                    pageContent.scrollTop(scrollTop, 300);
-                }
-            }
-        }
-        function closeOnHTMLClick(e) {
-            if (inPopover()) return;
-            if (p.input && p.input.length > 0) {
-                if (e.target !== p.input[0] && $(e.target).parents('.weui-picker-modal').length === 0) p.close();
-            }
-            else {
-                if ($(e.target).parents('.weui-picker-modal').length === 0) p.close();
-            }
-        }
-
-        if (p.params.input) {
-            p.input = $(p.params.input);
-            if (p.input.length > 0) {
-                if (p.params.inputReadOnly) p.input.prop('readOnly', true);
-                if (!p.inline) {
-                    p.input.on('click', openOnInput);
-                }
-                if (p.params.inputReadOnly) {
-                    p.input.on('focus mousedown', function (e) {
-                        e.preventDefault();
-                    });
-                }
-            }
-
-        }
-
-        if (!p.inline) $('html').on('click', closeOnHTMLClick);
-
-        // Open
-        function onPickerClose() {
-            p.opened = false;
-            if (p.input && p.input.length > 0) p.input.parents('.page-content').css({'padding-bottom': ''});
-            if (p.params.onClose) p.params.onClose(p);
-
-            // Destroy events
-            p.container.find('.picker-items-col').each(function () {
-                p.destroyPickerCol(this);
-            });
-        }
-
-        p.opened = false;
-        p.open = function () {
-            var toPopover = isPopover();
-
-            if (!p.opened) {
-
-                // Layout
-                p.layout();
-
-                // Append
-                if (toPopover) {
-                    p.pickerHTML = '<div class="popover popover-picker-columns"><div class="popover-inner">' + p.pickerHTML + '</div></div>';
-                    p.popover = $.popover(p.pickerHTML, p.params.input, true);
-                    p.container = $(p.popover).find('.weui-picker-modal');
-                    $(p.popover).on('close', function () {
-                        onPickerClose();
-                    });
-                }
-                else if (p.inline) {
-                    p.container = $(p.pickerHTML);
-                    p.container.addClass('picker-modal-inline');
-                    $(p.params.container).append(p.container);
-                }
-                else {
-                    p.container = $($.openPicker(p.pickerHTML));
-                    $(p.container)
-                        .on('close', function () {
-                            onPickerClose();
-                        });
-                }
-
-                // Store picker instance
-                p.container[0].f7Picker = p;
-
-                // Init Events
-                p.container.find('.picker-items-col').each(function () {
-                    var updateItems = true;
-                    if ((!p.initialized && p.params.value) || (p.initialized && p.value)) updateItems = false;
-                    p.initPickerCol(this, updateItems);
-                });
-
-                // Set value
-                if (!p.initialized) {
-                    if (p.params.value) {
-                        p.setValue(p.params.value, 0);
-                    }
-                }
-                else {
-                    if (p.value) p.setValue(p.value, 0);
-                }
-            }
-
-            // Set flag
-            p.opened = true;
-            p.initialized = true;
-
-            if (p.params.onOpen) p.params.onOpen(p);
-        };
-
-        // Close
-        p.close = function (force) {
-            if (!p.opened || p.inline) return;
-            if (inPopover()) {
-                $.closePicker(p.popover);
-                return;
-            }
-            else {
-                $.closePicker(p.container);
-                return;
-            }
-        };
-
-        // Destroy
-        p.destroy = function () {
-            p.close();
-            if (p.params.input && p.input.length > 0) {
-                p.input.off('click focus', openOnInput);
-                $(p.input).data('picker', null);
-            }
-            $('html').off('click', closeOnHTMLClick);
-            $(window).off('resize', resizeCols);
-        };
-
-        if (p.inline) {
-            p.open();
-        }
-
-        return p;
-    };
-
-    $(document).on("click", ".close-picker", function() {
-        var pickerToClose = $('.weui-picker-modal.weui-picker-modal-visible');
-        if (pickerToClose.length > 0) {
-            $.closePicker(pickerToClose);
-        }
-    });
-
-    //修复picker会滚动页面的bug
-    $(document).on($.touchEvents.move, ".picker-modal-inner", function(e) {
-        e.preventDefault();
-    });
-
-
-    $.openPicker = function(tpl, className, callback) {
-
-        if(typeof className === "function") {
-            callback = className;
-            className = undefined;
-        }
-
-        $.closePicker();
-
-        var container = $("<div class='weui-picker-container "+ (className || "") + "'></div>").appendTo(document.body);
-        container.show();
-
-        container.addClass("weui-picker-container-visible");
-
-        //关于布局的问题，如果直接放在body上，则做动画的时候会撑开body高度而导致滚动条变化。
-        var dialog = $(tpl).appendTo(container);
-
-        dialog.width(); //通过取一次CSS值，强制浏览器不能把上下两行代码合并执行，因为合并之后会导致无法出现动画。
-
-        dialog.addClass("weui-picker-modal-visible");
-
-        callback && container.on("close", callback);
-
-        return dialog;
-    }
-
-    $.updatePicker = function(tpl) {
-        var container = $(".weui-picker-container-visible");
-        if(!container[0]) return false;
-
-        container.html("");
-
-        var dialog = $(tpl).appendTo(container);
-
-        dialog.addClass("weui-picker-modal-visible");
-
-        return dialog;
-    }
-
-    $.closePicker = function(container, callback) {
-        if(typeof container === "function") callback = container;
-        $(".weui-picker-modal-visible").removeClass("weui-picker-modal-visible").transitionEnd(function() {
-            $(this).parent().remove();
-            callback && callback();
-        }).trigger("close");
-    };
-
-    $.fn.picker = function(params) {
-        var args = arguments;
-        return this.each(function() {
-            if(!this) return;
-            var $this = $(this);
-
-            var picker = $this.data("picker");
-            if(!picker) {
-                params = $.extend({ input: this }, params || {}) // https://github.com/lihongxun945/jquery-weui/issues/432
-                var inputValue = $this.val();
-                if(params.value === undefined && inputValue !== "") {
-                    params.value = (params.cols && params.cols.length > 1) ? inputValue.split(" ") : [inputValue];
-                }
-                var p = $.extend({input: this}, params);
-                picker = new Picker(p);
-                $this.data("picker", picker);
-            }
-            if(typeof params === typeof "a") {
-                picker[params].apply(picker, Array.prototype.slice.call(args, 1));
-            }
-        });
-    };
-}($);
+/*
+ * [neuiPicker]
+ * Picker选择器控件
+ * 基于 WeUI v1.1.3 开发而成 (https://weui.io) (https://github.com/weui/weui) 
+ * 参考文档：https://www.kancloud.cn/ywfwj2008/weuijs/274304
+ * Author: Mufeng
+ * Date: 2021.06.03
+ * Update: 2021.06.03
+ */
+
+
+//==============================================================================================================
+//														“自定义选择器组件”
+//==============================================================================================================
+if(typeof jQuery == 'undefined'){
+	var errs = '错误警告：您还没有引入jQuery，请先引入';
+	alert(errs);
+	console.log(errs);
+}
+;(function($){
+
+	var methods = {
+		/**
+		 * 给某个dom元素赋值
+		 * @param {dom} ps_obj  dom对象
+		 * @param {string} ps_str 要赋的显示值
+		 * @param {string} ps_hid 要赋的隐藏值
+		 */
+		giveValue2Element: function(ps_obj, ps_str, ps_hid){
+			var ele = ps_str instanceof jQuery ? ps_obj : $(ps_obj);
+			var tagname = ele[0].tagName.toLocaleLowerCase();
+			if(tagname == 'input' || tagname == 'textarea') ele.val(ps_str).attr('data-bh', ps_hid);
+			else ele.text(ps_str).attr('data-bh', ps_hid);
+		},
+
+		/**
+		 * 获取某个dom元素的值
+		 * @param {dom} ps_obj dom对象
+		 * @returns {string} 返回该dom元素的值
+		 */
+		getValueOfElement: function(ps_obj){
+			var ele = ps_obj instanceof jQuery ? ps_obj : $(ps_obj);
+			var tagname = ele[0].tagName.toLocaleLowerCase();
+			return ( tagname == 'input' || tagname == 'textarea' ? ele.val() : ele.text() );
+		},
+
+		/**
+		 * 在数据源数组中通过label获取对应的value
+		 * JSON解析递归调用：应用于JSON无限层级嵌套解析成一维数组
+		 * @param {array} ps_src_arr 数据源数组. eg.[{label:"显示值", value:"隐藏值", disabled:"是否禁用"}]
+		 * @param {string} ps_reveal_value 对象中的显示值
+		 * @param {array} ps_hid_arr 隐藏值数组,调用时只需要传递空数组. eg.[]
+		 * @returns {array} 返回隐藏值一维数组(仅单个元素). eg. ['1001']
+		 */
+		getSourceValueByLabel: function(ps_src_arr, ps_reveal_value, ps_hid_arr) {
+			var _this = this;
+			ps_src_arr.filter(function(item){
+				if(ps_reveal_value == item.label) 
+				ps_hid_arr.push(item.value);
+				if(item.children && item.children.length) {
+					_this.getSourceValueByLabel(item.children, ps_reveal_value, ps_hid_arr)
+				}
+			})
+			return ps_hid_arr.length == 0 ? [''] : ps_hid_arr;
+		},
+
+		/**
+		 * 在数据源数组中通过显示值获取对应的隐藏值
+		 * @param {array} ps_src_arr 数据源数组. eg.[{label:"显示值", value:"隐藏值", disabled:"是否禁用"}]
+		 * @param {string} ps_reveal_value 显示值(输入框或选择器默认值)
+		 * @param {string} ps_hyphen_char 默认值连字符，即分割符
+		 * @returns {array} 返回隐藏值一维数组(单个或多个元素). eg. ['1001', '1002', '1003']
+		 */
+		getSourceHidValueByRevealValue: function(ps_src_arr, ps_reveal_value, ps_hyphen_char){
+			var hidArr = [];	
+			var splitArr = ps_reveal_value.split(ps_hyphen_char);
+			for(var i = 0; i < splitArr.length; i++){
+				var text = splitArr[i];
+				var arr = this.getSourceValueByLabel(ps_src_arr, text, []);
+				// console.log('arr数组：', arr)
+				hidArr.push(arr[0]);
+			}
+			return hidArr;
+		}
+		
+
+		
+	}
+
+	$.fn.extend({
+		neuiPicker: function(opts){
+			var self = this;
+			var defaults = {
+				// 数据源
+				source: {}, // 数据源(object型或字符型)，1、字符型：值china, 当选择器为省市区县三级联动且使用系统数据源时,只需填值china即可. 2、object型标准格式: {data:[{value:"显示值", id:"隐藏值", disabled:"是否禁用项,布尔型"}]}, 其中：id、disabled可选
+				// format: ["id", "value", "disabled"], // 自定义数据源字段(数组型)(可选)。默认值为["id", "value", "disabled"], 数组第1个元素为数据源的“隐藏值”字段，第2个元素为数据源的“显示值”字段，第3个字段为数据源的“是否禁用项”字段。注意：只有“显示值”字段是必须的，故当数据源只有“显示值”字段时，本参数只须一个数组元素 ["value"]
+				format: { // 自定义数据源字段(Object对象)(可选)
+                    value: ["value"], // 显示值字段(数组型)
+					hid: ["id"], // 隐藏值字段(数组型)(可选)
+                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                },	
+				value: "", // 默认选项的值(字符型)(可选)，默认空。优先权大于输入框的属性value值，在不指定默认选项值时则默认选中的项为：输入框的值所在的项，若输入框无值则为中间项(奇数项时)或偏下一项(偶数项时)
+				depth: '', // 限制选择器深度(数值型)，默认值空(可选)。也就是选择器有多少列，取值为1-3。若为空则根据items项的深度自动调整(或取第一项的深度), 若不为空则将会按照参数设定的值显示N级数据(即使数据源中的级数比N大)
+				joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
+				cascade: false, // 是否级联选择器(可选)，默认false
+				district: false, // 是否省市区县联动选择器(可选)，默认false。值为true且使用系统数据源时,请设置source参数的值为'china'.
+
+				// 其它
+				caption: "", // 标题(字符型)，默认空(可选)。
+				// 节点DOM
+				className: "",  // 自定义选择器类名(字符型)，默认空(可选)。
+				id: "default", // 作为选择器的唯一标识(字符型)，默认值"default"(可选)。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分）。
+				container: "", // 指定容器(字符型)，默认空(可选)。
+
+				// 回调
+				onChange: function(){ }, // 在选择器选中的值发生变化的时候回调(可选)。
+				onConfirm: function(){ }, // 在点击"确定"之后的回调。回调返回选中的结果(Array)，数组长度依赖于选择器的层级(可选)。
+				onClose: function(){ } // 选择器关闭后的回调(可选)。
+			}
+			var settings = $.extend(true, {}, defaults, opts || {});
+
+			/**
+			 * 注
+			 * d 开头表示“自定义选择器组件”参数
+			 * t 开头表示“原始选择器组件”参数
+			 */
+
+			//----------------------------------------
+			// ·取值
+			//----------------------------------------
+			var dSource = settings.source,
+				dValue = settings.value,
+				dFormat = settings.format,
+				dDepth = settings.depth,
+				dJoint = settings.joint,
+				dCaption = settings.caption,
+				dCascade = settings.cascade,
+				dDistrict = settings.district,	
+				dClassName = settings.className,
+				dId = settings.id,
+				dContainer = settings.container;
+			// ·标记是否中断
+			var isGoOn = true;
+
+			
+			//----------------------------------------
+			// ·选择器深度
+			//----------------------------------------
+			// ·省市区县三级联动使用系统数据源
+			var chineseSource = { data:[] }
+			if(dCascade && dDistrict && dSource == 'china'){
+				if(typeof iosProvinces == 'undefined' || typeof iosCitys == 'undefined' || typeof iosCountys == 'undefined'){
+					var errs = '警告！请先引入“全国省市区数据源”\njquery.chineseDistricts.js';
+					alert(errs);
+					console.log(errs);
+					return;
+				}
+				for(var i = 0; i < iosProvinces.length; i++){
+					var row1 = iosProvinces[i];
+					var provinceId = row1.id, provinceName = row1.value;
+					var provinceOne = { "province": provinceName, "provinceId": provinceId, data: [] }
+					if(dDepth == '' || dDepth >=2 ){
+						for(var j = 0; j < iosCitys.length; j++){
+							var row2 = iosCitys[j];
+							var cityParentId = row2.parentId, cityId = row2.id, cityName = row2.value;
+							var cityOne = { "city": cityName, "cityId": cityId , data: [] }
+							if(dDepth == '' || dDepth >=3 ){
+								for(var k = 0; k < iosCountys.length; k++){
+									var row3 = iosCountys[k];
+									var countyParentId = row3.parentId, countyId = row3.id, countyName = row3.value;
+									var countyOne = { "county": countyName, "countyId": countyId, data: [] }
+									if(countyParentId == cityId){
+										cityOne.data.push(countyOne);
+									}
+								}
+							}
+							if(cityParentId == provinceId){
+								provinceOne.data.push(cityOne);
+							}
+						}
+					}
+					chineseSource.data.push(provinceOne);
+				}	
+				dSource = chineseSource;
+			}
+			// console.log('chineseSource：', chineseSource)
+
+
+			// ·数据源转化成标准数组格式. eg. [{label:"显示值", value:"隐藏值", disabled: "是否禁用,布尔型"}]
+			var tDepth = dDepth;
+			var tSource = [];
+			var level1IdArr = [], level2IdArr = [], level3IdArr = [], // 各层级ID数组
+				level1StartId = 110000, level2StartId = 210000, level3StartId = 310000; // 各层级起始ID
+			if(dCascade){ // 级联选择器
+				var _shengName = _shiName = _quName = '',
+					_shengId = _shiId = _quId = '';
+				if(dDistrict){ // 省市区三级联动时默认的字段名
+					_shengName = "province";
+					_shiName = "city";
+					_quName = "city";
+					_shengId = "provinceId";
+					_shiId = "cityId";
+					_quId = "countyId";
+				}
+				var countLevel = 0;
+				var areaArr = [];
+				var _level1Name = dFormat.value[0], _level2Name = dFormat.value[1], _level3Name = dFormat.value[2],
+					_level1Id = dFormat.hid[0], _level2Id = dFormat.hid[1], _level3Id = dFormat.hid[2];
+				if(typeof dSource.data != 'undefined'){ // 第1层
+					countLevel = 1;
+					$.each(dSource.data, function(k1, items1){
+						var level1Ids = level1StartId + (k1 + 1);
+						level1IdArr.push(level1Ids);
+						var levels1Name = typeof items1[_level1Name] != 'undefined' ? items1[_level1Name] : items1[_shengName],
+							levels2Id = typeof items1[_level1Id] != 'undefined' ? items1[_level1Id] : (typeof items1[_shengId] == 'undefined' ? level1Ids: items1[_shengId]);
+						var one1 = { label: levels1Name, value: levels2Id, children: [] }
+						if(typeof items1.data != 'undefined'){ // 第2层
+							countLevel = 2;
+							$.each(items1.data, function(k2, items2){
+								var level2Ids = ( k1 == 0 ? level2StartId + (k2 + 1) : level2IdArr[level2IdArr.length - 1] + 1 );
+								level2IdArr.push(level2Ids);
+								var levels2Name = typeof items2[_level2Name] != 'undefined' ? items2[_level2Name] : items2[_shiName],
+									levels2Id = typeof items2[_level2Id] != 'undefined' ? items2[_level2Id] : (typeof items2[_shiId] == 'undefined' ? level2Ids : items2[_shiId]);
+								var one2 = { label: levels2Name, value: levels2Id, children: [] }
+								if(typeof items2.data != 'undefined'){ // 第3层
+									countLevel = 3;
+									$.each(items2.data, function(k3, items3){
+										var level3Ids = ( k1 == 0 && k2 == 0 ? level3StartId + (k3 + 1) : level3IdArr[level3IdArr.length - 1] + 1 );
+										level3IdArr.push(level3Ids);
+										var levels3Name = typeof items3[_level3Name] != 'undefined' ? items3[_level3Name] : items3[_quName],
+											levels3Id = typeof items3[_level3Id] != 'undefined' ? items3[_level3Id] : (typeof items3[_quId]== 'undefined' ? level3Ids : items3[_quId]);
+										var one3 = { label: levels3Name, value: levels3Id }
+										one2.children.push(one3);
+									})
+								}
+								one1.children.push(one2);
+							})
+						}
+						areaArr.push(one1);
+					})
+				}
+				tDepth = countLevel;
+				tSource = areaArr;
+				// console.log('省市区数据：', areaArr)
+			}
+			else{ // 普通选择器：单列、多列
+				if(typeof dSource.data != 'undefined'){ // 单列
+					$.each(dSource.data, function(i, items){
+						var level1Ids = level1StartId + (i + 1);
+						level1IdArr.push(level1Ids);
+						var _value = dFormat.hid[0],
+							_label = dFormat.value[0],
+							_disabled = dFormat.forbid;
+						var value = typeof items[_value] == 'undefined' ? level1Ids : items[_value],
+							label = typeof items[_label] == 'undefined' ? '' : items[_label],
+							disabled = typeof items[_disabled] == 'undefined' ? false : (items[_disabled] === true ? true : false);
+						if(label == ''){
+							var errs = '警告！自定义数据源字段format参数的字段名有错误，请检查！';
+							alert(errs);
+							console.log(errs);
+							isGoOn = false;
+							return false;
+						}
+						var one = { value: value, label: label, disabled: disabled }
+						tSource.push(one);
+					})
+				}
+			}
+			// console.log('第一层ID数组：', level1IdArr, '\n第二层ID数组：', level2IdArr, '\n第三层ID数组：', level3IdArr);
+
+
+
+			//----------------------------------------
+			// ·选择器默认值
+			//----------------------------------------
+			var oldValue = methods.getValueOfElement(self), // 老的显示值
+				oldId = typeof self.attr('data-bh') == 'undefined' ? '' : self.attr('data-bh'); // 老的隐藏值
+			if(oldId == '') oldId = (methods.getSourceHidValueByRevealValue(tSource, oldValue, dJoint)).join(dJoint);
+
+			var initValue = (dValue == '' ? oldValue : dValue); // 输入框或选择器默认显示值
+			var tDefaultValue = []
+			if(initValue != ''){
+				tDefaultValue = methods.getSourceHidValueByRevealValue(tSource, initValue, dJoint);
+			}else{
+				tDefaultValue = [ Math.ceil(tSource.length / 2) ];
+			}
+			// console.log('老的显示值:', oldValue, '\n老的隐藏值：',oldId, '\n隐藏值数组：', tDefaultValue);
+
+			
+			//----------------------------------------
+			// ·把参数传给“原始选择器组件”
+			//----------------------------------------
+			if(!isGoOn) return;
+			weui.picker(
+				tSource, 
+				{
+				defaultValue: tDefaultValue, // 默认选项的值，数组型
+				depth: tDepth, // depth 选择器深度，数值型，默认值空。 也就是选择器有多少列，取值为1-3，如果为空，则根据items项的深度自动调整(或取第一项的深度)
+
+				className: '', // 自定义类名
+				id: 'default', // 作为选择器的唯一标识，字符型，默认值"default"。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分）。
+				// container: '#selector', // 指定容器，字符型，无默认值。
+
+				onChange: function (result) { // 在选择器选中的值发生变化的时候回调，函数型。
+					//console.log(item, index);
+					// console.log('您正在改变选项', result);
+					if(settings.onChange) settings.onChange(result);
+				},
+				onConfirm: function (result) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+					// console.log('您点了确定', result);
+					var id = value = '';
+					if(dCascade){ // 级联选择器
+						for(var i = 0; i < result.length; i++){
+							var row = result[i];
+							id += row.value + dJoint;
+							value += row.label + dJoint;
+						}
+						id = id.substr(0, id.length - dJoint.length);
+						value = value.substr(0, value.length - dJoint.length);
+					}
+					else{ // 普通选择器：单列、多列
+						if(tDepth == 1){ // 单列
+							id = result[0].value;
+							value = result[0].label;
+						}
+					}
+
+					methods.giveValue2Element(self, value, id); // 给元素赋值
+					var e = {id: id, value: value, old_id: oldId, old_value: oldValue}
+					if(settings.onConfirm) settings.onConfirm(e); // 回调
+					
+				},
+				onClose: function(result){ // 选择器关闭后的回调，函数型。
+					// console.log('您选择了关闭我', result);
+					if(settings.onClose) settings.onClose(result);
+				}
+			})
+		}
+	})
+})(window.jQuery);
+
+
+
+
+
+
+
+
+//==============================================================================================================
+//														“微信原始选择器组件”
+//==============================================================================================================
+!function(e, t) {
+	"object" == typeof exports && "object" == typeof module ? module.exports = t() : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? exports.weui = t() : e.weui = t()
+} (this,
+function() {
+	return function(e) {
+		function t(i) {
+			if (n[i]) return n[i].exports;
+			var o = n[i] = {
+				exports: {},
+				id: i,
+				loaded: !1
+			};
+			return e[i].call(o.exports, o, o.exports, t),
+			o.loaded = !0,
+			o.exports
+		}
+		var n = {};
+		return t.m = e,
+		t.c = n,
+		t.p = "",
+		t(0)
+	} ([function(e, t, n) {
+		"use strict";
+		function i(e) {
+			if (e && e.__esModule) return e;
+			var t = {};
+			if (null != e) for (var n in e) Object.prototype.hasOwnProperty.call(e, n) && (t[n] = e[n]);
+			return t.
+		default = e,
+			t
+		}
+		function o(e) {
+			return e && e.__esModule ? e: {
+			default:
+				e
+			}
+		}
+		function r(e) {
+			"object" != ("undefined" == typeof e ? "undefined": f(e)) && (e = {
+				label: e,
+				value: e
+			}),
+			s.
+		default.extend(this, e)
+		}
+		function a() {
+			function e() { (0, s.
+			default)(a.container).append(v),
+				s.
+			default.getStyle(v[0], "transform"),
+				v.find(".weui-picker__shade").addClass("weui-animate-fade-in"),
+				v.find(".weui-picker").addClass("weui-animate-slide-up")
+			}
+			function t(e) {
+				t = s.
+			default.noop,
+				v.find(".weui-picker__shade").addClass("weui-animate-fade-out"),
+				v.find(".weui-picker").addClass("weui-animate-slide-down").on("animationend webkitAnimationEnd",
+				function() {
+					v.remove(),
+					w = !1,
+					a.onClose(),
+					e && e()
+				})
+			}
+			function n(e) {
+				t(e)
+			}
+			function i(e, t) {
+				if (void 0 === h[t] && a.defaultValue && void 0 !== a.defaultValue[t]) {
+					var n = a.defaultValue[t],
+					o = 0,
+					u = e.length;
+					if ("object" == f(e[o])) for (; o < u && n != e[o].value; ++o);
+					else for (; o < u && n != e[o]; ++o);
+					o < u && (h[t] = o)
+				}
+				v.find(".weui-picker__group").eq(t).scroll({
+					items: e,
+					temp: h[t],
+					onChange: function(e, n) {
+						if (e ? d[t] = new r(e) : d[t] = null, h[t] = n, c) d.length == y && a.onChange(d);
+						else if (e.children && e.children.length > 0) v.find(".weui-picker__group").eq(t + 1).show(),
+						!c && i(e.children, t + 1);
+						else {
+							var o = v.find(".weui-picker__group");
+							o.forEach(function(e, n) {
+								n > t && (0, s.
+							default)(e).hide()
+							}),
+							d.splice(t + 1),
+							a.onChange(d)
+						}
+					},
+					onConfirm: a.onConfirm
+				})
+			}
+			if (w) return w;
+			var o = arguments[arguments.length - 1],
+			a = s.
+		default.extend({
+				id:
+				"default",
+				className: "",
+				container: "body",
+				onChange: s.
+			default.noop,
+				onConfirm: s.
+			default.noop,
+				onClose: s.
+			default.noop
+			},
+			o),
+			u = void 0,
+			c = !1;
+			if (arguments.length > 2) {
+				var l = 0;
+				for (u = []; l < arguments.length - 1;) u.push(arguments[l++]);
+				c = !0
+			} else u = arguments[0];
+			b[a.id] = b[a.id] || [];
+			for (var d = [], h = b[a.id], v = (0, s.
+		default)(s.
+		default.render(m.
+		default, a)), y = o.depth || (c ? u.length: p.depthOf(u[0])), _ = "", k = y; k--;) _ += g.
+		default;
+			return v.find(".weui-picker__bd").html(_),
+			e(),
+			c ? u.forEach(function(e, t) {
+				i(e, t)
+			}) : i(u, 0),
+			v.on("click", ".weui-picker__shade",
+			function() {
+				n()
+			}).on("click", ".weui-picker__action",
+			function() {
+				n()
+			}).on("click", "#weui-picker-confirm",
+			function() {
+				a.onConfirm(d)
+			}),
+			w = v[0],
+			w.hide = n,
+			w
+		}
+		function u(e) {
+			var t = s.
+		default.extend({
+				id:
+				"datePicker",
+				onChange: s.
+			default.noop,
+				onConfirm: s.
+			default.noop,
+				start: 2e3,
+				end: 2030,
+				cron: "* * *"
+			},
+			e);
+			"number" == typeof t.start ? t.start = new Date(t.start + "/01/01") : "string" == typeof t.start && (t.start = new Date(t.start.replace(/-/g, "/"))),
+			"number" == typeof t.end ? t.end = new Date(t.end + "/12/31") : "string" == typeof t.end && (t.end = new Date(t.end.replace(/-/g, "/")));
+			var n = function(e, t, n) {
+				for (var i = 0,
+				o = e.length; i < o; i++) {
+					var r = e[i];
+					if (r[t] == n) return r
+				}
+			},
+			i = [],
+			o = d.
+		default.parse(t.cron, t.start, t.end),
+			r = void 0;
+			do {
+				r = o.next();
+				var u = r.value.getFullYear(), f = r.value.getMonth() + 1, c = r.value.getDate(), l = n(i, "value", u);
+				l || (l = {
+					label: u + "年",
+					value: u,
+					children: []
+				},
+				i.push(l));
+				var h = n(l.children, "value", f);
+				h || (h = {
+					label: f + "月",
+					value: f,
+					children: []
+				},
+				l.children.push(h)), h.children.push({
+					label: c + "日",
+					value: c
+				})
+			} while (! r . done );
+			return a(i, t)
+		}
+		Object.defineProperty(t, "__esModule", {
+			value: !0
+		});
+		var f = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ?
+		function(e) {
+			return typeof e
+		}: function(e) {
+			return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol": typeof e
+		},
+		c = n(1),
+		s = o(c),
+		l = n(5),
+		d = o(l);
+		n(6);
+		var h = n(7),
+		p = i(h),
+		v = n(8),
+		m = o(v),
+		y = n(9),
+		g = o(y);
+		r.prototype.toString = function() {
+			return this.value
+		},
+		r.prototype.valueOf = function() {
+			return this.value
+		};
+		var w = void 0,
+		b = {};
+		t.
+	default = {
+			picker: a,
+			datePicker: u
+		},
+		e.exports = t.
+	default
+	},
+	function(e, t, n) {
+		"use strict";
+		function i(e) {
+			return e && e.__esModule ? e: {
+			default:
+				e
+			}
+		}
+		function o(e) {
+			var t = this.os = {},
+			n = e.match(/(Android);?[\s\/]+([\d.]+)?/);
+			n && (t.android = !0, t.version = n[2])
+		}
+		Object.defineProperty(t, "__esModule", {
+			value: !0
+		});
+		var r = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ?
+		function(e) {
+			return typeof e
+		}: function(e) {
+			return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol": typeof e
+		};
+		n(2);
+		var a = n(3),
+		u = i(a),
+		f = n(4),
+		c = i(f);
+		o.call(c.
+	default, navigator.userAgent),
+		(0, u.
+	default)(c.
+	default.fn, {
+			append: function(e) {
+				return e instanceof HTMLElement || (e = e[0]),
+				this.forEach(function(t) {
+					t.appendChild(e)
+				}),
+				this
+			},
+			remove: function() {
+				return this.forEach(function(e) {
+					e.parentNode.removeChild(e)
+				}),
+				this
+			},
+			find: function(e) {
+				return (0, c.
+			default)(e, this)
+			},
+			addClass: function(e) {
+				return this.forEach(function(t) {
+					t.classList.add(e)
+				}),
+				this
+			},
+			removeClass: function(e) {
+				return this.forEach(function(t) {
+					t.classList.remove(e)
+				}),
+				this
+			},
+			eq: function(e) {
+				return (0, c.
+			default)(this[e])
+			},
+			show: function() {
+				return this.forEach(function(e) {
+					e.style.display = "block"
+				}),
+				this
+			},
+			hide: function() {
+				return this.forEach(function(e) {
+					e.style.display = "none"
+				}),
+				this
+			},
+			html: function(e) {
+				return this.forEach(function(t) {
+					t.innerHTML = e
+				}),
+				this
+			},
+			css: function(e) {
+				var t = this;
+				return Object.keys(e).forEach(function(n) {
+					t.forEach(function(t) {
+						t.style[n] = e[n]
+					})
+				}),
+				this
+			},
+			on: function(e, t, n) {
+				var i = "string" == typeof t && "function" == typeof n;
+				return i || (n = t),
+				this.forEach(function(o) {
+					e.split(" ").forEach(function(e) {
+						o.addEventListener(e,
+						function(e) {
+							i ? this.contains(e.target.closest(t)) && n.call(e.target, e) : n.call(this, e)
+						})
+					})
+				}),
+				this
+			},
+			off: function(e, t, n) {
+				return "function" == typeof t && (n = t, t = null),
+				this.forEach(function(i) {
+					e.split(" ").forEach(function(e) {
+						"string" == typeof t ? i.querySelectorAll(t).forEach(function(t) {
+							t.removeEventListener(e, n)
+						}) : i.removeEventListener(e, n)
+					})
+				}),
+				this
+			},
+			index: function() {
+				var e = this[0],
+				t = e.parentNode;
+				return Array.prototype.indexOf.call(t.children, e)
+			},
+			offAll: function() {
+				var e = this;
+				return this.forEach(function(t, n) {
+					var i = t.cloneNode(!0);
+					t.parentNode.replaceChild(i, t),
+					e[n] = i
+				}),
+				this
+			},
+			val: function() {
+				var e = arguments;
+				return arguments.length ? (this.forEach(function(t) {
+					t.value = e[0]
+				}), this) : this[0].value
+			},
+			attr: function() {
+				var e = arguments;
+				if ("object" == r(arguments[0])) {
+					var t = arguments[0],
+					n = this;
+					return Object.keys(t).forEach(function(e) {
+						n.forEach(function(n) {
+							n.setAttribute(e, t[e])
+						})
+					}),
+					this
+				}
+				return "string" == typeof arguments[0] && arguments.length < 2 ? this[0].getAttribute(arguments[0]) : (this.forEach(function(t) {
+					t.setAttribute(e[0], e[1])
+				}), this)
+			}
+		}),
+		(0, u.
+	default)(c.
+	default, {
+			extend: u.
+		default,
+			noop: function() {},
+			render: function(e, t) {
+				var n = "var p=[];with(this){p.push('" + e.replace(/[\r\t\n]/g, " ").split("<%").join("\t").replace(/((^|%>)[^\t]*)'/g, "$1\r").replace(/\t=(.*?)%>/g, "',$1,'").split("\t").join("');").split("%>").join("p.push('").split("\r").join("\\'") + "');}return p.join('');";
+				return new Function(n).apply(t)
+			},
+			getStyle: function(e, t) {
+				var n, i = (e.ownerDocument || document).defaultView;
+				return i && i.getComputedStyle ? (t = t.replace(/([A-Z])/g, "-$1").toLowerCase(), i.getComputedStyle(e, null).getPropertyValue(t)) : e.currentStyle ? (t = t.replace(/\-(\w)/g,
+				function(e, t) {
+					return t.toUpperCase()
+				}), n = e.currentStyle[t], /^\d+(em|pt|%|ex)?$/i.test(n) ?
+				function(t) {
+					var n = e.style.left,
+					i = e.runtimeStyle.left;
+					return e.runtimeStyle.left = e.currentStyle.left,
+					e.style.left = t || 0,
+					t = e.style.pixelLeft + "px",
+					e.style.left = n,
+					e.runtimeStyle.left = i,
+					t
+				} (n) : n) : void 0
+			}
+		}),
+		t.
+	default = c.
+	default,
+		e.exports = t.
+	default
+	},
+	function(e, t) { !
+		function(e) {
+			"function" != typeof e.matches && (e.matches = e.msMatchesSelector || e.mozMatchesSelector || e.webkitMatchesSelector ||
+			function(e) {
+				for (var t = this,
+				n = (t.document || t.ownerDocument).querySelectorAll(e), i = 0; n[i] && n[i] !== t;)++i;
+				return Boolean(n[i])
+			}),
+			"function" != typeof e.closest && (e.closest = function(e) {
+				for (var t = this; t && 1 === t.nodeType;) {
+					if (t.matches(e)) return t;
+					t = t.parentNode
+				}
+				return null
+			})
+		} (window.Element.prototype)
+	},
+	function(e, t) {
+		/*
+	object-assign
+	(c) Sindre Sorhus
+	@license MIT
+	*/
+		"use strict";
+		function n(e) {
+			if (null === e || void 0 === e) throw new TypeError("Object.assign cannot be called with null or undefined");
+			return Object(e)
+		}
+		function i() {
+			try {
+				if (!Object.assign) return ! 1;
+				var e = new String("abc");
+				if (e[5] = "de", "5" === Object.getOwnPropertyNames(e)[0]) return ! 1;
+				for (var t = {},
+				n = 0; n < 10; n++) t["_" + String.fromCharCode(n)] = n;
+				var i = Object.getOwnPropertyNames(t).map(function(e) {
+					return t[e]
+				});
+				if ("0123456789" !== i.join("")) return ! 1;
+				var o = {};
+				return "abcdefghijklmnopqrst".split("").forEach(function(e) {
+					o[e] = e
+				}),
+				"abcdefghijklmnopqrst" === Object.keys(Object.assign({},
+				o)).join("")
+			} catch(e) {
+				return ! 1
+			}
+		}
+		var o = Object.getOwnPropertySymbols,
+		r = Object.prototype.hasOwnProperty,
+		a = Object.prototype.propertyIsEnumerable;
+		e.exports = i() ? Object.assign: function(e, t) {
+			for (var i, u, f = n(e), c = 1; c < arguments.length; c++) {
+				i = Object(arguments[c]);
+				for (var s in i) r.call(i, s) && (f[s] = i[s]);
+				if (o) {
+					u = o(i);
+					for (var l = 0; l < u.length; l++) a.call(i, u[l]) && (f[u[l]] = i[u[l]])
+				}
+			}
+			return f
+		}
+	},
+	function(e, t, n) {
+		var i, o; !
+		function(n, r) {
+			r = function(e, t, n) {
+				function i(o, r, a) {
+					return a = Object.create(i.fn),
+					o && a.push.apply(a, o[t] ? [o] : "" + o === o ? /</.test(o) ? ((r = e.createElement(r || t)).innerHTML = o, r.children) : r ? (r = i(r)[0]) ? r[n](o) : a: e[n](o) : "function" == typeof o ? e.readyState[7] ? o() : e[t]("DOMContentLoaded", o) : o),
+					a
+				}
+				return i.fn = [],
+				i.one = function(e, t) {
+					return i(e, t)[0] || null
+				},
+				i
+			} (document, "addEventListener", "querySelectorAll"),
+			i = [],
+			o = function() {
+				return r
+			}.apply(t, i),
+			!(void 0 !== o && (e.exports = o))
+		} (this)
+	},
+	function(e, t) {
+		"use strict";
+		function n(e, t) {
+			if (! (e instanceof t)) throw new TypeError("Cannot call a class as a function")
+		}
+		function i(e, t) {
+			var n = t[0],
+			i = t[1],
+			o = [],
+			r = void 0;
+			e = e.replace(/\*/g, n + "-" + i);
+			for (var u = e.split(","), f = 0, c = u.length; f < c; f++) {
+				var s = u[f];
+				s.match(a) && s.replace(a,
+				function(e, t, a, u) {
+					u = parseInt(u) || 1,
+					t = Math.min(Math.max(n, ~~Math.abs(t)), i),
+					a = a ? Math.min(i, ~~Math.abs(a)) : t,
+					r = t;
+					do o.push(r),
+					r += u;
+					while (r <= a)
+				})
+			}
+			return o
+		}
+		function o(e, t, n) {
+			var o = e.replace(/^\s\s*|\s\s*$/g, "").split(/\s+/),
+			r = [];
+			return o.forEach(function(e, t) {
+				var n = u[t];
+				r.push(i(e, n))
+			}),
+			new f(r, t, n)
+		}
+		Object.defineProperty(t, "__esModule", {
+			value: !0
+		});
+		var r = function() {
+			function e(e, t) {
+				for (var n = 0; n < t.length; n++) {
+					var i = t[n];
+					i.enumerable = i.enumerable || !1,
+					i.configurable = !0,
+					"value" in i && (i.writable = !0),
+					Object.defineProperty(e, i.key, i)
+				}
+			}
+			return function(t, n, i) {
+				return n && e(t.prototype, n),
+				i && e(t, i),
+				t
+			}
+		} (),
+		a = /^(\d+)(?:-(\d+))?(?:\/(\d+))?$/g,
+		u = [[1, 31], [1, 12], [0, 6]],
+		f = function() {
+			function e(t, i, o) {
+				n(this, e),
+				this._dates = t[0],
+				this._months = t[1],
+				this._days = t[2],
+				this._start = i,
+				this._end = o,
+				this._pointer = i
+			}
+			return r(e, [{
+				key: "_findNext",
+				value: function() {
+					for (var e = void 0;;) {
+						if (this._end.getTime() - this._pointer.getTime() < 0) throw new Error("out of range, end is " + this._end + ", current is " + this._pointer);
+						var t = this._pointer.getMonth(),
+						n = this._pointer.getDate(),
+						i = this._pointer.getDay();
+						if (this._months.indexOf(t + 1) !== -1) if (this._dates.indexOf(n) !== -1) {
+							if (this._days.indexOf(i) !== -1) {
+								e = new Date(this._pointer);
+								break
+							}
+							this._pointer.setDate(n + 1)
+						} else this._pointer.setDate(n + 1);
+						else this._pointer.setMonth(t + 1),
+						this._pointer.setDate(1)
+					}
+					return e
+				}
+			},
+			{
+				key: "next",
+				value: function() {
+					var e = this._findNext();
+					return this._pointer.setDate(this._pointer.getDate() + 1),
+					{
+						value: e,
+						done: !this.hasNext()
+					}
+				}
+			},
+			{
+				key: "hasNext",
+				value: function() {
+					try {
+						return this._findNext(),
+						!0
+					} catch(e) {
+						return ! 1
+					}
+				}
+			}]),
+			e
+		} ();
+		t.
+	default = {
+			parse: o
+		},
+		e.exports = t.
+	default
+	},
+	function(e, t, n) {
+		"use strict";
+		function i(e) {
+			return e && e.__esModule ? e: {
+			default:
+				e
+			}
+		}
+		var o = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ?
+		function(e) {
+			return typeof e
+		}: function(e) {
+			return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol": typeof e
+		},
+		r = n(1),
+		a = i(r),
+		u = function(e, t) {
+			return e.css({
+				"-webkit-transition": "all " + t + "s",
+				transition: "all " + t + "s"
+			})
+		},
+		f = function(e, t) {
+			return e.css({
+				"-webkit-transform": "translate3d(0, " + t + "px, 0)",
+				transform: "translate3d(0, " + t + "px, 0)"
+			})
+		},
+		c = function(e) {
+			for (var t = Math.floor(e.length / 2), n = 0; e[t] && e[t].disabled;) if (t = ++t % e.length, n++, n > e.length) throw new Error("No selectable item.");
+			return t
+		},
+		s = function(e, t, n) {
+			var i = c(n);
+			return (e - i) * t
+		},
+		l = function(e, t) {
+			return e * t
+		},
+		d = function(e, t, n) {
+			return - (t * (n - e - 1))
+		};
+		a.
+	default.fn.scroll = function(e) {
+			function t(e) {
+				y = e,
+				w = +new Date
+			}
+			function n(e) {
+				g = e;
+				var t = g - y;
+				u(m, 0),
+				f(m, b + t),
+				w = +new Date,
+				_.push({
+					time: w,
+					y: g
+				}),
+				_.length > 40 && _.shift()
+			}
+			function i(e) {
+				if (y) {
+					var t = (new Date).getTime(),
+					n = k - h.bodyHeight / 2;
+					if (g = e, t - w > 100) E(Math.abs(g - y) > 10 ? g - y: n - g);
+					else if (Math.abs(g - y) > 10) {
+						for (var i = _.length - 1,
+						o = i,
+						r = i; r > 0 && w - _[r].time < 100; r--) o = r;
+						if (o !== i) {
+							var a = _[i],
+							u = _[o],
+							f = a.time - u.time,
+							c = a.y - u.y,
+							s = c / f,
+							l = 150 * s + (g - y);
+							E(l)
+						} else E(0)
+					} else E(n - g);
+					y = null
+				}
+			}
+			var r = this,
+			h = a.
+		default.extend({
+				items:
+				[],
+				scrollable: ".weui-picker__content",
+				offset: 3,
+				rowHeight: 34,
+				onChange: a.
+			default.noop,
+				temp: null,
+				bodyHeight: 238
+			},
+			e),
+			p = h.items.map(function(e) {
+				return '<div class="weui-picker__item' + (e.disabled ? " weui-picker__item_disabled": "") + '">' + ("object" == ("undefined" == typeof e ? "undefined": o(e)) ? e.label: e) + "</div>"
+			}).join(""),
+			v = (0, a.
+		default)(this);
+			v.find(".weui-picker__content").html(p);
+			var m = v.find(h.scrollable),
+			y = void 0,
+			g = void 0,
+			w = void 0,
+			b = void 0,
+			_ = [],
+			k = window.innerHeight;
+			if (null !== h.temp && h.temp < h.items.length) {
+				var j = h.temp;
+				h.onChange.call(this, h.items[j], j),
+				b = (h.offset - j) * h.rowHeight
+			} else {
+				var x = c(h.items);
+				h.onChange.call(this, h.items[x], x),
+				b = s(h.offset, h.rowHeight, h.items)
+			}
+			f(m, b);
+			var E = function(e) {
+				b += e,
+				b = Math.round(b / h.rowHeight) * h.rowHeight;
+				var t = l(h.offset, h.rowHeight),
+				n = d(h.offset, h.rowHeight, h.items.length);
+				b > t && (b = t),
+				b < n && (b = n);
+				for (var i = h.offset - b / h.rowHeight; h.items[i] && h.items[i].disabled;) e > 0 ? ++i: --i;
+				b = (h.offset - i) * h.rowHeight,
+				u(m, .3),
+				f(m, b),
+				h.onChange.call(r, h.items[i], i)
+			};
+			m = v.offAll().on("touchstart",
+			function(e) {
+				t(e.changedTouches[0].pageY)
+			}).on("touchmove",
+			function(e) {
+				n(e.changedTouches[0].pageY),
+				e.preventDefault()
+			}).on("touchend",
+			function(e) {
+				i(e.changedTouches[0].pageY)
+			}).find(h.scrollable);
+			var S = "ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch;
+			S || v.on("mousedown",
+			function(e) {
+				t(e.pageY),
+				e.stopPropagation(),
+				e.preventDefault()
+			}).on("mousemove",
+			function(e) {
+				y && (n(e.pageY), e.stopPropagation(), e.preventDefault())
+			}).on("mouseup mouseleave",
+			function(e) {
+				i(e.pageY),
+				e.stopPropagation(),
+				e.preventDefault()
+			})
+		}
+	},
+	function(e, t) {
+		"use strict";
+		Object.defineProperty(t, "__esModule", {
+			value: !0
+		});
+		t.depthOf = function e(t) {
+			var n = 1;
+			return t.children && t.children[0] && (n = e(t.children[0]) + 1),
+			n
+		}
+	},
+	function(e, t) {
+		e.exports = '<div class="<%= className %>"> <div class=weui-picker__shade></div> <div class=weui-picker> <div class=weui-picker__hd> <a href=javascript:; data-action=cancel class=weui-picker__action>取消</a> <a href=javascript:; data-action=select class=weui-picker__action id=weui-picker-confirm>确定</a> </div> <div class=weui-picker__bd></div> </div> </div> '
+	},
+	function(e, t) {
+		e.exports = "<div class=weui-picker__group> <div class=weui-picker__mask></div> <div class=weui-picker__indicator></div> <div class=weui-picker__content></div> </div>"
+	}])
+});
