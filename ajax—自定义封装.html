@@ -33,10 +33,17 @@
 
                 /*+----------------自定义AJAX----------------+*/
                 //=====AJAX内部几种中断并提醒
-                if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } //空值或空对象提醒(轻微级别 NOTICE)
-                if(toolTip.zeroLengthTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } //数组长度为零提醒(警告级别 WARNING)
-                if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } //犯错就提醒(严格级别 STRICT)
-                if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } //接口不通ERROR提醒(致命错误 ERROR)
+                // 1、Success函数中
+                // ①.增删改等操作
+                if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 空值或空对象提醒(轻微级别 NOTICE)
+
+                // ②.获取数据时
+                if(toolTip.zeroLengthTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 数组长度为零提醒(警告级别 WARNING)
+                if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 犯错就提醒(严格级别 STRICT)
+
+                // 2、ERROR函数中
+                if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 接口不通ERROR提醒(致命错误 ERROR)
+
 
                 //=====获取数据时
                 // 后台返回
