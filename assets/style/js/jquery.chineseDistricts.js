@@ -1602,7 +1602,7 @@ var iosCountys = [
     {"id":"350104","value":"仓山区","parentId":"350100"},
     {"id":"350105","value":"马尾区","parentId":"350100"},
     {"id":"350111","value":"晋安区","parentId":"350100"},
-    {"id":"350182","value":"长乐区","parentId":"350100"},
+    {"id":"350112","value":"长乐区","parentId":"350100"},
     {"id":"350121","value":"闽侯县","parentId":"350100"},
     {"id":"350122","value":"连江县","parentId":"350100"},
     {"id":"350123","value":"罗源县","parentId":"350100"},
