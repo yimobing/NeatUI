@@ -20,6 +20,31 @@ if(typeof jQuery == 'undefined'){
 ;(function($){
 
 	var methods = {
+
+		/*
+		* 生成N位随机数(字母+数字组成)
+		* @param {number} min 最小位数(固定位数)
+		* @param {number} max 最大位数(可选), 默认max=min
+		* @param {boolean} isRandomed 是否任意长度(可选). true 是(默认), false 否. 值为false时,生成的字符长度为min指定的位数
+		*/
+		getRandomWord: function(min, max, isRandomed) {
+			max = typeof max == 'undefined' ? min : max;
+			isRandomed = typeof isRandomed == 'undefined' ? true : (isRandomed === false ? false : true);
+			var str = ''
+			var range = min
+			var arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+			// 随机产生
+			if (isRandomed) {
+				range = Math.round(Math.random() * (max - min)) + min
+			}
+			for (var i = 0; i < range; i++) { // eslint-disable-line
+				var pos = Math.round(Math.random() * (arr.length - 1))
+				str += arr[pos]
+			}
+			return str;
+		},
+
+
 		/**
 		 * 给某个dom元素赋值
 		 * @param {dom} ps_obj  dom对象
@@ -90,16 +115,25 @@ if(typeof jQuery == 'undefined'){
 	$.fn.extend({
 		neuiPicker: function(opts){
 			var self = this;
+			//输入框设为只读,不允许弹出软键盘
+			var _onfocusStr = typeof this.attr('onfocus') == 'undefined' ? '' : this.attr('onfocus');
+			_onfocusStr += ';this.blur()';
+			_onfocusStr = _onfocusStr.replace(/([\;]+)/g, ';').replace(/(^;)(.*?)/g, '$2');
+			this.attr({
+				readonly: true,
+				onFocus: _onfocusStr
+			})
+			//
 			var defaults = {
 				// 数据源
-				source: {}, // 数据源(object型或字符型)，1、字符型：值china, 当选择器为省市区县三级联动且使用系统数据源时,只需填值china即可. 2、object型标准格式: {data:[{value:"显示值", id:"隐藏值", disabled:"是否禁用项,布尔型"}]}, 其中：id、disabled可选
-				// format: ["id", "value", "disabled"], // 自定义数据源字段(数组型)(可选)。默认值为["id", "value", "disabled"], 数组第1个元素为数据源的“隐藏值”字段，第2个元素为数据源的“显示值”字段，第3个字段为数据源的“是否禁用项”字段。注意：只有“显示值”字段是必须的，故当数据源只有“显示值”字段时，本参数只须一个数组元素 ["value"]
-				format: { // 自定义数据源字段(Object对象)(可选)
+				source: {}, // 单列数据源(object型或字符型)，第1列的数据源。1、字符型：值china, 当选择器为省市区县三级联动且使用系统数据源时,只需填值china即可. 2、object型标准格式: {data:[{value:"显示值", id:"隐藏值", disabled:"是否禁用项,布尔型"}]}, 其中：id、disabled可选
+				columns: [], // 多列数据源(数组型)(可选)。第2、3、4...列的数据源组成数组. eg. [{}, {}, {}]
+				format: { // 自定义数据源字段(Object对象)(可选)。注意：每个数据源的字段必须一样，不能数据源1字段是a，数据源2字段是b
                     value: ["value"], // 显示值字段(数组型)
 					hid: ["id"], // 隐藏值字段(数组型)(可选)
                     forbid: "disabled" // 项禁用字段(字符型)(可选)
                 },	
-				value: "", // 默认选项的值(字符型)(可选)，默认空。优先权大于输入框的属性value值，在不指定默认选项值时则默认选中的项为：输入框的值所在的项，若输入框无值则为中间项(奇数项时)或偏下一项(偶数项时)
+				value: "", // 默认选项的值(字符型)(可选)，默认空。优先权小于输入框的value属性值，在不指定默认选项值时则默认选中的项为：输入框的值所在的项，若输入框无值则为中间项(奇数项时)或偏下一项(偶数项时)
 				depth: '', // 限制选择器深度(数值型)，默认值空(可选)。也就是选择器有多少列，取值为1-3。若为空则根据items项的深度自动调整(或取第一项的深度), 若不为空则将会按照参数设定的值显示N级数据(即使数据源中的级数比N大)
 				joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
 				cascade: false, // 是否级联选择器(可选)，默认false
@@ -109,7 +143,7 @@ if(typeof jQuery == 'undefined'){
 				caption: "", // 标题(字符型)，默认空(可选)。
 				// 节点DOM
 				className: "",  // 自定义选择器类名(字符型)，默认空(可选)。
-				id: "default", // 作为选择器的唯一标识(字符型)，默认值"default"(可选)。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分）。
+				id: "default" + methods.getRandomWord(8, 12), // 作为选择器的唯一标识(字符型)，默认值"default"(可选)。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分）。
 				container: "", // 指定容器(字符型)，默认空(可选)。
 
 				// 回调
@@ -129,6 +163,7 @@ if(typeof jQuery == 'undefined'){
 			// ·取值
 			//----------------------------------------
 			var dSource = settings.source,
+				dColumns = settings.columns,
 				dValue = settings.value,
 				dFormat = settings.format,
 				dDepth = settings.depth,
@@ -159,12 +194,12 @@ if(typeof jQuery == 'undefined'){
 					var row1 = iosProvinces[i];
 					var provinceId = row1.id, provinceName = row1.value;
 					var provinceOne = { "province": provinceName, "provinceId": provinceId, data: [] }
-					if(dDepth == '' || dDepth >=2 ){
+					if(dDepth == '' || dDepth >=2 ){ // 这里判断可减少不必要的循环次数
 						for(var j = 0; j < iosCitys.length; j++){
 							var row2 = iosCitys[j];
 							var cityParentId = row2.parentId, cityId = row2.id, cityName = row2.value;
 							var cityOne = { "city": cityName, "cityId": cityId , data: [] }
-							if(dDepth == '' || dDepth >=3 ){
+							if(dDepth == '' || dDepth >=3 ){ // 这里判断可减少不必要的循环次数
 								for(var k = 0; k < iosCountys.length; k++){
 									var row3 = iosCountys[k];
 									var countyParentId = row3.parentId, countyId = row3.id, countyName = row3.value;
@@ -188,7 +223,12 @@ if(typeof jQuery == 'undefined'){
 
 			// ·数据源转化成标准数组格式. eg. [{label:"显示值", value:"隐藏值", disabled: "是否禁用,布尔型"}]
 			var tDepth = dDepth;
-			var tSource = [];
+			var tSourceSingle = [], // 单列数据源
+				tSourceMultiple = [], // 多列数据源
+				tSourceAll = []; // 全部数据源
+			//
+			var countLevel = 0, // 层级深度
+				levelsArray = []; // 层级数组
 			var level1IdArr = [], level2IdArr = [], level3IdArr = [], // 各层级ID数组
 				level1StartId = 110000, level2StartId = 210000, level3StartId = 310000; // 各层级起始ID
 			if(dCascade){ // 级联选择器
@@ -196,17 +236,15 @@ if(typeof jQuery == 'undefined'){
 					_shengId = _shiId = _quId = '';
 				if(dDistrict){ // 省市区三级联动时默认的字段名
 					_shengName = "province";
-					_shiName = "city";
-					_quName = "city";
 					_shengId = "provinceId";
+					_shiName = "city";
 					_shiId = "cityId";
+					_quName = "county";
 					_quId = "countyId";
-				}
-				var countLevel = 0;
-				var areaArr = [];
+				}				
 				var _level1Name = dFormat.value[0], _level2Name = dFormat.value[1], _level3Name = dFormat.value[2],
 					_level1Id = dFormat.hid[0], _level2Id = dFormat.hid[1], _level3Id = dFormat.hid[2];
-				if(typeof dSource.data != 'undefined'){ // 第1层
+				if(typeof dSource.data != 'undefined' && (dDepth == '' || dDepth >=1) ){ // 第1层
 					countLevel = 1;
 					$.each(dSource.data, function(k1, items1){
 						var level1Ids = level1StartId + (k1 + 1);
@@ -214,7 +252,7 @@ if(typeof jQuery == 'undefined'){
 						var levels1Name = typeof items1[_level1Name] != 'undefined' ? items1[_level1Name] : items1[_shengName],
 							levels2Id = typeof items1[_level1Id] != 'undefined' ? items1[_level1Id] : (typeof items1[_shengId] == 'undefined' ? level1Ids: items1[_shengId]);
 						var one1 = { label: levels1Name, value: levels2Id, children: [] }
-						if(typeof items1.data != 'undefined'){ // 第2层
+						if(typeof items1.data != 'undefined' && (dDepth == '' || dDepth >=2) ){ // 第2层
 							countLevel = 2;
 							$.each(items1.data, function(k2, items2){
 								var level2Ids = ( k1 == 0 ? level2StartId + (k2 + 1) : level2IdArr[level2IdArr.length - 1] + 1 );
@@ -222,7 +260,7 @@ if(typeof jQuery == 'undefined'){
 								var levels2Name = typeof items2[_level2Name] != 'undefined' ? items2[_level2Name] : items2[_shiName],
 									levels2Id = typeof items2[_level2Id] != 'undefined' ? items2[_level2Id] : (typeof items2[_shiId] == 'undefined' ? level2Ids : items2[_shiId]);
 								var one2 = { label: levels2Name, value: levels2Id, children: [] }
-								if(typeof items2.data != 'undefined'){ // 第3层
+								if(typeof items2.data != 'undefined' && (dDepth == '' || dDepth >=3) ){ // 第3层
 									countLevel = 3;
 									$.each(items2.data, function(k3, items3){
 										var level3Ids = ( k1 == 0 && k2 == 0 ? level3StartId + (k3 + 1) : level3IdArr[level3IdArr.length - 1] + 1 );
@@ -236,15 +274,13 @@ if(typeof jQuery == 'undefined'){
 								one1.children.push(one2);
 							})
 						}
-						areaArr.push(one1);
-					})
+						levelsArray.push(one1);
+					})	
 				}
-				tDepth = countLevel;
-				tSource = areaArr;
-				// console.log('省市区数据：', areaArr)
 			}
 			else{ // 普通选择器：单列、多列
 				if(typeof dSource.data != 'undefined'){ // 单列
+					countLevel = 1;
 					$.each(dSource.data, function(i, items){
 						var level1Ids = level1StartId + (i + 1);
 						level1IdArr.push(level1Ids);
@@ -262,43 +298,93 @@ if(typeof jQuery == 'undefined'){
 							return false;
 						}
 						var one = { value: value, label: label, disabled: disabled }
-						tSource.push(one);
+						levelsArray.push(one);
 					})
+				}
+				if(dColumns.length > 0){ // 多列
+					countLevel += dColumns.length;
+					tSourceMultiple = new Array(dColumns.length);
+					for(var k = 0; k < tSourceMultiple.length; k++){
+						tSourceMultiple[k] = [];
+					}
+					for(var k = 0; k < dColumns.length; k++){
+						var tmpSource = dColumns[k];
+						$.each(tmpSource.data, function(i, items){
+							var level1Ids = level1StartId + (i + 1);
+							level1IdArr.push(level1Ids);
+							var _value = dFormat.hid[0],
+								_label = dFormat.value[0],
+								_disabled = dFormat.forbid;
+							var value = typeof items[_value] == 'undefined' ? level1Ids : items[_value],
+								label = typeof items[_label] == 'undefined' ? '' : items[_label],
+								disabled = typeof items[_disabled] == 'undefined' ? false : (items[_disabled] === true ? true : false);
+							if(label == ''){
+								var errs = '警告！自定义数据源字段format参数的字段名有错误，请检查！';
+								alert(errs);
+								console.log(errs);
+								isGoOn = false;
+								return false;
+							}
+							var one = { value: value, label: label, disabled: disabled }
+							tSourceMultiple[k].push(one);
+						})
+					}
 				}
 			}
 			// console.log('第一层ID数组：', level1IdArr, '\n第二层ID数组：', level2IdArr, '\n第三层ID数组：', level3IdArr);
+			// console.log('多列数据源：', tSourceMultiple);
 
-
+			//----------------------------------------
+			// ·全局赋值
+			//----------------------------------------
+			tDepth = countLevel;
+			tSourceSingle = levelsArray;
 
 			//----------------------------------------
 			// ·选择器默认值
 			//----------------------------------------
+			// 所有单列、多列数据源组成一个数组,数组中每个元素都是一个object型
+			var sourceArray = []
+			for(var i = 0; i < tSourceSingle.length; i++){
+				var row = tSourceSingle[i];
+				sourceArray.push(row);
+			}
+			for(var i = 0; i < tSourceMultiple.length; i++){
+				var arr = tSourceMultiple[i];
+				for(var j = 0; j < arr.length; j++){
+					var row = arr[j];
+					sourceArray.push(row);
+				}
+			}
+			// 新老值
 			var oldValue = methods.getValueOfElement(self), // 老的显示值
 				oldId = typeof self.attr('data-bh') == 'undefined' ? '' : self.attr('data-bh'); // 老的隐藏值
-			if(oldId == '') oldId = (methods.getSourceHidValueByRevealValue(tSource, oldValue, dJoint)).join(dJoint);
-
-			var initValue = (dValue == '' ? oldValue : dValue); // 输入框或选择器默认显示值
+			if(oldId == '') oldId = (methods.getSourceHidValueByRevealValue(tSourceSingle, oldValue, dJoint)).join(dJoint);
+			var initValue = (oldValue == '' ? dValue : oldValue); // 输入框或选择器默认显示值
 			var tDefaultValue = []
+			// 默认选项选中哪一个
 			if(initValue != ''){
-				tDefaultValue = methods.getSourceHidValueByRevealValue(tSource, initValue, dJoint);
+				tDefaultValue = methods.getSourceHidValueByRevealValue(sourceArray, initValue, dJoint);
 			}else{
-				tDefaultValue = [ Math.ceil(tSource.length / 2) ];
+				tDefaultValue = [ Math.ceil(tSourceSingle.length / 2) ];
 			}
+
+			// 打印信息
+			// console.log('单列数据源：', tSourceSingle)
+			// console.log('多列数据源：', tSourceMultiple)
 			// console.log('老的显示值:', oldValue, '\n老的隐藏值：',oldId, '\n隐藏值数组：', tDefaultValue);
 
-			
+
 			//----------------------------------------
 			// ·把参数传给“原始选择器组件”
 			//----------------------------------------
 			if(!isGoOn) return;
-			weui.picker(
-				tSource, 
-				{
+			var paramsObject = {
 				defaultValue: tDefaultValue, // 默认选项的值，数组型
 				depth: tDepth, // depth 选择器深度，数值型，默认值空。 也就是选择器有多少列，取值为1-3，如果为空，则根据items项的深度自动调整(或取第一项的深度)
 
-				className: '', // 自定义类名
-				id: 'default', // 作为选择器的唯一标识，字符型，默认值"default"。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分）。
+				className: dClassName, // 自定义选择器类名(字符型)，默认空(可选)
+				id: dId, // 作为选择器的唯一标识，字符型，默认值"default"。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分）。
 				// container: '#selector', // 指定容器，字符型，无默认值。
 
 				onChange: function (result) { // 在选择器选中的值发生变化的时候回调，函数型。
@@ -309,21 +395,13 @@ if(typeof jQuery == 'undefined'){
 				onConfirm: function (result) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
 					// console.log('您点了确定', result);
 					var id = value = '';
-					if(dCascade){ // 级联选择器
-						for(var i = 0; i < result.length; i++){
-							var row = result[i];
-							id += row.value + dJoint;
-							value += row.label + dJoint;
-						}
-						id = id.substr(0, id.length - dJoint.length);
-						value = value.substr(0, value.length - dJoint.length);
+					for(var i = 0; i < result.length; i++){
+						var row = result[i];
+						id += row.value + dJoint;
+						value += row.label + dJoint;
 					}
-					else{ // 普通选择器：单列、多列
-						if(tDepth == 1){ // 单列
-							id = result[0].value;
-							value = result[0].label;
-						}
-					}
+					id = id.substr(0, id.length - dJoint.length);
+					value = value.substr(0, value.length - dJoint.length);
 
 					methods.giveValue2Element(self, value, id); // 给元素赋值
 					var e = {id: id, value: value, old_id: oldId, old_value: oldValue}
@@ -334,7 +412,17 @@ if(typeof jQuery == 'undefined'){
 					// console.log('您选择了关闭我', result);
 					if(settings.onClose) settings.onClose(result);
 				}
-			})
+			}		
+			// ·整合数据源
+			for(var i = 0; i < tSourceMultiple.length; i++){ // 添加到数组中
+				tSourceAll.push(tSourceMultiple[i]);''
+			}
+			tSourceAll.unshift(tSourceSingle); // 添加到数组中作为第一个元素
+			tSourceAll.push(paramsObject); // 添加到数据中作为最后一个元素
+			// console.log('全部数据源：', tSourceAll); // 打印信息
+			// ·调用原始选择器组件,并传递参数
+			weui.picker.apply(null, tSourceAll); // 将数组中的每一个元素作为参数传递给函数 weui.picker()
+			
 		}
 	})
 })(window.jQuery);
