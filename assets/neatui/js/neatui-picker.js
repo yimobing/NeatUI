@@ -143,7 +143,7 @@ if(typeof jQuery == 'undefined'){
 				caption: "", // 标题(字符型)，默认空(可选)。
 				// 节点DOM
 				className: "",  // 自定义选择器类名(字符型)，默认空(可选)。
-				id: "default" + methods.getRandomWord(8, 12), // 作为选择器的唯一标识(字符型)，默认值"default"(可选)。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分）。
+				id: "default" + methods.getRandomWord(8, 12), // 作为选择器的唯一标识(字符型)，默认值"default"(可选)。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分，也就是每次id不一样同一个页面才能使用多个选择器，不然数据会错乱）。
 				container: "", // 指定容器(字符型)，默认空(可选)。
 
 				// 回调
@@ -384,7 +384,7 @@ if(typeof jQuery == 'undefined'){
 				depth: tDepth, // depth 选择器深度，数值型，默认值空。 也就是选择器有多少列，取值为1-3，如果为空，则根据items项的深度自动调整(或取第一项的深度)
 
 				className: dClassName, // 自定义选择器类名(字符型)，默认空(可选)
-				id: dId, // 作为选择器的唯一标识，字符型，默认值"default"。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分）。
+				id: dId, // 作为选择器的唯一标识，字符型，默认值"default"。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分，也就是每次id不一样同一个页面才能使用多个选择器，不然数据会错乱）。
 				// container: '#selector', // 指定容器，字符型，无默认值。
 
 				onChange: function (result) { // 在选择器选中的值发生变化的时候回调，函数型。
