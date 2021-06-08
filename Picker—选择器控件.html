@@ -55,21 +55,16 @@
                     <div class="group">
                         <div class="group__title">级联选择器</div>
                         <div class="group__list">
-                            <p><span>两级级联选择器</span><input type="text" id="i-react2"></p>
-                            <p><span>三级级联选择器</span><input type="text" id="i-react3"></p>
+                            <p><span>电脑手机品牌</span><input type="text" id="i-react2"></p>
+                            <p><span>水浒人物谱</span><input type="text" id="i-react3"></p>
                         </div><!--/.group__list-->
                     </div><!--/.group-->
                     <div class="group">
-                        <div class="group__title">省市区县选择器(使用自定义数据源,即只有部分省市区县数据)</div>
+                        <div class="group__title">省市区县选择器</div>
                         <div class="group__list">
-                            <p><span>省市两级联动选择器</span><input type="text" id="i-area2"></p>
-                            <p><span>省市区县三级联动选择器</span><input type="text" id="i-area3"></p>
-                        </div><!--/.group__list-->
-                    </div><!--/.group-->
-                    <div class="group">
-                        <div class="group__title">省市区县选择器(使用系统数据源,即拥有全国省市区县数据)</div>
-                        <div class="group__list">
-                            <p><span>省市区县三级联动选择器</span><input type="text" id="i-area4" value="福建省-泉州市-鲤城区"></p>
+                            <p><span>省市两级联动</span><input type="text" id="i-area2"></p>
+                            <p><span>省市区县三级联动<br>(自定义数据源)</span><input type="text" id="i-area3"></p>
+                            <p><span>省市区县三级联动<br>(系统数据源)</span><input type="text" id="i-area4"></p>
                         </div><!--/.group__list-->
                     </div><!--/.group-->
                     <div class="group">
@@ -119,21 +114,26 @@
             }
             $(this).neuiPicker({
                 source: normalJson,
-                format: { // 使用自定义数据源字段(Object对象)(可选)
-                    value: ["mc"], // 显示值字段(数组型)
-                    hid: ["bh"], // 隐藏值字段(数组型)(可选)
-                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                format: {
+                    value: ["mc"],
+                    hid: ["bh"],
+                    forbid: "disabled"
                 },
                 value: "工商银行",
-                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+                onConfirm: function (e) {
 					console.log('您点了确定', e);
 				}
             })
         });
 
 
+
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //+                 级联选择器
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //——————————————————————————————————————————
-        //=====两级级联选择器
+        //=====电脑手机品牌
         $('#i-react2').on('click', function(){
             var softJson = {
                 data:[
@@ -152,16 +152,15 @@
 
             $(this).neuiPicker({
                 source: softJson,
-                format: { // 使用自定义数据源字段(Object对象)(可选)
-                    value: ["computer", "mobile"], // 显示值字段(数组型)(可选)
-                    // hid: ["", "", ""], // 隐藏值字段(数组型)(可选)
-                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                format: {
+                    value: ["computer", "mobile"],
+                    // hid: ["", "", ""],
+                    forbid: "disabled"
                 },
-                value: "手机-魅族", //
-                joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
-                cascade: true, // 是否级联选择器(可选)，默认false
-				district: true, // 是否省市区县联动选择器(可选)，默认false。
-                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+                value: "手机-魅族",
+                joint: "-",
+                cascade: true,
+                onConfirm: function (e) {
 					console.log('您点了确定', e);
 				}
             })
@@ -170,7 +169,7 @@
 
 
         //——————————————————————————————————————————
-        //=====三级级联选择器
+        //=====水浒人物谱
         $('#i-react3').on('click', function(){
             var personJson = {
                 data:[
@@ -203,16 +202,15 @@
 
             $(this).neuiPicker({
                 source: personJson,
-                format: { // 使用自定义数据源字段(Object对象)(可选)
-                    value: ["grade", "classes", "student"], // 显示值字段(数组型)(可选)
-                    // hid: ["", "", ""], // 隐藏值字段(数组型)(可选)
-                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                format: {
+                    value: ["grade", "classes", "student"],
+                    // hid: ["", "", ""],
+                    forbid: "disabled"
                 },
-                value: "五年级-中等班-柴进", //
-                joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
-                cascade: true, // 是否级联选择器(可选)，默认false
-				district: true, // 是否省市区县联动选择器(可选)，默认false。
-                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+                value: "五年级-中等班-柴进",
+                joint: "-",
+                cascade: true,
+                onConfirm: function (e) {
 					console.log('您点了确定', e);
 				}
             })
@@ -222,10 +220,10 @@
 
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //+   省市区县选择器(使用自定义数据源,即只有部分省市区县数据)
+        //+                 省市区县选择器
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //——————————————————————————————————————————
-        //=====省市两级联动选择器
+        //=====省市两级联动
         $('#i-area2').on('click', function(){
             var areaJson = {
                 data:[
@@ -244,16 +242,16 @@
 
             $(this).neuiPicker({
                 source: areaJson,
-                format: { // 使用自定义数据源字段(Object对象)(可选)
-                    value: ["province", "city"], // 显示值字段(数组型)(可选)
-                    hid: ["provinceId", "cityId"], // 隐藏值字段(数组型)(可选)
-                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                format: {
+                    value: ["province", "city"],
+                    hid: ["provinceId", "cityId"],
+                    forbid: "disabled"
                 },
-                value: "浙江省-嘉兴市", //
-                joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
-                cascade: true, // 是否级联选择器(可选)，默认false
-				district: true, // 是否省市区县联动选择器(可选)，默认false。
-                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+                value: "浙江省-嘉兴市",
+                joint: "-",
+                cascade: true,
+				district: true,
+                onConfirm: function (e) {
 					console.log('您点了确定', e);
 				}
             })
@@ -262,7 +260,7 @@
 
 
         //——————————————————————————————————————————
-        //=====省市区县三级联动选择器
+        //=====省市区县三级联动(自定义数据源)
         $('#i-area3').on('click', function(){
             var areaJson = {
                 data:[
@@ -316,16 +314,16 @@
 
             $(this).neuiPicker({
                 source: areaJson,
-                format: { // 使用自定义数据源字段(Object对象)(可选)
-                    value: ["province", "city", "county"], // 显示值字段(数组型)(可选)
-                    hid: ["provinceId", "cityId", "countyId"], // 隐藏值字段(数组型)(可选)
-                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                format: {
+                    value: ["province", "city", "county"],
+                    hid: ["provinceId", "cityId", "countyId"],
+                    forbid: "disabled"
                 },
-                value: "浙江省-嘉兴市-秀洲区", //
-                joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
-                cascade: true, // 是否级联选择器(可选)，默认false
-				district: true, // 是否省市区县联动选择器(可选)，默认false。
-                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+                value: "浙江省-嘉兴市-秀洲区",
+                joint: "-",
+                cascade: true,
+				district: true,
+                onConfirm: function (e) {
 					console.log('您点了确定', e);
 				}
             })
@@ -334,25 +332,22 @@
 
 
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //+    省市区县选择器(使用系统数据源,即拥有全国省市区县数据)
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //——————————————————————————————————————————
-        //=====省市区县三级联动选择器
+        //=====省市区县三级联动(系统数据源)
         $('#i-area4').on('click', function(){
             $(this).neuiPicker({
                 source: 'china',
-                format: { // 使用自定义数据源字段(Object对象)(可选)
-                    value: ["province", "city", "county"], // 显示值字段(数组型)(可选)
-                    hid: ["provinceId", "cityId", "countyId"], // 隐藏值字段(数组型)(可选)
-                    forbid: "disabled" // 项禁用字段(字符型)(可选)
+                format: {
+                    value: ["province", "city", "county"],
+                    hid: ["provinceId", "cityId", "countyId"],
+                    forbid: "disabled"
                 },
                 value: "福建省-泉州市-丰泽区",
-                depth: 3, // 限制选择器深度(数值型)，默认值空(可选)。也就是选择器有多少列，取值为1-3。若为空则根据items项的深度自动调整(或取第一项的深度), 若不为空则将会按照参数设定的值显示N级数据(即使数据源中的级数比N大)
-                joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
-                cascade: true, // 是否级联选择器(可选)，默认false
-				district: true, // 是否省市区县联动选择器(可选)，默认false。
-                onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
+                depth: 3,
+                joint: "-",
+                cascade: true,
+				district: true,
+                onConfirm: function (e) {
 					console.log('您点了确定', e);
 				}
             })
