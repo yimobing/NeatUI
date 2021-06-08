@@ -319,8 +319,7 @@ if(typeof jQuery == 'undefined'){
 					}
 					id = id.substr(0, id.length - dJoint.length);
 					value = value.substr(0, value.length - dJoint.length);
-
-					methods.giveValue2Element(self, value, id); // 给元素赋值
+					// methods.giveValue2Element(self, value, id); // 给元素赋值,如果要在选项改变时界面上输入框的值也随之改变的话
 					var e = {id: id, value: value, oldId: oldId, oldValue: oldValue}
 					if(settings.onChange) settings.onChange(e);
 				},
