@@ -18,100 +18,6 @@ if(typeof jQuery == 'undefined'){
 	console.log(errs);
 }
 ;(function($){
-
-	var methods = {
-
-		/*
-		* 生成N位随机数(字母+数字组成)
-		* @param {number} min 最小位数(固定位数)
-		* @param {number} max 最大位数(可选), 默认max=min
-		* @param {boolean} isRandomed 是否任意长度(可选). true 是(默认), false 否. 值为false时,生成的字符长度为min指定的位数
-		*/
-		getRandomWord: function(min, max, isRandomed) {
-			max = typeof max == 'undefined' ? min : max;
-			isRandomed = typeof isRandomed == 'undefined' ? true : (isRandomed === false ? false : true);
-			var str = ''
-			var range = min
-			var arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-			// 随机产生
-			if (isRandomed) {
-				range = Math.round(Math.random() * (max - min)) + min
-			}
-			for (var i = 0; i < range; i++) { // eslint-disable-line
-				var pos = Math.round(Math.random() * (arr.length - 1))
-				str += arr[pos]
-			}
-			return str;
-		},
-
-
-		/**
-		 * 给某个dom元素赋值
-		 * @param {dom} ps_obj  dom对象
-		 * @param {string} ps_str 要赋的显示值
-		 * @param {string} ps_hid 要赋的隐藏值
-		 */
-		giveValue2Element: function(ps_obj, ps_str, ps_hid){
-			var ele = ps_str instanceof jQuery ? ps_obj : $(ps_obj);
-			var tagname = ele[0].tagName.toLocaleLowerCase();
-			if(tagname == 'input' || tagname == 'textarea') ele.val(ps_str).attr('data-bh', ps_hid);
-			else ele.text(ps_str).attr('data-bh', ps_hid);
-		},
-
-		/**
-		 * 获取某个dom元素的值
-		 * @param {dom} ps_obj dom对象
-		 * @returns {string} 返回该dom元素的值
-		 */
-		getValueOfElement: function(ps_obj){
-			var ele = ps_obj instanceof jQuery ? ps_obj : $(ps_obj);
-			var tagname = ele[0].tagName.toLocaleLowerCase();
-			return ( tagname == 'input' || tagname == 'textarea' ? ele.val() : ele.text() );
-		},
-
-		/**
-		 * 在数据源数组中通过label获取对应的value
-		 * JSON解析递归调用：应用于JSON无限层级嵌套解析成一维数组
-		 * @param {array} ps_src_arr 数据源数组. eg.[{label:"显示值", value:"隐藏值", disabled:"是否禁用"}]
-		 * @param {string} ps_reveal_value 对象中的显示值
-		 * @param {array} ps_hid_arr 隐藏值数组,调用时只需要传递空数组. eg.[]
-		 * @returns {array} 返回隐藏值一维数组(仅单个元素). eg. ['1001']
-		 */
-		getSourceValueByLabel: function(ps_src_arr, ps_reveal_value, ps_hid_arr) {
-			var _this = this;
-			ps_src_arr.filter(function(item){
-				if(ps_reveal_value == item.label) 
-				ps_hid_arr.push(item.value);
-				if(item.children && item.children.length) {
-					_this.getSourceValueByLabel(item.children, ps_reveal_value, ps_hid_arr)
-				}
-			})
-			return ps_hid_arr.length == 0 ? [''] : ps_hid_arr;
-		},
-
-		/**
-		 * 在数据源数组中通过显示值获取对应的隐藏值
-		 * @param {array} ps_src_arr 数据源数组. eg.[{label:"显示值", value:"隐藏值", disabled:"是否禁用"}]
-		 * @param {string} ps_reveal_value 显示值(输入框或选择器默认值)
-		 * @param {string} ps_hyphen_char 默认值连字符，即分割符
-		 * @returns {array} 返回隐藏值一维数组(单个或多个元素). eg. ['1001', '1002', '1003']
-		 */
-		getSourceHidValueByRevealValue: function(ps_src_arr, ps_reveal_value, ps_hyphen_char){
-			var hidArr = [];	
-			var splitArr = ps_reveal_value.split(ps_hyphen_char);
-			for(var i = 0; i < splitArr.length; i++){
-				var text = splitArr[i];
-				var arr = this.getSourceValueByLabel(ps_src_arr, text, []);
-				// console.log('arr数组：', arr)
-				hidArr.push(arr[0]);
-			}
-			return hidArr;
-		}
-		
-
-		
-	}
-
 	$.fn.extend({
 		neuiPicker: function(opts){
 			var self = this;
@@ -125,6 +31,7 @@ if(typeof jQuery == 'undefined'){
 			})
 			//
 			var defaults = {
+				caption: "", // 标题(字符型)，默认空(可选)。
 				// 数据源
 				source: {}, // 单列数据源(object型或字符型)，第1列的数据源。1、字符型：值china, 当选择器为省市区县三级联动且使用系统数据源时,只需填值china即可. 2、object型标准格式: {data:[{value:"显示值", id:"隐藏值", disabled:"是否禁用项,布尔型"}]}, 其中：id、disabled可选
 				columns: [], // 多列数据源(数组型)(可选)。第2、3、4...列的数据源组成数组. eg. [{}, {}, {}]
@@ -139,16 +46,13 @@ if(typeof jQuery == 'undefined'){
 				cascade: false, // 是否级联选择器(可选)，默认false
 				district: false, // 是否省市区县联动选择器(可选)，默认false。值为true且使用系统数据源时,请设置source参数的值为'china'.
 
-				// 其它
-				caption: "", // 标题(字符型)，默认空(可选)。
 				// 节点DOM
 				className: "",  // 自定义选择器类名(字符型)，默认空(可选)。
-				id: "default" + methods.getRandomWord(8, 12), // 作为选择器的唯一标识(字符型)，默认值"default"(可选)。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分，也就是每次id不一样同一个页面才能使用多个选择器，不然数据会错乱）。
-				container: "", // 指定容器(字符型)，默认空(可选)。
-
+				id: "default" + methods.getRandomWord(8, 12), // 作为选择器的唯一标识(字符型)(可选)，默认值"default"。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分，也就是每次id不一样同一个页面才能使用多个选择器，不然数据会错乱）。
+				container: "body", // 指定容器(字符型)(可选), 默认body。eg. '#selector'
 				// 回调
-				onChange: function(){ }, // 在选择器选中的值发生变化的时候回调(可选)。
-				onConfirm: function(){ }, // 在点击"确定"之后的回调。回调返回选中的结果(Array)，数组长度依赖于选择器的层级(可选)。
+				onConfirm: function(e){ }, // 在点击"确定"之后的回调。回调返回选中的结果(Array)，数组长度依赖于选择器的层级(可选)。e格式：{id:"新隐藏值", value:"新显示值", oldId:"旧隐藏值", oldValue:"旧显示值"}
+				onChange: function(e){ }, // 在选择器选中的值发生变化的时候回调(可选)。e格式：{id:"新隐藏值", value:"新显示值", oldId:"旧隐藏值", oldValue:"旧显示值"}
 				onClose: function(){ } // 选择器关闭后的回调(可选)。
 			}
 			var settings = $.extend(true, {}, defaults, opts || {});
@@ -162,13 +66,13 @@ if(typeof jQuery == 'undefined'){
 			//----------------------------------------
 			// ·取值
 			//----------------------------------------
-			var dSource = settings.source,
+			var dCaption = settings.caption,
+				dSource = settings.source,
 				dColumns = settings.columns,
 				dValue = settings.value,
 				dFormat = settings.format,
 				dDepth = settings.depth,
-				dJoint = settings.joint,
-				dCaption = settings.caption,
+				dJoint = settings.joint,	
 				dCascade = settings.cascade,
 				dDistrict = settings.district,	
 				dClassName = settings.className,
@@ -379,21 +283,18 @@ if(typeof jQuery == 'undefined'){
 			// ·把参数传给“原始选择器组件”
 			//----------------------------------------
 			if(!isGoOn) return;
+			// 配置项
 			var paramsObject = {
 				defaultValue: tDefaultValue, // 默认选项的值，数组型
 				depth: tDepth, // depth 选择器深度，数值型，默认值空。 也就是选择器有多少列，取值为1-3，如果为空，则根据items项的深度自动调整(或取第一项的深度)
 
 				className: dClassName, // 自定义选择器类名(字符型)，默认空(可选)
 				id: dId, // 作为选择器的唯一标识，字符型，默认值"default"。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分，也就是每次id不一样同一个页面才能使用多个选择器，不然数据会错乱）。
-				// container: '#selector', // 指定容器，字符型，无默认值。
+				container: dContainer == '' ? 'body' : dContainer, // 指定容器(字符型)(可选), 默认body。eg. '#selector'
 
-				onChange: function (result) { // 在选择器选中的值发生变化的时候回调，函数型。
-					//console.log(item, index);
-					// console.log('您正在改变选项', result);
-					if(settings.onChange) settings.onChange(result);
-				},
+				// 回调
 				onConfirm: function (result) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
-					// console.log('您点了确定', result);
+					// console.log('您正在点确定按钮', result);
 					var id = value = '';
 					for(var i = 0; i < result.length; i++){
 						var row = result[i];
@@ -404,13 +305,28 @@ if(typeof jQuery == 'undefined'){
 					value = value.substr(0, value.length - dJoint.length);
 
 					methods.giveValue2Element(self, value, id); // 给元素赋值
-					var e = {id: id, value: value, old_id: oldId, old_value: oldValue}
+					var e = {id: id, value: value, oldId: oldId, oldValue: oldValue}
 					if(settings.onConfirm) settings.onConfirm(e); // 回调
-					
 				},
-				onClose: function(result){ // 选择器关闭后的回调，函数型。
-					// console.log('您选择了关闭我', result);
-					if(settings.onClose) settings.onClose(result);
+				onChange: function (result) { // 在选择器选中的值发生变化的时候回调，函数型。
+					//console.log(item, index);
+					// console.log('您正在改变选项', result);
+					var id = value = '';
+					for(var i = 0; i < result.length; i++){
+						var row = result[i];
+						id += row.value + dJoint;
+						value += row.label + dJoint;
+					}
+					id = id.substr(0, id.length - dJoint.length);
+					value = value.substr(0, value.length - dJoint.length);
+
+					methods.giveValue2Element(self, value, id); // 给元素赋值
+					var e = {id: id, value: value, oldId: oldId, oldValue: oldValue}
+					if(settings.onChange) settings.onChange(e);
+				},
+				onClose: function(){ // 选择器关闭后的回调，函数型。
+					// console.log('您选择了关闭');
+					if(settings.onClose) settings.onClose();
 				}
 			}		
 			// ·整合数据源
@@ -422,9 +338,105 @@ if(typeof jQuery == 'undefined'){
 			// console.log('全部数据源：', tSourceAll); // 打印信息
 			// ·调用原始选择器组件,并传递参数
 			weui.picker.apply(null, tSourceAll); // 将数组中的每一个元素作为参数传递给函数 weui.picker()
+
+			// ·hack操作
+			$('.neatui-picker__title').text(dCaption);
 			
 		}
 	})
+
+
+
+	var methods = {
+		/*
+		* 生成N位随机数(字母+数字组成)
+		* @param {number} min 最小位数(固定位数)
+		* @param {number} max 最大位数(可选), 默认max=min
+		* @param {boolean} isRandomed 是否任意长度(可选). true 是(默认), false 否. 值为false时,生成的字符长度为min指定的位数
+		*/
+		getRandomWord: function(min, max, isRandomed) {
+			max = typeof max == 'undefined' ? min : max;
+			isRandomed = typeof isRandomed == 'undefined' ? true : (isRandomed === false ? false : true);
+			var str = ''
+			var range = min
+			var arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+			// 随机产生
+			if (isRandomed) {
+				range = Math.round(Math.random() * (max - min)) + min
+			}
+			for (var i = 0; i < range; i++) { // eslint-disable-line
+				var pos = Math.round(Math.random() * (arr.length - 1))
+				str += arr[pos]
+			}
+			return str;
+		},
+
+
+		/**
+		 * 给某个dom元素赋值
+		 * @param {dom} ps_obj  dom对象
+		 * @param {string} ps_str 要赋的显示值
+		 * @param {string} ps_hid 要赋的隐藏值
+		 */
+		giveValue2Element: function(ps_obj, ps_str, ps_hid){
+			var ele = ps_str instanceof jQuery ? ps_obj : $(ps_obj);
+			var tagname = ele[0].tagName.toLocaleLowerCase();
+			if(tagname == 'input' || tagname == 'textarea') ele.val(ps_str).attr('data-bh', ps_hid);
+			else ele.text(ps_str).attr('data-bh', ps_hid);
+		},
+
+		/**
+		 * 获取某个dom元素的值
+		 * @param {dom} ps_obj dom对象
+		 * @returns {string} 返回该dom元素的值
+		 */
+		getValueOfElement: function(ps_obj){
+			var ele = ps_obj instanceof jQuery ? ps_obj : $(ps_obj);
+			var tagname = ele[0].tagName.toLocaleLowerCase();
+			return ( tagname == 'input' || tagname == 'textarea' ? ele.val() : ele.text() );
+		},
+
+		/**
+		 * 在数据源数组中通过label获取对应的value
+		 * JSON解析递归调用：应用于JSON无限层级嵌套解析成一维数组
+		 * @param {array} ps_src_arr 数据源数组. eg.[{label:"显示值", value:"隐藏值", disabled:"是否禁用"}]
+		 * @param {string} ps_reveal_value 对象中的显示值
+		 * @param {array} ps_hid_arr 隐藏值数组,调用时只需要传递空数组. eg.[]
+		 * @returns {array} 返回隐藏值一维数组(仅单个元素). eg. ['1001']
+		 */
+		getSourceValueByLabel: function(ps_src_arr, ps_reveal_value, ps_hid_arr) {
+			var _this = this;
+			ps_src_arr.filter(function(item){
+				if(ps_reveal_value == item.label) 
+				ps_hid_arr.push(item.value);
+				if(item.children && item.children.length) {
+					_this.getSourceValueByLabel(item.children, ps_reveal_value, ps_hid_arr)
+				}
+			})
+			return ps_hid_arr.length == 0 ? [''] : ps_hid_arr;
+		},
+
+		/**
+		 * 在数据源数组中通过显示值获取对应的隐藏值
+		 * @param {array} ps_src_arr 数据源数组. eg.[{label:"显示值", value:"隐藏值", disabled:"是否禁用"}]
+		 * @param {string} ps_reveal_value 显示值(输入框或选择器默认值)
+		 * @param {string} ps_hyphen_char 默认值连字符，即分割符
+		 * @returns {array} 返回隐藏值一维数组(单个或多个元素). eg. ['1001', '1002', '1003']
+		 */
+		getSourceHidValueByRevealValue: function(ps_src_arr, ps_reveal_value, ps_hyphen_char){
+			var hidArr = [];	
+			var splitArr = ps_reveal_value.split(ps_hyphen_char);
+			for(var i = 0; i < splitArr.length; i++){
+				var text = splitArr[i];
+				var arr = this.getSourceValueByLabel(ps_src_arr, text, []);
+				// console.log('arr数组：', arr)
+				hidArr.push(arr[0]);
+			}
+			return hidArr;
+		}
+	}
+
+
 })(window.jQuery);
 
 
@@ -487,14 +499,14 @@ function() {
 			default)(a.container).append(v),
 				s.
 			default.getStyle(v[0], "transform"),
-				v.find(".weui-picker__shade").addClass("weui-animate-fade-in"),
-				v.find(".weui-picker").addClass("weui-animate-slide-up")
+				v.find(".neatui-picker__shade").addClass("neatui-animate-fade-in"),
+				v.find(".neatui-picker").addClass("neatui-animate-slide-up")
 			}
 			function t(e) {
 				t = s.
 			default.noop,
-				v.find(".weui-picker__shade").addClass("weui-animate-fade-out"),
-				v.find(".weui-picker").addClass("weui-animate-slide-down").on("animationend webkitAnimationEnd",
+				v.find(".neatui-picker__shade").addClass("neatui-animate-fade-out"),
+				v.find(".neatui-picker").addClass("neatui-animate-slide-down").on("animationend webkitAnimationEnd",
 				function() {
 					v.remove(),
 					w = !1,
@@ -514,15 +526,15 @@ function() {
 					else for (; o < u && n != e[o]; ++o);
 					o < u && (h[t] = o)
 				}
-				v.find(".weui-picker__group").eq(t).scroll({
+				v.find(".neatui-picker__group").eq(t).scroll({
 					items: e,
 					temp: h[t],
 					onChange: function(e, n) {
 						if (e ? d[t] = new r(e) : d[t] = null, h[t] = n, c) d.length == y && a.onChange(d);
-						else if (e.children && e.children.length > 0) v.find(".weui-picker__group").eq(t + 1).show(),
+						else if (e.children && e.children.length > 0) v.find(".neatui-picker__group").eq(t + 1).show(),
 						!c && i(e.children, t + 1);
 						else {
-							var o = v.find(".weui-picker__group");
+							var o = v.find(".neatui-picker__group");
 							o.forEach(function(e, n) {
 								n > t && (0, s.
 							default)(e).hide()
@@ -563,18 +575,18 @@ function() {
 		default.render(m.
 		default, a)), y = o.depth || (c ? u.length: p.depthOf(u[0])), _ = "", k = y; k--;) _ += g.
 		default;
-			return v.find(".weui-picker__bd").html(_),
+			return v.find(".neatui-picker__bd").html(_),
 			e(),
 			c ? u.forEach(function(e, t) {
 				i(e, t)
 			}) : i(u, 0),
-			v.on("click", ".weui-picker__shade",
+			v.on("click", ".neatui-picker__shade",
 			function() {
 				n()
-			}).on("click", ".weui-picker__action",
+			}).on("click", ".neatui-picker__action",
 			function() {
 				n()
-			}).on("click", "#weui-picker-confirm",
+			}).on("click", "#neatui-picker-confirm",
 			function() {
 				a.onConfirm(d)
 			}),
@@ -1145,7 +1157,7 @@ function() {
 		default.extend({
 				items:
 				[],
-				scrollable: ".weui-picker__content",
+				scrollable: ".neatui-picker__content",
 				offset: 3,
 				rowHeight: 34,
 				onChange: a.
@@ -1155,11 +1167,11 @@ function() {
 			},
 			e),
 			p = h.items.map(function(e) {
-				return '<div class="weui-picker__item' + (e.disabled ? " weui-picker__item_disabled": "") + '">' + ("object" == ("undefined" == typeof e ? "undefined": o(e)) ? e.label: e) + "</div>"
+				return '<div class="neatui-picker__item' + (e.disabled ? " neatui-picker__item_disabled": "") + '">' + ("object" == ("undefined" == typeof e ? "undefined": o(e)) ? e.label: e) + "</div>"
 			}).join(""),
 			v = (0, a.
 		default)(this);
-			v.find(".weui-picker__content").html(p);
+			v.find(".neatui-picker__content").html(p);
 			var m = v.find(h.scrollable),
 			y = void 0,
 			g = void 0,
@@ -1230,9 +1242,9 @@ function() {
 		}
 	},
 	function(e, t) {
-		e.exports = '<div class="<%= className %>"> <div class=weui-picker__shade></div> <div class=weui-picker> <div class=weui-picker__hd> <a href=javascript:; data-action=cancel class=weui-picker__action>取消</a> <a href=javascript:; data-action=select class=weui-picker__action id=weui-picker-confirm>确定</a> </div> <div class=weui-picker__bd></div> </div> </div> '
+		e.exports = '<div class="<%= className %>"> <div class=neatui-picker__shade></div> <div class=neatui-picker> <div class=neatui-picker__hd> <a href=javascript:; data-action=cancel class=neatui-picker__action>取消</a> <span class=neatui-picker__title></span> <a href=javascript:; data-action=select class=neatui-picker__action id=neatui-picker-confirm>确定</a> </div> <div class=neatui-picker__bd></div> </div> </div> '
 	},
 	function(e, t) {
-		e.exports = "<div class=weui-picker__group> <div class=weui-picker__mask></div> <div class=weui-picker__indicator></div> <div class=weui-picker__content></div> </div>"
+		e.exports = "<div class=neatui-picker__group> <div class=neatui-picker__mask></div> <div class=neatui-picker__indicator></div> <div class=neatui-picker__content></div> </div>"
 	}])
 });
