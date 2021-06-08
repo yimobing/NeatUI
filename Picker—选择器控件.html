@@ -22,13 +22,9 @@
 </head>
 <body>
     <style>
-        html, body{
-            height: 100%;
-            background-color: #f8f8f8;
-        }
+        html, body{height: 100%; background-color: #f8f8f8; }
         body{ width: 98%; margin: 0 auto; padding: 15px 0; font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif; }
         h2{ margin: 45px auto 5px 10px; color: #1aad19; font-size: 24px;  }
-
         h2:first-child{ margin-top: 0; }
         .group__title{ margin: 15px auto 5px auto; font-size: 14px; font-weight: bold; }
         /*+------------------------+*/
@@ -36,47 +32,13 @@
         .page_dropdown p{ margin-bottom: 0px; padding: 15px 10px; background-color: #fff; border-top: 1px solid #fafafa;}
         .page_dropdownp :first-child{ border-top: 0; }
         .page_dropdown span{ margin-right: 8px; color: #999; }
-        .page_dropdown input[type="text"]{
-            padding: 0 10px;
-            height: 35px;
-            line-height: 35px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            color: #555;
-        }
-
+        .page_dropdown input[type="text"]{padding: 0 10px; height: 35px; line-height: 35px; border-radius: 4px; border: 1px solid #ddd; color: #555; }
         /*+------------------------+*/
-        .page_feedback{
-            padding: 15px;
-            overflow: auto;
-            background-color: #FFFFFF;
-        }
-
-        .page_feedback a{
-            display: block;
-            width: 100%;
-            margin-top: 5px;
-            padding: 15px 12px;
-            background-color: #f4f4f4;
-            border-radius: 4px;
-            color: #777;
-        }
-        .item{
-            padding: 10px 0;
-        }
-        .item__title{
-            margin-bottom: 5px;
-            padding-left: 15px;
-            padding-right: 15px;
-            color: #999;
-            font-weight: normal;
-            font-size: 14px;
-        }
-        .item__ctn{
-            padding: 0 15px;
-        }
-
-       
+        .page_feedback{padding: 15px; overflow: auto; background-color: #FFFFFF; } 
+        .page_feedback a{display: block; width: 100%; margin-top: 5px; padding: 15px 12px; background-color: #f4f4f4; border-radius: 4px; color: #777; } 
+        .item{padding: 10px 0; } 
+        .item__title{margin-bottom: 5px; padding-left: 15px; padding-right: 15px; color: #999; font-weight: normal; font-size: 14px; } 
+        .item__ctn{padding: 0 15px; }
     </style>
 
     <div class="wrap">
@@ -100,14 +62,20 @@
                     <div class="group">
                         <div class="group__title">省市区县选择器(使用自定义数据源,即只有部分省市区县数据)</div>
                         <div class="group__list">
-                            <p><span>省市两级联动选择器</span><input type="text" id="i-area2" value="福建省-泉州市"></p>
-                            <p><span>省市区县三级联动选择器</span><input type="text" id="i-area3" value="福建省-泉州市-鲤城区"></p>
+                            <p><span>省市两级联动选择器</span><input type="text" id="i-area2"></p>
+                            <p><span>省市区县三级联动选择器</span><input type="text" id="i-area3"></p>
                         </div><!--/.group__list-->
                     </div><!--/.group-->
                     <div class="group">
                         <div class="group__title">省市区县选择器(使用系统数据源,即拥有全国省市区县数据)</div>
                         <div class="group__list">
-                            <p><span>省市区县三级联动选择器</span><input type="text" id="i-area4" value="福建省-泉州市-丰泽区"></p>
+                            <p><span>省市区县三级联动选择器</span><input type="text" id="i-area4" value="福建省-泉州市-鲤城区"></p>
+                        </div><!--/.group__list-->
+                    </div><!--/.group-->
+                    <div class="group">
+                        <div class="group__title">多列选择器</div>
+                        <div class="group__list">
+                            <p><span>示例1：</span><input type="text" id="i-column2"></p>
                         </div><!--/.group__list-->
                     </div><!--/.group-->
                 </div><!--/.page_feedback-->
@@ -119,7 +87,8 @@
                     <a href="javascript:;" id="pickerBtn">普通选择器</a>
                     <a href="javascript:;" id="datePickerBtn">时间选择器</a>
                     <a href="javascript:;" id="multiPickerBtn">多列选择器</a>
-                    <a href="javascript:;" id="cascadePickerBtn">级联选择器(如省市区县三级联动)</a>
+                    <a href="javascript:;" id="cascadePickerBtn1">级联选择器(如省市区县三级联动)1</a>
+                    <a href="javascript:;" id="cascadePickerBtn2">级联选择器(如省市区县三级联动)2</a>
                 </div><!--/.page_feedback-->
             </div>
         </div>
@@ -155,7 +124,7 @@
                     hid: ["bh"], // 隐藏值字段(数组型)(可选)
                     forbid: "disabled" // 项禁用字段(字符型)(可选)
                 },
-                value: "民生银行",
+                value: "工商银行",
                 onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
 					console.log('您点了确定', e);
 				}
@@ -190,7 +159,6 @@
                 },
                 value: "手机-魅族", //
                 joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
-                depth: 1,
                 cascade: true, // 是否级联选择器(可选)，默认false
 				district: true, // 是否省市区县联动选择器(可选)，默认false。
                 onConfirm: function (e) { // 在点击"确定"之后的回调，函数型。 回调返回选中的结果(Array)，数组长度依赖于选择器的层级
@@ -240,7 +208,7 @@
                     // hid: ["", "", ""], // 隐藏值字段(数组型)(可选)
                     forbid: "disabled" // 项禁用字段(字符型)(可选)
                 },
-                value: "五年级-优秀班-卢俊义", //
+                value: "五年级-中等班-柴进", //
                 joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
                 cascade: true, // 是否级联选择器(可选)，默认false
 				district: true, // 是否省市区县联动选择器(可选)，默认false。
@@ -281,7 +249,7 @@
                     hid: ["provinceId", "cityId"], // 隐藏值字段(数组型)(可选)
                     forbid: "disabled" // 项禁用字段(字符型)(可选)
                 },
-                value: "福建省-泉州市-鲤城区", //
+                value: "浙江省-嘉兴市", //
                 joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
                 cascade: true, // 是否级联选择器(可选)，默认false
 				district: true, // 是否省市区县联动选择器(可选)，默认false。
@@ -353,7 +321,7 @@
                     hid: ["provinceId", "cityId", "countyId"], // 隐藏值字段(数组型)(可选)
                     forbid: "disabled" // 项禁用字段(字符型)(可选)
                 },
-                value: "福建省-泉州市-鲤城区", //
+                value: "浙江省-嘉兴市-秀洲区", //
                 joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
                 cascade: true, // 是否级联选择器(可选)，默认false
 				district: true, // 是否省市区县联动选择器(可选)，默认false。
@@ -392,6 +360,59 @@
 
 
 
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //+                     多列选择器
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //——————————————————————————————————————————
+        //=====多列选择器：示例1
+        $('#i-column2').on('click', function(){
+            var dayJson = {
+                data:[
+                    {value:"6月1号"},
+                    {value:"6月2号"},
+                    {value:"6月3号"},
+                    {value:"6月4号"},
+                    {value:"6月5号"}
+                ]
+            }
+            var hourJson = {
+                data:[
+                    {value:"8时"},
+                    {value:"9时"},
+                    {value:"10时"},
+                    {value:"11时"},
+                    {value:"12时"},
+                    {value:"13时"}
+                ]
+            }
+
+            var minutesJson = {
+                data:[
+                    {value:"30分"},
+                    {value:"40分"},
+                    {value:"50分"},
+                    {value:"59分"}
+                ]
+            }
+
+            $(this).neuiPicker({
+                source: dayJson,
+                columns: [hourJson, minutesJson], // 多列选择器的数据源(数组型)(可选)。第2、3、4...列的数据源作为数组的一个元素. eg. [{}, {}]
+                format: { // 使用自定义数据源字段(Object对象)(可选)
+                    value: ["value"] // 显示值字段(数组型)(可选)
+                    // hid: [""], // 隐藏值字段(数组型)(可选)
+                    // forbid: "disabled" // 项禁用字段(字符型)(可选)
+                },
+                value: "6月5号 13时 59分",
+                joint: " ", 
+                cascade: false, 
+				district: false, 
+                onConfirm: function (e) {
+					console.log('您点了确定', e);
+				}
+            })
+        });
 
 
 
@@ -528,8 +549,8 @@
             });
         });
 
-        // 级联选择器
-        document.querySelector('#cascadePickerBtn').addEventListener('click', function () {
+        // 级联选择器1
+        document.querySelector('#cascadePickerBtn1').addEventListener('click', function () {
             weui.picker([
                 {
                     label: '广东',
