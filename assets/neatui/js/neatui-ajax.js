@@ -3,7 +3,7 @@
  * [jquery ajax自定义封装]
  * Author: mufeng
  * Date: 2021.01.04
- * Update: 2021.01.04
+ * Update: 2021.06.10
  */
 //========================================================================================================================
 //                                                          一、jQuery控件
@@ -15,13 +15,19 @@
     ------------------------------------------------------------------------------------------------*/
     //自定义“返回的字符串错误或执行失败时”的几种提示信息.
     var infos = {
-        "friend": "连接超时，请检查您的网络是否正常，可尝试切换网络", //友好提示
+        // "friend": "连接超时，请检查您的网络是否正常，可尝试切换网络", //友好提示
+        "friend": "连接超时，请重试或稍等片刻", //友好提示
+        "offLine": "当前网络信号弱，可尝试切换网络", // 无网络或网络信号弱
+        "nonstandard": "返回的字符串不是标准的格式", //返回的字符串不是标准的格式. 标准格式必须带return或result。标准格式eg. {return:"ok", data:"ok"}, {result:"ok" data:"ok"}
         "empty": "返回的字符串为空或空对象", //返回的字符串为空或空对象{}. eg. ''或 {}
         "notObject": "返回的字符串不是JSON格式(可能含有回车、换行等特殊字符)", //返回的字符串不是标准JSON. eg. {return:"ok", "保存成功\r\n请继续"} 。 \r\n 表示换行符
         "notData": "返回的字符串不含data属性", //返回的字符串不含data属性. eg. {return:"ok", length:[{name:"张三"}]}
         "zeroData": "返回的字符串data数组为空", //返回的字符串是空数组. eg. {return:"ok", data:[]}
         "fails": "", //接口有通(即进入success), 但执行失败,返回的字符串即为失败的原因. eg. {return:"error", data:"保存失败,因为张三已存在"}
         "errors": "Error，接口出错", //接口不通(即进入error)
+    }
+    if(window.navigator.onLine != true){ // 网络不可用时
+        infos.friend = infos.offLine;
     }
 
     //自定义“特殊情况下虽执行成功, 但返回的字符串格式为执行失败时的格式”时的几种提示信息.
@@ -97,7 +103,7 @@
          * @param {string} ps_msg 字符串(JSON格式)
          * @param {string} ps_url 接口地址
          * @param {string} ps_describe 接口描述
-         * @param {boolean} ps_debug 是否启用调试模式
+         * @param {boolean} ps_debug 是否启用调试模式. true 是(不显示友好信息), false 否(要显示友好信息)
          * @returns (boolean) 返回值： false 接口正常, true 接口有错误(eg.return不等于ok)
          */
         mistake: function(ps_msg, ps_url, ps_describe, ps_debug){
@@ -109,19 +115,27 @@
                 //· 执行失败
                 //当返回的信息里含有“登录超时”等字眼时，则直接弹出返回的信息，否则弹出自定义的错误信息
                 var json = JSON.parse(ps_msg);
+
                 if(typeof json["return"] != 'undefined'){
                     if(json["return"] != 'ok'){
                         var messages = typeof json["data"] == 'undefined' ? json["return"] : json["data"];
-                        utilities.toast(ps_action, ps_describe, messages, "fails", debug ? false : true);
+                        // utilities.toast(ps_action, ps_describe, messages, "fails", debug ? false : true);
+                        var isFriendly = typeof json["data"] != 'undefined' ? false : (debug ? false : true);
+                        utilities.toast(ps_action, ps_describe, messages, "fails", isFriendly);
                         return true;
                     }
                 }
-                if(typeof json["result"] != 'undefined'){
+                else if(typeof json["result"] != 'undefined'){
                     if(json["result"] != 'ok'){
                         var messages = typeof json["data"] == 'undefined' ? json["result"] : json["data"];
                         utilities.toast(ps_action, ps_describe, messages, "fails", debug ? false : true);
                         return true;
                     }
+                }
+                else{
+                    var messages = ps_msg;
+                    utilities.toast(ps_action, ps_describe, messages, "nonstandard", debug ? false : true);
+                    return true;
                 }
                 return false;
             }
@@ -197,19 +211,20 @@
                 this.dialogs(infos["friend"]);
             }else{  
                 var tips = '';
-                if(ps_type == "fails"){ //接口有通(即进入success),但执行失败.
-                    if(this.isStringInCludeArrayElement(ps_msg, overtimeArr)){ //直接使用返回的字符串作为错误信息. eg. {return:"登录超时"}
+                if(ps_type == "fails"){ // 接口有通(即进入success),但执行失败.
+                    if(this.isStringInCludeArrayElement(ps_msg, overtimeArr)){ // 直接使用返回的字符串作为错误信息. eg. {return:"登录超时"}
                         tips += ps_msg;
-                    }else{ //自定义错误信息. eg. {return:"error", data:"保存失败"}
+                    }else{ // 自定义错误信息. eg. {return:"error", data:"保存失败"}
                         tips += (msg == '' ? '操作失败！' : msg);
-                        tips += (action == '' ? '' : '<br>请检查' + description + '接口：' + action);
+                        // tips += (action == '' ? '' : '<br>请检查' + description + '接口：' + action);
                     }
                 }else if(ps_type == "errors"){ //接口不通(即进入error)
                     tips += infos[ps_type]; //eg. "Error，接口出错"
                     tips += (action == '' ? '' : '<br>请检查' + description + '接口：' + action);
-                }else{ //接口有通(即进入success),但返回的字符串有错
-                    tips += '返回出错！' + (infos[ps_type] == '' ? '' : '<br>' + infos[ps_type]);
-                    tips += (action == '' ? '' : '<br>请检查' + description + '接口：' + action);
+                }else{ // 接口有通(即进入success),但返回的字符串有错
+                    tips += '返回出错！'
+                    tips += infos[ps_type] == '' ? '' : '<br>错误类型：' + infos[ps_type];
+                    tips += action == '' ? '' : '<br>接口名称：' + description + ' ' + action;
                     if(msg.toString().replace(/([ ]+)/g, '')  !== '' && !$.isEmptyObject(msg)){
                         tips += '<br>返回的字符串：' + msg;
                     }
