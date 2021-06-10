@@ -169,7 +169,7 @@
                                 // {"title":"班超，字仲升，扶风郡平陵县人，东汉时期著名军事家、外交家，史学家班彪的幼子。zzz12", "date":"2020-12-31", "img":"https://inews.gtimg.com/newsapp_bt/0/13039858001/1000"}
                             ]
                         }
-
+                   
                     resolve(json);  // 成功，使用resolve()返回所有数据
                     // reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
 
@@ -326,7 +326,7 @@
 
                 // 注①：当 autoLoad=true, cleanUp=true 时, 则：页面一打开就会清空滑动区域已有数据,且马上加载第1页数据
                 autoLoad: true, // 是否自动加载,默认true(可选). true时如果文档高度小于可视高度则无须下滚就会自动加载第1页数据, false时须下滚才加载第1页数据
-                cleanUp: false, // 是否先清空滑动区域已有数据,默认true(可选). true时只对第1页有效
+                cleanUp: false, // 是否先清空滑动区域已有数据,默认true(可选). true时只对第1页有效 testing
                 
                 pagesize: PAGESIZE, // 每页记录数(可选), 默认20
                 threshold: 50, // 提前加载距离(正整数,可选),默认加载区高度2/3. 比如到底部边缘上方50px时提前加载
