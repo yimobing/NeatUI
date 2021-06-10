@@ -26,6 +26,7 @@
 .neRoll__more,
 .neRoll__load,
 .neRoll__update,
+.neRoll__nodata,
 .neRoll__empty{
     line-height: 50px;
     text-align: center;
