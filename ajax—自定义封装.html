@@ -26,25 +26,64 @@
             <pre>
 
 
-                /*+----------------引入自定义的ajax----------------+*/
+                //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+                //                                              一、引入自定义的ajax
+                //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
                 &lt;script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"&gt;&lt;/script&gt;
                 &lt;script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"&gt;&lt;/script&gt;&lt;!--自定义封装AJAX--&gt;
 
 
-                /*+----------------自定义AJAX----------------+*/
-                //=====AJAX内部几种中断并提醒
+                //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+                //                                             二、自定义AJAX
+                //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+                //==========================================
+                //            1、封装的几种报错机制
+                //==========================================
+                [报错并中断ajax的函数]
                 // 1、Success函数中
                 // ①.增删改等操作
-                if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 空值或空对象提醒(轻微级别 NOTICE)
+                if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 空值或空对象时提醒,其它情况不提醒(轻微级别 NOTICE)
 
                 // ②.获取数据时
-                if(toolTip.zeroLengthTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 数组长度为零提醒(警告级别 WARNING)
+                if(toolTip.zeroLengthTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 数组长度为零时提醒,其它情况不提醒(警告级别 WARNING)
                 if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 犯错就提醒(严格级别 STRICT)
 
                 // 2、ERROR函数中
                 if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 接口不通ERROR提醒(致命错误 ERROR)
 
 
+                [参数说明]
+                · res         后台接口返回的字符串(字符型) (下述中return、result可相互替换)
+                    成功：
+                        -标准格式如下
+                        eg1. var res = "{\"return\":\"ok\", \"data\":\"ok\"}" // 不返回任意值时
+                        eg2. var res = "{\"return\":\"ok\", \"data\":\"张三\"}" // 返回单个值时，该字段值作为字符串写在data中
+                        eg3. var res = "{\"return\":\"ok\", \"username\":\"张三\", \"sex\":\"男\"}" // 返回多个值时，多个值分别写成字段的格式返回
+                        eg4. var res = "{\"return\":\"ok\", \"data\":\"[{\"username\":\"张三\", \"sex\":\"男\"}, {\"username\":\"五娘\", \"sex\":\"女\"}]\"}" // 返回列表数据时，把列表数据组合成数组对象，写在data中
+
+                    失败：
+                        -标准格式如下
+                        eg1. var res = "{\"return\":\"error\", \"data\":\"保存失败\"}" // 把失败的信息作为字符串，写在data中
+
+                        -不太规范，但允许N种格式(基本报错函数内部有判机制)
+                        // 当失败的信息中含有特殊字眼“登录超时”、“次数超过”时，允许返回的格式不太规范，报错函数会自动判断
+                        eg1. var res = "{\"return\":\"系统登录超时\"}" // 把失败信息写在return中
+                        eg2. var res = "{\"return\":\"error\", \"data\":\"系统登录超时\"}" // 把失败信息写在return中
+                        eg3. var res = "{\"return\":\"您当前的使用次数超过10次，已被限制使用\"}" // 把失败信息写在return中
+                        eg4. var res = "{\"return\":\"error\", \"data\":\"您当前的使用次数超过10次，已被限制使用\"}" // 把失败信息写在data中
+
+                · url         接口地址(字符型)
+                · heading     接口中文名称或描述(字符型)
+                · debug       是否启用调试模式(布尔型). true 是, false 否。本地环境 true, 但生产环境下建议 false
+
+
+
+
+
+                //==========================================
+                //              2、封装的AJAX调用示例
+                //==========================================
+                //——————————————————————————————————————————
                 //=====获取数据时
                 // 后台返回
                 var userJson = { "name":"张三", "sex":"男", "age":"14"}
@@ -87,8 +126,8 @@
 
 
 
+                //——————————————————————————————————————————
                 //=====增、删、改操作
-
                 // 开始执行
                 var flag = '', msg = '保存成功';
                 neui.showAnimate();
@@ -147,11 +186,10 @@
 
 
 
-
-
-
-
-                /*+----------------原始AJAX----------------+*/
+                //==========================================
+                //                  3、原始AJAX调用示例
+                //==========================================
+                //——————————————————————————————————————————
                 //
                 /*
                 //START AJAX
