@@ -59,7 +59,8 @@
             labelDown: { // 下滚文本(可选)
                 more: '↑上拉加载更多', // 底部时默认文字(可选)
                 load: '加载中', // 加载(可选)
-                empty: '没有更多了'// 无数据(可选)
+                nodata: '抱歉，暂无数据', // 无数据(第1页就没有数据)(可选)
+                empty: '没有更多了'// 没有更多了(第2,3,4..页时没有数据)(可选)
             },
             labelUp: { // 上滚文本(可选)
                 more: '↓下拉刷新',
@@ -81,6 +82,7 @@
             father: 'neRoll__down',
             more: '<div class="neRoll__more">' + me.opts.labelDown.more + '</div>',
             load: '<div class="neRoll__load"><span class="loading"></span><em>' + me.opts.labelDown.load + '</em></div>',
+            nodata: '<div class="neRoll__nodata">' + me.opts.labelDown.nodata + '</div>',
             empty: '<div class="neRoll__empty">' + me.opts.labelDown.empty + '</div>'
         }
         me.opts.domUp = {
@@ -233,7 +235,10 @@
                     fnRecoverContentHeight(me);
                 }else{
                     setTimeout(function(){ //给一个小延迟,以显示转圈再销毁转圈
-                        me.$domDown.html(me.opts.domDown.empty);
+                        if(me.curpage == 1) //test2
+                            me.$domDown.html(me.opts.domDown.nodata);
+                        else
+                            me.$domDown.html(me.opts.domDown.empty);
                     }, Math.floor(me.opts.delay))
                 }
             })
@@ -245,7 +250,10 @@
                 //fnAutoLoad(me); // 继续自动加载
             }else{ // 无数据
                 setTimeout(function(){ //给一个小延迟,以显示转圈再销毁转圈
-                    me.$domDown.html(me.opts.domDown.empty);
+                    if(me.curpage == 1) //test2
+                        me.$domDown.html(me.opts.domDown.nodata);
+                    else
+                        me.$domDown.html(me.opts.domDown.empty);
                 }, Math.floor(me.opts.delay))
             }
         }
