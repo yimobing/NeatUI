@@ -31,6 +31,7 @@
         me.direction = 'down'; //滚动条滚动方向. down 下滚↓; up 上滚↑
         me.loading = false; // loading状态,默认false
         me.curpage = 0; // 当前页码,默认0
+        me.source = {} // 数据源 test2
         //me._scrollContentHeight = 0; // 文档高度
         //me._scrollWindowHeight = 0; // 可视高度
         me._scrollTop = 0; // 滚动距离,默认0
@@ -235,7 +236,7 @@
                     fnRecoverContentHeight(me);
                 }else{
                     setTimeout(function(){ //给一个小延迟,以显示转圈再销毁转圈
-                        if(me.curpage == 1) //test2
+                        if(me.curpage == 1 && me.opts.cleanUp && fnCheckZeroData(me.source, me)) //test2
                             me.$domDown.html(me.opts.domDown.nodata);
                         else
                             me.$domDown.html(me.opts.domDown.empty);
@@ -250,7 +251,7 @@
                 //fnAutoLoad(me); // 继续自动加载
             }else{ // 无数据
                 setTimeout(function(){ //给一个小延迟,以显示转圈再销毁转圈
-                    if(me.curpage == 1) //test2
+                    if(me.curpage == 1 && me.opts.cleanUp && fnCheckZeroData(me.source, me)) //test2
                         me.$domDown.html(me.opts.domDown.nodata);
                     else
                         me.$domDown.html(me.opts.domDown.empty);
@@ -263,7 +264,7 @@
      * 无数据
      * @param {boolean} flag 布尔值(可选). true 无数据(默认), false 有数据
      */
-    MyLoadMore.prototype.noData = function(flag){
+    MyLoadMore.prototype.noneData = function(flag){
         var me = this;
         if(flag === undefined || flag == true){
             me.isData = false; //无数据了
@@ -373,9 +374,10 @@
 
 
         function runDown(source){
+            me.source = source; //test2
             if(!fnCheckHasData(source, me)){
                 me.lock();
-                me.noData(true);
+                me.noneData(true);
             }
             var callback = { curpage: me.curpage, source: source }
             if(me.opts.delay === 0 || me.opts.delay === ''){
@@ -492,6 +494,7 @@
             runUp(result);
         }
         function runUp(source){
+            me.source = source; //test2
             var callback = { curpage: me.curpage, source: source } //回调参数
             if(me.opts.delay === 0 || me.opts.delay === ''){
                 fnLoadDataUp(source, me, callback);
@@ -507,14 +510,14 @@
     function fnLoadDataUp(source, me, callback){
         if(!fnCheckHasData(source, me)){ //test1
             //me.lock();
-            me.noData(true);
+            me.noneData(true);
         }else{
-            me.noData(false);
+            me.noneData(false);
         }
         me.opts.loadUpFn(callback);
         me.resetLoad();
         me.unlock(); // 解锁loadDownFn里锁定的情况
-        // me.noData(false); // 解锁loadDownFn里无数据的情况 test1
+        // me.noneData(false); // 解锁loadDownFn里无数据的情况 test1
     }
   
 
@@ -558,6 +561,7 @@
     /**
      * 校验数据源是否有数据
      * @param {object} ps_source 数据源
+     * @param {object} ps_me 当前插件对象
      * @returns {boolean} 返回布尔值. true 有, false 无
      */
     function fnCheckHasData(ps_source, ps_me){
@@ -567,5 +571,19 @@
         if(ps_source.data.length < ps_me.opts.pagesize) return false;
         return true;
     }
+
+    /**
+     * 判断数据源是否为空
+     * @param {object} ps_source 
+     * @param {object} ps_me 当前插件对象
+     * @returns {boolean} 返回布尔值。 true 数据源为空, false 数据源非空(至少有1条数据)
+     */
+    function fnCheckZeroData(ps_source, ps_me){
+        if(!ps_source || $.isEmptyObject(ps_source)) return true;
+        if(typeof ps_source.data == 'undefined') return true;
+        if(ps_source.data.length == 0) return true;
+        return false;
+    }
+
 
 })(window.jQuery);
