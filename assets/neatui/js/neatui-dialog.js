@@ -16,7 +16,7 @@
 			var self = this;
 			var defaults = {
 				message: '内容提示窗', //提示信息
-				delay: 1000, //关闭窗口延时时间(可选),默认1秒,单位：毫秒
+				delay: 2000, //关闭窗口延时时间(可选),默认2秒,单位：毫秒
 
 				nodeID:'', //自定义弹出窗口根节点ID(可选),默认空
 				mask:'#' + self.generateMaskNode() + '-' + self.generateRandChar(), //遮罩节点
