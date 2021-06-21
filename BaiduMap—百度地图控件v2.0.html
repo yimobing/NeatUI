@@ -17,7 +17,7 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20210621-1"><!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20210621-2"><!--百度地图控件-->
 </head>
 
 <body>
@@ -562,50 +562,69 @@
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //                                                   初始化设置
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+           
             //——————————————————————————————————————————
-            //=====设置地图宽高(高度一定设置,不然在服务器环境如.net地图可能不显示) add and edit 20210621-1
-            var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
-                winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
-            // 整个区域
-            var eleAll = $('.bdmap'),
-                allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
-                allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
-                allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
-                allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
-                allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
-                allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
-                allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
-                allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
-            //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
-            // 顶部区域
-            var eleTop = $('.bdmap__editor'),
-                topHeight = eleTop.outerHeight(true);
-            // 地图区域
-            var eleTu = $('.bdmap__map'),
-            tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
-                tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
-                tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
-                tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
-                tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
-                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
-                tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
-                tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
-                tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
-            // 计算宽高
-            var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
-                allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
-                tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
-                tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
-            // 设置宽高
-            $('.bdmap__map').css({
-                width: tuWidth,
-                height: tuHeight
-            })
-            $('#map').css({
-                width: eleTu.width(),
-                height: eleTu.height()
-            })
+            //=====初始化地图宽高 add 20210621-1
+            setDituSize();
+            
+            //——————————————————————————————————————————
+            //=====检测窗口变化事件 edit 20210621-1
+            $(window).on('resize', function(){
+                setDituSize();
+            });
 
+            /**
+             * 函数：设置地图宽高 edit 20210621-1
+             * (高度一定要在设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
+             */
+            function setDituSize(){
+                var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
+                    winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
+                // 整个区域
+                var eleAll = $('.bdmap'),
+                    allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
+                    allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
+                    allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
+                    allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
+                    allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
+                    allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
+                    allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
+                    allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
+                //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
+                // 顶部区域
+                var eleTop = $('.bdmap__editor'),
+                    topHeight = eleTop.outerHeight(true);
+                // 地图区域
+                var eleTu = $('.bdmap__map'),
+                    tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                    tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
+                    tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
+                    tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
+                    tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
+                    tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                    tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
+                    tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
+                    tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
+                // 计算宽高
+                var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
+                    allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
+                    tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
+                    tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
+                // console.log('bodyWidth：', $('body').width(), '\nallMargLeft:',allMargLeft, '\nallMargRight:',allMargRight, '\nallPadLeft:',allPadLeft, '\nallPadRight:', allPadRight);
+                // console.log('tuMargLeft:',tuMargLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadRight:',tuPadRight);
+                // console.log('--------------------------------');
+                // 设置地图宽高
+                $('.bdmap__map').css({
+                    width: tuWidth,
+                    height: tuHeight
+                })
+                $('#map').css({
+                    width: eleTu.width(),
+                    height: eleTu.height()
+                })
+            }
+
+            
 
 
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -775,6 +794,7 @@
             // 2、加载多个已有的多边形
             bdChinaMap.myPoints = coordinateArray;     
             bdChinaMap.init();
+
 
 
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
