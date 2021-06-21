@@ -170,41 +170,94 @@ button[type="button"]:hover{
 .bdmap__mouse{
 	position: absolute;
 	top: 50px;
-	right: 35px;
-	padding: 5px 20px;
+	right: 25px;
+	opacity: .90;
+	filter: alpha(opacity=90);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90);
+}
+.bdmap__mouse-title{
 	background-color: #ff0000;
+    padding: 8px 20px;
 	border-radius: 4px;
-	opacity: .85;
-	filter: alpha(opacity=85);
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=85);
 	color: #fff;
+	text-align: center;
 	font-size: 16px;
+	cursor: pointer;
 }
 
+.bdmap__mouse-title:after{
+	content: '';
+	display: inline-block;
+	vertical-align: middle;
+	width: 0;
+	height: 0;
+	margin-left: 8px;
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-bottom: 12px solid #fff;
+}
+.bdmap__mouse-title.angle-down{ }
+.bdmap__mouse-title.angle-down:after{
+	border-bottom: 0;
+	border-top: 12px solid #fff;
+}
+.bdmap__mouse-step{
+	margin-top: 5px;
+	background-color: #fff;
+	padding: 5px 20px;
+	border-radius: 4px;
+	color: #888;
+	font-size: 12px;
+}
+.bdmap__mouse-step p{ margin-top: 2px; }
+.bdmap__mouse-step p:first-child{ margin-top: 0; }
+.bdmap__mouse-step p.bold{ font-size: 1.1em; font-weight: bold; }
 
 /*+------------地图样式-------------+*/
-/*信息窗*/
+/*文本标*/
 .BMapLabel.bdMarkerLabel{
 	border: 0!important;
 	background: transparent!important;
 }
 .bdLabel{
+	position: relative;
     background-color: #fff;
-    padding: 5px 8px;
-    border-width: 2px;
+    padding: 12px 25px;
+    border-width: 1px;
     border-style: solid;
-    border-color: #ff0000;
+    border-color: #19b6f8;
     border-radius: 3px;
-    color: #ff0000;
-    font-size: 13px;
+    box-shadow: 0 1px 3px 0px #3291b9;
+    color: #0c88e8;
+    font-size: 15px;
     font-weight: bold; 
 }
-
 .bdLabel.blue{
     border-color: #1296db;
     color: #1296db;
 }
+.bdLabel:before{
+	content: '';
+	position: absolute;
+    bottom: -8px;
+    left: 30px;
+    margin: 0 auto;
+	display: block;
+	width: 0;
+	height: 0;
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-top: 15px solid #fff;
+}
+.bdLabel p,
+.bdLabel br{ line-height: 1.75; }
 
+
+/*+------------标注点信息窗-------------+*/
+.bdInfoTitle{ font-size: 16px; }
+.bdInfoDescribe{ padding: 5px 8px; font-size: 14px; }
+.bdInfoDescribe p,
+.bdInfoDescribe br{ line-height: 1.75; }
 
 
 
