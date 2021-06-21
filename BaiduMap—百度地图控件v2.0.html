@@ -17,27 +17,46 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css"><!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20210621-1"><!--百度地图控件-->
 </head>
 
 <body>
-    <div class="bdmap" id="allmap">
+    <div class="bdmap" id="allmap"><!--edit 20210621-1-->
         <div class="bdmap__editor">
             <div class="bdmap__picker">
                 当前学校坐标 <input type="text" id="c-locate">
                 <button type="button" data-type="copy" id="btn-pick-copy">复制</button>
                 <button type="button" data-type="save" id="btn-pick-save">保存学校坐标</button>
-                <label> (拖动标记点可更改坐标) </label>
+                <label> (拖动点标记可更改坐标) </label>
             </div>
             <div class="bdmap__draw">
-                <span>拖动多边形上的小正方形，可更改学区范围</span>
                 <button type="button" data-type="del" id="btn-poly-del">删除学区范围</button>
                 <button type="button" data-type="save" id="btn-poly-save">保存学区范围</button>
             </div><!--/.bdmap__draw-->
         </div><!--/.bdmap__editor-->
         <div class="bdmap__map">
             <div id="map"></div>
-            <div class="bdmap__mouse">绘制学区范围</div>
+            <div class="bdmap__mouse">
+                <div class="bdmap__mouse-title">绘制学区范围步骤</div>
+                <div class="bdmap__mouse-step">
+                    <p class="bold">一、绘制步骤(正方形)：</p>
+                    <p>1、选择绘制工具；</p>
+                    <p>2、按住鼠标左键，在地图任意位置上拖动<br>
+                        放开鼠标左键，即可完成绘制
+                    </p>
+                    <p>3、拖动图形上的白色小正方框，可更改形状。</p>
+                    <p class="bold">二、绘制步骤(线条、多边形等)：</p>
+                    <p>1、选择绘制工具；</p>
+                    <p>2、点击地图任意位置(作为起始点)；</p>
+                    <p>3、移动鼠标，再次点击地图任意位置<br>
+                        (就会出现线条或形状)；
+                    </p>
+                    <p>4、重复上一步；</p>
+                    <p>5、双击鼠标，完成绘制；</p>
+                    <p>6、拖动图形上的白色小正方框，可更改形状。</p>
+
+                </div><!--/.bdmap__mouse-step-->
+            </div><!--/.bdmap__mouse-->
             <div id="showPanelBtn">编辑多边形&lt;</div>
             <div id="panelWrap">
                 <div id="showOverlayInfo">此处用于展示覆盖物信息</div>
@@ -181,7 +200,7 @@
         
 
         /**
-         * 百度地图类对象
+         * 百度地图类对象 edit 20210621-1
          * 参考：http://mobai.blog.51cto.com/
          */
         var bdChinaMap = {
@@ -197,18 +216,34 @@
             label: '', // 信息窗覆盖物
             overlays: [], // 全部覆盖物
 
+            image: { // 自定义点标记图标及其它属性(可选)
+                enable: false, // 是否启用(可选)，默认false
+                path: 'assets/neatui/img/', // 图片路径(可选)
+                icon: 'bmap_locate_blue.png', // 图片名称(可选)
+                size: 50 // 图片大小(可选)
+            },
+            infos: { // 自定义信息窗口(可选)
+                enable: false, // 是否启用(可选), 默认false
+                title : '' , // 标题(可选)。默认为中心点说明文字，支持HTML内容
+                message: '', // 短信内容(可选)(这个貌似没用)。完整的短信内容包括：自定义部分+位置链接，不设置时，显示默认短信内容。短信内容最长为140个字
+                content: '', // 内容或描述，比如点标记的地址(可选)。默认空，支持HTML内容
+                width: 0, // 宽。单位像素，取值范围：0, 220 - 730, 其中0表示自动调整宽
+                height: 0, // 高。单位像素，取值范围：0, 60 - 650，其中0表示自动调整高
+                method: 'mouseover' // 打开方式(可选). mouseover 鼠标经过点标记时(默认)，click 鼠标点击点标记时
+            }, 
+
             overlaysCache: [],
             myPoints: [], // 所有坐标点数组
             myPolygon: '',
             myOverlay: [],
             drawingManager: '',
             styleOptions: {
-                strokeColor: "red",      // 边线颜色。
-                fillColor: "red",        // 填充颜色。当参数为空时，圆形将没有填充效果。
-                strokeWeight: 3,        // 边线的宽度，以像素为单位。
-                strokeOpacity: 0.8,     // 边线透明度，取值范围0 - 1。
-                fillOpacity: 0.3,       // 填充的透明度，取值范围0 - 1。
-                strokeStyle: 'solid'    // 边线的样式，solid或dashed。
+                strokeColor: 'red', // 边线颜色。
+                fillColor: 'red', // 填充颜色。当参数为空时，圆形将没有填充效果。
+                strokeWeight: 3, // 边线的宽度，以像素为单位。
+                strokeOpacity: 0.8, // 边线透明度，取值范围0 - 1。
+                fillOpacity: 0.3,  // 填充的透明度，取值范围0 - 1。
+                strokeStyle: 'solid' // 边线的样式，solid或dashed。
             },
 
             /**
@@ -229,6 +264,8 @@
                 
                 // 添加点标记
                 this.addMarker();
+                // 添加信息窗口
+                this.addInfoWindow();
 
                 // 实例化鼠标绘制工具
                 this.drawingManager = new BMapLib.DrawingManager(map, {
@@ -361,7 +398,18 @@
             addMarker: function(){
                 var map = this.map;
                 // 添加点标记
-                var marker = new BMap.Marker(this.point);
+                var iconUrl = this.image.path + this.image.icon,
+                    iconSize = new BMap.Size(this.image.size, this.image.size),
+                    iconOptions = {
+                        // offset: new BMap.Size(0, 0),
+                        // imageOffset: new BMap.Size(0, 0),
+                        anchor: new BMap.Size(5, 10) // 图标的定位锚点。此点用来决定图标与地理位置的关系，是相对于图标左上角的偏移值，默认等于图标宽度和高度的中间值
+                    };
+                var markerOptions = { }
+                if(this.image.enable){
+                    markerOptions.icon = new BMap.Icon(iconUrl, iconSize, iconOptions);
+                }
+                var marker = new BMap.Marker(this.point, markerOptions);
                 marker.enableDragging();
                 marker.name = 'dianbiaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
                 map.addOverlay(marker);
@@ -376,8 +424,8 @@
                         maxWidth:500,  // 最大宽度(220-730)
                         height: 0,     // 高度(60-650) 0 自动调整
                         offset: { // 位置偏移
-                            width: 10, 
-                            height: -50
+                            width: -40, 
+                            height: -75
                         }
                     }
                 var label = new BMap.Label(lbText, lbOptions);
@@ -391,10 +439,10 @@
                     lineHeight: '30px',
                     fontFamily: '微软雅黑'
                 })
-                label.name = 'xinxichuang'; // 标记覆盖物类型,方便清除指定覆盖物时用
-                marker.setLabel(label); // 绑定信息窗到点标记上
+                label.name = 'wenbenbiaozhu'; // 标记覆盖物类型,方便清除指定覆盖物时用
+                marker.setLabel(label); // 绑定文本标注到点标记上
                 map.addOverlay(label);
-                setTimeout(function(){ // 更改信息窗样式
+                setTimeout(function(){ // 更改文本标注样式
                     $('.bdLabel').parent().addClass('bdMarkerLabel');
                 }, 0)
                 this.label = label;
@@ -404,6 +452,32 @@
                 if($('#c-locate').length != 0) $('#c-locate').val(this.center);
             },
 
+
+            /**
+             * 添加信息窗口
+             */
+            addInfoWindow: function(){
+                if(!this.infos.enable) return;
+                var map = this.map;
+                var marker = this.marker;
+                var infoOptions = {
+                    width : this.infos.width, // 宽。单位像素，取值范围：0, 220 - 730
+                    height: this.infos.height, // 高。单位像素，取值范围：0, 60 - 650
+                    title : '<div class="bdInfoTitle">' + (this.infos.title == '' ? this.caption : this.infos.title) + '</div>', // 标题。支持HTML内容
+	                message: this.infos.message // 短信内容(可选)。完整的短信内容包括：自定义部分+位置链接，不设置时，显示默认短信内容。短信内容最长为140个字
+                }
+                var infoContent = '<div class="bdInfoDescribe">' + this.infos.content + '</div>';
+                var infoDow = new BMap.InfoWindow(infoContent, infoOptions);  // 创建信息窗口对象 
+                marker.addEventListener(this.infos.method, function(){       
+                    map.openInfoWindow(infoDow, this.point);
+                })
+
+                if(this.infos.method == 'mouseover'){
+                    marker.addEventListener('mouseout', function(){       
+                        map.closeInfoWindow()
+                    })
+                }
+            },
 
             /**
              * 拖动点标记事件
@@ -420,6 +494,7 @@
                     ele.val( x + ',' + y);
                 })
             },
+            
             
             /**
              * 清除所有覆盖物
@@ -483,6 +558,55 @@
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         $(function(){
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //                                                   初始化设置
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====设置地图宽高(高度一定设置,不然在服务器环境如.net地图可能不显示) add and edit 20210621-1
+            var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
+                winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
+            // 整个区域
+            var eleAll = $('.bdmap'),
+                allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
+                allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
+                allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
+                allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
+                allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
+                allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
+                allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
+                allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
+            //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
+            // 顶部区域
+            var eleTop = $('.bdmap__editor'),
+                topHeight = eleTop.outerHeight(true);
+            // 地图区域
+            var eleTu = $('.bdmap__map'),
+            tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
+                tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
+                tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
+                tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
+                tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
+                tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
+            // 计算宽高
+            var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
+                allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
+                tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
+                tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
+            // 设置宽高
+            $('.bdmap__map').css({
+                width: tuWidth,
+                height: tuHeight
+            })
+            $('#map').css({
+                width: eleTu.width(),
+                height: eleTu.height()
+            })
+
+
 
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //                                                   创建学校坐标、学区范围
@@ -631,11 +755,16 @@
 
 
             //——————————————————————————————————————————
-            //=====地图初始化
+            //=====地图初始化 edit 20210621-1
             // console.log('overlayArrray:', coordinateArray)
             bdChinaMap.center = g_zhongxin_zb; // '118.611836,24.918225'; // 中心点坐标
             bdChinaMap.caption = g_xuexiao_mc; // '泉州市'; // 中心点说明文字
             bdChinaMap.zoom = 15; // 缩放级别
+            bdChinaMap.image.enable = true;
+            bdChinaMap.image.icon = 'bmap_school.png';
+            // bdChinaMap.infos.enable = false;
+            // bdChinaMap.infos.content = '这里填写地址';
+
             // // 1、加载一个已有的多边形
             // bdChinaMap.myOverlay = [
             //     new BMap.Point(116.256515, 39.995242),
@@ -646,20 +775,13 @@
             // 2、加载多个已有的多边形
             bdChinaMap.myPoints = coordinateArray;     
             bdChinaMap.init();
-            //设置地图区域高度
-            $('.bdmap__map').css({
-                height: $('.bdmap').height() - parseFloat($('.bdmap').css('paddingTop')) * 2 - $('.bdmap__editor').outerHeight(true)
-            })
-
-
-
 
 
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //                                                   系列点击事件
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
-            // =====显示结果面板动作、编辑多边形
+            //=====显示结果面板动作、编辑多边形
             var isPanelShow = false;
             $("#showPanelBtn").on('click', function(){
                 if (isPanelShow == false) {
@@ -678,11 +800,26 @@
             });
 
 
+            //——————————————————————————————————————————
+            //=====绘制学区范围步骤显示或隐藏 add 20210621-1
+            $('.bdmap__mouse-title').on('click', function(){
+                var $this = $(this);
+                var $next = $(this).next();
+                if($next.is(':visible')){
+                    $this.addClass('angle-down');
+                    $next.slideUp('fast');
+                }else{
+                    $this.removeClass('angle-down');
+                    $next.slideDown('fast');
+                }
+            });
+
+
 
 
 
             //——————————————————————————————————————————
-            // =====复制按钮、复制当前坐标
+            //=====复制按钮、复制当前坐标
             $('#btn-pick-copy').on('click', function(){
                 var $text = $(this).siblings('#c-locate')
                 var value = $text.val();
@@ -702,7 +839,7 @@
 
 
             //——————————————————————————————————————————
-            // =====保存学校坐标按钮
+            //=====保存学校坐标按钮
             $('#btn-pick-save').on('click', function(){
                 var ls_zuobiao = $('#c-locate').val();
                 var arr = [ ls_zuobiao ]
@@ -767,7 +904,7 @@
 
             
             //——————————————————————————————————————————
-            // =====保存学区范围按钮
+            //=====保存学区范围按钮
             $('#btn-poly-save').on('click', function(){
                 // 获取学区范围坐标数据
                 var coordArr = tools.getPolyCoordinateData();
@@ -782,7 +919,6 @@
                             data = row;
                         var saveArr1 = [ xuhao, data ]
                         // console.log('外部行循环数组:', saveArr1);
-
                         var isGoOn = true; // 是否继续循环, true 是, false 否
                         for(var k = 0; k < data.length; k++){
                             var ls_weizhi = xuhao,
@@ -790,6 +926,7 @@
                                 ls_counts = i == 0 && k == 0 ? 0 : ''; // 第一行传0，其它传空
                             var saveArr2 = [ ls_weizhi, ls_zuobiao, ls_counts ]
                             // console.log('内部行循环数组：', saveArr2);
+
                             // 后台返回
                             /*
                             // START AJAX
@@ -826,13 +963,15 @@
                             })
                             if(!isHoldOn){
                                 neui.destroyAnimate();
-                                return;
+                                // return;
+                                // 注意：在for循环中要这样写,才能在后台错误时中断执行 add 20210621-1 下2行
+                                flag = 0; // 1 成功, 0 失败
+                                isGoOn = false;
                             }
                             // END AJAX
                             */
                             flag = parseInt(1); // 1 成功, 0 失败
                             if(!flag) msg = '保存失败';
-
 
                             if(!flag){
                                 isGoOn = false;
