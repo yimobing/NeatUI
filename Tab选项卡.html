@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>在线沟通消息</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="../assets/style/font-awesome/css/font-awesome.css"><!--图标库-->
+    <link type="text/css" rel="stylesheet" href="../assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="../assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="text/css" rel="stylesheet" href="../assets/neatui/css/neatui-form.css"><!--表单布局-->
+    <link type="text/css" rel="stylesheet" href="../assets/neatui/css/neatui-loadmore.css"><!--上拉加载更多-->
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+</head>
+<body>
+    <style>
+        body{width: 98.5%; max-width: 640px; margin: 0 auto; background-color: #f4f4f4; font-size: 16px; }
+        *{margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -moz-box-sizing: border-box; outline: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); -webkit-tap-highlight-color:rgba(0, 0, 0, 0); -webkit-text-size-adjust: none; } 
+        *:not(input, textarea){-webkit-touch-callout: none; -webkit-user-select: none; }
+        /*+----------------tab---------------+*/
+        .tab{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; margin-top: 12px; } 
+        .tab>div{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; height: 40px; background-color: #daf0fd; color: #4c626f; text-align: center; font-size: 15px; }
+        .tab>div:first-child{border-radius: 8px 0 0 0; } 
+        .tab>div:nth-child(2){border-radius: 0 8px 0 0; } 
+        .tab>div.on{background-color: #fff; border-radius: 0; font-weight: bold; } 
+        .tab>div.on:before{position: absolute; top: -5px; left: 0; content: ''; display: inline-block; width: 100%; height: 10px; background-color: #fff; } 
+        .tab>div.on:after{content: ''; position: absolute; z-index: 1; top: 0; width: 0; height: 0; } 
+        .tab>div:first-child.on:before{border-radius: 8px 20px 0 0; } 
+        .tab>div:first-child.on:after{right: -40px; border-bottom: 40px solid #fff; border-right: 40px solid  transparent; } 
+        .tab>div:nth-child(2).on:before{border-radius: 20px 8px 0 0; } 
+        .tab>div:nth-child(2).on:after{left: -40px; border-bottom: 40px solid #fff; border-left: 40px solid transparent; }
+        /*+----------------history---------------+*/
+        .history{min-height: 50px; /* background-color: #fff; */ } 
+        .history__one{ position: relative; margin-bottom: 15px; } 
+        .history__one .eform-content{padding: 20px 10px 8px 25px; background-color: #fff; border-radius: 8px 8px 0 0; } 
+        .history__one:first-child .eform-content{border-top-left-radius: 0; border-top-right-radius: 0; } 
+        .history__one .eform-button{ margin-top: 1px; border-radius: 0 0 8px 8px;}
+        .history__one .eform-button button{color: #759d89!important;}
+    </style>
+
+    <div class="wrap">
+       <section class="tab">
+           <div class="on">未读消息</div>
+           <div>最近消息</div>
+       </section>
+       <section class="history"></section>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="../assets/style/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="../assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="../assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="../assets/neatui/js/neatui-form.js"></script><!--表单布局-->
+    <script type="text/javascript" src="../assets/neatui/js/neatui-loadmore.js?v=20210422-1"></script><!--上拉加载更多-->
+    <script type="text/javascript" src="../assets/neatui/js/neatui-ajax.js"></script><!--自定义AJAX-->
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+        //=====常量
+        var TABINDEX = 1; // 切片索引值+1. 1 未读消息(默认), 2 最新消息
+        var ROOTNODE = '.history'; // 列表根节点
+        var PAGESIZE = 20; // 每页记录数
+       
+
+        /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 获取聊天消息数据 edit 20210422-1
+         * @param {number} ps_curpage 当前页码(可选),默认1
+         * @returns {Promise} 返回第N页对应的Promise对象. 其中resolve(res)中的res为数据源
+         */
+        function get_data_message(ps_curpage){
+            var ls_sjlb = TABINDEX,
+                ls_open_page_num = typeof ps_curpage == 'undefined' ? 1 : ( isNaN(parseInt(ps_curpage)) ? 1 : (parseInt(ps_curpage)) );
+                ls_every_page_count = PAGESIZE;
+            return new Promise(function(resolve, reject){
+
+                // · 前台模拟异步
+                setTimeout(function(){
+                    // 后台返回
+                    var json = {
+                        "data":[
+                            {"xjdh":"X1001", "dyw_xh":"D1001", "xjr":"张三", "dyw_add":"1、住宅/泉州万科城（一期）/1号楼/2/201/126平方米/已满2年", "jgmc":"中国建设银行股份有限公司泉州分公司", "check_user_kd":"1", "create_time":"2021-04-15 12:03:48"},
+                            {"xjdh":"X1002", "dyw_xh":"D1001", "xjr":"李四", "dyw_add":"1、住宅/泉州星光耀广场（二期）/5号楼/10/1005/178平方米/已满2年", "jgmc":"中国建设银行股份有限公司泉州分公司", "check_user_kd":"0", "create_time":"2021-04-15 12:03:48"},
+                            {"xjdh":"X1003", "dyw_xh":"D1001", "xjr":"王五", "dyw_add":"1、住宅/南安中骏四季康城（三期）/7号楼/17/1702/142平方米/已满2年", "jgmc":"中国建设银行股份有限公司泉州分公司", "check_user_kd":"1", "create_time":"2021-04-15 12:03:48"},
+                            {"xjdh":"X1004", "dyw_xh":"D1001", "xjr":"赵六", "dyw_add":"1、住宅/晋江宝龙城市广场（四期）/8号楼/25/2501/140平方米/已满2年", "jgmc":"中国建设银行股份有限公司泉州分公司", "check_user_kd":"0", "create_time":"2021-04-15 12:03:48"}
+                        ]
+                    }
+
+                    resolve(json);  // 成功，使用resolve()返回所有数据
+                    // reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+
+                }, 100)
+
+                // ·后台返回
+                /*
+                //START AJAX
+                var json = {}
+                var isHoldOn = true;
+                ajax({
+                    heading: "获取聊天消息数据",
+                    debug: false,
+                    url: "../../fwh_pub/jk_pic_chat.ashx",
+                    data: {
+                        "action": "sel_v2_xjd_chat_msgs_lssj",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk%>",
+                        "sjlb": ls_sjlb,
+                        "open_page_num": ls_open_page_num, // 当前页码
+                        "every_page_count": ls_every_page_count // 每页记录数
+                    },
+                    success: function(res){
+                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        // if(res == '') return '';
+                        json = JSON.parse(res);
+                        resolve(json); // 成功，使用resolve()返回所有数据
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    return {}
+                }
+                //END AJAX
+                */
+            })
+        }
+
+
+        /**
+         * 创建聊天消息列表
+         * @param {object} ps_source 数据源
+         * @param {object} ps_params 当前页码等组成的一维对象
+         */
+        function create_list_message(ps_source, ps_params){
+            var parameter = typeof ps_params == 'undefined' ? {} : ps_params;
+            var nowpage = typeof parameter.curpage == 'undefined' ? 1 : (parameter.curpage == '' ? 1 : parameter.curpage); // !!!页码标记
+            var node = ROOTNODE;
+            var _html = '';
+            $.each(ps_source.data, function(i, items){
+                var ls_xuhao = (nowpage - 1) * PAGESIZE + (i + 1);
+                _html += [
+                    '<div class="history__one">',
+                        '<div class="eform-order">' + ls_xuhao + '</div>',
+                        '<div class="eform-content">',
+                            '<div class="eform-row">',
+                                '<div class="item-l"><label>询价单号：</label></div>',
+                                '<div class="item-r"><span>' + items["xjdh"] + '</span></div>',
+                            '</div>',
+                            '<div class="eform-row flex-start">',
+                                '<div class="item-l"><label>抵押物：</label></div>',
+                                '<div class="item-r"><span>' + items["dyw_add"] + '</span></div>',
+                            '</div>',
+                            '<div class="eform-row">',
+                                '<div class="item-l"><label>询价人：</label></div>',
+                                '<div class="item-r"><span>' + items["xjr"] + '</span></div>',
+                            '</div>',
+                            '<div class="eform-row flex-start">',
+                                '<div class="item-l"><label>机构名称：</label></div>',
+                                '<div class="item-r"><span>' + items["jgmc"] + '</span></div>',
+                            '</div>',
+                            '<div class="eform-row">',
+                                '<div class="item-l"><label>创建时间：</label></div>',
+                                '<div class="item-r"><span>' + items["create_time"] + '</span></div>',
+                            '</div>',
+                        '</div><!--/.eform-content-->',
+                        '<div class="eform-button child-w-100 child-no-border" data-xjdh="' + items["xjdh"] + '" data-dyw-xh="' + items["dyw_xh"] + '" data-check-user-kd="' + items["check_user_kd"] + '">',
+                            '<button type="button" class="ne-btn only-text btn-view"><i class="fa fa-eye"></i><span>查看</span></button>',
+                        '</div><!--/.eform-button-->',
+                    '</div><!--/.history__one-->'
+                ].join('\r\n');
+            })
+            if($(node).length > 0){
+                $(node).append(_html);
+            }
+        }
+
+
+
+        /**
+         * 加载数据 edit 20210422-1
+         */
+        function load_data(){
+            neui.showAnimate();
+            setTimeout(function(){
+                // 调用上拉加载更多
+                var node = ROOTNODE;
+                $(node).neuiLoadmore({
+                    scrollArea: window,
+                    scrollHeight: 0,
+                    autoLoad: true,
+                    cleanUp: true,
+                    pagesize: PAGESIZE,
+                    threshold: 50,
+                    distance: 50,
+                    delay: 0,
+                    labelDown: {
+                        more: '↑上拉加载更多',
+                        load: '加载中',
+                        empty: '没有更多了'
+                    },
+                    getData: function(e){
+                        // console.log('当前页码：', e.curpage)
+                        return get_data_message(e.curpage)
+                    },
+                    loadDownFn: function (e) {
+                        create_list_message(e.source, {curpage: e.curpage})
+                    }
+                })
+                neui.destroyAnimate();
+            }, 100)
+        }
+
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //                                                   初始化
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====初始化加载数据
+            load_data();
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //                                                   系列事件
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====选项卡切换事件
+            $('.tab div').on('click', function(){
+                $(this).addClass('on').siblings().removeClass('on');
+                var index = $(this).index() + 1;
+                //console.log("index：", index)
+                TABINDEX = index;  // 全局赋值
+                load_data(); // 重载数据
+            });
+
+
+            //——————————————————————————————————————————
+            //=====查看按钮、查看聊天消息按钮
+            $(ROOTNODE).on('click', '.btn-view', function(){
+                var eleParent = $(this).parent();
+                var ls_xjdh = eleParent.attr('data-xjdh'),
+                    ls_dyw_xh = eleParent.attr('data-dyw-xh'),
+                    ls_check_user_kd = eleParent.attr('data-check-user-kd');
+                var arr = [ ls_xjdh, ls_dyw_xh, ls_check_user_kd ]
+                // console.log('数组arr：', arr);
+                // 跳转链接
+                var linkUrl = '../inquiry/wyxj-我要询价v2.0-惠安农信社.html'; // ajax({})
+                window.location.href = linkUrl + '?x=' + ls_xjdh + '&d=' + ls_dyw_xh + '&k=' + ls_check_user_kd + '&chat=1'; // ajax({})
+            })
+
+
+        }); //$(function(){})
+    </script>
+</body>
+</html>
