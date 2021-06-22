@@ -136,11 +136,12 @@
         var g_xuexiao_bh = ''; // '<%=s_xuexiao_bh%>'; // 学校编号 ajax({})
         var g_xuexiao_mc = ''; // 学校名称
         var g_zhongxin_zb = ''; // 地图中心点坐标
+        var g_ditu_suofang = ''; // 地图缩放级别 add 20210622-1
 
 
         /*+————————————————FUNCTION————————————————+*/
         /**
-         * 自定义工具库类
+         * 自定义工具库类 edit 20210622-1
          */
         var tools = {
             /**
@@ -195,12 +196,21 @@
                 }
                 // console.log('coordArr：', coordArr);
                 return coordArr;
+            },
+
+            /**
+             * 获取地图当前缩放级别
+             * @returns {number} 返回缩放级别
+             */
+            getZoom: function(){
+                var map = bdChinaMap.map;
+                return map.getZoom();
             }
         }
         
 
         /**
-         * 百度地图类对象 edit 20210621-1
+         * 百度地图类对象 edit 20210622-1
          * 参考：http://mobai.blog.51cto.com/
          */
         var bdChinaMap = {
@@ -216,6 +226,9 @@
             label: '', // 信息窗覆盖物
             overlays: [], // 全部覆盖物
 
+            default: { // 地图默认配置项,即MapOptions及其它参数(可选)
+                enableMapClick: true // 是否启用底图景点可点功能(可选), 默认启用
+            },
             image: { // 自定义点标记图标及其它属性(可选)
                 enable: false, // 是否启用(可选)，默认false
                 path: 'assets/neatui/img/', // 图片路径(可选)
@@ -255,7 +268,10 @@
                 }
                 this.center = this.center == '' ? '118.611836,24.918225' : this.center; // 当中心点坐标为空时,设定一个默认坐标
                 this.status = true;
-                this.map = new BMap.Map('map');
+                var options = {
+                    enableMapClick: this.default.enableMapClick
+                }
+                this.map = new BMap.Map('map', options);
                 this.point = new BMap.Point(this.center.split(',')[0], this.center.split(',')[1]);
                 var map = this.map;
                 var styleOptions = this.styleOptions;
@@ -290,10 +306,10 @@
                     rectangleOptions: styleOptions // 矩形的样式
                 })
                 // 添加鼠标绘制工具监听事件，用于获取绘制结果
-                this.drawingManager.addEventListener('overlaycomplete', bdChinaMap.overlaycomplete);
+                this.drawingManager.addEventListener('overlaycomplete', this.overlaycomplete);
 
      
-                // 加载多边形testing
+                // 加载多边形
                 if(this.myPoints.length != 0){
                     // 加载多个已有的多边形
                     for(var i = 0; i < this.myPoints.length; i++){
@@ -318,6 +334,7 @@
              * 加载覆盖物
              */
             loadMyOverlay: function () {
+                var _this = this;
                 var map = this.map;
                 // this.clearAll();
                 map.centerAndZoom(this.point, this.zoom); // 设置地图中心点
@@ -334,9 +351,9 @@
                 };
                 ply.addEventListener("lineupdate", function (e) { // 拖动边线进行编辑时监听事件
                     // console.log('e:', e)
-                    bdChinaMap.showLatLon(e.currentTarget.ha);
+                    _this.showLatLon(e.currentTarget.ha);
                 })
-                // bdChinaMap.showLatLon(myPolygon.getPath()); // 绘制完成时显示覆盖物点信息 testing
+                // this.showLatLon(ply.getPath()); // 绘制完成时显示覆盖物点信息
                 map.addOverlay(ply);
             },
 
@@ -362,15 +379,16 @@
              *绘制完成后回调获得覆盖物信息
              */
             overlaycomplete: function (e) {
+                var _this = this;
                 e.overlay.name = 'duobianxing'; // 标记覆盖物类型,方便清除指定覆盖物时用
-                bdChinaMap.overlays.push(e.overlay);
+                this.overlays.push(e.overlay);
                 if(typeof e.overlay.enableEditing != 'undefined') e.overlay.enableEditing();
                 e.overlay.addEventListener("lineupdate", function (e) { // 拖动边线进行编辑时监听事件
                     // console.log('e:', e);
-                    bdChinaMap.showLatLon(e.currentTarget.ha);
+                    _this.showLatLon(e.currentTarget.ha);
                 });
-                if(typeof e.overlay.getPath != 'undefined'){ // 绘制完成时显示覆盖物点信息 testing
-                    bdChinaMap.showLatLon(e.overlay.getPath());
+                if(typeof e.overlay.getPath != 'undefined'){ // 绘制完成时显示覆盖物点信息
+                    _this.showLatLon(e.overlay.getPath());
                 }
             },
 
@@ -631,10 +649,10 @@
             //                                                   创建学校坐标、学区范围
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
-            //======后台返回学校坐标数据
+            //======后台返回学校坐标数据 edit 20210622-1
             var schoolJson = {
                 "return":"ok", "data":[
-                    {"xuexiao_bh":"X1001", "xuexiao_mc":"泉州五中", "xuexiao_ms":"泉州五中是泉州市最好的学校", "zuobiao":"118.611836,24.918225"}
+                    {"xuexiao_bh":"X1001", "xuexiao_mc":"泉州五中", "xuexiao_ms":"泉州五中是泉州市最好的学校", "zuobiao":"118.611836,24.918225", "ditu_suofang":"15"}
                 ]
             }
             /*
@@ -678,6 +696,7 @@
             // g_xuexiao_bh = firstRowData["xuexiao_bh"];
             g_xuexiao_mc = firstRowData["xuexiao_mc"];
             g_zhongxin_zb = firstRowData["zuobiao"];
+            g_ditu_suofang = firstRowData["ditu_suofang"]; // add 20210622-1
 
 
 
@@ -774,15 +793,17 @@
 
 
             //——————————————————————————————————————————
-            //=====地图初始化 edit 20210621-1
+            //=====地图初始化 edit 20210621-1 20210622-1
             // console.log('overlayArrray:', coordinateArray)
             bdChinaMap.center = g_zhongxin_zb; // '118.611836,24.918225'; // 中心点坐标
             bdChinaMap.caption = g_xuexiao_mc; // '泉州市'; // 中心点说明文字
-            bdChinaMap.zoom = 15; // 缩放级别
+            bdChinaMap.zoom = g_ditu_suofang == '' ? 15 : g_ditu_suofang; // 缩放级别
             bdChinaMap.image.enable = true;
             bdChinaMap.image.icon = 'bmap_school.png';
             // bdChinaMap.infos.enable = false;
+            // bdChinaMap.infos.method = 'click';
             // bdChinaMap.infos.content = '这里填写地址';
+            bdChinaMap.default.enableMapClick = false; // 是否启用底图景点可点功能 add 20210622-1
 
             // // 1、加载一个已有的多边形
             // bdChinaMap.myOverlay = [
@@ -926,13 +947,71 @@
             //——————————————————————————————————————————
             //=====保存学区范围按钮
             $('#btn-poly-save').on('click', function(){
-                // 获取学区范围坐标数据
-                var coordArr = tools.getPolyCoordinateData();
+                // edit 20210622-1 下8行
+                var ls_ditu_suofang = tools.getZoom(); // 获取地图缩放级别
+                // console.log('当前地图缩放级别：', ls_ditu_suofang);
+                var coordArr = tools.getPolyCoordinateData();  // 获取学区范围坐标数据
                 // console.log('保存时coordArr：', coordArr);
                 // 开始执行
+                var marks = '', tips = '保存地图缩放级别成功';
                 var flag = '', msg = '保存成功';
                 neui.showAnimate();
                 setTimeout(function(){
+
+                    // 1. 保存地图缩放级别 add 20210622-1
+                    // 后台返回
+                    /*
+                    // START AJAX
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "保存地图缩放级别",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                        data: {
+                            "action": "wh_xuexiao_ditu_suofang_ins",
+                            "menu_bh": "<%=s_menu_bh%>",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "xuexiao_bh": g_xuexiao_bh,
+                            "ditu_suofang": ls_ditu_suofang
+                        },
+                        success: function(res){
+                            if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            var json = JSON.parse(res);
+                            marks = json.return == 'ok' ? 1 : 0;
+                            if(!marks) tips = json.data;
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // END AJAX
+                    */
+                    marks = parseInt(1); // 1 成功, 0 失败
+                    if(!marks) tips = '保存地图缩放级别失败';
+    
+                    if(!marks){ // 失败才提示
+                        neuiDialog.alert({
+                            caption: '提示',
+                            message: tips,
+                            buttons: ['确定']
+                        })
+                        neui.destroyAnimate();
+                        return;
+                    }
+
+
+                    // 2、保存学区坐标
                     for(var i = 0; i < coordArr.length; i++){
                         var row = coordArr[i];
                         var xuhao = "100" + (i + 1); // eg.1001, 1002, 1003, ...
