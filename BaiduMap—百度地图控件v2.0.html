@@ -263,6 +263,7 @@
              * 实例化
              */
             init: function () {
+                var _this = this;
                 if (this.status) {
                     return;
                 }
@@ -306,7 +307,19 @@
                     rectangleOptions: styleOptions // 矩形的样式
                 })
                 // 添加鼠标绘制工具监听事件，用于获取绘制结果
-                this.drawingManager.addEventListener('overlaycomplete', this.overlaycomplete);
+                this.drawingManager.addEventListener('overlaycomplete', function(e){
+                    // 绘制完成后回调获得覆盖物信息
+                    e.overlay.name = 'duobianxing'; // 标记覆盖物类型,方便清除指定覆盖物时用
+                    _this.overlays.push(e.overlay);
+                    if(typeof e.overlay.enableEditing != 'undefined') e.overlay.enableEditing();
+                    e.overlay.addEventListener("lineupdate", function (e) { // 拖动边线进行编辑时监听事件
+                        // console.log('e:', e);
+                        _this.showLatLon(e.currentTarget.ha);
+                    });
+                    if(typeof e.overlay.getPath != 'undefined'){ // 绘制完成时显示覆盖物点信息
+                        _this.showLatLon(e.overlay.getPath());
+                    }
+                })
 
      
                 // 加载多边形
@@ -373,24 +386,6 @@
                 $("#panelWrap")[0].innerHTML = '<ul>' + s + '</ul>';
             },
 
-    
-
-            /**
-             *绘制完成后回调获得覆盖物信息
-             */
-            overlaycomplete: function (e) {
-                var _this = this;
-                e.overlay.name = 'duobianxing'; // 标记覆盖物类型,方便清除指定覆盖物时用
-                this.overlays.push(e.overlay);
-                if(typeof e.overlay.enableEditing != 'undefined') e.overlay.enableEditing();
-                e.overlay.addEventListener("lineupdate", function (e) { // 拖动边线进行编辑时监听事件
-                    // console.log('e:', e);
-                    _this.showLatLon(e.currentTarget.ha);
-                });
-                if(typeof e.overlay.getPath != 'undefined'){ // 绘制完成时显示覆盖物点信息
-                    _this.showLatLon(e.overlay.getPath());
-                }
-            },
 
             /**
              * 删除覆盖物点坐标
