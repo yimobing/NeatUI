@@ -95,7 +95,12 @@ function neuiInputsearch(options, input) {
 	
 
 	var arrval = settings.inputChange(); //edit 20191129-1
-	ipt.attr({ 'data-id': '', 'data-bh': '' }); //初始化add 20191212-1
+	//初始化
+	ipt.attr({ 
+		'data-id': '', 
+		'data-bh': '',
+		'data-value': ''
+	})
 
 	if ("undefined" != typeof arrval && typeof (arrval.data) != 'undefined' && arrval != '') { //add 20200827-1
 		var newJson = {"data":[]}
@@ -137,7 +142,8 @@ function neuiInputsearch(options, input) {
 			ipt.attr('data-oldVal', newVal);
 			ipt.attr('data-oldId', newId);
 			ipt.attr('data-id', newId);
-			ipt.attr('data-bh', newId); 
+			ipt.attr('data-bh', newId);
+			ipt.attr('data-value', newVal);
 			ipt.attr('title',newVal);
 			if (settings.inputBack) {
 				var json = { "id": newId, "value": newVal, "oldId": oldId, "oldValue": oldVal, "object": ipt }
@@ -199,6 +205,7 @@ function neuiInputsearch(options, input) {
 					ipt.attr('data-oldId', newId);
 					ipt.attr('data-id', newId); //add 20180223-1 edti 20191212-1 兼容旧版
 					ipt.attr('data-bh', newId); //add 20191212-1
+					ipt.attr('data-value', newVal);
 					ipt.attr('title',newVal); //add 20191223-1
 					//回调函数
 					if (settings.inputBack) {
@@ -231,7 +238,7 @@ function neuiInputsearch(options, input) {
 	$(document).on('click', function(e){
 		var target = $(e.target); //注:e.target.closest(selector).length==0 说明点击的不是元素selector区域,反之则是
 		if($('#searchListNew').length>0){
-			if(target.closest('#searchListNew').length !=0 || ipt.length != 0) return;
+			if(target.closest('#searchListNew').length !=0 && ipt.length != 0) return;
 			$('#searchListNew').remove(); 
 		}
 	});
