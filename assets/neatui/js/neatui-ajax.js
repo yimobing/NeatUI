@@ -49,6 +49,7 @@
                 type: "GET",
                 dataType: "html",
                 cache: false,
+                timeout: 10000, //请求超时时间(单位:毫秒计), 默认10秒
                 url: "",
                 data: { },
                 success: function(res){ },
