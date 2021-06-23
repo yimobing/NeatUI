@@ -231,7 +231,7 @@ function neuiInputsearch(options, input) {
 	$(document).on('click', function(e){
 		var target = $(e.target); //注:e.target.closest(selector).length==0 说明点击的不是元素selector区域,反之则是
 		if($('#searchListNew').length>0){
-			if(target.closest('#searchListNew').length!=0) return;
+			if(target.closest('#searchListNew').length !=0 || ipt.length != 0) return;
 			$('#searchListNew').remove(); 
 		}
 	});
