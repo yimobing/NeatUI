@@ -24,10 +24,14 @@
 <body>
     <style>
         html, body{height: 100%; background-color: #f8f8f8; }
-        body{ width: 640px; margin: 0 auto; padding: 15px 0; font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif; }
+        body{ width: 90%; min-width: 640px; margin: 0 auto; padding: 15px 0; font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif; }
+        h1{  color: #1aad19; text-align: center; font-size: 32px; font-weight: bold;}
         h2{ margin: 45px auto 5px 10px; color: #1aad19; font-size: 24px;  }
         h2:first-child{ margin-top: 0; }
         .group__title{ margin: 15px auto 5px auto; font-size: 14px; font-weight: bold; }
+        .panel__webname{ margin: 25px auto;  background-color: #fff; padding: 15px 25px; }
+        .webname_description{ margin-top: 25px; color: #777; font-size: 16px; }
+        .panel__description{ margin-top: 15px; font-size: 16px; }
         .panel__tab{ margin-top: 50px; }
         /*+------------------------+*/
         .page_dropdown{ }
@@ -45,6 +49,12 @@
 
 
     <div class="wrap">
+        <section class="panel__webname">
+            <h1>Picker选择器</h1>
+            <div class="webname_description">
+                Picker选择器基于微信Picker选择器(即weui picker)，在它的基础上进行了符合生产习惯的自定义封装。
+            </div>
+        </section>
         <section class="panel__code">
 <pre>
 
@@ -64,25 +74,32 @@
     {
         caption: "", // 标题(字符型)，默认空(可选)。
         // 数据源
-        source: {}, // 单列数据源(object型或字符型)，第1列的数据源。1、字符型：值china, 当选择器为省市区县三级联动且使用系统数据源时,只需填值china即可. 2、object型标准格式: {data:[{value:"显示值", id:"隐藏值", disabled:"是否禁用项,布尔型"}]}, 其中：id、disabled可选
+        source: {}, // 单列数据源(object型或字符型)，第1列的数据源。
+        // 1、字符型：值china, 当选择器为省市区县三级联动且使用系统数据源时,只需填值china即可. 
+        // 2、object型标准格式: {data:[{value:"显示值", id:"隐藏值", disabled:"是否禁用项,布尔型"}]}, 其中：id、disabled可选
         columns: [], // 多列数据源(数组型)(可选)。第2、3、4...列的数据源组成数组. eg. [{}, {}, {}]
         format: { // 自定义数据源字段(Object对象)(可选)。注意：每个数据源的字段必须一样，不能数据源1字段是a，数据源2字段是b
             value: ["value"], // 显示值字段(数组型)
             hid: ["id"], // 隐藏值字段(数组型)(可选)
             forbid: "disabled" // 项禁用字段(字符型)(可选)
         },	
-        value: "", // 默认选项的值(字符型)(可选)，默认空。优先权小于输入框的value属性值，在不指定默认选项值时则默认选中的项为：输入框的值所在的项，若输入框无值则为中间项(奇数项时)或偏下一项(偶数项时)
-        depth: '', // 限制选择器深度(数值型)，默认值空(可选)。也就是选择器有多少列，取值为1-3。若为空则根据items项的深度自动调整(或取第一项的深度), 若不为空则将会按照参数设定的值显示N级数据(即使数据源中的级数比N大)
+        value: "", // 默认选项的值(字符型)(可选)，默认空。
+        // 优先权小于输入框的value属性值，在不指定默认选项值时则默认选中的项为：输入框的值所在的项，若输入框无值则为中间项(奇数项时)或偏下一项(偶数项时)
+        depth: '', // 限制选择器深度(数值型)，默认值空(可选)。也就是选择器有多少列，取值为1-3。
+        // 若为空则根据items项的深度自动调整(或取第一项的深度), 若不为空则将会按照参数设定的值显示N级数据(即使数据源中的级数比N大)
         joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
         cascade: false, // 是否级联选择器(可选)，默认false
         district: false, // 是否省市区县联动选择器(可选)，默认false。值为true且使用系统数据源时,请设置source参数的值为'china'.
 
         // 节点DOM
         className: "",  // 自定义选择器类名(字符型)，默认空(可选)。
-        id: "default" + methods.getRandomWord(8, 12), // 作为选择器的唯一标识(字符型)(可选)，默认值"default"。作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时，可以使用不同的id区分，也就是每次id不一样同一个页面才能使用多个选择器，不然数据会错乱）。
+        id: "default", // 作为选择器的唯一标识(字符型)(可选)，默认值"default"。
+        // 作用是以id缓存当时的选择。（当你想每次传入的defaultValue都是不一样时
+        // 可以使用不同的id区分，也就是每次id不一样同一个页面才能使用多个选择器，不然数据会错乱）。
         container: "body", // 指定容器(字符型)(可选), 默认body。eg. '#selector'
         // 回调
-        onConfirm: function(e){ }, // 在点击"确定"之后的回调。回调返回选中的结果(Array)，数组长度依赖于选择器的层级(可选)。e格式：{id:"新隐藏值", value:"新显示值", oldId:"旧隐藏值", oldValue:"旧显示值"}
+        onConfirm: function(e){ }, // 在点击"确定"之后的回调。回调返回选中的结果(Array)，数组长度依赖于选择器的层级(可选)。
+        //e格式：{id:"新隐藏值", value:"新显示值", oldId:"旧隐藏值", oldValue:"旧显示值"}
         onChange: function(e){ }, // 在选择器选中的值发生变化的时候回调(可选)。e格式：{id:"新隐藏值", value:"新显示值", oldId:"旧隐藏值", oldValue:"旧显示值"}
         onClose: function(){ } // 选择器关闭后的回调(可选)。
     }
