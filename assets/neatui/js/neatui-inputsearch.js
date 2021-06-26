@@ -234,14 +234,14 @@ function neuiInputsearch(options, input) {
 	});
 
 	//=====点击输入框元素以外的地方隐藏下拉区域 add 20191223-1
+	// 在同一个页面多个地方(比如多个弹出窗口中)用到本控件时会出现问题,故须注释掉下面的代码 edit 20210626-1
 	//$('body').bind('click',function(e){
-	$(document).on('click', function(e){
+	/* $(document).on('click', function(e){
 		var target = $(e.target); //注:e.target.closest(selector).length==0 说明点击的不是元素selector区域,反之则是
-		if($('#searchListNew').length>0){
-			if(target.closest('#searchListNew').length !=0 && ipt.length != 0) return;
-			$('#searchListNew').remove(); 
-		}
-	});
+		if(target.closest('#searchListNew').length !=0 || target.closest(ipt).length !=0) return;
+		$('#searchListNew').remove(); 
+	}); */
+
 
 	/**/
 
