@@ -39,7 +39,8 @@ if(typeof jQuery == 'undefined'){
                     value: ["value"], // 显示值字段(数组型)
 					hid: ["id"], // 隐藏值字段(数组型)(可选)
                     forbid: "disabled" // 项禁用字段(字符型)(可选)
-                },	
+                },
+				autoFill: true, // 点确定时是否自动填充值到输入框元素(可选),默认true
 				value: "", // 默认选项的值(字符型)(可选)，默认空。优先权小于输入框的value属性值，在不指定默认选项值时则默认选中的项为：输入框的值所在的项，若输入框无值则为中间项(奇数项时)或偏下一项(偶数项时)
 				depth: '', // 限制选择器深度(数值型)，默认值空(可选)。也就是选择器有多少列，取值为1-3。若为空则根据items项的深度自动调整(或取第一项的深度), 若不为空则将会按照参数设定的值显示N级数据(即使数据源中的级数比N大)
 				joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
@@ -69,6 +70,7 @@ if(typeof jQuery == 'undefined'){
 			var dCaption = settings.caption,
 				dSource = settings.source,
 				dColumns = settings.columns,
+				dAutoFill = settings.autoFill,
 				dValue = settings.value,
 				dFormat = settings.format,
 				dDepth = settings.depth,
@@ -304,7 +306,7 @@ if(typeof jQuery == 'undefined'){
 					id = id.substr(0, id.length - dJoint.length);
 					value = value.substr(0, value.length - dJoint.length);
 
-					methods.giveValue2Element(self, value, id); // 给元素赋值
+					if(dAutoFill) methods.giveValue2Element(self, value, id); // 给元素赋值
 					var e = {id: id, value: value, oldId: oldId, oldValue: oldValue}
 					if(settings.onConfirm) settings.onConfirm(e); // 回调
 				},
