@@ -635,7 +635,50 @@ var utilities = {
     getRandomChar: function(){
         var str = Math.random().toString(36).substr(2);
         return str;
+    },
+
+    /**
+     * 将一维数组相邻元素相减(相减的值为指定值)，相减的值相同的元素组合成数组
+     * 常见的应用：将数组中数值连续相邻的元素组合在一起(也就是相邻元素相减的值为1)
+     * 示例：
+        eg1.相邻元素相差1
+        [1,2,3,4, 9,13,16, 20,21,22, 30,40, 80,81,82] <=> [[1,2,3,4], [20,21,22], [80,81,81]]
+        eg2.相邻元素相差5
+        [1,6,11, 9,18, 20,25,30, 30,40, 80,85,90] <=> [[1,6,11], [20,25,30], [80,85,90]]
+     * @param {array} ps_arr 一维数组
+     * @param {number} ps_value 指定相减的值(可选)，默认1
+     * @returns {array} 返回二维数组，其中二维数组中的每个元素的类型为一维数组
+     */
+    getArrayNextElementEqualSubtractResult(ps_arr, ps_value){
+        var subValue = typeof ps_value == 'undefined' ? 1 : ps_value;
+        var tmpArr = []
+        var k = 0;
+        var loops = 0;
+        for(var i = 0; i < ps_arr.length; i++){
+            var value1 = ps_arr[i];
+            tmpArr[k] = tmpArr[k] instanceof Array ? tmpArr[k] : new Array();
+            var j = i + 1;
+            if(j < ps_arr.length){
+                var value2 = ps_arr[j];
+                if(value2 - value1 == subValue){
+                    if(loops == 0) tmpArr[k].push(value1);
+                    tmpArr[k].push(value2);
+                    loops++;
+                }else{
+                    k++;
+                    loops = 0;
+                }
+            }
+        }
+        // 过滤空数组
+        var resultArr = []
+        for(var i = 0; i < tmpArr.length; i++){
+            var row = tmpArr[i];
+            if(row.length != 0) resultArr.push(row);
+        }
+        return resultArr;
     }
+
 
     
 }; //END UTILITIES对象
@@ -1440,6 +1483,78 @@ var convert = {
             }
         }
         return $.isEmptyObject(newSource) ? ps_source : newSource;
+    },
+
+    
+    /**
+     * 将数字转换成中文(处理到万级别)(亿级别暂时处理不了)
+     * eg. 12345 <=> 一万二千三百四十五。
+     * @param {number|string} num 原始数字
+     * @returns {string} 返回数字对应的中文
+     */
+     numToChines: function(num){
+        var changeNum = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九']; //changeNum[0] = "零"
+        var unit = ["", "十", "百", "千", "万"];
+        num = parseInt(num);
+        var getWan = function(temp){
+            var strArr = temp.toString().split("").reverse();
+            var newNum = "";
+            for (var i = 0; i < strArr.length; i++) {
+                newNum = (i == 0 && strArr[i] == 0 ? "" : (i > 0 && strArr[i] == 0 && strArr[i - 1] == 0 ? "" : changeNum[strArr[i]] + (strArr[i] == 0 ? unit[0] : unit[i]))) + newNum;
+            }
+            return newNum;
+        }
+        var overWan = Math.floor(num / 10000);
+        var noWan = num % 10000;
+        if (noWan.toString().length < 4) noWan = "0" + noWan;
+        return overWan ? getWan(overWan) + "万" + getWan(noWan) : getWan(num);   
+    },
+
+
+    /**
+     * 将某一天转化成星期几，即将日期转换为星期名称
+     * @param {string} date 日期。格式：2020-06-28，中间用"-"分割
+     * @returns {string} 返回星期几
+     */
+    dateToWeek: function(date) {
+        var newDate = new Date(date.replace(/-/g, '/'));
+        var weekday = new Array(7);
+        weekday[0] = "星期日";
+        weekday[1] = "星期一";
+        weekday[2] = "星期二";
+        weekday[3] = "星期三";
+        weekday[4] = "星期四";
+        weekday[5] = "星期五";
+        weekday[6] = "星期六";
+        return weekday[newDate.getDay()];
+    },
+
+    /**
+     * 将数字转化在星期
+     * 即：将数字型的星期转成中文型的星期(将对象日期转换成字符串)
+     * @param {string | array} ps_num_arr_str 表示星期的数字或数字数组。eg1. 5或"5"表示星期五; eg2.["1", "2", "3"] 表示 ["星期一", "星期二", "星期三"]
+     * @returns {string | array} 返回数字对应的星期.原参数若是字符串,则返回字符串型;若是数组则返回数组型
+     */
+    numToWeek: function(ps_num_arr_str){
+        if(typeof ps_num_arr_str == 'undefined') return [];
+        var numData = ps_num_arr_str instanceof Array ? ps_num_arr_str : [ps_num_arr_str.toString()];
+        var standWeekArr = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"];	
+        var tabWeekArr = [];
+        var tabWeek = '';
+        var resultWeekArr = [];
+        for (var j = 0; j < numData.length; j++) {  // 遍历所有的数据，截取到相应的下标
+            var resArr = numData[j].toString().split(",").sort();
+            for(var i = 0; i < resArr.length; i++){
+                var thatW = standWeekArr[resArr[i] - 1]; // 按照下标取值						
+                tabWeekArr.push(thatW)
+                if(i == resArr.length - 1){	
+                    tabWeek = tabWeekArr.join(",");
+                    tabWeekArr = []; // 遍历到最后的时候 将上一个的数据清空，不然不正确
+                    resultWeekArr.push(tabWeek);
+                }
+            }
+        }
+        return (ps_num_arr_str instanceof Array ? resultWeekArr : resultWeekArr[0]);
     }
 
 } //END CONVERT 对象
