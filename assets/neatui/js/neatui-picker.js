@@ -44,6 +44,7 @@ if(typeof jQuery == 'undefined'){
 				value: "", // 默认选项的值(字符型)(可选)，默认空。优先权小于输入框的value属性值，在不指定默认选项值时则默认选中的项为：输入框的值所在的项，若输入框无值则为中间项(奇数项时)或偏下一项(偶数项时)
 				depth: '', // 限制选择器深度(数值型)，默认值空(可选)。也就是选择器有多少列，取值为1-3。若为空则根据items项的深度自动调整(或取第一项的深度), 若不为空则将会按照参数设定的值显示N级数据(即使数据源中的级数比N大)
 				joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
+				itemIncludeJointChar: false, // 数据源中是否含有连接符号(可选)，默认false。当数据源中含有连接符号时,设置本参数为true时可解决“下拉选择中项与输入框的值不对应”的问题。
 				cascade: false, // 是否级联选择器(可选)，默认false
 				district: false, // 是否省市区县联动选择器(可选)，默认false。值为true且使用系统数据源时,请设置source参数的值为'china'.
 
@@ -74,7 +75,8 @@ if(typeof jQuery == 'undefined'){
 				dValue = settings.value,
 				dFormat = settings.format,
 				dDepth = settings.depth,
-				dJoint = settings.joint,	
+				dJoint = settings.joint,
+				dItemIncludeJointChar = settings.itemIncludeJointChar,
 				dCascade = settings.cascade,
 				dDistrict = settings.district,	
 				dClassName = settings.className,
@@ -265,12 +267,12 @@ if(typeof jQuery == 'undefined'){
 			// 新老值
 			var oldValue = methods.getValueOfElement(self), // 老的显示值
 				oldId = typeof self.attr('data-bh') == 'undefined' ? '' : self.attr('data-bh'); // 老的隐藏值
-			if(oldId == '') oldId = (methods.getSourceHidValueByRevealValue(tSourceSingle, oldValue, dJoint)).join(dJoint);
+			if(oldId == '') oldId = (methods.getSourceHidValueByRevealValue(tSourceSingle, oldValue, dJoint, dItemIncludeJointChar)).join(dJoint);
 			var initValue = (oldValue == '' ? dValue : oldValue); // 输入框或选择器默认显示值
 			var tDefaultValue = []
 			// 默认选项选中哪一个
 			if(initValue != ''){
-				tDefaultValue = methods.getSourceHidValueByRevealValue(sourceArray, initValue, dJoint);
+				tDefaultValue = methods.getSourceHidValueByRevealValue(sourceArray, initValue, dJoint, dItemIncludeJointChar);
 			}else{
 				tDefaultValue = [ Math.ceil(tSourceSingle.length / 2) ];
 			}
@@ -422,16 +424,23 @@ if(typeof jQuery == 'undefined'){
 		 * @param {array} ps_src_arr 数据源数组. eg.[{label:"显示值", value:"隐藏值", disabled:"是否禁用"}]
 		 * @param {string} ps_reveal_value 显示值(输入框或选择器默认值)
 		 * @param {string} ps_hyphen_char 默认值连字符，即分割符
+		 * @param {string} ps_item_include_hyphen_char 数据源中是否含有连接符号
 		 * @returns {array} 返回隐藏值一维数组(单个或多个元素). eg. ['1001', '1002', '1003']
 		 */
-		getSourceHidValueByRevealValue: function(ps_src_arr, ps_reveal_value, ps_hyphen_char){
-			var hidArr = [];	
-			var splitArr = ps_reveal_value.split(ps_hyphen_char);
-			for(var i = 0; i < splitArr.length; i++){
-				var text = splitArr[i];
-				var arr = this.getSourceValueByLabel(ps_src_arr, text, []);
-				// console.log('arr数组：', arr)
+		getSourceHidValueByRevealValue: function(ps_src_arr, ps_reveal_value, ps_hyphen_char, ps_item_include_hyphen_char){
+			var hidArr = [];
+			console.log('ps_item_include_hyphen_char:', ps_item_include_hyphen_char)
+			if(ps_item_include_hyphen_char){
+				var arr = this.getSourceValueByLabel(ps_src_arr, ps_reveal_value, []);
 				hidArr.push(arr[0]);
+			}else{
+				var splitArr = ps_reveal_value.split(ps_hyphen_char);
+				for(var i = 0; i < splitArr.length; i++){
+					var text = splitArr[i];
+					var arr = this.getSourceValueByLabel(ps_src_arr, text, []);
+					// console.log('arr数组：', arr)
+					hidArr.push(arr[0]);
+				}
 			}
 			return hidArr;
 		}
