@@ -638,19 +638,19 @@ var utilities = {
     },
 
     /**
-     * 将一维数组相邻元素相减的值为N的元素组成二维数组
+     * 将一维数组中相邻元素组合成数组，并返回重组后的二维数组
      * 即：将一维数组相邻元素相减(相减的值为指定值)，相减的值相同的元素组合成数组
      * 常见的应用：将数组中数值连续相邻的元素组合在一起(也就是相邻元素相减的值为1)
      * 示例：
         eg1.相邻元素相差1
-        [1,2,3,4, 9,13,16, 20,21,22, 30,40, 80,81,82] <=> [[1,2,3,4], [20,21,22], [80,81,81]]
+        [1,2,3,4, 9,13,16, 20,21,22, 30,40, 80,81,82] <=> [[1,2,3,4], [9], [13], [16], [20,21,22], [30], [40], [80,81,81]]
         eg2.相邻元素相差5
-        [1,6,11, 9,18, 20,25,30, 30,40, 80,85,90] <=> [[1,6,11], [20,25,30], [80,85,90]]
+        [1,6,11, 9,18, 20,25,30, 30,40, 80,85,90] <=> [[1,6,11], [9], [18], [20,25,30], [30], [40], [80,85,90]]
      * @param {array} ps_arr 一维数组
      * @param {number} ps_value 指定相减的值(可选)，默认1
      * @returns {array} 返回二维数组，其中二维数组中的每个元素的类型为一维数组
      */
-    getArrayNextElementEqualSubtractResult(ps_arr, ps_value){
+    combineNextElementToArray(ps_arr, ps_value){
         var subValue = typeof ps_value == 'undefined' ? 1 : ps_value;
         var tmpArr = []
         var k = 0;
@@ -661,12 +661,18 @@ var utilities = {
             var j = i + 1;
             if(j < ps_arr.length){
                 var value2 = ps_arr[j];
+                if(loops == 0){
+                    if(tmpArr[k].includes(value1) == false) tmpArr[k].push(value1);
+                }
                 if(value2 - value1 == subValue){
-                    if(loops == 0) tmpArr[k].push(value1);
+                    
                     tmpArr[k].push(value2);
                     loops++;
                 }else{
                     k++;
+                    tmpArr[k] = tmpArr[k] instanceof Array ? tmpArr[k] : new Array();
+                    
+                    if(tmpArr[k].includes(value2) == false) tmpArr[k].push(value2);
                     loops = 0;
                 }
             }
