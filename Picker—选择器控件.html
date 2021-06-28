@@ -89,6 +89,7 @@
         depth: '', // 限制选择器深度(数值型)，默认值空(可选)。也就是选择器有多少列，取值为1-3。
         // 若为空则根据items项的深度自动调整(或取第一项的深度), 若不为空则将会按照参数设定的值显示N级数据(即使数据源中的级数比N大)
         joint: "-", // 多列或级联选择器时选项值之间的连接符号(可选)，默认短横线'-'。
+        itemIncludeJointChar: true, // 数据源中是否含有连接符号(可选)，默认false。当数据源中含有连接符号时,设置本参数为true时可解决“下拉选择中项与输入框的值不对应”的问题。
         cascade: false, // 是否级联选择器(可选)，默认false
         district: false, // 是否省市区县联动选择器(可选)，默认false。值为true且使用系统数据源时,请设置source参数的值为'china'.
 
@@ -114,7 +115,8 @@
                 <div class="group">
                     <div class="group__title">普通选择器</div>
                     <div class="group__list">
-                        <p><span>普通选择器</span><input type="text" id="i-normal"></p>
+                        <p><span>普通选择器1</span><input type="text" id="i-normal"></p>
+                        <p><span>普通选择器2<br>(含连接符短横线"-")</span><input type="text" id="i-normal2"></p>
                     </div><!--/.group__list-->
                 </div><!--/.group-->
                 <div class="group">
@@ -200,6 +202,38 @@
                     forbid: "disabled"
                 },
                 value: "工商银行",
+                onConfirm: function (e) {
+					console.log('您点了确定', e);
+				}
+            })
+        });
+
+
+
+          //——————————————————————————————————————————
+        //=====普通选择器2
+        $('#i-normal2').on('click', function(){
+            var normalJson = {
+                "data":[
+                    {"value":"08:00-10:00"},
+                    {"value":"10:00-11:00"},
+                    {"value":"11:00-12:00"},
+                    {"value":"14:00-16:00"},
+                    {"value":"16:00-18:00"}
+                ]
+            }
+
+            $(this).neuiPicker({
+                caption: "选择银行",
+                source: normalJson,
+                format: {
+                    value: ["value"]
+                    // hid: [""],
+                    // forbid: "disabled"
+                },
+                value: "14:00-16:00",
+                itemIncludeJointChar: true, // 数据源中是否含有连接符号(可选)，默认false。当数据源中含有连接符号时,设置本参数为true时可解决“下拉选择中项与输入框的值不对应”的问题。
+                // value: "14:00到16:00",
                 onConfirm: function (e) {
 					console.log('您点了确定', e);
 				}
