@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Dropdown  | 下拉联动控件v3.0</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+<body>
+    <div class="wrap">
+        <section class="code">
+            <pre>
+            下拉联动v3.0构想：
+            var options = 
+            {
+                source: {}, // 数据源。
+                format: [], // 数据源字段(可选)。
+                
+                // 定位、大小
+                position: "relative", // 定位方式(可选)，默认relative。值：relative 相对定位(即相对元素定位), absolute 绝对定位(即相对浏览器窗口定位)，fixed 绝对定位。
+                zIndex: 1, // 自定义控件层级，默认1。
+                width: "auto", // 宽度(可选)，默认auto根据元素自动调整。
+                height: 200, // 高度(可选)，默认200。
+
+                // 控件标识
+                caption: "标题", // 标题(可选)，默认空。
+                id: "default", // 作为控件的唯一标识(可选)，默认值"default"。
+                className: "",  // 自定义控件类名(可选)，默认空。
+                
+                // 下拉项设置
+                itemHeight: 32, // 每一项的高度(可选)，默认32
+                explained: true, // 是否启用下去过滤下拉项中的说明性文字(可选)， 默认true。启用后，选中下拉项后输入框或元素中的值将自动过滤掉这些说明性文字。
+
+                // 下拉值设置
+                value: "", // 下拉默认值，即输入框默认值(可选)，默认空。
+                entire: "", // 给数据源自动添加一个下拉项(可选)， 默认空。值不为空时，系统将会在下拉中自动新增一项作为第一项，该项的名称为本参数值，比如下拉中要新增一项“不限”或“全部”，则本参数值填“不限”或“全部”即可。
+                autoFill: true, // 是否自动填充值到输入框或元素中(可选)，默认true。
+
+                // 联动下拉
+                cascade: { // 联动下拉(可选)。
+                    enable: false, // 是否启用(可选)，默认false。
+                    depth: 1, // 联动级别或深度(可选)，默认1。最多支持四级联动。
+                    joint: "-", // 联动选项值之间的连接符(可选)，默认短横线'-'。
+                    relatedNode: [], // 自定义联动输入框DOM节点(可选)，默认空数组。当有多个输入框或元素联动时，这里可设置选择器节点。 eg. ['#c-province', '#c-city', '#c-county']
+
+                    // 省市区县联动使用系统数据源时
+                    region: "" // 指定省市区县数据源类型(可选)，默认空。值：province 省份, city 城市, county 区县, street 街道社区。
+
+                },
+                
+                // 按钮
+                closeButton: { // 关闭按钮(可选)。
+                    enable: false, // 是否显示关闭按钮(可选)，默认false
+                    theme: "text", // 关闭按钮样式(可选)。值：text 文字按钮(默认), image 图标按钮
+                    direction: "bottomCenter" // 关闭按钮位置(可选)。值： bottomCenter 底部居中(默认), topCenter 顶部居中, leftTop 左上角, rightTop 右上角, leftBottom 左下角, rightBottom 右下角。
+                },
+                
+               
+
+                // 回调
+                onChange: function(e){ // 下拉项值发生变化时的回调(可选)。
+                },
+                onConfirm: function(e){ // 选择某一项后的回调(可选)。
+                },
+                onClose: function(e){ // 关闭后的回调(可选)。
+                }
+
+            }
+            </pre>
+        </section>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            
+
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
