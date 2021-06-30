@@ -95,7 +95,26 @@
             </div><!--/.eform-item-->
 				</div><!--/.eform-content-->
 		</section><!--/.panel-form-->
-    
+		
+		<section class="panel-form item-layout has-border">
+    		<div class="eform-caption">级联下拉</div><!--/.eform-caption-->
+			<div class="eform-content">
+				<div class="eform-item">
+					<div class="eform-box">
+						<div class="item-l"><label>二级级联</label></div>
+						<div class="item-r item-full"><i class="fa fa-map-o"></i><input type="text" id="i-two-drop" readonly></div>
+					</div><!--/.eform-box-->
+				</div><!--/.eform-item-->
+				<div class="eform-item">
+					<div class="eform-box">
+						<div class="item-l"><label>三级级联</label></div>
+						<div class="item-r item-full"><i class="fa fa-map-o"></i><input type="text" id="i-three-drop" readonly></div>
+					</div><!--/.eform-box-->
+				</div><!--/.eform-item-->
+			</div><!--/.eform-content-->
+		</section><!--/.panel-form-->
+
+
  		<section class="panel-form item-layout has-border">
     		<div class="eform-caption">省市区同框联动下拉：一个下拉框里有三个联动</div><!--/.eform-caption-->
 				<div class="eform-content">
@@ -108,7 +127,7 @@
 				</div><!--/.eform-content-->
 		</section><!--/.panel-form-->
     
-    <section class="panel-form item-layout has-border">
+    	<section class="panel-form item-layout has-border">
     		<div class="eform-caption">省市区三级联动下拉：使用系统数据源</div><!--/.eform-caption-->
 				<div class="eform-content">
 						<div class="eform-item">
@@ -132,7 +151,7 @@
 				</div><!--/.eform-content-->
 		</section><!--/.panel-form-->
 
-    <section class="panel-form item-layout has-border">
+    	<section class="panel-form item-layout has-border">
     		<div class="eform-caption">省市区三级联动下拉：使用自定义数据源</div><!--/.eform-caption-->
 				<div class="eform-content">
             <div class="eform-item">
@@ -384,6 +403,120 @@ $(function(){
 		
 		
 		
+		
+		//=======================================================================================================//
+		//									二、级联下拉
+		//=======================================================================================================//
+		/*+--------------------------------------------------------+*/
+		//=====二级级联
+		var twoJilianJson = {
+			"data":[
+				{"county":"丰泽区", "data":[
+					{"street":"丰泽街道"},
+					{"street":"泉秀街道"},
+					{"street":"东海街道"}
+				]},
+				{"county":"鲤城区", "data":[
+					{"street":"东待"},
+					{"street":"浮桥"},
+					{"street":"九一路"}
+				]}
+			]
+		}
+		$('#i-two-drop').neuiDropdown({
+			position: 'fixed',
+			caption: '区域',
+			chain: true, //是否省市区同框联动.默认false
+			level: 2, //省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
+			json: twoJilianJson,
+			areaFormat: ["county", "street"], //地区显示值JSON格式(可缺省)
+			// keyFormat: ["", ""], //地区隐藏值JSON格式(可缺省)
+			
+			entire:'不限',
+			// value: '鲤城区-九一路',
+
+			isCnClose:true, //当省市区同框联动,是否点了"全部"选项后就马上填充值并关闭控件(可缺省),默认true
+			isCnPartEmpty:true, //当省市区同框联动,选中下拉值后当城市或区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省", eg3. "全部-全部-全部" 变成 "全部"
+			isCnAllEmpty:false, //当省市区同框联动, 选中下拉值后当省份、城市、区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省"， eg3. "全部-全部-全部" 变成 ""
+			//说明：isCnAllEmpty=true 具有 isCnPartEmpty=true 的功能，并且还能将省份值为"全部"时也替换成空
+
+			showCloseButton: true,
+			//closeButtonAppearance: 'image', //关闭按钮的外观. text 文字（默认），image 图片.
+			callBack:function(e){
+				console.log('三级联动下拉回调：', e);
+			}
+		});
+
+
+
+		/*+--------------------------------------------------------+*/
+		//=====三级级联
+		var threeJilianJson = {
+			"data":[
+				{"county":"丰泽区", "data":[
+					{"street":"丰泽街道", "data":[
+						{"shequ":"后坂小区1"},
+						{"shequ":"后坂小区2"},
+						{"shequ":"后坂小区3"}
+					]},
+					{"street":"泉秀街道", "data":[
+						{"shequ":"霞淮小区1"},
+						{"shequ":"霞淮小区2"}
+					]},
+					{"street":"东海街道", "data":[
+						{"shequ":"海星小区1"},
+						{"shequ":"海星小区2"},
+					]}
+				]},
+				{"county":"鲤城区", "data":[
+					{"street":"东待", "data":[
+						{"shequ":"东美小区1"},
+						{"shequ":"东美小区2"}
+					]},
+					{"street":"浮桥", "data":[
+						{"shequ":"兴贤小区1"},
+						{"shequ":"兴贤小区2"}
+					]},
+					{"street":"九一路", "data":[
+						{"shequ":"五中小区1"},
+						{"shequ":"五中小区2"}
+					]}
+				]}
+			]
+		}
+		$('#i-three-drop').neuiDropdown({
+			position: 'fixed',
+			caption: '区域',
+			chain: true, //是否省市区同框联动.默认false
+			level: 3, //省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
+			json: threeJilianJson,
+			areaFormat: ["county", "street", "shequ"], //地区显示值JSON格式(可缺省)
+			// keyFormat: ["", "", ""], //地区隐藏值JSON格式(可缺省)
+			
+			entire:'不限',
+			// value: '鲤城区-九一路-五中小区1',
+
+			isCnClose:true, //当省市区同框联动,是否点了"全部"选项后就马上填充值并关闭控件(可缺省),默认true
+			isCnPartEmpty:true, //当省市区同框联动,选中下拉值后当城市或区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省", eg3. "全部-全部-全部" 变成 "全部"
+			isCnAllEmpty:false, //当省市区同框联动, 选中下拉值后当省份、城市、区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省"， eg3. "全部-全部-全部" 变成 ""
+			//说明：isCnAllEmpty=true 具有 isCnPartEmpty=true 的功能，并且还能将省份值为"全部"时也替换成空
+
+			showCloseButton: true,
+			//closeButtonAppearance: 'image', //关闭按钮的外观. text 文字（默认），image 图片.
+			callBack:function(e){
+				console.log('三级联动下拉回调：', e);
+			}
+		});
+
+
+
+		
+
+
+		
+		//=======================================================================================================//
+		//									三、省市区同框联动下拉：一个下拉框里有3个联动
+		//=======================================================================================================//
 		/*+--------------------------------------------------------+*/
 		//=====自定义省市区json
 		// var $districtJson = {
@@ -427,10 +560,7 @@ $(function(){
 			]
 		}
 
-		
-		//=======================================================================================================//
-		//									二、省市区同框联动下拉：一个下拉框里有3个联动
-		//=======================================================================================================//
+
 		/*+--------------------------------------------------------+*/
 		//=====省市区同框联动下拉
 		$('#i-three-link').neuiDropdown({
@@ -439,8 +569,8 @@ $(function(){
 			chain: true, //是否省市区同框联动.默认false
 			level: 3, //省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
 			json: $districtJson,
-			//areaFormat: [province', 'city', 'county'], //地区显示值JSON格式(可缺省)
-			//keyFormat: ['provinceId', 'cityId', 'countyId'], //地区隐藏值JSON格式(可缺省)
+			//areaFormat: ["province", "city", "county"], //地区显示值JSON格式(可缺省)
+			//keyFormat: ["provinceId", "cityId", '"ountyId"], //地区隐藏值JSON格式(可缺省)
 			
 			//id: '350000-350500-350503',
 			entire:'全部',
@@ -462,7 +592,7 @@ $(function(){
 			
 			
 		//=======================================================================================================//
-		//							三、省市区三级联动1：系统数据源
+		//							四、省市区三级联动1：系统数据源
 		//=======================================================================================================//	
 		/*+--------------------------------------------------------+*/
 		//=====省市区联动关联节点绑定
