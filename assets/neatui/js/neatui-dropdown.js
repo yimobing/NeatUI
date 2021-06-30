@@ -122,27 +122,35 @@
 					for(var i in customs){ //先清空customs内所有数组元素（必须）
 						customs[i] = [];
 					}
-					for(i=0;i<gJson.data.length;i++){
-						var row1 = gJson.data[i];
-						var _shengId = typeof row1.id == 'undefined' ? '1'+(i+1)+'0000' : row1.id;
-						var provinceName = row1[areaArr[0]],
-							provinceHid = row1[keyArr[0]];
-						customs.pcProvinces.push({'id':_shengId, 'value':provinceName, 'parentId':'0', 'hid':provinceHid});
-						for(j=0;j<row1.data.length;j++){
-							var row2 = row1.data[j];
-							var _shiId = typeof row2.id == 'undefined' ? '1'+(i+1)+'0'+(j+1)+'00' : row2.id;
-							var cityName = row2[areaArr[1]],
-								cityHid = row2[keyArr[1]];
-							customs.pcCitys.push({'id':_shiId, 'value':cityName, 'parentId':_shengId, 'hid':cityHid});
-							for(var k=0;k<row2.data.length;k++){
-								var row3 = row2.data[k];
-								var _quId = typeof row3.id == 'undefined' ? '1'+(i+1)+'0'+(j+1)+'0'+(k+1) : row3.id;
-								var countyName = row3[areaArr[2]],
-									countyHid = row3[keyArr[2]];
-								customs.pcCountys.push({'id':_quId, 'value':countyName, 'parentId':_shiId, 'hid':countyHid});
+
+					if(typeof gJson.data != 'undefined'){
+						for(i=0;i<gJson.data.length;i++){
+							var row1 = gJson.data[i];
+							var _shengId = typeof row1.id == 'undefined' ? '1'+(i+1)+'0000' : row1.id;
+							var provinceName = row1[areaArr[0]],
+								provinceHid = row1[keyArr[0]];
+							customs.pcProvinces.push({'id':_shengId, 'value':provinceName, 'parentId':'0', 'hid':provinceHid});
+							if(typeof row1.data != 'undefined'){
+								for(j=0;j<row1.data.length;j++){
+									var row2 = row1.data[j];
+									var _shiId = typeof row2.id == 'undefined' ? '1'+(i+1)+'0'+(j+1)+'00' : row2.id;
+									var cityName = row2[areaArr[1]],
+										cityHid = row2[keyArr[1]];
+									customs.pcCitys.push({'id':_shiId, 'value':cityName, 'parentId':_shengId, 'hid':cityHid});
+									if(typeof row2.data != 'undefined'){
+										for(var k=0;k<row2.data.length;k++){
+											var row3 = row2.data[k];
+											var _quId = typeof row3.id == 'undefined' ? '1'+(i+1)+'0'+(j+1)+'0'+(k+1) : row3.id;
+											var countyName = row3[areaArr[2]],
+												countyHid = row3[keyArr[2]];
+											customs.pcCountys.push({'id':_quId, 'value':countyName, 'parentId':_shiId, 'hid':countyHid});
+										}
+									}
+								}
 							}
 						}
 					}
+
 					//console.log('自定义的省份数据：',customs.pcProvinces,'\n城市数据：',customs.pcCitys,'\n区县数据：',customs.pcCountys);
 				}
 				gFormat = defaults.format;
