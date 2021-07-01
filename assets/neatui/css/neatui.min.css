@@ -91,6 +91,7 @@ a img { border: 0 }
 /*+================================================================================+*/
 /*									元素外观
 /*+================================================================================+*/
+/*+-------------元素外观-------------------+*/
 /*+ios、安卓都有默认样式,故需重定义+*/
 button, input[type="text"], textarea{
 	font-size: 14px;
@@ -142,9 +143,6 @@ textarea[disabled]{
 	opacity: 1; /*默认透明度0.3，故一定要加opacity:1*/
 	cursor: not-allowed!important;
 }
-
-
-/*+--------------------------------+*/
 /*+placeholder+*/
 ::-webkit-input-placeholder{
 	color: #afafaf;
@@ -287,7 +285,7 @@ pre, pre code {
 .ne-input,
 .ne-textarea,
 .ne-editbox{
-	width: 100%;
+	/* width: 100%; */
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 2px;
@@ -583,7 +581,7 @@ pre, pre code {
 .ne-checkbox.square:checked{width:14px;height:14px;width:16px\9;height:16px\9;vertical-align:middle;}
 .ne-checkbox.square:after{content:'';display:inline-block;border:1px solid rgba(0, 0, 0,.3);border:0\9;margin-top:-8px;margin-left:-2px;}
 .ne-checkbox.square:checked{background:#00BFFF;; width:12px;height:12px;width:16px\9;height:16px\9;border:1px solid rgba(0, 0, 0,.15);border:0\9;}
-.ne-checkbox.square:checked:after{width:16px;height:16px;width:16px\9;height:16px\9;margin-top:-10px;margin-left:-4px;}
+.ne-checkbox.square:checked:after{width:16px;height:16px;width:16px\9;height:16px\9;margin-top:-8px;margin-left:-4px;}
 /*蓝色主题*/
 .ne-checkbox.square.green:checked{background:#04BE02;}
 .ne-checkbox.square.red:checked{background:#FF0000;}
@@ -788,9 +786,8 @@ pre, pre code {
 .ne-button.has-texture>button,
 .ne-btn.has-texture{
 	position:relative;
-  *display: inline;
-  zoom: 1; 
-  width:100%;
+    *display: inline;
+    zoom: 1;
 	outline: none;
 	text-align: center;
 	justify-content:center;/*if flex*/
