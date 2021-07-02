@@ -429,7 +429,6 @@ if(typeof jQuery == 'undefined'){
 		 */
 		getSourceHidValueByRevealValue: function(ps_src_arr, ps_reveal_value, ps_hyphen_char, ps_item_include_hyphen_char){
 			var hidArr = [];
-			console.log('ps_item_include_hyphen_char:', ps_item_include_hyphen_char)
 			if(ps_item_include_hyphen_char){
 				var arr = this.getSourceValueByLabel(ps_src_arr, ps_reveal_value, []);
 				hidArr.push(arr[0]);
