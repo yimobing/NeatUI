@@ -1,0 +1,158 @@
+
+
+ //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+ //                                                   JS插件开发的几种方式
+ //                                  注：           //... 表示省一堆代码
+ //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//                    jQuery extend 封装控件1
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+// jQuery 插件开发
+;(function ($) {   
+    //...
+    // 定义methods对象
+    var methods = {
+        init: function(options){
+            var _this = this; // 控件元素对象
+            var defaults = {
+                // 这里是控件默认参数
+            }
+            var settings = $.extend(true, {}, defaults, options || {});
+   
+            //...
+
+            return this.each(function(){
+                var $this = $(this); // 控件元素对象
+            })
+        },
+        event1: function(source, options){ // 函数1
+            //...
+        },
+        event2: function(userName, userSex, userAge){ // 函数2
+            //...
+        }
+    };
+
+    //...
+
+    //对外暴露接口
+    $.fn.jeDate = function(method){
+        if(methods[method]){
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        }else if(typeof method === 'object' || !method){
+            return methods.init.apply(this, arguments);
+        }else{
+            $.error('Method ' + method + ' does not exist in jQuery');
+        }
+    }
+
+})(jQuery);
+
+
+//=====前台调用示例
+//eg1.
+$('#id').jeDate('init', opts); // 调用控件内部init函数,并传递参数opts
+//eg2.
+$('#id').jeDate('event1', source, opts); // 调用控件内部event1函数，并传递对应的两个参数source, opts
+//eg3.
+$('#id').jeDate('event2', userName, userSex, userAge); // 调用控件内部event2函数，并传递对应的三个参数：userName, userSex, userAge
+
+
+
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//                    jQuery extend 封装控件2
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+// jQuery 插件开发
+;(function ($) {
+
+    //...
+
+    $.fn.jeDate = function(options){
+        return new MyJet(this, options); // 实例化 MyJet 函数
+    };
+
+    // 定义一个函数(其实该函数也是一个对象) MyJet
+    var MyJet = function(element, options){
+        var me = this;
+        me.$element = element;
+        //后面可设置一堆内部变量
+        me.aa = '';
+        me.bb = '';
+
+        //...
+
+        me.init(options);
+    };
+
+    // 给 MyJet 添加函数或对象
+    MyJet.prototype.init = function(options){
+        var me = this;
+        var defaults = {
+
+        }
+        var settings = $.extend(true, {}, defaults, options || {});
+        me.opts = settings;
+        //...
+    };
+
+    MyJet.prototype.event1 = function(){ // 函数1
+        //..
+    };
+    MyJet.prototype.event2 = function(){ // 函数2
+        //..
+    };
+
+    //...
+
+})(jQuery);
+
+
+
+//=====前台调用示例
+$('#id').jeDate(opts); // opts是一个对象
+
+
+
+
+
+
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//                    原生JS封装控件
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+;(function(root, factory){
+    if (typeof define === 'function' && define.amd) { // amd
+        define(factory);
+    } else if (typeof exports === 'object') { // umd
+        module.exports = factory();
+    } else {
+        window.jeDate = factory();
+    }
+})(this, function(){
+    var jeDate = function(elem,options){
+        var opts = typeof (options) === "function" ? options() : options;
+        return new jeDatePick(elem, opts);
+    };
+
+    //...
+
+    function jeDatePick(elem, options){
+        var defaults = {
+            
+        }
+    }
+    
+
+    //...
+    
+    return jeDate; // 返回对象
+});
+
+
+//=====前台调用示例
+jeDate(elem, options);
+
