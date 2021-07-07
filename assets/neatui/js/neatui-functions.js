@@ -1125,7 +1125,29 @@ var checker = {
      */
     checkNetWorkOnline: function(){
         return !navigator.onLine ? false : true;
-    }	
+    },
+
+    /**
+     * 判断是否为时间格式“时:分”. eg. 08:00
+     * @param {string} ps_str 字符串
+     * @returns {boolean} 返回布尔值, true 或 false
+     */
+    checkIsHourMinute: function(ps_str){
+        if(ps_str.toString().replace(/([ ]+)/g, '') === '') return false;
+        var reg = /^([0-1]{1}[0-9]{1}|2[0-3]{1}):[0-5]{1}[0-9]{1}$/; // 小时最多只能到23时,不能是24,25,39时
+        return reg.test(ps_str);
+    },
+
+    /**
+     * 判断是否为时间格式“时:分:秒”. eg. 08:30:59
+     * @param {string} ps_str 字符串
+     * @returns {boolean} 返回布尔值, true 或 false
+     */
+     checkIsHourMinuteSecond: function(ps_str){
+        if(ps_str.toString().replace(/([ ]+)/g, '') === '') return false;
+        var reg = /^([0-1]{1}[0-9]{1}|2[0-3]{1}):[0-5]{1}[0-9]{1}:[0-5]{1}[0-9]{1}$/; // 小时最多只能到23时,不能是24,25,39时
+        return reg.test(ps_str);
+    }
    
 
 }; //END CHECKER对象
@@ -1301,7 +1323,42 @@ var restrict = {
 		value = filter.repeatedChar(value, '-'); //只保留一个负号
 		value = value.indexOf('-') > 0 ? '-' + value.replace('-', '') : value; //把负号提到最前面
 		return value;
-	}
+	},
+
+    /**
+     * 只能输入：“时:分”。 eg. 08:30
+     * @param {string} str 字符串
+     * @returns {string} 返回“时:分”字符串
+     */
+    hourMinute: function(str){
+        var value = str.toString().replace(/[^\d\:]/g,'');
+		value = filter.repeatedChar(value, ':'); //只保留一个冒号
+        var hour = '', minute = '';
+        if(value.indexOf(':') >= 0){ // 当输入冒号后
+            var arr = value.split(':');
+            hour = arr[0], minute = arr[1];
+            minute = minute.length >=2 ? minute.substr(0, 2) : minute; // 分钟最多两位
+            if(hour.length == 1) hour = '0' + hour; // 小时必须两位. eg. 8:00 要转成 08:00
+            if(parseInt(hour) > 23) hour = 23; // 小时不能大于23
+            if(parseInt(minute) > 59) minute = 59; // 分钟不能大于59
+            // console.log('Y\n小时：', hour, '\n分钟：',minute);
+            // console.log('-----------');
+            var newValue = hour + ':' + minute;
+            return newValue;
+        }else{ // 一直不输入冒号
+            if(value.length >=4){ // 小时最多两位
+                var tmpHour = value.substr(0, 2);
+                var tmpMinute = value.replace(/([\:]+)/g, '').substr(2, 2);
+                if(parseInt(tmpHour) > 23) tmpHour = 23; // 小时不能大于23
+                if(parseInt(tmpMinute) > 59) tmpMinute = 59; // 分钟不能大于59
+                var newValue = tmpHour + ':' + tmpMinute;
+                // console.log('X\n小时：', tmpHour, '\n分钟：',tmpMinute);
+                // console.log('-----------');
+                return tmpMinute == '' ? value : newValue;
+            }
+        }
+        return value;
+    }
 
 } //END RESTRICT 对象
 
