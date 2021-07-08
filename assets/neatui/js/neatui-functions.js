@@ -659,21 +659,25 @@ var utilities = {
             var value1 = ps_arr[i];
             tmpArr[k] = tmpArr[k] instanceof Array ? tmpArr[k] : new Array();
             var j = i + 1;
-            if(j < ps_arr.length){
-                var value2 = ps_arr[j];
-                if(loops == 0){
-                    if(tmpArr[k].includes(value1) == false) tmpArr[k].push(value1);
-                }
-                if(value2 - value1 == subValue){
-                    
-                    tmpArr[k].push(value2);
-                    loops++;
-                }else{
-                    k++;
-                    tmpArr[k] = tmpArr[k] instanceof Array ? tmpArr[k] : new Array();
-                    
-                    if(tmpArr[k].includes(value2) == false) tmpArr[k].push(value2);
-                    loops = 0;
+            if(ps_arr.length == 1){
+                tmpArr[k].push(value1);
+            }else{
+                if(j < ps_arr.length){
+                    var value2 = ps_arr[j];
+                    if(loops == 0){
+                        if(tmpArr[k].includes(value1) == false) tmpArr[k].push(value1);
+                    }
+                    if(value2 - value1 == subValue){
+                        
+                        tmpArr[k].push(value2);
+                        loops++;
+                    }else{
+                        k++;
+                        tmpArr[k] = tmpArr[k] instanceof Array ? tmpArr[k] : new Array();
+                        
+                        if(tmpArr[k].includes(value2) == false) tmpArr[k].push(value2);
+                        loops = 0;
+                    }
                 }
             }
         }
