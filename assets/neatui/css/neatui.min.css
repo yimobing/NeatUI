@@ -601,10 +601,28 @@ pre, pre code {
 	display: -webkit-flex;
 	display: flex;
 	display: box;
+
+	/*设置自适应大小且自动换行1*/
+	-webkit-flex-wrap: wrap;
+	-moz-flex-wrap: wrap;
+	-ms-flex-wrap: wrap;
+	-o-flex-wrap: wrap;
+	flex-wrap: wrap;
 	margin: 15px auto;
 }
-.ne-button>button{ width: 100%; margin-left: 10px; }
-.ne-button>button:first-child{ margin-left: 0; }
+.ne-button>button{
+	margin-right: 10px;
+    margin-bottom: 10px;
+    /*设置自适应大小且自动换行2*/
+    /*width: 100%;*/
+    -webkit-flex: auto;
+    -moz-flex: auto;
+    -o-flex: auto;
+    -ms-flex: auto;
+    flex: auto;
+}
+
+.ne-button>button:first-child{ }
 .ne-btn{
 	position: relative;
 	-webkit-appearance: none;
@@ -619,12 +637,11 @@ pre, pre code {
 	border: 0;
 	border-radius: 2px;
 	cursor: pointer;
-
 	overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    word-wrap: break-word;
-    word-break: break-all;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	word-wrap: break-word;
+	word-break: break-all;
 }
 .ne-btn:focus{ outline: none; }
 .ne-btn:hover{
@@ -642,26 +659,35 @@ pre, pre code {
 
 
 /*+::::::::大小::::::::+*/
+.ne-btn.sm{ height: 25px; line-height: 25px; font-size: .5rem; }
+.ne-btn.lg{ height: 47px; font-size: .8rem; }
 .ne-btn.l-1x{height: 32px;/* line-height: 32px; */}
-.ne-btn.l-2x{height: 40px;/* line-height: 40px; */}
-.ne-btn.l-3x{height: 45px;/* line-height: 45px; */}
-.ne-btn.l-4x{height: 50px;/* line-height: 50px; */}
-.ne-btn.l-5x{height: 55px;/* line-height: 55px; */}
+.ne-btn.l-2x{height: 40px;/* line-height: 40px; */ font-size: .6rem; }
+.ne-btn.l-3x{height: 45px;/* line-height: 45px; */ font-size: .65rem;}
+.ne-btn.l-4x{height: 50px;/* line-height: 50px; */ font-size: .75rem;}
+.ne-btn.l-5x{height: 55px;/* line-height: 55px; */ font-size: .8rem;}
 
 
 /*+::::::::颜色::::::::+*/
-.ne-btn.blue,
-.ne-btn.info{ background-color: #19b6f8; color: #fff; }
-.ne-btn.green,
-.ne-btn.success{ background-color: #08ba61; color: #fff; }
-.ne-btn.orange,
-.ne-btn.warn{ background-color: #f39509; color: #fff; }
-.ne-btn.red,
-.ne-btn.error{ background-color: #d81e06; color: #fff; }
-.ne-btn.pink,
-.ne-btn.danger{background-color: #F25E54; color: #fff;}
+.ne-btn.blue{ background-color: #2196F3; color: #fff; }
+.ne-btn.green{ background-color: #4CAF50; color: #fff; }
+.ne-btn.red{ background-color: #F44336; color: #fff; }
+.ne-btn.black{ background-color: #1c1d30; color: #bbb;}
+.ne-btn.orange{ background-color: #ff5c38;color: #fff;}
+.ne-btn.pink{ background-color: #F25E54; color: #fff;}
+.ne-btn.purple{ background-color: #827ae1; color: #fff;}
+
 .ne-btn.black{background-color: #1c1d30; color: #bbb;}
 .ne-btn.purple{background-color: #827ae1; color: #fff;}
+
+/*提示信息色*/
+.ne-btn.info{ background-color: #19b6f8; color: #fff; }
+.ne-btn.success{ background-color: #08ba61; color: #fff; }
+.ne-btn.warn{background-color: #ff5c38;color: #fff;}
+.ne-btn.error{ background-color: #d81e06; color: #fff; }
+.ne-btn.danger{background-color: #F25E54; color: #fff;}
+
+
 /*浅色调*/
 .ne-btn.light-blue{background-color: #80c0ef; color: #fff;}
 .ne-btn.light-green{background-color: #62CC67; color: #fff;}
@@ -672,9 +698,10 @@ pre, pre code {
 .ne-btn.light-red2{background-color: #E48275; color: #fff;}
 .ne-btn.light-red3{background-color: #F89188; color: #fff;}
 
-.ne-btn.light-orange{background-color: #FEAE1B; color: #fff; }
-.ne-btn.light-orange2{background-color: #f5d078;color: #32576f; }
-.ne-btn.light-orange3{background-color: #fee39e; color: #be5511; }
+.ne-btn.light-orange{background-color:#f39509 ; color: #fff; }
+.ne-btn.light-orange2{background-color: #FEAE1B; color: #fff; }
+.ne-btn.light-orange3{background-color: #f5d078;color: #fafafa; }
+.ne-btn.light-orange4{background-color: #fee39e; color: #be5511; }
 
 .ne-btn.light-pink{background-color: #efa2a8; color: #fff;}
 .ne-btn.light-purple{background-color: #a49ef0; color: #fff;}
@@ -780,6 +807,122 @@ pre, pre code {
     background-image: linear-gradient(to right,#b7b2b2,#686868);
     filter:progid:DXImageTransform.Microsoft.Gradient(gradientType=1, startColorStr=#17e66c, endColorStr=#b7b2b2,);
 }
+
+/*+::::::::立体按钮::::::::+*/
+.ne-button.has-3d>button,
+.ne-btn.has-3d{
+    position: relative;
+    background-image: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='3' height='3' viewBox='0 0 8 8'%3E%3Cg fill='%23fff' fill-opacity='.1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E");
+    transition: background-color .2s ease-out;
+    border: 1px solid;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.3),0 2px 2px -1px rgba(0,0,0,0.5),0 1px 0 rgba(255,255,255,0.3) inset;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    
+    background-color: #eee;
+    border-color: #d5d5d5;
+    color: #333;   
+}
+
+.ne-button.has-3d>button:active,
+.ne-btn.has-3d:active{
+    top: 1px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3) inset;
+    background-image: none;
+}
+.ne-button.has-3d>button[disabled],
+.ne-btn.has-3d[disabled]{
+    position: static;
+    box-shadow: none;
+    cursor: default;
+    cursor: not-allowed;
+    opacity: 1;
+	filter: alpha(opacity=100);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	
+    background: #fbfbfb;
+    border-color: #fbfbfb;
+    color: gray;
+
+}
+
+.ne-button.has-3d>button:hover,
+.ne-btn.has-3d:hover{
+	background-color: #fbfbfb;
+}
+
+/*浅色立体*/
+.ne-button.has-3d>button.light,
+.ne-btn.has-3d.light{
+    background-color: #eee;
+    border-color: #d5d5d5;
+    color: #333;
+}
+.ne-button.has-3d>button.light:hover,
+.ne-btn.has-3d.light:hover{
+    background-color: #fbfbfb;
+}
+.ne-button.has-3d>button.light[disabled],
+.ne-btn.has-3d.light[disabled]{
+    background: #fbfbfb;
+    border-color: #fbfbfb;
+    color: gray;
+}
+
+/*蓝色立体*/
+.ne-button.has-3d>button.blue,
+.ne-btn.has-3d.blue{
+    border-color: #2196F3;
+    color: #fff;
+    background-color: #2196F3;
+}
+.ne-button.has-3d>button.blue:hover,
+.ne-btn.has-3d.blue:hover{
+   background-color: #39a1f4;
+}
+.ne-button.has-3d>button.blue[disabled],
+.ne-btn.has-3d.blue[disabled]{  
+   background: #39a1f4;
+   border-color: #39a1f4;
+   color: #b2dbfb;
+}
+/*绿色立体*/
+.ne-button.has-3d>button.green,
+.ne-btn.has-3d.green{
+    border-color: #4CAF50;
+    color: #fff;
+    background-color: #4CAF50;
+}
+.ne-button.has-3d>button.green:hover,
+.ne-btn.has-3d.green:hover{
+   background-color: #5cb860;
+}
+.ne-button.has-3d>button.green[disabled],
+.ne-btn.has-3d.green[disabled]{
+   background: #5cb860;
+   border-color: #5cb860;
+   color: #b5dfb7;
+}
+/*红色立体*/
+.ne-button.has-3d>button.red,
+.ne-btn.has-3d.red{
+    border-color: #F44336;
+    color: #fff;
+    background-color: #F44336;
+}
+.ne-button.has-3d>button.red:hover,
+.ne-btn.has-3d.red:hover{
+   background-color: #f55a4e;
+}
+.ne-button.has-3d>button.red[disabled],
+.ne-btn.has-3d.red[disabled]{
+    background: #f55a4e;
+    border-color: #f55a4e;
+    color: #fccbc7;
+}
+
 
 
 
@@ -943,12 +1086,16 @@ pre, pre code {
 .ne-btn[read-only]{
     background-color: #f0f0f0;
     color: #979797;
+    cursor: default;
 }
 .ne-btn.disabled,
 .ne-btn[disabled]{
-    background-color: #f2f2f2;
-    color: rgba(0,0,0,0.2);
-    color: #cccccc\9;
+    /* background-color: #f2f2f2; */
+    /* color: rgba(0,0,0,0.2); */
+    /* color: #cccccc\9; */
+    opacity: 0.75;
+	filter: alpha(opacity=75);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=75);
     cursor: not-allowed;
 }
 
