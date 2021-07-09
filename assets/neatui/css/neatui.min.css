@@ -4,7 +4,7 @@
 * 小巧UI前端框架
 * Author：mufeng
 * Date: 2021.01.11
-* Update: 2021.03.18
+* Update: 2021.07.10
 *================================================*/
 
 /*+================================================================================+*/
@@ -660,6 +660,7 @@ pre, pre code {
 .ne-btn.error{ background-color: #d81e06; color: #fff; }
 .ne-btn.pink,
 .ne-btn.danger{background-color: #F25E54; color: #fff;}
+.ne-btn.black{background-color: #1c1d30; color: #bbb;}
 .ne-btn.purple{background-color: #827ae1; color: #fff;}
 /*浅色调*/
 .ne-btn.light-blue{background-color: #80c0ef; color: #fff;}
