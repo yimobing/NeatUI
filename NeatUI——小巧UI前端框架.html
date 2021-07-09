@@ -52,8 +52,30 @@
             <h3><span>按钮</span></h3>
             <section class="grid-module grid-buttons">
 
+               
+                <div class="grid-module-block grid-buttons-color">
+                    <div class="grid-module-caption">按钮属性(只读、禁用等)</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn readonly">只读</button>
+                        <button type="button" class="ne-btn disabled">禁用</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block grid-neat-buttons-size">
+                    <div class="grid-module-caption">按钮大小</div>
+                    <div class="grid-module-content ne-button">    
+                        <button type="button" class="ne-btn sm">小按钮</button>
+                        <button type="button" class="ne-btn lg">大按钮</button>
+                        <button type="button" class="ne-btn l-1x">1倍按钮(高32px)</button>
+                        <button type="button" class="ne-btn l-2x">2倍大按钮(高40px)</button>
+                        <button type="button" class="ne-btn l-3x">3倍大按钮(高45px)</button>
+                        <button type="button" class="ne-btn l-4x">4倍大按钮(高50px)</button>
+                        <button type="button" class="ne-btn l-5x">5倍大按钮(高55px)</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
                 <div class="grid-module-block grid-buttons-text">
-                    <div class="grid-module-caption">无背景色按钮</div>
+                    <div class="grid-module-caption">纯文字的按钮</div>
                     <div class="grid-module-content ne-button">
                         <button type="button" class="ne-btn only-text">默认文字</button>
                         <button type="button" class="ne-btn only-text blue">蓝色文字</button>
@@ -65,19 +87,8 @@
                     </div><!--/.grid-module-content-->
                 </div><!--/.grid-module-block-->
 
-                <div class="grid-module-block grid-neat-buttons-size">
-                    <div class="grid-module-caption">按钮大小</div>
-                    <div class="grid-module-content ne-button">
-                        <button type="button" class="ne-btn l-1x">1倍大小(高32px)</button>
-                        <button type="button" class="ne-btn l-2x">2倍大小(高40px)</button>
-                        <button type="button" class="ne-btn l-3x">3倍大小(高45px)</button>
-                        <button type="button" class="ne-btn l-4x">4倍大小(高50px)</button>
-                        <button type="button" class="ne-btn l-5x">5倍大小(高55px)</button>
-                    </div><!--/.grid-module-content-->
-                </div><!--/.grid-module-block-->
-
                 <div class="grid-module-block grid-neat-buttons-bg">
-                    <div class="grid-module-caption">按钮图标、背景等</div>
+                    <div class="grid-module-caption">有图标、背景图的按钮</div>
                     <div class="grid-module-content ne-button">
                         <button type="button" class="ne-btn blue has-bg-square">有方格背景</button>
                         <button type="button" class="ne-btn green has-bg-img">有前置图标</button>
@@ -86,40 +97,54 @@
 
 
                 <div class="grid-module-block grid-buttons-color">
-                    <div class="grid-module-caption">按钮颜色(深色调)</div>
+                    <div class="grid-module-caption">颜色按钮1(常用色)</div>
                     <div class="grid-module-content ne-button">
                         <button type="button" class="ne-btn">默认色</button>
-                        <button type="button" class="ne-btn info blue">Info信息（蓝）</button>
-                        <button type="button" class="ne-btn success green">Success成功（绿）</button>
-                    </div><!--/.grid-module-content-->
-                    <div class="grid-module-content ne-button">
-                        <button type="button" class="ne-btn error red">Error错误（红）</button>  
-                        <button type="button" class="ne-btn warn orange">Warn警告（橙）</button>
-                        <button type="button" class="ne-btn danger pink">Danger危险（粉）</button>
+                        <button type="button" class="ne-btn blue">蓝色</button>
+                        <button type="button" class="ne-btn green">绿色</button>
+                        <button type="button" class="ne-btn red">红色</button> 
                         <button type="button" class="ne-btn black">黑色</button>
                         <button type="button" class="ne-btn purple">紫色</button>
                     </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block grid-buttons-color">
+                    <div class="grid-module-caption">颜色按钮2(非常用色)</div>
                     <div class="grid-module-content ne-button">
                         <button type="button" class="ne-btn light-blue">浅蓝</button>
-                    </div><!--/.grid-module-content-->
-                    <div class="grid-module-content ne-button">
                         <button type="button" class="ne-btn light-green">浅绿</button>
                         <button type="button" class="ne-btn light-green2">浅绿2</button>
                         <button type="button" class="ne-btn light-green3">浅绿3</button>
-                    </div><!--/.grid-module-content-->
-                    <div class="grid-module-content ne-button">
                         <button type="button" class="ne-btn light-red">浅红</button>
                         <button type="button" class="ne-btn light-red2">浅红2</button>
                         <button type="button" class="ne-btn light-red3">浅红3</button>
-                    </div><!--/.grid-module-content-->
-                    <div class="grid-module-content ne-button">
                         <button type="button" class="ne-btn light-orange">浅橙</button>
                         <button type="button" class="ne-btn light-orange2">浅橙2</button>
                         <button type="button" class="ne-btn light-orange3">浅橙3</button>
-                    </div><!--/.grid-module-content-->
-                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn light-orange4">浅橙4</button>
                         <button type="button" class="ne-btn light-pink">浅粉</button>
                         <button type="button" class="ne-btn light-purple">浅紫色</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block grid-buttons-color">
+                    <div class="grid-module-caption">提示信息色的按钮</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn info">Info信息</button>
+                        <button type="button" class="ne-btn success">Success成功</button>
+                        <button type="button" class="ne-btn error red">Error错误</button>  
+                        <button type="button" class="ne-btn warn orange">Warn警告</button>
+                        <button type="button" class="ne-btn danger pink">Danger危险</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block grid-neat-buttons-size">
+                    <div class="grid-module-caption">立体的按钮</div>
+                    <div class="grid-module-content ne-button">
+                        <button type="button" class="ne-btn has-3d">默认立体</button>
+                        <button type="button" class="ne-btn has-3d blue">蓝色立体</button>
+                        <button type="button" class="ne-btn has-3d green">绿色立体</button>
+                        <button type="button" class="ne-btn has-3d red">红色立体</button>
                     </div><!--/.grid-module-content-->
                 </div><!--/.grid-module-block-->
 
@@ -135,7 +160,7 @@
                     </div><!--/.grid-module-content-->
                 </div><!--/.grid-module-block-->
                 <div class="grid-module-block grid-buttons-color">
-                    <div class="grid-module-caption">渐变按钮</div>
+                    <div class="grid-module-caption">渐变的按钮</div>
                     <div class="grid-module-content ne-button">
                         <button type="button" class="ne-btn linear">默认渐变</button>
                         <button type="button" class="ne-btn linear blue">蓝色渐变</button>
@@ -145,15 +170,6 @@
                         <button type="button" class="ne-btn linear gray">灰色渐变</button>
                     </div><!--/.grid-module-content-->
                 </div><!--/.grid-module-block-->
-
-                <div class="grid-module-block grid-buttons-color">
-                    <div class="grid-module-caption">按钮属性(只读、禁用等)</div>
-                    <div class="grid-module-content ne-button">
-                        <button type="button" class="ne-btn readonly">只读</button>
-                        <button type="button" class="ne-btn disabled">禁用</button>
-                    </div><!--/.grid-module-content-->
-                </div><!--/.grid-module-block-->
-             
             </section><!--/.grid-buttons-->
 
 
