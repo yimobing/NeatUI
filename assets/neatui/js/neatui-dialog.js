@@ -3,7 +3,7 @@
 * 对话框插件
 * Author: ChenMufeng
 * Date: 2018.8.30
-* Update:2020.11.05
+* Update:2021.07.09
 */
 //(function($){
 //	$.fn.extend({
@@ -328,8 +328,13 @@
 				conPadding: '', //中间内容padding (可选),默认空
 				minWidth: -1, //窗口最小宽度(必须为正整数)(可选)
 				maxWidth: -1, //窗口最大宽度(必须为正整数)(可选)
+				fullScreen: false, //是否启用全屏(可选). 默认false add 20210327-1
 				showButton: true, //是否显示按钮,默认true
 				showCross: true, //是否显示右上角打叉图标(关闭按钮). 显示|true,不显示|false,默认显示
+				// add 20210709-1 下2行
+				showBack: false, //是否显示左上角返回图标(可选)，默认false。
+				backText: '返回', //左上角显示返回图标时的文字(可选)，默认‘返回'。
+
 				closeWindow: false, //是否禁用按钮(是否一点击按钮就关闭窗口,默认true)
 				openBack: null, //窗口加载完成后的回调函数
 				callBack: null, //点按钮后的回调函数(可选)
@@ -368,11 +373,19 @@
 				minWidth = settings.minWidth,
 				maxWidth = settings.maxWidth,
 				showCross = settings.showCross,
+				// add 20210709-1 下2行
+				showBack = settings.showBack,
+				backText = settings.backText,
+
 				showButton = settings.showButton;
 
 			//...HTML
 			var _tips = _content = _notes = '';
-			var crossStyle = showCross == true ? '' : ' style="display:none"';
+
+			// add and edit 20210709-1 下2行
+			var crossStyle = showCross == true ? '' : ' style="display:none"',
+				backStyle = showBack == true ? '' : ' style="display:none"';
+
 			var _btnAStr = btnAlign == '' ? '' : ' ' + btnAlign;
 			var btnClass = btnDirection == 'vertical' ? ' vertical' : '';
 			var _widhStr = btnWidth == '' ? 
@@ -406,9 +419,13 @@
 						}
 						_btnHtml+='</div>';
 			}
-			//标题
+
+			//标题 add and edit 20210709-1 下3行
+			textAlign = !showBack ? textAlign : (caption.toString().replace(/([ ]+)/g, '') !== '' ? ' center' : textAlign); // 有返回图标时强制标题居中
 			var _capClass = textAlign + fontWeight;
+			_capClass += !showBack ? '' : (backText.toString().replace(/([ ]+)/g, '') === '' ? ' has-back-noText' : ' has-back-hasText');
 			var _capStyle = fontSize == '' ? '' : ' style="font-size:' + fontSize + '"';
+
 			//内容
 			var _cmarginStr = '', _cpaddingStr = '';
 			if(conMargin!='') _cmarginStr = 'margin:' + conMargin + ';';
@@ -420,9 +437,11 @@
 			if(minWidth!='' && regNumc.test(minWidth)) _minWidthStr = 'min-width:' + minWidth + 'px;';
 			if(maxWidth!='' && regNumc.test(maxWidth)) _maxWidthStr = 'max-width:' + maxWidth + 'px';
 			var _layStyle = (_minWidthStr == '' && _maxWidthStr == '') ? '' : ' style="' + _minWidthStr + _maxWidthStr + '"';
+			var _layClassName = caption.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' has-caption-noText'; // add 20210709-1
 			//html
 			var _html = '<div class="'+IdClass+'" id="' + parentId.replace(/[\#\.]/g,'') + '" data-maskId="' + shade + '">'+
-									'	<div class="feedback-layout"' + _layStyle + '>'+
+									'	<div class="feedback-layout' + _layClassName + '"' + _layStyle + '>'+ // edit 20210709-1
+									'		<div class="feedback-close feedback-back ne-dialog-back"'+backStyle+'>' + backText + '</div>'+ // add 20210709-1
 									'		<div class="feedback-close ne-dialog-close"'+crossStyle+'></div>'+
 									'		<div class="feedback-caption' + _capClass + '"' + _capStyle + '>'+caption+'</div>'+
 									'		<div class="feedback-content"' + _contentStyle + '>'+_content+_notes+'</span></div>'+ _btnHtml +
@@ -508,7 +527,7 @@
 			})
 		 
 			//...关闭按钮事件
-			$(document).off('click',parentId + ' .feedback-close').on('click',parentId + ' .feedback-close',function(){
+			$(document).off('click', parentId + ' .feedback-close').on('click', parentId + ' .feedback-close',function(){
 				closeFeedback($(this));
 			});
 			
@@ -586,7 +605,26 @@
 
 						$(parentId).find('.feedback-button-group').css('margin-top', btnMarginTop);
 					}
-					$(parentId).css({'z-index':zIndex, 'left':left,'top':top, 'right':left});
+
+					//add edit 20210327-1
+					if(settings.fullScreen){ //全屏
+						$(parentId).css({
+							zIndex:zIndex, 
+							left: '0px',
+							right: '0px',
+							top: '0px',
+							bottom: '0px',
+							maxWidth: '100%'
+						})
+						$(parentId).find('.feedback-layout').css({
+							height: '100%',
+							maxHeight: '100%',
+							borderRadius: '0'
+						})
+					}else{
+						$(parentId).css({'z-index':zIndex, 'left':left,'top':top, 'right':left});
+					}
+
 					if(settings.openBack){
 						settings.openBack();
 					}
