@@ -62,6 +62,116 @@ if(!Array.prototype.indexOf){
 };
 
 
+/**
+ * ie9-兼容document.getElementsByClassName
+ */
+if (!document.getElementsByClassName) {
+    document.getElementsByClassName = function (className, element) {
+        var children = (element || document).getElementsByTagName('*');
+        var elements = new Array();
+        for (var i = 0; i < children.length; i++) {
+            var child = children[i];
+            var classNames = child.className.split(' ');
+            for (var j = 0; j < classNames.length; j++) {
+                if (classNames[j] == className) {
+                    elements.push(child);
+                    break;
+                }
+            }
+        }
+        return elements;
+    };
+};
+
+
+/**
+ * ie9-兼容forEach
+ */
+if(!Array.prototype.forEach){
+    Array.prototype.forEach = function(callback){
+        for (var i = 0; i < this.length; i++){
+            callback.apply(this, [this[i], i, this]);
+        }
+    }
+};
+
+
+
+
+/**
+ * ie11-兼容Array.from
+ */
+ if (!Array.from) {
+    Array.from = (function () {
+        var toStr = Object.prototype.toString;
+        var isCallable = function (fn) {
+        return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+        };
+        var toInteger = function (value) {
+        var number = Number(value);
+        if (isNaN(number)) { return 0; }
+        if (number === 0 || !isFinite(number)) { return number; }
+        return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+        };
+        var maxSafeInteger = Math.pow(2, 53) - 1;
+        var toLength = function (value) {
+        var len = toInteger(value);
+        return Math.min(Math.max(len, 0), maxSafeInteger);
+        };
+        // The length property of the from method is 1.
+        return function from(arrayLike/*, mapFn, thisArg */) {
+        // 1. Let C be the this value.
+        var C = this;
+        // 2. Let items be ToObject(arrayLike).
+        var items = Object(arrayLike);
+        // 3. ReturnIfAbrupt(items).
+        if (arrayLike == null) {
+            throw new TypeError("Array.from requires an array-like object - not null or undefined");
+        }  
+        // 4. If mapfn is undefined, then let mapping be false.
+        var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+        var T;
+        if (typeof mapFn !== 'undefined') {
+            // 5. else
+            // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+            if (!isCallable(mapFn)) {
+            throw new TypeError('Array.from: when provided, the second argument must be a function');
+            }
+            // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+            if (arguments.length > 2) {
+            T = arguments[2];
+            }
+        }
+        // 10. Let lenValue be Get(items, "length").
+        // 11. Let len be ToLength(lenValue).
+        var len = toLength(items.length);
+        // 13. If IsConstructor(C) is true, then
+        // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
+        // 14. a. Else, Let A be ArrayCreate(len).
+        var A = isCallable(C) ? Object(new C(len)) : new Array(len);
+        // 16. Let k be 0.
+        var k = 0;
+        // 17. Repeat, while k < len… (also steps a - h)
+        var kValue;
+        while (k < len) {
+            kValue = items[k];
+            if (mapFn) {
+            A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+            } else {
+            A[k] = kValue;
+            }
+            k += 1;
+        }
+        // 18. Let putStatus be Put(A, "length", len, true).
+        A.length = len;
+        // 20. Return A.
+        return A;
+        };
+    }());
+ };
+
+
+
 
 
 /*********************************************************************************************************************
@@ -856,13 +966,37 @@ var calendar = {
 //=====================================================================================================================
 var checker = {
     /**
-     * 判断对象是否为JQ对象
-     * @param {object} ps_obj js或jq对象
+     * 判断是否为JQ对象
+     * @param {object} ps_obj 目标对象
      * @returns {boolean} 返回布尔值. true 是, false 否
      */
-    checkJqueryObject: function(ps_obj){
+    checkIsJqObject: function(ps_obj){
         return ps_obj instanceof jQuery ? true : false;
     },
+
+    /**
+     * 判断是否dom对象
+     * 首先要对HTMLElement进行类型检查，因为即使在支持HTMLElement的浏览器中，类型却是有差别的，在Chrome,Opera中HTMLElement的类型为function，此时就不能用它来判断了
+     * @param {object} ps_obj 目标对象
+     * @returns {boolean} 返回布尔值. true 是, false 否
+     */
+    checkIsDomObject: function(ps_obj){
+        return ( typeof HTMLElement === 'object' ) ?
+            ps_obj instanceof HTMLElement
+            :
+            ps_obj && typeof ps_obj === 'object' && ps_obj.nodeType === 1 && typeof ps_obj.nodeName === 'string';
+    },
+
+    
+    /**
+     * 判断是否JSON对象
+     * @param {object} ps_obj 目标对象
+     * @returns 返回布尔值. true 是, false 否
+     */
+    checkIsJsonObject: function(ps_obj){
+        return typeof(ps_obj) == "object" && Object.prototype.toString.call(ps_obj).toLowerCase() == "[object object]" && !ps_obj.length;
+    },
+
 
     /**
      * 判断数据是否为JSON格式，且是否有数据
