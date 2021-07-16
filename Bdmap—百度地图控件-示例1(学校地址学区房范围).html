@@ -252,6 +252,7 @@
             myOverlay: [],
             drawManager: '',
             drawMode: '', // 当前绘制模式(可选), 默认空. 值：空 无任何绘制操作, hander 拖动地图(鼠标为一只手), marker 画点, circle 画圆, polyline 画线,  polygon 画多边形, rectangle 画矩形。
+            clickTimes: 0, // 记录地图被点击的次数(可选), 默认0
 
             styleOptions: {
                 strokeColor: 'red', // 边线颜色。
@@ -333,7 +334,11 @@
                         // console.log('event:', event);
                         _this.drawMode = e.drawingMode; //全局赋值
                         _this.showLatLon(event.currentTarget.ha);
-                    });
+                    })
+                    e.overlay.addEventListener("mouseout", function(e){ // 鼠标离开时的监听事件
+                        // console.log('鼠标离开了e：', e)
+                        _this.drawMode = 'hander'; // 全局赋值
+                    })
                     if(typeof e.overlay.getPath != 'undefined'){ // 绘制完成时显示覆盖物点信息
                         _this.showLatLon(e.overlay.getPath());
                     }
@@ -343,19 +348,15 @@
 
 
                 // 加载多边形
-                if(this.myPoints.length != 0){
-                    // 加载多个已有的多边形
+                if(this.myPoints.length != 0){ // 加载多个已有的多边形
                     for(var i = 0; i < this.myPoints.length; i++){
                         this.myOverlay = this.myPoints[i];
                         if (this.myOverlay) {
                             this.loadMyOverlay();
                         }
                     }
-                    // console.log('aaa')
-                }else{
-                    // 加载一个已有的多边形
+                }else{  // 加载一个已有的多边形
                     if (this.myOverlay) this.loadMyOverlay();
-                    // console.log('bbb')
                 }
                 // 鼠标右键点击事件
                 map.addEventListener("rightclick", function (e) {
@@ -364,6 +365,7 @@
                 // 鼠标左键点击事件
                 map.addEventListener('click', function(e){
                     // console.log('点我了e：', e);
+                    _this.clickTimes++; // 全局赋值
                     if(_this.clickCreateNewCenter){ // 点击地图时把中心点坐标移到点击位置
                         // 当前有覆盖物时，则不执行点击事件(即在覆盖物上点击时，只执行覆盖物的click事件，但不执行map的click事件)
                         if(e.overlay) return;
@@ -383,14 +385,13 @@
             },
 
             /**
-             * 加载覆盖物
+             * 加载已有的覆盖物
              */
             loadMyOverlay: function () {
                 var _this = this;
                 var map = this.map;
                 // this.clearAll();
                 map.centerAndZoom(this.point, this.zoom); // 设置地图中心点
-
                 // 创建多边形覆盖物
                 var ply = new BMap.Polygon(this.myOverlay, this.styleOptions);
                 this.myPolygon = ply;
@@ -398,12 +399,15 @@
                     ply.enableEditing(); 
                     ply.name = 'duobianxing'; // 标记覆盖物类型,方便清除指定覆盖物时用
                 } 
-                catch (e) { 
-                };
+                catch (e) { };
                 ply.addEventListener("lineupdate", function (e) { // 拖动边线进行编辑时监听事件
-                    //console.log('这里是多边形覆盖物属性发生变化e:', e);
-                    _this.drawMode = 'polygon'; // 全局赋值
+                    // console.log('覆盖物属性发生变化e:', e);
+                    if(_this.clickTimes != 0) _this.drawMode = 'polygon'; // 全局赋值
                     _this.showLatLon(e.currentTarget.ha);
+                })
+                ply.addEventListener("mouseout", function(e){ // 鼠标离开多边形区域时的监听事件
+                    // console.log('鼠标离开了e：', e)
+                    _this.drawMode = 'hander'; // 全局赋值
                 })
                 // this.showLatLon(ply.getPath()); // 绘制完成时显示覆盖物点信息
                 map.addOverlay(ply);
