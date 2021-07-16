@@ -293,14 +293,29 @@
             ),
             ( btDirection.toLocaleLowerCase().indexOf('top') >= 0 ? '' : btnHtml )
         ].join('\r\n');
+
         // 拼接节点
+        // 输入框父节点处理
+        var faCell = valCell.parentNode; //父节点
+        faCell.style.position = 'relative';
+        // 宽、高等距离
+        var valWidth = valCell.offsetWidth,
+            valHeight = valCell.offsetHeight,
+            faHeight = faCell.offsetHeight,
+            faWidth = faCell.offsetWidth;
+        var top = faHeight + 2;
+        // console.log('top：', top)
+        // console.log('width:', width, '\valWidth:', valWidth)
+        // 控件处理
         me.removeNode(); // 先移除控件
+        // 拼接处理
         var _eClassNameStr = opts.className.replace(/([ ]+)/g, '') === '' ? '' : ' ' + opts.className;
         var nodeDiv = document.createElement('div');
         nodeDiv.className = net.idClass + ' ne_input_search_' + tools.generateRandomChar() + _eClassNameStr;
         opts.id === 'default' ||  opts.id.replace(/([ ]+)/g, '') === '' ? '' : nodeDiv.id = opts.id;
-        width == 'auto' ? '' : nodeDiv.style.width = width + 'px';
+        width == 'auto' ? nodeDiv.style.width = valWidth + 'px' : nodeDiv.style.width = width + 'px';
         nodeDiv.style.zIndex = zIndex;
+        nodeDiv.style.top = top + 'px';
         nodeDiv.innerHTML = allHtml;
         valCell.after(nodeDiv);
         // 全局赋值
