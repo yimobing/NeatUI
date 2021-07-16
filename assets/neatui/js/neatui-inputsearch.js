@@ -146,7 +146,7 @@
             closeButton: { // 关闭按钮(可选)。
                 enable: true, // 是否显示关闭按钮(可选)，默认true
                 theme: "text", // 关闭按钮样式(可选)。值：text 文字按钮(默认), image 图标按钮
-                direction: "bottomCenter" // 关闭按钮位置(可选)。值： default 底部居中(默认), topCenter 顶部居中, leftTop 左上角, rightTop 右上角, leftBottom 左下角, rightBottom 右下角。
+                direction: "default" // 关闭按钮位置(可选)。值： default 底部居中(默认), topCenter 顶部居中, leftTop 左上角, rightTop 右上角, leftBottom 左下角, rightBottom 右下角。
             },
 
             // 回调
