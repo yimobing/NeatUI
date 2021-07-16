@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Inputsearch  | 输入下拉控件v2.0</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"><!--输入下拉控件-->
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+<body>
+    <style>
+        /*+--------------------------------+*/
+        html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color:rgba(0, 0, 0, 0); } 
+        *:not(input,textarea) {-webkit-touch-callout: none; -webkit-user-select: none; }
+        html{font-size: 20px;}
+        @media only screen and (min-width: 400px){html{font-size: 21.33333333px!important;} } 
+        @media only screen and (min-width: 414px){html{font-size: 21px!important;} }
+        @media only screen and (min-width: 480px){html{font-size: 25.6px!important;} }
+        body{background-color: #fff; line-height: 1.5; font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', '-apple-system-font', 'Helvetica Neue', 'sans-serif'; font-size: .7rem; color: #212121; overflow-x: hidden; overflow-y: auto; }
+        *{margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        header, footer, main, section, menu, nav, article, aside, hgroup, summary, details, figcaption, figure{display: block;}
+        a { text-decoration: none; -webkit-tap-highlight-color: rgba(0,0,0,0); }
+        a img { border: 0 }
+        /*+-------------元素外观-------------------+*/
+        button, input[type="text"], textarea{font-size: 14px; color: inherit; outline: 0; -moz-appearance: none; -webkit-appearance: none; -o-ppearance: none; -ms-appearance: none; appearance: none; background-color: transparent; overflow: hidden; text-overflow: ellipsis; resize: none; } 
+        button{ overflow: visible; text-transform: none; }
+        select{ text-transform: none; }
+        ol, ul, li{ list-style: none; }
+        a{ color: inherit; text-decoration: none; background-color: transparent; }
+        i, em{ font-style: normal; }
+        /*+-------------元素属性-------------------+*/
+        /*+readoly+*/
+        input:read-only, input[readonly], span[readonly], textarea[readonly]{background-color: #fff!important; -webkit-text-fill-color: inherit; -webkit-text-stroke: 1px solid #d6e9c6; filter: alpha(opacity=100); -webkit-opacity: 1; opacity: 1; filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100); }
+        /*+disabled+*/
+        /*默认的，ios中input,textarea属性disabled时字体会变成灰色*/
+        input:disabled, input[disabled], textarea:disabled, textarea[disabled]{background-color: #f4f4f4!important; -webkit-text-fill-color: inherit; -webkit-text-stroke: 1px solid #d6e9c6; filter: alpha(opacity=100); filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100); -webkit-opacity: 1; opacity: 1; /*默认透明度0.3，故一定要加opacity:1*/ cursor: not-allowed!important; }
+        /*+placeholder+*/
+        ::-webkit-input-placeholder{color: #afafaf; font-size: 0.6rem; } 
+        ::-moz-placeholder{color: #afafaf; font-size: 0.6rem; } 
+        :-moz-placeholder{color: #afafaf; font-size: 0.6rem; } 
+        :-ms-input-placeholder{color: #afafaf; font-size: 0.6rem; } 
+        div:empty::before, span:empty::before{content: attr(placeholder); color: #afafaf; font-size: 0.6rem; }
+        /*+--------------代码块------------------+*/
+        code, kbd, pre, samp {font-family: Monaco,Menlo,Consolas,"Courier New",FontAwesome,monospace; } 
+        code, pre {font-size: 14px; background-color: #f8f8f8; -webkit-touch-callout: default; /*允许系统默认菜单*/ -webkit-user-select: text; /*允许用户选择文本*/ tab-size: 2; }
+        pre {display: block; padding: 16px; margin: 16px 0; line-height: 1.6; word-break: break-all; word-wrap: break-word; color: #555; border: 1px solid #dedede; border-radius: 0; } 
+        pre, pre code { white-space: pre-wrap;}
+
+
+        /*+--------------------------------+*/
+        body{ max-width: 1024px; }
+        textarea,
+        input[type="text"]{ width: 150px; padding: 8px 12px; border: 1px solid rgb(165, 160, 160); border-radius: 4px; }
+        .demo{ margin: 0 auto; padding: 15px 20px; }
+        .group{margin-bottom: 25px; border: 3px solid #1296db; border-radius: 10px; }
+        .group__caption{ padding: 8px 15px; background-color: #1296db; border-bottom: 3px solid #1296db; text-align: center; color: #fff; font-size: 18px; font-weight: bold; }
+        .group__form{  padding: 8px 10px; }
+        .list{ margin-bottom: 10px; padding: 8px 15px; border: 2px solid #0ce; border-radius: 4px; }
+        .list .title{ }
+        .list .title>span{ display: inline-block; padding: 5px 15px; background-color: #ff0000; border: 1px solid #ff0000; border-radius: 2px; color: #fff; font-size: 14px;  font-weight: bold; }
+        .list .title>em{ margin-left: 8px; padding: 5px 6px; background-color: green; border-radius: 2px; color: #fff; font-size: 12px; }
+        .content{ margin-top: 8px; }
+        .content p { margin-bottom: 5px; }
+        .content p.inline{ display: inline-block; vertical-align: middle; margin-right: 10px; }
+        .content p span{ margin-right: 10px; }
+        
+        
+    </style>
+
+
+    <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script><!--jQuery库-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
+    <div class="wrap">
+        <section class="code">
+            <pre>
+            ****************************************************************
+                                输入下拉控件v.20构想
+            ****************************************************************
+            ----------------------------------------
+                        · 控件配置
+            ----------------------------------------
+            [核心方法及配置]
+            neuiInputsearch(elem, options); 或 neuiInputsearch(options, elem);
+            [参数说明]
+            elem 为当前输入框元素dom节点 例如'#area', '.area'，或jq对象 例如$('#area'), $('.area')
+            options 为一个OBJECT类型的JSON对象
+
+            ----------------------------------------
+                        · 使用方法
+            ----------------------------------------
+            // 方法1、外部调用，即“根据控件事件触发方式及返回的数据源”调用控件
+            neuiInputsearch('#area', {
+                event: 'input', // 指定事件为input输入事件或click点击事件
+                inputBack: function(e){ //
+                    var value = e.value;
+                    var source = { data: [{username:"小明", age:"18"}, {username:"小王", age:"20"} ]}
+                    return source;
+                },
+                //...
+                //... options其它参数
+            });
+
+
+            // 方法2、内部调用，即“在on input 或 on input 事件中指定数据源”调用控件
+            $('#area').on('input', function(){
+                var $this = $(this);
+                neuiInputsearch({
+                    source: { data: [{username:"小明", age:"18"}, {username:"小王", age:"20"} ]}, // 指定数组源
+                    //...
+                    //...options其它参数
+                }, $this)
+            });
+
+
+            ----------------------------------------
+                        · 控件参数 options
+            ----------------------------------------
+            var options = {
+                // 控件调用的两种方式：
+                // 方法1、“根据控件事件触发方式及返回的数据源”调用控件
+                event: "input", // 事件触发方式(可选)，默认input。值：input 在输入框元素中输入文字时, click 点击输入框元素时
+                inputBack: function(e){ // 根据事件触发方式返回数据源(可选)。
+                    var value = e.value;
+                    var source = {data:[]}
+                    return source; // 返回数据源
+                },
+                // 方法2、“在on input 或 on input 事件中指定数据源”调用控件
+                source: {}, // 数据源
+                
+                // 字段
+                format: [], // 自定义数据源字段(可选)，默认空数组。
+                // 定位    
+                position: "relative", // 定位方式(可选)，默认relative。值：relative 相对定位(即相对元素定位), absolute 绝对定位(即相对浏览器窗口定位)，fixed 绝对定位。
+                zIndex: 1, // 自定义控件层级(可选)，默认1。
+                width: "auto", // 宽度(可选)，默认auto根据元素自动调整。
+                height: 200, // 高度(可选)，默认200。
+                animate: false, // 是否启用动画效果(可选), 默认false
+
+                // 控件标识
+                caption: "", // 标题(可选)，默认空。
+                value: "", // 输入框元素默认值，仅当event='click'时有效(可选)，默认空。
+                id: "", // 作为控件的唯一标识(可选)，默认空。
+                className: "",  // 自定义控件类名(可选)，默认空。
+               
+                
+                // 下拉项设置
+                itemHeight: 36, // 每一项的高度(可选)，默认36
+                explained: true, // 是否选中下拉项后自动过滤说明性文字(可选)，默认true。
+                // 若想要下拉项中有说明性文字,则可在数据源非编号字段中添加em或span标签. eg {"bh":"1001", "mc":"张三<em>一个大好人</em>"}, 那么"一个大好人"就是说明性文字了.
+                autoFill: { // 自动填充值到输入框元素中(可选)。
+                    selectedFill: true, // 选中下拉项后是否自动填充(可选)，默认true。
+                    oneItemFill: "auto", // 只有一个下拉项时是否自动填充(可选)，默认auto。值：auto 根据设备自动判断(移动端false，pc端true), true 自动填充, false 手动点下拉项填充。
+                },
+                noData: { // 无数据时(可选)。
+                    enable: true, // 无数据时是否显示“无数据”下拉项(可选)，默认true。
+                    label: "无数据" // 自定义无数据时显示的下拉项值(可选)，默认无数据。
+                },
+                
+                // 按钮
+                closeButton: { // 关闭按钮(可选)。
+                    enable: false, // 是否显示关闭按钮(可选)，默认false
+                    theme: "text", // 关闭按钮样式(可选)。值：text 文字按钮(默认), image 图标按钮
+                    direction: "bottomCenter" // 关闭按钮位置(可选)。值： 空或default或bottomCenter 底部居中(默认), topCenter 顶部居中, leftTop 左上角, rightTop 右上角, leftBottom 左下角, rightBottom 右下角。
+                },
+
+                // 回调
+                onConfirm: function(e){ // 选择某一项后的回调(可选)。
+                },
+                onClose: function(e){ // 关闭后的回调(可选)。
+                }
+            }
+
+
+            </pre>
+        </section>
+
+
+        <section class="demo">
+            <div class="group">
+                <div class="group__caption">方法1、“根据控件事件触发方式及返回的数据源”调用控件</div>
+                <div class="group__form">
+                    <div class="list">
+                        <div class="title"><span>单个下拉</span><em>使用ID(DOM对象)</em></div>
+                        <div class="content">
+                            <p><span>三国人物</span><input type="text" id="username"></p>
+                        </div><!--/.content-->
+                        <div class="code">
+                            <pre>
+                                neuiInputsearch('#username', {
+                                    event: "input", 
+                                    inputBack: function(e){
+                                        var value = e.value;
+                                        var source = {
+                                            data:[
+                                                {value:"刘备"},
+                                                {value:"孙权"},
+                                                {value:"曹操"},
+                                                {value:"孔明"},
+                                                {value:"张秀"}
+                                            ]
+                                        }
+                                        return source; // 返回数据源
+                                    }
+                                });
+                            </pre>
+                        </div>
+                    </div><!--/.list-->
+                    <div class="list">
+                        <div class="title"><span>单个下拉</span><em>使用ID(JQ对象)</em></div>
+                        <div class="content">
+                            <p><span>水浒人物</span><input type="text" id="person"></p>
+                        </div><!--/.content-->
+                        <div class="code">
+                            <pre>
+                                neuiInputsearch($('#person'), {
+                                    event: "input", 
+                                    inputBack: function(e){
+                                        var value = e.value;
+                                        var source = {
+                                            data:[
+                                                {value:"宋江"},
+                                                {value:"吴用"},
+                                                {value:"阮小七"},
+                                                {value:"公孙胜"},
+                                                {value:"李逵"}
+                                            ]
+                                        }
+                                        return source; // 返回数据源
+                                    }
+                                });
+                            </pre>
+                        </div>
+                    </div><!--/.list-->
+                    <div class="list">
+                        <div class="title"><span>名著</span><em>使用ClassName(DOM对象)</em></div>
+                        <div class="content">
+                            <p class="inline"><span>三国</span><input type="text" class="famous"></p>
+                            <p class="inline"><span>水浒</span><input type="text" class="famous"></p>
+                            <p class="inline"><span>红楼</span><input type="text" class="famous"></p>
+                        </div><!--/.content-->
+                        <div class="code">
+                            <pre>
+                                neuiInputsearch('.famous', {
+                                    event: "input", 
+                                    inputBack: function(e){
+                                        var value = e.value;
+                                        var source = {
+                                            data:[
+                                                {value:"三国演义"},
+                                                {value:"水浒传"},
+                                                {value:"西游记"},
+                                                {value:"红楼梦"}
+                                            ]
+                                        }
+                                        return source; // 返回数据源
+                                    }
+                                });                    
+                            </pre>
+                        </div>
+                    </div><!--/.list-->
+                    <div class="list">
+                        <div class="title"><span>小说</span><em>使用ClassName(JQ对象)</em></div>
+                        <div class="content">
+                            <p class="inline"><span>醒世</span><input type="text" class="novel"></p>
+                            <p class="inline"><span>预世</span><input type="text" class="novel"></p>
+                            <p class="inline"><span>警世</span><input type="text" class="novel"></p>
+                        </div><!--/.content-->
+                        <div class="code">
+                            <pre>
+                                neuiInputsearch($('.novel'), {
+                                    event: "input", 
+                                    inputBack: function(e){
+                                        var value = e.value;
+                                        var source = {
+                                            data:[
+                                                {value:"警世恒言"},
+                                                {value:"醒世恒言"},
+                                                {value:"预世名言"},
+                                                {value:"初刻拍案惊奇"},
+                                                {value:"二刻拍案惊奇"}
+                                            ]
+                                        }
+                                        return source; // 返回数据源
+                                    }
+                                });
+                            </pre>
+                        </div>
+                    </div><!--/.list-->
+                </div><!--/.group__form-->
+            </div><!--/.group-->
+
+
+            <div class="group">
+                <div class="group__caption">方法2、“在on input 或 on input 事件中指定数据源”调用控件</div>
+                <div class="group__form">
+                    <div class="list">
+                        <div class="title"><span>单个下拉</span><em>使用ID(DOM对象)</em></div>
+                        <div class="content">
+                            <p><span>街道</span><input type="text" id="address"></p>
+                        </div><!--/.content-->
+                        <div class="code">
+                            <pre>
+                                $('#address').on('input', function(){
+                                    var $this = $(this);
+                                    neuiInputsearch({
+                                        source: {
+                                            data:[
+                                                {value:"泉秀路"},
+                                                {value:"宝洲路"},
+                                                {value:"东湖街"}
+                                            ]
+                                    }
+                                    }, this)
+                                });
+                            </pre>
+                        </div>
+                    </div><!--/.list-->
+                    <div class="list">
+                        <div class="title"><span>单个下拉</span><em>使用ID(JQ对象)</em></div>
+                        <div class="content">
+                            <p><span>社区</span><input type="text" id="community"></p>
+                        </div><!--/.content-->
+                        <div class="code">
+                            <pre>
+                                $('#community').on('input', function(){
+                                    var $this = $(this);
+                                    neuiInputsearch({
+                                        source: {
+                                            data:[
+                                                {value:"津坂小区"},
+                                                {value:"灯星小区"},
+                                                {value:"西湖小区"}
+                                            ]
+                                        }
+                                    }, $this)
+                                });
+                            </pre>
+                        </div>
+                    </div><!--/.list-->
+                    <div class="list">
+                        <div class="title"><span>食用肉</span><em>使用ClassName(DOM对象)</em></div>
+                        <div class="content">
+                            <p class="inline"><span>猪肉</span><input type="text" class="meat"></p>
+                            <p class="inline"><span>牛肉</span><input type="text" class="meat"></p>
+                            <p class="inline"><span>羊肉</span><input type="text" class="meat"></p>
+                        </div><!--/.content-->
+                        <div class="code">
+                            <pre>
+                                $('.meat').on('input', function(){
+                                    var $this = $(this);
+                                    neuiInputsearch({
+                                        source: {
+                                            data:[
+                                                {value:"猪肉"},
+                                                {value:"牛肉"},
+                                                {value:"羊肉"},
+                                                {value:"鸭肉"},
+                                                {value:"鸡肉"}
+                                            ]
+                                        }
+                                    }, this)
+                                });
+                            </pre>
+                        </div>
+                    </div><!--/.list-->
+                    <div class="list">
+                        <div class="title"><span>水果</span><em>使用ClassName(JQ对象)</em></div>
+                        <div class="content">
+                            <p class="inline"><span>西瓜</span><input type="text" class="fruit"></p>
+                            <p class="inline"><span>菠萝</span><input type="text" class="fruit"></p>
+                            <p class="inline"><span>哈密瓜</span><input type="text" class="fruit"></p>
+                        </div><!--/.content-->
+                        <div class="code">
+                            <pre>
+                                $('.fruit').on('input', function(){
+                                    var $this = $(this);
+                                    neuiInputsearch({
+                                        source: {
+                                            data:[
+                                                {value:"西瓜"},
+                                                {value:"菠萝"},
+                                                {value:"哈密瓜"},
+                                                {value:"榴莲"}
+                                            ]
+                                        }
+                                    }, $this)
+                                });                    
+                            </pre>
+                        </div>
+                    </div><!--/.list-->
+                </div><!--/.group__form-->
+            </div><!--/.group-->
+
+            <div class="group">
+                <div class="group__caption">实例</div>
+                <div class="group__form">
+                    <div class="list">
+                        <div class="title">房产询价</div>
+                        <div class="content">
+                            <p><span>楼盘名称</span> <textarea id="i-house"></textarea></p>
+                            <p><span>幢号</span><input type="text" id="i-build" class="building" readonly></p>
+                            <p><span>楼层</span><input type="text" id="i-floor" class="building" readonly></p>
+                            <p><span>房号</span><input type="text" id="i-room" readonly></p>
+                            <p><span>产权年限</span><input type="text" id="i-property" readonly></p>
+                        </div><!--/.content-->
+                    </div><!--/.list-->
+                </div><!--/.group__form-->
+            </div><!--/.group-->
+        </section>
+
+       
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                    方法1、“根据控件事件触发方式及返回的数据源”调用控件                                       
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====三国人物下拉，使用ID(DOM对象)
+            neuiInputsearch('#username', {
+                event: "input", 
+                inputBack: function(e){
+                    var value = e.value;
+                    var source = {
+                        data:[
+                            {value:"刘备"},
+                            {value:"孙权"},
+                            {value:"曹操"},
+                            {value:"孔明"},
+                            {value:"张秀"}
+                        ]
+                    }
+                    return source; // 返回数据源
+                }
+            });
+
+
+            //——————————————————————————————————————————
+            //=====水浒人物下拉，使用ID(JQ对象)
+            neuiInputsearch($('#person'), {
+                event: "input", 
+                inputBack: function(e){
+                    var value = e.value;
+                    var source = {
+                        data:[
+                            {value:"宋江"},
+                            {value:"吴用"},
+                            {value:"阮小七"},
+                            {value:"公孙胜"},
+                            {value:"李逵"}
+                        ]
+                    }
+                    return source; // 返回数据源
+                }
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====三国、水浒、红楼，使用ClassName(DOM对象)
+            neuiInputsearch('.famous', {
+                event: "input", 
+                inputBack: function(e){
+                    var value = e.value;
+                    var source = {
+                        data:[
+                            {value:"三国演义"},
+                            {value:"水浒传"},
+                            {value:"西游记"},
+                            {value:"红楼梦"}
+                        ]
+                    }
+                    return source; // 返回数据源
+                }
+            });
+
+
+
+           //——————————————————————————————————————————
+            //=====醒世、预世、警世，使用ClassName(DOM对象)
+            neuiInputsearch($('.novel'), {
+                event: "input", 
+                inputBack: function(e){
+                    var value = e.value;
+                    var source = {
+                        data:[
+                            {value:"警世恒言"},
+                            {value:"醒世恒言"},
+                            {value:"预世名言"},
+                            {value:"初刻拍案惊奇"},
+                            {value:"二刻拍案惊奇"}
+                        ]
+                    }
+                    return source; // 返回数据源
+                }
+            });
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                             方法2、“在on input 或 on input 事件中指定数据源”调用控件                                       
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====街道下拉，使用ID(DOM对象)
+            $('#address').on('input', function(){
+                var $this = $(this);
+                neuiInputsearch({
+                    source: {
+                        data:[
+                            {value:"泉秀路"},
+                            {value:"宝洲路"},
+                            {value:"东湖街"}
+                        ]
+                }
+                }, this)
+            });
+            
+
+
+            //——————————————————————————————————————————
+            //=====社区下拉，使用ID(JQ对象)
+            $('#community').on('input', function(){
+                var $this = $(this);
+                neuiInputsearch({
+                    source: {
+                        data:[
+                            {value:"津坂小区"},
+                            {value:"灯星小区"},
+                            {value:"西湖小区"}
+                        ]
+                    }
+                }, $this)
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====猪肉、牛肉、羊肉下拉，使用ClassName(DOM对象)
+            $('.meat').on('input', function(){
+                var $this = $(this);
+                neuiInputsearch({
+                    source: {
+                        data:[
+                            {value:"猪肉"},
+                            {value:"牛肉"},
+                            {value:"羊肉"},
+                            {value:"鸭肉"},
+                            {value:"鸡肉"}
+                        ]
+                    }
+                }, this)
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====西瓜、菠萝、哈密瓜下拉，使用ClassName(JQ对象)
+            $('.fruit').on('input', function(){
+                var $this = $(this);
+                neuiInputsearch({
+                    source: {
+                        data:[
+                            {value:"西瓜"},
+                            {value:"菠萝"},
+                            {value:"哈密瓜"},
+                            {value:"榴莲"}
+                        ]
+                    }
+                }, $this)
+            });
+
+
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         实例系列事件                                              
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====楼盘名称输入下拉
+            neuiInputsearch('#i-house', {
+                event: "input", 
+                inputBack: function(e){
+                    var value = e.value;
+                    var source = {
+                        data:[
+                            {value:"泉州浦西万达广场<em>(丰泽区宝洲街中段))</em>"},
+                            {value:"建发珑月湾"},
+                            {value:"三盛四季家园"},
+                            {value:"阳光时代广场"},
+                            {value:"中骏四季康城"}
+                        ]
+                    }
+                    return source; // 返回数据源
+                }
+            });
+
+
+            //——————————————————————————————————————————
+            //=====幢号下拉
+            $('.building').on('click', function(){
+                var $this = $(this);
+                neuiInputsearch({
+                    source: {
+                        data:[
+                            {value:"一幢<em>(小区的楼王))</em>"},
+                            {value:"二幢"},
+                            {value:"三幢"},
+                            {value:"四幢"},
+                            {value:"五幢"}
+                        ]
+                    }
+                }, $this)
+            });
+
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          测试js插件开发对象方法                                              
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            /* var jeDate = function(elem, options){
+                
+            }
+            
+            jeDate.prototype.name = function(){
+                console.log('人生')
+            }
+            jeDate.niubibi = function(){
+                console.log('牛逼逼')
+            }
+            jeDate.extend = function(){
+                console.log('我是extend函数');
+            }
+            jeDate.extend();
+
+            // var jet = new jeDate();
+            // jet.name();
+            // jeDate.niubibi();
+
+            var Person = function(){
+                this.name = '张三';
+                this.sayName = function(){
+                    console.log('我的名字是张三');
+                }
+            }
+            Person.prototype.sex = function(){
+                console.log('我的性别是男');
+            }
+            var person = new Person();
+            person.sayName();
+            person.sex(); */
+
+
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
