@@ -29,7 +29,7 @@ i, em{ font-style: normal; }
 .neInputsearch{
     position: absolute;
     z-index: 1;
-    min-width: 335px;
+    min-width: 200px;
     max-width: 100%;
     /* left: 0; */
     /* right: 400px; */
