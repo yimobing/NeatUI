@@ -210,7 +210,7 @@
         
 
         /**
-         * 百度地图类对象 edit 20210712-1
+         * 百度地图类对象 edit 20210719-1
          * 参考：http://mobai.blog.51cto.com/
          */
         var bdChinaMap = {
@@ -248,8 +248,12 @@
             
             overlaysCache: [],
             myPoints: [], // 所有坐标点数组
-            myPolygon: '',
-            myOverlay: [],
+            myOverlay: [], // 所有覆盖物数组
+
+            myLayIdentifier: [], // 覆盖物标识符数组(即让一个标识符对应一个覆盖物)
+            myLayNumber: '', // 覆盖物编号
+
+            myPolygon: '', // 多边莆
             drawManager: '',
             drawMode: '', // 当前绘制模式(可选), 默认空. 值：空 无任何绘制操作, hander 拖动地图(鼠标为一只手), marker 画点, circle 画圆, polyline 画线,  polygon 画多边形, rectangle 画矩形。
             clickTimes: 0, // 记录地图被点击的次数(可选), 默认0
@@ -327,15 +331,36 @@
                 // 鼠标绘制完成后，派发总事件的接口
                 this.drawManager.addEventListener('overlaycomplete', function(e){
                     // 绘制完成后回调获得覆盖物信息
-                    e.overlay.name = 'duobianxing'; // 标记覆盖物类型,方便清除指定覆盖物时用
+                    e.overlay.name = 'duobianxing'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
+                    //testing
+                    // 统计多边形个数, 给覆盖物添加唯一标识符
+                    var count = 0;
+                    var allOverlay = map.getOverlays();
+                    allOverlay.map(function(item){
+                        if(item.name === 'duobianxing'){
+                            count++;
+                        }
+                    })
+                    var layUid = 'duobianxing-' + count;
+                    e.overlay.identifier = layUid; // 添加覆盖物唯一标识符
+                    //
                     _this.overlays.push(e.overlay);
                     if(typeof e.overlay.enableEditing != 'undefined') e.overlay.enableEditing();
+                    // 给覆盖物添加操作按钮
+                    var lngLat = _this.getPolyCenter(e.overlay);  // 获取多边形中心点
+                    var point = new BMap.Point(lngLat.lng, lngLat.lat); // this.myOverlay[0];
+                    _this.addOverlayButton(point, '', layUid);  
+                    //
                     e.overlay.addEventListener("lineupdate", function (event) { // 拖动边线进行编辑时监听事件
                         // console.log('event:', event);
                         _this.drawMode = e.drawingMode; //全局赋值
                         _this.showLatLon(event.currentTarget.ha);
                     })
-                    e.overlay.addEventListener("mouseout", function(e){ // 鼠标离开时的监听事件
+                    e.overlay.addEventListener("mouseover", function(event){ // 鼠标进入时的监听事件
+                        // console.log('鼠标进入了e：', e)
+                        _this.drawMode = e.drawingMode; // 全局赋值
+                    })
+                    e.overlay.addEventListener("mouseout", function(event){ // 鼠标离开时的监听事件
                         // console.log('鼠标离开了e：', e)
                         _this.drawMode = 'hander'; // 全局赋值
                     })
@@ -351,6 +376,7 @@
                 if(this.myPoints.length != 0){ // 加载多个已有的多边形
                     for(var i = 0; i < this.myPoints.length; i++){
                         this.myOverlay = this.myPoints[i];
+                        this.myLayNumber = this.myLayIdentifier[i];
                         if (this.myOverlay) {
                             this.loadMyOverlay();
                         }
@@ -394,26 +420,135 @@
                 map.centerAndZoom(this.point, this.zoom); // 设置地图中心点
                 // 创建多边形覆盖物
                 var ply = new BMap.Polygon(this.myOverlay, this.styleOptions);
-                this.myPolygon = ply;
+                this.myPolygon = ply; 
                 try { 
                     ply.enableEditing(); 
-                    ply.name = 'duobianxing'; // 标记覆盖物类型,方便清除指定覆盖物时用
+                    ply.name = 'duobianxing'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
+                    //testing
+                    // 统计多边形个数, 给覆盖物添加唯一标识符
+                    var count = 1; // 统计多边形覆盖物个数
+                    var allOverlay = map.getOverlays();
+                    allOverlay.map(function(item){
+                        if(item.name === 'duobianxing'){
+                            count++;
+                        }
+                    })
+                    var layUid = 'duobianxing-' + count;
+                    ply.identifier = layUid; // 添加覆盖物唯一标识符
+                    //
+                    ply.addEventListener("lineupdate", function (event) { // 拖动边线进行编辑时监听事件
+                    // console.log('覆盖物属性发生变化event:', event);
+                    if(_this.clickTimes != 0) _this.drawMode = 'polygon'; // 全局赋值
+                        _this.showLatLon(event.currentTarget.ha);
+                    })
+                    ply.addEventListener("mouseover", function(event){ // 鼠标进入时的监听事件
+                        // console.log('鼠标进入了event：', event)
+                        _this.drawMode = 'polygon'; // 全局赋值
+                    })
+                    ply.addEventListener("mouseout", function(event){ // 鼠标离开多边形区域时的监听事件
+                        // console.log('鼠标离开了event：', event)
+                        _this.drawMode = 'hander'; // 全局赋值
+                    })
+                    // this.showLatLon(ply.getPath()); // 绘制完成时显示覆盖物点信息
+                    map.addOverlay(ply);
+                    // 给覆盖物添加操作按钮
+                    var lngLat = this.getPolyCenter(ply);  // 获取多边形中心点
+                    var point = new BMap.Point(lngLat.lng, lngLat.lat); // this.myOverlay[0];
+                    this.addOverlayButton(point, this.myLayNumber, layUid);  
                 } 
                 catch (e) { };
-                ply.addEventListener("lineupdate", function (e) { // 拖动边线进行编辑时监听事件
-                    // console.log('覆盖物属性发生变化e:', e);
-                    if(_this.clickTimes != 0) _this.drawMode = 'polygon'; // 全局赋值
-                    _this.showLatLon(e.currentTarget.ha);
+            },
+
+            /**
+             * 给覆盖物添加操作按钮
+             * @param {POINT} 文本标注所在的地理位置. eg. new BMap.Point(118.599547, 24.92461547)
+             * @param {string} 覆盖物对应的编号(可为空,新增时为空)
+             * @param {string} 覆盖物唯一标识符
+             */
+             addOverlayButton: function(ps_position, ps_lay_bh, ps_lay_uid){
+                var _this = this;
+                var map = this.map;
+                var opts = {
+                    position: ps_position, // 指定文本标注所在的地理位置. eg.new BMap.Point(118.599547, 24.9246154) 
+                    offset: new BMap.Size(0, 0) //设置文本偏移量  
+                    // offset: new BMap.Size(30, 50) //设置文本偏移量  
+                }
+                var label = new BMap.Label('<div class="bmap__polygon_del" data-bh="' + ps_lay_bh + '">删除本学区</div>', opts);  // 创建文本标注对象  
+                label.enableMassClear(); // 允许覆盖物被清除
+                label.name = 'duobianbtn'; // 添加覆盖物分类标识符
+                var lbUid = 'duobianbtn-' + ps_lay_uid;
+                label.identifier = lbUid; // 添加覆盖物唯一标识符
+                label.setStyle({
+                    color: "black",
+                    fontSize: "12px",
+                    backgroundColor: "#fff",      //填充颜色。当参数为空时，圆形将没有填充效果。
+                    color: "#666",
+                    // borderColor: "#2196F3",
+                    padding: '6px 10px',
+                    borderRadius: '4px'
+                });
+                map.addOverlay(label);
+                
+                label.addEventListener('click', function(e){
+                    // console.log('e：', e, '\ncontent：', e.target.content);
+                    var content = e.target.content;
+                    var reg = /^\<(.*?)data-bh="(.*?)"(.*?)>(.*?)\<\/(.*?)\>/g; // 提取data-*值
+                    var ls_data_bh = content.replace(reg, '$2');
+                    if(ls_data_bh === '' || typeof ls_data_bh == 'undefined' || ls_data_bh == null){
+                        neuiDialog.alert({
+                            caption: '提示',
+                            message: '确认删除当前学区范围？',
+                            buttons: ['确定', '取消'],
+                            callBack: function(ret){
+                                if(ret == 1){
+                                    _this.removeOnePoly(ps_lay_uid, lbUid); // 删除当前覆盖物
+                                }
+                            }
+                        })
+                        return;
+                    }
+                    fnDelOneSchoolArea(ls_data_bh, ps_lay_uid, lbUid);
                 })
-                ply.addEventListener("mouseout", function(e){ // 鼠标离开多边形区域时的监听事件
-                    // console.log('鼠标离开了e：', e)
-                    _this.drawMode = 'hander'; // 全局赋值
-                })
-                // this.showLatLon(ply.getPath()); // 绘制完成时显示覆盖物点信息
-                map.addOverlay(ply);
             },
 
             
+            /**
+             * 删除某个多边形覆盖物
+             * @param {string} ps_lay_uid 多边形覆盖物唯一标识符
+             * @param {string} ps_btn_uid 多边形覆盖物上面的按钮唯一标识符
+             */
+            removeOnePoly: function(ps_lay_uid, ps_btn_uid){
+                var map = this.map;
+                var allOverlay = map.getOverlays();
+                allOverlay.map(function(item){
+                    if(item.identifier === ps_lay_uid){
+                        map.removeOverlay(item);
+                    }
+                    if(item.identifier === ps_btn_uid){
+                        map.removeOverlay(item);
+                    }
+                })
+            },
+
+
+            /**
+            * 获取多边形中心点
+            * @param {overlay} ps_ply 多边形覆盖物
+            * @param {object} 返回经纬度对象
+            */
+            getPolyCenter: function(ps_ply){
+                var x = 0, y = 0;
+                var path = ps_ply .getPath();//返回多边型的点数组；ply是多边形覆盖物
+                for(var k = 0; k < path.length; k++){
+                        x = x + parseFloat(path[k].lng);
+                        y = y + parseFloat(path[k].lat);
+                }
+                x = x / path.length;
+                y = y / path.length;
+                return {lng: x, lat: y}
+            },
+
+
             /**
              * 添加点标记
              * @param {BMap Point} ps_point 地理坐标点
@@ -669,6 +804,88 @@
                 // console.log('当前覆盖物个数：', n);
             }
         };
+
+
+
+        /**
+         * 删除一个学区范围、删除一个多边形区域 add 20210719-1
+         * @param {string} ps_weizhi 学区编号
+         * @param {string} ps_lay_uid 多边形覆盖物唯一标识符
+         * @param {string} ps_btn_uid 多边形覆盖物上面的按钮唯一标识符
+         */
+        function fnDelOneSchoolArea(ps_weizhi, ps_lay_uid, ps_btn_uid){
+            console.log('位置编号：', ps_weizhi); // testing
+            neuiDialog.alert({
+                caption: '提示',
+                message: '确认删除当前学区范围？',
+                buttons: ['确定', '取消'],
+                callBack: function(ret){
+                    if(ret == 1){
+                        // 开始执行
+                        var flag = '', msg = '删除成功';
+                        neui.showAnimate();
+                        setTimeout(function(){
+                            //后台返回
+                            /*
+                            //START AJAX
+                            var isHoldOn = true;
+                            ajax({
+                                heading: "删除单个学区范围",
+                                debug: false,
+                                async: false, // 取数方式. true 异步, false 同步(默认)
+                                type: "GET",
+                                dataType: "html",
+                                cache: false,
+                                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                                data: {
+                                    "action": "wh_xuexiao_xq_weizhi_del",
+                                    "menu_bh": "<%=s_menu_bh%>",
+                                    "user": "<%=s_user%>",
+                                    "sjk": "<%=s_sjk%>",
+                                    "xuexiao_bh": g_xuexiao_bh,
+                                    "weizhi": ps_weizhi
+                                },
+                                success: function(res){
+                                    if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    var json = JSON.parse(res);
+                                    flag = json.return == 'ok' ? 1 : 0;
+                                    if(!flag) msg = json.data;
+                                },
+                                error: function(res){
+                                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                },
+                                beforeSend: function(XMLHttpRequest){ },
+                                complete: function(XMLHttpRequest, textStatus){ }
+                            })
+                            if(!isHoldOn){
+                                neui.destroyAnimate();
+                                return;
+                            }
+                            //END AJAX
+                            */
+                            flag = parseInt(1); //1 成功, 0 失败
+                            if(!flag) msg = '删除失败';
+
+                            neuiDialog.alert({
+                                //animate: true,
+                                popup: flag ? false : true, // 成功不弹窗，失败才弹窗
+                                caption: '提示',
+                                message: msg,
+                                buttons: ['确定'],
+                                callBack: function(){
+                                    if(flag){ //成功
+                                        //..
+                                        bdChinaMap.removeOnePoly(ps_lay_uid, ps_btn_uid);
+                                    }
+                                }
+                            })
+
+                            neui.destroyAnimate();
+                        }, 100)
+                    }
+                }
+            })
+        }
 
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -949,6 +1166,15 @@
                 }
             }
 
+            // 将坐标数据转化成覆盖物标识符数组 add 20210719-1
+            var identifyArray = [ ];
+            if(typeof coordinateJson.data != 'undefined'){
+                for(var i = 0; i < coordinateJson.data.length; i++){
+                    var item = coordinateJson.data[i];
+                    identifyArray.push(item["weizhi"]);
+                }
+            }
+
 
             //——————————————————————————————————————————
             //=====地图初始化 edit 20210621-1 20210622-1
@@ -972,7 +1198,8 @@
             // ];
             // bdChinaMap.init();
             // 2、加载多个已有的多边形
-            bdChinaMap.myPoints = coordinateArray;     
+            bdChinaMap.myPoints = coordinateArray;
+            bdChinaMap.myLayIdentifier = identifyArray; // add 20210719-1
             bdChinaMap.init();
 
 
@@ -1240,10 +1467,15 @@
                         if(!isGoOn) break;
                     } // END 外层FOR
 
-                    neuiDialog.alert({
+                    neuiDialog.alert({ // edit 20210719-1
                         caption: '提示',
                         message: msg,
-                        buttons: ['确定']
+                        buttons: ['确定'],
+                        callBack: function(){
+                            if(flag){
+                                window.location.reload(); // 重载页面
+                            }
+                        }
                     })
                     neui.destroyAnimate();
                 }, 100)
