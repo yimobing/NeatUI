@@ -2,6 +2,7 @@
 * [neuiInputsearch]
 * 输入下拉控件 
 * 版本 v2.0
+* 兼容情况：兼容ie8及ie8+
 * Website: https://github.com/yimobing/neatui
 * Author: chenMufeng
 * Date: 2021.07.01
