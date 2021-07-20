@@ -300,37 +300,40 @@
                 theme: "text", // 关闭按钮样式(可选)。值：text 文字按钮(默认), image 图标按钮
                 direction: "default" // 关闭按钮位置(可选)。值： default 底部居中(默认), topCenter 顶部居中, leftTop 左上角, rightTop 右上角, leftBottom 左下角, rightBottom 右下角。
             },
-
+   
             // 回调
-            onConfirm: function(e){ // 选择某一项后的回调(可选)。
+            onConfirm: function(e){ // 选择某一项后的回调(可选)。e 格式：{dom: "当前输入框元素DOM对象", id: "新的隐藏值", value: "新的显示值", oldId: "旧的隐藏值", oldValue: "旧的显示值"}
             },
-            onClose: function(e){ // 关闭后的回调(可选)。
+            onClose: function(e){ // 关闭后的回调(可选)。e 格式：{dom: "当前输入框元素DOM对象", id: "新的隐藏值", value: "新的显示值"}
             }
         }
 
         // 全局赋值
-        this.$method = method; // 调用方式。 值： "OUTER" 内部调用,  "INNER" 外部调用
-        this.$elem = elem; // 入框元素节点. eg.'#floor', '.floor'
+        this.$opts = net.extend(defaults, options || {}); // 控件参数对象
         var selector = elem.indexOf('#') >= 0 ?  
                     elem.replace(/([\#]+)/g, '') 
                     : 
                     ( elem.indexOf('.') >= 0 ? tools.getClassNameString(elem) : elem.replace(/([\#\.]+)/g, '') );
-        this.$selector = selector; // 当前元素选择器的ID属性值或Class类名
-        this.$obj = obj; // 输入框元素节点DOM对象
         this.$ids = document.getElementById(selector);
         this.$classes = document.getElementsByClassName(selector);
-        this.$elements = this.$ids == null ? this.$classes : [this.$ids];
-        this.$dom = document.getElementById(selector) == null ? document.getElementsByClassName(selector)[0] : document.getElementById(selector); // 当前元素节点
-        this.$opts = net.extend(defaults, options || {}); // 控件参数对象
-        // 控制台输出 testing
-        // console.log('method：', this.$method);
-        // console.log('elem：',this.$elem);
-        // console.log('selector：', this.$selector);
-        // console.log('Object对象：', this.$obj);
-        // console.log('ID属性DOM：',this.$ids);
-        // console.log('Class属性DOM：',this.$classes);
-        // console.log('DOM对象：', this.$dom);
+        //
+        this.$method = method; // 调用方式。 值： "OUTER" 内部调用,  "INNER" 外部调用
+        this.$selector = selector; // 输入框元素节点ID或CLass属性值(不含选择器符号井号#或点号.). eg. 'floor'
+        this.$elem = elem; // 输入框元素节点ID或Class属性值(含选择器符号井号#或点号.). eg.'#floor', '.floor'
+        this.$elements = this.$ids == null ? this.$classes : [this.$ids]; // 输入框元素DOM对象集合（所有元素，数组对象）
+        // this.$dom = document.getElementById(selector) == null ? document.getElementsByClassName(selector)[0] : document.getElementById(selector); // 输入框元素节点DOM对象
+        this.$obj = this.$dom = obj; // 输入框元素DOM对象（单个元素，当前对象）
+    
+        // 控制台输出
         // console.log('opts：',this.$opts);
+        // console.log('ids：',this.$ids);
+        // console.log('classes：',this.$classes);
+        // console.log('method：', this.$method);
+        // console.log('selector：', this.$selector);
+        // console.log('elem：',this.$elem);
+        // console.log('elements：', this.$elements);
+        // console.log('object：', this.$obj);
+        // console.log('DOM：', this.$dom);
         // console.log('--------------------------------------');
 
         // 初始化
@@ -338,7 +341,6 @@
             tools.dialogs("控件绑定的节点有错误，请查询是否存在以下节点\n" + elem);
             return;
         }
-
         // 初始化
         this.init();
 
@@ -395,7 +397,8 @@
                 value = row[fFieldValue];
             var liHeight = isNaN(Math.floor(me.$opts.itemHeight)) ? 32 : Math.floor(me.$opts.itemHeight);
             var _liStyle = ' style="min-height:' + liHeight + 'px"';
-            listHtml += '<li data-bh="' + bh + '"' + _liStyle + '>' + value + '</li>';
+            var _liClassName = ( value == inputValue ) ? ' on' : '';
+            listHtml += '<li data-bh="' + bh + '" class="' + _liClassName + '"' + _liStyle + '>' + value + '</li>';
         }
         // 输入框元素默认值
         if(me.$opts.event == 'click' && me.$opts.value.toString().replace(/([ ]+)/g, '') !== '') {
@@ -448,7 +451,6 @@
             ),
             ( btDirection.toLocaleLowerCase().indexOf('top') >= 0 ? '' : btnHtml )
         ].join('\r\n');
-
         // 拼接节点
         // 输入框父节点处理
         var faCell = valCell.parentNode; //父节点
@@ -472,9 +474,8 @@
         nodeDiv.style.zIndex = zIndex;
         nodeDiv.style.top = top + 'px';
         nodeDiv.innerHTML = allHtml;
-        // valCell.after(nodeDiv);
-        // valCell.parentNode.appendChild(nodeDiv);
-        tools.insertAfter(nodeDiv, valCell);
+        tools.insertAfter(nodeDiv, valCell); // valCell.after(nodeDiv); 在后面插入节点
+
         // 全局赋值
         me.$root = document.getElementsByClassName(net.idClass)[0]; // 根节点
         me.$ul = typeof document.getElementsByClassName('neInputsearch__pane')[0] == 'undefined' ? 
@@ -489,18 +490,27 @@
         if(typeof me.$oldId == 'undefined'){ // 第1次时才赋值
             me.$oldId = valCell.getAttribute('data-bh') == null ? '' : valCell.getAttribute('data-bh'); // 旧的隐藏值
         }
-        if(typeof me.$oldValue == 'undefined'){ // 第1次时才赋值
-            me.$oldValue = tools.getElementValue(valCell); // 旧的显示值
+
+        // 取旧的显示值
+        var old_value = valCell.getAttribute('data-old-value'); // 取data-旧的显示值
+        if(old_value == null){ // 第1次时才赋值
+            var now_value = tools.getElementValue(valCell)
+            // console.log('now_value', now_value)
+            me.$oldValue = now_value; // 全局赋值
+        }else{
+            me.$oldValue = old_value; // 全局赋值
         }
+    
+
         // 触发事件 
         if(me.$ul != null) me.chooseItem(valCell); // 选中下拉项事件
         if(me.$noneData != null) me.nodata(); // 选中无数据时的项
-        me.closeButton(); // 点击关闭按钮关闭控件
-        document.onclick = function(event){ //点击页面其它地方关闭控件
+        me.chooseButton(valCell); // 点击关闭按钮关闭控件
+        document.onclick = function(event){ // 点击页面其它地方关闭控件
             var target = event.target || event.srcElement;
-            var closest1 = target.closest('.' + net.idClass);
-            var closest2 = target.closest(me.$elem);
-            if(closest1 == null || (closest1.length == 0 && closest2.length == 0)){
+            var closest1 = target.closest('.' + net.idClass); // 控件节点
+            var closest2 = target.closest(me.$elem); // 输入框元素节点
+            if( (closest1 == null && closest2 == null) || (!closest1 && !closest2)){
                 me.removeControl();
             }
         }
@@ -509,9 +519,10 @@
 
 
     /**
-     * 选择某一项
+     * 选择某一项、选中下拉项
+     * @param {HTML DOM} ps_element 当前输入框元素DOM对象
      */
-    inputDrop.prototype.chooseItem = function(valCell){
+    inputDrop.prototype.chooseItem = function(ps_element){
         var me = this;
         var child = me.$ul.children;
         for(var i = 0; i < child.length; i++){
@@ -526,16 +537,36 @@
                 value = value.replace(newSmZi, '');
             }
             if(child.length == 1 && fnGetIsOneFill(me)){ // 只有一个下拉项时
-                fnFillValue2Box(me, valCell, bh, value);
+                fnFillValue2Box(me, ps_element, bh, value);
             }
             // console.log('隐藏值：', bh, ' - 显示值：', value);
             (function(hid, val){ // 使用闭包才能正确传值。hid 隐藏值, val 显示值
                 lis.onclick = function(){
-                    fnFillValue2Box(me, valCell, hid, val);
+                    fnFillValue2Box(me, ps_element, hid, val);
                 }
             })(bh, value)
         }
     };
+
+
+
+    /**
+     * 点击关闭按钮
+     * @param {HTML DOM} ps_element 当前输入框元素DOM对象
+     */
+    inputDrop.prototype.chooseButton = function(ps_element){
+        var me = this;
+        var btn = document.getElementsByClassName('neInputsearch__btn')[0];
+        if(typeof btn == 'undefined') return;
+        btn.onclick = function(){
+            if(me.$opts.onClose) // 关闭后的回调
+                me.$opts.onClose({dom: ps_element, id: me.$oldId, value: me.$oldValue});
+            if(me.$root){
+                tools.removeNode(me.$root); // 关闭控件
+            }
+        }
+    };
+
 
     
     /**
@@ -551,21 +582,7 @@
     };
 
 
-    /**
-     * 关闭按钮
-     */
-    inputDrop.prototype.closeButton = function(){
-        var me = this;
-        var btn = document.getElementsByClassName('neInputsearch__btn')[0];
-        if(typeof btn == 'undefined') return;
-        btn.onclick = function(){
-            if(me.$opts.onClose) // 关闭后的回调
-                me.$opts.onClose({id: me.$oldId, value: me.$oldValue});
-            if(me.$root){
-                tools.removeNode(me.$root); // 关闭控件
-            }
-        }
-    };
+
 
     /**
      * 移除控件
@@ -586,21 +603,24 @@
     /**
      * 把值填充到输入框元素中
      * @param {object} ps_this 控件参数对象
+     * @param {HTML DOM} ps_element 输入框元素DOM对象
      * @param {string} ps_bh 隐藏的值
      * @param {string} ps_val 显示的值
      */
     function fnFillValue2Box(ps_this, ps_element, ps_bh, ps_val){
         var me = ps_this;
-        if(me.$opts.autoFill.selectedFill || (child.length == 1 && fnGetIsOneFill(me))){
+        if(me.$opts.autoFill.selectedFill || (me.$ul.children.length == 1 && fnGetIsOneFill(me))){
             ps_element.setAttribute('data-bh', ps_bh); // 给当前元素赋隐藏值
             tools.giveValueToElement(ps_element, ps_val); // 给当前元素赋显示值
         }
         if(me.$opts.onConfirm)  // 选择某一项后回调
-            me.$opts.onConfirm({id: ps_bh, value: ps_val, oldId: me.$oldId, oldValue: me.$oldValue});
+            me.$opts.onConfirm({dom: ps_element, id: ps_bh, value: ps_val, oldId: me.$oldId, oldValue: me.$oldValue});
         if(me.$root){
             tools.removeNode(me.$root); // 关闭控件
         }
+        
         // 全局赋值 (旧的隐藏值、显示值再次赋值)
+        ps_element.setAttribute('data-old-value', ps_val); // 设置data-旧的显示值
         me.$oldId = ps_bh;
         me.$oldValue = ps_val;
     }
