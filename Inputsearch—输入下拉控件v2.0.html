@@ -73,13 +73,8 @@
         .content p { margin-bottom: 5px; }
         .content p.inline{ display: inline-block; vertical-align: middle; margin-right: 10px; }
         .content p span{ margin-right: 10px; }
-        
-        
     </style>
 
-
-    <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script><!--jQuery库-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
     <div class="wrap">
         <section class="code">
             <pre>
@@ -170,13 +165,13 @@
                 closeButton: { // 关闭按钮(可选)。
                     enable: false, // 是否显示关闭按钮(可选)，默认false
                     theme: "text", // 关闭按钮样式(可选)。值：text 文字按钮(默认), image 图标按钮
-                    direction: "bottomCenter" // 关闭按钮位置(可选)。值： 空或default或bottomCenter 底部居中(默认), topCenter 顶部居中, leftTop 左上角, rightTop 右上角, leftBottom 左下角, rightBottom 右下角。
+                    direction: "default" // 关闭按钮位置(可选)。值： default 底部居中(默认), topCenter 顶部居中, leftTop 左上角, rightTop 右上角, leftBottom 左下角, rightBottom 右下角。
                 },
 
                 // 回调
-                onConfirm: function(e){ // 选择某一项后的回调(可选)。
+                onConfirm: function(e){ // 选择某一项后的回调(可选)。e 格式：{dom: "当前输入框元素DOM对象", id: "新的隐藏值", value: "新的显示值", oldId: "旧的隐藏值", oldValue: "旧的显示值"}
                 },
-                onClose: function(e){ // 关闭后的回调(可选)。
+                onClose: function(e){ // 关闭后的回调(可选)。e 格式：{dom: "当前输入框元素DOM对象", id: "新的隐藏值", value: "新的显示值"}
                 }
             }
 
@@ -402,16 +397,15 @@
             </div><!--/.group-->
 
             <div class="group">
-                <div class="group__caption">实例</div>
+                <div class="group__caption">综合实例</div>
                 <div class="group__form">
                     <div class="list">
-                        <div class="title">房产询价</div>
+                        <div class="title"><span>房产询价联动下拉</span></div>
                         <div class="content">
                             <p><span>楼盘名称</span> <textarea id="i-house"></textarea></p>
-                            <p><span>幢号</span><input type="text" id="i-build" class="building" readonly></p>
-                            <p><span>楼层</span><input type="text" id="i-floor" class="building" readonly></p>
+                            <p><span>幢号</span><input type="text" id="i-build" readonly></p>
+                            <p><span>楼层</span><input type="text" id="i-floor" readonly></p>
                             <p><span>房号</span><input type="text" id="i-room" readonly></p>
-                            <p><span>产权年限</span><input type="text" id="i-property" readonly></p>
                         </div><!--/.content-->
                     </div><!--/.list-->
                 </div><!--/.group__form-->
@@ -425,7 +419,9 @@
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
-    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script><!--jQuery库-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
+
     <script type="text/javascript">
         $(function(){
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -449,6 +445,8 @@
                     return source; // 返回数据源
                 }
             });
+
+            
 
 
             //——————————————————————————————————————————
@@ -531,7 +529,7 @@
                         ]
                 }
                 }, this)
-            });
+            });        
             
 
 
@@ -598,11 +596,10 @@
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
             //=====楼盘名称输入下拉
-            neuiInputsearch('#i-house', {
-                event: "input", 
-                inputBack: function(e){
-                    var value = e.value;
-                    var source = {
+            $('#i-house').on('input', function(){
+                var $this = $(this);
+                neuiInputsearch({
+                    source: {
                         data:[
                             {value:"泉州浦西万达广场<em>(丰泽区宝洲街中段))</em>"},
                             {value:"建发珑月湾"},
@@ -610,69 +607,81 @@
                             {value:"阳光时代广场"},
                             {value:"中骏四季康城"}
                         ]
-                    }
-                    return source; // 返回数据源
-                }
-            });
-
-
-            //——————————————————————————————————————————
-            //=====幢号下拉
-            $('.building').on('click', function(){
-                var $this = $(this);
-                neuiInputsearch({
-                    source: {
-                        data:[
-                            {value:"一幢<em>(小区的楼王))</em>"},
-                            {value:"二幢"},
-                            {value:"三幢"},
-                            {value:"四幢"},
-                            {value:"五幢"}
-                        ]
+                    },
+                    onConfirm: function(e){
+                        if(e.value != e.oldValue){ // 新老值不一样时，清空幢号、楼层、房号
+                            $('#i-build, #i-floor, #i-room').val('');
+                        }
                     }
                 }, $this)
             });
 
 
 
-
-
-
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //+                                                          测试js插件开发对象方法                                              
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
-            /* var jeDate = function(elem, options){
-                
-            }
-            
-            jeDate.prototype.name = function(){
-                console.log('人生')
-            }
-            jeDate.niubibi = function(){
-                console.log('牛逼逼')
-            }
-            jeDate.extend = function(){
-                console.log('我是extend函数');
-            }
-            jeDate.extend();
+            //=====幢号下拉
+            $('#i-build').on('click', function(){
+                var $this = $(this);
+                neuiInputsearch({
+                    source: {
+                        data:[
+                            {value:"一幢"},
+                            {value:"二幢"},
+                            {value:"三幢"},
+                            {value:"四幢<em>(小区的楼王))</em>"},
+                            {value:"五幢"}
+                        ]
+                    },
+                    onConfirm: function(e){
+                        if(e.value != e.oldValue){ // 新老值不一样时，清空楼层、房号
+                            $('#i-floor, #i-room').val('');
+                        }
+                    }
+                }, $this)
+            });
 
-            // var jet = new jeDate();
-            // jet.name();
-            // jeDate.niubibi();
 
-            var Person = function(){
-                this.name = '张三';
-                this.sayName = function(){
-                    console.log('我的名字是张三');
-                }
-            }
-            Person.prototype.sex = function(){
-                console.log('我的性别是男');
-            }
-            var person = new Person();
-            person.sayName();
-            person.sex(); */
+            //——————————————————————————————————————————
+            //=====楼层下拉
+            $('#i-floor').on('click', function(){
+                var $this = $(this);
+                neuiInputsearch({
+                    source: {
+                        data:[
+                            {value:"1楼"},
+                            {value:"2楼"},
+                            {value:"3楼"},
+                            {value:"5楼"},
+                            {value:"6楼"}
+                        ]
+                    },
+                    onConfirm: function(e){
+                        if(e.value != e.oldValue){ // 新老值不一样时，清空房号
+                            $('#i-room').val('');
+                        }
+                    }
+                }, $this)
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====房号下拉
+            $('#i-room').on('click', function(){
+                var $this = $(this);
+                neuiInputsearch({
+                    source: {
+                        data:[
+                            {value:"1001"},
+                            {value:"1002"},
+                            {value:"1003"},
+                            {value:"1005"},
+                            {value:"1006"}
+                        ]
+                    }
+                }, $this)
+            });
+
 
 
     
