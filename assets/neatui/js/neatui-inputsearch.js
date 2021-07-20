@@ -74,7 +74,29 @@
     };
 
 
+    /**
+     * ie11- 兼容matches
+     */
+    if (!Element.prototype.matches) {
+        Element.prototype.matches =
+            Element.prototype.msMatchesSelector ||
+            Element.prototype.webkitMatchesSelector;
+    };
 
+    /**
+     * ie11- 兼容closest方法（用于查找父元素）
+     */
+    if (!Element.prototype.closest) {
+        Element.prototype.closest = function(s) {
+            var el = this;
+
+            do {
+                if (Element.prototype.matches.call(el, s)) return el;
+                el = el.parentElement || el.parentNode;
+            } while (el !== null && el.nodeType === 1);
+            return null;
+        };
+    };
 
     /**
      * ie11-兼容Array.from
@@ -147,6 +169,7 @@
             };
         }());
     };
+
 
 
     //================================================================
@@ -449,7 +472,9 @@
         nodeDiv.style.zIndex = zIndex;
         nodeDiv.style.top = top + 'px';
         nodeDiv.innerHTML = allHtml;
-        valCell.after(nodeDiv);
+        // valCell.after(nodeDiv);
+        // valCell.parentNode.appendChild(nodeDiv);
+        tools.insertAfter(nodeDiv, valCell);
         // 全局赋值
         me.$root = document.getElementsByClassName(net.idClass)[0]; // 根节点
         me.$ul = typeof document.getElementsByClassName('neInputsearch__pane')[0] == 'undefined' ? 
@@ -519,7 +544,9 @@
     inputDrop.prototype.nodata = function(){
         var me = this;
         document.getElementsByClassName('neInputsearch__zero')[0].onclick = function(){
-            if(me.$root) me.$root.remove(); // 关闭控件
+            if(me.$root){
+                tools.removeNode(me.$root); // 关闭控件
+            }
         }
     };
 
@@ -534,7 +561,9 @@
         btn.onclick = function(){
             if(me.$opts.onClose) // 关闭后的回调
                 me.$opts.onClose({id: me.$oldId, value: me.$oldValue});
-            if(me.$root) me.$root.remove(); // 关闭控件
+            if(me.$root){
+                tools.removeNode(me.$root); // 关闭控件
+            }
         }
     };
 
@@ -543,7 +572,9 @@
      */
     inputDrop.prototype.removeControl = function(){
         var div = document.getElementsByClassName(net.idClass);
-        if(div.length != 0 ) div[0].remove();
+        if(div.length != 0 ){
+            tools.removeNode(div[0]); // 关闭控件
+        }
     };
 
     
@@ -566,7 +597,9 @@
         }
         if(me.$opts.onConfirm)  // 选择某一项后回调
             me.$opts.onConfirm({id: ps_bh, value: ps_val, oldId: me.$oldId, oldValue: me.$oldValue});
-        if(me.$root) me.$root.remove(); // 关闭控件
+        if(me.$root){
+            tools.removeNode(me.$root); // 关闭控件
+        }
         // 全局赋值 (旧的隐藏值、显示值再次赋值)
         me.$oldId = ps_bh;
         me.$oldValue = ps_val;
@@ -623,6 +656,37 @@
                 ele.attachEvent('on'+event,fn.bind(ele)); //js原生bind()函数也有兼容问题,故也需写个兼容函数
             }
         },
+
+        /**
+         * 在已存在的节点向后面插入新节点 (兼容ie9-)
+         * @param {HTML DOM} newNode 新节点
+         * @param {HTML DOM} existingNode 已存在的节点
+         */
+        insertAfter: function(newNode, existingNode) {
+            var parent = existingNode.parentNode;
+            // 最后一个子节点 lastElementChild兼容其他浏览器 lastChild  兼容ie678;
+            var lastNode = parent.lastElementChild || parent.lastChild;
+            // 兄弟节点同样也是有兼容性
+            var siblingNode = existingNode.nextElementSibling || existingNode.nextSibling;
+            if (lastNode == existingNode) // 先判断目标节点是不是父级的最后一个节点，如果是的话，直接给父级加子节点就好
+            { 
+                parent.appendChild(newNode);
+            }
+            else // 不是最好后一个节点  那么插入到目标元素的下一个兄弟节点之前（就相当于目标元素的insertafter）
+            { 
+                parent.insertBefore(newNode, siblingNode);
+            }
+        },
+
+        /**
+         * 移除指定节点 (兼容ie11-)
+         * @param {HTML DOM} node 要移除的节点
+         */
+        removeNode: function(node){
+            // node.remove();
+            node.parentNode.removeChild(node);
+        },
+
 
         /**
          * 给输入框赋值
