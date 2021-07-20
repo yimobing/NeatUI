@@ -99,6 +99,31 @@ if(!Array.prototype.forEach){
 
 
 /**
+ * ie11- 兼容matches
+ */
+ if (!Element.prototype.matches) {
+    Element.prototype.matches =
+        Element.prototype.msMatchesSelector ||
+        Element.prototype.webkitMatchesSelector;
+};
+
+/**
+ * ie11- 兼容closest方法（用于查找父元素）
+ */
+if (!Element.prototype.closest) {
+    Element.prototype.closest = function(s) {
+        var el = this;
+
+        do {
+            if (Element.prototype.matches.call(el, s)) return el;
+            el = el.parentElement || el.parentNode;
+        } while (el !== null && el.nodeType === 1);
+        return null;
+    };
+};
+
+
+/**
  * ie11-兼容Array.from
  */
  if (!Array.from) {
@@ -173,6 +198,35 @@ if(!Array.prototype.forEach){
 
 
 
+/*********************************************************************************************************************
+ *                                                  jq兼容IE低版本浏览器
+ ********************************************************************************************************************/
+
+/**
+ * ie8兼容on input
+ * eg. $("#div").onInput(function(e) { var value = e.value; });
+ */
+$.fn.extend({
+    onInput: function(callback) {
+        var el = $(this);
+        // 当前浏览器是否支持 oninput 事件
+        if ("oninput" in el.get(0)) {
+            el.on("input", function() {
+                callback && callback( {value: $(this).val()} );
+            });
+        } else {
+            el.keyup(function() {
+                callback && callback( { value: $(this).val()} );
+            });
+            el.change(function() {
+                callback && callback( { value: $(this).val()} );
+            });
+        }
+    }
+});
+
+
+
 
 /*********************************************************************************************************************
  *                                                  IEHacker对象，让IE低版本浏览器兼容JS属性
@@ -193,9 +247,9 @@ var IEHacker = {
 		//不兼容ie8-的原生js
 		usernameDom.addEventListener('paste', function (e){})
 	 */
-	addEventListener:function(ele,event,fn){
+	addEventListener:function(ele, event, fn){
 		if(ele.addEventListener){
-			ele.addEventListener(event,fn,false);
+			ele.addEventListener(event, fn, false);
 		}else{
 			ele.attachEvent('on'+event,fn.bind(ele)); //js原生bind()函数也有兼容问题,故也需写个兼容函数
 		}
