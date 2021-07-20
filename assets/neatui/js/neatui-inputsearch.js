@@ -6,7 +6,7 @@
 * Website: https://github.com/yimobing/neatui
 * Author: chenMufeng
 * Date: 2021.07.01
-* Update: 2021.07.01
+* Update: 2021.07.20
 */
 
 
@@ -294,6 +294,11 @@
                 enable: true, // 无数据时是否显示“无数据”下拉项(可选)，默认true。
                 label: "无数据" // 自定义无数据时显示的下拉项值(可选)，默认无数据。
             },
+            entire: { // 给数据源自动添加一个下拉项(可选)。
+                enable: false, // 是否启用(可选), 默认false。
+                text: "全部", // 下拉项显示值(可选), 默认"全部"。
+                hid: "全部" // 下拉项隐藏值, 默认"全部"。
+            },
 
             // 按钮
             closeButton: { // 关闭按钮(可选)。
@@ -392,14 +397,18 @@
         }
         // 列表HTML
         var listHtml = '';
-        for(var i = 0; i < dataSource.data.length; i++){
+        var liHeight = isNaN(Math.floor(opts.itemHeight)) ? 32 : Math.floor(opts.itemHeight);
+        var _liStyle = ' style="min-height:' + liHeight + 'px"';
+        if(opts.entire.enable){ // 给数据源自动增加一个下拉项
+            var _liClassName = opts.entire.text == inputValue ? ' class="on"' : '';
+            listHtml += '<li data-bh="' + opts.entire.hid + '"' +_liClassName + _liStyle + '>' + opts.entire.text + '</li>';
+        }
+        for(var i = 0; i < dataSource.data.length; i++){ // 循环数据源中的下拉项
             var row = dataSource.data[i];
-            var bh = fFieldId == dFieldId ? (i + 1) : row[fFieldId],
+            var bh = typeof row[dFieldId] != 'undefined' ? row[dFieldId] : ( fFieldId == dFieldId ? (i + 1) : row[fFieldId] ),
                 value = row[fFieldValue];
-            var liHeight = isNaN(Math.floor(me.$opts.itemHeight)) ? 32 : Math.floor(me.$opts.itemHeight);
-            var _liStyle = ' style="min-height:' + liHeight + 'px"';
-            var _liClassName = ( value == inputValue ) ? ' on' : '';
-            listHtml += '<li data-bh="' + bh + '" class="' + _liClassName + '"' + _liStyle + '>' + value + '</li>';
+            var _liClassName = ( value == inputValue ) ? ' class="on"' : '';
+            listHtml += '<li data-bh="' + bh + '"' + _liClassName + _liStyle + '>' + value + '</li>';
         }
         // 输入框元素默认值
         if(me.$opts.event == 'click' && me.$opts.value.toString().replace(/([ ]+)/g, '') !== '') {
@@ -476,7 +485,6 @@
         nodeDiv.style.top = top + 'px';
         nodeDiv.innerHTML = allHtml;
         tools.insertAfter(nodeDiv, valCell); // valCell.after(nodeDiv); 在后面插入节点
-
         // 全局赋值
         me.$root = document.getElementsByClassName(net.idClass)[0]; // 根节点
         me.$ul = typeof document.getElementsByClassName('neInputsearch__pane')[0] == 'undefined' ? 
@@ -491,6 +499,9 @@
         if(typeof me.$oldId == 'undefined'){ // 第1次时才赋值
             me.$oldId = valCell.getAttribute('data-bh') == null ? '' : valCell.getAttribute('data-bh'); // 旧的隐藏值
         }
+
+        // 下拉项定位
+        me.scrollItemIntoView(); // 滚动到指定下拉项
 
         // 取旧的显示值
         var old_value = valCell.getAttribute('data-old-value'); // 取data-旧的显示值
@@ -515,7 +526,37 @@
                 me.removeControl();
             }
         }
-    }
+    },
+
+
+    /**
+     * 滚动到当前高亮的下拉项
+     */
+    inputDrop.prototype.scrollItemIntoView = function(){
+        var me = this;
+        if(me.$ul == null) return;
+        var realHeight = 0, // 实际高
+        limitHeight = me.$ul.parentNode.offsetHeight; // 限制高
+        var child = me.$ul.children;
+        var currentItem = null;
+        for(var i = 0; i < child.length; i++){
+            var lis = child[i];
+            realHeight += lis.offsetHeight;
+            if(lis.getAttribute('class') != null && lis.getAttribute('class').indexOf('on') >= 0){
+                currentItem = lis;
+            }
+        }
+        /**
+         *  scrollIntoView参数：
+            behavior 定义动画过渡效果(可选)。值："auto"或 "smooth" 之一。默认为 "auto"。
+            block 定义垂直方向的对齐(可选)。值："start", "center", "end", 或 "nearest"之一。默认为 "start"。
+            inline 定义水平方向的对齐(可选)。值："start", "center", "end", 或 "nearest"之一。默认为 "nearest"。
+         */
+        if(currentItem != null && realHeight > limitHeight) {
+            currentItem.scrollIntoView({behavior: "auto", block: "center", inline: "nearest"});
+        }
+
+    },
 
 
 
@@ -525,6 +566,7 @@
      */
     inputDrop.prototype.chooseItem = function(ps_element){
         var me = this;
+        if(me.$ul == null) return;
         var child = me.$ul.children;
         for(var i = 0; i < child.length; i++){
             var lis = child[i];
