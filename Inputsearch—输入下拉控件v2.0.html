@@ -160,6 +160,11 @@
                     enable: true, // 无数据时是否显示“无数据”下拉项(可选)，默认true。
                     label: "无数据" // 自定义无数据时显示的下拉项值(可选)，默认无数据。
                 },
+                entire: { // 给数据源自动添加一个下拉项(可选)。
+                    enable: false, // 是否启用(可选), 默认false。
+                    text: "全部", // 下拉项显示值(可选), 默认"全部"。
+                    hid: "全部" // 下拉项隐藏值, 默认"全部"。
+                },
                 
                 // 按钮
                 closeButton: { // 关闭按钮(可选)。
@@ -408,6 +413,14 @@
                             <p><span>房号</span><input type="text" id="i-room" readonly></p>
                         </div><!--/.content-->
                     </div><!--/.list-->
+                    <div class="list">
+                        <div class="title"><span>省市区县联动下拉(系统数据源)</span></div>
+                        <div class="content">
+                            <p><span>省份</span> <textarea id="i-province" readonly></textarea></p>
+                            <p><span>城市</span><input type="text" id="i-city" readonly></p>
+                            <p><span>区(县)</span><input type="text" id="i-county" readonly></p>
+                        </div><!--/.content-->
+                    </div><!--/.list-->
                 </div><!--/.group__form-->
             </div><!--/.group-->
         </section>
@@ -421,6 +434,7 @@
     <!--================================================================================-->
     <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script><!--jQuery库-->
     <script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-district.js"></script><!--省市区县数据源控件-->
 
     <script type="text/javascript">
         $(function(){
@@ -592,8 +606,11 @@
 
 
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //+                                                         实例系列事件                                              
+            //+                                                        综合实例                                              
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            //+                                  房产询价联动下拉
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             //——————————————————————————————————————————
             //=====楼盘名称输入下拉
             $('#i-house').on('input', function(){
@@ -680,7 +697,70 @@
                         ]
                     }
                 }, $this)
+            }); 
+
+
+
+
+
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            //+                              省市区县联动下拉(系统数据源)
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            //——————————————————————————————————————————
+            //=====省份下拉
+            $('#i-province').on('click', function(){
+                var $this = $(this);
+                var provinceJson = neuiDistrict.getProvinceData();
+                // console.log('省份：', provinceJson);
+                neuiInputsearch({
+                    source: provinceJson,
+                    onConfirm: function(e){
+                        if(e.value != e.oldValue){ // 新老值不一样时，清空城市、区县
+                           //..
+                        }
+                    }
+                }, $this)
             });
+
+
+
+
+            //——————————————————————————————————————————
+            //=====城市下拉
+            $('#i-city').on('click', function(){
+                var $this = $(this);
+                var ls_sheng = $('#i-province').val();
+                var cityJson = neuiDistrict.getCityData(ls_sheng);
+                // console.log('城市：', cityJson);
+                neuiInputsearch({
+                    source: cityJson,
+                    onConfirm: function(e){
+                        if(e.value != e.oldValue){ // 新老值不一样时，清空城市、区县
+                           //..
+                        }
+                    }
+                }, $this)
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====区县下拉
+            $('#i-county').on('click', function(){
+                var $this = $(this);
+                var ls_shi = $('#i-city').val();
+                var countyJson = neuiDistrict.getCountyData(ls_shi);
+                // console.log('区县：', countyJson);
+                neuiInputsearch({
+                    source: countyJson,
+                    onConfirm: function(e){
+                        if(e.value != e.oldValue){ // 新老值不一样时，清空城市、区县
+                           //..
+                        }
+                    }
+                }, $this)
+            });
+
 
 
 
