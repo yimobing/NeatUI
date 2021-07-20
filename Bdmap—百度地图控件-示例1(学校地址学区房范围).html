@@ -332,7 +332,6 @@
                 this.drawManager.addEventListener('overlaycomplete', function(e){
                     // 绘制完成后回调获得覆盖物信息
                     e.overlay.name = 'duobianxing'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
-                    //testing
                     // 统计多边形个数, 给覆盖物添加唯一标识符
                     var count = 0;
                     var allOverlay = map.getOverlays();
@@ -424,7 +423,6 @@
                 try { 
                     ply.enableEditing(); 
                     ply.name = 'duobianxing'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
-                    //testing
                     // 统计多边形个数, 给覆盖物添加唯一标识符
                     var count = 1; // 统计多边形覆盖物个数
                     var allOverlay = map.getOverlays();
@@ -814,7 +812,6 @@
          * @param {string} ps_btn_uid 多边形覆盖物上面的按钮唯一标识符
          */
         function fnDelOneSchoolArea(ps_weizhi, ps_lay_uid, ps_btn_uid){
-            console.log('位置编号：', ps_weizhi); // testing
             neuiDialog.alert({
                 caption: '提示',
                 message: '确认删除当前学区范围？',
@@ -1335,9 +1332,9 @@
             $('#btn-poly-save').on('click', function(){
                 // edit 20210622-1 下8行
                 var ls_ditu_suofang = tools.getZoom(); // 获取地图缩放级别
-                // console.log('当前地图缩放级别：', ls_ditu_suofang);
+                console.log('当前地图缩放级别：', ls_ditu_suofang);
                 var coordArr = tools.getPolyCoordinateData();  // 获取学区范围坐标数据
-                // console.log('保存时coordArr：', coordArr);
+                console.log('保存时coordArr：', coordArr);
                 // 开始执行
                 var marks = '', tips = '保存地图缩放级别成功';
                 var flag = '', msg = '保存成功';
