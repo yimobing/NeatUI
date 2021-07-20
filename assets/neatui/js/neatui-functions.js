@@ -1,6 +1,14 @@
-/*********************************************************************************************************************
- *                                                  拓展prototype兼容ie
- ********************************************************************************************************************/
+/**
+ * [neuiFunctions]
+ * NeatUI 函数库
+ * Author: ChenMufeng
+ * Date: 2021.02.05
+ * Update: 2021.07.20
+ */
+
+//=====================================================================================================================
+//                                                 拓展prototype兼容ie
+//=====================================================================================================================
  /**
  * ie9-兼容原生js bind
  * 因为js addEventListener为兼容ie8-,会重写addEventListener，但重写的函数会使用到原生的js bind函数
@@ -18,8 +26,6 @@ if(!Function.prototype.bind){
         }
     }
 };
-
-
 
 /**
  * ie9-兼容原生js filter
@@ -196,41 +202,9 @@ if (!Element.prototype.closest) {
  };
 
 
-
-
-/*********************************************************************************************************************
- *                                                  jq兼容IE低版本浏览器
- ********************************************************************************************************************/
-
-/**
- * ie8兼容on input
- * eg. $("#div").onInput(function(e) { var value = e.value; });
- */
-$.fn.extend({
-    onInput: function(callback) {
-        var el = $(this);
-        // 当前浏览器是否支持 oninput 事件
-        if ("oninput" in el.get(0)) {
-            el.on("input", function() {
-                callback && callback( {value: $(this).val()} );
-            });
-        } else {
-            el.keyup(function() {
-                callback && callback( { value: $(this).val()} );
-            });
-            el.change(function() {
-                callback && callback( { value: $(this).val()} );
-            });
-        }
-    }
-});
-
-
-
-
-/*********************************************************************************************************************
- *                                                  IEHacker对象，让IE低版本浏览器兼容JS属性
- ********************************************************************************************************************/
+//=====================================================================================================================
+//                                                  IEHacker对象，让IE低版本浏览器兼容JS属性
+//=====================================================================================================================
 var IEHacker = {
 
     /**
@@ -289,49 +263,74 @@ var IEHacker = {
 //=====================================================================================================================
 //                                                  JQ小插件
 //=====================================================================================================================
-/**
- * 使用GET方式获取URL中参数（JQ方法）
- * @param {string} name 参数名
- * 注意：
- * 1.若参数为对象,则要使用JSON.stringify(对象)先将对象转化成字符串;
- * 2. 若参数值含中文，要传递参数时要使用 encodeURI()进行编码,否则会乱码，接收参数时一般无须使用decodeURI()进行解码也不会乱码
- * eg. 
-    · 父页面传递参数：
-    var json = {province:"福建省", city:"泉州市", county:"丰泽区"}
-    var url = 'https://www.xxx.com/login.aspx?area=' + encodeURI(JSON.stringify(json));
-    · 子页面接收参数：
-    var result = JSON.parse($.getUrlParam('area'));
-    var sheng = shi = qu = '';
-    if(result != null){
-        sheng = result.province;
-        shi = result.city;
-        qu = result.qu;
-    }
- */
-;(function ($){
-    $.getUrlParam = function(name){
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-        var r = window.location.search.substr(1).match(reg);
-        if(r != null) return decodeURI(r[2]);
-        return null;
-    }
-})(jQuery);
-
-/**
- * textarea自动增加高度(适用于多个输入框元素)
- * @param {object} selector 输入框的js或jq对象
- * @param {string} opt 自定义初始高度、最大高度等参数组成的一维对象(可选). eg. {initHeight: 28, maxHeight: 120}
- * eg. $.makeTextareaExpanding('.name');
- * eg. $.makeTextareaExpanding('#id1, #id2');
- */
 ;(function($){
+    $.fn.extend({
+        /**
+         * ie9-兼容on input 
+         * eg. $("#div").onInput(function(e) { var $this = e.dom; var value = e.value; });
+         * @param {function} callback 回调函数
+         */
+        onInput:function (callback) {
+            var el = $(this);
+            if("oninput" in el.get(0)){ // 当前浏览器是否支持 oninput 事件
+                el.on("input", function () {
+                    callback && callback({ dom: el, value: $(this).val() });
+                });
+            }else { // IE独有属性，IE9 以下版本使用   
+                // el.keyup(function() {
+                //     callback && callback( { dom: el, value: $(this).val()} );
+                // });
+                // el.change(function() {
+                //     callback && callback( { dom: el, value: $(this).val()} );
+                // });
+                el.on("propertychange", function () {
+                    callback && callback({ eom: el, value: $(this).val() });
+                });
+            }
+        }
+    });
+
+    /**
+     * textarea自动增加高度(适用于多个输入框元素)
+     * @param {object} selector 输入框的js或jq对象
+     * @param {string} opt 自定义初始高度、最大高度等参数组成的一维对象(可选). eg. {initHeight: 28, maxHeight: 120}
+     * eg. $.makeTextareaExpanding('.name');
+     * eg. $.makeTextareaExpanding('#id1, #id2');
+     */
     $.makeTextareaExpanding = function(selector, opt){
         var _this = selector instanceof jQuery ? selector : $(selector);
         return _this.each(function(){
             var _this = $(this);
             utilities.makeTextareaExpanding($(this), opt);
         })
-    }
+    };
+
+
+    /**
+     * 使用GET方式获取URL中参数（JQ方法）
+     * @param {string} name 参数名
+     * 注意：
+     * 1.若参数为对象,则要使用JSON.stringify(对象)先将对象转化成字符串;
+     * 2. 若参数值含中文，要传递参数时要使用 encodeURI()进行编码,否则会乱码，接收参数时一般无须使用decodeURI()进行解码也不会乱码
+     * eg. 
+        · 父页面传递参数：
+        var json = {province:"福建省", city:"泉州市", county:"丰泽区"}
+        var url = 'https://www.xxx.com/login.aspx?area=' + encodeURI(JSON.stringify(json));
+        · 子页面接收参数：
+        var result = JSON.parse($.getUrlParam('area'));
+        var sheng = shi = qu = '';
+        if(result != null){
+            sheng = result.province;
+            shi = result.city;
+            qu = result.qu;
+        }
+    */
+    $.getUrlParam = function(name){
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if(r != null) return decodeURI(r[2]);
+        return null;
+    };
 })(jQuery);
 
 
@@ -843,7 +842,7 @@ var utilities = {
      * @param {number} ps_value 指定相减的值(可选)，默认1
      * @returns {array} 返回二维数组，其中二维数组中的每个元素的类型为一维数组
      */
-    combineNextElementToArray(ps_arr, ps_value){
+    combineNextElementToArray: function(ps_arr, ps_value){
         var subValue = typeof ps_value == 'undefined' ? 1 : ps_value;
         var tmpArr = []
         var k = 0;
@@ -1581,7 +1580,7 @@ var restrict = {
         return value;
     }
 
-} //END RESTRICT 对象
+}; //END RESTRICT 对象
 
 
 
@@ -1748,7 +1747,7 @@ var convert = {
        eg2. 不规范的数组对象 {data:[{name:"张三", sex:"男"}, {name:"张三", sex:"男"}]}
             转成规范的数组对象  {return:"ok", data:[{name:"张三", sex:"男"}, {name:"张三", sex:"男"}]}
      */
-    nonstandardObjectToStandardData(ps_source, ps_opts){
+    nonstandardObjectToStandardData: function(ps_source, ps_opts){
         var defaults = {
             oneWiki: false // 是否强制转化成一维对象. true 是, false 否. true 时给的原始数据源必须是一维对象转化后才能返回标准格式的一维对象
         }
@@ -1842,4 +1841,4 @@ var convert = {
         return (ps_num_arr_str instanceof Array ? resultWeekArr : resultWeekArr[0]);
     }
 
-} //END CONVERT 对象
+}; //END CONVERT 对象
