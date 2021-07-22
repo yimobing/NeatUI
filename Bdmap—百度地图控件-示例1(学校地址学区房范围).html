@@ -257,7 +257,7 @@
             drawManager: '',
             drawMode: '', // 当前绘制模式(可选), 默认空. 值：空 无任何绘制操作, hander 拖动地图(鼠标为一只手), marker 画点, circle 画圆, polyline 画线,  polygon 画多边形, rectangle 画矩形。
             clickTimes: 0, // 记录地图被点击的次数(可选), 默认0
-
+            loadTimes: 0, // 记录地图重载的次数(可选), 默认0
             styleOptions: {
                 strokeColor: 'red', // 边线颜色。
                 fillColor: 'red', // 填充颜色。当参数为空时，圆形将没有填充效果。
@@ -272,9 +272,10 @@
              */
             init: function () {
                 var _this = this;
-                if (this.status) {
-                    return;
-                }
+                // if (this.status) { // 只允许地图加载一次
+                //     return;
+                // }
+                this.loadTimes++;
                 this.center = this.center == '' ? '118.611836,24.918225' : this.center; // 当中心点坐标为空时,设定一个默认坐标
                 this.status = true;
                 var options = {
@@ -285,8 +286,9 @@
                 var map = this.map;
                 var styleOptions = this.styleOptions;
                 map.centerAndZoom(this.point, 16);
-                map.enableScrollWheelZoom();
-                
+                map.enableScrollWheelZoom();    
+                // 先清空所有覆盖物
+                _this.clearAll();
                 // 添加点标记
                 this.addMarker();
                 // 添加信息窗口
@@ -343,7 +345,7 @@
                     var layUid = 'duobianxing-' + count;
                     e.overlay.identifier = layUid; // 添加覆盖物唯一标识符
                     //
-                    _this.overlays.push(e.overlay);
+                    _this.overlays.push(e.overlay); // 全局赋值 add 20210722-1
                     if(typeof e.overlay.enableEditing != 'undefined') e.overlay.enableEditing();
                     // 给覆盖物添加操作按钮
                     var lngLat = _this.getPolyCenter(e.overlay);  // 获取多边形中心点
@@ -449,6 +451,7 @@
                     })
                     // this.showLatLon(ply.getPath()); // 绘制完成时显示覆盖物点信息
                     map.addOverlay(ply);
+                    _this.overlays.push(ply); // 全局赋值 add 20210722-1
                     // 给覆盖物添加操作按钮
                     var lngLat = this.getPolyCenter(ply);  // 获取多边形中心点
                     var point = new BMap.Point(lngLat.lng, lngLat.lat); // this.myOverlay[0];
@@ -486,6 +489,7 @@
                     borderRadius: '4px'
                 });
                 map.addOverlay(label);
+                _this.overlays.push(label); // 全局赋值 add 20210722-1
                 
                 label.addEventListener('click', function(e){
                     // console.log('e：', e, '\ncontent：', e.target.content);
@@ -570,6 +574,7 @@
                 marker.enableDragging();
                 marker.name = 'dianbiaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
                 map.addOverlay(marker);
+                this.overlays.push(marker); // 全局赋值 add 20210722-1
                 this.marker = marker;
 
                 // 添加信息窗
@@ -599,6 +604,7 @@
                 label.name = 'wenbenbiaozhu'; // 标记覆盖物类型,方便清除指定覆盖物时用
                 marker.setLabel(label); // 绑定文本标注到点标记上
                 map.addOverlay(label);
+                this.overlays.push(label); // 全局赋值 add 20210722-1
                 setTimeout(function(){ // 更改文本标注样式
                     $('.bdLabel').parent().addClass('bdMarkerLabel');
                 }, 0)
@@ -700,8 +706,8 @@
              * 清除所有覆盖物
              */
             clearAll: function () {
-                var r = confirm('确认清除所有覆盖物？');
-                if(r !== true) return;
+                // var r = confirm('确认清除所有覆盖物？');
+                // if(r !== true) return;
                 var map = this.map;
                 var overlays = this.overlays;
                 for (var i = 0; i < overlays.length; i++) {
