@@ -5,7 +5,7 @@
 * Website: https://github.com/yimobing/neatui
 * Author: chenMufeng
 * Date: 2021.07.01
-* Update: 2021.07.20
+* Update: 2021.07.22
 */
 
 @charset "utf-8";
@@ -120,10 +120,12 @@ i, em{ font-style: normal; }
     cursor: pointer;
 }
 .neInputsearch__btn button{
-    padding: 0;
-    border: 0;
-    color: #777;
-    cursor: pointer;
+    padding: 0!important;
+    border: 0!important;
+    background: none!important;
+    box-shadow: none!important;
+    color: #777!important;
+    cursor: pointer!important;
 }
 .neInputsearch__btn:hover button{ color: #333; }
 
