@@ -70,6 +70,10 @@ var neuiDistrict = {
      * @returns {string} 返回省份编号
      */
     getProvinceIdByProvinceName: function(ps_province_name){
+        if(typeof ps_province_name == 'undefined'){
+            alert('省份名称undefined，请检查！');
+            return;
+        }
         var province_id = '';
         for(var i = 0; i < iosProvinces.length; i++){
             var row = iosProvinces[i];
@@ -90,6 +94,10 @@ var neuiDistrict = {
      * @returns {string} 返回城市编号
      */
     getCityIdByCityName: function(ps_city_name){
+        if(typeof ps_city_name == 'undefined'){
+            alert('城市名称undefined，请检查！');
+            return;
+        }
         var city_id = '';
         for(var i = 0; i < iosCitys.length; i++){
             var row = iosCitys[i];
@@ -109,6 +117,10 @@ var neuiDistrict = {
      * @returns {string} 返回区县编号
      */
     getCountyIdByCountyName: function(ps_county_name){
+        if(typeof ps_county_name == 'undefined'){
+            alert('区县名称undefined，请检查！');
+            return;
+        }
         var county_id = '';
         for(var i = 0; i < iosCountys.length; i++){
             var row = iosCountys[i];
