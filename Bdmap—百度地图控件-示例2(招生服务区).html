@@ -138,6 +138,7 @@
             map: '', // 地图根节点
             
             center: '118.611836,24.918225', // 中心点坐标. eg.'经度,纬度'
+            city: '', // 自定义地图中心点城市(可选)。值为空时根据中心点坐标定位, 非空时根据中心点城市定位。eg.'泉州市', eg.'泉州市惠安县'
             caption: '泉州市', // 中心点说明文字
             zoom: 11, // 缩放级别(3-19)
             point: '', // 地图中心点信息. eg. new BMap.Point(经度,纬度)
@@ -210,6 +211,9 @@
                 var styleOptions = this.styleOptions;
                 map.centerAndZoom(this.point, 16);
                 map.enableScrollWheelZoom();
+                if(this.city.toString().replace(/([ ]+)/g, '') !== ''){
+                    map.setCenter(this.city);
+                }     
                 // 先清空所有覆盖物
                 _this.clearAll();
                 // 加载多边形
@@ -811,6 +815,7 @@
                     // 加载多个已有的多边形
                     bdChinaMap.myPoints = coordinateArray;
                     bdChinaMap.myGroupName = schoolNameArray;
+                    bdChinaMap.city = $('#s-city').val() + $('#s-county').val();
                     bdChinaMap.init();
 
 

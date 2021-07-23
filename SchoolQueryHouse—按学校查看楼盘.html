@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>按学校查看楼盘</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-picker.css"><!--下拉选择器-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"><!--输入下拉-->
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+</head>
+<body>
+    <style>
+        body{ max-width: 640px; padding: 5px; background-color: #f4f4f4; }
+        .wrap{  }
+        .form{ }
+        .form__search{ padding: 10px 15px; background-color: #fff; border-radius: 2px;}
+        .form__operate { margin-top: 15px; }
+        .form__operate button{ width: 100%; }
+        .result{ margin-top: 25px; }
+        .result__caption{ text-align: center; font-size: 18px; }
+        .result__list{ margin-top: 15px; padding: 8px 12px; background-color: #fff;  border-radius: 4px;}
+        .result__list .item-r{ padding: 8px 12px!important; }
+        .result__list .item-l{ width: 50px;  }
+        .nodata{ margin-top: 25px;  text-align: center; color: #1b9af7; font-size: 18px; }
+    </style>
+    <div class="wrap">
+        <section class="form">
+            <div class="form__search ne-form">
+                <div class="eform-row">
+                    <div class="item-l"><label>地区</label></div>
+                    <div class="item-r"><input type="text" id="i-area" placeholder="请选择" onblur="this.placeholder='请选择'" readonly></div>
+                    <div class="item-cell" data-type="must">*</div>
+                </div><!--/.eform-row-->
+                <div class="eform-row">
+                    <div class="item-l"><label>学校名称</label></div>
+                    <div class="item-r"><textarea id="i-edu" placeholder="输入学校名称，从下拉中选择一个学校" onblur="this.placeholder='输入学校名称，从下拉中选择一个学校'" onfocus="this.placeholder=''"></textarea></div>
+                    <div class="item-cell" data-type="must">*</div>
+                </div><!--/.eform-row-->
+            </div><!--/.form__search-->
+            <div class="form__operate flex">
+                <button type="button" id="btn-query" class="ne-btn has-texture blue">查询楼盘</button>
+            </div><!--/.form__operate-->
+        </section>
+        <section class="nodata" style="display: none;">抱歉，没有找到相应的学校...</section>
+        <section class="result" style="display: none;">
+            <div class="result__caption">当前学校对应的楼盘如下</div>
+            <div class="result__list ne-form has-border dotted"></div>
+        </section>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script><!--JQ库-->
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-picker.js"></script><!--下拉选择器控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义封装AJAX-->
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+        //
+
+        /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 创建学校列表
+         * @param {object} ps_source 数据源
+         */
+        function createSchoolList(ps_source){
+            var node = '.result__list';
+            var $parent = $(node).parent();
+            if(!checker.checkJsonHasData(ps_source)) {
+                $('.nodata').show();
+                $parent.hide();
+                return;
+            }
+            var _html = '<div class="eform-content">';
+            $.each(ps_source.data, function(i,items){
+                _html += 
+                [
+                    '<div class="eform-row" data-loupan-bh="' + items["qydcb_bh"] + '">',
+                        '<div class="item-r"><span>' + items["loupan_mc"] + '</span></div>',
+                    '</div><!--/.eform-row-->'
+                ].join('\r\n')
+            })
+            _html += '</div><!--/.result__list-->';
+           
+            if($(node).length > 0){
+                $(node).empty().append(_html);
+                $('.nodata').hide();
+                $parent.show();
+            }
+        }
+       
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         系列事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====地区下拉、省市区县下拉
+            $('#i-area').on('click', function(){
+                // 后台返回
+                var areaJson = {
+                    data:[
+                        {"province":"福建省", "data":[
+                                {"city":"泉州市", "data":[
+                                        {"county":"丰泽区"}, 
+                                        {"county":"鲤城区"}, 
+                                        {"county":"洛江区"}, 
+                                        {"county":"泉港区"}, 
+                                        {"county":"惠安县"}, 
+                                        {"county":"安溪县"}, 
+                                        {"county":"永春县"}, 
+                                        {"county":"德化县"}, 
+                                        {"county":"石狮市"}, 
+                                        {"county":"晋江市"}, 
+                                        {"county":"南安市"}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+
+                /*
+                //START AJAX
+                var areaJson = {}
+                var isHoldOn = true;
+                ajax({
+                    heading: "获取地区数据",
+                    debug: false,
+                    async: false, // 取数方式. true 异步, false 同步(默认)
+                    type: "GET",
+                    dataType: "html",
+                    cache: false,
+                    url: "../../fwh_pub/jk_xuexiao_loupan.ashx",
+                    data: {
+                        "action": "sel_v3_xuexiao_loupan_area",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk%>"
+                    },
+                    success: function(res){
+                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        // if(res == '') return;
+                        areaJson = JSON.parse(res);
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    neui.destroyAnimate();
+                    return;
+                }
+                //END AJAX
+                */
+
+                $(this).neuiPicker({
+                    caption: "选择地区",
+                    source: areaJson,
+                    format: {
+                        value: ["province", "city", "county"]
+                    },
+                    value: "福建省-泉州市-丰泽区",
+                    joint: "-",
+                    cascade: true,
+                    district: true,
+                    onConfirm: function (e) {
+                        // console.log('您点了确定', e);
+                    }
+                })
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====学校名称下拉
+            $('#i-edu').on('input', function(){
+                var $this = $(this);
+                var ls_area = $('#i-area').val(),
+                    ls_xuexiao_mc = filter.html($(this).val());
+                var arr = [ ls_area, ls_xuexiao_mc ]
+                // console.log('数组：', arr);
+                // 校验完整性
+                var tips = '';
+                if(ls_area.toString().replace(/([ ]+)/g, '') === '') tips += '请先选择地区';
+                if(tips != ''){
+                    neuiDialog.notice({
+                        message: tips,
+                        delay: 1500,
+                        animate: true,
+                        showMask: false,
+                        theme: 'danger',
+                        location: 'top'
+                    })
+                    return;
+                }
+
+                // 后台返回
+                var schoolJson = {
+                    data:[
+                        {"xuexiao_bh":"X1001", "xuexiao_mc":"丰泽区崇德实验小学", "xuexiao_lb_mc":"小学"},
+                        {"xuexiao_bh":"X1002", "xuexiao_mc":"泉州师范学院附属小学", "xuexiao_lb_mc":"小学"},
+                        {"xuexiao_bh":"X1003", "xuexiao_mc":"泉州第九中学", "xuexiao_lb_mc":"初中"},
+                        {"xuexiao_bh":"X1004", "xuexiao_mc":"泉州第七中学", "xuexiao_lb_mc":"初中"},
+                        {"xuexiao_bh":"X1005", "xuexiao_mc":"泉州第五中学", "xuexiao_lb_mc":"高中"},
+                        {"xuexiao_bh":"X1006", "xuexiao_mc":"泉州剑影实验学校高中部", "xuexiao_lb_mc":"高中"}
+                    ]
+                }
+
+                /*
+                //START AJAX
+                var schoolJson = {}
+                var isHoldOn = true;
+                ajax({
+                    heading: "获取学校名称下拉",
+                    debug: false,
+                    async: false, // 取数方式. true 异步, false 同步(默认)
+                    type: "GET",
+                    dataType: "html",
+                    cache: false,
+                    url: "../../fwh_pub/jk_xuexiao_loupan.ashx",
+                    data: {
+                        "action": "sel_xuexiao_loupan_xuexiao_mc_xl",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk%>",
+                        "area": ls_area,
+                        "xuexiao_mc": ls_xuexiao_mc
+                    },
+                    success: function(res){
+                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        // if(res == '') return;
+                        schoolJson = JSON.parse(res);
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    neui.destroyAnimate();
+                    return;
+                }
+                //END AJAX
+                */
+                neuiInputsearch({
+                   source: schoolJson,
+                   format: ["xuexiao_bh", "xuexiao_mc"]
+                }, $this)
+            });
+            
+
+            //——————————————————————————————————————————
+            //=====查询楼盘按钮
+            $('#btn-query').on('click', function(){
+                var ls_area = $('#i-area').val(),
+                    ls_xuexiao_bh = typeof $('#i-edu').attr('data-bh') == 'undefined' ? '' : $('#i-edu').attr('data-bh'),
+                    ls_xuexiao_mc = $('#i-edu').val();
+                var arr = [ ls_area, ls_xuexiao_bh, ls_xuexiao_mc ]
+                // console.log('数组：', arr); 
+                // 校验数据是否来自下拉
+                if(ls_xuexiao_bh == ''){
+                    neuiDialog.notice({
+                        message: '学校名称必须从下拉中选择一项',
+                        delay: 1500,
+                        animate: true,
+                        showMask: false,
+                        theme: 'danger',
+                        location: 'top'
+                    })
+                    return;
+                }
+
+                // 校验完整性
+                var tips = '';
+                $('.form .eform-row').each(function(){
+                    var label = $('label', this).text(),
+                        value = $('input:text, textarea', this).val(),
+                        isMust = $('[data-type="must"]').length > 0 ? true : false;
+                    if(isMust && value.toString().replace(/([ ]+)/g, '') === '') tips += label + '、';
+                })
+                if(tips != ''){
+                    neuiDialog.notice({
+                        message: '请填写：' + tips.substr(0, tips.length - 1),
+                        delay: 1500,
+                        animate: true,
+                        showMask: false,
+                        theme: 'danger',
+                        location: 'top'
+                    })
+                    return;
+                }
+
+                // 开始执行
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    var houseJson = {
+                        "return":"ok", "data":[
+                            {"qydcb_bh":"L1001", "loupan_mc":"泉州浦西万达广场<em>(丰泽区宝洲街中段))</em>"},
+                            {"qydcb_bh":"L1002", "loupan_mc":"建发珑月湾"},
+                            {"qydcb_bh":"L1003", "loupan_mc":"三盛四季家园"},
+                            {"qydcb_bh":"L1004", "loupan_mc":"阳光时代广场"},
+                            {"qydcb_bh":"L1005", "loupan_mc":"中骏四季康城"}
+                        ]
+                    }
+
+                    /*
+                    //START AJAX
+                    var houseJson = {}
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "获取楼盘列表数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "../../fwh_pub/jk_xuexiao_loupan.ashx",
+                        data: {
+                            "action": "sel_wh_xuexiao_loupan_loupan_list",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "area": ls_area,
+                            "xuexiao_bh": ls_xuexiao_bh
+                        },
+                        success: function(res){
+                            if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            // if(res == '') return;
+                            houseJson = JSON.parse(res);
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    //END AJAX
+                    */
+
+                    createSchoolList(houseJson);
+                    
+                    neui.destroyAnimate();
+                }, 100)
+                
+            });
+
+
+           
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
