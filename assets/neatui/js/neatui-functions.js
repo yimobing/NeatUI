@@ -580,8 +580,13 @@ var utilities = {
             output = output.replace(/(\<p\>\<\/p\>)/g, '');
         }
         // 其它替换
-        output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
-        output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
+        if(!checker.checkIsMobile()){ // pc端时
+            output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
+            output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
+        }else{ // 移动端时
+            output = output.replace(/\t/g, ''); // 制表符替换成空
+            output = output.replace(/([\s]+)/g, ''); // 多个空格替换成空
+        }
 		output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');  // div标签换成p
         // 字符串化+斜杠处理
         output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
