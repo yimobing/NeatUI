@@ -190,9 +190,9 @@
             styleOptions: {
                 strokeColor: 'red', // 边线颜色。
                 fillColor: 'red', // 填充颜色。当参数为空时，圆形将没有填充效果。
-                strokeWeight: 3, // 边线的宽度，以像素为单位。
+                strokeWeight: 1, // 边线的宽度，以像素为单位。
                 strokeOpacity: 0.8, // 边线透明度，取值范围0 - 1。
-                fillOpacity: 0.3,  // 填充的透明度，取值范围0 - 1。
+                fillOpacity: 0.65,  // 填充的透明度，取值范围0 - 1。
                 strokeStyle: 'solid' // 边线的样式，solid或dashed。
             },
 
@@ -256,7 +256,7 @@
                 var ply = new BMap.Polygon(this.myOverlay, this.styleOptions);
                 this.myPolygon = ply; 
                 try { 
-                    // ply.enableEditing(); 
+                    // ply.enableEditing();
                     ply.setFillColor(color); // 设置多边形填充颜色
                     ply.setStrokeColor(color); // 设置多边形边线颜色
                     ply.setFillOpacity(.65); // 设置透明度. 0到1
@@ -278,7 +278,7 @@
                 for (var i = 0; i < overlays.length; i++) {
                     map.removeOverlay(overlays[i]);
                 }
-                this.overlays.length = 0
+                this.overlays.length = 0;
                 map.removeOverlay(this.myPolygon);
                 this.myPolygon = '';
             }
@@ -656,7 +656,7 @@
                 // 开始执行
                 neui.showAnimate();
                 setTimeout(function(){
-                
+                    
                     // 后台返回多个学校学区坐标数据
                     var coordinateJson = {
                         "return":"ok",
@@ -709,6 +709,23 @@
                                     {"zuobiao":"118.620011,24.89934"},
                                     {"zuobiao":"118.620523,24.899069"},
                                     {"zuobiao":"118.620945,24.899676"}
+                                ]}
+                            ]},
+                            {"xuexiao_bh":"X1004", "xuexiao_mc":"泉州第一实验小学", "data":[
+                                { "weizhi":"W1001", "data":[
+                                    {"zuobiao":"118.595128,24.917275"},
+                                    {"zuobiao":"118.606123,24.917275"},
+                                    {"zuobiao":"118.606123,24.910262"},
+                                    {"zuobiao":"118.595128,24.910262"}
+                                ]}
+                            ]},
+
+                            {"xuexiao_bh":"X1005", "xuexiao_mc":"泉州第八实验小学", "data":[
+                                { "weizhi":"W2001", "data":[
+                                    {"zuobiao":"118.59678,24.913146"},
+                                    {"zuobiao":"118.605045,24.913146"},
+                                    {"zuobiao":"118.605045,24.906591"},
+                                    {"zuobiao":"118.59678,24.906591"}
                                 ]}
                             ]}
                         ]
