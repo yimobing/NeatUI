@@ -22,7 +22,7 @@
 </head>
 
 <body>
-    <!--edit 20210723-2-->
+    <!--edit 20210724-1-->
     <style>
         .eform-row-query{ margin-left: 20px; }
         .bdmap__editor{ padding-bottom: 15px; border-bottom: 1px solid #ddd; }
@@ -30,11 +30,13 @@
         .bdmap__editor>div:first-child{ margin-top: 0; }
         .bdmap__editor:after,
         .bdmap__editor .eform-row:after{ content: ''; display: block; clear: both; }
-        .bdmap__editor .eform-row{ margin-bottom: 5px; margin-right: 10px; float: left;}
+        .bdmap__editor .eform-row{ position: relative; margin-bottom: 5px; margin-right: 10px; float: left;}
         .bdmap__editor .eform-row-query{ width: auto;}
         .bdmap__editor .eform-row>div{ float: left; }
         .bdmap__editor .eform-row>div.item-l{ width: auto; margin-top: 5px; }
         .bdmap__editor .eform-row>div.item-r{ }
+        .bdmap__editor .eform-row .item-cell{ position: absolute; right: 5px; top: 5px; cursor: pointer; }
+        .bdmap__editor .eform-row .item-cell i{ display: block; width: 16px; height: 16px; background: transparent url('assets/neatui/img/pub_icon_mod_cross_gray_x12.png') 50% 50% no-repeat;}
         .bdmap__editor input[type="text"]{ min-width: 50px; max-width: 100px; background: #fff; }
         .bdmap__editor input[type="text"][readonly],
         .bdmap__editor input[type="text"]:read-only{ background-color: #fdfdfd!important;}
@@ -53,31 +55,37 @@
 
     </style>
     
-    <div class="bdmap" id="allmap">
+    <div class="bdmap" id="allmap"><!--edit 20210724-1-->
         <div class="bdmap__editor search ne-form flex111">
             <div class="eform-row">
                 <div class="item-l"><label>省份</label></div>
-                <div class="item-r"><input type="text" id="s-province" value="福建省" readonly></div>
+                <div class="item-r"><input type="text" id="s-province" readonly></div>
+                <div class="item-cell"><i></i></div>
             </div><!--/.eform-row-->
             <div class="eform-row">
                 <div class="item-l"><label>城市</label></div>
-                <div class="item-r"><input type="text" id="s-city" value="泉州市" readonly></div>
+                <div class="item-r"><input type="text" id="s-city" readonly></div>
+                <div class="item-cell"><i></i></div>
             </div><!--/.eform-row-->
             <div class="eform-row">
                 <div class="item-l"><label>区(县)</label></div>
-                <div class="item-r"><input type="text" id="s-county" value="丰泽区" readonly></div>
+                <div class="item-r"><input type="text" id="s-county" readonly></div>
+                <div class="item-cell"><i></i></div>
             </div><!--/.eform-row-->
             <div class="eform-row">
                 <div class="item-l"><label>街道</label></div>
                 <div class="item-r"><input type="text" id="s-street"></div>
+                <div class="item-cell"><i></i></div>
             </div><!--/.eform-row-->
             <div class="eform-row">
                 <div class="item-l"><label>社区</label></div>
                 <div class="item-r"><input type="text" id="s-community"></div>
+                <div class="item-cell"><i></i></div>
             </div><!--/.eform-row-->
             <div class="eform-row">
                 <div class="item-l"><label>学校名称</label></div>
                 <div class="item-r"><input type="text" id="s-school"></div>
+                <div class="item-cell"><i></i></div>
             </div><!--/.eform-row-->
             <div class="eform-row eform-row-query">
                 <div class="item-r"><button type="button" class="ne-btn has-texture blue" id="btn-query">查询</button></div>
@@ -378,6 +386,13 @@
             });
 
 
+            //——————————————————————————————————————————
+            //=====清空输入框add 20210724-1
+            $('.bdmap__editor .eform-row .item-cell').on('click', function(){
+                $(this).siblings().find('input:text, textarea').val('');
+            });
+
+
 
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //                                                  搜索区域事件
@@ -450,7 +465,7 @@
                 var provinceJson = {
                     "data":[
                         {"get_value":"福建省"},
-                        {"get_value":"浙江省"}
+                        // {"get_value":"浙江省"}
                     ]
                 }
 
@@ -492,6 +507,10 @@
                 neuiInputsearch({
                     source: provinceJson,
                     format: ["get_value"],
+                    autoFill: { // add 20210724-1
+                        selectedFill: true,
+                        oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
+                    },
                     onConfirm: function(e){
                         if(e.value != e.oldValue){ // 新老值不一样时，清空城市、区县、街道、社区
                            $('#s-city, #s-county, #s-street, #s-community').val('');
@@ -556,6 +575,10 @@
                 neuiInputsearch({
                     source: cityJson,
                     format: ["get_value"],
+                    autoFill: { // add 20210724-1
+                        selectedFill: true,
+                        oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
+                    },
                     onConfirm: function(e){
                         if(e.value != e.oldValue){ // 新老值不一样时，清空区县、街道、社区
                             $('#s-county, #s-street, #s-community').val('');
@@ -628,6 +651,10 @@
                 neuiInputsearch({
                     source: countyJson,
                     format: ["get_value"],
+                    autoFill: { // add 20210724-1
+                        selectedFill: true,
+                        oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
+                    },
                     onConfirm: function(e){
                         if(e.value != e.oldValue){ // 新老值不一样时，清空街道、社区
                             $('#s-street, #s-community').val('');
@@ -719,6 +746,10 @@
                 neuiInputsearch({
                     source: streetJson,
                     format: ["get_value"],
+                    autoFill: { // add 20210724-1
+                        selectedFill: true,
+                        oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
+                    },
                     onConfirm: function(e){
                         if(e.value != e.oldValue){ // 新老值不一样时，清空社区
                            $('#s-community').val('');
@@ -808,6 +839,10 @@
                 neuiInputsearch({
                     source: communityJson,
                     format: ["get_value"],
+                    autoFill: { // add 20210724-1
+                        selectedFill: true,
+                        oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
+                    },
                     onConfirm: function(e){
                         if(e.value != e.oldValue){ // 新老值不一样时
                            //..
@@ -833,13 +868,13 @@
                 var arr = [ ls_sheng_mc, ls_shi_mc, ls_qu_mc, ls_jiedao_mc, ls_shequ_mc, ls_xuexiao_mc ]
                 // console.log('数组：', arr);
                 
-                // 校验完整性
-                var tips = '';
-                $(this).parents('.eform-row').prevAll().each(function(){
-                    var label = $('label', this).text(),
-                        value = $('input:text, textarea', this).val().toString().replace(/([ ]+)/g, '');
-                    if(value === '') tips += label + '、';
-                })
+                // 校验完整性（所有条件必填) edit 20210724-1
+                // var tips = '';
+                // $(this).parents('.eform-row').prevAll().each(function(){
+                //     var label = $('label', this).text(),
+                //         value = $('input:text, textarea', this).val().toString().replace(/([ ]+)/g, '');
+                //     if(value === '') tips += label + '、';
+                // })
                 // if(tips != ''){
                 //     neuiDialog.alert({
                 //         animate: true,
@@ -849,6 +884,20 @@
                 //     })
                 //     return;
                 // }
+                // 校验完整性（部分条件必填) add 20210724-1
+                var tips = '';
+                if(ls_sheng_mc == '') tips += '省份、';
+                if(ls_shi_mc == '') tips += '城市、';
+                if(tips != ''){
+                    neuiDialog.alert({
+                        animate: true,
+                        caption: '提示',
+                        message: '请选择：' + tips.substr(0, tips.length - 1),
+                        buttons: ['确定']
+                    })
+                    return;
+                }
+
                 
 
                 // 开始执行

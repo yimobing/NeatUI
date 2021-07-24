@@ -19,7 +19,7 @@
         copyright: '福建华审评估公司版权所有 (<span style="font-size:12px">version 1.0.0</span>)', //版权信息
         width: 800, 
         height: 800,
-        image: { //自定义坐标标注点图标及其它属性(可选) testing
+        image: { //自定义坐标标注点图标及其它属性(可选) test
             draged: false, //图标是否可拖动,默认false(可选)
             enable: true, //是否开启自定义图标, 默认false(可选)
             path: 'assets/neatui/img/', //图片文件夹相对静态文件html位置,仅当enable=true时有效(可选)
@@ -184,7 +184,7 @@
         //后台返回
         var json = {
             data:[
-                {"bh":"1001", "name":"山东省", "zuobiao":"117.124638,36.680865", "lpsl":"1000", "dragging":false}, //testing
+                {"bh":"1001", "name":"山东省", "zuobiao":"117.124638,36.680865", "lpsl":"1000", "dragging":false}, //test
                 {"bh":"1002", "name":"江苏省", "zuobiao":"118.835587,32.092177", "lpsl":"2000"},
                 {"bh":"1003", "name":"安徽省", "zuobiao":"117.198227,31.825526", "lpsl":"3000"},
                 {"bh":"1004", "name":"浙江省", "zuobiao":"117.198227,31.825526", "lpsl":"4000"},
