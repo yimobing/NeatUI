@@ -125,7 +125,7 @@ BatchLoadData.prototype = (function(){
 		if( (winH + top) >= (docH - 50) ){ //滚动条滚动到底部(预留50px前)了
 			_this.pos++; //滚动到底次数+1
 			if(_this.pos <= GetScrollMaxTimes(_this)){
-				//console.log('滚动到底部了,第', _this.pos, '次'); //testing
+				//console.log('滚动到底部了,第', _this.pos, '次'); //test
 				_this.onScroll(_this.pos);
 			}
 		}
