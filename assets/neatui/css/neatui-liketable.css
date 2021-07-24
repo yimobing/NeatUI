@@ -38,7 +38,7 @@
 .table-scrollbar{position:absolute; z-index:1; right:0; width:20px; background-color:#fafafa; overflow-y: auto; overflow-y:scroll\9; -webkit-overflow-scrolling:touch; } 
 .table-scrollbar>div{position:absolute; top:0; left:0; right:0; width:17px; }
 /*.table-scrollbar .thumb{background-color: #718096;}*/
-.thumb{background-color: #718096;} /*testing5*/
+.thumb{background-color: #718096;} /*test5*/
 
 /*表内部*/
 .table-inner{position:relative; display: inline-block; *display:inline; _display:inline; *zoom:1;}
