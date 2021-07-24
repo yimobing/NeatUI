@@ -297,7 +297,7 @@
                             if($rootNode.find('.bdmap_point').length == 0) $rootNode.prepend(plyHTML);
                             else $rootNode.find('.bdmap_point').after(plyHTML);
                         }
-                        // 新建按钮、新建多边形按钮 test3 testing
+                        // 新建按钮、新建多边形按钮 test3 test
                         $('#bdmap_draw_new').on('click', function(){
                             // 先清除多边形覆盖物
                             methods.removePolyOverlay();
@@ -317,9 +317,9 @@
                             if(dPoly.btnNewCallBack) dPoly.btnNewCallBack(coordArr);
                         })
 
-                        // 删除按钮、删除多边形按钮 test3 testing
+                        // 删除按钮、删除多边形按钮 test3 test
                         $('#bdmap_draw_del').on('click', function(){
-                            //testing2
+                            //test2
                             var r = confirm('确认' + dPoly.btnDelText);
                             if(r !== true) return;
                             // 先获取多边形的点坐标，并回调
@@ -338,7 +338,7 @@
                             methods.removePolyOverlay();
                         })
 
-                         // 保存按钮、保存多边形按钮 test3 testing
+                         // 保存按钮、保存多边形按钮 test3 test
                          $('#bdmap_draw_save').on('click', function(){  
                             // 获取多边形的点坐标，并回调
                             var tmpPointArr = [];
@@ -616,7 +616,7 @@
             if(dDrawPoly){
                 // 多边形是否有坐标点（少要有3个点才能组成多边形). true 有, false 无
                 // 注：有坐标点时将根据坐标点直接生成多边形, 无坐标点时会根据中心点坐标获取指定范围内的M个点再根据这M个点生成多边形
-                //testing
+                //test
                 //var isPolyArray = dPointsArray == null ? false : (utilities.isArray(dPointsArray) ? (dPointsArray.length >= 3 ? true : false) : false);
                 var isPolyArray = isForcedPly ? false : ( dPointsArray == null ? false : (utilities.isArray(dPointsArray) ? (dPointsArray.length >= 3 ? true : false) : false) );
 
