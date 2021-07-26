@@ -21,158 +21,8 @@
     }
 })(this, function(){
 
-
     //================================================================
-     /**
-     * ie9-兼容原生js bind
-     * 因为js addEventListener为兼容ie8-,会重写addEventListener，但重写的函数会使用到原生的js bind函数
-     */
-    if(!Function.prototype.bind){
-        Function.prototype.bind = function(){
-            if(typeof this !== 'function'){
-                throw new TypeError('Function.prototype.bind - what is trying to be bounded is not callable');
-            }
-            var _this = this;
-            var obj = arguments[0];
-            var args = Array.prototype.slice.call(arguments, 1);
-            return function(){
-                _this.apply(obj, args);
-            }
-        }
-    };
-
-    /**
-     * ie9-兼容document.getElementsByClassName
-     */
-     if (!document.getElementsByClassName) {
-        document.getElementsByClassName = function (className, element) {
-            var children = (element || document).getElementsByTagName('*');
-            var elements = new Array();
-            for (var i = 0; i < children.length; i++) {
-                var child = children[i];
-                var classNames = child.className.split(' ');
-                for (var j = 0; j < classNames.length; j++) {
-                    if (classNames[j] == className) {
-                        elements.push(child);
-                        break;
-                    }
-                }
-            }
-            return elements;
-        };
-    };
-
-
-    /**
-     * ie9-兼容forEach
-     */
-    if(!Array.prototype.forEach){
-        Array.prototype.forEach = function(callback){
-            for (var i = 0; i < this.length; i++){
-                callback.apply(this, [this[i], i, this]);
-            }
-        }
-    };
-
-
-    /**
-     * ie11- 兼容matches
-     */
-    if (!Element.prototype.matches) {
-        Element.prototype.matches =
-            Element.prototype.msMatchesSelector ||
-            Element.prototype.webkitMatchesSelector;
-    };
-
-    /**
-     * ie11- 兼容closest方法（用于查找父元素）
-     */
-    if (!Element.prototype.closest) {
-        Element.prototype.closest = function(s) {
-            var el = this;
-
-            do {
-                if (Element.prototype.matches.call(el, s)) return el;
-                el = el.parentElement || el.parentNode;
-            } while (el !== null && el.nodeType === 1);
-            return null;
-        };
-    };
-
-    /**
-     * ie11-兼容Array.from
-     */
-    if (!Array.from) {
-        Array.from = (function () {
-            var toStr = Object.prototype.toString;
-            var isCallable = function (fn) {
-            return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
-            };
-            var toInteger = function (value) {
-            var number = Number(value);
-            if (isNaN(number)) { return 0; }
-            if (number === 0 || !isFinite(number)) { return number; }
-            return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
-            };
-            var maxSafeInteger = Math.pow(2, 53) - 1;
-            var toLength = function (value) {
-            var len = toInteger(value);
-            return Math.min(Math.max(len, 0), maxSafeInteger);
-            };
-            // The length property of the from method is 1.
-            return function from(arrayLike/*, mapFn, thisArg */) {
-            // 1. Let C be the this value.
-            var C = this;
-            // 2. Let items be ToObject(arrayLike).
-            var items = Object(arrayLike);
-            // 3. ReturnIfAbrupt(items).
-            if (arrayLike == null) {
-                throw new TypeError("Array.from requires an array-like object - not null or undefined");
-            }  
-            // 4. If mapfn is undefined, then let mapping be false.
-            var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
-            var T;
-            if (typeof mapFn !== 'undefined') {
-                // 5. else
-                // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
-                if (!isCallable(mapFn)) {
-                throw new TypeError('Array.from: when provided, the second argument must be a function');
-                }
-                // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
-                if (arguments.length > 2) {
-                T = arguments[2];
-                }
-            }
-            // 10. Let lenValue be Get(items, "length").
-            // 11. Let len be ToLength(lenValue).
-            var len = toLength(items.length);
-            // 13. If IsConstructor(C) is true, then
-            // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
-            // 14. a. Else, Let A be ArrayCreate(len).
-            var A = isCallable(C) ? Object(new C(len)) : new Array(len);
-            // 16. Let k be 0.
-            var k = 0;
-            // 17. Repeat, while k < len… (also steps a - h)
-            var kValue;
-            while (k < len) {
-                kValue = items[k];
-                if (mapFn) {
-                A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
-                } else {
-                A[k] = kValue;
-                }
-                k += 1;
-            }
-            // 18. Let putStatus be Put(A, "length", len, true).
-            A.length = len;
-            // 20. Return A.
-            return A;
-            };
-        }());
-    };
-
-
-
+    //                      · 控件开发
     //================================================================
     var doc = document, win = window;
     var net = {};
@@ -210,7 +60,7 @@
 
 
 
-     //================================================================
+    //================================================================
     // 用一个或多个对象来扩展一个对象，返回被拓展的对象
     /* neuiInputsearch.extend = net.extend = function(defaults, options){
         var target = defaults;
@@ -221,13 +71,31 @@
         }
         return target;
     }; */
-    // 用一个或多个对象来扩展一个对象，返回被拓展的对象
+
+
+    /**
+     * 原生JS模拟JQ extend合并对象
+     * 用一个或多个对象来扩展一个对象，返回被拓展的对象
+     * @param {boolean} deep 是否深度合并对象(可选),默认false
+     * @param {object} target 目标对象，其他对象的成员属性将被附加到该对象上。
+     * @param {object} object1 第1个被合并的对象(可选)。
+     * @param {object} objectN 第N个被合并的对象(可选)。
+     *  [调用示例]
+        格式：extend(deep, target, defs, opts);
+        eg1. extend(defs, opts); // 浅合并
+        eg2. extend({}, defs, opts); // 浅合并
+        eg2. extend(true, defs, opts); // 深合并
+        eg3. extend(true, {}, defs, opts); //深合并
+     * [jq合并对象的方法]
+        $.extend(deep, target, obj1, obj2, ..., objN);
+     */
     neuiInputsearch.extend = net.extend = function(){
-        var options, name, src, copy,deep = false, target = arguments[0], i = 1, length = arguments.length;
-        if (typeof (target) === "boolean") deep = target, target = arguments[1] || {}, i = 2;
-        if (typeof (target) !== "object" && typeof (target) !== "function") target = {};
+        var options, name, src, copy, deep = false, target = arguments[0], i = 1, length = arguments.length;
+        if (typeof (target) === "boolean") deep = target, target = arguments[1] || {}, i = 2; // eg. extend(true, {}, defs, opts || {});
+        if (typeof (target) !== "object" && typeof (target) !== "function") target = {}; // eg.
         if (length === i) target = this, --i;
-        for (; i < length; i++) {
+        // 方法1：浅合并
+       /*  for (; i < length; i++) {
             if ((options = arguments[i]) != null) {
                 for (name in options) {
                     src = target[name], copy = options[name];
@@ -235,7 +103,14 @@
                     if (copy !== undefined) target[name] = copy;
                 }
             }
+        } */
+        // 方法2：浅深合并皆可
+        for (; i < length; i++) {
+            if ((options = arguments[i]) != null) {
+                target = EXT({ isDeep: deep }).merge(target, options);
+            }
         }
+        // console.log('target：', target)
         return target;
     };
 
@@ -244,6 +119,7 @@
     
 
 
+    
     //================================================================
     /**
      * 
@@ -288,7 +164,7 @@
             // 若想要下拉项中有说明性文字,则可在数据源非编号字段中添加em或span标签. eg {"bh":"1001", "mc":"张三<em>一个大好人</em>"}, 那么"一个大好人"就是说明性文字了.
             autoFill: { // 自动填充值到输入框元素中(可选)。
                 selectedFill: true, // 选中下拉项后是否自动填充(可选)，默认true。
-                oneItemFill: "auto", // 只有一个下拉项时是否自动填充(可选)，默认auto。值：auto 根据设备自动判断(移动端false，pc端true), true 自动填充, false 手动点下拉项填充。
+                oneItemFill: false // 只有一个下拉项时是否自动填充(可选)，默认false。值：auto 根据设备自动判断(移动端false，pc端true), true 自动填充, false 手动点下拉项填充。
             },
             noData: { // 无数据时(可选)。
                 enable: true, // 无数据时是否显示“无数据”下拉项(可选)，默认true。
@@ -315,7 +191,7 @@
         }
 
         // 全局赋值
-        this.$opts = net.extend(defaults, options || {}); // 控件参数对象
+        this.$opts = net.extend(true, {}, defaults, options || {}); // 控件参数对象(深度合并)
         var selector = elem.indexOf('#') >= 0 ?  
                     elem.replace(/([\#]+)/g, '') 
                     : 
@@ -355,8 +231,9 @@
 
 
 
+
     //================================================================
-    //                          原型函数或对象
+    //                          · 原型函数或对象
     //================================================================
     /**
      * 初始化
@@ -641,7 +518,7 @@
 
 
     //================================================================
-    //                         自定义函数
+    //                         · 自定义函数
     //================================================================
     /**
      * 把值填充到输入框元素中
@@ -679,9 +556,112 @@
     }
 
 
+    /**
+     * 原生JS合并对象
+     * @param {object} options 选项
+     * @returns {object} 返回合并后的对象
+     * [参考]：https://segmentfault.com/a/1190000011492291
+     * [示例]
+        // eg1.普通合并(浅合并)
+        var target = EXT().merge(data1, data2);
+        // eg2. isDeep 选择是否进行深合并。true 深度合并, false 浅合并，默认true
+        var target = EXT({ isDeep: false }).merge(data1, data2);
+        // eg3. includePrototype：选择是否要遍历对象的原型链，默认为 true
+        var target = EXT({ includePrototype: false }).merge(data1, data2);
+        // eg4. forEach：对每个合并项进行自定义处理
+        var target = EXT({
+            forEach: function(target, name, sourceItem) {
+                target[name] = sourceItem + 'hello， 自定义每个合并项';
+                return target;
+            }
+        }).merge(data1, data2);
+     */
+    function EXT(options) {
+        return new EXT.prototype.init(options);
+    }
+    EXT.fn = EXT.prototype = {
+        type: function(o) {
+            return Object.prototype.toString.call(o).slice(8, -1).toLowerCase();
+        },
+        typeMap: {
+            object: function() {
+                return {};
+            },
+            array: function() {
+                return [];
+            }
+        },
+        // 默认配置项
+        defaults: {
+            // 是否深合并
+            isDeep: true,
+            // 是否遍历合并源对象原型链上的属性
+            includePrototype: true,
+            // 用于对每个合并项进行自定义修正
+            forEach: function(target, name, sourceItem) {
+                target[name] = sourceItem;
+                return target;
+            }
+        },
+        // 将配置项合并到默认配置项
+        init: function(options) {
+            for (var name in options) {
+                this.defaults[name] = options[name];
+            }
+            return this;
+        },
+        merge: function() {
+            var self = this,
+                _default = self.defaults,
+                i = 1,
+                length = arguments.length,
+                target = arguments[0] || {},
+                source,
+                targetItem,
+                sourceItem,
+                tiType,
+                siType,
+                clone,
+                name;
+            for (; i < length; i++) {
+                // 判断源对象是否为空
+                if ((source = arguments[i]) != null) {
+                    for (name in source) {
+                        var hasPro = source.hasOwnProperty(name);
+                        // 是否遍历源对象的原型链
+                        if (hasPro || _default.includePrototype) {
+                            targetItem = target[name];
+                            sourceItem = source[name];
+                            tiType = self.type(targetItem);
+                            siType = self.type(sourceItem);
+                            // 防止出现回环
+                            if (target === sourceItem) {
+                                continue;
+                            }
+                            // 如果复制的是对象或者数组
+                            if (_default.isDeep && sourceItem != null && self.typeMap[siType]) {
+                                clone = targetItem != null && tiType === siType ? targetItem : self.typeMap[siType]();
+                                // 递归
+                                target[name] = self.merge(clone, sourceItem);
+                            } else {
+                                clone = hasPro ? target : target.__proto__;
+                                // 处理每一个合并项
+                                clone = _default.forEach.call(self, clone, name, sourceItem);
+                            }
+                        }
+                    }
+                }
+            }
+            return target;
+        }
+    };
+    EXT.fn.init.prototype = EXT.fn;
+    
+
+
 
     //================================================================
-    //                          工具库类
+    //                          · 工具库类
     //================================================================
     /**
      * 工具库类
@@ -898,6 +878,39 @@
         },
 
         /**
+         * 递归深度合并JSON对象
+         * 合并结果：不返还新Object，而是target改变
+         * 注：遇到相同元素级属性，以defs为准。
+         * @param {object} defs 第1个被合并的对象
+         * @param {object} tart  第2个被合并的对象
+         * @returns {object} 返回目标对象target，所有被合并的对象的成员属性将被附加到该对象上。
+         */
+        mergeJsonObject: function(defs, tart){
+            var tart = { }
+            var loopMerged = function(defs, tart) {
+                for(var key in defs) {
+                    if(tart[key] === undefined) { // 不冲突的，直接赋值 
+                        tart[key] = defs[key];
+                        continue;
+                    }
+                    // 冲突了，如果是Object，看看有么有不冲突的属性
+                    // 不是Object 则以（minor）为准为主，
+                    // console.log(key)
+                    if(this.isJsonObject(defs[key]) || this.isArray(defs[key])) { // arguments.callee 递归调用，并且与函数名解耦 
+                        // console.log("is json")
+                        //arguments.callee(minor[key], main[key]);
+                        loopMerged(defs[key], tart[key]);
+                    }else{
+                        tart[key] = defs[key];
+                    }
+                }
+            }
+            loopMerged(defs, tart);
+            return tart;
+        },
+
+
+        /**
          * 弹出提示信息对话框
          * @param {string} ps_str 提示信息字符串
          */
@@ -914,9 +927,167 @@
                 alert(message);
             }
         }
-    }
+    };
+
+
 
 
     //================================================================
+    //                      · ie兼容
+    //================================================================
+     /**
+     * ie9-兼容原生js bind
+     * 因为js addEventListener为兼容ie8-,会重写addEventListener，但重写的函数会使用到原生的js bind函数
+     */
+    if(!Function.prototype.bind){
+        Function.prototype.bind = function(){
+            if(typeof this !== 'function'){
+                throw new TypeError('Function.prototype.bind - what is trying to be bounded is not callable');
+            }
+            var _this = this;
+            var obj = arguments[0];
+            var args = Array.prototype.slice.call(arguments, 1);
+            return function(){
+                _this.apply(obj, args);
+            }
+        }
+    };
+
+    /**
+     * ie9-兼容document.getElementsByClassName
+     */
+     if (!document.getElementsByClassName) {
+        document.getElementsByClassName = function (className, element) {
+            var children = (element || document).getElementsByTagName('*');
+            var elements = new Array();
+            for (var i = 0; i < children.length; i++) {
+                var child = children[i];
+                var classNames = child.className.split(' ');
+                for (var j = 0; j < classNames.length; j++) {
+                    if (classNames[j] == className) {
+                        elements.push(child);
+                        break;
+                    }
+                }
+            }
+            return elements;
+        };
+    };
+
+
+    /**
+     * ie9-兼容forEach
+     */
+    if(!Array.prototype.forEach){
+        Array.prototype.forEach = function(callback){
+            for (var i = 0; i < this.length; i++){
+                callback.apply(this, [this[i], i, this]);
+            }
+        }
+    };
+
+
+    /**
+     * ie11- 兼容matches
+     */
+    if (!Element.prototype.matches) {
+        Element.prototype.matches =
+            Element.prototype.msMatchesSelector ||
+            Element.prototype.webkitMatchesSelector;
+    };
+
+    /**
+     * ie11- 兼容closest方法（用于查找父元素）
+     */
+    if (!Element.prototype.closest) {
+        Element.prototype.closest = function(s) {
+            var el = this;
+
+            do {
+                if (Element.prototype.matches.call(el, s)) return el;
+                el = el.parentElement || el.parentNode;
+            } while (el !== null && el.nodeType === 1);
+            return null;
+        };
+    };
+
+    /**
+     * ie11-兼容Array.from
+     */
+    if (!Array.from) {
+        Array.from = (function () {
+            var toStr = Object.prototype.toString;
+            var isCallable = function (fn) {
+            return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+            };
+            var toInteger = function (value) {
+            var number = Number(value);
+            if (isNaN(number)) { return 0; }
+            if (number === 0 || !isFinite(number)) { return number; }
+            return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+            };
+            var maxSafeInteger = Math.pow(2, 53) - 1;
+            var toLength = function (value) {
+            var len = toInteger(value);
+            return Math.min(Math.max(len, 0), maxSafeInteger);
+            };
+            // The length property of the from method is 1.
+            return function from(arrayLike/*, mapFn, thisArg */) {
+            // 1. Let C be the this value.
+            var C = this;
+            // 2. Let items be ToObject(arrayLike).
+            var items = Object(arrayLike);
+            // 3. ReturnIfAbrupt(items).
+            if (arrayLike == null) {
+                throw new TypeError("Array.from requires an array-like object - not null or undefined");
+            }  
+            // 4. If mapfn is undefined, then let mapping be false.
+            var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+            var T;
+            if (typeof mapFn !== 'undefined') {
+                // 5. else
+                // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+                if (!isCallable(mapFn)) {
+                throw new TypeError('Array.from: when provided, the second argument must be a function');
+                }
+                // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+                if (arguments.length > 2) {
+                T = arguments[2];
+                }
+            }
+            // 10. Let lenValue be Get(items, "length").
+            // 11. Let len be ToLength(lenValue).
+            var len = toLength(items.length);
+            // 13. If IsConstructor(C) is true, then
+            // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
+            // 14. a. Else, Let A be ArrayCreate(len).
+            var A = isCallable(C) ? Object(new C(len)) : new Array(len);
+            // 16. Let k be 0.
+            var k = 0;
+            // 17. Repeat, while k < len… (also steps a - h)
+            var kValue;
+            while (k < len) {
+                kValue = items[k];
+                if (mapFn) {
+                A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+                } else {
+                A[k] = kValue;
+                }
+                k += 1;
+            }
+            // 18. Let putStatus be Put(A, "length", len, true).
+            A.length = len;
+            // 20. Return A.
+            return A;
+            };
+        }());
+    };
+
+    
+
+    //================================================================
+    //                  · 返回对象供前台调用
+    //================================================================
     return neuiInputsearch;
+    
 });
