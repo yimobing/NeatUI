@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>输入框高度自动增长</title>
+    <style type="text/css">
+        *{ margin: 0; padding: 0;}
+        textarea{
+            border: 1px solid #eee;
+            padding: 5px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="textarea"></textarea>
+    <script src="../assets/style/js/jquery-1.8.3.min.js"></script>
+    <script src="../assets/neatui/js/neatui-functions.js"></script>
+    <script type="text/javascript">
+        var textarea = document.getElementById('textarea');
+        $.makeTextareaExpanding(textarea);
+        // $.makeTextareaExpanding(textarea, {
+        //     initHeight: 28,
+        //     maxHeight: 80
+        // });
+    </script>
+
+</body>
+</html>

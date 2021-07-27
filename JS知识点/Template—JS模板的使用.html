@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>JS模板的使用</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="../highlight/styles/monokai-sublime.css"><!--代码高亮-->
+</head>
+<body>
+
+    <style>
+        body,html{ width:100%; margin:0 auto; padding:0; -webkit-text-size-adjust:none; -webkit-tap-highlight-color:transparent; }
+        *:not(input,textarea) { -webkit-touch-callout: none; -webkit-user-select: none; }
+        html{font-size: 20px;}
+        @media only screen and (min-width:400px){html{font-size:21.33333333px!important}}
+        @media only screen and (min-width:414px){html{font-size:21px!important}}
+        @media only screen and (min-width:480px){html{font-size:25.6px!important}}
+        body{background-color:#fff;line-height:1.5;font-family:'Hiragino Sans GB W3','Hiragino Sans GB','microsoft yahei','Sim sun','Helvetica Neue','Helvetica,sans-serif';font-size:.7rem;color:#212121;overflow-x:hidden;overflow-y:auto}
+        body.mobile{ max-width: 640px; margin: 0 auto; }
+        body.transparent{ background-color: #f4f4f4; }
+        *{margin:0;padding:0;-moz-box-sizing:border-box;-o-box-sizing:border-box;-webkit-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;outline:0;-webkit-tap-highlight-color:transparent}
+        header, footer, main, section, menu, nav, article, aside, hgroup, summary, details, figcaption, figure{display: block;}
+
+        /*+----------------------------------------+*/
+        body{ max-width: 1280px; margin: 0 auto; }
+        .wrap{ padding: 15px 20px; }
+        .neat__header{ margin: 15px auto; text-align: center; }
+        h1{ color: #08ba61; }
+        h3{margin: 50px auto 15px auto; border-bottom: 3px solid #f25824; padding: 0;}
+        h3>span{ padding: 5px 10px; border: 2px solid #f25824; color: #f25824; border-radius: 4px; }
+        .grid-module{ margin-top: 20px; }
+        .grid-module-block{ margin-top: 15px; margin-right: 15px; }
+        .grid-module-caption{ font-size: 18px; font-weight: bold;}
+        .grid-module-content{ margin-top: 5px;}
+        .grid-module-content>input[type="checkbox"]{ margin-left: 10px; }
+        
+        .block{ }
+        .block__hd{ position: relative; display: inline-block; margin: 50px auto 15px auto; padding: 6px 12px; border: 3px solid #08ba61; border-bottom: 0;  border-radius: 8px 8px 0 0; color: #08ba61; font-size: 24px; font-weight: bold; }
+        .block__hd:after{ content: ''; position: absolute; left: 0; right: 0; bottom: 0; width: 800px; border-bottom: 3px solid #08ba61; }
+        .block__bd{ }
+        .block__bd_item .title{ margin-top: 25px; margin-bottom: 10px; font-size: 20px; font-weight: bold; }
+    
+    </style>
+
+    <div class="wrap">
+        <section class="block">
+            <div class="block__hd">JS模板的使用&lt;script type="text/html"&gt;&lt;/script&gt; </div><!--/.block__hd-->
+            <div class="block__bd">
+                <div class="block__bd_item">
+                    <div class="title">知识点，参考：https://www.cnblogs.com/xcsn/p/6375129.html</div>
+                    <div class="content">
+<pre>
+
+一、简单示例
+&lt;script type="text/html" id="javascript_template"&gt;
+&lt;div onclick="_dom()"&gt;
+  &lt;ul id="wrap"&gt;
+      &lt;li&gt;1&lt;/li&gt;
+      &lt;li&gt;2&lt;/li&gt;
+      &lt;li&gt;3&lt;/li&gt;
+      &lt;li&gt;4&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+&lt;/script&gt;
+
+1.在页面渲染的时候，浏览器不会读取script标签中的html代码，又不在页面上显示
+2.外面不能获取到里面的div节点
+在使用时，要在script标签上加个ID可以供我们找到它，即然做模版用，且里面的html代码不会被渲染读取，则需在外面再新建一个div来当容器，装下这些html代码，
+ 即我们可以通过 
+    var _html=document.getElementById('javascript_template').innerHTML;
+    document.getElementsByTagName('div')[0].innerHTML=_html;
+然后我们模版里的htmll代码就可以运行在页面中了;
+如果遇到html代码加入外部div后，获取不到节点的情况，可以在外部写个函数，然后在html内部用行内调用 onclick="_dom()"
+function _dom() {  document.getElementById('wrap') ;}
+</pre>
+                    </div><!--/.content-->
+                </div><!--/.block__item-->
+            </div><!--/.block__bd-->
+        </section>
+
+
+
+        <section class="block">
+            <div class="block__hd">Demo示例</div><!--/.block__hd-->
+            <div class="block__bd">
+                <div class="block__bd_item">
+                    <div class="title"></div>
+                    <div class="content">
+                        <button type="button" id="btn-demo">点我加载示例</button>
+                        <div id="list"></div>
+                    </div><!--/.content-->
+                </div><!--/.block__item-->
+            </div><!--/.block__bd-->
+        </section>
+
+    </div><!--/.wrap-->
+
+    <!--================================================================================-->
+    <!--                            JS模板                                      -->
+    <!--================================================================================-->
+    <script id="tpl_user" type="text/html">
+        <div class="block__user">
+			<p><span>用户名</span><em>[username]</em></p>
+			<p><span>年龄</span><em>[age]</em></p>
+			<p><span>性别</span><em>[sex]</em></p>
+		</div><!--/.user-->
+    </script>
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="../assets/style/js/jquery-1.8.3.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
+	<!--<script type="text/javascript" href="../highlight/highlight.min.js"></script>--><!--代码高亮-->
+    <script type="text/javascript">
+        $(function(){
+            //——————————————————————————————————————————
+            //=====代码块高亮
+            hljs.initHighlightingOnLoad()
+            hljs.configure({
+                languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
+            });
+            document.querySelectorAll('pre').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+        }); //$(function(){});
+    </script>
+    
+    <script type="text/javascript">
+
+        //——————————————————————————————————————————
+        var reg = new RegExp("\\[([^\\[\\]]*?)\\]", "igm"); //i g m是指分别用于指定区分大小写的匹配、全局匹配和多行匹配。
+        $("#btn-demo").click(function () {
+            var html = document.getElementById("tpl_user").innerHTML;
+            var eleUser = document.getElementById("list");
+            eleUser.innerHTML = html.replace(reg, function(str, group, index, oldStr){
+                console.log('str：', str, '\group', group, '\nindex：', index);
+                return {
+                    "username":"张三",
+                    "age":"28",
+                    "sex":"男"
+                }[group]
+            })
+        });
+
+        /* JavaScript replace()的使用和里面function()的说明
+        注： str.replace(reg, function(str, group, index, oldStr){ return 'abc'});
+        第1个参数str 表示匹配到的字符串, 
+        第2个参数group 表示匹配成功的部分(匹配到的最后一个分组)
+        第3个参数index 表示匹配到的字符串(第一个位置的)索引，
+        第4个参数oldStr 表示被匹配的字符串(即原字符串)
+        注：如果没有分组，那么只有三个参数，没有了分组这个参数。 */
+
+    </script>
+
+
+
+</body>
+</html>
