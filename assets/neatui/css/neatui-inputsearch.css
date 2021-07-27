@@ -5,7 +5,7 @@
 * Website: https://github.com/yimobing/neatui
 * Author: chenMufeng
 * Date: 2021.07.01
-* Update: 2021.07.22
+* Update: 2021.07.227
 */
 
 @charset "utf-8";
@@ -29,7 +29,7 @@ i, em{ font-style: normal; }
 .neInputsearch{
     position: absolute;
     z-index: 1;
-    min-width: 200px;
+    min-width: 70px;
     max-width: 100%;
     /* left: 0; */
     /* right: 400px; */
@@ -103,7 +103,7 @@ i, em{ font-style: normal; }
     border: 1px solid #ddd;
     text-align: center;
     color: #333;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 /*+--------关闭按钮--------+*/
@@ -118,14 +118,25 @@ i, em{ font-style: normal; }
     border-radius: 0 0 10px 10px;
     text-align: center;
     cursor: pointer;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .neInputsearch__btn button{
     padding: 0!important;
     border: 0!important;
-    background: none!important;
     box-shadow: none!important;
     color: #777!important;
     cursor: pointer!important;
+}
+.neInputsearch__btn.isText button{
+    background: none!important;
 }
 .neInputsearch__btn:hover button{ color: #333; }
 
@@ -146,7 +157,7 @@ i, em{ font-style: normal; }
 .neInputsearch__btn.rightBottom{ right: -20px; bottom: -30px; }
 .neInputsearch__btn.leftTop{left: -20px;top: -30px;}
 .neInputsearch__btn.rightTop{ right: -20px; top: -30px; }
-.neInputsearch__btn.topCenter{
+.neInputsearch__btn.isText.topCenter{
     padding-left: 10px;
     padding-right: 10px;
     border-width: 1px 1px 0 1px;
