@@ -135,9 +135,9 @@
                 // 字段
                 format: [], // 自定义数据源字段(可选)，默认空数组。
                 // 定位    
-                position: "relative", // 定位方式(可选)，默认relative。值：relative 相对定位(即相对元素定位), absolute 绝对定位(即相对浏览器窗口定位)，fixed 绝对定位。
+                position: "fixed", // 定位方式(可选)，默认fixed。值：fixed 固定定位(即相对浏览器窗口定位)，absolute 绝对定位(即相对输入框元素定位)。
                 zIndex: 1, // 自定义控件层级(可选)，默认1。
-                width: "auto", // 宽度(可选)，默认auto根据元素自动调整。
+                width: "auto", // 宽度(可选)，默认auto根据输入框元素自动调整。
                 height: 200, // 高度(可选)，默认200。
                 animate: false, // 是否启用动画效果(可选), 默认false
 
@@ -168,7 +168,7 @@
                 
                 // 按钮
                 closeButton: { // 关闭按钮(可选)。
-                    enable: false, // 是否显示关闭按钮(可选)，默认false
+                    enable: true, // 是否显示关闭按钮(可选)，默认true
                     theme: "text", // 关闭按钮样式(可选)。值：text 文字按钮(默认), image 图标按钮
                     direction: "default" // 关闭按钮位置(可选)。值： default 底部居中(默认), topCenter 顶部居中, leftTop 左上角, rightTop 右上角, leftBottom 左下角, rightBottom 右下角。
                 },
@@ -718,6 +718,7 @@
                            $('#i-city, #i-county').val('');
                         }
                     }
+
                 }, $this)
             });
 
