@@ -94,24 +94,77 @@
         if (typeof (target) === "boolean") deep = target, target = arguments[1] || {}, i = 2; // eg. extend(true, {}, defs, opts || {});
         if (typeof (target) !== "object" && typeof (target) !== "function") target = {}; // eg.
         if (length === i) target = this, --i;
-        // 方法1：浅合并
-       /*  for (; i < length; i++) {
-            if ((options = arguments[i]) != null) {
-                for (name in options) {
-                    src = target[name], copy = options[name];
-                    if (target === copy) continue;
-                    if (copy !== undefined) target[name] = copy;
+        if(deep){ 
+            // 深度合并
+            for (; i < length; i++) {
+                if ((options = arguments[i]) != null) {
+                    target = fnExtendObject(target, options);
                 }
             }
-        } */
-        // 方法2：浅深合并皆可
-        for (; i < length; i++) {
-            if ((options = arguments[i]) != null) {
-                target = EXT({ isDeep: deep }).merge(target, options);
+        }else{ 
+            // 浅合并
+            for (; i < length; i++) {
+                if ((options = arguments[i]) != null) {
+                    for (name in options) {
+                        src = target[name], copy = options[name];
+                        if (target === copy) continue;
+                        if (copy !== undefined) target[name] = copy;
+                    }
+                }
             }
         }
         // console.log('target：', target)
         return target;
+
+
+        /**
+         * 子函数：递归深度合并JSON对象
+         * 注：遇到相同元素级属性，以defs为准。
+         * 参考：https://www.cnblogs.com/catgatp/p/9189228.html
+         * @param {object} defs 第1个被合并的对象
+         * @param {object} opts 第2个被合并的对象
+         * @returns {object} 返回合并后的目标对象，所有被合并的对象的成员属性将被附加到该对象上。
+         */
+         function fnExtendObject(defs, opts){
+            if(!fnIsJson(defs)  || !fnIsJson(opts)){
+                alert('参数不是JSON对象，请检查！');
+                return {};
+            }
+            var target = JSON.parse(JSON.stringify(defs)); // 赋值而不改变原对象(注意：对象直接赋值是引用赋值，会改变原对象)
+            // 遇到相同元素级属性，以 minor 为准
+            // 不返还新Object，而是 main 改变
+            var mergeObj = function(minor, main) {
+                for(var key in minor) {
+                    if(main[key] === undefined) { // 不冲突的，直接赋值 
+                        main[key] = minor[key];
+                        continue;
+                    }
+                    // 冲突了，如果是Object，看看有么有不冲突的属性; 不是Object 则以 minor 为准为主
+                    // console.log(key)
+                    if(fnIsJson(minor[key]) || fnIsArray(minor[key])) { // arguments.callee 递归调用，并且与函数名解耦 
+                        // console.log("is json")
+                        //arguments.callee(minor[key], main[key]);
+                        mergeObj(minor[key], main[key]);
+                    }else{
+                        main[key] = minor[key];
+                    }
+                }
+            }
+            mergeObj(opts, target);
+            return target;
+        }
+        /**
+         * 子函数：判断是否JSON对象
+         */
+        function fnIsJson(o) {
+            return typeof o == "object" && o.constructor == Object;
+        }
+        /**
+         * 子函数：判断是否数组
+         */
+        function fnIsArray(o) {
+            return Object.prototype.toString.call(o) == '[object Array]';
+        }
     };
 
     // 自定义控件参数(仅限控件内部使用)
@@ -543,7 +596,7 @@
         ps_element.setAttribute('data-old-value', ps_val); // 设置data-旧的显示值
         me.$oldId = ps_bh;
         me.$oldValue = ps_val;
-    }
+    };
 
     /**
      * 获取只有一个下拉项时是否自动填充输入框元素
@@ -553,110 +606,40 @@
     function fnGetIsOneFill(ps_this){
         var me = ps_this;
         return me.$opts.autoFill.oneItemFill == 'auto' ? ( tools.isAppDevice() ? false : true ) : me.$opts.autoFill.oneItemFill;
-    }
+    };
 
 
     /**
-     * 原生JS合并对象
-     * @param {object} options 选项
-     * @returns {object} 返回合并后的对象
-     * [参考]：https://segmentfault.com/a/1190000011492291
-     * [示例]
-        // eg1.普通合并(浅合并)
-        var target = EXT().merge(data1, data2);
-        // eg2. isDeep 选择是否进行深合并。true 深度合并, false 浅合并，默认true
-        var target = EXT({ isDeep: false }).merge(data1, data2);
-        // eg3. includePrototype：选择是否要遍历对象的原型链，默认为 true
-        var target = EXT({ includePrototype: false }).merge(data1, data2);
-        // eg4. forEach：对每个合并项进行自定义处理
-        var target = EXT({
-            forEach: function(target, name, sourceItem) {
-                target[name] = sourceItem + 'hello， 自定义每个合并项';
-                return target;
-            }
-        }).merge(data1, data2);
+     * 递归深度合并 JSON对象
+     * 合并结果：不返还新Object，而是target改变
+     * 注：遇到相同元素级属性，以defs为准。
+     * @param {object} defs 第1个被合并的对象
+     * @param {object} target  第2个被合并的对象
+     * @returns {object} 返回目标对象target，所有被合并的对象的成员属性将被附加到该对象上。
      */
-    function EXT(options) {
-        return new EXT.prototype.init(options);
-    }
-    EXT.fn = EXT.prototype = {
-        type: function(o) {
-            return Object.prototype.toString.call(o).slice(8, -1).toLowerCase();
-        },
-        typeMap: {
-            object: function() {
-                return {};
-            },
-            array: function() {
-                return [];
-            }
-        },
-        // 默认配置项
-        defaults: {
-            // 是否深合并
-            isDeep: true,
-            // 是否遍历合并源对象原型链上的属性
-            includePrototype: true,
-            // 用于对每个合并项进行自定义修正
-            forEach: function(target, name, sourceItem) {
-                target[name] = sourceItem;
-                return target;
-            }
-        },
-        // 将配置项合并到默认配置项
-        init: function(options) {
-            for (var name in options) {
-                this.defaults[name] = options[name];
-            }
-            return this;
-        },
-        merge: function() {
-            var self = this,
-                _default = self.defaults,
-                i = 1,
-                length = arguments.length,
-                target = arguments[0] || {},
-                source,
-                targetItem,
-                sourceItem,
-                tiType,
-                siType,
-                clone,
-                name;
-            for (; i < length; i++) {
-                // 判断源对象是否为空
-                if ((source = arguments[i]) != null) {
-                    for (name in source) {
-                        var hasPro = source.hasOwnProperty(name);
-                        // 是否遍历源对象的原型链
-                        if (hasPro || _default.includePrototype) {
-                            targetItem = target[name];
-                            sourceItem = source[name];
-                            tiType = self.type(targetItem);
-                            siType = self.type(sourceItem);
-                            // 防止出现回环
-                            if (target === sourceItem) {
-                                continue;
-                            }
-                            // 如果复制的是对象或者数组
-                            if (_default.isDeep && sourceItem != null && self.typeMap[siType]) {
-                                clone = targetItem != null && tiType === siType ? targetItem : self.typeMap[siType]();
-                                // 递归
-                                target[name] = self.merge(clone, sourceItem);
-                            } else {
-                                clone = hasPro ? target : target.__proto__;
-                                // 处理每一个合并项
-                                clone = _default.forEach.call(self, clone, name, sourceItem);
-                            }
-                        }
-                    }
+    function fnExtendObject(defs, target){
+        var target = { }
+        var mergeObj = function(defs, target) {
+            for(var key in defs) {
+                if(target[key] === undefined) { // 不冲突的，直接赋值 
+                    target[key] = defs[key];
+                    continue;
+                }
+                // 冲突了，如果是Object，看看有么有不冲突的属性
+                // 不是Object 则以（minor）为准为主，
+                // console.log(key)
+                if(tools.isJsonObject(defs[key]) || tools.isArray(defs[key])) { // arguments.callee 递归调用，并且与函数名解耦 
+                    // console.log("is json")
+                    //arguments.callee(minor[key], main[key]);
+                    mergeObj(defs[key], target[key]);
+                }else{
+                    target[key] = defs[key];
                 }
             }
-            return target;
         }
+        mergeObj(defs, target);
+        return target;
     };
-    EXT.fn.init.prototype = EXT.fn;
-    
 
 
 
