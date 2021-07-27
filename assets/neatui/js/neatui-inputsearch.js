@@ -199,11 +199,11 @@
             // 字段
             format: [ ], // 自定义数据源字段(可选)，默认空数组。
             // 定位    
-            position: "relative", // 定位方式(可选)，默认relative。值：relative 相对定位(即相对元素定位), absolute 绝对定位(即相对浏览器窗口定位)，fixed 绝对定位。
+            position: "fixed", // 定位方式(可选)，默认fixed。值：fixed 固定定位(即相对浏览器窗口定位)，absolute 绝对定位(即相对输入框元素定位)。
             zIndex: 1, // 自定义控件层级(可选)，默认1。
-            width: "auto", // 宽度(可选)，默认auto根据元素自动调整。
+            width: "auto", // 宽度(可选)，默认auto根据输入框元素自动调整。
             height: 200, // 高度(可选)，默认200。
-            animate: false, // 是否启用动画效果(可选), 默认false
+            animate: false, // 是否启用动画效果(可选), 默认false。
 
             // 控件标识
             caption: "", // 标题(可选)，默认空。
@@ -400,7 +400,10 @@
             valHeight = valCell.offsetHeight,
             faHeight = faCell.offsetHeight,
             faWidth = faCell.offsetWidth;
-        var top = faHeight + 2;
+        var selfH = valCell.offsetHeight, // 元素自自高
+            selfW = valCell.offsetWidth;
+        var top = faHeight + 2,
+            left = 0;
         // console.log('top：', top)
         // console.log('width:', width, '\valWidth:', valWidth)
         // 控件处理
@@ -411,10 +414,21 @@
         nodeDiv.className = net.idClass + ' ne_input_search_' + tools.generateRandomChar() + _eClassNameStr;
         opts.id === 'default' ||  opts.id.replace(/([ ]+)/g, '') === '' ? '' : nodeDiv.id = opts.id;
         width == 'auto' ? nodeDiv.style.width = valWidth + 'px' : nodeDiv.style.width = width + 'px';
-        nodeDiv.style.zIndex = zIndex;
-        nodeDiv.style.top = top + 'px';
         nodeDiv.innerHTML = allHtml;
-        tools.insertAfter(nodeDiv, valCell); // valCell.after(nodeDiv); 在后面插入节点
+        nodeDiv.style.position = 'absolute';
+        nodeDiv.style.zIndex = zIndex;
+        if(opts.position == 'fixed'){
+            left = tools.getLeft(valCell); //valCell.offsetLeft;
+            top = tools.getTop(valCell); //valCell.offsetTop;
+            // console.log('left：', left, '\ntop：', top, '\nselfH：', selfH);
+            nodeDiv.style.top = (top + selfH + 1) + 'px';
+            nodeDiv.style.left = left + 'px';
+            tools.insertAfter(nodeDiv, document.getElementsByTagName('body')[0]); // 在后面插入节点
+        }else{
+            nodeDiv.style.top = top + 'px';
+            tools.insertAfter(nodeDiv, valCell); // valCell.after(nodeDiv); 在后面插入节点
+        }
+
         // 全局赋值
         me.$root = document.getElementsByClassName(net.idClass)[0]; // 根节点
         me.$ul = typeof document.getElementsByClassName('neInputsearch__pane')[0] == 'undefined' ? 
@@ -780,6 +794,40 @@
                 :
                 document.getElementsByClassName(this.getClassNameString(ps_str));
         },
+
+
+        /**
+         * 获取dom到根元素(浏览器)顶部的距离，即offsetTop
+         * 注：不能直接使用obj.offsetTop，因为它获取的是你绑定元素上边框相对离自己最近且position属性为非static的祖先元素的偏移量
+         * @param {HTML DOM} o dom元素
+         * @returns {number} 返回距离值
+         */
+        getTop: function(o) {
+            var actualTop = o.offsetTop;
+            var current = o.offsetParent;
+            while (current !== null) {
+                actualTop += current.offsetTop;
+                current = current.offsetParent;
+            }
+            return actualTop;
+        },    
+
+         /**
+         * 获取dom到根元素(浏览器)左侧的距离，即offsetLeft
+         * 注：不能直接使用obj.offsetLeft，因为它获取的是你绑定元素上边框相对离自己最近且position属性为非static的祖先元素的偏移量
+         * @param {HTML DOM} element dom元素
+         * @returns {number} 返回距离值
+         */
+        getLeft: function(o) {
+            var actualLeft = o.offsetLeft;
+            var current = o.offsetParent;
+            while (current !== null) {
+              actualLeft += current.offsetLeft;
+              current = current.offsetParent;
+            }
+            return actualLeft;
+        },
+
 
         /**
          * 生成N位随机数(字母+数字组成)
