@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>网页导出图片</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="">
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+</head>
+<body>
+    <div class="wrap">
+        <main>
+            
+
+            <section class="export">
+                <button type="button" id="btn-save-web">保存整个网页为图片</button>
+                <button type="button" id="btn-save-area">保存黄色区域为图片</button>
+                <a id="picture" href="" download="下载图片.png"></a>
+            </section>
+
+            <section class="content">
+                <div class="user">
+                    <div class="title">水浒传会物谱</div>
+                    <div class="list">
+                        <p><label>用户：</label><span>林冲</span></p>
+                        <p><label>性别：</label><span>男</span></p>
+                        <p><label>昵称：</label><span>豹子头</span></p>
+                        <p><label>籍贯：</label><span>梁山泊</span></p>
+                    </div>
+                </div><!--/.user-->
+                <div class="test" id="capture" style="padding: 10px; background: #f5da55">
+                    <h4 style="color: #000; ">Hello world!</h4>
+                </div><!--/.test-->
+            </section>
+        </main>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="../assets/style/js/jquery.html2canvas.min.js"></script>
+    <script type="text/javascript">
+
+        /**
+         * 文档
+         * [官网]：http://html2canvas.hertzen.com/
+         * [参考]:
+         * http://caibaojian.com/h5-download.html
+         * https://www.cnblogs.com/xieyongbin/p/10921913.html
+         */
+
+
+
+        /**
+         * 函数：保存图片，即将canvas导出成图片
+         * @param {HTML DOM} o 表示canvas DOM元素对象
+         * @param {string} fileName 保存后的图片名称(可选)，默认为'下载图片.png'
+         */
+        function saveCanvas(o, fileName){
+            var fileName = typeof fileName === 'undefined' || fileName.toString().replace(/([ ]+)/g, '') === '' ? '下载图片.png' : fileName + '.png';
+            // document.body.appendChild(o); // 现在你已经拿到了canvas DOM元素
+            var imgUri = o.toDataURL("image/png").replace("image/png", "image/octet-stream"); // 得到图片的base64编码数据
+            // console.log('图片URL：', imgUri);
+            var pic = document.getElementById('picture'); // a标签的DOM元素
+            pic.setAttribute('href', imgUri); // 给a标签的href属性赋值为图片地址
+            pic.setAttribute('download', fileName);
+            pic.click(); // 触发a标签的click事件
+        }
+
+
+
+        //——————————————————————————————————————————
+        //=====示例1：保存整个网页为图片
+        var btnAll = document.getElementById('btn-save-web');
+        btnAll.addEventListener('click', function(){
+            html2canvas(document.querySelector("body")).then(canvas => {
+                saveCanvas(canvas, '整个网页');
+            })
+        });
+
+
+
+        //——————————————————————————————————————————
+        //=====示例2：保存黄色区域为图片
+        var btnYellow = document.getElementById('btn-save-area');
+        btnYellow.addEventListener('click', function(){
+            html2canvas(document.querySelector("#capture")).then(canvas => {
+                saveCanvas(canvas, '黄色区域');
+            })
+        });
+
+    </script>
+</body>
+</html>
