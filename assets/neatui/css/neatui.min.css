@@ -1671,3 +1671,14 @@ pre, pre code {
 	-webkit-transform: translate(0%, 0%);
 	transform: translate(0%, 0%);
 }
+
+
+
+
+/*+================================================================================+*/
+/*                                   将网页导出成图片
+/*+================================================================================+*/
+.ne-web2Image{ width: 98%; margin: 0 auto; height: auto; }
+.web2Image__text{ margin-bottom: 15px; text-align: center; color: #888; font-size: 14px;}
+.web2Image__img{ width: 100%; margin: 0 auto; text-align: center; /*border: 1px solid #ddd; */  border-radius: 4px;}
+.web2Image__img img{display: block; width: 100%; }
