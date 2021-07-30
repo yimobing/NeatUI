@@ -1644,14 +1644,13 @@ var convert = {
 	 * 小数转化成百分数
 	 * eg. 0.5 <=> 50%
 	 * @param {string} ps_decimalStr 小数字符串
-	 * @param {string} ps_method 取值方式:
+	 * @param {string} ps_method 取值方式(可选), 默认round。值如下：
 		round 四舍五入，eg1. Math.floor(12.3)=12, eg2. Math.floor(12.8)=13
-		loor 向下取数（即舍去小数，仅取整数部分）. 
+		floor 向下取数（即舍去小数，仅取整数部分）. 
 		ceil 向上取整(即舍去小数，即小数部分一律向整数部分进位，整数部分+1)
-	 * @param {number} ps_digit 小数位数,仅当ps_method='round'时有效（默认-1，即不处理原样返回.eg. 56.23% <=> 0.5623）
-	 * @param {boolean} ps_isEmptyTips 空值时是否返回一个默认字符串，默认false
+	 * @param {number} ps_digit 小数位数(可选), 默认-1, 仅当ps_method='round'时有效。(值为-1时, 表示无论取值方式是round、floor、ceil中的哪种，皆不处理原样返回, 比如：eg.0.5623 <=> 56.23%)
+	 * @param {boolean} ps_isEmptyTips 空值时是否返回一个默认字符串(可选), 默认false
      * @returns {string} 返回百分数
-     * 
 	 * eg.
 	 	Math.floor(0.05)=0, eg2.Math.floor(12.3)=12, eg3. Math.floor(12.8)=12
 		Math.ceil(0.05)=1, eg2. Math.ceil(12.3)=13, eg3. Math.ceil(12.8)=13
