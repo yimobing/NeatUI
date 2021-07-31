@@ -819,7 +819,7 @@
             return style;
         },
 
-        
+
         /**
          * 获取元素到浏览器顶部的距离，即offsetTop
          * 注：不能直接使用obj.offsetTop，因为它获取的是你绑定元素上边框相对离自己最近且position属性为非static的祖先元素的偏移量
@@ -857,7 +857,7 @@
             var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             var docStyle = this.getStyle(document.documentElement), // HTML节点
                 docW = parseFloat(docStyle.width.toString().replace(/([\px]+)/g, ''));
-            actualLeft += winW == docW ? 0 : Math.ceil( (winW - docW) / 2 );
+            actualLeft += ( window.innerWidth == docW || document.documentElement.clientWidth == docW || document.body.clientWidth == docW ) ? 0 : Math.ceil( (winW - docW) / 2 );
             return actualLeft;
         },
 
