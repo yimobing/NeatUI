@@ -391,8 +391,9 @@
             ),
             ( btDirection.toLocaleLowerCase().indexOf('top') >= 0 ? '' : btnHtml )
         ].join('\r\n');
+
         // 拼接节点
-        // 输入框父节点处理
+        // 1.输入框父节点处理
         var faCell = valCell.parentNode; //父节点
         faCell.style.position = 'relative';
         // 宽、高等距离
@@ -406,9 +407,9 @@
             left = 0;
         // console.log('top：', top)
         // console.log('width:', width, '\valWidth:', valWidth)
-        // 控件处理
+        // 2.控件处理
         me.removeControl(); // 先移除控件
-        // 拼接处理
+        // 3.拼接处理
         var _eClassNameStr = opts.className.replace(/([ ]+)/g, '') === '' ? '' : ' ' + opts.className;
         var nodeDiv = document.createElement('div');
         nodeDiv.className = net.idClass + ' ne_input_search_' + tools.generateRandomChar() + _eClassNameStr;
@@ -796,24 +797,51 @@
         },
 
 
+         /**
+         * 原生js获取元素style属性
+         * [用途]：原生js获取元素margin外边距、内边距padding
+         * [注意]：返回值中的各个属性值带单位px
+         * 兼容性：兼容IE、火狐、谷歌
+         * @param {HTML DOM} o DOM元素. 
+         * @returns {object} 返回元素的各种css属性组成的数组。
+         * [示例]
+            var div = document.getElementById("user");
+            var style = getStyle(div);
+            alert(style.marginTop);
+        */
+        getStyle: function(o){
+            //  兼容IE和火狐谷歌等的写法
+            if (window.getComputedStyle) {
+                var style = getComputedStyle(o, null);
+            } else {
+                style = o.currentStyle; // 兼容IE
+            }
+            return style;
+        },
+
+        
         /**
-         * 获取dom到根元素(浏览器)顶部的距离，即offsetTop
+         * 获取元素到浏览器顶部的距离，即offsetTop
          * 注：不能直接使用obj.offsetTop，因为它获取的是你绑定元素上边框相对离自己最近且position属性为非static的祖先元素的偏移量
          * @param {HTML DOM} o dom元素
          * @returns {number} 返回距离值
          */
-        getTop: function(o) {
+         getTop: function(o) {
             var actualTop = o.offsetTop;
             var current = o.offsetParent;
             while (current !== null) {
                 actualTop += current.offsetTop;
                 current = current.offsetParent;
             }
+            // 当HTML节点有设置margin值时
+            var docStyle = this.getStyle(document.documentElement), // HTML节点
+                docMarTop = Math.ceil(docStyle.marginTop.toString().replace(/([\px]+)/g, ''));
+            actualTop += docMarTop;
             return actualTop;
         },    
 
          /**
-         * 获取dom到根元素(浏览器)左侧的距离，即offsetLeft
+         * 获取元素到浏览器左侧的距离，即offsetLeft
          * 注：不能直接使用obj.offsetLeft，因为它获取的是你绑定元素上边框相对离自己最近且position属性为非static的祖先元素的偏移量
          * @param {HTML DOM} element dom元素
          * @returns {number} 返回距离值
@@ -825,9 +853,13 @@
               actualLeft += current.offsetLeft;
               current = current.offsetParent;
             }
+            // 当HTML节点宽度不是100%时
+            var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            var docStyle = this.getStyle(document.documentElement), // HTML节点
+                docW = parseFloat(docStyle.width.toString().replace(/([\px]+)/g, ''));
+            actualLeft += winW == docW ? 0 : Math.ceil( (winW - docW) / 2 );
             return actualLeft;
         },
-
 
         /**
          * 生成N位随机数(字母+数字组成)
