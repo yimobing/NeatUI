@@ -5,7 +5,7 @@
  * 说明：兼容IE8+
  * Author: Mufeng
  * Date: 2021.01.09
- * Update: 2021.03.08
+ * Update: 2021.08.02
  */
 
 /*+--------------------------------+*/
@@ -203,7 +203,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .item-r nput[readonly],
 .item-r span[readonly],
 .item-r textarea[readonly]{
-    background-color: #fff!important;
+    background-color: #fff;
     -webkit-text-fill-color: inherit;
     -webkit-text-stroke: 1px solid #d6e9c6;
     filter: alpha(opacity=100);
