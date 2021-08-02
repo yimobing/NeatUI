@@ -973,6 +973,82 @@ var utilities = {
             docW = parseFloat(docStyle.width.toString().replace(/([\px]+)/g, ''));
         actualLeft += ( window.innerWidth == docW || document.documentElement.clientWidth == docW || document.body.clientWidth == docW ) ? 0 : Math.ceil( (winW - docW) / 2 );
         return actualLeft;
+    },
+
+    /**
+     * 原生js append字符串
+     * 即：向已存在的节点对象后面追加HTML字符串
+     * @param {string} str 字符串
+     * @param {HTML DOM} el 已存在的节点对象
+     */
+    appendHTML: function(str, el){
+        HTMLElement.prototype.appendStr = function(str) {
+            var divTemp = document.createElement("div"), nodes = null, 
+                fragment = document.createDocumentFragment(); // 文档片段，一次性append，提高性能
+            divTemp.innerHTML = str;
+            nodes = divTemp.childNodes;
+            for (var i=0, length=nodes.length; i<length; i+=1) {
+            fragment.appendChild(nodes[i].cloneNode(true));
+            }
+            this.appendChild(fragment);
+            // 据说下面这样子世界会更清净
+            nodes = null;
+            fragment = null;
+        }
+        el.appendStr(str);
+    },
+
+
+    /**
+     * 原生js prepend字符串
+     * 即：向已存在的节点对象前面追加HTML字符串
+     * @param {string} str 字符串
+     * @param {HTML DOM} el 已存在的节点对象
+     */
+    prependHTML: function(str, el) {
+        var divTemp = document.createElement("div"), nodes = null
+            , fragment = document.createDocumentFragment();
+    
+        divTemp.innerHTML = str;
+        nodes = divTemp.childNodes;
+        for (var i=0, length=nodes.length; i<length; i+=1) {
+        fragment.appendChild(nodes[i].cloneNode(true));
+        }
+        // 插入到容器的前面 - 差异所在
+        el.insertBefore(fragment, el.firstChild);
+        // 内存回收？
+        nodes = null;
+        fragment = null;
+    },
+
+    /**
+     * 原生js在已存在的节点向后面插入新节点(兼容ie9-)
+     * @param {HTML DOM} newNode 新节点
+     * @param {HTML DOM} existingNode 已存在的节点
+     */
+    insertAfter: function(newNode, existingNode) {
+        var parent = existingNode.parentNode;
+        // 最后一个子节点 lastElementChild兼容其他浏览器 lastChild  兼容ie678;
+        var lastNode = parent.lastElementChild || parent.lastChild;
+        // 兄弟节点同样也是有兼容性
+        var siblingNode = existingNode.nextElementSibling || existingNode.nextSibling;
+        if (lastNode == existingNode) // 先判断目标节点是不是父级的最后一个节点，如果是的话，直接给父级加子节点就好
+        { 
+            parent.appendChild(newNode);
+        }
+        else // 不是最好后一个节点  那么插入到目标元素的下一个兄弟节点之前（就相当于目标元素的insertafter）
+        { 
+            parent.insertBefore(newNode, siblingNode);
+        }
+    },
+
+    /**
+     * 原生js移除指定节点(兼容ie11-)
+     * @param {HTML DOM} node 要移除的节点
+     */
+    removeNode: function(node){
+        // node.remove();
+        node.parentNode.removeChild(node);
     }
 
     
