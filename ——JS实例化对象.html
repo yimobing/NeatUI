@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>JS实例化对象</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+</head>
+<body>
+    <div class="wrap">
+        <main>
+            <div class="mortgage"></div>
+            <div class="tax"></div>
+        </main>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        /*+----------------全局变量----------------+*/
+        /*+----------------FUNCTION----------------+*/
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          JS实例化对象                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====new 一个函数
+            function Person(name, age){
+                this.name = name;
+                this.age = age;
+                this.sayName = function(){
+                    console.log('--------------------------------START SAYNAME');
+                    console.log('人物称谓\n姓名：', this.name + '\n年龄：', this.age);
+                    console.log('--------------------------------END SAYNAME');
+                }
+                //return 'hello world';
+            };
+            Person.prototype.face = function(sex, origin){
+                console.log('--------------------------------START FACE');
+                console.log('人物脸谱\n姓名：', this.name, '\n年龄：', this.age + '\n性别：', sex, '\n籍贯：',origin);
+                console.log('--------------------------------END FACE');
+            };
+
+
+            //——————————————————————————————————————————
+            //=====实例化调用
+            var person = new Person('张三', 18);
+            person.sayName();
+            person.face('女', '金陵市');
+
+            //——————————————————————————————————————————
+            //=====使用apply 重定义 this 对象，并传递参数
+            var user = {
+                name: "林冲",
+                age: 58
+            }
+            person.sayName.apply(user);
+            person.face.apply(user, ['男', '开封市']);
+            
+
+        });
+    </script>
+
+
+</body>
+</html>

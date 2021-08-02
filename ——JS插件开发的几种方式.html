@@ -4,6 +4,12 @@
  //                                                   JS插件开发的几种方式
  //                                  注：           //... 表示省一堆代码
  //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+/**
+*  参考文档：
+    JavaScript中new一个函数和直接调用函数的区别：https://www.cnblogs.com/vicky-li/p/8669549.html
+    JavaScript中call()、apply()、bind() 的用法：https://www.runoob.com/w3cnote/js-call-apply-bind.html
+*
+*/
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //                    jQuery extend 封装控件1
@@ -124,35 +130,66 @@ $('#id').jeDate(opts); // opts是一个对象
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //                    原生JS封装控件
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//——————————————————————————————————————————
+//            只调用单一方法
+//——————————————————————————————————————————
 ;(function(root, factory){
     if (typeof define === 'function' && define.amd) { // amd
         define(factory);
     } else if (typeof exports === 'object') { // umd
         module.exports = factory();
     } else {
-        window.jeDate = factory();
+        window.JeDate = factory();
     }
 })(this, function(){
-    var jeDate = function(elem,options){
+    var JeDate = function(elem,options){
         var opts = typeof (options) === "function" ? options() : options;
-        return new jeDatePick(elem, opts);
+        return new DatePick(elem, opts);
     };
-
     //...
-
-    function jeDatePick(elem, options){
+    function DatePick(elem, options){
         var defaults = {
             
         }
     }
-    
-
-    //...
-    
-    return jeDate; // 返回对象
+    //...  
+    return JeDate; // 返回对象
 });
-
 
 //=====前台调用示例
 jeDate(elem, options);
+
+
+
+
+//——————————————————————————————————————————
+//                  可调用多个方法
+//——————————————————————————————————————————
+;(function(root, factory){
+    if (typeof define === 'function' && define.amd) { // amd
+        define(factory);
+    } else if (typeof exports === 'object') { // umd
+        module.exports = factory();
+    } else {
+        window.JeDate = factory();
+    }
+})(this, function(){
+    var JeDate = function(){
+        var me = this;
+        this.init = function(elem, opts){
+            console.log('init方法：elem1：', elem, '\noptions1：', opts);
+        };
+        this.load = function(elem, opts){
+            console.log('house方法：elem2：', elem, '\noptions2：', opts);
+        };
+    }
+    //... 
+    return JeDate; // 返回对象
+});
+
+//=====前台调用示例
+var date = new JeDate(); // 实例化一个对象
+date.init('.house', {user:"林冲", sex: "男", grade: "梁山泊"}); 
+date.load('.tax',  {source: "数据源"});
 
