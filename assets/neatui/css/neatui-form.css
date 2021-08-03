@@ -134,7 +134,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 
 
 /*+--------左边--------+*/
-.item-l{ width: 70px; margin-right: 8px; }
+.item-l{ position: relative; width: 70px; margin-right: 8px; }
 .item-l label{
     display: block;
     width: 100%;
@@ -368,6 +368,24 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     cursor: pointer;
 }
 .item-cell[data-type="cross"].has-cell-btn{ right: 60px!important; }
+
+
+/*+--------输入框图标--------+*/
+.item-l>.icon,
+.item-r>.icon{
+    position: absolute;
+    left: 5px;
+    width: 16px;
+    height: 16px;
+    background: transparent url('') no-repeat scroll center center / 100% auto;
+}
+.item-r>.icon + input,
+.item-r>.icon + textarea{ padding-left: 26px; }
+.item-l>.icon{ left: 0px; }
+.item-l>.icon + label{ padding-left: 15px; }
+.ne-form.theme-popular .item-r>.icon+input,
+.ne-form.theme-popular .item-r>.icon+textarea{ padding-left: 5px; }
+
 
 /*+--------序号--------+*/
 .eform-order{
