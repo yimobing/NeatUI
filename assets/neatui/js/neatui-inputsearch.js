@@ -157,7 +157,7 @@
          * 子函数：判断是否JSON对象
          */
         function fnIsJson(o) {
-            return typeof o == "object" && o.constructor == Object;
+            return typeof o == "object" && (o != null && o.constructor == Object);
         }
         /**
          * 子函数：判断是否数组
