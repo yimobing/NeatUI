@@ -263,6 +263,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     font-size: 12px;
     color: #999;
 }
+.item-r .r-unit.has-cell-cross{ right: 35px; }
 
 /*右边电话*/
 .item-r .r-tel{
@@ -362,6 +363,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     background-size: 12px auto;
     cursor: pointer;
 }
+.item-cell[data-type="cross"].has-cell-btn{ right: 60px!important; }
 
 /*+--------序号--------+*/
 .eform-order{
@@ -486,6 +488,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .ne-form.has-must-aline .item-cell{ right: -3px; }
 .ne-form.has-must-aline .item-cell.absolute{ right: 20px; }
 .ne-form.has-must-aline .item-cell[data-type="cross"]{ right: 10px!important; }
+.ne-form.has-must-aline .item-cell[data-type="cross"].has-cell-btn{ right: 92px!important; }
 
 /*+----------------主题----------------+*/
 /*+--------主题1：流行（输入框无边线）--------+*/
@@ -506,6 +509,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .ne-form.has-border.has-must-left .item-cell[data-type="must"]{ left: 5px; }
 .ne-form.has-border.has-must-aline .item-r{ padding-right: 15px; }
 .ne-form.has-border.has-must-aline .item-r>em{ right: 25px; }
+.ne-form.has-border.has-must-aline .item-r>em.has-cell-cross{ right: 55px; }
 
 
 
