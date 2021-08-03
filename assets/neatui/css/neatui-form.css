@@ -185,10 +185,14 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     border-radius: 2px;
     color: #586075;
     font-size: 14px;
+    font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', 'Helvetica Neue', 'Helvetica,sans-serif';
 }
 .item-r input[type="text"]{
     height: 35px;
     line-height: 35px;
+}
+.item-r input[type="checkbox"]{
+	margin: 8px 0 8px 0;
 }
 .item-r textarea{
     height: 70px;
