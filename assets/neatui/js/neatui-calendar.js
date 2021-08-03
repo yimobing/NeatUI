@@ -43,7 +43,7 @@ var neuiCalendar = {
 	*/	
 	neDate:function(element,params,callBack){ 
 			var selector = calendarUi.getClassID(element);
-			var obj = typeof(selector)=='object' ? selector : $(selector);
+			var obj = element instanceof jQuery ? (typeof(selector)=='object' ? selector : $(selector)) : $(element); // 判断是dom对象还是jq对象
 			var boolean = true,
 					theme = 'green';
 			var format = 'YYYY-MM-DD', //默认日期格式
