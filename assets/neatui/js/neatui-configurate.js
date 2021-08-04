@@ -41,7 +41,7 @@
             multiple    是否多行(可选)。值: true 是, false 否(默认)
             readonly    是否强制为只读(可选), 默认false
             disabled    是否强制为禁用(可选), 默认false
-            iconName    自定义图标名称(即className)(可选), 默认图标名称为field参数值
+            icon    自定义图标名称(即className)(可选), 默认图标名称为field参数值
             attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"         
 
             --------------------------------
@@ -132,22 +132,6 @@
                 return;
             }
 
-
-
-            // [字段名称]
-            // title       字段名称(中文), 即显示名称
-            // field       字段名称(英文), 即ID属性
-            // type        输入框类型(可选)。值：文本, 日期, 数字, 单选, 下拉
-            // value       初始值(可选), 默认空
-            // unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
-            // phone       是否电话类型(可选)。值：true, false 否(默认)
-            // must        是否必填项(可选)。值：true 是, false 否(默认)
-            // multiple    是否多行(可选)。值: true 是, false 否(默认)
-            // readonly    是否强制为只读(可选), 默认false
-            // disabled    是否强制为禁用(可选), 默认false
-            // iconName    自定义图标名称(即className)(可选), 默认图标名称为field参数值
-            // attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
-
             // ·--------按数据源类型--------
             // ①.数据源类型为“标准数据格式”
             if(me.$opts.type == 'standard'){
@@ -165,7 +149,7 @@
                         multiple = typeof items["multiple"] == 'undefined' ? false : items["multiple"] === true ? true : false,
                         readonly = typeof items["readonly"] == 'undefined' ? false : items["readonly"] === true ? true : false,
                         disabled = typeof items["disabled"] == 'undefined' ? false : items["disabled"] === true ? true : false,
-                        iconName = typeof items["iconName"] == 'undefined' ? field : items["iconName"],
+                        icon = typeof items["icon"] == 'undefined' ? field : items["icon"],
                         attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"];
                     
                     //
@@ -179,6 +163,7 @@
                         types = 'text', // type属性。值: text 文本(默认), number 数字, checkbox 复选(单选、多选)
                         ids = field, // ID属性
                         className = ''; // class属性
+                    //
                     if(type == '文本') {
                         types = 'text';
                     }
@@ -187,32 +172,39 @@
                         readonly = true;
                     }
                     if(type == '数字') {
-                        types = 'number';
+                        // types = 'number';
+                        className = 'click-num';
                     }
                     if(type == '单选') {
                         types = 'checkbox';
+                        className = 'ne-switch';
                     }
                     if(type == '下拉') {
                         readonly = true;
                     }
-                    var _btnStr = ''; // 按钮
                     //
-                    var chooseText = (!readonly ? '请填写' : '请选择') + title,
+                    if(phone){
+                        className += ' click-tel';
+                    }
+                    //
+                    var chooseText = (!readonly ? '请填写' : '请选择'); //+title,
                         _looseFocusStr = !readonly ?  '' : ';this.blur()';
                     var _classNameStr = ' class="' + className + '"',
                         _placeholderStr = !must ? '' : ' placeholder="' + chooseText + '"',
                         _blurStr = !must ? '' : ' onblur="this.placeholder=\'' + chooseText + '\'"';
-                        _focusStr = !must ? '' : ' onfocus="this.placeholder=\'\'' + _looseFocusStr + '"',
+                        _focusStr = !must ? ( !readonly ? '' : ' onfocus="this.blur()"') : ' onfocus="this.placeholder=\'\'' + _looseFocusStr + '"',
                         _readonlyStr = !readonly ? '' : ' readonly',
                         _disabledStr = !disabled ? '' : ' disabled',
+                        _btnStr = '', // 按钮
                         _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
+                        _unitClass = !me.$opts.layout.inputCross ? '' : ' has-cell-cross';
                         _crossClass = ''; // me.$opts.layout.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
                         _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
                     var _attrListStr = ' id="' + ids + '"' + _classNameStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr; // 所有公用属性串
                     //
-                    var _iconStr = iconName == '' ? '' : '<i class="icon icon-' + iconName + '"></i>',
-                        _unitStr = unit == '' ? '' : '<em class="r-unit"></em>',
-                        _phoneStr = phone == '' ? '' : '<em class="r-tel"><a></a></em>';
+                    var _iconStr = icon == '' ? '' : '<i class="icon icon-' + icon + '"></i>',
+                        _unitStr = unit == '' ? '' : '<em class="r-unit' + _unitClass + '">' + unit + '</em>',
+                        _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a></a></em>';
                     var _crossStr = ( types == 'text' && me.$opts.layout.inputCross ) ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' : '',
                         _mustStr = must && me.$opts.layout.inputMust ? '<div class="item-cell" data-type="must">*</div>' : '';
                     //
@@ -286,8 +278,8 @@
 
                     // 右边文字
                     if (val3 != '') {
-                        var _unitStyle = !me.$opts.layout.inputCross ? '' : ' has-cell-cross';
-                        _UHtml = '<em class="r-unit' + _unitStyle + '">' + val3 + '</em>';
+                        var _unitClass = !me.$opts.layout.inputCross ? '' : ' has-cell-cross';
+                        _UHtml = '<em class="r-unit' + _unitClass + '">' + val3 + '</em>';
                     }			
 
                     // 隐藏值1是空时
@@ -460,7 +452,6 @@
                 Array.from(dateNode).forEach(function(el, i){
                     if(typeof neuiCalendar == 'object'){
                         if(typeof neuiCalendar.neDate === 'function'){
-                            // console.log('el：', el);
                             neuiCalendar.neDate(el, {
                                 empty: me.$opts.controls.calendar.empty,
                                 theme: me.$opts.controls.calendar.theme,
@@ -474,7 +465,7 @@
             }
 
             // 数字类型
-            var numeralNode = document.getElementsByClassName('click-num'); // 数字类型
+            var numeralNode = document.getElementsByClassName('click-num');
             if(me.$opts.controls.keyboard.enable){
                 // 调用数字键盘控件
                 Array.from(numeralNode).forEach(function(el, i){
@@ -506,6 +497,29 @@
                     })
                 })
             }
+
+            // 电话类型(电话高亮)
+            var inputNode = document.getElementsByClassName('click-tel');
+            Array.from(inputNode).forEach(function(el, i){
+                el.addEventListener('input', function(){ // 输入事件
+                    var value = this.value;
+                    var reg = /[^\d\-]/g; // 只允许输入数字、短横线
+                    value = value.toString().replace(reg,'');
+                    value = tools.repeatedChar(value, '-'); // 只保留一个短横线
+                    this.value = value;
+                    var next = tools.getNextElement(this);
+                    if(next != null){
+                       var child = tools.getFirstChildElement(next);
+                       var className = child.className;
+                        if(tools.isTel(value)){
+                            child.className += className.indexOf('hover') >= 0 ? '' : 'hover';
+                        }else{
+                            child.className = '';
+                        }
+                    }
+                })   
+            })
+
             
             // ·--------操作事件--------
             // 单选开关
@@ -545,13 +559,14 @@
                 })
             })
 
-            // 输入框元素在输入或点击时，打叉图标根据需要显示或隐藏
+            // 输入框元素在输入或点击时
             var inputNode = document.querySelectorAll('input[type="text"], textarea');
             Array.from(inputNode).forEach(function(el, i){
                 el.addEventListener('input', function(){ // 输入事件
                     var value = this.value;
                     var next = tools.getNextElement(this.parentNode);
                     if(next != null){
+                        // 打叉图标根据需要显示或隐藏
                         this.value.toString().replace(/([ ]+)/g, '') !== '' ? next.style = '' : next.style = 'display: none;';
                     }
                 })
@@ -560,6 +575,7 @@
                     var next = tools.getNextElement(this.parentNode);
                     var oldValue = this.value;
                     if(next != null){
+                        // 打叉图标根据需要显示或隐藏
                         var intervals = null;
                         var seconds = 0;
                         intervals = setInterval(function(){ // 定时器监测输入框是否发生了变化
@@ -926,7 +942,52 @@
                 return ps_str.indexOf(s) == index ? s : ( char == '' ? '' : (char == s ? '' : s) );
             })
             return result;
-        }
+        },
+
+        /**
+         * 判断是否手机号码(正则表达式验证)
+         * @param {string} str 电话字符串
+         * @param {options} 验证类型等参数组成的对象. eg. {pattern: "mobilephone"}.
+         * @returns {boolean} 返回布尔值. true 是, false 否
+         */
+        isTel:function(str, options){
+            var defaults = {
+                mode: "standard", //校验模式. standard 标准模式,严格校验电话格式(默认), loose 宽松模式,只校验电话位数
+                pattern: "mobilephone", //验证类型(只在mode="standard"时有效). mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
+                bit: { //校验的电话位数(只在mode="loose"时有效)
+                    from: 6, //校验6位.与to配合使用,可与to值相等
+                    to: 12 //校验12位.与from配合使用,可与from值相等
+                }
+            }
+            var settings = $.extend(true, {}, defaults, options || {});
+            var mode = settings.mode,
+                pattern = settings.pattern;
+                bit = settings.bit;
+            var from = parseInt(bit.from),
+                to = parseInt(bit.to);
+
+            var bools = false;
+            if(mode == 'standard'){ //标准校验模式
+                //var reg1 = /^0?1[3|4|5|7|8|9][0-9]\d{8}$/; //手机号码：13,14,15,17,18,19开头电话号码
+                var reg1 = /^(0|86)?1\d{10}$/; //手机号码：11位数字. 最前面的 0是长途冠码, 86是中国区号
+                var reg2 = /^((0|\+)?86(\s{1})?)?(0?\d{2,3}(\-|\s{1})?)?\d{7,8}$/; //固定电话：前面086或+86是中国区号, 中间10或010或0595是区号, 后面7-8位是号码	
+                if(pattern == 'mobilephone'){ //只能移动电话
+                    bools = reg1.test($.trim(str)) ? true : false;
+                }
+                if(pattern == 'telephone'){ //只能固话(固定电话)
+                    bools = reg2.test(str) ? true : false;
+                }
+                if(pattern == 'both'){ //移动电话或固话
+                    bools = reg1.test($.trim(str)) || reg2.test(str) ? true : false;
+                }
+            }else{ //宽松校验模式
+                //if(str.trim().length == 11) return true; //只检验是否11位
+                //if(str.trim().length <= 12 && str.trim().length >= 6) return true; //只检验是否6-12位(含固话、手机号）,不兼容ie8(若节点不存在，直接str.trim()会报错）
+                if($.trim(str).length <= to && $.trim(str).length >= from) return true; //只检验是否6-12位(含固话、手机号), 兼容ie8及以下版本
+            }
+
+            return bools;
+        },
 
     };
     
