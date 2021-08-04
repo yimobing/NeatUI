@@ -196,10 +196,10 @@ if(typeof jQuery == 'undefined'){
 							_label = dFormat.value[0],
 							_disabled = dFormat.forbid;
 						var value = typeof items[_value] == 'undefined' ? level1Ids : items[_value],
-							label = typeof items[_label] == 'undefined' ? '' : items[_label],
+							label = typeof items[_label] == 'undefined' ? 'undefined' : items[_label],
 							disabled = typeof items[_disabled] == 'undefined' ? false : (items[_disabled] === true ? true : false);
-						if(label == ''){
-							var errs = '警告！自定义数据源字段format参数的字段名有错误，请检查！';
+						if(label == 'undefined'){
+							var errs = '警告！自定义数据源字段format参数的字段名' + _label + '有错误，请检查！';
 							alert(errs);
 							console.log(errs);
 							isGoOn = false;
