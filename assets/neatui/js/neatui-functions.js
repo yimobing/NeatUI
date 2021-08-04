@@ -910,6 +910,100 @@ var utilities = {
     },
 
 
+    /**
+     * 原生js获取子节点集合 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {NodeList || null} 返回子节点集合或null
+     */
+    getChildElement: function(o){
+        if(o == null) return null;
+        var children = o.childNodes;
+        for (var i = 0; i < children.length; i++) {
+            var s = children[i].nodeName,
+                r = children[i].nodeValue;
+            if (s == "#text" && /\s/.test(r)) { // 文本节点或空节点(空或换行)
+                o.removeChild(children[i]);
+            }
+        }
+        return o.childNodes;
+    },
+
+
+    /**
+     * 原生js获取下一个兄弟节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {HTML DOM || null} 返回元素节点或null
+     */
+    getNextElement: function(o){
+        if(o == null) return null;
+        var e = o.nextSibling;
+        if(e == null){ // 测试节点是否存在，否则返回null
+            return null;
+        }
+        if(e.nodeType == 3){ // 如果元素为文本节点
+            var two = this.getNextElement(e);
+            if(two.nodeType == 1)
+                return two;
+        }else{
+            if(e.nodeType == 1){ // 确认节点为元素节点才返回
+                return e;
+            }else{
+                return null;
+            }
+        }
+    },
+    
+
+    /**
+     * 原生js获取上一个兄弟节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {HTML DOM || null} 返回元素节点或null
+     */
+    getPrevElement: function(o){
+        if(o == null) return null;
+        var e = o.previousSibling;
+        if(e == null){ // 测试节点是否存在，否则返回null
+            return null;
+        }
+        if(e.nodeType == 3){ // 如果元素为文本节点
+            var two = this.getPrevElement(e);
+            if(two.nodeType == 1)
+                return two;
+        }else{
+            if(e.nodeType == 1){ // 确认节点为元素节点才返回
+                return e;
+            }else{
+                return null;
+            }
+        }
+    },
+
+
+    /**
+     * 原生js获取第一个子节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {HTML DOM || null} 返回元素节点或null
+     */
+    getFirstChildElement: function(o){
+        if(o == null) return null;
+        return o.children[0];
+    },
+
+
+    /**
+     * 原生js获取最后一个子节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {HTML DOM || null} 返回元素节点或null
+     */
+        getLastChildElement: function(o){
+        if(o == null) return null;
+        return o.children[o.children.length - 1];
+    },
 
     /**
      * 原生js获取元素style属性
@@ -952,10 +1046,11 @@ var utilities = {
             docMarTop = Math.ceil(docStyle.marginTop.toString().replace(/([\px]+)/g, ''));
         actualTop += docMarTop;
         return actualTop;
-    },    
+    },
+
 
      /**
-     * 获取元素到浏览器左侧的距离，即offsetLeft
+     * 原生js获取元素到浏览器左侧的距离，即offsetLeft
      * 注：不能直接使用obj.offsetLeft，因为它获取的是你绑定元素上边框相对离自己最近且position属性为非static的祖先元素的偏移量
      * @param {HTML DOM} element DOM元素。
      * @returns {number} 返回距离值
@@ -974,6 +1069,7 @@ var utilities = {
         actualLeft += ( window.innerWidth == docW || document.documentElement.clientWidth == docW || document.body.clientWidth == docW ) ? 0 : Math.ceil( (winW - docW) / 2 );
         return actualLeft;
     },
+
 
     /**
      * 原生js append字符串
@@ -1021,6 +1117,7 @@ var utilities = {
         fragment = null;
     },
 
+
     /**
      * 原生js在已存在的节点向后面插入新节点(兼容ie9-)
      * @param {HTML DOM} newNode 新节点
@@ -1041,6 +1138,7 @@ var utilities = {
             parent.insertBefore(newNode, siblingNode);
         }
     },
+    
 
     /**
      * 原生js移除指定节点(兼容ie11-)
