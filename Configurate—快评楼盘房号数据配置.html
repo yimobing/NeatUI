@@ -19,6 +19,7 @@
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css"><!--日历控件-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-configurate.css"><!--楼盘房号数据配置-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-picker.css"><!--Picker选择器-->
     <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
     <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
 </head>
@@ -27,7 +28,7 @@
         <main>
             <div class="mortgage"></div>
             <div class="tax"></div>
-            <div id="mortgage"></div>
+           
         </main>
     </div><!--/.wrap-->
     <!--================================================================================-->
@@ -36,6 +37,7 @@
     <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
     <script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
     <script type="text/javascript" src="assets/neatui/js/neatui-configurate.js"></script><!--楼盘房号数据配置控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-picker.js"></script><!--Picker选择器-->
     <script type="text/javascript">
         /*+----------------全局变量----------------+*/
         /*+----------------FUNCTION----------------+*/
@@ -106,7 +108,7 @@
                     theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
                     inputIcon: false, // 输入框是否使用图标(可选), 默认false
                     inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
-                    inputMust: true, // 输入框不能为空时右侧是否显示星号(可选), 默认true
+                    inputMust: false, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
                     houseRightButton: true // 是否楼盘名称右侧显示查询按钮(可选), 默认false
                 },
                 controls: { // 控件调用(可选)
@@ -144,6 +146,42 @@
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             /*+----------------------------------------+*/
             //=====xx点击事件
+
+            var nCount = 0;
+            $(document).on('click', '#build', function(){
+                // console.log('我这里');
+                // nCount++;
+                // var value = nCount <= 1 ? '第1幢' : '';
+                // if(nCount >= 2) value = '';
+                // if(nCount >= 3) value = '第3幢';
+                // if(nCount >= 4) value = '';
+                // if(nCount >= 5) value = '第5幢';
+                // $(this).val(value);
+                var normalJson = {
+                    "data":[
+                        {"bh":"1001", "mc":""},
+                        {"bh":"1001", "mc":"3幢"},
+                        {"bh":"1002", "mc":"建设银行"},
+                        {"bh":"1003", "mc":"民生银行"},
+                        {"bh":"1004", "mc":"农业银行"},
+                        {"bh":"1005", "mc":"工商银行"}
+                    ]
+                }
+                $(this).neuiPicker({
+                    caption: "选择银行",
+                    source: normalJson,
+                    format: {
+                        value: ["mc"],
+                        hid: ["bh"],
+                        forbid: "disabled"
+                    },
+                    value: "工商银行",
+                    onConfirm: function (e) {
+                        // console.log('您点了确定', e);
+                    }
+                })
+
+            });
         });
     </script>
 
