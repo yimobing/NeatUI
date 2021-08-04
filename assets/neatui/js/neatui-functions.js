@@ -944,7 +944,7 @@ var utilities = {
         }
         if(e.nodeType == 3){ // 如果元素为文本节点
             var two = this.getNextElement(e);
-            if(two.nodeType == 1)
+            if(two != null && two.nodeType == 1)
                 return two;
         }else{
             if(e.nodeType == 1){ // 确认节点为元素节点才返回
@@ -970,7 +970,7 @@ var utilities = {
         }
         if(e.nodeType == 3){ // 如果元素为文本节点
             var two = this.getPrevElement(e);
-            if(two.nodeType == 1)
+            if(two != null && two.nodeType == 1)
                 return two;
         }else{
             if(e.nodeType == 1){ // 确认节点为元素节点才返回
@@ -1138,7 +1138,7 @@ var utilities = {
             parent.insertBefore(newNode, siblingNode);
         }
     },
-    
+
 
     /**
      * 原生js移除指定节点(兼容ie11-)
