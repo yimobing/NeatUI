@@ -4,7 +4,7 @@
  * 楼盘房号数据配置
  * Author: ChenMufeng
  * Date: 2021.08.02
- * Update: 2021.08.02
+ * Update: 2021.08.04
  */
 
 /*+--------------------------------+*/
@@ -34,7 +34,7 @@ body{ padding: 10px 25px!important; }
 /*+--------------------------------+*/
 .neConfigurate.theme-popular .item-l{ width: 90px; }
 .neConfigurate .icon{
-    background: transparent url('../img/bmap_locate_red.png') no-repeat scroll center center / 100% auto;
+    background: transparent url('') no-repeat scroll center center / 100% auto;
 }
 
 .icon-house{ background-image: url('../img/config_mod_icon_loupan.png')!important; }
@@ -48,6 +48,8 @@ body{ padding: 10px 25px!important; }
 .icon-tel{ background-image: url('../img/config_mod_icon_tel.png')!important; }
 .icon-tel.hover{ background-image: url('../img/config_mod_icon_tel_blue.png')!important; }
 .icon-mobile{ background-image: url('../img/config_mod_icon_mobile.png')!important; }
+.icon-loan{ background-image: url('../img/config_mod_icon_loan.png')!important; }
+.icon-user{ background-image: url('../img/config_mod_icon_user.png')!important; }
 .icon-locate{ background-image: url('../img/config_mod_icon_locate.png')!important; }
 .icon-category{ background-image: url('../img/config_mod_icon_category.png')!important; }
 .icon-purpose{ background-image: url('../img/config_mod_icon_purpose.png')!important; }
