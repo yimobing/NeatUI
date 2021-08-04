@@ -69,7 +69,6 @@
             //=====
             var example = new NeConfiguration(); // 实例化控件
             
-            
             /**
                 --------------------------------
                 ①. 数据源类型为“标准数据格式”
@@ -85,20 +84,22 @@
                 multiple    是否多行(可选)。值: true 是, false 否(默认)
                 readonly    是否强制为只读(可选), 默认false
                 disabled    是否强制为禁用(可选), 默认false
-                iconName    自定义图标名称(即className)(可选), 默认图标名称为field参数值
+                icon    自定义图标名称(即className)(可选), 默认图标名称为field参数值
                 attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
             */
             //——————————————————————————————————————————
-            // 
+            //===== 加载静态表单(常规数据)
             var regularJson = {
                 data:[
-                    {title:"评估目的", field:"purpose", type:"下拉", value:"", must:false},
-                    {title:"贷款品种", field:"loan", type:"下拉", value:"", must:false},
-                    {title:"客户姓名", field:"user", type:"文本", value:"张三", must:false},
-                    {title:"客户电话", field:"mobile", type:"文本", value:"", must:false},
-                    {title:"抵押物所在地", field:"locate", type:"下拉", value:"", must:false},
-                    {title:"抵押物类型", field:"category", type:"下拉", value:"", must:false},
-                    {title:"测试1", field:"tokyo", type:"文本", value:"中国", must:true}
+                    {title:"评估目的", field:"purpose", type:"下拉", value:"", must:true},
+                    {title:"贷款品种", field:"loan", type:"下拉", value:"", must:true},
+                    {title:"客户姓名", field:"user", type:"文本", value:"张三", must:true},
+                    {title:"客户电话", field:"mobile", type:"文本", value:"", must:true, phone: true},
+                    {title:"抵押物所在地", field:"locate", type:"下拉", value:"", must:true},
+                    {title:"抵押物类型", field:"category", type:"下拉", value:"", must:true},
+                    {title:"日期", field:"tokyo", type:"日期", value:"", must:false},
+                    {title:"数字", field:"tokyo", type:"数字", value:"", must:false},
+                    {title:"单选", field:"tokyo", type:"单选", value:"", must:false}
                 ]
             }
 
@@ -163,7 +164,7 @@
 
              */
 
-            // 配置数据
+            // 加载动态表单(配置数据)
             var conditionJson = {
                 data:[
                     {val1:"楼盘名称", val2:"万达广场", val3:"", val4:"请输入楼盘", hid1:"楼盘", hid2:"", hid3:"", hid4:"1", hid5:"1", hid6:"楼盘名称"},
@@ -210,10 +211,6 @@
                     }
                 }
             });
-
-
-    
-
 
 
 
