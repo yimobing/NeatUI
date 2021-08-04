@@ -65,14 +65,14 @@
                 source: {}, // 数据源
                 layout: { // 布局(可选)
                     theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
-                    inputIcon: false, // 输入框是否使用图标(可选), 默认false
-                    inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
-                    inputMust: true, // 输入框不能为空时右侧是否显示星号(可选), 默认true
-                    houseRightButton: false // 是否楼盘名称右侧显示查询按钮(可选), 默认false
+                    inputIcon: false, // 输入框是否使用图标(可选), 默认 false
+                    inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认 true
+                    inputMust: false, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                    houseRightButton: false // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
                 },
                 controls: { // 控件调用(可选)
                     calendar: {  // 日历控件(可选)
-                        enable: true, // 是否启用(可选)，默认true
+                        enable: true, // 是否启用(可选)，默认 true
                         empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
                         theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
                         format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
@@ -92,10 +92,9 @@
             me.$elem = element; // 节点ID或Class属性值(含选择器符号井号#或点号.). eg.'#floor', '.floor'
             me.$obj = document.getElementById(selector) == null ? document.getElementsByClassName(selector)[0] : document.getElementById(selector); // 元素dom对象
             // console.log('生成房号配置数据\nelem：', me.$elem, '\noptions：',me.$opts);
-
-            me.$obj.className += 'neConfigurate ne-form';
+            // --------添加class属性--------
+            me.$obj.className += ' neConfigurate ne-form';
             me.$obj.className += me.$opts.layout.theme != 'popular' ? '' : ' theme-popular';
-
             //
             var source = me.$opts.source;
             // ·--------校验数据格式--------
@@ -128,6 +127,7 @@
                     _onblur = ' onblur="this.placeholder=\'' + val4 + '\'"';
                 var	_LHtml = '', // 左边内容
                     _UHtml = '', // 单位等内容
+                    _btnHtml = '', // 按钮内容
                     _RHtml = ''; // 右边内容
                 var _mustHtml = hid5 != '1' ? '' : '<div class="item-cell" data-type="must">*</div>'; // 必填项星号*
                 // 输入框
@@ -204,9 +204,9 @@
                                 className += ' click-search';
                                 ids = 'house';
                                 icons = ' icon-house';
-                                boxWidth = '100%';
+                                // boxWidth = '100%';
                                 if(me.$opts.layout.houseRightButton)
-                                    _RHtml = '<div class="item-cell"><button type="button" id="btn-query-house">查询</button></div>';
+                                    _btnHtml = '<div class="item-cell"><button type="button" id="btn-query-house">查询</button></div>';
                             }else{
                                 className += ' click-hand';
                                 readonly = true;
@@ -274,12 +274,18 @@
                     }
                     _LHtml = '<input type="' + types + '"' + _idStr + ' class="' + className + '" value="' + value + '"' + _hideStr + _hid1 + _hid3 + _hid5 + _hid6 + _checkStr + '>';
                 }
-                
-
-                var _crossStyle = me.$opts.layout.houseRightButton && _RHtml != '' ? ' has-cell-btn' : '';
-                _RHtml += me.$opts.layout.inputCross && types == 'text' ? '<div class="item-cell' + _crossStyle + '" data-type="cross"></div>' : '';
-                var _boxWClass = boxWidth == '' ? '' : (boxWidth == '100%' ? ' w-100' : '');
-                var _iconStr = icons == '' || me.$opts.layout.inputIcon === false ? '' : '<i class="icon' + icons + '"></i>';
+                //
+                var _boxWClass = ''; // boxWidth == '' ? '' : (boxWidth == '100%' ? ' w-100' : ''); // 宽
+                var _iconStr = icons == '' || me.$opts.layout.inputIcon === false ? '' : '<i class="icon' + icons + '"></i>'; // 图标
+                //
+                var _crossClass = me.$opts.layout.houseRightButton && _btnHtml != '' ? ' has-cell-btn' : '';
+                var _crossStyle = val2.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
+                _RHtml += types == 'text' && me.$opts.layout.inputCross 
+                            ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' 
+                            : 
+                            '';
+                _RHtml += _btnHtml; // 右侧内容
+                // 拼接HTML
                 var _outerHtml = [
                         '<div class="eform-row' +  _boxWClass + '">',
                             '<div class="item-l">',
@@ -296,6 +302,7 @@
                         '</div>'
                 ].join('\r\n');
                 tools.appendHTML(_outerHtml, me.$obj);
+
             } // END FOR
 
             // ·--------根据控件类型调用相应控件--------
@@ -329,7 +336,7 @@
                             title:'数字键盘'
                             // mode: 'computer',
                             // size: 'normal' // 键盘尺寸,仅在mode='computer'时有效(可缺省). normal 正常(默认), small 小型, little 较小型, tiny 微型	
-                            // hasPoint:false, // 是否有小数点(可缺省),默认true
+                            // hasPoint:false, // 是否有小数点(可缺省),默认 true
                         })
                     }
                 })
@@ -371,7 +378,8 @@
             // 打叉图标
             var crossNode = document.querySelectorAll('[data-type="cross"]');
             Array.from(crossNode).forEach(function(el, i){
-                el.addEventListener('click', function(){
+                el.addEventListener('click', function(e){
+                    e.stopPropagation();
                     var siblingArr = [];
                     var brother = this.parentNode.children;
                     for(var i = 0, len = brother.length; i < len; i++){ // 获取兄弟节点
@@ -382,11 +390,46 @@
                         for(var i = 0, len = child.length; i < len; i++){
                             var tagname = child[i].tagName.toString().toLocaleLowerCase();                          
                             if(tagname == 'input' || tagname == 'textarea'){
-                                child[i].value = '';
+                                child[i].value = ''; // 清空输入框值
+                                el.style = 'display: none;'; // 隐藏打叉图标
                             }
                         }
                     })
                 })
+            })
+
+            // 输入框元素在输入或点击时，打叉图标根据需要显示或隐藏
+            var inputNode = document.querySelectorAll('input[type="text"], textarea');
+            Array.from(inputNode).forEach(function(el, i){
+                el.addEventListener('input', function(){ // 输入事件
+                    var value = this.value;
+                    var next = tools.getNextElement(this.parentNode);
+                    if(next != null){
+                        this.value.toString().replace(/([ ]+)/g, '') !== '' ? next.style = '' : next.style = 'display: none;';
+                    }
+                })
+                el.addEventListener('click', function(){ // 点击事件
+                    var _this = this;
+                    var next = tools.getNextElement(this.parentNode);
+                    var oldValue = this.value;
+                    if(next != null){
+                        var intervals = null;
+                        var seconds = 0;
+                        intervals = setInterval(function(){ // 定时器监测输入框是否发生了变化
+                            seconds++;
+                            var newValue = _this.value;
+                            // console.log('老值：', oldValue, '\n新值：', newValue, '\n当前秒数：', seconds);
+                            // console.log('---------------')
+                            if(newValue != oldValue){
+                                newValue.toString().replace(/([ ]+)/g, '') !== '' ? next.style = '' :  next.style = 'display: none;';
+                            }
+                            if(seconds > 6){ // N秒后关闭定时器
+                                clearInterval(intervals);
+                                intervals = null;
+                            }
+                        }, 1000)
+                    }
+                })      
             })
         };
 
@@ -545,6 +588,104 @@
             var tmpStr = ps_str.toString().replace(/([\.]+)/g, ' ');
             return ps_str.indexOf('.') == 0 ? (tmpStr.substr(1, tmpStr.length)) : tmpStr;
         },
+
+
+
+        /**
+         * 原生js获取子节点集合 (兼容ie6+)
+         * 注：已排除文本、空格，换行符
+         * @param {HTML DOM} o 当前节点
+         * @returns {NodeList || null} 返回子节点集合或null
+         */
+        getChildElement: function(o){
+            if(o == null) return null;
+            var children = o.childNodes;
+            for (var i = 0; i < children.length; i++) {
+                var s = children[i].nodeName,
+                    r = children[i].nodeValue;
+                if (s == "#text" && /\s/.test(r)) { // 文本节点或空节点(空或换行)
+                    o.removeChild(children[i]);
+                }
+            }
+            return o.childNodes;
+        },
+            
+
+        /**
+         * 原生js获取下一个兄弟节点 (兼容ie6+)
+         * 注：已排除文本、空格，换行符
+         * @param {HTML DOM} o 当前节点
+         * @returns {HTML DOM || null} 返回元素节点或null
+         */
+        getNextElement: function(o){
+            if(o == null) return null;
+            var e = o.nextSibling;
+            if(e == null){ // 测试节点是否存在，否则返回null
+                return null;
+            }
+            if(e.nodeType == 3){ // 如果元素为文本节点
+                var two = this.getNextElement(e);
+                if(two != null && two.nodeType == 1)
+                    return two;
+            }else{
+                if(e.nodeType == 1){ // 确认节点为元素节点才返回
+                    return e;
+                }else{
+                    return null;
+                }
+            }
+        },
+
+
+        /**
+         * 原生js获取上一个兄弟节点 (兼容ie6+)
+         * 注：已排除文本、空格，换行符
+         * @param {HTML DOM} o 当前节点
+         * @returns {HTML DOM || null} 返回元素节点或null
+         */
+         getPrevElement: function(o){
+            if(o == null) return null;
+            var e = o.previousSibling;
+            if(e == null){ // 测试节点是否存在，否则返回null
+                return null;
+            }
+            if(e.nodeType == 3){ // 如果元素为文本节点
+                var two = this.getPrevElement(e);
+                if(two != null && two.nodeType == 1)
+                    return two;
+            }else{
+                if(e.nodeType == 1){ // 确认节点为元素节点才返回
+                    return e;
+                }else{
+                    return null;
+                }
+            }
+        },
+  
+
+        /**
+         * 原生js获取第一个子节点 (兼容ie6+)
+         * 注：已排除文本、空格，换行符
+         * @param {HTML DOM} o 当前节点
+         * @returns {HTML DOM || null} 返回元素节点或null
+         */
+        getFirstChildElement: function(o){
+            if(o == null) return null;
+            return o.children[0];
+        },
+
+        /**
+         * 原生js获取最后一个子节点 (兼容ie6+)
+         * 注：已排除文本、空格，换行符
+         * @param {HTML DOM} o 当前节点
+         * @returns {HTML DOM || null} 返回元素节点或null
+         */
+         getLastChildElement: function(o){
+            if(o == null) return null;
+            return o.children[o.children.length - 1];
+        },
+
+
 
          /**
          * 原生js append字符串
