@@ -5,7 +5,7 @@
  * 说明：兼容IE8+
  * Author: Mufeng
  * Date: 2021.01.09
- * Update: 2021.08.03
+ * Update: 2021.08.04
  */
 
 /*+--------------------------------+*/
@@ -344,6 +344,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     transform: translateY(-50%);
     top: 12px\9;
     transform: translateY(0)\9;
+    width: 12px;
 	color: #ff0000;
 }
 /*细胞提示文字*/

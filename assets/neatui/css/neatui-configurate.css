@@ -23,7 +23,7 @@ a{ color: inherit; text-decoration: none; background-color: transparent; }
 i, em{ font-style: normal; }
 
 /*+--------------------------------+*/
-body{ padding: 10px 15px; }
+body{ padding: 10px 25px!important; }
 
 
 /*+--------------------------------+*/

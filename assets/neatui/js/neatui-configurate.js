@@ -25,8 +25,28 @@
 
         /**
          * ********************************
-         *          楼盘房号数据配置
+         *          数据源字段说明
          * ********************************
+            --------------------------------
+            ①. 数据源类型为“标准数据格式”
+            --------------------------------
+            [字段名称]
+            title       字段名称(中文), 即显示名称
+            field       字段名称(英文), 即ID属性
+            type        输入框类型(可选)。值：文本,日期, 数字, 单选, 下拉
+            value       初始值(可选), 默认空
+            unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
+            phone       是否电话类型(可选)。值：true, false 否(默认)
+            must        是否必填项(可选)。值：true 是, false 否(默认)
+            multiple    是否多行(可选)。值: true 是, false 否(默认)
+            readonly    是否强制为只读(可选), 默认false
+            disabled    是否强制为禁用(可选), 默认false
+            iconName    自定义图标名称(即className)(可选), 默认图标名称为field参数值
+            attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"         
+
+            --------------------------------
+            ②.数据源类型为“楼盘房号数据格式”
+            --------------------------------
             [字段说明]
             val 表示显示值(要显示在界面上)，
             hid 表示隐藏值(无须显示在界面上,只需隐藏起来,后续操作能取到值即可)
@@ -54,6 +74,8 @@
             保存时，要取到显示值2、隐藏值5、隐藏值6；
         */
 
+
+
         /**
          * 生成楼盘房号数据配置表单
          * @param {HTML DOM} elem 绑定的dom节点
@@ -63,11 +85,13 @@
         me.houses = function(element, options){
             var defaults = {
                 source: {}, // 数据源
+                type: "standard", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
                 layout: { // 布局(可选)
                     theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
                     inputIcon: false, // 输入框是否使用图标(可选), 默认 false
                     inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认 true
                     inputMust: false, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                    mustAlign: "left", // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
                     houseRightButton: false // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
                 },
                 controls: { // 控件调用(可选)
@@ -95,6 +119,7 @@
             // --------添加class属性--------
             me.$obj.className += ' neConfigurate ne-form';
             me.$obj.className += me.$opts.layout.theme != 'popular' ? '' : ' theme-popular';
+            me.$obj.className += me.$opts.layout.inputMust && me.$opts.layout.mustAlign == 'left' ? ' has-must-left' : '';
             //
             var source = me.$opts.source;
             // ·--------校验数据格式--------
@@ -106,204 +131,326 @@
                 alert('source参数不含data属性，请检查！');
                 return;
             }
-            // ·--------循环项--------
-            for(var i = 0; i < source.data.length; i++){
-                var items = source.data[i];
-                var val1 = items.val1,
-                    val2 = items.val2,
-                    val3 = items.val3,
-                    val4 = items.val4,
-                    hid1 = items.hid1,
-                    hid2 = items.hid2,
-                    hid3 = items.hid3,
-                    hid4 = items.hid4,
-                    hid5 = items.hid5,
-                    hid6 = items.hid6;
-                var _hid1 = ' data-hid1="' + hid1 + '"', 
-                    _hid3 = ' data-hid3="' + hid3 + '"', 
-                    _hid5 = ' data-hid5="' + hid5 + '"', 
-                    _hid6 = ' data-hid6="' + hid6 + '"';
-                var _placeholder = ' placeholder="' + val4 + '"',
-                    _onblur = ' onblur="this.placeholder=\'' + val4 + '\'"';
-                var	_LHtml = '', // 左边内容
-                    _UHtml = '', // 单位等内容
-                    _btnHtml = '', // 按钮内容
-                    _RHtml = ''; // 右边内容
-                var _mustHtml = hid5 != '1' ? '' : '<div class="item-cell" data-type="must">*</div>'; // 必填项星号*
-                // 输入框
-                var tagName = 'input', // 标签类型。值：input(默认), radio, textarea
-                    types = 'text'; // type属性。值: text 文本(默认), number 数字, checkbox 复选(单选、多选)
-                    ids = '', // ID属性
-                    className = 'click-input', // class属性
-                    readonly = false; // 输入框是否只读。 true 只读,不允许手动输入，false 可手动输入
-                // 其它
-                var  icons = '', // 输入框修饰图标
-                    boxWidth = ''; // box宽度
 
-                // 右边文字
-                if (val3 != '') {
-                    var _unitStyle = !me.$opts.layout.inputCross ? '' : ' has-cell-cross';
-                    _UHtml = '<em class="r-unit' + _unitStyle + '">' + val3 + '</em>';
-                }			
 
-                // 隐藏值1是空时
-                if (hid1 == '') {	
-                    if (hid4.toString() == '1') { // 多行文本
-                        tagName = 'textarea';
-                        className += ' click-textarea';
-                        icons = ' icon-textarea';
-                    }else{ // 单行文本
-                        className += ' click-single-input';
-                        icons = ' icon-text';
+
+            // [字段名称]
+            // title       字段名称(中文), 即显示名称
+            // field       字段名称(英文), 即ID属性
+            // type        输入框类型(可选)。值：文本, 日期, 数字, 单选, 下拉
+            // value       初始值(可选), 默认空
+            // unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
+            // phone       是否电话类型(可选)。值：true, false 否(默认)
+            // must        是否必填项(可选)。值：true 是, false 否(默认)
+            // multiple    是否多行(可选)。值: true 是, false 否(默认)
+            // readonly    是否强制为只读(可选), 默认false
+            // disabled    是否强制为禁用(可选), 默认false
+            // iconName    自定义图标名称(即className)(可选), 默认图标名称为field参数值
+            // attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
+
+            // ·--------按数据源类型--------
+            // ①.数据源类型为“标准数据格式”
+            if(me.$opts.type == 'standard'){
+                var _outerHtml = '';
+                // 循环项
+                for(var i = 0; i < source.data.length; i++){
+                    var items = source.data[i];
+                    var title = items["title"],
+                        field = items["field"],
+                        type = typeof items["type"] == 'undefined' ? '文本' : items["type"],
+                        value = typeof items["value"] == 'undefined' ? '' : items["value"],
+                        unit = typeof items["unit"] == 'undefined' ? '' : items["unit"],
+                        phone = typeof items["phone"] == 'undefined' ? false : items["phone"] === true ? true : false,
+                        must = typeof items["must"] == 'undefined' ? false : items["must"] === true ? true : false,
+                        multiple = typeof items["multiple"] == 'undefined' ? false : items["multiple"] === true ? true : false,
+                        readonly = typeof items["readonly"] == 'undefined' ? false : items["readonly"] === true ? true : false,
+                        disabled = typeof items["disabled"] == 'undefined' ? false : items["disabled"] === true ? true : false,
+                        iconName = typeof items["iconName"] == 'undefined' ? field : items["iconName"],
+                        attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"];
+                    
+                    //
+                    var _LHtml = '', // 左边内容
+                        _RHtml = '', // 右边内容
+                        _UHtml = '', // 单位、电话内容
+                        _IcoHtml = ''; // 图标内容
+                   
+                    // 输入框
+                    var tagName = !multiple ? 'input' : 'textarea', // 标签类型。值：input(默认), radio, textarea
+                        types = 'text', // type属性。值: text 文本(默认), number 数字, checkbox 复选(单选、多选)
+                        ids = field, // ID属性
+                        className = ''; // class属性
+                    if(type == '文本') {
+                        types = 'text';
                     }
-                } else { // 隐藏值1是“无”时	
-                    if (hid1 == '无') {
-                        if (hid2 == '日期') { // 调用日期控件
-                            className += ' click-date';
-                            icons = ' icon-calendar';
-                            me.$opts.controls.calendar.enable ? readonly = true : readonly = false;
-                        }			
-                        if (hid2 == '数字') { // 调用数字键盘
-                            className += ' click-num';
-                            icons = ' icon-numeric';
-                            me.$opts.controls.keyboard.enable ? readonly = true : readonly = false;
-                            // types = 'number'; // 只能输入数字(部分手机不支持)
-                            if (val1.indexOf('面积') >= 0) icons = ' icon-metre';
-                        }
-                        if (hid2 == '单选') {
-                            tagName = 'radio';
-                            className += ' click-radio ne-switch';
-                            types = 'checkbox';
-                        }
-                        if (hid2 == '下拉') {
-                            className += ' click-dropdown';
-                            icons = ' icon-drop';
-                            readonly = true;
-                        }
-                        if (hid2 == '无' || hid2 == '') {
-                            if (hid4.toString() == '1') { // 多行文本
-                                tagName = 'textarea';
-                                className += ' click-textarea';
-                                icons = ' icon-textarea';
-                            }else{ // 单行文本
-                                className += ' click-single-input';
-                                icons = ' icon-text';
-                            }
-                        }
-
-                    } else { // 隐藏值1不是"无"
-
-                        // 注：click-hand 表示可从下拉切换成手动输入，clear-relation 表示关联数据(楼盘值改变，关联的那几栏值要清空)
-                        // 楼盘名称、幢号、楼层、房号是关联数据
-                        // 所有通过下拉选择数据的元素都要加上class名称：click-hand
-
-                        if(hid1 == '楼盘' || hid1 == '幢号' || hid1 == '楼层' || hid1 == '房号'){
-                            className += ' clear-relation';
-                            tagName =  hid4.toString() == '1' ? 'textarea' : 'input';
-                            if(hid1 == '楼盘') {
-                                className += ' click-search';
-                                ids = 'house';
-                                icons = ' icon-house';
-                                // boxWidth = '100%';
-                                if(me.$opts.layout.houseRightButton)
-                                    _btnHtml = '<div class="item-cell"><button type="button" id="btn-query-house">查询</button></div>';
-                            }else{
-                                className += ' click-hand';
-                                readonly = true;
-                                if (hid1 == '幢号'){
-                                    className += ' click-build';
-                                    ids = 'build';
-                                    icons = ' icon-build';
-                                }
-                                if (hid1 == '楼层'){
-                                    className += ' click-floor';
-                                    ids = 'floor';
-                                    icons = ' icon-floor';
-                                }
-                                if (hid1 == '房号'){
-                                    className += ' click-room';
-                                    ids = 'room';
-                                    icons = ' icon-room';
-                                }
-                            }
-                        }
-
-                        if (hid1 == '产权年限') {
-                            className += ' click-hand click-property';
-                            ids = 'property';
-                            icons = ' icon-clock';
-                            readonly = true;
-                        }
-
-                        if (hid1 == '建筑面积') { // 调用数字键盘
-                            className += ' click-num click-jzmj';
-                            ids = 'jzmj';
-                            icons = ' icon-metre';
-                            readonly = true;
-                            // types = 'number'; // 只能输入数字(部分手机不支持)
-                        }
-
-                        if (hid1 == '储藏间面积') { // 调用数字键盘
-                            className += ' click-num click-ccjmj';
-                            ids = 'ccjmj';
-                            icons = ' icon-metre';
-                            readonly = true;
-                            // types = 'number'; // 只能输入数字(部分手机不支持)
-                        }
+                    if(type == '日期') {
+                        className = 'click-date';
+                        readonly = true;
                     }
-                }
-
-
-                // 节点拼接
-                var _idStr = ids == '' ? '' : ' id="' + ids + '"';
-                var _hideStr = hid1 == '' ? '' : ' data-hide="' + hid1 + '"';
-                var _readStr = readonly ? ' readonly="readonly"' : '';
-                var _blur = readonly ? 'this.blur();' : '';
-                var _onfocus = ' onfocus="this.placeholder=\'\';' + _blur + '"';
-                
-                if(tagName == 'input') { // input
-                    _LHtml = '<input type="' + types + '"' + _idStr + ' class="' + className + '" value="' + val2 + '"' + _placeholder + _onfocus + _onblur + _hideStr + _hid1 + _hid3 + _hid5 + _hid6 + _readStr + '>';
-                }else if(tagName == 'textarea'){ // textarea
-                    _LHtml = '<textarea' + _idStr + ' class="' + className + '"' + _placeholder + _onfocus + _onblur + _hideStr + _hid1 + _hid3 + _hid5 + _hid6 + _readStr + '>' + val2 + '</textarea>';
-                }else{ // radio单选开关
-                    var _checkStr = '';
-                    var value = 0;
-                    if (val2.toString() === 'true' || val2.toString() == '1') {
-                        _checkStr = ' checked="checked"';
-                        value = 1;
+                    if(type == '数字') {
+                        types = 'number';
                     }
-                    _LHtml = '<input type="' + types + '"' + _idStr + ' class="' + className + '" value="' + value + '"' + _hideStr + _hid1 + _hid3 + _hid5 + _hid6 + _checkStr + '>';
-                }
-                //
-                var _boxWClass = ''; // boxWidth == '' ? '' : (boxWidth == '100%' ? ' w-100' : ''); // 宽
-                var _iconStr = icons == '' || me.$opts.layout.inputIcon === false ? '' : '<i class="icon' + icons + '"></i>'; // 图标
-                //
-                var _crossClass = me.$opts.layout.houseRightButton && _btnHtml != '' ? ' has-cell-btn' : '';
-                var _crossStyle = val2.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
-                _RHtml += types == 'text' && me.$opts.layout.inputCross 
-                            ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' 
-                            : 
-                            '';
-                _RHtml += _btnHtml; // 右侧内容
-                // 拼接HTML
-                var _outerHtml = [
-                        '<div class="eform-row' +  _boxWClass + '">',
+                    if(type == '单选') {
+                        types = 'checkbox';
+                    }
+                    if(type == '下拉') {
+                        readonly = true;
+                    }
+                    var _btnStr = ''; // 按钮
+                    //
+                    var chooseText = (!readonly ? '请填写' : '请选择') + title,
+                        _looseFocusStr = !readonly ?  '' : ';this.blur()';
+                    var _classNameStr = ' class="' + className + '"',
+                        _placeholderStr = !must ? '' : ' placeholder="' + chooseText + '"',
+                        _blurStr = !must ? '' : ' onblur="this.placeholder=\'' + chooseText + '\'"';
+                        _focusStr = !must ? '' : ' onfocus="this.placeholder=\'\'' + _looseFocusStr + '"',
+                        _readonlyStr = !readonly ? '' : ' readonly',
+                        _disabledStr = !disabled ? '' : ' disabled',
+                        _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
+                        _crossClass = ''; // me.$opts.layout.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
+                        _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
+                    var _attrListStr = ' id="' + ids + '"' + _classNameStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr; // 所有公用属性串
+                    //
+                    var _iconStr = iconName == '' ? '' : '<i class="icon icon-' + iconName + '"></i>',
+                        _unitStr = unit == '' ? '' : '<em class="r-unit"></em>',
+                        _phoneStr = phone == '' ? '' : '<em class="r-tel"><a></a></em>';
+                    var _crossStr = ( types == 'text' && me.$opts.layout.inputCross ) ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' : '',
+                        _mustStr = must && me.$opts.layout.inputMust ? '<div class="item-cell" data-type="must">*</div>' : '';
+                    //
+                    var _inputStr = '';
+                    if(tagName == 'input'){
+                        _inputStr = '<input type="' + types + '" value="' + value + '"' + _attrListStr + '>';
+                    }
+                    if(tagName == 'textarea'){
+                        _inputStr = '<textarea' + _attrListStr + '>' + value + '</textarea>';
+                    }
+                    // 节点拼接
+                    _LHtml += _inputStr;
+                    _RHtml += _btnStr + _crossStr + _mustStr;
+                    _UHtml += _unitStr + _phoneStr;
+                    _IcoHtml += _iconStr;
+                    // 拼接HTML
+                    _outerHtml += [
+                        '<div class="eform-row">',
                             '<div class="item-l">',
-                                ( me.$opts.layout.theme != 'popular' ? '' : _iconStr ),
-                                '<label>' + val1 + '</label>',
+                                ( me.$opts.layout.theme != 'popular' ? '' : _IcoHtml ),
+                                '<label>' + title + '</label>',
                             '</div>',
                             '<div class="item-r">',
-                            ( me.$opts.layout.theme == 'popular' ? '' : _iconStr ),
-                            _LHtml,
-                            _UHtml,
+                                ( me.$opts.layout.theme == 'popular' ? '' : _IcoHtml ),
+                                _LHtml,
+                                _UHtml,
                             '</div>',
-                        _RHtml,
-                        ( !me.$opts.layout.inputMust ? '' : _mustHtml ),
-                        '</div>'
-                ].join('\r\n');
-                tools.appendHTML(_outerHtml, me.$obj);
+                            _RHtml,
+                        '</div><!--/.eform-row-->'
+                    ].join('\r\n');
 
-            } // END FOR
+                } // END FOR
+
+                tools.appendHTML(_outerHtml, me.$obj);
+            }
+
+            // ②.数据源类型为“楼盘房号数据格式”
+            if(me.$opts.type == 'rooms'){
+                for(var i = 0; i < source.data.length; i++){
+                    var items = source.data[i];
+                    var val1 = items["val1"],
+                        val2 = items["val2"],
+                        val3 = items["val3"],
+                        val4 = items["val4"],
+                        hid1 = items["hid1"],
+                        hid2 = items["hid2"],
+                        hid3 = items["hid3"],
+                        hid4 = items["hid4"],
+                        hid5 = items["hid5"],
+                        hid6 = items["hid6"];
+                    var _hid1 = ' data-hid1="' + hid1 + '"', 
+                        _hid3 = ' data-hid3="' + hid3 + '"', 
+                        _hid5 = ' data-hid5="' + hid5 + '"', 
+                        _hid6 = ' data-hid6="' + hid6 + '"';
+                    var _placeholder = ' placeholder="' + val4 + '"',
+                        _onblur = ' onblur="this.placeholder=\'' + val4 + '\'"';
+                    var	_LHtml = '', // 左边内容
+                        _UHtml = '', // 单位等内容
+                        _BtHtml = '', // 按钮内容
+                        _RHtml = ''; // 右边内容
+                    var _MustHtml = hid5 != '1' ? '' : '<div class="item-cell" data-type="must">*</div>'; // 必填项星号*
+                    // 输入框
+                    var tagName = 'input', // 标签类型。值：input(默认), radio, textarea
+                        types = 'text'; // type属性。值: text 文本(默认), number 数字, checkbox 复选(单选、多选)
+                        ids = '', // ID属性
+                        className = 'click-input', // class属性
+                        readonly = false; // 输入框是否只读。 true 只读,不允许手动输入，false 可手动输入
+                    // 其它
+                    var  icons = '', // 输入框修饰图标
+                        boxWidth = ''; // box宽度
+
+                    // 右边文字
+                    if (val3 != '') {
+                        var _unitStyle = !me.$opts.layout.inputCross ? '' : ' has-cell-cross';
+                        _UHtml = '<em class="r-unit' + _unitStyle + '">' + val3 + '</em>';
+                    }			
+
+                    // 隐藏值1是空时
+                    if (hid1 == '') {	
+                        if (hid4.toString() == '1') { // 多行文本
+                            tagName = 'textarea';
+                            className += ' click-textarea';
+                            icons = ' icon-textarea';
+                        }else{ // 单行文本
+                            className += ' click-single-input';
+                            icons = ' icon-text';
+                        }
+                    } else { // 隐藏值1是“无”时	
+                        if (hid1 == '无') {
+                            if (hid2 == '日期') { // 调用日期控件
+                                className += ' click-date';
+                                icons = ' icon-calendar';
+                                me.$opts.controls.calendar.enable ? readonly = true : readonly = false;
+                            }			
+                            if (hid2 == '数字') { // 调用数字键盘
+                                className += ' click-num';
+                                icons = ' icon-numeric';
+                                me.$opts.controls.keyboard.enable ? readonly = true : readonly = false;
+                                // types = 'number'; // 只能输入数字(部分手机不支持)
+                                if (val1.indexOf('面积') >= 0) icons = ' icon-metre';
+                            }
+                            if (hid2 == '单选') {
+                                tagName = 'radio';
+                                className += ' click-radio ne-switch';
+                                types = 'checkbox';
+                            }
+                            if (hid2 == '下拉') {
+                                className += ' click-dropdown';
+                                icons = ' icon-drop';
+                                readonly = true;
+                            }
+                            if (hid2 == '无' || hid2 == '') {
+                                if (hid4.toString() == '1') { // 多行文本
+                                    tagName = 'textarea';
+                                    className += ' click-textarea';
+                                    icons = ' icon-textarea';
+                                }else{ // 单行文本
+                                    className += ' click-single-input';
+                                    icons = ' icon-text';
+                                }
+                            }
+
+                        } else { // 隐藏值1不是"无"
+
+                            // 注：click-hand 表示可从下拉切换成手动输入，clear-relation 表示关联数据(楼盘值改变，关联的那几栏值要清空)
+                            // 楼盘名称、幢号、楼层、房号是关联数据
+                            // 所有通过下拉选择数据的元素都要加上class名称：click-hand
+
+                            if(hid1 == '楼盘' || hid1 == '幢号' || hid1 == '楼层' || hid1 == '房号'){
+                                className += ' clear-relation';
+                                tagName =  hid4.toString() == '1' ? 'textarea' : 'input';
+                                if(hid1 == '楼盘') {
+                                    className += ' click-search';
+                                    ids = 'house';
+                                    icons = ' icon-house';
+                                    // boxWidth = '100%';
+                                    if(me.$opts.layout.houseRightButton)
+                                        _BtHtml = '<div class="item-cell"><button type="button" id="btn-query-house">查询</button></div>';
+                                }else{
+                                    className += ' click-hand';
+                                    readonly = true;
+                                    if (hid1 == '幢号'){
+                                        className += ' click-build';
+                                        ids = 'build';
+                                        icons = ' icon-build';
+                                    }
+                                    if (hid1 == '楼层'){
+                                        className += ' click-floor';
+                                        ids = 'floor';
+                                        icons = ' icon-floor';
+                                    }
+                                    if (hid1 == '房号'){
+                                        className += ' click-room';
+                                        ids = 'room';
+                                        icons = ' icon-room';
+                                    }
+                                }
+                            }
+
+                            if (hid1 == '产权年限') {
+                                className += ' click-hand click-property';
+                                ids = 'property';
+                                icons = ' icon-clock';
+                                readonly = true;
+                            }
+
+                            if (hid1 == '建筑面积') { // 调用数字键盘
+                                className += ' click-num click-jzmj';
+                                ids = 'jzmj';
+                                icons = ' icon-metre';
+                                readonly = true;
+                                // types = 'number'; // 只能输入数字(部分手机不支持)
+                            }
+
+                            if (hid1 == '储藏间面积') { // 调用数字键盘
+                                className += ' click-num click-ccjmj';
+                                ids = 'ccjmj';
+                                icons = ' icon-metre';
+                                readonly = true;
+                                // types = 'number'; // 只能输入数字(部分手机不支持)
+                            }
+                        }
+                    }
+
+
+                    // 节点拼接
+                    var _idStr = ids == '' ? '' : ' id="' + ids + '"';
+                    var _hideStr = hid1 == '' ? '' : ' data-hide="' + hid1 + '"';
+                    var _readStr = readonly ? ' readonly="readonly"' : '';
+                    var _blur = readonly ? 'this.blur();' : '';
+                    var _onfocus = ' onfocus="this.placeholder=\'\';' + _blur + '"';
+                    
+                    if(tagName == 'input') { // input
+                        _LHtml = '<input type="' + types + '"' + _idStr + ' class="' + className + '" value="' + val2 + '"' + _placeholder + _onfocus + _onblur + _hideStr + _hid1 + _hid3 + _hid5 + _hid6 + _readStr + '>';
+                    }else if(tagName == 'textarea'){ // textarea
+                        _LHtml = '<textarea' + _idStr + ' class="' + className + '"' + _placeholder + _onfocus + _onblur + _hideStr + _hid1 + _hid3 + _hid5 + _hid6 + _readStr + '>' + val2 + '</textarea>';
+                    }else{ // radio单选开关
+                        var _checkStr = '';
+                        var value = 0;
+                        if (val2.toString() === 'true' || val2.toString() == '1') {
+                            _checkStr = ' checked="checked"';
+                            value = 1;
+                        }
+                        _LHtml = '<input type="' + types + '"' + _idStr + ' class="' + className + '" value="' + value + '"' + _hideStr + _hid1 + _hid3 + _hid5 + _hid6 + _checkStr + '>';
+                    }
+                    //
+                    var _boxWClass = ''; // boxWidth == '' ? '' : (boxWidth == '100%' ? ' w-100' : ''); // 宽
+                    var _iconStr = icons == '' || me.$opts.layout.inputIcon === false ? '' : '<i class="icon' + icons + '"></i>'; // 图标
+                    //
+                    var _crossClass = me.$opts.layout.houseRightButton && _BtHtml != '' ? ' has-cell-btn' : '';
+                    var _crossStyle = val2.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
+                    _RHtml += types == 'text' && me.$opts.layout.inputCross 
+                                ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' 
+                                : 
+                                '';
+                    _RHtml += _BtHtml; // 右侧内容
+                    // 拼接HTML
+                    var _outerHtml = [
+                            '<div class="eform-row' +  _boxWClass + '">',
+                                '<div class="item-l">',
+                                    ( me.$opts.layout.theme != 'popular' ? '' : _iconStr ),
+                                    '<label>' + val1 + '</label>',
+                                '</div>',
+                                '<div class="item-r">',
+                                ( me.$opts.layout.theme == 'popular' ? '' : _iconStr ),
+                                _LHtml,
+                                _UHtml,
+                                '</div>',
+                            _RHtml,
+                            ( !me.$opts.layout.inputMust ? '' : _MustHtml ),
+                            '</div>'
+                    ].join('\r\n');
+                    tools.appendHTML(_outerHtml, me.$obj);
+
+                } // END FOR
+            }
+
+            
 
             // ·--------根据控件类型调用相应控件--------
             // 日期类型

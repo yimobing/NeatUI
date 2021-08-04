@@ -26,9 +26,26 @@
 <body>
     <div class="wrap">
         <main>
-            <div class="mortgage"></div>
-            <div class="tax"></div>
-           
+            <!--[========·提交询价区域·========]-->
+            <div class="grid__mortgage">
+                <!---[++++++++·抵押物基本信息面板·++++++++]-->
+                <div class="mortgage__basic">
+                    <!--[::::::::·静态表单模块·::::::::]-->
+                    <div class="mortgage__static"></div><!--/.mortgage__static-->
+                </div><!--/.mortgage__basic-->
+                <!---[++++++++·抵押物更多信息面板·++++++++]-->
+                <div class="mortgage__more">
+                    <!--[::::::::·动态表单模块·::::::::]-->
+                    <div class="mortgage__dynamic"></div><!--/.mortgage__dynamic-->
+                    <!--[::::::::·切换输入模块·::::::::]-->
+                    <div class="mortgage__switch"></div><!--/.mortgage__switch-->
+                </div><!--/.mortgage__more-->
+                <!---[++++++++·抵押物照片信息面板·++++++++]-->
+                <div class="mortgage__photo"></div><!--/.mortgage__photo-->
+            </div><!--/.grid__mortgage-->
+            <!--[========·询价结果区域·========]-->
+            <div class="grid__result"></div><!--/.grid__result-->
+
         </main>
     </div><!--/.wrap-->
     <!--================================================================================-->
@@ -49,10 +66,75 @@
             //+                                                          初始化                                                 
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
-            //=====初始化加载
+            //=====
+            var example = new NeConfiguration(); // 实例化控件
+            
+            
+            /**
+                --------------------------------
+                ①. 数据源类型为“标准数据格式”
+                --------------------------------
+                [字段名称]
+                title       字段名称(中文), 即显示名称
+                field       字段名称(英文), 即ID属性
+                type        输入框类型(可选)。值：文本, 日期, 数字, 单选, 下拉
+                value       初始值(可选), 默认空
+                unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
+                phone       是否电话类型(可选)。值：true, false 否(默认)
+                must        是否必填项(可选)。值：true 是, false 否(默认)
+                multiple    是否多行(可选)。值: true 是, false 否(默认)
+                readonly    是否强制为只读(可选), 默认false
+                disabled    是否强制为禁用(可选), 默认false
+                iconName    自定义图标名称(即className)(可选), 默认图标名称为field参数值
+                attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
+            */
+            //——————————————————————————————————————————
+            // 
+            var regularJson = {
+                data:[
+                    {title:"评估目的", field:"purpose", type:"下拉", value:"", must:false},
+                    {title:"贷款品种", field:"loan", type:"下拉", value:"", must:false},
+                    {title:"客户姓名", field:"user", type:"文本", value:"张三", must:false},
+                    {title:"客户电话", field:"mobile", type:"文本", value:"", must:false},
+                    {title:"抵押物所在地", field:"locate", type:"下拉", value:"", must:false},
+                    {title:"抵押物类型", field:"category", type:"下拉", value:"", must:false},
+                    {title:"测试1", field:"tokyo", type:"文本", value:"中国", must:true}
+                ]
+            }
+
+            example.houses('.mortgage__static', {
+                source: regularJson, // 数据源
+                type: "standard", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
+                layout: { // 布局(可选)
+                    theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
+                    inputIcon: true, // 输入框是否使用图标(可选), 默认false
+                    inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
+                    inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                    mustAlign: "left", // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
+                    houseRightButton: false // 是否楼盘名称右侧显示查询按钮(可选), 默认false
+                },
+                controls: { // 控件调用(可选)
+                    calendar: {  // 日历控件(可选)
+                        enable: true, // 是否启用(可选)，默认true
+                        empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
+                        theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
+                        format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
+                        minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
+                        maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
+                        callBack: null // 回调(可选) 
+                    },
+                    keyboard: { // 数字键盘控件(可选)
+                        enable: false // 是否启用(可选)，默认false
+                    }
+                }
+            });
+
+
 
             /**
-             * 楼盘房号数据配置
+                --------------------------------
+                ②.数据源类型为“楼盘房号数据格式”
+                --------------------------------
                 [字段说明]
                 val 表示显示值(要显示在界面上)，
                 hid 表示隐藏值(无须显示在界面上,只需隐藏起来,后续操作能取到值即可)
@@ -101,14 +183,16 @@
                 ]
             }
 
-            var condition = new NeConfiguration();
-            condition.houses('.mortgage', {
+            
+            example.houses('.mortgage__dynamic', {
                 source: conditionJson, // 数据源
+                type: "rooms", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
                 layout: { // 布局(可选)
                     theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
-                    inputIcon: false, // 输入框是否使用图标(可选), 默认false
+                    inputIcon: true, // 输入框是否使用图标(可选), 默认false
                     inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
-                    inputMust: false, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                    inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                    mustAlign: "left", // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
                     houseRightButton: true // 是否楼盘名称右侧显示查询按钮(可选), 默认false
                 },
                 controls: { // 控件调用(可选)
@@ -125,17 +209,10 @@
                         enable: false // 是否启用(可选)，默认false
                     }
                 }
-
             });
-      
 
 
-            // neuiConfigurate('.mortgage', 'house', {user:"林冲", sex: "男", grade: "梁山泊"});
-            // neuiConfigurate('.tax', 'load', {source: "数据源"})
-
-            // $('.mortgage').neuiConfigurate('house', {user:"林冲", sex: "男", grade: "梁山泊"});
-            // $('.tax').neuiConfigurate('load', {source: "数据源"});
-
+    
 
 
 
