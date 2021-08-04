@@ -1363,16 +1363,16 @@ var checker = {
     /**
 	 * 判断是否手机号码(正则表达式验证)
 	 * @param {string} str 电话字符串
-     * @param {options} 验证类型等参数组成的对象. eg. {pattern: "mobilephone"}.
+     * @param {options} 验证类型等参数组成的对象(可选). eg. {pattern: "mobilephone"}.
      * @returns {boolean} 返回布尔值. true 是, false 否
 	 */
 	checkTel:function(str, options){
         var defaults = {
-            mode: "standard", //校验模式. standard 标准模式,严格校验电话格式(默认), loose 宽松模式,只校验电话位数
-            pattern: "mobilephone", //验证类型(只在mode="standard"时有效). mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
-            bit: { //校验的电话位数(只在mode="loose"时有效)
-                from: 6, //校验6位.与to配合使用,可与to值相等
-                to: 12 //校验12位.与from配合使用,可与from值相等
+            mode: "standard", // 校验模式. standard 标准模式,严格校验电话格式(默认), loose 宽松模式,只校验电话位数
+            pattern: "mobilephone", // 验证类型(只在mode="standard"时有效). mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
+            bit: { // 校验的电话位数(只在mode="loose"时有效)
+                from: 6, // 校验6位.与to配合使用,可与to值相等
+                to: 12 // 校验12位.与from配合使用,可与from值相等
             }
         }
         var settings = $.extend(true, {}, defaults, options || {});
