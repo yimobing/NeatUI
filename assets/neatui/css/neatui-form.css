@@ -541,15 +541,11 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 
 
 /*+================================================================================+*/
-/*							neatui搜索框
+/*							搜索框控件
 /*+================================================================================+*/
 /*+-------------------------+*/
-.ne-search-form{
-	
-}
-.search-box{ 
-    width: 100%;
-}
+.ne-search-form{ }
+.search-box{ width: 100%; }
 .search-box input,
 .search-box textarea{
 	width: 100%;
@@ -689,7 +685,6 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 	height: 14px;
 	background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAtUlEQVQ4T8WSUQ3CQBBE3zhASh1QCUhAAjgAB+CgEnAADgAHSMDBkCVXciXtNU1D2N/beTs7e2Jmaaae/wBsV0AjqZrsIInPwFZSMwlgewFcgX2II783wHYt6VIKNIlj8rEV54AbcMgfctiQOAeEtQew+nZSEn8AaY1I9pQg4ShWC3DYvkta963YCdF2NG2AOjUXxR0HLd32DlimlTQ0ue3vPaPtONFTUrgp1qR/MJrB2LSfAF7MXkURpMyWiAAAAABJRU5ErkJggg==') center/100% 100% no-repeat scroll;
 }
-
 .search-box-main-group,
 .search-box-main-group .sgroup{
 	display: -webkit-box;
@@ -703,9 +698,41 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .search-box-main-group{ }
 .search-box-main-group .sgroup{ }
 .search-box-main-group .sgroup label{ margin: 0 5px; }
-
-
 /*+-------------------------+*/
 @media screen and (max-width: 374px){
 	.search-box-main-item .option{ width: 30%;}
 }
+
+
+
+
+
+/*+================================================================================+*/
+/*							表单配置控件
+/*+================================================================================+*/
+/*+--------------------------------+*/
+.ne-configuration{ }
+/*+--------------------------------+*/
+.ne-configuration.theme-popular .item-l{ width: 90px; }
+.ne-configuration .icon{
+    background: transparent url('') no-repeat scroll center center / 100% auto;
+}
+.icon-house{ background-image: url('../img/config_mod_icon_loupan.png')!important; }
+.icon-build{ background-image: url('../img/config_mod_icon_build.png')!important; }
+.icon-floor{ background-image: url('../img/config_mod_icon_floor.png')!important; }
+.icon-room{ background-image: url('../img/config_mod_icon_room.png')!important; }
+.icon-clock{ background-image: url('../img/config_mod_icon_property.png')!important; }
+.icon-metre{ background-image: url('../img/config_mod_icon_area.png')!important; }
+.icon-calendar{ background-image: url('../img/config_mod_icon_calendar.png')!important; }
+.icon-numeric{ background-image: url('../img/config_mod_icon_numeral.png')!important; }
+.icon-tel{ background-image: url('../img/config_mod_icon_tel.png')!important; }
+.icon-tel.hover{ background-image: url('../img/config_mod_icon_tel_blue.png')!important; }
+.icon-mobile{ background-image: url('../img/config_mod_icon_mobile.png')!important; }
+.icon-loan{ background-image: url('../img/config_mod_icon_loan.png')!important; }
+.icon-user{ background-image: url('../img/config_mod_icon_user.png')!important; }
+.icon-locate{ background-image: url('../img/config_mod_icon_locate.png')!important; }
+.icon-category{ background-image: url('../img/config_mod_icon_category.png')!important; }
+.icon-purpose{ background-image: url('../img/config_mod_icon_purpose.png')!important; }
+.icon-drop{ background-image: url('../img/config_mod_icon_drop.png')!important; }
+.icon-text{ background-image: url('../img/config_mod_icon_text.png')!important; }
+.icon-textarea{ background-image: url('../img/config_mod_icon_multiple.png')!important; }
