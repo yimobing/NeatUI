@@ -38,7 +38,7 @@
             title       字段名称(中文), 即显示名称
             field       字段名称(英文), 即ID属性
             type        输入框类型(可选)。值：文本,日期, 数字, 单选, 下拉
-            value       初始值(可选), 默认空
+            value       初始值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
             unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
             phone       是否电话类型(可选)。值：true, false 否(默认)
             must        是否必填项(可选)。值：true 是, false 否(默认)
@@ -221,7 +221,8 @@
                 var tagName = !multiple ? 'input' : 'textarea', // 标签类型。值：input(默认), radio, textarea
                     types = 'text', // type属性。值: text 文本(默认), number 数字, checkbox 复选(单选、多选)
                     ids = field, // ID属性
-                    className = ''; // class属性
+                    className = '', // class属性
+                    checked = ''; // checked属性。值：空 表示没有这个属性, true 表示选中, false 不选中
                 //
                 if(type == '文本') {
                     types = 'text';
@@ -237,6 +238,7 @@
                 if(type == '单选') {
                     types = 'checkbox';
                     className = 'ne-switch';
+                    checked = parseInt(value) == 1 ? true : false;
                 }
                 if(type == '下拉') {
                     readonly = true;
@@ -255,6 +257,7 @@
                     _readonlyStr = !readonly ? '' : ' readonly',
                     _disabledStr = !disabled ? '' : ' disabled',
                     _btnStr = '', // 按钮
+                    _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
                     _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
                     _unitClass = !me.$opts.layout.inputCross ? '' : ' has-cell-cross';
                     _crossClass = ''; // me.$opts.layout.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
@@ -269,7 +272,7 @@
                 //
                 var _inputStr = '';
                 if(tagName == 'input'){
-                    _inputStr = '<input type="' + types + '" value="' + value + '"' + _attrListStr + '>';
+                    _inputStr = '<input type="' + types + '" value="' + value + '"' + _checkStr + _attrListStr + '>';
                 }
                 if(tagName == 'textarea'){
                     _inputStr = '<textarea' + _attrListStr + '>' + value + '</textarea>';
