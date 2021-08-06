@@ -4,7 +4,7 @@
 * 小巧UI前端框架
 * Author：mufeng
 * Date: 2021.01.11
-* Update: 2021.07.10
+* Update: 2021.08.05
 *================================================*/
 
 /*+================================================================================+*/
@@ -126,6 +126,7 @@ textarea[readonly]{
 	-webkit-opacity: 1;
 	opacity: 1;
 	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	cursor: default!important;
 }
 
 /*+disabled+*/
