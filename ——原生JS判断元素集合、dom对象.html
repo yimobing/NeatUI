@@ -1,0 +1,23 @@
+
+· 数组特有PUSH方法
+· NODEList为HTML 对象集合，例如document.getElementsByTagName("p")所返回的对象集合
+nodeList只有2个属性，item（）和length
+· dom对象，特有nodeName 属性
+https://www.cnblogs.com/strangerqt/archive/2013/05/21/3090485.html
+
+if (OBJ.push) {
+    console.log("array");
+} else if (OBJ.item) {
+    console.log("nodelist");
+}
+else if (OBJ.nodeName) {
+    console.log("dom obj");
+}
+
+
+
+//==============================================
+元素、节点、选择器等概念区域
+document.getElementById(a); // 这个是元素或节点
+'#user' // CSS选择器
+$('#user'); // JQ选择器
