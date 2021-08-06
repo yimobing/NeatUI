@@ -78,11 +78,11 @@
             保存时，要取到显示值2、隐藏值5、隐藏值6；
         */
        
+
         /**
          * 创建表单
-         * @param {HTML DOM} elem 绑定的dom节点
+         * @param {string} elem 根节点ID或Class选择器字符串。eg1.'#user', eg2.'.user'
          * @param {object} opts 参数对象 
-         * @returns 返回
          */
         me.forms = function(elem, options){
             var defaults = {
@@ -146,6 +146,7 @@
                     if(typeof neui !== 'undefined' && typeof neui.showAnimate === 'function') neui.showAnimate();
                     setTimeout(function(){
                         formUI.createStandardForm(me);
+                        console.log('aaaaaa')
                         formUI.callControls(me); // 根据控件类型调用相应控件
                         formUI.doneEvents(me); // 执行一系列操作事件
                         if(typeof neui !== 'undefined' && typeof neui.destroyAnimate === 'function') neui.destroyAnimate();
@@ -585,15 +586,23 @@
 
             tools.removeAllChildren(me.$obj); // 先清空元素内容
             tools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
+            this.loadExchangeModule(me);
+        },
 
-            
-            // 切换输入模块：“如查无数据，请选择手动输入”、“取消手动输入”
-            var _tmpHtml = [
+
+
+
+        /**
+         * 加载切换输入模块：“如查无数据，请选择手动输入”、“取消手动输入”
+         * @param {object} me 控件对象参数
+         */
+        loadExchangeModule: function(me){
+             var _tmpHtml = [
                 '<div class="block__switch block__switch-hand">',
                     '<span>如查无数据，请选择</span>',
                     '<button type="button" id="btn-manual">手动输入</button>',
                 '</div>',
-                '<div class="block__switch block__switch-select">',
+                '<div class="block__switch block__switch-select" style="display: none">',
                     '<button type="button" id="btn-dropdown">取消手动输入</button>',
                 '</div>',
             ].join('\r\n');
