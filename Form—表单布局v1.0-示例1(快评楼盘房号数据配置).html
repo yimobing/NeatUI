@@ -26,6 +26,71 @@
 </head>
 <body>
     <div class="wrap">
+        <aside>
+            <section class="code">
+<pre>
+    ----------------------------------------
+                    [控件使用说明]
+    ----------------------------------------
+    var example = new NeForm(); // 实例化控件
+    可调用的函数如下：
+    /**
+    * 创建表单
+    * @param {string} elem 根节点ID或Class选择器字符串。eg1.'#user', eg2.'.user'
+    * @param {object} opts 参数对象 
+    */
+    example.forms(elem, options);
+    /**
+    * 切换成手动输入
+    * @param {HTML DOM || jQuery Object} o 元素对象或jq选择器对象
+    * @param {string} limit 切换的范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
+    */
+    example.switchHandEnter(o, limit); 
+    
+    ----------------------------------------
+                [options参数]
+    ----------------------------------------
+    其中options参数如下：
+    var options = {
+        source: regularJson, // 数据源
+        type: "standard", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
+        animate: false, // 是否启用转圈动画特效(可选), 默认false
+        houses: { // “楼盘房号配置数据”时(可选)
+            houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
+            switches: {
+                enable: true, // 是否允许手动输入(可选), 默认true
+                scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
+            }
+        },
+        layout: { // 布局(可选)
+            theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
+            inputIcon: true, // 输入框是否使用图标(可选), 默认false
+            inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
+            inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+            mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
+        },
+        controls: { // 控件调用(可选)
+            calendar: {  // 日历控件(可选)
+                enable: true, // 是否启用(可选)，默认true
+                empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
+                theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
+                format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
+                minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
+                maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
+                callBack: null // 回调(可选) 
+            },
+            keyboard: { // 数字键盘控件(可选)
+                enable: false // 是否启用(可选)，默认false
+            }
+        }
+    }
+
+</pre>
+            </section>
+        </aside>
+
+
+        
         <main>
             <section class="enquiry">
                 <!--[========·提交询价区域·========]-->
@@ -57,6 +122,7 @@
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
     <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
     <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
     <script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
     <script type="text/javascript" src="assets/neatui/js/neatui-form.js"></script><!--表单布局-->
@@ -75,7 +141,6 @@
             //——————————————————————————————————————————
             //=====
             var example = new NeForm(); // 实例化控件
-            
             /**
                 --------------------------------
                 ①. 数据源类型为“标准数据格式”
@@ -84,7 +149,7 @@
                 title       字段名称(中文), 即显示名称
                 field       字段名称(英文), 即ID属性
                 type        输入框类型(可选)。值：文本, 日期, 数字, 单选, 下拉
-                value       初始值(可选), 默认空
+                value       初始值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
                 unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
                 phone       是否电话类型(可选)。值：true, false 否(默认)
                 must        是否必填项(可选)。值：true 是, false 否(默认)
@@ -95,7 +160,7 @@
                 attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
             */
             //——————————————————————————————————————————
-            //===== 加载静态表单(常规数据)
+            //===== 创建静态表单(常规数据)
             var regularJson = {
                 data:[
                     {title:"评估目的", field:"purpose", type:"下拉", value:"", must:true},
@@ -111,42 +176,21 @@
             }
 
             example.forms('.mortgage__static', {
-                source: regularJson, // 数据源
-                type: "standard", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
-                animate: false, // 是否启用转圈动画特效(可选), 默认false
-                houses: { // “楼盘房号配置数据”时(可选)
-                    houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
-                    switches: {
-                        enable: true, // 是否允许手动输入(可选), 默认true
-                        scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
-                    }
-                },
+                source: regularJson,
+                type: "standard",
+                animate: false,
                 layout: { // 布局(可选)
                     theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
                     inputIcon: true, // 输入框是否使用图标(可选), 默认false
-                    inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
+                    inputCross: false, // 输入框右侧是否有打叉图标(可选), 默认true
                     inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
                     mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
-                },
-                controls: { // 控件调用(可选)
-                    calendar: {  // 日历控件(可选)
-                        enable: true, // 是否启用(可选)，默认true
-                        empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
-                        theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
-                        format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
-                        minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
-                        maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
-                        callBack: null // 回调(可选) 
-                    },
-                    keyboard: { // 数字键盘控件(可选)
-                        enable: false // 是否启用(可选)，默认false
-                    }
                 }
             });
 
 
 
-            /**
+             /**
                 --------------------------------
                 ②.数据源类型为“楼盘房号数据格式”
                 --------------------------------
@@ -178,7 +222,7 @@
 
              */
 
-            // 加载动态表单(配置数据)
+            // 创建动态表单(配置数据)
             var conditionJson = {
                 data:[
                     {val1:"楼盘名称", val2:"万达广场", val3:"", val4:"请输入楼盘", hid1:"楼盘", hid2:"", hid3:"", hid4:"1", hid5:"1", hid6:"楼盘名称"},
@@ -197,38 +241,16 @@
                     {val1:"多行文本", val2:"", val3:"", val4:"", hid1:"", hid2:"", hid3:"", hid4:"1", hid5:"0", hid6:"多行文本"}
                 ]
             }
-
-            
+  
             example.forms('.mortgage__dynamic', {
-                source: conditionJson, // 数据源
-                type: "rooms", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
-                animate: false, // 是否启用转圈动画特效(可选), 默认false
-                houses: { // “楼盘房号配置数据”时(可选)
-                    houseRightButton: true, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
+                source: conditionJson,
+                type: "rooms",
+                animate: false,
+                houses: {
+                    houseRightButton: true,
                     switches: {
-                        enable: true, // 是否允许手动输入(可选), 默认true
-                        scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
-                    }
-                },
-                layout: { // 布局(可选)
-                    theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
-                    inputIcon: true, // 输入框是否使用图标(可选), 默认false
-                    inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
-                    inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
-                    mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
-                },
-                controls: { // 控件调用(可选)
-                    calendar: {  // 日历控件(可选)
-                        enable: true, // 是否启用(可选)，默认true
-                        empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
-                        theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
-                        format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
-                        minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
-                        maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
-                        callBack: null // 回调(可选) 
-                    },
-                    keyboard: { // 数字键盘控件(可选)
-                        enable: false // 是否启用(可选)，默认false
+                        enable: true, 
+                        scope: "related"
                     }
                 }
             });
