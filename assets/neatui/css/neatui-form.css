@@ -5,7 +5,7 @@
  * 说明：兼容IE8+
  * Author: Mufeng
  * Date: 2021.01.09
- * Update: 2021.08.04
+ * Update: 2021.08.05
  */
 
 /*+--------------------------------+*/
@@ -214,6 +214,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     -webkit-opacity: 1;
     opacity: 1;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    cursor: default!important;
 }
 /*disabled 禁止输入框*/
 .item-r input:disabled,
