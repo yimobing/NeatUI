@@ -140,40 +140,18 @@
                 return;
             }
             // ·--------按数据源类型--------
-            // ①.数据源类型为标准数据格式,即“标准表单配置数据”
-            if(me.$opts.type == 'standard'){
-                if(me.$opts.animate){
-                    if(typeof neui !== 'undefined' && typeof neui.showAnimate === 'function') neui.showAnimate();
-                    setTimeout(function(){
-                        formUI.createStandardForm(me);
-                        console.log('aaaaaa')
-                        formUI.callControls(me); // 根据控件类型调用相应控件
-                        formUI.doneEvents(me); // 执行一系列操作事件
-                        if(typeof neui !== 'undefined' && typeof neui.destroyAnimate === 'function') neui.destroyAnimate();
-                    }, 100)
-                }else{
+            if(me.$opts.animate && typeof neui !== 'undefined' && typeof neui.showAnimate === 'function') neui.showAnimate();
+            // setTimeout(function(){
+                // ①.数据源类型为标准数据格式,即“标准表单配置数据”
+                if(me.$opts.type == 'standard') 
                     formUI.createStandardForm(me);
-                    formUI.callControls(me); // 根据控件类型调用相应控件
-                    formUI.doneEvents(me); // 执行一系列操作事件
-                }
-            }
-            // ②.数据源类型为楼盘数据格式,即“楼盘房号配置数据”
-            if(me.$opts.type == 'rooms'){
-                if(me.$opts.animate){
-                    if(typeof neui !== 'undefined' && typeof neui.showAnimate === 'function') neui.showAnimate();
-                    setTimeout(function(){
-                        formUI.createHouseForm(me);
-                        formUI.callControls(me); // 根据控件类型调用相应控件
-                        formUI.doneEvents(me); // 执行一系列操作事件
-                       
-                        if(typeof neui !== 'undefined' && typeof neui.destroyAnimate === 'function') neui.destroyAnimate();
-                    }, 100)
-                }else{
+                // ②.数据源类型为楼盘数据格式,即“楼盘房号配置数据”
+                if(me.$opts.type == 'rooms') 
                     formUI.createHouseForm(me);
-                    formUI.callControls(me); // 根据控件类型调用相应控件
-                    formUI.doneEvents(me); // 执行一系列操作事件
-                }
-            }
+                formUI.callControls(me); // 根据控件类型调用相应控件
+                formUI.doneEvents(me); // 执行一系列操作事件
+                if(me.$opts.animate && typeof neui !== 'undefined' && typeof neui.destroyAnimate === 'function') neui.destroyAnimate();
+            // }, 100)
         };
 
 
@@ -339,7 +317,7 @@
                     _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
                 var _attrListStr = ' id="' + ids + '"' + _classNameStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr; // 所有公用属性串
                 //
-                var _iconStr = icon == '' ? '' : '<i class="icon icon-' + icon + '"></i>',
+                var _iconStr = !me.$opts.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="icon icon-' + icon + '"></i>'),
                     _unitStr = unit == '' ? '' : '<em class="r-unit' + _unitClass + '">' + unit + '</em>',
                     _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a></a></em>';
                 var _crossStr = ( types == 'text' && me.$opts.layout.inputCross ) ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' : '',
