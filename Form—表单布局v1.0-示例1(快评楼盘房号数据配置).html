@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>快评楼盘房号配置数据</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css"><!--日历控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-picker.css"><!--Picker选择器-->
+    <link type="text/css" rel="stylesheet" href="assets/test/css/demo-kuaiping.css"><!--本页样式-->
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+</head>
+<body>
+    <div class="wrap">
+        <main>
+            <section class="enquiry">
+                <!--[========·提交询价区域·========]-->
+                <div class="grid__mortgage">
+                    <!---[++++++++·抵押物基本信息面板·++++++++]-->
+                    <div class="mortgage__basic">
+                        <!--[::::::::·静态表单模块·::::::::]-->
+                        <div class="mortgage__static"></div><!--/.mortgage__static-->
+                    </div><!--/.mortgage__basic-->
+                    <!---[++++++++·抵押物更多信息面板·++++++++]-->
+                    <div class="mortgage__more">
+                        <!--[::::::::·动态表单模块·::::::::]-->
+                        <div class="mortgage__dynamic"></div><!--/.mortgage__dynamic-->
+                        <!--[::::::::·切换输入模块·::::::::]--> <!--本模块不必手动添加,系统将自动添加-->
+                        <!--<div class="mortgage__switch"></div>--><!--/.mortgage__switch-->
+                    </div><!--/.mortgage__more-->
+                    <!---[++++++++·抵押物照片信息面板·++++++++]-->
+                    <div class="mortgage__photo"></div><!--/.mortgage__photo-->
+                </div><!--/.grid__mortgage-->
+                <!--[========·询价结果区域·========]-->
+                <div class="grid__result"></div><!--/.grid__result-->
+            </section><!--/.layout__enquiry-->
+
+            <section class="history">
+            </section><!--/.history-->
+        </main>
+    </div><!--/.wrap-->
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-form.js"></script><!--表单布局-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-picker.js"></script><!--Picker选择器-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+    <script type="text/javascript">
+        /*+----------------全局变量----------------+*/
+        /*+----------------FUNCTION----------------+*/
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====
+            var example = new NeForm(); // 实例化控件
+            
+            /**
+                --------------------------------
+                ①. 数据源类型为“标准数据格式”
+                --------------------------------
+                [字段名称]
+                title       字段名称(中文), 即显示名称
+                field       字段名称(英文), 即ID属性
+                type        输入框类型(可选)。值：文本, 日期, 数字, 单选, 下拉
+                value       初始值(可选), 默认空
+                unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
+                phone       是否电话类型(可选)。值：true, false 否(默认)
+                must        是否必填项(可选)。值：true 是, false 否(默认)
+                multiple    是否多行(可选)。值: true 是, false 否(默认)
+                readonly    是否强制为只读(可选), 默认false
+                disabled    是否强制为禁用(可选), 默认false
+                icon    自定义图标名称(即className)(可选), 默认图标名称为field参数值
+                attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
+            */
+            //——————————————————————————————————————————
+            //===== 加载静态表单(常规数据)
+            var regularJson = {
+                data:[
+                    {title:"评估目的", field:"purpose", type:"下拉", value:"", must:true},
+                    {title:"贷款品种", field:"loan", type:"下拉", value:"", must:true},
+                    {title:"客户姓名", field:"user", type:"文本", value:"张三", must:true},
+                    {title:"客户电话", field:"mobile", type:"文本", value:"", must:true, phone: true},
+                    {title:"抵押物所在地", field:"locate", type:"下拉", value:"", must:true},
+                    {title:"抵押物类型", field:"category", type:"下拉", value:"", must:true},
+                    {title:"日期", field:"tokyo", type:"日期", value:"", must:false},
+                    {title:"数字", field:"tokyo", type:"数字", value:"", must:false},
+                    {title:"单选", field:"tokyo", type:"单选", value:"", must:false}
+                ]
+            }
+
+            example.forms('.mortgage__static', {
+                source: regularJson, // 数据源
+                type: "standard", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
+                animate: false, // 是否启用转圈动画特效(可选), 默认false
+                houses: { // “楼盘房号配置数据”时(可选)
+                    houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
+                    switches: {
+                        enable: true, // 是否允许手动输入(可选), 默认true
+                        scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
+                    }
+                },
+                layout: { // 布局(可选)
+                    theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
+                    inputIcon: true, // 输入框是否使用图标(可选), 默认false
+                    inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
+                    inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                    mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
+                },
+                controls: { // 控件调用(可选)
+                    calendar: {  // 日历控件(可选)
+                        enable: true, // 是否启用(可选)，默认true
+                        empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
+                        theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
+                        format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
+                        minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
+                        maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
+                        callBack: null // 回调(可选) 
+                    },
+                    keyboard: { // 数字键盘控件(可选)
+                        enable: false // 是否启用(可选)，默认false
+                    }
+                }
+            });
+
+
+
+            /**
+                --------------------------------
+                ②.数据源类型为“楼盘房号数据格式”
+                --------------------------------
+                [字段说明]
+                val 表示显示值(要显示在界面上)，
+                hid 表示隐藏值(无须显示在界面上,只需隐藏起来,后续操作能取到值即可)
+                [字段名称]
+                val1    显示值1：字段名称(中文)、显示名称
+                val2    显示值2：字段值(即字段名称对应的值)、显示值(输入框值)
+                val3    显示值3：右边文字，一般是单位。eg. 平方米,元,万元,元/平方米
+                val4    显示值4：提示文字，一般用于必填时若为空就提示某些信息(输入框占位符placeholder)
+                hid1    隐藏值1：控件类型。值：空, 无, 楼盘, 幢号, 楼层, 房号, 建筑面积, 储藏间面积, 产权年限
+                hid2    隐藏值2：控件属性。值：空, 无, 日期, 数字, 单选, 下拉
+                                hid1=""时，hid2的值：空
+                                hid1="无"时，hid2的值：空, 无, 日期, 数字, 单选, 下拉
+                                hid1!="" && hid!="无"时，hid2的值：空(一般为空,也可能为其它值)
+                hid3    隐藏值3：控件属性标识。值：空, 非空。当为普通下拉类型(hid2="下拉")时，需要根据hid3获取下拉数据。
+                hid4    隐藏值4：是否多行。值：1 多行(input), 0 单行(textarea)
+                hid5    隐藏值5：是否必填。值：1 是, 0 否
+                hid6    隐藏值6：字段名称(英文)
+                [要点说明]
+                选择房号后建筑面积值要(根据后台返回的值)自动填充；
+                隐藏值1为“无”时，才须判断隐藏值2；
+                隐藏值1为“建筑面积”、“储藏间面积”时，直接采用数字类型(只能输入数字和小数点)；
+                隐藏值1为“产权年限”时，直接采用下拉类型；
+                隐藏值1为空时，(根据隐藏值4)直接采集单行或多行类型；
+                隐藏值2为空或“无”时，(根据隐藏值4)直接采集单行或多行类型；
+                保存时，要取到显示值2、隐藏值5、隐藏值6；
+
+             */
+
+            // 加载动态表单(配置数据)
+            var conditionJson = {
+                data:[
+                    {val1:"楼盘名称", val2:"万达广场", val3:"", val4:"请输入楼盘", hid1:"楼盘", hid2:"", hid3:"", hid4:"1", hid5:"1", hid6:"楼盘名称"},
+                    {val1:"幢号", val2:"3幢", val3:"", val4:"请选择幢号", hid1:"幢号", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"幢号"},
+                    {val1:"楼层", val2:"3楼", val3:"", val4:"请选择楼层", hid1:"楼层", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"楼层"},
+                    {val1:"房号", val2:"304号", val3:"", val4:"请选择房号", hid1:"房号", hid2:"", hid3:"下拉值", hid4:"0", hid5:"1", hid6:"房号"},
+                    {val1:"产权年限", val2:"70年", val3:"", val4:"请选择产权年限", hid1:"产权年限", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"产权年限"},
+                    {val1:"建筑面积", val2:"130", val3:"平方米", val4:"请输入建筑面积", hid1:"建筑面积", hid2:"", hid3:"101", hid4:"0", hid5:"1", hid6:"建筑面积"},
+                    {val1:"储藏间面积",	 val2:"30", val3:"平方米", val4:"请输入储藏间面积", hid1:"储藏间面积", hid2:"", hid3:"101", hid4:"0", hid5:"1", hid6:"储藏间面积"},
+                    {val1:"土地面积", val2:"120", val3:"平方米", val4:"请输入土地面积", hid1:"无", hid2:"数字", hid3:"101", hid4:"0", hid5:"1", hid6:"土地面积"},
+                    {val1:"日期", val2:"", val3:"", val4:"", hid1:"无", hid2:"日期", hid3:"", hid4:"0", hid5:"0", hid6:"日期"},
+                    {val1:"数字", val2:"", val3:"", val4:"", hid1:"无", hid2:"数字", hid3:"", hid4:"0", hid5:"0", hid6:"数字"}, 
+                    {val1:"单选", val2:"", val3:"", val4:"", hid1:"无", hid2:"单选", hid3:"", hid4:"0", hid5:"0", hid6:"单选"},
+                    {val1:"普通下拉", val2:"", val3:"", val4:"", hid1:"无", hid2:"下拉", hid3:"我是下拉1", hid4:"0", hid5:"0", hid6:"下拉"},
+                    {val1:"单行文本", val2:"", val3:"", val4:"", hid1:"", hid2:"", hid3:"", hid4:"0", hid5:"0", hid6:"单行文本"},
+                    {val1:"多行文本", val2:"", val3:"", val4:"", hid1:"", hid2:"", hid3:"", hid4:"1", hid5:"0", hid6:"多行文本"}
+                ]
+            }
+
+            
+            example.forms('.mortgage__dynamic', {
+                source: conditionJson, // 数据源
+                type: "rooms", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
+                animate: false, // 是否启用转圈动画特效(可选), 默认false
+                houses: { // “楼盘房号配置数据”时(可选)
+                    houseRightButton: true, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
+                    switches: {
+                        enable: true, // 是否允许手动输入(可选), 默认true
+                        scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
+                    }
+                },
+                layout: { // 布局(可选)
+                    theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
+                    inputIcon: true, // 输入框是否使用图标(可选), 默认false
+                    inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
+                    inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                    mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
+                },
+                controls: { // 控件调用(可选)
+                    calendar: {  // 日历控件(可选)
+                        enable: true, // 是否启用(可选)，默认true
+                        empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
+                        theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
+                        format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
+                        minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
+                        maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
+                        callBack: null // 回调(可选) 
+                    },
+                    keyboard: { // 数字键盘控件(可选)
+                        enable: false // 是否启用(可选)，默认false
+                    }
+                }
+            });
+
+
+
+            
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         系列事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====幢号下拉
+            var nCount = 0;
+            $(document).on('click', '#build.click-hand', function(){
+                var $this = $(this);
+                // console.log('我这里');
+                // nCount++;
+                // var value = nCount <= 1 ? '第1幢' : '';
+                // if(nCount >= 2) value = '';
+                // if(nCount >= 3) value = '第3幢';
+                // if(nCount >= 4) value = '';
+                // if(nCount >= 5) value = '第5幢';
+                // $(this).val(value);
+                // 后台返回
+                var normalJson = {
+                    "data":[
+                        // {"bh":"1001", "mc":""},
+                        // {"bh":"1001", "mc":"3幢"},
+                        // {"bh":"1002", "mc":"建设银行"},
+                        // {"bh":"1003", "mc":"民生银行"},
+                        // {"bh":"1004", "mc":"农业银行"},
+                        // {"bh":"1005", "mc":"工商银行"}
+                    ]
+                }
+
+                if(!checker.checkJsonHasData(normalJson)){ // 无数据
+                    example.switchHandEnter($(this)); // 切换成手动输入
+                    return;
+                }
+                $this.neuiPicker({
+                    caption: "选择银行",
+                    source: normalJson,
+                    format: {
+                        value: ["mc"],
+                        hid: ["bh"],
+                        forbid: "disabled"
+                    },
+                    value: "工商银行",
+                    onConfirm: function (e) {
+                        // console.log('您点了确定', e);
+                    }
+                })
+
+            });
+
+
+
+
+            
+            //——————————————————————————————————————————
+            //=====楼层下拉
+            $(document).on('click', '#floor.click-hand', function(){
+                example.switchHandEnter(this); // 切换成手动输入
+            });
+
+
+        });
+    </script>
+
+
+</body>
+</html>
