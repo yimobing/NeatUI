@@ -84,19 +84,25 @@
          * @param {object} opts 参数对象 
          * @returns 返回
          */
-        me.forms = function(element, options){
+        me.forms = function(elem, options){
             var defaults = {
                 source: {}, // 数据源
                 type: "standard", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式,即“标准表单配置数据”(默认), rooms 楼盘数据格式,即“楼盘房号配置数据”
                 animate: false, // 是否启用转圈动画特效(可选), 默认false
+                houses: { // “楼盘房号配置数据”时(可选)
+                    houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
+                    switches: {
+                        enable: true, // 是否允许手动输入(可选), 默认true
+                        scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
+                    }
+                },
                 layout: { // 布局(可选)
                     theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
                     inputIcon: false, // 输入框是否使用图标(可选), 默认 false
                     inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认 true
                     inputMust: false, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
-                    mustAlign: "left", // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
-                    houseRightButton: false // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
-                },
+                    mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
+                }, 
                 controls: { // 控件调用(可选)
                     calendar: {  // 日历控件(可选)
                         enable: true, // 是否启用(可选)，默认 true
@@ -112,11 +118,11 @@
                     }
                 }
             }
-            var selector = element.indexOf('#') >= 0 ? element.replace(/([\#]+)/g, '') :  ( element.indexOf('.') >= 0 ? tools.getClassNameString(element) : element.replace(/([\#\.]+)/g, '') );
+            var selector = elem.indexOf('#') >= 0 ? elem.replace(/([\#]+)/g, '') :  ( elem.indexOf('.') >= 0 ? tools.getClassNameString(elem) : elem.replace(/([\#\.]+)/g, '') );
             // --------全局赋值--------
             me.$opts = net.extend(true, {}, defaults, options || {}); // 控件参数
             me.$selector = selector;  // 节点ID或CLass属性值(不含选择器符号井号#或点号.). eg. 'floor'
-            me.$elem = element; // 节点ID或Class属性值(含选择器符号井号#或点号.). eg.'#floor', '.floor'
+            me.$elem = elem; // 节点ID或Class属性值(含选择器符号井号#或点号.). eg.'#floor', '.floor'
             me.$obj = document.getElementById(selector) == null ? document.getElementsByClassName(selector)[0] : document.getElementById(selector); // 元素dom对象
             // console.log('生成房号配置数据\nelem：', me.$elem, '\noptions：',me.$opts);
             // --------添加class属性--------
@@ -158,6 +164,7 @@
                         formUI.createHouseForm(me);
                         formUI.callControls(me); // 根据控件类型调用相应控件
                         formUI.doneEvents(me); // 执行一系列操作事件
+                       
                         if(typeof neui !== 'undefined' && typeof neui.destroyAnimate === 'function') neui.destroyAnimate();
                     }, 100)
                 }else{
@@ -171,11 +178,78 @@
 
 
         /**
-         * 生成交易税费表单
+         * 切换成手动输入
+         * @param {HTML DOM || jQuery Object} o 元素对象或jq选择器对象
+         * @param {string} limit 切换的范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
          */
-        me.taxes = function(){
-            //...
+        me.switchHandEnter = function(o, limit){
+            var elem = o instanceof jQuery ? o[0] : o;
+            var scope = typeof limit == 'undefined' ? 'related' : limit,
+                idName = elem.id,
+                className = elem.className;    
+            if(typeof className == 'undefined') return;
+            if(typeof neuiDialog == 'undefined') return;
+            if(typeof neuiDialog.alert !== 'function') return;
+            var $this = this;
+
+            //alert('className:'+className);
+            // 1.允许手动输入
+            if(me.$opts.houses.switches.enable) {
+                if(className.indexOf('build') >= 0){ // 如果是幢号
+                    neuiDialog.alert({
+                        animate: true,
+                        caption: '提示',
+                        message: '系统暂无该楼盘数据<br>请确认楼盘名称是否正确',
+                        buttons: ['名称错误，重新输入', '名称正确，允许我手动输入'],
+                        btnDirection: 'vertical',
+                        callBack: function(ret){
+                            if(ret == 1){
+                                // 楼盘名称清空并聚焦
+                                var el = document.querySelector('#house');
+                                el.value = ''; // 楼盘名称清空
+                                tools.setFocus(el); // 光标聚焦
+                                // 隐藏打叉图标
+                                var nextNodes = tools.getSiblingElement(el.parentNode);
+                                for(var i = 0; i < nextNodes.length; i++){
+                                    var next = nextNodes[i];
+                                    var attr = next.getAttribute('data-type');
+                                    if(typeof attr != 'undefined' && attr == 'cross'){
+                                        next.style.display = 'none';
+                                    }
+                                }
+                            }else if(ret == 2){
+                                formUI.switchToHand(scope, elem);
+                            }
+                        }
+                    })
+                }else{ //如果是楼层、房号等
+                    neuiDialog.alert({
+                        animate: true,
+                        caption: '提示',
+                        message: '系统无数据，将为您自动切换手动输入',
+                        buttons: ['确定'],
+                        callBack:function(){
+                            formUI.switchToHand(scope, elem);
+                        }
+                    })
+                }
+            }
+
+            // 2.不允许手动输入
+            else {
+                var message = '';
+                if(className.indexOf('build') >= 0) message = '幢号';
+                if(className.indexOf('floor') >= 0) message = '楼层';
+                if(className.indexOf('room') >= 0) message = '房号';
+                if(className.indexOf('property') >= 0) message = '产权年限';
+                neuiDialog.alert({
+                    caption: '提示',
+                    message: '对不起，该楼盘暂无' + message + '数据',
+                    buttons: ['确定']
+                })
+            }
         };
+        
 
     };
 
@@ -260,7 +334,7 @@
                     _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
                     _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
                     _unitClass = !me.$opts.layout.inputCross ? '' : ' has-cell-cross';
-                    _crossClass = ''; // me.$opts.layout.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
+                    _crossClass = ''; // me.$opts.houses.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
                     _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
                 var _attrListStr = ' id="' + ids + '"' + _classNameStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr; // 所有公用属性串
                 //
@@ -410,7 +484,7 @@
                                 ids = 'house';
                                 icons = ' icon-house';
                                 // boxWidth = '100%';
-                                if(me.$opts.layout.houseRightButton)
+                                if(me.$opts.houses.houseRightButton)
                                     _BtHtml = '<div class="item-cell"><button type="button" id="btn-query-house">查询</button></div>';
                             }else{
                                 className += ' click-hand';
@@ -444,7 +518,7 @@
                             className += ' click-num click-jzmj';
                             ids = 'jzmj';
                             icons = ' icon-metre';
-                            readonly = true;
+                            me.$opts.controls.keyboard.enable ? readonly = true : readonly = false;
                             // types = 'number'; // 只能输入数字(部分手机不支持)
                         }
 
@@ -452,7 +526,7 @@
                             className += ' click-num click-ccjmj';
                             ids = 'ccjmj';
                             icons = ' icon-metre';
-                            readonly = true;
+                            me.$opts.controls.keyboard.enable ? readonly = true : readonly = false;
                             // types = 'number'; // 只能输入数字(部分手机不支持)
                         }
                     }
@@ -483,7 +557,7 @@
                 var _boxWClass = ''; // boxWidth == '' ? '' : (boxWidth == '100%' ? ' w-100' : ''); // 宽
                 var _iconStr = icons == '' || me.$opts.layout.inputIcon === false ? '' : '<i class="icon' + icons + '"></i>'; // 图标
                 //
-                var _crossClass = me.$opts.layout.houseRightButton && _BtHtml != '' ? ' has-cell-btn' : '';
+                var _crossClass = me.$opts.houses.houseRightButton && _BtHtml != '' ? ' has-cell-btn' : '';
                 var _crossStyle = val2.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
                 _RHtml += types == 'text' && me.$opts.layout.inputCross 
                             ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' 
@@ -511,6 +585,20 @@
 
             tools.removeAllChildren(me.$obj); // 先清空元素内容
             tools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
+
+            
+            // 切换输入模块：“如查无数据，请选择手动输入”、“取消手动输入”
+            var _tmpHtml = [
+                '<div class="block__switch block__switch-hand">',
+                    '<span>如查无数据，请选择</span>',
+                    '<button type="button" id="btn-manual">手动输入</button>',
+                '</div>',
+                '<div class="block__switch block__switch-select">',
+                    '<button type="button" id="btn-dropdown">取消手动输入</button>',
+                '</div>',
+            ].join('\r\n');
+            var switchNode = tools.createOneNextNode(me.$obj, "switch");
+            switchNode.innerHTML = _tmpHtml; 
         },
 
         /**
@@ -546,8 +634,8 @@
                         el.fadeIn(400).neuiKeyboard({
                             title:'数字键盘'
                             // mode: 'computer',
-                            // size: 'normal' // 键盘尺寸,仅在mode='computer'时有效(可缺省). normal 正常(默认), small 小型, little 较小型, tiny 微型	
-                            // hasPoint:false, // 是否有小数点(可缺省),默认 true
+                            // size: 'normal' // 键盘尺寸,仅在mode='computer'时有效(可选). normal 正常(默认), small 小型, little 较小型, tiny 微型	
+                            // hasPoint:false, // 是否有小数点(可选),默认 true
                         })
                     }
                 })
@@ -600,19 +688,20 @@
          * @param {object} me 控件对象参数
          */
         doneEvents: function(me){
+            var _this = this;
             // 单选开关
-            /* var radioNode = document.getElementsByClassName('ne-switch');
-            Array.from(radioNode).forEach(function(el, i){
-                el.addEventListener('click', function(){
-                    if(this.value == 1){
-                        this.setAttribute('checked', false);
-                        this.setAttribute('value', 0);
-                    }else{
-                        this.setAttribute('checked', true);
-                        this.setAttribute('value', 1);
-                    }
-                })
-            }) */
+            // var radioNode = document.getElementsByClassName('ne-switch');
+            // Array.from(radioNode).forEach(function(el, i){
+            //     el.addEventListener('click', function(){
+            //         if(this.value == 1){
+            //             this.setAttribute('checked', false);
+            //             this.setAttribute('value', 0);
+            //         }else{
+            //             this.setAttribute('checked', true);
+            //             this.setAttribute('value', 1);
+            //         }
+            //     })
+            // })
             
             // 打叉图标
             var crossNode = document.querySelectorAll('[data-type="cross"]');
@@ -672,7 +761,113 @@
                     }
                 })      
             })
+
+
+            // “楼盘房号配置数据”时(可选)
+            if(me.$opts.type == 'rooms'){
+                var manualNode = document.getElementById('btn-manual'),
+                    dropNode = document.getElementById('btn-dropdown');
+                if(manualNode == null || dropNode == null) return;
+                manualNode.addEventListener('click', function(){ // 切换成手动输入
+                    _this.switchToHand('related');
+                })
+                dropNode.addEventListener('click', function(){ // 切换成下拉，即取消手动输入
+                    _this.switchToSelect('related');
+                })
+            }
+        },
+
+
+
+         /**
+         * 切换成手动输入
+         * @param {string} scope 要切换手动输入的范围(可选)。related 仅限关联元素(默认), self 仅自身元素, all 所有使用下拉选择的元素
+         * @param {HTML DOM}} o 当前点击的元素对象(可选)
+         */
+          switchToHand:function(scope, o){
+            var pale = typeof scope == 'undefined' ? 'related' : scope;
+            var elem = '';
+            if(pale == 'self') elem = o instanceof jQuery ? o[0] : o;
+            if(pale == 'related') elem = document.getElementsByClassName('clear-relation click-hand');
+            if(pale == 'all') elem = document.getElementsByClassName('click-hand');
+
+            // 设置元素可写入
+            var setCanWrite = function(el){
+                var _placeholder = typeof el.getAttribute('placeholder') == 'undefined' ? '' : el.getAttribute('placeholder').toString().replace(/选择/g, '输入'),
+                    _onblur = typeof el.getAttribute('onblur') == 'undefined' ? '' : el.getAttribute('onblur').toString().replace(/选择/g, '输入'),
+                    _onfocus = typeof el.getAttribute('onfocus') == 'undefined' ? '' : el.getAttribute('onfocus').toString().replace(/(this\.blur\(\))/g, '').replace(/([\;]+)/g, ';');
+                el.classList.remove('click-hand');
+                el.classList.add('click-select');
+                el.removeAttribute('readonly');
+                el.removeAttribute('onfocus');
+                el.setAttribute('onfocus', _onfocus);
+                el.setAttribute('placeholder', _placeholder);
+                el.setAttribute('onblur', _onblur);
+            }
+            if(elem.item) // 元素对象集合, NodeList 对象
+                Array.from(elem).forEach(function(el){
+                    setCanWrite(el);
+                })
+            else // DOM对象
+                setCanWrite(elem);
+            // 根据切换范围
+            if(pale == 'self'){ // 只切换自身
+                if(typeof o != 'undefined' && o != ''){
+                    o = o instanceof jQuery ? o[0] : o;
+                    tools.setFocus(o); // 光标聚焦
+                }
+            }else{
+                // 显示“取消手动输入”，隐藏“如查无数据，请选择手动输入”
+                var parent = document.getElementById('btn-manual').parentNode;
+                parent.style.display = 'none';
+                tools.getNextElement(parent).style.display = '';
+            }
+        },
+
+
+
+        /**
+         * 切换成下拉选择
+         * @param {string} scope 要切换手动输入的范围(可选)。related 仅限关联元素(默认), self 仅自身元素, all 所有使用下拉选择的元素
+         * @param {HTML DOM} obj 当前对象(可选)
+         */
+        switchToSelect: function(scope, o){
+            var pale = typeof scope == 'undefined' ? 'related' : scope;
+            var elem = '';
+            if(pale == 'self') elem = o instanceof jQuery ? o[0] : o;
+            if(pale == 'related') elem = document.getElementsByClassName('clear-relation click-select');
+            if(pale == 'all') elem = document.getElementsByClassName('click-select');
+            var setCannotWrite = function(el){
+                var _blur = 'this.blur();',
+                    _onfocus = "this.placeholder='';this.blur();",
+                    _placeholder = typeof el.getAttribute('placeholder') == 'undefined' ? '' : el.getAttribute('placeholder').toString().replace(/(输入|填写)/g, '选择'),
+                    _onblur = typeof el.getAttribute('onblur') == 'undefined' ? '' : el.getAttribute('onblur').toString().replace(/(输入|填写)/g, '选择');
+                el.classList.add('click-hand');
+                el.classList.remove('click-select');
+                el.setAttribute('readonly', true);
+                el.removeAttribute('onfocus');
+                el.setAttribute('onfocus', _onfocus);
+                el.setAttribute('placeholder', _placeholder);
+                el.setAttribute('onblur', _onblur);
+            }
+            if(elem.item) // 元素对象集合, NodeList 对象
+                Array.from(elem).forEach(function(el){
+                    setCannotWrite(el);
+                })
+            else // DOM对象
+                setCanWrite(elem);  
+            if(pale != 'self'){
+                // 显示“如查无数据，请选择手动输入”，隐藏“取消手动输入”
+                var parent = document.getElementById('btn-dropdown').parentNode;
+                parent.style.display = 'none';
+                tools.getPrevElement(parent).style.display = '';
+            }
         }
+
+
+       
+
+
     };
     
 
@@ -788,11 +983,86 @@
         },
 
         /**
+         * 光标聚焦，并移动到最后
+         * 默认的调用element.focus()光标会在最前面，故需重写focus
+         * @param {HTML DOM} 要聚焦的元素
+         */
+        setFocus: function(o){
+            if (o.setSelectionRange) {
+                o.focus();
+                o.setSelectionRange(o.value.length, o.value.length);
+            } else {
+                var range = o.createTextRange(); // 创建Range对象操作文本
+                range.moveStart('character', o.value.length); // 修改文档的开始节点，向后移动长度
+                range.collapse(false);  // true 移动到开始, false 移动到最后
+                range.select();
+            }
+        },
+
+
+        /**
+         * 在当前元素后面创建一个新元素(新元素指定class类名属性)
+         * 注：该新元素的class属性命名规则和当前元素的第一个class类名一样。
+            eg. 已有节点class="pp__content a b c"，新元素指定class必须包含client，则新元素的class="pp__client"
+            eg. 已有节点class="pp-content a b c"，新元素指定class必须包含client，则新元素的class="pp-client"
+            eg. 已有节点class="pp_content a b c"，新元素指定class必须包含client，则新元素的class="pp_client"
+            eg. 已有节点class="pp a b c"，新元素指定class必须包含client，则新元素的class="client"
+         * @param {HTML DOM} o 当前元素
+         * @param {string} cname 指定新元素的class类名
+         * @returns {HTML DOM} 返回新元素对象
+         */
+        createOneNextNode: function(o, cname){
+            if(typeof o.className == 'undefined' ) return null;
+            var tmpClassName = o.className.toString().split(' ')[0];
+            var jointArr = [ '__', '_', '-' ]; // 可能的分割符组成的数组
+            var indexArr = [ ]; // 分割符在字符串的位置组成的数组
+            for(var i = 0; i < jointArr.length; i++){
+                indexArr.push(tmpClassName.indexOf(jointArr[i]));
+            }
+            var index = this.getArrayMaxValue(indexArr); // 取最大值
+            var jointChar = ''; // 新元素类名连接符
+            for(var i = 0; i < jointArr.length; i++){
+                var char = jointArr[i];
+                if(tmpClassName.indexOf(char) >= 0){
+                    jointChar = char;
+                    break;
+                }
+            }
+            // console.log('连字符：', jointChar);
+            if(jointChar == '') jointChar = '__';
+            var realClassName = tmpClassName.substr(0, index).toString().replace(/([]+)/g, '');
+            // console.log('jointArr：', jointArr, '\ntmpClassName：',tmpClassName, '\nindex：', index, '\nrealClassName：', realClassName);
+            var finalClassName = realClassName + ( realClassName === '' ? '' : jointChar ) + cname;
+            var tempNode = document.getElementsByClassName(finalClassName)[0];
+            if(tempNode == null){
+                tempNode = document.createElement('div');
+                tempNode.className = finalClassName;
+                tempNode.className += finalClassName == cname ? '' : ' ' + cname;
+                this.insertAfter(tempNode, o);
+            }
+            return tempNode;
+        },
+
+
+        /**
+         * 取数组中的最大值
+         * @param {array} arr 数组
+         * @returns {number} 返回数组中最大的值的那个元素
+         */
+        getArrayMaxValue: function(arr){
+            var max = arr[0];
+            for(var i = 0; i < arr.length; i++){
+                max = max < arr[i + 1] ? arr[i + 1] : max;
+            }
+            return max;
+        },
+
+        /**
          * 获取字符串对应的元素节点(供jq调用)
          * eg1. 'floor' <=> '.floor'
          * eg2. 'floor build' <=> '.floor.build'
          * @param {string} ps_str 字符串
-         * @returns 返回元素节点字符串
+         * @returns 返回元素节点
          */
         getStringClassName: function(ps_str){
             if(ps_str.replace(/([ ]+)/g, '') === '') return '';
@@ -808,7 +1078,7 @@
          * 获取元素节点对应的字符串(供dom调用)
          * eg1. '.floor' <=> 'floor'
          * eg2. '.floor.build' <=> 'floor build'
-         * @param {string} ps_str 元素节点字符串
+         * @param {string} ps_str 元素节点
          * @returns 返回字符串
          */
         getClassNameString: function(ps_str){
@@ -820,7 +1090,7 @@
 
 
         /**
-         * 原生js获取子节点集合 (兼容ie6+)
+         * 原生js获取子节点集合(不含孙子节点) (兼容ie6+)
          * 注：已排除文本、空格，换行符
          * @param {HTML DOM} o 当前节点
          * @returns {NodeList || null} 返回子节点集合或null
@@ -835,7 +1105,44 @@
                     o.removeChild(children[i]);
                 }
             }
-            return o.childNodes;
+            return o.childNodes; // return o.children;
+        },
+
+        /**
+         * 原生js获取第一个子节点 (兼容ie6+)
+         * 注：已排除文本、空格，换行符
+         * @param {HTML DOM} o 当前节点
+         * @returns {HTML DOM || null} 返回元素对象或null
+         */
+         getFirstChildElement: function(o){
+            if(o == null) return null;
+            return o.children[0];
+        },
+
+        /**
+         * 原生js获取最后一个子节点 (兼容ie6+)
+         * 注：已排除文本、空格，换行符
+         * @param {HTML DOM} o 当前节点
+         * @returns {HTML DOM || null} 返回元素对象或null
+         */
+         getLastChildElement: function(o){
+            if(o == null) return null;
+            return o.children[o.children.length - 1];
+        },
+
+
+        /**
+         * 原生js获取所有兄弟节点
+         * @param {HTML DOM} o 当前节点
+         * @returns {Array} 返回兄弟节点组成的数组
+         */
+        getSiblingElement: function(o) {
+            var a = [];
+            var p = o.parentNode.children;
+            for(var i = 0, len = p.length; i< len; i++) {
+                if(p[i] !== o) a.push(p[i]);
+            }
+            return a;
         },
             
 
@@ -843,7 +1150,7 @@
          * 原生js获取下一个兄弟节点 (兼容ie6+)
          * 注：已排除文本、空格，换行符
          * @param {HTML DOM} o 当前节点
-         * @returns {HTML DOM || null} 返回元素节点或null
+         * @returns {HTML DOM || null} 返回元素对象或null
          */
         getNextElement: function(o){
             if(o == null) return null;
@@ -869,7 +1176,7 @@
          * 原生js获取上一个兄弟节点 (兼容ie6+)
          * 注：已排除文本、空格，换行符
          * @param {HTML DOM} o 当前节点
-         * @returns {HTML DOM || null} 返回元素节点或null
+         * @returns {HTML DOM || null} 返回元素对象或null
          */
          getPrevElement: function(o){
             if(o == null) return null;
@@ -889,29 +1196,8 @@
                 }
             }
         },
-  
 
-        /**
-         * 原生js获取第一个子节点 (兼容ie6+)
-         * 注：已排除文本、空格，换行符
-         * @param {HTML DOM} o 当前节点
-         * @returns {HTML DOM || null} 返回元素节点或null
-         */
-        getFirstChildElement: function(o){
-            if(o == null) return null;
-            return o.children[0];
-        },
-
-        /**
-         * 原生js获取最后一个子节点 (兼容ie6+)
-         * 注：已排除文本、空格，换行符
-         * @param {HTML DOM} o 当前节点
-         * @returns {HTML DOM || null} 返回元素节点或null
-         */
-         getLastChildElement: function(o){
-            if(o == null) return null;
-            return o.children[o.children.length - 1];
-        },
+        
 
 
 
