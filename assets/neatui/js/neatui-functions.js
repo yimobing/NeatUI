@@ -911,7 +911,7 @@ var utilities = {
 
 
     /**
-     * 原生js获取子节点集合 (兼容ie6+)
+     * 原生js获取子节点元素集合(不含孙子节点) (兼容ie6+)
      * 注：已排除文本、空格，换行符
      * @param {HTML DOM} o 当前节点
      * @returns {NodeList || null} 返回子节点集合或null
@@ -928,13 +928,54 @@ var utilities = {
         }
         return o.childNodes;
     },
+    
+
+    /**
+     * 原生js获取第一个子节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {HTML DOM || null} 返回元素对象或null
+     */
+    getFirstChildElement: function(o){
+        if(o == null) return null;
+        return o.children[0];
+    },
 
 
     /**
-     * 原生js获取下一个兄弟节点 (兼容ie6+)
+     * 原生js获取最后一个子节点 (兼容ie6+)
      * 注：已排除文本、空格，换行符
      * @param {HTML DOM} o 当前节点
-     * @returns {HTML DOM || null} 返回元素节点或null
+     * @returns {HTML DOM || null} 返回元素对象或null
+     */
+    getLastChildElement: function(o){
+        if(o == null) return null;
+        return o.children[o.children.length - 1];
+    },
+
+
+
+
+    /**
+     * 原生js获取所有兄弟节点
+     * @param {HTML DOM} o 当前节点
+     * @returns {Array} 返回兄弟节点组成的数组
+     */
+    getSiblingElement: function(o) {
+        var a = [];
+        var p = o.parentNode.children;
+        for(var i = 0, len = p.length; i< len; i++) {
+            if(p[i] !== o) a.push(p[i]);
+        }
+        return a;
+    },
+
+        
+    /**
+     * 原生js获取下一个兄弟节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前元素对象节点
+     * @returns {HTML DOM || null} 返回元素对象或null
      */
     getNextElement: function(o){
         if(o == null) return null;
@@ -956,11 +997,12 @@ var utilities = {
     },
     
 
+
     /**
      * 原生js获取上一个兄弟节点 (兼容ie6+)
      * 注：已排除文本、空格，换行符
      * @param {HTML DOM} o 当前节点
-     * @returns {HTML DOM || null} 返回元素节点或null
+     * @returns {HTML DOM || null} 返回元素对象或null
      */
     getPrevElement: function(o){
         if(o == null) return null;
@@ -982,28 +1024,7 @@ var utilities = {
     },
 
 
-    /**
-     * 原生js获取第一个子节点 (兼容ie6+)
-     * 注：已排除文本、空格，换行符
-     * @param {HTML DOM} o 当前节点
-     * @returns {HTML DOM || null} 返回元素节点或null
-     */
-    getFirstChildElement: function(o){
-        if(o == null) return null;
-        return o.children[0];
-    },
-
-
-    /**
-     * 原生js获取最后一个子节点 (兼容ie6+)
-     * 注：已排除文本、空格，换行符
-     * @param {HTML DOM} o 当前节点
-     * @returns {HTML DOM || null} 返回元素节点或null
-     */
-        getLastChildElement: function(o){
-        if(o == null) return null;
-        return o.children[o.children.length - 1];
-    },
+   
 
     /**
      * 原生js获取元素style属性
