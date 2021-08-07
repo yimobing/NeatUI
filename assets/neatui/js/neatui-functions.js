@@ -922,7 +922,7 @@ var utilities = {
         for (var i = 0; i < children.length; i++) {
             var s = children[i].nodeName,
                 r = children[i].nodeValue;
-            if (s == "#text" && /\s/.test(r)) { // 文本节点或空节点(空或换行)
+            if (s == "#comment" || (s == "#text" && /\s/.test(r))) { // 排除注释节点或文本节点或空节点(空或换行)
                 o.removeChild(children[i]);
             }
         }
@@ -1899,7 +1899,34 @@ var format = {
 //=====================================================================================================================
 
 var convert = {
-		
+
+    /**
+     * 将任何未知的对象转化为dom对象
+     * @param {selector || Query Object || HTML DOM} o 未知的对象。几种可能的值如下：
+        选择器 '.user', '#user' 
+        jq对象 '.user', '#user'
+        dom对象 document.getElementById('#user') 或 document.getElementsByClassName('user')
+    * @returns {HTML DOM} 返回dom对象(注意不是元素集合nodeList)
+    */
+    anyToDomObject: function(o){
+        // var str = o.toString().replace(/([\#\.]+)/g, ''); // 去掉井号#和点号.
+        if(o == null) return null;
+        return o instanceof jQuery ? 
+            o[0] : 
+            ( o.nodeName ?  // 判断是否dom对象
+                o : 
+                (
+                    o.item ? // nodeList对象
+                    o[0] : 
+                    (   document.getElementById(o.toString().replace(/([\#\.]+)/g, '')) != null ? 
+                        document.getElementById(o.toString().replace(/([\#\.]+)/g, '')) : 
+                        document.getElementsByClassName(o.toString().replace(/([\#\.]+)/g, ''))[0]
+                    )
+                ) 
+            );
+    },
+
+
 	/**
 	 * 小数转化成百分数
 	 * eg. 0.5 <=> 50%
