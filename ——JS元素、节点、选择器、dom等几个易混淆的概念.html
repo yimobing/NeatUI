@@ -31,3 +31,19 @@ else if (OBJ.nodeName) {
 document.getElementById(a); // 这个是元素或节点
 '#user' // CSS选择器
 $('#user'); // JQ选择器
+
+
+
+
+//=============================
+https://developer.mozilla.org/zh-CN/docs/Web/API/Node/nodeName
+
+
+Node.nodeName // 节点名称的字符串
+Node.nodeValue // 节点名称的值
+
+
+eg.
+var user = document.getElementById('user');
+var s = user.nodeName,
+    r = user.nodeValue;

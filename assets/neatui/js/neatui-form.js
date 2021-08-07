@@ -1,6 +1,6 @@
 /**
  * [NeForm]、[neuiSearchBox]
- * 表单配置控件，含：通用表单控件、搜索框控件
+ * 表单配置控件，含：表单控件、搜索框控件
  * Version：1.0.0
  * compatible：ie8 and ie8+
  * Website: https://github.com/yimobing/neatui
@@ -11,7 +11,7 @@
  */
 
 /*———————————————————————————————————————————————————————————————————————————————————————————————
- *                                    一、通用表单控件(原生JS)
+ *                                    一、表单控件(原生JS)
 ———————————————————————————————————————————————————————————————————————————————————————————————*/
  ;(function(root, factory){
     if (typeof define === 'function' && define.amd) { // amd
@@ -24,6 +24,8 @@
 })(this, function(){
     var net = { };
     //================================================================
+    //                      NeForm对象
+    //================================================================
     var NeForm = function(){
         var me = this;
 
@@ -32,7 +34,7 @@
          *          数据源字段说明
          * ********************************
             --------------------------------
-            ①. 数据源类型为标准数据格式，即“标准表单配置数据”
+            ①. 数据源类型为“标准表单”，即“标准配置数据”
             --------------------------------
             [字段名称]
             title       字段名称(中文), 即显示名称
@@ -49,7 +51,7 @@
             attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"         
 
             --------------------------------
-            ②.数据源类型为楼盘数据格式,即“楼盘房号配置数据”
+            ②.数据源类型为“楼盘表单”,即“楼盘房号配置数据”
             --------------------------------
             [字段说明]
             val 表示显示值(要显示在界面上)，
@@ -87,7 +89,7 @@
         me.forms = function(elem, options){
             var defaults = {
                 source: {}, // 数据源
-                type: "standard", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式,即“标准表单配置数据”(默认), rooms 楼盘数据格式,即“楼盘房号配置数据”
+                type: "standard", // 数据源类型(即数据源字段类型)。值：standard “标准表单”,即“标准配置数据”(默认), rooms “楼盘表单”,即“楼盘房号配置数据”
                 animate: false, // 是否启用转圈动画特效(可选), 默认false
                 houses: { // “楼盘房号配置数据”时(可选)
                     houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
@@ -142,12 +144,16 @@
             // ·--------按数据源类型--------
             if(me.$opts.animate && typeof neui !== 'undefined' && typeof neui.showAnimate === 'function') neui.showAnimate();
             // setTimeout(function(){
-                // ①.数据源类型为标准数据格式,即“标准表单配置数据”
-                if(me.$opts.type == 'standard') 
+                // ①.数据源类型为“标准表单”,即“标准配置数据”
+                if(me.$opts.type == 'standard') {
+                    me.$obj.className += ' ne-config-standard';
                     formUI.createStandardForm(me);
-                // ②.数据源类型为楼盘数据格式,即“楼盘房号配置数据”
-                if(me.$opts.type == 'rooms') 
+                }
+                // ②.数据源类型为“楼盘表单”,即“楼盘房号配置数据”
+                if(me.$opts.type == 'rooms') {
+                    me.$obj.className += ' ne-config-rooms';
                     formUI.createHouseForm(me);
+                }
                 formUI.callControls(me); // 根据控件类型调用相应控件
                 formUI.doneEvents(me); // 执行一系列操作事件
                 if(me.$opts.animate && typeof neui !== 'undefined' && typeof neui.destroyAnimate === 'function') neui.destroyAnimate();
@@ -158,7 +164,7 @@
 
         /**
          * 切换成手动输入
-         * @param {HTML DOM || jQuery Object} o 元素对象或jq选择器对象
+         * @param {HTML DOM || jQuery Object} o 当前元素dom对象或jq选择器对象
          * @param {string} limit 切换的范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
          */
         me.switchHandEnter = function(o, limit){
@@ -230,19 +236,339 @@
         };
         
 
-    };
+
+        //-----------------------------------------------------
+        //                  表单公用函数
+        //-----------------------------------------------------
+        /**
+         * 判断表单是否有数据
+         * @param {HTML DOM || jQuery Object} 表单根节点dom对象或jq选择器对象
+         * @returns {boolean} 返回布尔值。true 有数据, false 无数据
+         * 返回值为数组arr
+         * arr.length>0 则面板有数据,否则没有数据
+         */
+         me.isFormHasData = function(o){
+            var arr = [];
+            o = tools.anyToDomObject(o);
+            var child = tools.getChildElement(o);
+            Array.from(child).forEach(function(el){
+                var input = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                Array.from(input).forEach(function(ele){
+                    var type = ele.getAttribute('type');
+                    var value = '';
+                    if(type == null || type == 'text') {
+                        value = ele.value;
+                    }
+                    else if(type == 'checkbox') {
+                        value = ele.checked ? 1 : 0;
+                    }
+                    // console.log('值：', value);
+                    if(type == 'checkbox') {
+                        if(value != 0) arr.push(value);
+                    }
+                    else {
+                        if(value.toString().replace(/([ ]+)/g, '') !== '') arr.push(value);
+                    }
+                   
+                })
+            })
+            return arr.length > 0 ? true : false;
+        };
+
+
+
+        /**
+         * 判断表单是否全部为输入类型，而不包含下拉类型
+         * @return {boolean} 返回值： true 全是输入类型, false 不全是输入类型(有下拉类型)
+         */
+        me.isFormAllCanWrite = function(){
+            var result = true; //默认是
+            $('.showform .eform-box').each(function(){
+                var eleClassName = '.click-hand';
+                if($(eleClassName,this).length != 0){ //有下拉类型
+                    result = false; //重置为否
+                    return false;
+                }
+            })
+            return result;
+        };
+    
+
+        /**
+         * 校验表单格式与完整性
+         * 符合eform格式的表单都可以用此校验方法
+         * @param {string | selector} ps_node 表单根节点
+         * @param {number} ps_dialog_zIndex 对话框层级(可选).默认z-index 114
+         * @returns {boolean} 返回布尔值. true 数据正常, false 数据异常
+         */
+        me.examineForm = function(ps_node, ps_dialog_zIndex){
+            var tips1 = '';
+            var tips2 = '';
+            $(ps_node).find('.eform-one').each(function(){
+                var label = $('.eform-l label', this).text(),
+                    value = $('input, textarea', this).val();
+                    isMust = $('.r-star', this).length > 0 ? true : false;
+                    isPhone = $('.icon-tel', this).length > 0 ? true : false;
+                //console.log('label:', label, '-value:', value, '-isMUst:',isMust, '-isPhone:',isPhone)
+                if(isMust && value == '') tips1 += label + '、';
+                if(isMust && isPhone && !checker.checkTel(value, 'both')) tips2 += label + '、';
+            })
+            //校验完整性
+            if(tips1 != ''){
+                meuiDialog.alert({
+                    zIndex: ps_dialog_zIndex,
+                    animate: true,
+                    caption: '提示',
+                    message: '请填写：' + tips1.substr(0, tips1.length - 1),
+                    buttons: ['确定']
+                })
+                return false;
+            }
+            //校验电话
+            if(tips2 != ''){
+                meuiDialog.alert({
+                    zIndex: ps_dialog_zIndex,
+                    animate: true,
+                    caption: '提示',
+                    message: '请填写正确的：' + tips2.substr(0, tips2.length - 1),
+                    buttons: ['确定']
+                })
+                return false;
+            }
+            return true;
+        };
+
+        
+        /**
+         * 获取整个表单数据
+         * @return {json} 返回JSON数组
+         */
+         me.getFormData = function(){
+            var json = {}
+            $('.showform .eform-box').each(function(){
+                var eleClassName = '.click-input';
+                var title = $('label',this).text(), //显示名称（会变)
+                    hide = typeof $(eleClassName,this).attr('data-hide') == 'undefined' ? '' : $(eleClassName,this).attr('data-hide'), // 英文字段值 
+                    hid1 = typeof $(eleClassName,this).attr('data-hid1') == 'undefined' ? '' :  $(eleClassName,this).attr('data-hid1'), //隐藏值1（不会变)
+                    id = $(eleClassName,this)[0].id,
+                    className = $(eleClassName,this)[0].className.toString().replace(/click-input /g,''),
+                    bh = typeof $(eleClassName,this).attr('data-bh') == 'undefined' ? '' :  $(eleClassName,this).attr('data-bh'),
+                    value = $(eleClassName,this).val();
+                var oneJson = {"title":title, "id":id, "className":className, "bh":bh, "value":value}
+                json[hide] = oneJson;
+            })
+            return json;
+        };
+
+
+
+
+
+        //-----------------------------------------------------
+        //                  “标准表单”专用函数
+        //-----------------------------------------------------
+        /**
+         * 获取“标准表单”数据
+         * @param {array|string} ps_type 数组或字符串. 'array' JSON数据(默认）， 'tooltip' 提示信息
+         * @param {array|string} 返回值为数组或字符串
+         */
+        me.getStandardFormData = function(ps_type){
+            var json = {}
+            $('.showsheet .eform-box').each(function(){
+                var eleClassName = '.click-input';
+                var title = $('label',this).text(), //显示名称（会变)
+                    hid1 = typeof $(eleClassName,this).attr('data-hid1') == 'undefined' ? '' :  $(eleClassName,this).attr('data-hid1'), //隐藏值1（不会变)
+                    id = $(eleClassName,this)[0].id,
+                    className = $(eleClassName,this)[0].className.toString().replace(/click-input /g,''),
+                    bh = typeof $(eleClassName,this).attr('data-bh') == 'undefined' ? '' :  $(eleClassName,this).attr('data-bh'),
+                    value = $(eleClassName,this).val();
+                var oneJson = {"title":title, "id":id, "className":className, "bh":bh, "value":value}
+
+                var field = (hid1 == '' || hid1 == '无' ? title : hid1);
+                json[field] = oneJson;
+            })
+
+            var tips = '';
+            var dialog1 = '';
+            var dialog2 = '';
+            $('.showsheet .eform-box').each(function(){
+                if($(this).is(':visible')){
+                    var text = $('label',this).text();
+                    var placeholder = (typeof $('.click-input',this).attr('placeholder') == 'undefined') ? '' : $('.click-input',this).attr('placeholder');
+                    var value = $('.click-input',this).val();
+                    if(placeholder!='' && value=='') dialog1 += text + '、';
+                    //console.log('text:',text,' placeholder:',placeholder, ' value:',value);
+                    if(value != '' && $(this).find('.eform-tel').length > 0){ //验证电话格式
+                        if(!checker.checkTel(value, 'both')) dialog2 += '请填写正确的' + text;
+                    }
+                }
+            })
+            tips += dialog1 == '' ? '' : '请填写' + dialog1.substr(0, dialog1.length - 1) +'<br>'; //去掉最后一个字符
+            tips += dialog2 == '' ? '' : dialog2;
+
+            var types = typeof ps_type == 'undefined' ? 'array' : ps_type;
+            if(types == 'array') return json;
+            if(types == 'tooltip') return tips;
+        };
+
+
+
+
+
+        //-----------------------------------------------------
+        //                  “楼盘表单”专用函数
+        //-----------------------------------------------------
+        /**
+         * 判断“楼盘表单”是否有数据
+         * 返回值为数组arr
+         * arr.length>0 则面板有数据,否则没有数据
+         */
+        me.isRoomFormHasData = function(){
+            var arr = [];
+            $('.showjson .eform-box').each(function(){
+                var value = $('.click-input',this).val();
+                if(value != '' && value != 0) arr.push({"value":value});
+            })
+            return arr; 
+        };
+
+
+        /**
+         * 判断抵押物类型是否为住宅
+         * @returns {boolean} 返回值：true 是住宅, false 非住宅,即“其他(如商业、工业等非住宅用途)”
+         */
+         me.isRoomFormPawnTypeHouse = function(){
+            var hid1Arr = [];
+            $('.showform .eform-box').each(function(){
+                var eleClassName = '.click-input';
+                var title = $('label',this).text(), //显示名称（会变)
+                    hid1 = typeof $(eleClassName,this).attr('data-hid1') == 'undefined' ? '' :  $(eleClassName,this).attr('data-hid1'); //隐藏值1（不会变)
+                    hid1Arr.push(hid1);
+            })
+            //console.log('arr:', hid1Arr);
+            var houseArr = ['楼盘', '幢号', '楼层', '房号']; //住宅类型hid1必备的值
+            var count = 0;
+            for(var i = 0; i < hid1Arr.length; i++){
+                var hid1 = hid1Arr[i];
+                for(var j = 0; j < houseArr.length; j++){
+                    var value = houseArr[j];
+                    if(hid1 == value) count++;
+                }
+            }
+            var result = count >= houseArr.length ? true : false; //是否住宅
+            return result;
+        },
+
+            
+        /**
+         * 过滤楼盘名称中的特殊字符
+         */
+        me.filterRoomFormHouseChar = function(str){
+            //过滤html
+            var str = str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g,''); //过滤css
+            str = str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g,''); //过滤JS
+            str = str.replace(/<[^<>]+?>/g,'');  //过滤html标签
+            str = str.replace(/\ +/g,''); //去掉空格
+            str = str.replace(/[\r\n]+?/g,''); //去掉换行
+            str = str.replace(/&npsp;/ig, ''); //去掉npsp;
+            //str = str.replace(/[\w\d\_\-?？!！]/g,''); //过滤数字、字母、下划线、短线、问号，感叹号等
+            return str;
+        };
+
+        
+        /**
+         * 点击关联元素中任意一个，提示用户“前面的数据是否为空”
+         * 也就是前面栏的数据如果为空，则当前栏不允许输入或选择下拉
+         * 用于：楼盘名称、幢号、楼层、房号等关联数据
+         * @param {object} obj 当前对象
+         * @return {string} 返回提示信息（空表示前面的数据是完整的）
+         */
+        me.warnRoomFormRelatedPreviousEmpty = function(obj){
+            var index = $(obj).parents('.eform-box').index();
+            var warnInfo = '';
+            for(i=0;i<index;i++){
+                var $eq = $('.showjson .eform-box').eq(i);
+                var text = $eq.find('label').text();
+                var value = $eq.find('.click-input').val();
+                if(value=='') warnInfo+=text + '、';
+            }
+            if(warnInfo!='')
+                warnInfo = '请填写：' + warnInfo.substr(0,warnInfo.length-1); //去掉最后一个符号
+            return warnInfo;
+        };
+
+
+        /**
+         * 上级元素值改变，则清空下级关联元素数据
+         * 用于：楼盘名称、幢号、楼层、房号等关联数据
+         * @param {object} obj 当前对象
+         * @param {string} oValue 老值
+         * @param {string} nValue 新值
+         * eg.
+         * 楼盘名称改变：清空幢号、楼层、房号
+         * 幢号改变：清空楼层、房号
+         * 楼层改变：清空房号
+         */
+        me.clearRoomFormRelatedSubordinateData = function(obj, oValue, nValue){
+            if(nValue != oValue){
+                $(obj).parents('.eform-box').nextAll().find('.clear-relation').val('').attr('data-bh','');
+            }
+        };
+
+
+        /**
+         * 获取“楼盘表单”数据
+         * @param {array|string} ps_type 数组或字符串. 'array' 数组(默认）， 'tooltip' 提示信息
+         * @param {array|string} 返回值为数组或字符串
+         */
+        me.getRoomFormData = function(ps_type){
+            var arr = [];
+            var warnInfo = '';
+            var tips = ''; //检验完整性的提示信息
+            var oneJson = {}
+            $('.showjson .eform-box').each(function(){
+                var eleClassName = '.click-input';
+                if($(eleClassName,this).length>0){
+                    var val2 = $(eleClassName,this).val(),
+                        hid5 = $(eleClassName,this).data('hid5'),
+                        hid6 = $(eleClassName,this).data('hid6');
+                    onejson = {"val2":val2, "hid5":hid5, "hid6":hid6}
+                    if(hid5=='1' && val2 ==''){
+                        warnInfo += $('label',this).text() + '、';
+                    }
+                }
+                arr.push(onejson);
+            });
+            
+            for(var i=0;i<arr.length;i++){ //数组去重
+                for(var j=i+1;j<arr.length;){
+                    if(arr[i].val2==arr[j].val2 && arr[i].hid5==arr[j].hid5 && arr[i].hid6==arr[j].hid6) arr.splice(j,1);
+                    else j++;
+                }
+            }
+            tips =  warnInfo == '' ? '' : '请填写：' + warnInfo.substr(0,warnInfo.length - 1);	
+            //console.log('types:',types,'\ntips:',tips,'\narr:',arr);
+            var types = typeof ps_type == 'undefined' ? 'array' : ps_type;
+            if(types == 'array') return arr;
+            if(types == 'tooltip') return tips;
+        };
+
+
+
+
+ 
+    }; //END NeForm
 
 
 
 
 
     //================================================================
-    /**
-     * 表单控件UI对象
-     */
+    //                      表单控件UI对象
+    //================================================================
     var formUI = {
         /**
-         * 生成标准数据格式,即“标准表单配置数据”
+         * 生成“标准表单”,即“标准配置数据”
          * @param {object} me 控件对象参数
          */
         createStandardForm: function(me){
@@ -359,7 +685,7 @@
 
 
         /**
-         * 生成楼盘数据格式,即“楼盘房号配置数据”
+         * 生成“楼盘表单”,即“楼盘房号配置数据”
          * @param {object} me 控件对象参数
          */
         createHouseForm: function(me){
@@ -855,9 +1181,12 @@
        
 
 
-    };
+    }; // END formUI
     
 
+
+    //================================================================
+    //                      EXTEND拓展对象
     //================================================================
     /**
      * 原生JS模拟JQ extend合并对象
@@ -951,14 +1280,13 @@
         function fnIsArray(o) {
             return Object.prototype.toString.call(o) == '[object Array]';
         }
-    };
+    }; // END net.extend
 
 
 
     //================================================================
-    /**
-     * 工具库
-     */
+    //                      工具库
+    //================================================================
     var tools = {
         /**
          * 判断是否JSON对象
@@ -1075,6 +1403,33 @@
         },
 
 
+        
+        /**
+         * 将未知的对象转化为dom对象
+         * @param {selector || Query Object || HTML DOM} o 未知的对象。几种可能的值如下：
+            选择器 '.user', '#user' 
+            jq对象 '.user', '#user'
+            dom对象 document.getElementById('#user') 或 document.getElementsByClassName('user')
+         * @returns {HTML DOM} 返回dom对象(注意不是元素集合nodeList)
+         */
+        anyToDomObject: function(o){
+            // var str = o.toString().replace(/([\#\.]+)/g, ''); // 去掉井号#和点号.
+            if(o == null) return null;
+            return o instanceof jQuery ? 
+                o[0] : 
+                ( o.nodeName ?  // 判断是否dom对象
+                    o : 
+                    (
+                        o.item ? // nodeList对象
+                        o[0] : 
+                        (   document.getElementById(o.toString().replace(/([\#\.]+)/g, '')) != null ? 
+                            document.getElementById(o.toString().replace(/([\#\.]+)/g, '')) : 
+                            document.getElementsByClassName(o.toString().replace(/([\#\.]+)/g, ''))[0]
+                        )
+                    ) 
+                );
+        },
+
 
         /**
          * 原生js获取子节点集合(不含孙子节点) (兼容ie6+)
@@ -1088,7 +1443,7 @@
             for (var i = 0; i < children.length; i++) {
                 var s = children[i].nodeName,
                     r = children[i].nodeValue;
-                if (s == "#text" && /\s/.test(r)) { // 文本节点或空节点(空或换行)
+                if (s == "#comment" || (s == "#text" && /\s/.test(r))) { // 排除注释节点或文本节点或空节点(空或换行)
                     o.removeChild(children[i]);
                 }
             }
@@ -1336,13 +1691,14 @@
             }
 
             return bools;
-        },
+        }
 
-    };
+    }; // END tools
     
 
+
     //================================================================
-    //                  ie兼容
+    //                      ie兼容
     //================================================================
     /**
      * ie9-兼容forEach
@@ -1356,11 +1712,11 @@
     };   
 
     //================================================================
-    return NeForm; // 返回对象
+    //                      返回对象
+    //================================================================
+    return NeForm; 
 
 });
-
-
 
 
 
@@ -1639,7 +1995,7 @@ var neuiSearchBox = {
 
 
     //================================================================
-    //                       对外暴露控件接口
+    //                      对外暴露控件接口
     //================================================================
     $.fn.neuiSearchBox = function(method){
         if(methods[method]){

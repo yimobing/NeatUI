@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>Form | 表单布局</title>
+    <title>Form | 静态表单布局</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css">
@@ -233,8 +233,8 @@
                     <div class="control__caption"><h4>通用表单控件</h4></div>
                     <div class="control__operation">
                         <div class="control__operation-group">
-                            <button type="button" class="ne-btn has-texture" id="btn-generate-normal">生成“标准表单配置数据”</button>
-                            <button type="button" class="ne-btn has-texture" id="btn-close-normal">关闭“标准表单配置数据”</button>
+                            <button type="button" class="ne-btn has-texture" id="btn-generate-normal">生成“标准配置数据”</button>
+                            <button type="button" class="ne-btn has-texture" id="btn-close-normal">关闭“标准配置数据”</button>
                         </div><!--/.control__operation-group-->
                         <div class="control__operation-group">
                             <button type="button" class="ne-btn has-texture" id="btn-generate-house">生成“楼盘房号配置数据”</button>
@@ -319,7 +319,7 @@
             var example = new NeForm(); // 实例化控件
             /**
                 --------------------------------
-                ①. 数据源类型为“标准数据格式”
+                ①. 数据源类型为““标准表单””
                 --------------------------------
                 [字段名称]
                 title       字段名称(中文), 即显示名称
@@ -336,7 +336,7 @@
                 attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
             */
             //——————————————————————————————————————————
-            //=====生成“标准表单配置数据”按钮
+            //=====生成“标准配置数据”按钮
             $('#btn-generate-normal').on('click', function(){
                 // 创建静态表单(常规数据)
                 var regularJson = {
@@ -354,7 +354,7 @@
                 }
                 example.forms('.mortgage__static', {
                     source: regularJson, // 数据源
-                    type: "standard", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
+                    type: "standard", // 数据源类型(即数据源字段类型)。值：standard “标准表单”(默认), rooms 楼盘房号数据格式
                     animate: true, // 是否启用转圈动画特效(可选), 默认false
                     houses: { // “楼盘房号配置数据”时(可选)
                         houseRightButton: true, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
@@ -390,7 +390,7 @@
 
 
             //——————————————————————————————————————————
-            //=====关闭“标准表单配置数据”按钮
+            //=====关闭“标准配置数据”按钮
             $('#btn-close-normal').on('click', function(){
                 $('.mortgage__static').empty();
             });
@@ -456,7 +456,7 @@
 
                 example.forms('.mortgage__dynamic', {
                     source: conditionJson, // 数据源
-                    type: "rooms", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
+                    type: "rooms", // 数据源类型(即数据源字段类型)。值：standard “标准表单”(默认), rooms 楼盘房号数据格式
                     animate: true, // 是否启用转圈动画特效(可选), 默认false
                     houses: { // “楼盘房号配置数据”时(可选)
                         houseRightButton: true, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false

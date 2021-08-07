@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>快评楼盘房号配置数据</title>
+    <title>Form | 表单控件</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
@@ -25,8 +25,25 @@
     <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
 </head>
 <body>
+    <style>
+        body{ max-width: 1024px; margin: 0 auto; }
+        h1{  color: #1aad19; text-align: center; font-size: 32px; font-weight: bold;}
+        h2{ margin: 45px auto 5px 10px; color: #1aad19; font-size: 24px;  }
+        h2:first-child{ margin-top: 0; }
+        .group__title{ margin: 15px auto 5px auto; font-size: 14px; font-weight: bold; }
+        .panel__webname{ margin: 25px auto;  background-color: #fff; padding: 15px 25px; }
+        .webname_description{ margin-top: 25px; color: #777; font-size: 16px; }
+    </style>
+
     <div class="wrap">
         <aside>
+            <section class="panel__webname">
+                <h1>Form | 表单控件</h1>
+                <div class="webname_description">
+                    表单控件，即通过指定格式的数组源，生成一组表单。其中数据源分两种：“标准配置数据” 和 “楼盘房号配置数据”。
+                </div>
+            </section>
+
             <section class="code">
 <pre>
     ----------------------------------------
@@ -34,26 +51,31 @@
     ----------------------------------------
     var example = new NeForm(); // 实例化控件
     可调用的函数如下：
+    函数1：
     /**
     * 创建表单
     * @param {string} elem 根节点ID或Class选择器字符串。eg1.'#user', eg2.'.user'
     * @param {object} opts 参数对象 
     */
     example.forms(elem, options);
+
+    函数2：
     /**
     * 切换成手动输入
     * @param {HTML DOM || jQuery Object} o 元素对象或jq选择器对象
     * @param {string} limit 切换的范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
     */
     example.switchHandEnter(o, limit); 
+
+    
     
     ----------------------------------------
                 [options参数]
     ----------------------------------------
     其中options参数如下：
     var options = {
-        source: regularJson, // 数据源
-        type: "standard", // 数据源类型(即数据源字段类型)。值：standard 标准数据格式(默认), rooms 楼盘房号数据格式
+        source: dataSource, // 数据源
+        type: "standard", // 数据源类型(即数据源字段类型)。值：standard “标准表单”,即“标准配置数据”(默认), rooms “楼盘表单”,即“楼盘房号配置数据”
         animate: false, // 是否启用转圈动画特效(可选), 默认false(待实现)
         houses: { // “楼盘房号配置数据”时(可选)
             houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
@@ -85,12 +107,64 @@
         }
     }
 
+
+
+
+    ----------------------------------------
+                [数据源参数source格式]
+    ----------------------------------------
+    /**
+    --------------------------------
+    ①. 数据源类型为“标准表单”,即“标准配置数据”
+    --------------------------------
+    [字段名称]
+    title       字段名称(中文), 即显示名称
+    field       字段名称(英文), 即ID属性
+    type        输入框类型(可选)。值：文本, 日期, 数字, 单选, 下拉
+    value       初始值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
+    unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
+    phone       是否电话类型(可选)。值：true, false 否(默认)
+    must        是否必填项(可选)。值：true 是, false 否(默认)
+    multiple    是否多行(可选)。值: true 是, false 否(默认)
+    readonly    是否强制为只读(可选), 默认false
+    disabled    是否强制为禁用(可选), 默认false
+    icon    自定义图标名称(即className)(可选), 默认图标名称为field参数值
+    attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
+    */
+    /**
+    --------------------------------
+    ②.数据源类型为“楼盘表单”,即“楼盘房号配置数据”
+    --------------------------------
+    [字段说明]
+    val 表示显示值(要显示在界面上)，
+    hid 表示隐藏值(无须显示在界面上,只需隐藏起来,后续操作能取到值即可)
+    [字段名称]
+    val1    显示值1：字段名称(中文)、显示名称
+    val2    显示值2：字段值(即字段名称对应的值)、显示值(输入框值)
+    val3    显示值3：右边文字，一般是单位。eg. 平方米,元,万元,元/平方米
+    val4    显示值4：提示文字，一般用于必填时若为空就提示某些信息(输入框占位符placeholder)
+    hid1    隐藏值1：控件类型。值：空, 无, 楼盘, 幢号, 楼层, 房号, 建筑面积, 储藏间面积, 产权年限
+    hid2    隐藏值2：控件属性。值：空, 无, 日期, 数字, 单选, 下拉
+                    hid1=""时，hid2的值：空
+                    hid1="无"时，hid2的值：空, 无, 日期, 数字, 单选, 下拉
+                    hid1!="" && hid!="无"时，hid2的值：空(一般为空,也可能为其它值)
+    hid3    隐藏值3：控件属性标识。值：空, 非空。当为普通下拉类型(hid2="下拉")时，需要根据hid3获取下拉数据。
+    hid4    隐藏值4：是否多行。值：1 多行(input), 0 单行(textarea)
+    hid5    隐藏值5：是否必填。值：1 是, 0 否
+    hid6    隐藏值6：字段名称(英文)
+    [要点说明]
+    选择房号后建筑面积值要(根据后台返回的值)自动填充；
+    隐藏值1为“无”时，才须判断隐藏值2；
+    隐藏值1为“建筑面积”、“储藏间面积”时，直接采用数字类型(只能输入数字和小数点)；
+    隐藏值1为“产权年限”时，直接采用下拉类型；
+    隐藏值1为空时，(根据隐藏值4)直接采集单行或多行类型；
+    隐藏值2为空或“无”时，(根据隐藏值4)直接采集单行或多行类型；
+    保存时，要取到显示值2、隐藏值5、隐藏值6；
+    */
 </pre>
             </section>
         </aside>
 
-
-        
         <main>
             <section class="enquiry">
                 <!--[========·提交询价区域·========]-->
@@ -117,6 +191,39 @@
             <section class="history">
             </section><!--/.history-->
         </main>
+
+        <footer>
+            <section class="operate">
+                <div class="operate__group">
+                    <div class="operate__caption">表单公用函数</div>
+                    <div class="operate__buttons">
+                        <button type="button" id="btn-isFormHasData">判断表单是否有数据</button>
+                        <button type="button" id="btn-isFormAllCanWrite">判断表单是否全部为输入类型，而不包含下拉类型</button>
+                        <button type="button" id="btn-examineForm">校验表单格式与完整性</button>
+                        <button type="button" id="btn-getFormData">获取表单数据</button>
+                    </div><!--/.operate__buttons-->
+                </div><!--/.group-->
+
+                <div class="operate__group">
+                    <div class="operate__caption">“标准表单”专用函数</div>
+                    <div class="operate__buttons">
+                        <button type="button" id="btn-getStandardFormData">获取“标准表单”数据</button>
+                    </div><!--/.operate__buttons-->
+                </div><!--/.group-->
+
+                <div class="operate__group">
+                    <div class="operate__caption">“楼盘表单”专用函数</div>
+                    <div class="operate__buttons">
+                        <button type="button" id="btn-isRoomFormHasData">判断“楼盘表单”是否有数据</button>
+                        <button type="button" id="btn-isRoomFormPawnTypeHouse">判断抵押物类型是否为住宅</button>
+                        <button type="button" id="btn-filterRoomFormHouseChar">过滤楼盘名称中的特殊字符</button>
+                        <button type="button" id="btn-warnRoomFormRelatedPreviousEmpty">点击关联元素中任意一个，提示用户“前面的数据是否为空”</button>
+                        <button type="button" id="btn-clearRoomFormRelatedSubordinateData">上级元素值改变，则清空下级关联元素数据</button>
+                        <button type="button" id="btn-getRoomFormData">获取“楼盘表单”数据</button>
+                    </div><!--/.operate__buttons-->
+                </div><!--/.group-->
+            </section>
+        </footer>
     </div><!--/.wrap-->
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
@@ -135,38 +242,23 @@
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         $(function(){
+
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //+                                                          初始化                                                 
+            //+                                                     初始化事件
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
             //=====
             var example = new NeForm(); // 实例化控件
-            /**
-                --------------------------------
-                ①. 数据源类型为“标准数据格式”
-                --------------------------------
-                [字段名称]
-                title       字段名称(中文), 即显示名称
-                field       字段名称(英文), 即ID属性
-                type        输入框类型(可选)。值：文本, 日期, 数字, 单选, 下拉
-                value       初始值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
-                unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
-                phone       是否电话类型(可选)。值：true, false 否(默认)
-                must        是否必填项(可选)。值：true 是, false 否(默认)
-                multiple    是否多行(可选)。值: true 是, false 否(默认)
-                readonly    是否强制为只读(可选), 默认false
-                disabled    是否强制为禁用(可选), 默认false
-                icon    自定义图标名称(即className)(可选), 默认图标名称为field参数值
-                attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
-            */
+           
             //——————————————————————————————————————————
-            //===== 创建静态表单(常规数据)
+            //===== 创建常规数据表单
             var regularJson = {
                 data:[
                     {title:"评估目的", field:"purpose", type:"下拉", value:"", must:true},
                     {title:"贷款品种", field:"loan", type:"下拉", value:"", must:true},
-                    {title:"客户姓名", field:"user", type:"文本", value:"张三", must:true},
+                    {title:"客户姓名", field:"user", type:"文本", value:"", must:true},
                     {title:"客户电话", field:"mobile", type:"文本", value:"", must:true, phone: true},
+                    {title:"客户备注", field:"note", type:"文本", value:"", multiple: true, must:true},
                     {title:"抵押物所在地", field:"locate", type:"下拉", value:"", must:true},
                     {title:"抵押物类型", field:"category", type:"下拉", value:"", must:true},
                     {title:"日期", field:"tokyo", type:"日期", value:"", must:false},
@@ -179,50 +271,18 @@
                 source: regularJson,
                 type: "standard",
                 animate: false,
-                layout: { // 布局(可选)
-                    theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
-                    inputIcon: false, // 输入框是否使用图标(可选), 默认false
-                    inputCross: false, // 输入框右侧是否有打叉图标(可选), 默认true
-                    inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
-                    mustAlign: "right" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
+                layout: {
+                    theme: "popular",
+                    inputIcon: true,
+                    inputCross: true,
+                    inputMust: true,
+                    mustAlign: "left"
                 }
             });
 
-
-
-             /**
-                --------------------------------
-                ②.数据源类型为“楼盘房号数据格式”
-                --------------------------------
-                [字段说明]
-                val 表示显示值(要显示在界面上)，
-                hid 表示隐藏值(无须显示在界面上,只需隐藏起来,后续操作能取到值即可)
-                [字段名称]
-                val1    显示值1：字段名称(中文)、显示名称
-                val2    显示值2：字段值(即字段名称对应的值)、显示值(输入框值)
-                val3    显示值3：右边文字，一般是单位。eg. 平方米,元,万元,元/平方米
-                val4    显示值4：提示文字，一般用于必填时若为空就提示某些信息(输入框占位符placeholder)
-                hid1    隐藏值1：控件类型。值：空, 无, 楼盘, 幢号, 楼层, 房号, 建筑面积, 储藏间面积, 产权年限
-                hid2    隐藏值2：控件属性。值：空, 无, 日期, 数字, 单选, 下拉
-                                hid1=""时，hid2的值：空
-                                hid1="无"时，hid2的值：空, 无, 日期, 数字, 单选, 下拉
-                                hid1!="" && hid!="无"时，hid2的值：空(一般为空,也可能为其它值)
-                hid3    隐藏值3：控件属性标识。值：空, 非空。当为普通下拉类型(hid2="下拉")时，需要根据hid3获取下拉数据。
-                hid4    隐藏值4：是否多行。值：1 多行(input), 0 单行(textarea)
-                hid5    隐藏值5：是否必填。值：1 是, 0 否
-                hid6    隐藏值6：字段名称(英文)
-                [要点说明]
-                选择房号后建筑面积值要(根据后台返回的值)自动填充；
-                隐藏值1为“无”时，才须判断隐藏值2；
-                隐藏值1为“建筑面积”、“储藏间面积”时，直接采用数字类型(只能输入数字和小数点)；
-                隐藏值1为“产权年限”时，直接采用下拉类型；
-                隐藏值1为空时，(根据隐藏值4)直接采集单行或多行类型；
-                隐藏值2为空或“无”时，(根据隐藏值4)直接采集单行或多行类型；
-                保存时，要取到显示值2、隐藏值5、隐藏值6；
-
-             */
-
-            // 创建动态表单(配置数据)
+             
+            //——————————————————————————————————————————
+            // 创建配置数据表单
             var conditionJson = {
                 data:[
                     {val1:"楼盘名称", val2:"万达广场", val3:"", val4:"请输入楼盘", hid1:"楼盘", hid2:"", hid3:"", hid4:"1", hid5:"1", hid6:"楼盘名称"},
@@ -252,7 +312,28 @@
                         enable: true, 
                         scope: "related"
                     }
+                },
+                layout: {
+                    theme: "popular",
+                    inputIcon: true,
+                    inputCross: true,
+                    inputMust: true,
+                    mustAlign: "left"
                 }
+            });
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         按钮事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====判断表单是否有数据按钮
+            $('#btn-isFormHasData').on('click', function(){
+                var bool = example.isFormHasData('.mortgage__static');
+                console.log('bool：', bool);
             });
 
 
