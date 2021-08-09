@@ -3,7 +3,7 @@
 * 对话框插件
 * Author: ChenMufeng
 * Date: 2018.8.30
-* Update:2021.07.09
+* Update:2021.08.09
 */
 //(function($){
 //	$.fn.extend({
@@ -141,7 +141,7 @@
 				loadDelay:100, //转圈延迟时间(animate=true时有效).默认100（单位：毫秒）
 				popup:true, //是否允许弹出窗口. 是|true,否|false,默认true
 				bubbleRet:1, //popup=false时,指定默认执行第几个按钮事件(默认值1). eg. popup=false,bubbleRet=2,表示不弹出窗口,但默认执行第2个按钮里的事件
-				caption:'提示', //标题.默认"提示"
+				caption:'', //标题.默认空。"提示"
 				message:'欢迎使用对话框插件！', //提示信息.默认"欢迎使用对话框插件！"
 				buttons:['确定','取消'], //按钮名称.默认['确定','取消']
 				theme:'', //插件主题(可选). 蓝色|blue,黑色|black,绿色|green,红色|red,橙色|orange,紫色|purple.默认空''
@@ -193,11 +193,13 @@
 				crossStyle = showCross==true ? '' : ' style="display:none"';
 			var level = zIndex < 999 ? '' : 'z-index:' + (zIndex + 1) + ';'; //默认窗口层级999
 			var _alertStyle = level == '' ? '' : ' style="' + level + '"';
-			var _alertContentStr = message == '' ? '' : '<div class="alert-content">'+message+'</div><!--/alert-content-->';
+			var _contentClassName = caption.toString().replace(/([ ]+)/g, '') === '' ? ' no-caption' : '';
+			var _captionClassName = message.toString().replace(/([ ]+)/g, '') === '' ? ' no-content' : '';
+			var _alertContentStr = message == '' ? '' : '<div class="alert-content' + _contentClassName + '">'+message+'</div><!--/alert-content-->';
 			var _html = '<div class="' + IdClass + '"' + nodeStr + ' data-maskId="' + shade + '"' + _alertStyle + '>'+
 						'	<div class="alert-layout'+themeClass+'">'+
 								'<div class="alert-close ne-dialog-close"'+crossStyle+'></div>'+
-								'<div class="alert-caption">'+caption+'</div><!--/alert-caption-->'+
+								( caption.toString().replace(/([ ]+)/g, '') === '' ? '' : '<div class="alert-caption' + _captionClassName + '">'+caption+'</div><!--/alert-caption-->' ) +
 								_alertContentStr+
 								'<div class="alert-button-group'+btnClass+'">';
 							for(var i=0;i<buttons.length;i++){
