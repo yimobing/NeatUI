@@ -4,7 +4,7 @@
 * 对话框控件
 * Author: ChenMufeng
 * Date：2018.8.30
-* Update: 2021.07.09
+* Update: 2021.08.09
 */
 
 html,body{width:100%;margin:0 auto;padding:0;}
@@ -135,6 +135,12 @@ html,body,header,section,footer,div,ul,ol,li,img,a,span,em,del,legend,center,str
 	font-size: 16px;
 	word-wrap: break-word;
 	word-break: break-all;
+}
+
+.alert-caption.no-content,
+.alert-content.no-caption{
+	padding: 30px 10px;
+	color: #333;
 }
 .alert-button-group{
 	display:-webkit-box;  
