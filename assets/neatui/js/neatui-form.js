@@ -7,7 +7,7 @@
  * Author: ChenMufeng
  * QQ: 1614644937
  * Date: 2021.03.06
- * Update: 2021.08.065
+ * Update: 2021.08.09
  */
 
 /*———————————————————————————————————————————————————————————————————————————————————————————————
@@ -28,6 +28,24 @@
     //================================================================
     var NeForm = function(){
         var me = this;
+
+         /**
+         * ********************************
+         *          表单类型说明
+         * ********************************
+            [表单类型说明]
+            class属性含有：
+            click-input         只要标签为input或textarea，就必须加此属性值
+            click-textarea      多行输入框
+            click-hand          下拉
+            click-radio         单选
+            click-num           数字
+            click-date          日期
+
+            click-single-input  单行输入框(只用于“楼盘房号配置数据”时)
+            click-dropdown      普通下拉(单个下拉)(只用于“楼盘房号配置数据”时)
+
+         */
 
         /**
          * ********************************
@@ -61,7 +79,7 @@
             val2    显示值2：字段值(即字段名称对应的值)、显示值(输入框值)
             val3    显示值3：右边文字，一般是单位。eg. 平方米,元,万元,元/平方米
             val4    显示值4：提示文字，一般用于必填时若为空就提示某些信息(输入框占位符placeholder)
-            hid1    隐藏值1：控件类型。值：空, 无, 楼盘, 幢号, 楼层, 房号, 建筑面积, 储藏间面积, 产权年限
+            hid1    隐藏值1(不会变)：控件类型。值：空, 无, 楼盘, 幢号, 楼层, 房号, 建筑面积, 储藏间面积, 产权年限
             hid2    隐藏值2：控件属性。值：空, 无, 日期, 数字, 单选, 下拉
                             hid1=""时，hid2的值：空
                             hid1="无"时，hid2的值：空, 无, 日期, 数字, 单选, 下拉
@@ -69,7 +87,7 @@
             hid3    隐藏值3：控件属性标识。值：空, 非空。当为普通下拉类型(hid2="下拉")时，需要根据hid3获取下拉数据。
             hid4    隐藏值4：是否多行。值：1 多行(input), 0 单行(textarea)
             hid5    隐藏值5：是否必填。值：1 是, 0 否
-            hid6    隐藏值6：字段名称(英文)
+            hid6    隐藏值6：字段名称(英文)(键值)
             [要点说明]
             选择房号后建筑面积值要(根据后台返回的值)自动填充；
             隐藏值1为“无”时，才须判断隐藏值2；
@@ -89,8 +107,7 @@
         me.forms = function(elem, options){
             var defaults = {
                 source: {}, // 数据源
-                type: "standard", // 数据源类型(即数据源字段类型)。值：standard “标准表单”,即“标准配置数据”(默认), rooms “楼盘表单”,即“楼盘房号配置数据”
-                animate: false, // 是否启用转圈动画特效(可选), 默认false
+                type: "standard", // 数据源类型(即数据源字段类型)。值：standard “标准表单”,即“标准配置数据”(默认), rooms “楼盘表单”,即“楼盘房号配置数据”    
                 houses: { // “楼盘房号配置数据”时(可选)
                     houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
                     switches: {
@@ -98,27 +115,40 @@
                         scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
                     }
                 },
-                layout: { // 布局(可选)
-                    theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
-                    inputIcon: false, // 输入框是否使用图标(可选), 默认 false
-                    inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认 true
-                    inputMust: false, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
-                    mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
-                }, 
-                controls: { // 控件调用(可选)
-                    calendar: {  // 日历控件(可选)
-                        enable: true, // 是否启用(可选)，默认 true
-                        empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
-                        theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
-                        format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
-                        minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
-                        maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
-                        callBack: null // 回调(可选)
+                config: { // 配置项(可选)
+                    animate: false, // 是否启用转圈动画特效(可选), 默认false(待实现)
+                    layout: { // 布局(可选)
+                        theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
+                        inputIcon: false, // 输入框是否使用图标(可选), 默认 false
+                        inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认 true
+                        inputMust: false, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                        mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
+                    }, 
+                    controls: { // 控件调用(可选)
+                        calendar: {  // 日历控件(可选)
+                            enable: true, // 是否启用(可选)，默认 true
+                            empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
+                            theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
+                            format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
+                            minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
+                            maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
+                            callBack: null // 回调(可选)
+                        },
+                        keyboard: { // 数字键盘控件(可选)
+                            enable: false // 是否启用(可选)，默认false
+                        }
                     },
-                    keyboard: { // 数字键盘控件(可选)
-                        enable: false // 是否启用(可选)，默认false
+                    format: { // 校验数据格式(可选)
+                        phone: { // 电话号码格式(可选)
+                            mode: "standard", // 校验模式(可选)。值： standard 标准模式，即严格校验电话格式(默认), loose 宽松模式，即只校验电话位数
+                            pattern: "mobilephone", // 验证类型(只在mode="standard"时有效)(可选)。值：mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
+                            bit: { // 校验的电话位数(只在mode="loose"时有效)(可选)
+                                from: 6, // 校验6位(可选)。与to配合使用,可与to值相等
+                                to: 12 // 校验12位(可选)。与from配合使用,可与from值相等
+                            }
+                        }
                     }
-                }
+                } 
             }
             var selector = elem.indexOf('#') >= 0 ? elem.replace(/([\#]+)/g, '') :  ( elem.indexOf('.') >= 0 ? tools.getClassNameString(elem) : elem.replace(/([\#\.]+)/g, '') );
             // --------全局赋值--------
@@ -129,8 +159,8 @@
             // console.log('生成房号配置数据\nelem：', me.$elem, '\noptions：',me.$opts);
             // --------添加class属性--------
             me.$obj.className += ' ne-configuration ne-form';
-            me.$obj.className += me.$opts.layout.theme != 'popular' ? '' : ' theme-popular';
-            me.$obj.className += me.$opts.layout.inputMust && me.$opts.layout.mustAlign == 'left' ? ' has-must-left' : '';
+            me.$obj.className += me.$opts.config.layout.theme != 'popular' ? '' : ' theme-popular';
+            me.$obj.className += me.$opts.config.layout.inputMust && me.$opts.config.layout.mustAlign == 'left' ? ' has-must-left' : '';
             // ·--------校验数据格式--------
             var source = me.$opts.source;
             if(!tools.isJsonObject(source)){
@@ -142,7 +172,7 @@
                 return;
             }
             // ·--------按数据源类型--------
-            if(me.$opts.animate && typeof neui !== 'undefined' && typeof neui.showAnimate === 'function') neui.showAnimate();
+            if(me.$opts.config.animate && typeof neui !== 'undefined' && typeof neui.showAnimate === 'function') neui.showAnimate();
             // setTimeout(function(){
                 // ①.数据源类型为“标准表单”,即“标准配置数据”
                 if(me.$opts.type == 'standard') {
@@ -156,7 +186,7 @@
                 }
                 formUI.callControls(me); // 根据控件类型调用相应控件
                 formUI.doneEvents(me); // 执行一系列操作事件
-                if(me.$opts.animate && typeof neui !== 'undefined' && typeof neui.destroyAnimate === 'function') neui.destroyAnimate();
+                if(me.$opts.config.animate && typeof neui !== 'undefined' && typeof neui.destroyAnimate === 'function') neui.destroyAnimate();
             // }, 100)
         };
 
@@ -183,7 +213,6 @@
                 if(className.indexOf('build') >= 0){ // 如果是幢号
                     neuiDialog.alert({
                         animate: true,
-                        caption: '提示',
                         message: '系统暂无该楼盘数据<br>请确认楼盘名称是否正确',
                         buttons: ['名称错误，重新输入', '名称正确，允许我手动输入'],
                         btnDirection: 'vertical',
@@ -194,7 +223,7 @@
                                 el.value = ''; // 楼盘名称清空
                                 tools.setFocus(el); // 光标聚焦
                                 // 隐藏打叉图标
-                                var nextNodes = tools.getSiblingElement(el.parentNode);
+                                var nextNodes = tools.getAllSiblingElement(el.parentNode);
                                 for(var i = 0; i < nextNodes.length; i++){
                                     var next = nextNodes[i];
                                     var attr = next.getAttribute('data-type');
@@ -210,7 +239,6 @@
                 }else{ //如果是楼层、房号等
                     neuiDialog.alert({
                         animate: true,
-                        caption: '提示',
                         message: '系统无数据，将为您自动切换手动输入',
                         buttons: ['确定'],
                         callBack:function(){
@@ -228,7 +256,6 @@
                 if(className.indexOf('room') >= 0) message = '房号';
                 if(className.indexOf('property') >= 0) message = '产权年限';
                 neuiDialog.alert({
-                    caption: '提示',
                     message: '对不起，该楼盘暂无' + message + '数据',
                     buttons: ['确定']
                 })
@@ -236,31 +263,29 @@
         };
         
 
-
         //-----------------------------------------------------
         //                  表单公用函数
         //-----------------------------------------------------
         /**
-         * 判断表单是否有数据
-         * @param {HTML DOM || jQuery Object} 表单根节点dom对象或jq选择器对象
+         * 判断表单是否有数据，即是否有非空的数据
+         * @param {Selector String || jQuery Object || HTML DOM} o 表单根节点选择器字符串或dom对象或jq选择器对象。
+            eg1.'.user', eg2. $('.user') eg3.document.getElementById('#user'), document.getElementsByClassName('user')
          * @returns {boolean} 返回布尔值。true 有数据, false 无数据
-         * 返回值为数组arr
-         * arr.length>0 则面板有数据,否则没有数据
          */
          me.isFormHasData = function(o){
             var arr = [];
             o = tools.anyToDomObject(o);
             var child = tools.getChildElement(o);
             Array.from(child).forEach(function(el){
-                var input = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
-                Array.from(input).forEach(function(ele){
-                    var type = ele.getAttribute('type');
+                var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                Array.from(inputNode).forEach(function(txt){
+                    var type = txt.getAttribute('type');
                     var value = '';
                     if(type == null || type == 'text') {
-                        value = ele.value;
+                        value = txt.value;
                     }
                     else if(type == 'checkbox') {
-                        value = ele.checked ? 1 : 0;
+                        value = txt.checked ? 1 : 0;
                     }
                     // console.log('值：', value);
                     if(type == 'checkbox') {
@@ -272,67 +297,101 @@
                    
                 })
             })
-            return arr.length > 0 ? true : false;
+            return arr.length > 0 ? true : false; // arr.length>0 则有数据,否则没有数据
         };
-
 
 
         /**
          * 判断表单是否全部为输入类型，而不包含下拉类型
-         * @return {boolean} 返回值： true 全是输入类型, false 不全是输入类型(有下拉类型)
+         * @param {Selector String || jQuery Object || HTML DOM} o 表单根节点选择器字符串或dom对象或jq选择器对象。
+         * @return {boolean} 返回布尔值。true 全是输入类型, false 不全是输入类型(有下拉类型)
          */
-        me.isFormAllCanWrite = function(){
-            var result = true; //默认是
-            $('.showform .eform-box').each(function(){
-                var eleClassName = '.click-hand';
-                if($(eleClassName,this).length != 0){ //有下拉类型
-                    result = false; //重置为否
-                    return false;
-                }
+        me.isFormAllCanWrite = function(o){
+            var result = true; // 默认true 是
+            o = tools.anyToDomObject(o);
+            var child = tools.getChildElement(o);
+            Array.from(child).forEach(function(el){
+                var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                Array.from(inputNode).forEach(function(txt){
+                    var className = txt.className;
+                    // console.log('className：', className);
+                    if(className != null && className.indexOf('click-hand') >= 0){
+                        result = false;
+                        return false;
+                    }
+                })
+                if(result == false) return false;
             })
-            return result;
+            return result;  
         };
     
 
         /**
          * 校验表单格式与完整性
-         * 符合eform格式的表单都可以用此校验方法
-         * @param {string | selector} ps_node 表单根节点
-         * @param {number} ps_dialog_zIndex 对话框层级(可选).默认z-index 114
+         * 符合ne-form格式的表单都可以用此校验方法
+         * @param {Selector String || jQuery Object || HTML DOM} o 表单根节点选择器字符串或dom对象或jq选择器对象。
+         * @param {number} ps_dialog_zIndex 对话框层级(可选),默认999
          * @returns {boolean} 返回布尔值. true 数据正常, false 数据异常
          */
-        me.examineForm = function(ps_node, ps_dialog_zIndex){
+        me.examineForm = function(o, ps_dialog_zIndex){
             var tips1 = '';
             var tips2 = '';
-            $(ps_node).find('.eform-one').each(function(){
-                var label = $('.eform-l label', this).text(),
-                    value = $('input, textarea', this).val();
-                    isMust = $('.r-star', this).length > 0 ? true : false;
-                    isPhone = $('.icon-tel', this).length > 0 ? true : false;
-                //console.log('label:', label, '-value:', value, '-isMUst:',isMust, '-isPhone:',isPhone)
-                if(isMust && value == '') tips1 += label + '、';
-                if(isMust && isPhone && !checker.checkTel(value, 'both')) tips2 += label + '、';
-            })
-            //校验完整性
-            if(tips1 != ''){
-                meuiDialog.alert({
-                    zIndex: ps_dialog_zIndex,
-                    animate: true,
-                    caption: '提示',
-                    message: '请填写：' + tips1.substr(0, tips1.length - 1),
-                    buttons: ['确定']
+            var zIndex = typeof ps_dialog_zIndex == 'undefined' ? 999 : isNaN(parseInt(ps_dialog_zIndex)) ? 999 : parseInt(ps_dialog_zIndex);
+            o = tools.anyToDomObject(o);
+            var child = tools.getChildElement(o);
+            Array.from(child).forEach(function(el){
+                var lbNode = el.querySelector('label'),
+                    mustNode = el.querySelector('[data-type="must"]'),
+                    telNode= el.querySelector('.r-tel'),
+                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                Array.from(inputNode).forEach(function(txt){
+                    var type = txt.getAttribute('type');
+                    var value = '';
+                    if(type == null || type == 'text') {
+                        value = txt.value;
+                    }
+                    else if(type == 'checkbox') {
+                        value = txt.checked ? 1 : 0;
+                    }
+                    var label = lbNode.innerText,
+                        hid5 = txt.getAttribute('data-hid5') == null ? '0' : txt.getAttribute('data-hid5'), // 隐藏值5, 表示是否必填项. 1 必填, 0 选填
+                        isMust = mustNode == null ? (hid5 == '1' ? true : false ) : true,
+                        isPhone = telNode == null ? false : true;
+                    // console.log('mustNode：', mustNode, '\ntelNode：', telNode);
+                    // console.log('label：', label, '\nisMust：',isMust, '\nisPhone：',isPhone);
+                    // console.log('-------------')
+                    if(isMust && value.toString().replace(/([ ]+)/g, '') === '') tips1 += label + '、';
+                    if(isMust && isPhone && !tools.isTel(value, me.$opts.config.format.phone)) tips2 += label + '、';
                 })
+            })
+            // 校验数据完整性
+            if(tips1 != ''){
+                var tips = '请填写：' + tips1.substr(0, tips1.length - 1);
+                if(tools.isExistDialogControl()){
+                    neuiDialog.alert({
+                        zIndex: ps_dialog_zIndex,
+                        animate: true,
+                        message: tips,
+                        buttons: ['确定']
+                    })
+                }else{
+                    alert(tips);
+                }
                 return false;
             }
-            //校验电话
+            // 校验数据格式：校验电话
             if(tips2 != ''){
-                meuiDialog.alert({
-                    zIndex: ps_dialog_zIndex,
-                    animate: true,
-                    caption: '提示',
-                    message: '请填写正确的：' + tips2.substr(0, tips2.length - 1),
-                    buttons: ['确定']
-                })
+                var tips = '请填写正确的：' + tips2.substr(0, tips2.length - 1);
+                if(tools.isExistDialogControl()){
+                    neuiDialog.alert({
+                        zIndex: ps_dialog_zIndex,
+                        animate: true,
+                        message: tips,
+                        buttons: ['确定']
+                    })
+                }else{
+                    alert(tips);
+                }
                 return false;
             }
             return true;
@@ -340,22 +399,35 @@
 
         
         /**
-         * 获取整个表单数据
-         * @return {json} 返回JSON数组
+         * 获取表单数据
+         * @param {Selector String || jQuery Object || HTML DOM} o 表单根节点选择器字符串或dom对象或jq选择器对象。
+         * @return {object} 返回JSON对象数组
          */
-         me.getFormData = function(){
+         me.getFormData = function(o){
+            o = tools.anyToDomObject(o);
+            var child = tools.getChildElement(o);
             var json = {}
-            $('.showform .eform-box').each(function(){
-                var eleClassName = '.click-input';
-                var title = $('label',this).text(), //显示名称（会变)
-                    hide = typeof $(eleClassName,this).attr('data-hide') == 'undefined' ? '' : $(eleClassName,this).attr('data-hide'), // 英文字段值 
-                    hid1 = typeof $(eleClassName,this).attr('data-hid1') == 'undefined' ? '' :  $(eleClassName,this).attr('data-hid1'), //隐藏值1（不会变)
-                    id = $(eleClassName,this)[0].id,
-                    className = $(eleClassName,this)[0].className.toString().replace(/click-input /g,''),
-                    bh = typeof $(eleClassName,this).attr('data-bh') == 'undefined' ? '' :  $(eleClassName,this).attr('data-bh'),
-                    value = $(eleClassName,this).val();
-                var oneJson = {"title":title, "id":id, "className":className, "bh":bh, "value":value}
-                json[hide] = oneJson;
+            Array.from(child).forEach(function(el){
+                var lbNode = el.querySelector('label'),
+                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                Array.from(inputNode).forEach(function(txt){
+                    var type = txt.getAttribute('type');
+                    var value = '';
+                    if(type == null || type == 'text') {
+                        value = txt.value;
+                    }
+                    else if(type == 'checkbox') {
+                        value = txt.checked ? 1 : 0;
+                    }
+                    var title = lbNode.innerText,
+                        id = txt.id == null ? '' : txt.id,
+                        className = txt.className == null ? '' : txt.className,
+                        bh = txt.getAttribute('data-bh') == null ? '' : txt.getAttribute('data-bh');
+                        hide = txt.getAttribute('data-hide') == null ? (txt.getAttribute('data-hid1') == null ? '' : txt.getAttribute('data-hid1')) : txt.getAttribute('data-hide'); // 隐藏值1(不会变)
+                    var oneJson = { title: title, bh: bh, value: value, id: id, className: className, node: txt }
+                    if(hide.toString().replace(/([ ]+)/g, '') != '' && hide != '无') json[hide] = oneJson;
+                    else json[title] = oneJson;
+                })
             })
             return json;
         };
@@ -369,48 +441,12 @@
         //-----------------------------------------------------
         /**
          * 获取“标准表单”数据
-         * @param {array|string} ps_type 数组或字符串. 'array' JSON数据(默认）， 'tooltip' 提示信息
-         * @param {array|string} 返回值为数组或字符串
+         * @param {Selector String || jQuery Object || HTML DOM} o 表单根节点选择器字符串或dom对象或jq选择器对象。
+         * @return {object} 返回JSON对象数组
          */
-        me.getStandardFormData = function(ps_type){
-            var json = {}
-            $('.showsheet .eform-box').each(function(){
-                var eleClassName = '.click-input';
-                var title = $('label',this).text(), //显示名称（会变)
-                    hid1 = typeof $(eleClassName,this).attr('data-hid1') == 'undefined' ? '' :  $(eleClassName,this).attr('data-hid1'), //隐藏值1（不会变)
-                    id = $(eleClassName,this)[0].id,
-                    className = $(eleClassName,this)[0].className.toString().replace(/click-input /g,''),
-                    bh = typeof $(eleClassName,this).attr('data-bh') == 'undefined' ? '' :  $(eleClassName,this).attr('data-bh'),
-                    value = $(eleClassName,this).val();
-                var oneJson = {"title":title, "id":id, "className":className, "bh":bh, "value":value}
-
-                var field = (hid1 == '' || hid1 == '无' ? title : hid1);
-                json[field] = oneJson;
-            })
-
-            var tips = '';
-            var dialog1 = '';
-            var dialog2 = '';
-            $('.showsheet .eform-box').each(function(){
-                if($(this).is(':visible')){
-                    var text = $('label',this).text();
-                    var placeholder = (typeof $('.click-input',this).attr('placeholder') == 'undefined') ? '' : $('.click-input',this).attr('placeholder');
-                    var value = $('.click-input',this).val();
-                    if(placeholder!='' && value=='') dialog1 += text + '、';
-                    //console.log('text:',text,' placeholder:',placeholder, ' value:',value);
-                    if(value != '' && $(this).find('.eform-tel').length > 0){ //验证电话格式
-                        if(!checker.checkTel(value, 'both')) dialog2 += '请填写正确的' + text;
-                    }
-                }
-            })
-            tips += dialog1 == '' ? '' : '请填写' + dialog1.substr(0, dialog1.length - 1) +'<br>'; //去掉最后一个字符
-            tips += dialog2 == '' ? '' : dialog2;
-
-            var types = typeof ps_type == 'undefined' ? 'array' : ps_type;
-            if(types == 'array') return json;
-            if(types == 'tooltip') return tips;
+        me.getStandardFormData = function(o){
+            return me.getFormData(o);
         };
-
 
 
 
@@ -419,34 +455,72 @@
         //                  “楼盘表单”专用函数
         //-----------------------------------------------------
         /**
-         * 判断“楼盘表单”是否有数据
-         * 返回值为数组arr
-         * arr.length>0 则面板有数据,否则没有数据
+         * 获取“楼盘表单”数据
+         * @param {Selector String || jQuery Object || HTML DOM} o 表单根节点选择器字符串或dom对象或jq选择器对象。
+         * @param {array} 返回由数组组成的JSON对象
          */
-        me.isRoomFormHasData = function(){
-            var arr = [];
-            $('.showjson .eform-box').each(function(){
-                var value = $('.click-input',this).val();
-                if(value != '' && value != 0) arr.push({"value":value});
+        me.getRoomFormData = function(o){
+            o = tools.anyToDomObject(o);
+            var child = tools.getChildElement(o);
+            var json = {}, arr = [];
+            Array.from(child).forEach(function(el){
+                var lbNode = el.querySelector('label'),
+                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                Array.from(inputNode).forEach(function(txt){
+                    var type = txt.getAttribute('type');
+                    var value = '';
+                    if(type == null || type == 'text') {
+                        value = txt.value;
+                    }
+                    else if(type == 'checkbox') {
+                        value = txt.checked ? 1 : 0;
+                    }
+                    var title = lbNode.innerText,
+                        val2 = value, // 显示值2, 表示输入框值
+                        hid5 = txt.getAttribute('data-hid5') == null ? '' : txt.getAttribute('data-hid5'), // 隐藏值5, 表示是否必填项. 1 必填, 0 选填
+                        hid6 = txt.getAttribute('data-hid6') == null ? '' : txt.getAttribute('data-hid6'); // 隐藏值6, 表示字段名称(英文)(键值) 
+                     var title = lbNode.innerText,
+                        id = txt.id == null ? '' : txt.id,
+                        bh = txt.getAttribute('data-bh') == null ? '' : txt.getAttribute('data-bh'); 
+                    var oneJson = { val2: val2, hid5: hid5, hid6: hid6, title: title, id: id, bh: bh, value: value }
+                    arr.push(oneJson);
+                })
             })
-            return arr; 
+            return arr;
+        };
+
+            
+
+        /**
+         * 判断“楼盘表单”是否有数据
+         * @param {Selector String || jQuery Object || HTML DOM} o 表单根节点选择器字符串或dom对象或jq选择器对象。
+         * @returns {boolean} 返回布尔值. true 有数据, false 无数据
+         */
+        me.isRoomFormHasData = function(o){
+            return me.isFormHasData(o);
         };
 
 
         /**
          * 判断抵押物类型是否为住宅
-         * @returns {boolean} 返回值：true 是住宅, false 非住宅,即“其他(如商业、工业等非住宅用途)”
+         * @param {Selector String || jQuery Object || HTML DOM} o 表单根节点选择器字符串或dom对象或jq选择器对象。
+         * @returns {boolean} 返回布尔值。true 是住宅, false 非住宅,即“其他(如商业、工业等非住宅用途)”
          */
-         me.isRoomFormPawnTypeHouse = function(){
+         me.isRoomFormPawnTypeHouse = function(o){
+            o = tools.anyToDomObject(o);
+            var child = tools.getChildElement(o);
             var hid1Arr = [];
-            $('.showform .eform-box').each(function(){
-                var eleClassName = '.click-input';
-                var title = $('label',this).text(), //显示名称（会变)
-                    hid1 = typeof $(eleClassName,this).attr('data-hid1') == 'undefined' ? '' :  $(eleClassName,this).attr('data-hid1'); //隐藏值1（不会变)
+            Array.from(child).forEach(function(el){
+                var lbNode = el.querySelector('label'),
+                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                Array.from(inputNode).forEach(function(txt){
+                    var title = lbNode.innerText,
+                        hid1 = txt.getAttribute('data-hid1') == null ? '' : txt.getAttribute('data-hid1'); // 隐藏值1(不会变)
                     hid1Arr.push(hid1);
+                })
             })
-            //console.log('arr:', hid1Arr);
-            var houseArr = ['楼盘', '幢号', '楼层', '房号']; //住宅类型hid1必备的值
+            // console.log('hidArr：', hid1Arr);
+            var houseArr = ['楼盘', '幢号', '楼层', '房号']; // 住宅类型hid1必备的值，即抵押物类型为住宅时，必须包含这些配置项
             var count = 0;
             for(var i = 0; i < hid1Arr.length; i++){
                 var hid1 = hid1Arr[i];
@@ -455,16 +529,16 @@
                     if(hid1 == value) count++;
                 }
             }
-            var result = count >= houseArr.length ? true : false; //是否住宅
-            return result;
+            return ( count >= houseArr.length ? true : false );
         },
 
             
         /**
          * 过滤楼盘名称中的特殊字符
+         * @param {string} str 楼盘名称的值
+	     * @returns {string} 返回过滤后的新字符串
          */
         me.filterRoomFormHouseChar = function(str){
-            //过滤html
             var str = str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g,''); //过滤css
             str = str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g,''); //过滤JS
             str = str.replace(/<[^<>]+?>/g,'');  //过滤html标签
@@ -478,84 +552,76 @@
         
         /**
          * 点击关联元素中任意一个，提示用户“前面的数据是否为空”
-         * 也就是前面栏的数据如果为空，则当前栏不允许输入或选择下拉
+         * 也就是说如果前面的输入栏数据为空，则当前栏不允许输入或选择下拉
          * 用于：楼盘名称、幢号、楼层、房号等关联数据
-         * @param {object} obj 当前对象
-         * @return {string} 返回提示信息（空表示前面的数据是完整的）
+         * @param {Selector String || jQuery Object || HTML DOM} o 当前点击的输入框 选择器字符串或dom对象或jq选择器对象。
+         * @return {string} 返回提示信息(空值时表示前面的数据是完整的, 非空时为提示信息字符串)
          */
-        me.warnRoomFormRelatedPreviousEmpty = function(obj){
-            var index = $(obj).parents('.eform-box').index();
+        me.warnRoomFormRelatedPreviousEmpty = function(o){
             var warnInfo = '';
-            for(i=0;i<index;i++){
-                var $eq = $('.showjson .eform-box').eq(i);
-                var text = $eq.find('label').text();
-                var value = $eq.find('.click-input').val();
-                if(value=='') warnInfo+=text + '、';
-            }
-            if(warnInfo!='')
-                warnInfo = '请填写：' + warnInfo.substr(0,warnInfo.length-1); //去掉最后一个符号
-            return warnInfo;
+            var isAllRead = true; // true 表示所有输入框为只读
+            o = tools.anyToDomObject(o);
+            // var index = o.parentNode.parentNode.index;
+            // var siblings = tools.getAllSiblingElement(o.parentNode.parentNode);
+            var previousNode = tools.getAllPrevElement(o.parentNode.parentNode);
+            Array.from(previousNode).forEach(function(el, i){
+                var lbNode = el.querySelector('label'),
+                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                Array.from(inputNode).forEach(function(txt){
+                    var type = txt.getAttribute('type');
+                    var readonly = txt.getAttribute('readonly');
+                    if(readonly != 'readonly' && readonly != 'true') isAllRead = false;
+                    var value = '';
+                    if(type == null || type == 'text') {
+                        value = txt.value;
+                    }
+                    else if(type == 'checkbox') {
+                        value = txt.checked ? 1 : 0;
+                    }
+                    var title = lbNode.innerText;
+                    if(value.toString().replace(/([ ]+)/g, '') === '') warnInfo += title + '、';
+                }) 
+            })
+            var chooseText = isAllRead ? '选择' : '填写';
+            return warnInfo == '' ? '' : '请' + chooseText + '：' + warnInfo.substr(0, warnInfo.length - 1);
         };
 
 
         /**
          * 上级元素值改变，则清空下级关联元素数据
          * 用于：楼盘名称、幢号、楼层、房号等关联数据
-         * @param {object} obj 当前对象
-         * @param {string} oValue 老值
-         * @param {string} nValue 新值
+         * @param {null || Selector String || jQuery Object || HTML DOM} o 当前点击的输入框 选择器字符串或dom对象或jq选择器对象。当o=null时,表示清空所有关联元素数据
+         * @param {string} newValue 输入框老值
+         * @param {string} oldValue 输入框老值
          * eg.
-         * 楼盘名称改变：清空幢号、楼层、房号
-         * 幢号改变：清空楼层、房号
-         * 楼层改变：清空房号
+            抵押物所在地改变：清空楼盘名称、幢号、楼层、房号。此时参数o传值null即可
+            楼盘名称改变：清空幢号、楼层、房号
+            幢号改变：清空楼层、房号
+            楼层改变：清空房号
          */
-        me.clearRoomFormRelatedSubordinateData = function(obj, oValue, nValue){
-            if(nValue != oValue){
-                $(obj).parents('.eform-box').nextAll().find('.clear-relation').val('').attr('data-bh','');
-            }
-        };
-
-
-        /**
-         * 获取“楼盘表单”数据
-         * @param {array|string} ps_type 数组或字符串. 'array' 数组(默认）， 'tooltip' 提示信息
-         * @param {array|string} 返回值为数组或字符串
-         */
-        me.getRoomFormData = function(ps_type){
-            var arr = [];
-            var warnInfo = '';
-            var tips = ''; //检验完整性的提示信息
-            var oneJson = {}
-            $('.showjson .eform-box').each(function(){
-                var eleClassName = '.click-input';
-                if($(eleClassName,this).length>0){
-                    var val2 = $(eleClassName,this).val(),
-                        hid5 = $(eleClassName,this).data('hid5'),
-                        hid6 = $(eleClassName,this).data('hid6');
-                    onejson = {"val2":val2, "hid5":hid5, "hid6":hid6}
-                    if(hid5=='1' && val2 ==''){
-                        warnInfo += $('label',this).text() + '、';
+        me.clearRoomFormRelatedSubordinateData = function(o, newValue, oldValue){
+            if(o == null){
+                var next = document.querySelectorAll('.clear-relation');
+                Array.from(next).forEach(function(el){
+                    if(newValue.toString().replace(/([ ]+)/g, '') != oldValue.toString().replace(/([ ]+)/g, '')){
+                        el.value = '';
                     }
-                }
-                arr.push(onejson);
-            });
-            
-            for(var i=0;i<arr.length;i++){ //数组去重
-                for(var j=i+1;j<arr.length;){
-                    if(arr[i].val2==arr[j].val2 && arr[i].hid5==arr[j].hid5 && arr[i].hid6==arr[j].hid6) arr.splice(j,1);
-                    else j++;
-                }
+                })
+            }else{
+                o = tools.anyToDomObject(o);
+                var next = tools.getAllNextElement(o.parentNode.parentNode);
+                Array.from(next).forEach(function(el){
+                    var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                    Array.from(inputNode).forEach(function(txt){
+                        var className = typeof txt.className == 'undefined' ? '' : txt.className;
+                        if(newValue.toString().replace(/([ ]+)/g, '') != oldValue.toString().replace(/([ ]+)/g, '')){
+                            if(className.indexOf('clear-relation') >= 0) txt.value = '';
+                        }
+                    })
+                })
             }
-            tips =  warnInfo == '' ? '' : '请填写：' + warnInfo.substr(0,warnInfo.length - 1);	
-            //console.log('types:',types,'\ntips:',tips,'\narr:',arr);
-            var types = typeof ps_type == 'undefined' ? 'array' : ps_type;
-            if(types == 'array') return arr;
-            if(types == 'tooltip') return tips;
         };
-
-
-
-
+        
  
     }; //END NeForm
 
@@ -600,32 +666,37 @@
                 var tagName = !multiple ? 'input' : 'textarea', // 标签类型。值：input(默认), radio, textarea
                     types = 'text', // type属性。值: text 文本(默认), number 数字, checkbox 复选(单选、多选)
                     ids = field, // ID属性
-                    className = '', // class属性
+                    className = 'click-input', // class属性
                     checked = ''; // checked属性。值：空 表示没有这个属性, true 表示选中, false 不选中
                 //
                 if(type == '文本') {
                     types = 'text';
+                    if(multiple){
+                        className += ' click-textarea';
+                    }
                 }
                 if(type == '日期') {
-                    className = 'click-date';
+                    className += ' click-date';
                     readonly = true;
                 }
                 if(type == '数字') {
                     // types = 'number';
-                    className = 'click-num';
+                    className += ' click-num';
                 }
                 if(type == '单选') {
                     types = 'checkbox';
-                    className = 'ne-switch';
+                    className += ' click-radio ne-switch';
                     checked = parseInt(value) == 1 ? true : false;
                 }
                 if(type == '下拉') {
+                    className += ' click-hand';
                     readonly = true;
                 }
                 //
                 if(phone){
                     className += ' click-tel';
                 }
+                
                 //
                 var chooseText = (!readonly ? '请填写' : '请选择'); //+title,
                     _looseFocusStr = !readonly ?  '' : ';this.blur()';
@@ -638,16 +709,17 @@
                     _btnStr = '', // 按钮
                     _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
                     _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
-                    _unitClass = !me.$opts.layout.inputCross ? '' : ' has-cell-cross';
+                    _unitClass = !me.$opts.config.layout.inputCross ? '' : ' has-cell-cross';
+                    _telAClass = phone == '' ? '' : !tools.isTel(value, me.$opts.config.format.phone) ? '' : ' class="hover"';
                     _crossClass = ''; // me.$opts.houses.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
                     _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
                 var _attrListStr = ' id="' + ids + '"' + _classNameStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr; // 所有公用属性串
                 //
-                var _iconStr = !me.$opts.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="icon icon-' + icon + '"></i>'),
+                var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="icon icon-' + icon + '"></i>'),
                     _unitStr = unit == '' ? '' : '<em class="r-unit' + _unitClass + '">' + unit + '</em>',
-                    _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a></a></em>';
-                var _crossStr = ( types == 'text' && me.$opts.layout.inputCross ) ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' : '',
-                    _mustStr = must && me.$opts.layout.inputMust ? '<div class="item-cell" data-type="must">*</div>' : '';
+                    _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a' + _telAClass + '></a></em>';
+                var _crossStr = ( types == 'text' && me.$opts.config.layout.inputCross ) ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' : '',
+                    _mustStr = must && me.$opts.config.layout.inputMust ? '<div class="item-cell" data-type="must">*</div>' : '';
                 //
                 var _inputStr = '';
                 if(tagName == 'input'){
@@ -665,11 +737,11 @@
                 _outerHtml += [
                     '<div class="eform-row">',
                         '<div class="item-l">',
-                            ( me.$opts.layout.theme != 'popular' ? '' : _IcoHtml ),
+                            ( me.$opts.config.layout.theme != 'popular' ? '' : _IcoHtml ),
                             '<label>' + title + '</label>',
                         '</div>',
                         '<div class="item-r">',
-                            ( me.$opts.layout.theme == 'popular' ? '' : _IcoHtml ),
+                            ( me.$opts.config.layout.theme == 'popular' ? '' : _IcoHtml ),
                             _LHtml,
                             _UHtml,
                         '</div>',
@@ -726,7 +798,7 @@
 
                 // 右边文字
                 if (val3 != '') {
-                    var _unitClass = !me.$opts.layout.inputCross ? '' : ' has-cell-cross';
+                    var _unitClass = !me.$opts.config.layout.inputCross ? '' : ' has-cell-cross';
                     _UHtml = '<em class="r-unit' + _unitClass + '">' + val3 + '</em>';
                 }			
 
@@ -745,12 +817,12 @@
                         if (hid2 == '日期') { // 调用日期控件
                             className += ' click-date';
                             icons = ' icon-calendar';
-                            me.$opts.controls.calendar.enable ? readonly = true : readonly = false;
+                            me.$opts.config.controls.calendar.enable ? readonly = true : readonly = false;
                         }			
                         if (hid2 == '数字') { // 调用数字键盘
                             className += ' click-num';
                             icons = ' icon-numeric';
-                            me.$opts.controls.keyboard.enable ? readonly = true : readonly = false;
+                            me.$opts.config.controls.keyboard.enable ? readonly = true : readonly = false;
                             // types = 'number'; // 只能输入数字(部分手机不支持)
                             if (val1.indexOf('面积') >= 0) icons = ' icon-metre';
                         }
@@ -823,7 +895,7 @@
                             className += ' click-num click-jzmj';
                             ids = 'jzmj';
                             icons = ' icon-metre';
-                            me.$opts.controls.keyboard.enable ? readonly = true : readonly = false;
+                            me.$opts.config.controls.keyboard.enable ? readonly = true : readonly = false;
                             // types = 'number'; // 只能输入数字(部分手机不支持)
                         }
 
@@ -831,7 +903,7 @@
                             className += ' click-num click-ccjmj';
                             ids = 'ccjmj';
                             icons = ' icon-metre';
-                            me.$opts.controls.keyboard.enable ? readonly = true : readonly = false;
+                            me.$opts.config.controls.keyboard.enable ? readonly = true : readonly = false;
                             // types = 'number'; // 只能输入数字(部分手机不支持)
                         }
                     }
@@ -860,11 +932,11 @@
                 }
                 //
                 var _boxWClass = ''; // boxWidth == '' ? '' : (boxWidth == '100%' ? ' w-100' : ''); // 宽
-                var _iconStr = icons == '' || me.$opts.layout.inputIcon === false ? '' : '<i class="icon' + icons + '"></i>'; // 图标
+                var _iconStr = icons == '' || me.$opts.config.layout.inputIcon === false ? '' : '<i class="icon' + icons + '"></i>'; // 图标
                 //
                 var _crossClass = me.$opts.houses.houseRightButton && _BtHtml != '' ? ' has-cell-btn' : '';
                 var _crossStyle = val2.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
-                _RHtml += types == 'text' && me.$opts.layout.inputCross 
+                _RHtml += types == 'text' && me.$opts.config.layout.inputCross 
                             ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' 
                             : 
                             '';
@@ -873,16 +945,16 @@
                 _outerHtml += [
                         '<div class="eform-row' +  _boxWClass + '">',
                             '<div class="item-l">',
-                                ( me.$opts.layout.theme != 'popular' ? '' : _iconStr ),
+                                ( me.$opts.config.layout.theme != 'popular' ? '' : _iconStr ),
                                 '<label>' + val1 + '</label>',
                             '</div>',
                             '<div class="item-r">',
-                            ( me.$opts.layout.theme == 'popular' ? '' : _iconStr ),
+                            ( me.$opts.config.layout.theme == 'popular' ? '' : _iconStr ),
                             _LHtml,
                             _UHtml,
                             '</div>',
                         _RHtml,
-                        ( !me.$opts.layout.inputMust ? '' : _MustHtml ),
+                        ( !me.$opts.config.layout.inputMust ? '' : _MustHtml ),
                         '</div>'
                 ].join('\r\n');
 
@@ -892,8 +964,6 @@
             tools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
             this.loadExchangeModule(me);
         },
-
-
 
 
         /**
@@ -921,18 +991,18 @@
         callControls: function(me){
             // 日期类型
             var dateNode = document.getElementsByClassName('click-date');
-            if(me.$opts.controls.calendar.enable){
+            if(me.$opts.config.controls.calendar.enable){
                 // 调用日历控件
                 Array.from(dateNode).forEach(function(el, i){
                     if(typeof neuiCalendar == 'object'){
                         if(typeof neuiCalendar.neDate === 'function'){
                             neuiCalendar.neDate(el, {
-                                empty: me.$opts.controls.calendar.empty,
-                                theme: me.$opts.controls.calendar.theme,
-                                format: me.$opts.controls.calendar.format,
-                                minDate: me.$opts.controls.calendar.minDate,
-                                maxDate: me.$opts.controls.calendar.maxDate
-                            }, me.$opts.controls.calendar.callBack)
+                                empty: me.$opts.config.controls.calendar.empty,
+                                theme: me.$opts.config.controls.calendar.theme,
+                                format: me.$opts.config.controls.calendar.format,
+                                minDate: me.$opts.config.controls.calendar.minDate,
+                                maxDate: me.$opts.config.controls.calendar.maxDate
+                            }, me.$opts.config.controls.calendar.callBack)
                         }
                     }
                 })
@@ -940,7 +1010,7 @@
 
             // 数字类型
             var numeralNode = document.getElementsByClassName('click-num');
-            if(me.$opts.controls.keyboard.enable){
+            if(me.$opts.config.controls.keyboard.enable){
                 // 调用数字键盘控件
                 Array.from(numeralNode).forEach(function(el, i){
                     if(typeof el.neuiKeyboard === 'function'){
@@ -985,7 +1055,7 @@
                     if(next != null){
                        var child = tools.getFirstChildElement(next);
                        var className = child.className;
-                        if(tools.isTel(value)){
+                        if(tools.isTel(value, me.$opts.config.format.phone)){
                             child.className += className.indexOf('hover') >= 0 ? '' : 'hover';
                         }else{
                             child.className = '';
@@ -1091,13 +1161,12 @@
         },
 
 
-
          /**
          * 切换成手动输入
          * @param {string} scope 要切换手动输入的范围(可选)。related 仅限关联元素(默认), self 仅自身元素, all 所有使用下拉选择的元素
          * @param {HTML DOM}} o 当前点击的元素对象(可选)
          */
-          switchToHand:function(scope, o){
+        switchToHand:function(scope, o){
             var pale = typeof scope == 'undefined' ? 'related' : scope;
             var elem = '';
             if(pale == 'self') elem = o instanceof jQuery ? o[0] : o;
@@ -1138,7 +1207,6 @@
         },
 
 
-
         /**
          * 切换成下拉选择
          * @param {string} scope 要切换手动输入的范围(可选)。related 仅限关联元素(默认), self 仅自身元素, all 所有使用下拉选择的元素
@@ -1176,10 +1244,6 @@
                 tools.getPrevElement(parent).style.display = '';
             }
         }
-
-
-       
-
 
     }; // END formUI
     
@@ -1406,8 +1470,8 @@
         
         /**
          * 将未知的对象转化为dom对象
-         * @param {selector || Query Object || HTML DOM} o 未知的对象。几种可能的值如下：
-            选择器 '.user', '#user' 
+         * @param {Selector String || jQuery Object || HTML DOM} o 未知的对象。几种可能的值如下：
+            选择器字符串 '.user', '#user' 
             jq对象 '.user', '#user'
             dom对象 document.getElementById('#user') 或 document.getElementsByClassName('user')
          * @returns {HTML DOM} 返回dom对象(注意不是元素集合nodeList)
@@ -1474,21 +1538,6 @@
 
 
         /**
-         * 原生js获取所有兄弟节点
-         * @param {HTML DOM} o 当前节点
-         * @returns {Array} 返回兄弟节点组成的数组
-         */
-        getSiblingElement: function(o) {
-            var a = [];
-            var p = o.parentNode.children;
-            for(var i = 0, len = p.length; i< len; i++) {
-                if(p[i] !== o) a.push(p[i]);
-            }
-            return a;
-        },
-            
-
-        /**
          * 原生js获取下一个兄弟节点 (兼容ie6+)
          * 注：已排除文本、空格，换行符
          * @param {HTML DOM} o 当前节点
@@ -1537,6 +1586,65 @@
                     return null;
                 }
             }
+        },
+
+
+        /**
+         * 原生js获取所有兄弟节点
+         * @param {HTML DOM} o 当前节点
+         * @returns {Array} 返回兄弟节点组成的数组
+         */
+        getAllSiblingElement: function(o) {
+            var a = [];
+            var p = o.parentNode.children;
+            for(var i = 0, len = p.length; i< len; i++) {
+                if(p[i] !== o) a.push(p[i]);
+            }
+            return a;
+        },
+
+        /**
+         * 原生js获取前面所有的兄弟节点 (兼容ie6+)
+         * 注：已排除文本、空格，换行符
+         * @param {HTML DOM} o 当前元素对象节点
+         * @returns {Array} 返回数组，数组中的元素为dom对象
+         */
+        getAllPrevElement: function(o){
+            var arr = [];
+            var parent = o.parentNode;
+            if(parent == null) return [];
+            for(var i = 0; i < parent.children.length; i++){
+                var child = parent.children[i];
+                if(child == o){
+                    break;
+                }else{
+                    arr.push(child)
+                }
+            }
+            return arr;
+        },
+
+
+        /**
+         * 原生js获取后面所有的兄弟节点 (兼容ie6+)
+         * 注：已排除文本、空格，换行符
+         * @param {HTML DOM} o 当前元素对象节点
+         * @returns {Array} 返回数组，数组中的元素为dom对象
+         */
+        getAllNextElement: function(o){
+            var arr = [];
+            var parent = o.parentNode;
+            if(parent == null) return [];
+            var index = -1;
+            for(var i = 0; i < parent.children.length; i++){
+                var child = parent.children[i];
+                if(child == o){
+                    index = i;
+                }else{
+                    if(index != -1 && i > index) arr.push(child);
+                }
+            }
+            return arr;
         },
 
         
@@ -1656,11 +1764,11 @@
          */
         isTel:function(str, options){
             var defaults = {
-                mode: "standard", //校验模式. standard 标准模式,严格校验电话格式(默认), loose 宽松模式,只校验电话位数
-                pattern: "mobilephone", //验证类型(只在mode="standard"时有效). mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
-                bit: { //校验的电话位数(只在mode="loose"时有效)
-                    from: 6, //校验6位.与to配合使用,可与to值相等
-                    to: 12 //校验12位.与from配合使用,可与from值相等
+                mode: "standard", // 校验模式(可选)。值： standard 标准模式，即严格校验电话格式(默认), loose 宽松模式，即只校验电话位数
+                pattern: "mobilephone", // 验证类型(只在mode="standard"时有效)(可选)。值：mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
+                bit: { // 校验的电话位数(只在mode="loose"时有效)(可选)
+                    from: 6, // 校验6位(可选)。与to配合使用,可与to值相等
+                    to: 12 // 校验12位(可选)。与from配合使用,可与from值相等
                 }
             }
             var settings = $.extend(true, {}, defaults, options || {});
@@ -1691,6 +1799,17 @@
             }
 
             return bools;
+        },
+
+
+        /**
+         * 判断是否存在对话框控件
+         * @returns {boolean} 返回布尔值. true 存在, false 不存在
+         */
+        isExistDialogControl: function(){
+            if(typeof neuiDialog == 'undefined') return false;
+            if(typeof neuiDialog.alert !== 'function') return false;
+            return true;
         }
 
     }; // END tools

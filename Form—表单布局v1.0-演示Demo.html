@@ -355,33 +355,27 @@
                 example.forms('.mortgage__static', {
                     source: regularJson, // 数据源
                     type: "standard", // 数据源类型(即数据源字段类型)。值：standard “标准表单”(默认), rooms 楼盘房号数据格式
-                    animate: true, // 是否启用转圈动画特效(可选), 默认false
-                    houses: { // “楼盘房号配置数据”时(可选)
-                        houseRightButton: true, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
-                        switches: {
-                            enable: true, // 是否允许手动输入(可选), 默认true
-                            scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
-                        }
-                    },
-                    layout: { // 布局(可选)
-                        theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
-                        inputIcon: true, // 输入框是否使用图标(可选), 默认false
-                        inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
-                        inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
-                        mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
-                    },
-                    controls: { // 控件调用(可选)
-                        calendar: {  // 日历控件(可选)
-                            enable: true, // 是否启用(可选)，默认true
-                            empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
-                            theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
-                            format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
-                            minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
-                            maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
-                            callBack: null // 回调(可选) 
+                    config: { // 配置项(可选)
+                        layout: { // 布局(可选)
+                            theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
+                            inputIcon: true, // 输入框是否使用图标(可选), 默认false
+                            inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
+                            inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                            mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
                         },
-                        keyboard: { // 数字键盘控件(可选)
-                            enable: false // 是否启用(可选)，默认false
+                        controls: { // 控件调用(可选)
+                            calendar: {  // 日历控件(可选)
+                                enable: true, // 是否启用(可选)，默认true
+                                empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
+                                theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
+                                format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
+                                minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
+                                maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
+                                callBack: null // 回调(可选) 
+                            },
+                            keyboard: { // 数字键盘控件(可选)
+                                enable: false // 是否启用(可选)，默认false
+                            }
                         }
                     }
                 })
@@ -457,7 +451,6 @@
                 example.forms('.mortgage__dynamic', {
                     source: conditionJson, // 数据源
                     type: "rooms", // 数据源类型(即数据源字段类型)。值：standard “标准表单”(默认), rooms 楼盘房号数据格式
-                    animate: true, // 是否启用转圈动画特效(可选), 默认false
                     houses: { // “楼盘房号配置数据”时(可选)
                         houseRightButton: true, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
                         switches: {
@@ -465,25 +458,27 @@
                             scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
                         }
                     },
-                    layout: { // 布局(可选)
-                        theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
-                        inputIcon: true, // 输入框是否使用图标(可选), 默认false
-                        inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
-                        inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
-                        mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
-                    },
-                    controls: { // 控件调用(可选)
-                        calendar: {  // 日历控件(可选)
-                            enable: true, // 是否启用(可选)，默认true
-                            empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
-                            theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
-                            format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
-                            minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
-                            maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
-                            callBack: null // 回调(可选) 
+                    config: { // 配置项(可选)
+                        layout: { // 布局(可选)
+                            theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
+                            inputIcon: true, // 输入框是否使用图标(可选), 默认false
+                            inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
+                            inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                            mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
                         },
-                        keyboard: { // 数字键盘控件(可选)
-                            enable: false // 是否启用(可选)，默认false
+                        controls: { // 控件调用(可选)
+                            calendar: {  // 日历控件(可选)
+                                enable: true, // 是否启用(可选)，默认true
+                                empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
+                                theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
+                                format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
+                                minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
+                                maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
+                                callBack: null // 回调(可选) 
+                            },
+                            keyboard: { // 数字键盘控件(可选)
+                                enable: false // 是否启用(可选)，默认false
+                            }
                         }
                     }
                 })

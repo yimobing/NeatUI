@@ -44,20 +44,6 @@ body{ background-color: #f4f4f4; }
 /*+----------------+*/
 /*+提交询价区域+*/
 .grid__mortgage{ }
-.mortgage__switch{
-    margin-top: 20px;
-}
-.mortgage__switch *{
-    font-size: 14px;
-    font-weight: bold;
-}
-.mortgage__switch button{
-    margin-left: 0!important;
-    background: transparent;
-    border: 0;
-    color: #87b87f;
-    text-decoration: underline;
-}
 
 /*+----------------+*/
 /*+询价结果区域+*/
