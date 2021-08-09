@@ -197,7 +197,8 @@
             source: {}, // 数据源。
             
             // 字段
-            format: [ ], // 自定义数据源字段(可选)，默认空数组。
+            format: [ ], // 自定义数据源字段(可选)，默认空数组。若数据源字段为id, value或bh, mc，控件将自动识别(即本参数值为空数组即可)。参数格式：eg1. ["value"], eg2.["id", "value"] 其中, "id" 表示隐藏值字段, "value" 表示显示值字段。
+            notes: "", // 自定义下拉项中说明性文字字段(可选), 默认空。eg. "bz"
             // 定位    
             position: "fixed", // 定位方式(可选)，默认fixed。值：fixed 固定定位(即相对浏览器窗口定位)，absolute 绝对定位(即相对输入框元素定位)。
             zIndex: 1, // 自定义控件层级(可选)，默认1。
@@ -311,9 +312,11 @@
         var me = this;
         var opts = me.$opts;
         var format = opts.format, source = opts.source;
-        var dFieldId = "id", dFieldValue = "value";
+        var dFieldId = "id", dFieldValue = "value"; // 默认数据源字段1
+        var dFieldHid = "bh", dFieldName = "mc"; // 默认数据源字段2
         var fFieldId = tools.isArray(format) ? (format.length > 1 ? format[0] : dFieldId) : dFieldId,
-            fFieldValue = tools.isArray(format) ? ( format.length > 1 ? format[1] : ( format.length == 1 ? format[0] : dFieldValue) ) : dFieldValue;
+            fFieldValue = tools.isArray(format) ? ( format.length > 1 ? format[1] : ( format.length == 1 ? format[0] : dFieldValue) ) : dFieldValue,
+            fFieldBz = opts.notes;
         // 判断数据源
         var inputValue = tools.getElementValue(valCell); // 当前输入框元素的值
         var dataSource = me.$method == 'OUTER' ? opts.inputBack({value: inputValue}) : source;
@@ -335,9 +338,17 @@
         }
         for(var i = 0; i < dataSource.data.length; i++){ // 循环数据源中的下拉项
             var row = dataSource.data[i];
-            var bh = typeof row[dFieldId] != 'undefined' ? row[dFieldId] : ( fFieldId == dFieldId ? (i + 1) : row[fFieldId] ),
-                value = row[fFieldValue];
+            var bh = typeof row[dFieldId] != 'undefined' ? 
+                    row[dFieldId] : 
+                    ( 
+                        typeof row[dFieldHid] != 'undefined' ?
+                        row[dFieldHid] :
+                        ( fFieldId == dFieldId ? (i + 1) : row[fFieldId] )  
+                    ),
+                value = typeof row[fFieldValue] == 'undefined' ? (typeof row[dFieldName] == 'undefined' ? row[fFieldValue] : row[dFieldName]) : row[fFieldValue],
+                beiZhu = fFieldBz.toString().replace(/([ ]+)/g, '') === '' ? '' : ( typeof row[fFieldBz] == 'undefined' ? '' : row[fFieldBz]);
             var _liClassName = ( value == inputValue ) ? ' class="on"' : '';
+            value += beiZhu == '' ? '' : '<em>(' + beiZhu + ')</em>'
             listHtml += '<li data-bh="' + bh + '"' + _liClassName + _liStyle + '>' + value + '</li>';
         }
         // 输入框元素默认值
@@ -518,7 +529,7 @@
             var bh = tools.getDataset(lis).bh, // lis.dataset.bh,
                 value = lis.innerText; 
             if(me.$opts.explained){ // 过滤下拉项中的说明性文字
-                var tempStr = lis.innerHTML.toString().replace(/<[^<>]+?>/g, '`'); //说明性文字(过滤html标签)
+                var tempStr = lis.innerHTML.toString().replace(/<[^<>]+?>/g, '`'); // 说明性文字(过滤html标签)
                 tempStr = tempStr.replace(/(\`+)/g, '`');
                 var newSmZi = tempStr.replace(/(.*)`(.*)`$/g, '$2');
                 if(newSmZi == value) newSmZi = ''; 
