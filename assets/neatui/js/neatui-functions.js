@@ -954,23 +954,6 @@ var utilities = {
     },
 
 
-
-
-    /**
-     * 原生js获取所有兄弟节点
-     * @param {HTML DOM} o 当前节点
-     * @returns {Array} 返回兄弟节点组成的数组
-     */
-    getSiblingElement: function(o) {
-        var a = [];
-        var p = o.parentNode.children;
-        for(var i = 0, len = p.length; i< len; i++) {
-            if(p[i] !== o) a.push(p[i]);
-        }
-        return a;
-    },
-
-        
     /**
      * 原生js获取下一个兄弟节点 (兼容ie6+)
      * 注：已排除文本、空格，换行符
@@ -1023,6 +1006,64 @@ var utilities = {
         }
     },
 
+
+    /**
+     * 原生js获取所有兄弟节点
+     * @param {HTML DOM} o 当前节点
+     * @returns {Array} 返回兄弟节点组成的数组
+     */
+     getAllSiblingElement: function(o) {
+        var a = [];
+        var p = o.parentNode.children;
+        for(var i = 0, len = p.length; i< len; i++) {
+            if(p[i] !== o) a.push(p[i]);
+        }
+        return a;
+    },
+
+    /**
+     * 原生js获取前面所有的兄弟节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前元素对象节点
+     * @returns {Array} 返回数组，数组中的元素为dom对象
+     */
+    getAllPrevElement: function(o){
+        var arr = [];
+        var parent = o.parentNode;
+        if(parent == null) return [];
+        for(var i = 0; i < parent.children.length; i++){
+            var child = parent.children[i];
+            if(child == o){
+                break;
+            }else{
+                arr.push(child)
+            }
+        }
+        return arr;
+    },
+
+
+    /**
+     * 原生js获取后面所有的兄弟节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前元素对象节点
+     * @returns {Array} 返回数组，数组中的元素为dom对象
+     */
+    getAllNextElement: function(o){
+        var arr = [];
+        var parent = o.parentNode;
+        if(parent == null) return [];
+        var index = -1;
+        for(var i = 0; i < parent.children.length; i++){
+            var child = parent.children[i];
+            if(child == o){
+                index = i;
+            }else{
+                if(index != -1 && i > index) arr.push(child);
+            }
+        }
+        return arr;
+    },
 
    
 
@@ -1389,11 +1430,11 @@ var checker = {
 	 */
 	checkTel:function(str, options){
         var defaults = {
-            mode: "standard", // 校验模式. standard 标准模式,严格校验电话格式(默认), loose 宽松模式,只校验电话位数
-            pattern: "mobilephone", // 验证类型(只在mode="standard"时有效). mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
-            bit: { // 校验的电话位数(只在mode="loose"时有效)
-                from: 6, // 校验6位.与to配合使用,可与to值相等
-                to: 12 // 校验12位.与from配合使用,可与from值相等
+            mode: "standard", // 校验模式(可选)。值： standard 标准模式，即严格校验电话格式(默认), loose 宽松模式，即只校验电话位数
+            pattern: "mobilephone", // 验证类型(只在mode="standard"时有效)(可选)。值：mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
+            bit: { // 校验的电话位数(只在mode="loose"时有效)(可选)
+                from: 6, // 校验6位(可选)。与to配合使用,可与to值相等
+                to: 12 // 校验12位(可选)。与from配合使用,可与from值相等
             }
         }
         var settings = $.extend(true, {}, defaults, options || {});
