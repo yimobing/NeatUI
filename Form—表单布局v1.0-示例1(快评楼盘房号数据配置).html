@@ -121,6 +121,9 @@
                         from: 6, // 校验6位(可选)。与to配合使用,可与to值相等
                         to: 12 // 校验12位(可选)。与from配合使用,可与from值相等
                     }
+                },
+                numeric: { // 数字类型格式(可选)
+                    thousandth: false // 数字类型是否使用千分进位法，即3个数字就加一个英文逗号(可选), 默认false。优先权说明：若数据源中不存在"thousandth"字段, 则是否千分进位取决于本参数; 若数据源中有存在"thousandth"字段，则本参数自动失效。
                 }
             }
         }
@@ -140,6 +143,7 @@
     title       字段名称(中文), 即显示名称
     field       字段名称(英文), 即ID属性
     type        输入框类型(可选)。值：文本, 日期, 数字, 单选, 下拉
+    thousandth  数字类型是否使用千分进位法，即3个数字就加一个英文逗号(可选), 默认false。仅当type="数字"时有效。优先权说明：若数据源中不存在"thousandth"字段, 则是否千分进位取决于options中的thousandth参数; 若数据源中有存在"thousandth"字段，则options中的thousandth参数自动失效。
     value       初始值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
     unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
     phone       是否电话类型(可选)。值：true, false 否(默认)
@@ -291,7 +295,8 @@
                     {title:"抵押物类型", field:"category", type:"下拉", value:"住宅(有储藏间)", must:true},
                     {title:"日期", field:"tokyo", type:"日期", value:"2021-08-31", must:false},
                     {title:"数字", field:"tokyo", type:"数字", value:"123456789", must:false},
-                    {title:"单选", field:"tokyo", type:"单选", value:"1", must:false}
+                    {title:"单选", field:"tokyo", type:"单选", value:"1", must:false},
+                    {title:"交易单价", field:"unitPrice", type:"数字", value:"15000", thousandth:true, must:false}
                 ]
             }
 
@@ -305,6 +310,11 @@
                         inputCross: true,
                         inputMust: true,
                         mustAlign: "left"
+                    },
+                    format: {
+                        numeric: { 
+                            thousandth: false
+                        }
                     }
                 }
             });
