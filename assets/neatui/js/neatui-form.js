@@ -76,6 +76,11 @@
             [字段说明]
             val 表示显示值(要显示在界面上)，
             hid 表示隐藏值(无须显示在界面上,只需隐藏起来,后续操作能取到值即可)
+            [对应关系]
+            val1 <=> column_title
+            val2 <=> column_value
+            hid6 <=> column_name
+            hid2 <=> column_type
             [字段名称]
             val1    显示值1：字段名称(中文)、显示名称
             val2    显示值2：字段值(即字段名称对应的值)、显示值(输入框值)
@@ -342,6 +347,7 @@
         me.examineForm = function(o, ps_dialog_zIndex){
             var tips1 = '';
             var tips2 = '';
+            var isAllRead = true; // true 表示所有输入框为只读
             var zIndex = typeof ps_dialog_zIndex == 'undefined' ? 999 : isNaN(parseInt(ps_dialog_zIndex)) ? 999 : parseInt(ps_dialog_zIndex);
             o = tools.anyToDomObject(o);
             var child = tools.getChildElement(o);
@@ -352,6 +358,7 @@
                     inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
                     var type = txt.getAttribute('type');
+                    var readonly = txt.getAttribute('readonly');
                     var value = '';
                     if(type == null || type == 'text') {
                         value = txt.value;
@@ -366,13 +373,20 @@
                     // console.log('mustNode：', mustNode, '\ntelNode：', telNode);
                     // console.log('label：', label, '\nisMust：',isMust, '\nisPhone：',isPhone);
                     // console.log('-------------')
-                    if(isMust && value.toString().replace(/([ ]+)/g, '') === '') tips1 += label + '、';
-                    if(isMust && isPhone && !tools.isTel(value, me.$opts.config.format.phone)) tips2 += label + '、';
+                    if(isMust && value.toString().replace(/([ ]+)/g, '') === ''){
+                        tips1 += label + '、';
+                        if(readonly != '' && readonly != 'readonly' && readonly != 'true') isAllRead = false;
+                    }
+                    if(isMust && isPhone && !tools.isTel(value, me.$opts.config.format.phone)){
+                        tips2 += label + '、';
+                        if(readonly != '' && readonly != 'readonly' && readonly != 'true') isAllRead = false;
+                    }
                 })
             })
+            var chooseText = isAllRead ? '选择' : '填写';
             // 校验数据完整性
             if(tips1 != ''){
-                var tips = '请填写：' + tips1.substr(0, tips1.length - 1);
+                var tips = '请' + chooseText + '：' + tips1.substr(0, tips1.length - 1);
                 if(tools.isExistDialogControl()){
                     neuiDialog.alert({
                         zIndex: ps_dialog_zIndex,
@@ -387,7 +401,7 @@
             }
             // 校验数据格式：校验电话
             if(tips2 != ''){
-                var tips = '请填写正确的：' + tips2.substr(0, tips2.length - 1);
+                var tips = '请' + chooseText + '正确的：' + tips2.substr(0, tips2.length - 1);
                 if(tools.isExistDialogControl()){
                     neuiDialog.alert({
                         zIndex: ps_dialog_zIndex,
@@ -583,7 +597,7 @@
                 Array.from(inputNode).forEach(function(txt){
                     var type = txt.getAttribute('type');
                     var readonly = txt.getAttribute('readonly');
-                    if(readonly != 'readonly' && readonly != 'true') isAllRead = false;
+                    if(readonly != '' && readonly != 'readonly' && readonly != 'true') isAllRead = false;
                     var value = '';
                     if(type == null || type == 'text') {
                         value = txt.value;
