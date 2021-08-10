@@ -484,13 +484,18 @@
                         value = txt.checked ? 1 : 0;
                     }
                     var title = lbNode.innerText,
+                        val1 = title,
                         val2 = value, // 显示值2, 表示输入框值
+                        hid1 = txt.getAttribute('data-hid1') == null ? '' : txt.getAttribute('data-hid1'), // 隐藏值1, 表示控件类型(如空, 无, 楼盘, 幢号, 楼层, 房号, 建筑面积, 储藏间面积, 产权年限)
+                        hid2 = txt.getAttribute('data-hid2') == null ? '' : txt.getAttribute('data-hid2'), // 隐藏值2, 表示控件属性(如空, 无, 日期, 数字, 单选, 下拉)
+                        hid3 = txt.getAttribute('data-hid3') == null ? '' : txt.getAttribute('data-hid3'), // 隐藏值3, 表示控件属性标识(如空, 非空)
+                        hid4 = txt.getAttribute('data-hid4') == null ? '' : txt.getAttribute('data-hid4'), // 隐藏值4, 表示是否多行. 1 是, 0 否
                         hid5 = txt.getAttribute('data-hid5') == null ? '' : txt.getAttribute('data-hid5'), // 隐藏值5, 表示是否必填项. 1 必填, 0 选填
                         hid6 = txt.getAttribute('data-hid6') == null ? '' : txt.getAttribute('data-hid6'); // 隐藏值6, 表示字段名称(英文)(键值) 
                      var title = lbNode.innerText,
                         id = txt.id == null ? '' : txt.id,
                         bh = txt.getAttribute('data-bh') == null ? '' : txt.getAttribute('data-bh'); 
-                    var oneJson = { val2: val2, hid5: hid5, hid6: hid6, title: title, id: id, bh: bh, value: value }
+                    var oneJson = { val1:val1, val2:val2, hid1:hid1, hid2:hid2, hid3:hid3, hid4:hid4, hid5:hid5, hid6:hid6, title:title, id:id, bh:bh, value:value }
                     arr.push(oneJson);
                 })
             })
@@ -792,9 +797,11 @@
                     hid4 = items["hid4"],
                     hid5 = items["hid5"],
                     hid6 = items["hid6"];
-                var _hid1 = ' data-hid1="' + hid1 + '"', 
-                    _hid3 = ' data-hid3="' + hid3 + '"', 
-                    _hid5 = ' data-hid5="' + hid5 + '"', 
+                var _hid1 = ' data-hid1="' + hid1 + '"',
+                    _hid2 = ' data-hid2="' + hid2 + '"',
+                    _hid3 = ' data-hid3="' + hid3 + '"',
+                    _hid4 = ' data-hid4="' + hid4 + '"',
+                    _hid5 = ' data-hid5="' + hid5 + '"',
                     _hid6 = ' data-hid6="' + hid6 + '"';
                 var _placeholder = ' placeholder="' + val4 + '"',
                     _onblur = ' onblur="this.placeholder=\'' + val4 + '\'"';
@@ -935,9 +942,9 @@
                 var _onfocus = ' onfocus="this.placeholder=\'\';' + _blur + '"';
                 
                 if(tagName == 'input') { // input
-                    _LHtml = '<input type="' + types + '"' + _idStr + ' class="' + className + '" value="' + val2 + '"' + _placeholder + _onfocus + _onblur + _hideStr + _hid1 + _hid3 + _hid5 + _hid6 + _readStr + '>';
+                    _LHtml = '<input type="' + types + '"' + _idStr + ' class="' + className + '" value="' + val2 + '"' + _placeholder + _onfocus + _onblur + _hideStr + _hid1 + _hid2 + _hid3 + _hid4 + _hid5 + _hid6 + _readStr + '>';
                 }else if(tagName == 'textarea'){ // textarea
-                    _LHtml = '<textarea' + _idStr + ' class="' + className + '"' + _placeholder + _onfocus + _onblur + _hideStr + _hid1 + _hid3 + _hid5 + _hid6 + _readStr + '>' + val2 + '</textarea>';
+                    _LHtml = '<textarea' + _idStr + ' class="' + className + '"' + _placeholder + _onfocus + _onblur + _hideStr + _hid1 + _hid2 + _hid3 + _hid4 + _hid5 + _hid6 + _readStr + '>' + val2 + '</textarea>';
                 }else{ // radio单选开关
                     var _checkStr = '';
                     var value = 0;
@@ -945,7 +952,7 @@
                         _checkStr = ' checked="checked"';
                         value = 1;
                     }
-                    _LHtml = '<input type="' + types + '"' + _idStr + ' class="' + className + '" value="' + value + '"' + _hideStr + _hid1 + _hid3 + _hid5 + _hid6 + _checkStr + '>';
+                    _LHtml = '<input type="' + types + '"' + _idStr + ' class="' + className + '" value="' + value + '"' + _hideStr + _hid1 + _hid2 + _hid3 + _hid4 + _hid5 + _hid6 + _checkStr + '>';
                 }
                 //
                 var _boxWClass = ''; // boxWidth == '' ? '' : (boxWidth == '100%' ? ' w-100' : ''); // 宽
