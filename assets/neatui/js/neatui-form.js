@@ -1416,9 +1416,9 @@
             if(tempNode == null){
                 tempNode = document.createElement('div');
                 tempNode.className = finalClassName;
-                tempNode.className += finalClassName == cname ? '' : ' ' + cname;
                 this.insertAfter(tempNode, o);
             }
+            tempNode.className += finalClassName == cname ? '' : ' ' + cname;
             return tempNode;
         },
 
