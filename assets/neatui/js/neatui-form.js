@@ -58,6 +58,8 @@
             title       字段名称(中文), 即显示名称
             field       字段名称(英文), 即ID属性
             type        输入框类型(可选)。值：文本,日期, 数字, 单选, 下拉
+            thousandth  数字类型是否使用千分进位法，即3个数字就加一个英文逗号(可选), 默认false。仅当type="数字"时有效。优先权说明：若数据源中不存在"thousandth"字段, 则是否千分进位取决于options中的thousandth参数; 若数据源中有存在"thousandth"字段，则options中的thousandth参数自动失效。
+
             value       初始值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
             unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
             phone       是否电话类型(可选)。值：true, false 否(默认)
@@ -146,12 +148,16 @@
                                 from: 6, // 校验6位(可选)。与to配合使用,可与to值相等
                                 to: 12 // 校验12位(可选)。与from配合使用,可与from值相等
                             }
+                        },
+                        numeric: { // 数字类型格式(可选)
+                            thousandth: false // 数字类型是否使用千分进位法，即3个数字就加一个英文逗号(可选), 默认false。优先权说明：若数据源中不存在"thousandth"字段, 则是否千分进位取决于本参数; 若数据源中有存在"thousandth"字段，则本参数自动失效。
                         }
                     }
                 } 
             }
             var selector = elem.indexOf('#') >= 0 ? elem.replace(/([\#]+)/g, '') :  ( elem.indexOf('.') >= 0 ? tools.getClassNameString(elem) : elem.replace(/([\#\.]+)/g, '') );
             // --------全局赋值--------
+            me.$defaults = defaults;
             me.$opts = net.extend(true, {}, defaults, options || {}); // 控件参数
             me.$selector = selector;  // 节点ID或CLass属性值(不含选择器符号井号#或点号.). eg. 'floor'
             me.$elem = elem; // 节点ID或Class属性值(含选择器符号井号#或点号.). eg.'#floor', '.floor'
@@ -412,9 +418,11 @@
                     inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
                     var type = txt.getAttribute('type');
+                    var isThousands = typeof txt.getAttribute('data-thousand') == 'undefined' ? false : txt.getAttribute('data-thousand') == 'true' ? true : false; // 是否千分进位
                     var value = '';
                     if(type == null || type == 'text') {
                         value = txt.value;
+                        if(isThousands) value = value.toString().replace(/\,/g, ''); // 去掉逗号 test1
                     }
                     else if(type == 'checkbox') {
                         value = txt.checked ? 1 : 0;
@@ -647,6 +655,11 @@
                     field = items["field"],
                     type = typeof items["type"] == 'undefined' ? '文本' : items["type"],
                     value = typeof items["value"] == 'undefined' ? '' : items["value"],
+                    // thousands = typeof items["thousandth"] == 'undefined' ? false : items["thousandth"] === true ? true : false,
+                    thousands = me.$opts.config.format.numeric.thousandth ? 
+                    ( typeof items["thousandth"] == 'undefined' ? true : (items["thousandth"] === true ? true : false) )
+                    :
+                    ( typeof items["thousandth"] == 'undefined' ? false : (items["thousandth"] === true ? true : false) ),
                     unit = typeof items["unit"] == 'undefined' ? '' : items["unit"],
                     phone = typeof items["phone"] == 'undefined' ? false : items["phone"] === true ? true : false,
                     must = typeof items["must"] == 'undefined' ? false : items["must"] === true ? true : false,
@@ -655,7 +668,7 @@
                     disabled = typeof items["disabled"] == 'undefined' ? false : items["disabled"] === true ? true : false,
                     icon = typeof items["icon"] == 'undefined' ? field : items["icon"],
                     attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"];
-                
+
                 //
                 var _LHtml = '', // 左边内容
                     _RHtml = '', // 右边内容
@@ -668,6 +681,7 @@
                     ids = field, // ID属性
                     className = 'click-input', // class属性
                     checked = ''; // checked属性。值：空 表示没有这个属性, true 表示选中, false 不选中
+                var _dataThousandStr = ''; // 数字类型千分进位法 data-thousand 属性
                 //
                 if(type == '文本') {
                     types = 'text';
@@ -682,6 +696,9 @@
                 if(type == '数字') {
                     // types = 'number';
                     className += ' click-num';
+                    // test1
+                    _dataThousandStr = !thousands ? '' : ' data-thousand="' + thousands + '"';
+                    value = !thousands ? value : tools.thousandth(value);
                 }
                 if(type == '单选') {
                     types = 'checkbox';
@@ -713,7 +730,7 @@
                     _telAClass = phone == '' ? '' : !tools.isTel(value, me.$opts.config.format.phone) ? '' : ' class="hover"';
                     _crossClass = ''; // me.$opts.houses.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
                     _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
-                var _attrListStr = ' id="' + ids + '"' + _classNameStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr; // 所有公用属性串
+                var _attrListStr = ' id="' + ids + '"' + _classNameStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr; // 所有公用属性串
                 //
                 var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="icon icon-' + icon + '"></i>'),
                     _unitStr = unit == '' ? '' : '<em class="r-unit' + _unitClass + '">' + unit + '</em>',
@@ -1026,17 +1043,21 @@
                 // 直接输入
                 Array.from(numeralNode).forEach(function(el, i){
                     el.addEventListener('input', function(){
+                        var isThousands = typeof this.getAttribute('data-thousand') == 'undefined' ? false : this.getAttribute('data-thousand') == 'true' ? true : false; // 是否千分进位
                         var value = this.value;
                         var reg = /[^\d\.]/g; // 只允许输入数字、小数点
                         value = value.toString().replace(reg,'');
                         value = tools.repeatedChar(value, '.'); // 只保留一个小数点
+                        if(isThousands){ // test1
+                            value = tools.thousandth(value);
+                        }
                         this.value = value;
                     })
                     el.addEventListener('blur', function(){
                         var value = this.value;
                         var reg = /^(.*?)\.$/;
-                        if(reg.test(value)){ // 小数点后没有东西了
-                            this.value = value.replace(/([\.]+)/g, ''); // 去掉小数点
+                        if(reg.test(value)){ // 小数点后没有东西了(即最后面直接一个小数点结尾)
+                            this.value = value.replace(/([\.]+)/g, ''); // 去掉小数点;
                         }
                     })
                 })
@@ -1755,6 +1776,21 @@
             })
             return result;
         },
+
+
+        /**
+         * 数字千分位(不处理小数部分)，即每三位数字一个用一个逗号,分隔开
+         * @param {string | number} ps_str 原始数字
+         * @returns {string} 返回经过千分位处理后的新数字
+         * [示例]
+            eg1. 2500347 <=> 2,500,347
+            eg2. 2500347.90185 <=> 2,500,347.90185
+        */
+        thousandth: function(ps_str){
+            var arr = ps_str.toString().split('.');
+            return arr[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (arr.length <= 1 ? '':  '.' + arr[1]);
+        },
+        
 
         /**
          * 判断是否手机号码(正则表达式验证)
