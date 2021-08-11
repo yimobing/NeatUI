@@ -59,12 +59,14 @@
             field       字段名称(英文), 即ID属性
             type        输入框类型(可选)。值：文本,日期, 数字, 单选, 下拉
             thousandth  数字类型是否使用千分进位法，即3个数字就加一个英文逗号(可选), 默认false。仅当type="数字"时有效。优先权说明：若数据源中不存在"thousandth"字段, 则是否千分进位取决于options中的thousandth参数; 若数据源中有存在"thousandth"字段，则options中的thousandth参数自动失效。
-
-            value       初始值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
+                        
+            value       初始显示值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
+            hid         初始隐藏值,即显示值对应的编号(可选)。在输入框上有属性data-bh="隐藏值"
             unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
             phone       是否电话类型(可选)。值：true, false 否(默认)
             must        是否必填项(可选)。值：true 是, false 否(默认)
             multiple    是否多行(可选)。值: true 是, false 否(默认)
+            placeholder 空占位符(可选), 默认空。仅在must=true时有效。
             readonly    是否强制为只读(可选), 默认false
             disabled    是否强制为禁用(可选), 默认false
             icon    自定义图标名称(即className)(可选), 默认图标名称为field参数值
@@ -674,11 +676,13 @@
                     field = items["field"],
                     type = typeof items["type"] == 'undefined' ? '文本' : items["type"],
                     value = typeof items["value"] == 'undefined' ? '' : items["value"],
+                    hid = typeof items["hid"] == 'undefined' ? '' : items["hid"],
                     // thousands = typeof items["thousandth"] == 'undefined' ? false : items["thousandth"] === true ? true : false,
                     thousands = me.$opts.config.format.numeric.thousandth ? 
                     ( typeof items["thousandth"] == 'undefined' ? true : (items["thousandth"] === true ? true : false) )
                     :
                     ( typeof items["thousandth"] == 'undefined' ? false : (items["thousandth"] === true ? true : false) ),
+                    placeholder = items["placeholder"] == 'undefined' ? null : items["placeholder"],
                     unit = typeof items["unit"] == 'undefined' ? '' : items["unit"],
                     phone = typeof items["phone"] == 'undefined' ? false : items["phone"] === true ? true : false,
                     must = typeof items["must"] == 'undefined' ? false : items["must"] === true ? true : false,
@@ -734,12 +738,13 @@
                 }
                 
                 //
-                var chooseText = (!readonly ? '请填写' : '请选择'); //+title,
+                var chooseText = placeholder != null && placeholder.toString().replace(/([ ]+)/g, '') != '' ? placeholder :  (!readonly ? '请填写' : '请选择'); //+title 
                     _looseFocusStr = !readonly ?  '' : ';this.blur()';
                 var _classNameStr = ' class="' + className + '"',
                     _placeholderStr = !must ? '' : ' placeholder="' + chooseText + '"',
                     _blurStr = !must ? '' : ' onblur="this.placeholder=\'' + chooseText + '\'"';
                     _focusStr = !must ? ( !readonly ? '' : ' onfocus="this.blur()"') : ' onfocus="this.placeholder=\'\'' + _looseFocusStr + '"',
+                    _dataHideStr = hid.toString().replace(/([ ]+)/g, '') === '' ? '' : ' data-bh="' + hid + '"';
                     _readonlyStr = !readonly ? '' : ' readonly',
                     _disabledStr = !disabled ? '' : ' disabled',
                     _btnStr = '', // 按钮
@@ -749,7 +754,7 @@
                     _telAClass = phone == '' ? '' : !tools.isTel(value, me.$opts.config.format.phone) ? '' : ' class="hover"';
                     _crossClass = ''; // me.$opts.houses.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
                     _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
-                var _attrListStr = ' id="' + ids + '"' + _classNameStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr; // 所有公用属性串
+                var _attrListStr = ' id="' + ids + '"' + _classNameStr + _dataHideStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr; // 所有公用属性串
                 //
                 var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="icon icon-' + icon + '"></i>'),
                     _unitStr = unit == '' ? '' : '<em class="r-unit' + _unitClass + '">' + unit + '</em>',
