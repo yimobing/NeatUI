@@ -701,7 +701,7 @@
                     titleHeight: 35, // 标题栏高度(可选), 默认35
                     titleFontSize:'18px', // 标题文字大小(可选), 默认18px
                     showCross: true, // 是否显示右上角打叉图标(可选), 默认true
-                    crossDirection: 'left', // 打叉图标位置(可选). left 左上角, right 右上角(默认)
+                    crossDirection: 'right', // 打叉图标位置(可选). left 左上角, right 右上角(默认)
                     buttons: ['确定', '取消'], // 操作按钮(可选)
                     //btnTheme: '', // 按钮主题(可选). 默认空. 其它值: back 返回主题
                     btnBgColor: ['#04BE02', '#888'], // 自定义按钮背景色(可选). 英文单词或颜色值. eg. green, #1296db
@@ -719,8 +719,8 @@
                         //maskId: 'ne-frame-mask', // 遮罩id(可选)
                         //maskZindex: 50, // 遮罩层级z-index(可选)
                         animation: { // 嵌入打开时是否启用动画效果(可选)
-                            enable: false, // 默认false不开启(可选)
-                            direction: 'left' // 动画方向(可选). left 向左(默认), top 向上
+                            enable: false, // 默认true开启(可选)
+                            direction: 'top' // 动画方向(可选). left 向左, top 向上(默认)
                         }
                     }, 
                     closeCallBack: function(){ } // 关闭时的回调函数(可选)
