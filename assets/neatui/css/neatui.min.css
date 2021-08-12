@@ -267,6 +267,24 @@ pre, pre code {
 	-o-flex-wrap: wrap;
 	flex-wrap: wrap;
 }
+.flex.align-center{
+	align-items: center;
+}
+.flex.align-start{
+	align-items: flex-start;
+}
+.flex.align-end{
+	align-items: flex-end;
+}
+.flex.justify-center{
+	justify-content: center;
+}
+.flex.justify-start{
+	justify-content: flex-start;
+}
+.flex.justify-end{
+	justify-content: flex-end;
+}
 
 /*+公用属性+*/
 .hide{ display: none; }
