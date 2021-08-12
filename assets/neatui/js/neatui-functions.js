@@ -1275,9 +1275,9 @@ var calendar = {
 	 * 格式化日期 / 标准化日期时间
 	 * 说明: 该方法有效防止后台传数据格式发生变化. eg.10-19-2017 <==> 2017/10/19
 	 * 思路：后台的时间日期 => 时间戳 =>标准的时间日期 y=年，m=月，d=天，h=时，u=分，s=秒
-	 * @param {string} dateTime 日期字符串
-	 * @param {string} formatStr 日期格式(可缺省).默认返回"年-月-日 时:分:秒"的格式. eg1. "yyyy-MM-dd HH:mm:ss" 返回"年-月-日 时:分:秒"eg2. "yyyy-MM-dd" 返回"年-月-日"
-	 * @returns {string} 返回标准化日期字符串
+	 * @param {string} dateTime 日期字符串。必须是以下格式的日期：“月-日-年”、“年/月/日”、“年-月-日”。eg. 10-19-2017、2017/10/19、2017-10-19. eg. 10-19-2017 14:52:31、2017/10/19 14:52:31、2017-10-19 14:52:31
+	 * @param {string} formatStr 自定义日期格式(可选).默认返回"年-月-日 时:分:秒"的格式. eg1. "yyyy-MM-dd HH:mm:ss" 返回"年-月-日 时:分:秒"eg2. "yyyy-MM-dd" 返回"年-月-日"
+	 * @returns {string} 返回自定义格式的日期字符串(标准化日期字符串) 或 日期JSON对象(里面包含年、月、日、时、分、秒字段)
 	 * eg. var a="2017/12/31 23:12:54"; console.log(dateFormat(a));
 	 */
 	dateFormat:function(dateTime, formatStr){
@@ -1285,6 +1285,10 @@ var calendar = {
 		var formatStr = typeof formatStr == 'undefined' ? 'yyyy-MM-dd HH:mm:ss' : formatStr;
 		var dateParse = Date.parse(new Date(dateTime));//转成时间戳
 		var time = new Date(dateParse);//再转成标准时间
+        if(time == 'Invalid Date'){
+            alert('您传递的日期字符串无效，请检查是否为“月-日-年”、“年/月/日”、“年-月-日”格式\n如果是，则检查月份是否超出12月、天数是否超出31天！');
+            return '';
+        }
 		var y = String(time.getFullYear());
 		var m = String(time.getMonth()+1);
 		var d = String(time.getDate());
@@ -1308,11 +1312,14 @@ var calendar = {
 		else if(formatStr == 'dd/MM') return d + '/' + m;
 		else if(formatStr == 'HH:mm:ss') return h + ':' + u + ':' + s;
 		else if(formatStr == 'HH:mm') return h + ':' + u;
+        else if(formatStr == '年-月-日') return y + '年' + m + '月' + d + '日'; // eg. 2021年8月12日
 		else return {"year":y, "mon":m, "day":d, "hours":h, "minutes":u, "seconds":s}; //return m+"/"+d//直接输入自己想要的格式
 	},
 
+
+
 	/**
-	 * 根据当天获取某一天
+	 * 根据当天获取某一天、获取当天几天前或几天后的某一天的日期
 	 * @param {Number} day 天数(可缺省), 默认当天
 	 * @returns {string} 返回某一天的日期. eg. 2020-05-07
 	 * eg. getDay(0) 当天,  getDay(7)) 7天后, getDay(-7) 7天前
@@ -1335,7 +1342,55 @@ var calendar = {
 		tMonth = doHandleMonth(tMonth + 1);
 		tDate = doHandleMonth(tDate);
 		return tYear + "-" + tMonth + "-" + tDate;
-	}
+	},
+
+
+    /**
+     * 将某一天转化成星期几，即将日期转换为星期名称
+     * @param {string} date 日期。格式：2020-06-28，中间用"-"分割
+     * @returns {string} 返回星期几
+     */
+     datesToWeek: function(date) {
+        var newDate = new Date(date.replace(/-/g, '/'));
+        var weekday = new Array(7);
+        weekday[0] = "星期日";
+        weekday[1] = "星期一";
+        weekday[2] = "星期二";
+        weekday[3] = "星期三";
+        weekday[4] = "星期四";
+        weekday[5] = "星期五";
+        weekday[6] = "星期六";
+        return weekday[newDate.getDay()];
+    },
+
+
+    /**
+     * 将数字转化成星期
+     * 即：将数字型的星期转成中文型的星期(将对象日期转换成字符串)
+     * @param {string | array} ps_num_arr_str 表示星期的数字或数字数组。eg1. 5或"5"表示星期五; eg2.["1", "2", "3"] 表示 ["星期一", "星期二", "星期三"]
+     * @returns {string | array} 返回数字对应的星期.原参数若是字符串,则返回字符串型;若是数组则返回数组型
+     */
+    numericToWeek: function(ps_num_arr_str){
+        if(typeof ps_num_arr_str == 'undefined') return [];
+        var numData = ps_num_arr_str instanceof Array ? ps_num_arr_str : [ps_num_arr_str.toString()];
+        var standWeekArr = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"];	
+        var tabWeekArr = [];
+        var tabWeek = '';
+        var resultWeekArr = [];
+        for (var j = 0; j < numData.length; j++) {  // 遍历所有的数据，截取到相应的下标
+            var resArr = numData[j].toString().split(",").sort();
+            for(var i = 0; i < resArr.length; i++){
+                var thatW = standWeekArr[resArr[i] - 1]; // 按照下标取值						
+                tabWeekArr.push(thatW)
+                if(i == resArr.length - 1){	
+                    tabWeek = tabWeekArr.join(",");
+                    tabWeekArr = []; // 遍历到最后的时候 将上一个的数据清空，不然不正确
+                    resultWeekArr.push(tabWeek);
+                }
+            }
+        }
+        return (ps_num_arr_str instanceof Array ? resultWeekArr : resultWeekArr[0]);
+    }
 
 };  //END CALENDAR对象
 
