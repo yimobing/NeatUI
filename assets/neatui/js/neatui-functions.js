@@ -1865,8 +1865,22 @@ var filter = {
         var isAll = typeof ps_method == 'undefined' ? true : (ps_method == 'one' ? false : true);
         if(isAll) return ps_str.toString().replace(/\ +/g, ''); //去掉所有空格
         else return ps_str.toString().replace(/([ ]+)/g, ' '); //只保留一个空格
-    }
+    },
 
+
+    /**
+     * 若小数点后没有东西了则去掉最后一个小数点，即：如果字符串最后面直接以一个小数点结尾, 则去掉这个小数点
+     * [用法] 一般用于 input blur事件中, 把最后一个小数点去掉, 防止数据不规范
+     * @param {string} ps_str 原字符串
+     * @returns {string} 返回新字符串. eg1. 200. <=> 200  eg2. 190. <=> 190
+     */
+    lastDotChar: function(ps_str){
+        var reg = /^(.*?)\.$/;
+        if(reg.test(ps_str)){ // 小数点后没有东西了(即最后面直接以一个小数点结尾)
+            ps_str = ps_str.toString().replace(/([\.]+)/g, ''); // 去掉小数点;
+        }
+        return ps_str;
+    }   
     
 }; //END FILTER对象
 
