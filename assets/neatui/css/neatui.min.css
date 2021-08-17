@@ -1701,3 +1701,16 @@ pre, pre code {
 .web2Image__text{ margin-bottom: 15px; text-align: center; color: #888; font-size: 14px;}
 .web2Image__img{ width: 100%; margin: 0 auto; text-align: center; /*border: 1px solid #ddd; */  border-radius: 4px;}
 .web2Image__img img{display: block; width: 100%; }
+
+
+/*+================================================================================+*/
+/*                                 房贷计算器分期金额
+/*+================================================================================+*/
+.stages{ padding: 5px 8px; border-bottom: 1px solid #f5f5f5; }
+.stages__term{ width: 80px; }
+.stages__money{ -webkit-flex: 1; -moz-flex: 1; -o-flex: 1; flex: 1; width: 100%; text-align: right; }
+.stages__top{ }
+.stages__term,
+.stages__monthly{ font-size: 14px; color: #666; }
+.stages__con{ }
+.stages__con>div{ display: inline-block; vertical-align: center; margin-left: 4px; color: #999; font-size: 12px; }
