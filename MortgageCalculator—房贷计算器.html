@@ -48,11 +48,11 @@
     <div class="wrap">
         <main>
             <section class="caculate">
-                <div class="caculate__form  ne-form">
+                <div class="caculate__form ne-form">
                     <div class="eform-row">
                         <div class="item-l"><label>房产总价</label></div>
                         <div class="item-r">
-                            <input type="text" id="c-housePrice" data-type="int[positive]" readonly disabled>
+                            <input type="text" id="c-housePrice" data-type="float[positive]" readonly disabled>
                             <em class="r-unit">万元</em>
                         </div>
                     </div><!--/.eform-row-->
@@ -64,7 +64,7 @@
                     <div class="eform-row">
                         <div class="item-l"><label>贷款总额</label></div>
                         <div class="item-r">
-                            <input type="text" id="c-loanAmount" data-type="int[positive]" placeholder="手输或房产总价、按揭成数计算" onblur="this.placeholder='手输或房产总价、按揭成数'" onfocus="this.placeholder=''">
+                            <input type="text" id="c-loanAmount" data-type="float[positive]" placeholder="手输或房产总价、按揭成数计算" onblur="this.placeholder='手输或房产总价、按揭成数'" onfocus="this.placeholder=''">
                             <em class="r-unit">万元</em>
                         </div>
                         <div class="item-cell" data-type="must">*</div>
@@ -257,7 +257,7 @@
             var years = parseInt(loanJson["daikuan_nianxian"]),
                 months = years * 12,
                 yearText = years + '年(' + months + '期)';
-            $('#c-housePrice').val(format.thousandth(g_pgjz));
+            $('#c-housePrice').val(format.thousandth(convert.yuan2TenThousand(g_pgjz)));
             $('#c-loanMix').val(convert.decimal2Percent(loanJson["anjie_chengshu"])).attr('data-value', loanJson["anjie_chengshu"]); // 按揭成数
             $('#c-loanAmount').val(format.thousandth(convert.yuan2TenThousand(loanJson["daikuan_je"]))); // 贷款总额
             $('#c-loanCategory').val(loanJson["dkpz"]); // 贷款品种
@@ -353,7 +353,7 @@
                 var total = isNaN(ps_price) ? 0 : parseFloat(ps_price),
                     mix = isNaN(ps_ratio) ? 0 : parseFloat(ps_ratio);
                 // console.log('房产总价：', total, '\n按揭成数：', mix);
-                var amount = convert.yuan2TenThousand((total) * parseFloat(mix));
+                var amount = (total) * parseFloat(mix);
                 $('#c-loanAmount').val(amount); // 向上取整
             }
 
@@ -606,12 +606,11 @@
             //——————————————————————————————————————————
             //=====等额本息查看分期金额按钮
             $('#btn-view-stage-amount-interest').on('click', function(){ 
-                var amount = parseFloat(convert.tenThousand2Yuan($('#c-loanAmount').val())), // 贷款总额(单位：元)
-                    cate = $('#c-loanCategory').val(), // 贷款品种
+                var amount = parseFloat(convert.tenThousand2Yuan($('#c-loanAmount').val().replace(/,/g, ''))), // 贷款总额(单位：元)
                     month = parseInt($('#c-loanYears').attr('data-value')), // 贷款年限(单位：月)
                     rate = parseFloat($('#c-loanRate').val()), // 贷款利率(年利率)
                     method = $('#c-loanPayBackMethod').val(); // 还款方式
-                var arr = [ amount, cate, month, rate, method ]
+                var arr = [ amount, month, rate, method ]
                  // console.log('数组：', arr);
                 neui.installmentPayment({
                     payment: "等额本息", // 还款方式(可选)。值：本额本息(默认), 等额本金
@@ -630,12 +629,11 @@
             //——————————————————————————————————————————
             //=====等额本金查看分期金额按钮
             $('#btn-view-stage-amount-principal').on('click', function(){ 
-                var amount = parseFloat(convert.tenThousand2Yuan($('#c-loanAmount').val())), // 贷款总额(单位：元)
-                    cate = $('#c-loanCategory').val(), // 贷款品种
+                var amount = parseFloat(convert.tenThousand2Yuan($('#c-loanAmount').val().replace(/,/g, ''))), // 贷款总额(单位：元)
                     month = parseInt($('#c-loanYears').attr('data-value')), // 贷款年限(单位：月)
                     rate = parseFloat($('#c-loanRate').val()), // 贷款利率(年利率)
                     method = $('#c-loanPayBackMethod').val(); // 还款方式
-                var arr = [ amount, cate, month, rate, method ]
+                var arr = [ amount, month, rate, method ]
                 // console.log('数组：', arr);
                 neui.installmentPayment({
                     payment: "等额本金", // 还款方式(可选)。值：本额本息(默认), 等额本金
