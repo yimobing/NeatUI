@@ -187,12 +187,13 @@
         /*+————————————————全局变量————————————————+*/
         // ajax({})
         var g_ygdh = '2107130768-237809'; // 预估单号
-        var g_pgjz = 1125000; // '<%=s_pgzj%>'; // 评估总价
+        var g_pgjz = 1125000; // 评估总价
         // var g_ygdh = '<%=s_ygdh%>'; // 预估单号
         // var g_pgjz = '<%=s_pgzj%>'; // 评估总价
 
         //
         var digit = 2; // 统一设置保留的小数位数
+        var counter = 0; // 计数器
 
 
         /*+————————————————FUNCTION————————————————+*/
@@ -448,8 +449,9 @@
 
             //=====计算按揭结果
             function fnCalculateResult(){
-                 // 校验数据完整性
-                 var tips = '';
+                counter++;
+                // 校验数据完整性
+                var tips = '';
                 $('.caculate__form .eform-row').each(function(){
                     var label = $('label', this).text(),
                         value = $('input:text', this).val(),
@@ -587,13 +589,23 @@
                     if(!flag) msg = '保存失败';
 
 
-                    neuiDialog.alert({
-                        animate: true,
-                        popup: flag ? false : true, // 成功不弹窗, 失败才弹窗
-                        caption: '提示',
-                        message: msg,
-                        buttons: ['确定']
-                    })
+                    if(counter > 1){
+                        neuiDialog.notice({
+                            message: msg,
+                            theme: 'black',
+                            //location: 'top',
+                            maskOpacity: 1,
+                            delay: 1000
+                        })
+                    }
+                    // neuiDialog.alert({
+                    //     animate: true,
+                    //     popup: flag ? false : true, // 成功不弹窗, 失败才弹窗
+                    //     caption: '提示',
+                    //     message: msg,
+                    //     buttons: ['确定']
+                    // })
+                   
     
                     neui.destroyAnimate();
                 }, 100)
