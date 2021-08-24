@@ -290,7 +290,7 @@
             o = tools.anyToDomObject(o);
             var child = tools.getChildElement(o);
             Array.from(child).forEach(function(el){
-                var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
                     var type = txt.getAttribute('type');
                     var value = '';
@@ -324,7 +324,7 @@
             o = tools.anyToDomObject(o);
             var child = tools.getChildElement(o);
             Array.from(child).forEach(function(el){
-                var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
                     var className = txt.className;
                     // console.log('className：', className);
@@ -357,7 +357,7 @@
                 var lbNode = el.querySelector('label'),
                     mustNode = el.querySelector('[data-type="must"]'),
                     telNode= el.querySelector('.r-tel'),
-                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
                     var type = txt.getAttribute('type');
                     var readonly = txt.getAttribute('readonly');
@@ -431,7 +431,7 @@
             var json = {}
             Array.from(child).forEach(function(el){
                 var lbNode = el.querySelector('label'),
-                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
                     var type = txt.getAttribute('type');
                     var isThousands = typeof txt.getAttribute('data-thousand') == 'undefined' ? false : txt.getAttribute('data-thousand') == 'true' ? true : false; // 是否千分进位
@@ -489,7 +489,7 @@
             var json = {}, arr = [];
             Array.from(child).forEach(function(el){
                 var lbNode = el.querySelector('label'),
-                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
                     var type = txt.getAttribute('type');
                     var value = '';
@@ -541,7 +541,7 @@
             var hid1Arr = [];
             Array.from(child).forEach(function(el){
                 var lbNode = el.querySelector('label'),
-                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
                     var title = lbNode.innerText,
                         hid1 = txt.getAttribute('data-hid1') == null ? '' : txt.getAttribute('data-hid1'); // 隐藏值1(不会变)
@@ -595,7 +595,7 @@
             var previousNode = tools.getAllPrevElement(o.parentNode.parentNode);
             Array.from(previousNode).forEach(function(el, i){
                 var lbNode = el.querySelector('label'),
-                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
                     var type = txt.getAttribute('type');
                     var readonly = txt.getAttribute('readonly');
@@ -640,7 +640,7 @@
                 o = tools.anyToDomObject(o);
                 var next = tools.getAllNextElement(o.parentNode.parentNode);
                 Array.from(next).forEach(function(el){
-                    var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]');
+                    var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                     Array.from(inputNode).forEach(function(txt){
                         var className = typeof txt.className == 'undefined' ? '' : txt.className;
                         if(newValue.toString().replace(/([ ]+)/g, '') != oldValue.toString().replace(/([ ]+)/g, '')){
@@ -1092,7 +1092,7 @@
             // 电话类型(电话高亮)
             var inputNode = document.getElementsByClassName('click-tel');
             Array.from(inputNode).forEach(function(el, i){
-                el.addEventListener('input', function(){ // 输入事件
+                el.addEventListener('input', function(){ // 输入事件. 只允许输入电话号码、只允许输入手机号码
                     var value = this.value;
                     var reg = /[^\d\-]/g; // 只允许输入数字、短横线
                     value = value.toString().replace(reg,'');
@@ -1157,7 +1157,7 @@
             })
 
             // 输入框元素在输入或点击时
-            var inputNode = document.querySelectorAll('input[type="text"], textarea');
+            var inputNode = document.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"]');
             Array.from(inputNode).forEach(function(el, i){
                 el.addEventListener('input', function(){ // 输入事件
                     var value = this.value;
