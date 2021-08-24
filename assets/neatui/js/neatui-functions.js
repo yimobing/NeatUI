@@ -1941,6 +1941,28 @@ var restrict = {
 		value = value.indexOf('-') > 0 ? '-' + value.replace('-', '') : value; //把负号提到最前面
 		return value;
 	},
+    
+
+    /**
+     * 数值型输入框失去焦点时，过滤最前面的0、负号-及最后面一个小数点
+     * [说明] 这里的数值型仅限于：正负整数、正负小数、电话号码
+     * @param {string} ps_str 原值
+     * @returns {string} 返回新值
+     */
+    numericalOnBlur: function(ps_str){
+        var value = ps_str;
+        if(/^(.*?)\.$/.test(value)){ // 小数点后没有东西了(即最后面直接一个小数点结尾)
+            value = value.replace(/([\.]+)/g, ''); // 去掉小数点;
+        }
+        if(/^(.*?)\-$/.test(value)){ // 负号后没有东西了(即最后面直接一个负号结尾)
+            value = value.replace(/([\-]+)/g, ''); // 去掉负号;
+        }
+        if(/^0([\d\.]+)$/.test(value)){ // 以0开头，则把最前面的0去掉，比如 030.5 <=> 30.5
+            value = value.replace(/^0(.*?)/g, '$1');
+        }
+        return value;
+    },
+
 
     /**
      * 只能输入：“时:分”。 eg. 08:30
