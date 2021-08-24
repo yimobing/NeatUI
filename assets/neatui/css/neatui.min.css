@@ -678,13 +678,13 @@ pre, pre code {
 
 
 /*+::::::::大小::::::::+*/
-.ne-btn.sm{ height: 25px; line-height: 25px; font-size: .5rem; }
-.ne-btn.lg{ height: 47px; font-size: .8rem; }
+.ne-btn.sm{ height: 28px; line-height: 28px; font-size: 10px; }
+.ne-btn.lg{ height: 47px; font-size: 16px; }
 .ne-btn.l-1x{height: 32px;/* line-height: 32px; */}
-.ne-btn.l-2x{height: 40px;/* line-height: 40px; */ font-size: .6rem; }
-.ne-btn.l-3x{height: 45px;/* line-height: 45px; */ font-size: .65rem;}
-.ne-btn.l-4x{height: 50px;/* line-height: 50px; */ font-size: .75rem;}
-.ne-btn.l-5x{height: 55px;/* line-height: 55px; */ font-size: .8rem;}
+.ne-btn.l-2x{height: 40px;/* line-height: 40px; */ font-size: 12px }
+.ne-btn.l-3x{height: 45px;/* line-height: 45px; */ font-size: 13px;}
+.ne-btn.l-4x{height: 50px;/* line-height: 50px; */ font-size: 15px;}
+.ne-btn.l-5x{height: 55px;/* line-height: 55px; */ font-size: 16px;}
 
 
 /*+::::::::颜色::::::::+*/
