@@ -4,7 +4,7 @@
 * 小巧UI前端框架
 * Author：mufeng
 * Date: 2021.01.11
-* Update: 2021.08.05
+* Update: 2021.08.24
 *================================================*/
 
 /*+================================================================================+*/
@@ -1673,7 +1673,11 @@ pre, pre code {
 .ne-aside .aside-layer.unfreeze .lay-header-caption{
 	padding: 12px 8px;
 }
-.ne-aside .aside-layer.unfreeze .as-lay-main{ margin: 0 auto!important; padding: 10px 15px; }
+.ne-aside .aside-layer.unfreeze .as-lay-main{ 
+    margin: 0 auto!important; 
+    padding: 10px 15px; 
+    padding: 0 15px;
+}
 .ne-aside .aside-layer.unfreeze .as-lay-footer{
 	margin: 15px auto;
 	padding: 0 10px;
