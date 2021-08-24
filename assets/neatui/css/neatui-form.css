@@ -5,7 +5,7 @@
  * 说明：兼容IE8+
  * Author: Mufeng
  * Date: 2021.01.09
- * Update: 2021.08.09
+ * Update: 2021.08.24
  */
 
 /*+--------------------------------+*/
@@ -345,17 +345,18 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 /*细胞星号必填*/
 .item-cell[data-type="must"]{
 	position: absolute;
-	right: -10px;
-    top: 50%;
+	right: -17px;
+	top: 50%;
 	-webkit-transform: translateY(-50%);
-    -moz-transform: translateY(-50%);
-    -o-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
-    top: 12px\9;
-    transform: translateY(0)\9;
-    width: 12px;
+	-moz-transform: translateY(-50%);
+	-o-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+	top: 12px\9;
+	transform: translateY(0)\9;
+	width: 12px;
 	color: #ff0000;
+    margin-top: 5px;
 }
 /*细胞提示文字*/
 .item-cell[data-type="tip"]{
@@ -518,7 +519,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 /*+星号统一对齐+*/
 .ne-form.has-must-aline .item-r{ padding-right: 10px; }
 .ne-form.has-must-aline .item-r>em{ right: 20px; }
-.ne-form.has-must-aline .item-cell{ right: -3px; }
+.ne-form.has-must-aline .item-cell{ right: -10px; }
 .ne-form.has-must-aline .item-cell.absolute{ right: 20px; }
 .ne-form.has-must-aline .item-cell[data-type="cross"]{ right: 10px!important; }
 .ne-form.has-must-aline .item-cell[data-type="cross"].has-cell-btn{ right: 92px!important; }
