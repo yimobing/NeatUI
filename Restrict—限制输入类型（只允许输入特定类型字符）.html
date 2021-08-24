@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>限制输入框输入类型(只允许输入)</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css">
+</head>
+<body>
+    <style>
+        body{ max-width: 640px; margin: 0 auto; }
+        h1{ color: #ff0000; text-align: center; font-size: 24px; font-weight: bold; }
+        .form{ padding: 15px 12px; }
+        .form .item-l{ width: 150px; }
+    </style>
+
+    <div class="wrap">
+        <header>
+            <h1>限制输入框输入类型</h1>
+        </header>
+        <main>
+            <section class="form">
+                <div class="eform-row">
+                    <div class="item-l"><label>input type number问题</label></div>
+                    <div class="item-r"><input type="number" pattern="[0-9\-\.]*" id="number"></div>
+                </div><!--/.eform-row-->
+
+                <div class="eform-row">
+                    <div class="item-l"><label>只允许输入正负整数</label></div>
+                    <div class="item-r"><input type="text" id="inter"></div>
+                </div><!--/.eform-row-->
+                <div class="eform-row">
+                    <div class="item-l"><label>只允许输入正整数</label></div>
+                    <div class="item-r"><input type="text" id="positiveInter"></div>
+                </div><!--/.eform-row-->
+                <div class="eform-row">
+                    <div class="item-l"><label>只允许输入正负小数</label></div>
+                    <div class="item-r"><input type="text" id="decimal"></div>
+                </div><!--/.eform-row-->
+                <div class="eform-row">
+                    <div class="item-l"><label>只允许输入正小数</label></div>
+                    <div class="item-r"><input type="text" id="positiveDecimal"></div>
+                </div><!--/.eform-row-->
+                <div class="eform-row">
+                    <div class="item-l"><label>只允许“时:分” eg. 08:30</label></div>
+                    <div class="item-r"><input type="text" id="hourMinute"></div>
+                </div><!--/.eform-row-->
+            </section><!--/.form-->
+        </main>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script>
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+    
+        /*+————————————————FUNCTION————————————————+*/
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+
+            //——————————————————————————————————————————
+            //=====input type number问题
+             //=====只允许输入正负整数
+             $('#number').on('input', function(){ // 输入时
+                var value = $(this).val();
+                // 注意：如果输入非数字的字符，比如加号、负号，使用.val()取值的空为空，很奇怪
+                console.log('value：', value)
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====只允许输入正负整数
+            $('#inter').on('input', function(){ // 输入时
+                var value = $(this).val();
+                // console.log('value-：', value)
+                value = restrict.negativeInterval(value);
+                $(this).val(value);
+            });
+            $('#inter').on('blur', function(){ // 失焦时
+                var value = $(this).val();
+                value = restrict.numericalOnBlur(value);
+                $(this).val(value);
+            });
+
+
+
+
+            //——————————————————————————————————————————
+            //=====只允许输入正整数
+            $('#positiveInter').on('input', function(){ // 输入时
+                var value = $(this).val();
+                value = restrict.onlyInterval(value);
+                $(this).val(value);
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====只允许输入正负小数
+            $('#decimal').on('input', function(){ // 输入时
+                var value = $(this).val();
+                value = restrict.negativeFloat(value);
+                $(this).val(value);
+            });
+            $('#decimal').on('blur', function(){ // 失焦时
+                var value = $(this).val();
+                value = restrict.numericalOnBlur(value);
+                $(this).val(value);
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====只允许输入正小数
+            $('#positiveDecimal').on('input', function(){ // 输入时
+                var value = $(this).val();
+                value = restrict.onlyFloat(value);
+                $(this).val(value);
+            });
+            $('#positiveDecimal').on('blur', function(){ // 失焦时
+                var value = $(this).val();
+                value = restrict.numericalOnBlur(value);
+                $(this).val(value);
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====只允许输入“时:分”
+            $('#hourMinute').on('input', function(){ // 输入时
+                var value = $(this).val();
+                value = restrict.hourMinute(value);
+                $(this).val(value);
+            });
+
+    
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
