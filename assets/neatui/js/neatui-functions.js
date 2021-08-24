@@ -1904,18 +1904,6 @@ var restrict = {
 	},
 
 	/**
-	 * 只能输入：正小数
-	 * eg. 10.53
-	 * @param {string} str 字符串值
-	 * @returns {number} 返回字符
-	 */
-	onlyFloat: function(str){
-		var value = str.toString().replace(/[^\d\.]/g,'');
-		value = filter.repeatedChar(value, '.'); //只保留一个小数点
-		return value;
-	},
-
-	/**
 	 * 只能输入：正负整数（即正整数、负整数）
 	 * 适用于：手机号码、固定电话
 	 * @param {string} str 字符串值
@@ -1923,8 +1911,23 @@ var restrict = {
 	 */
 	negativeInterval: function(str){
 		var value = str.toString().replace(/[^\d\-]/g,'');
-		value = filter.repeatedChar(value, '-'); //只保留一个负号
-		value = value.indexOf('-') > 0 ? '-' + value.replace('-', '') : value; //把负号提到最前面
+        // value = value.replace(/\-{2,}/g, '-'); // 只保留第一个-，清除多余的
+		value = filter.repeatedChar(value, '-'); // 只保留一个负号
+		value = value.indexOf('-') > 0 ? '-' + value.replace('-', '') : value; // 把负号提到最前面
+		return value;
+	},
+
+
+    /**
+	 * 只能输入：正小数
+	 * eg. 10.53
+	 * @param {string} str 字符串值
+	 * @returns {number} 返回字符
+	 */
+	onlyFloat: function(str){
+		var value = str.toString().replace(/[^\d\.]/g,'');
+        value = value.replace(/^[\.]/g, ''); // 禁止第1个字符为.
+		value = filter.repeatedChar(value, '.'); // 只保留一个小数点
 		return value;
 	},
 
@@ -1936,9 +1939,13 @@ var restrict = {
 	 */
 	negativeFloat: function(str){
 		var value = str.toString().replace(/[^\d\.\-]/g,'');
-		value = filter.repeatedChar(value, '.'); //只保留一个小数点
-		value = filter.repeatedChar(value, '-'); //只保留一个负号
-		value = value.indexOf('-') > 0 ? '-' + value.replace('-', '') : value; //把负号提到最前面
+        value = value.replace(/^[\.]/g, ''); // 禁止第1个字符为.
+        value = value.replace('-.', ''); // 禁止前两个字符为-.
+        // value = value.replace(/\-{2,}/g, '-'); // 只保留第一个-，清除多余的
+        // value = value.replace(/\.{2,}/g, '.'); // 只保留第一个.，清除多余的
+		value = filter.repeatedChar(value, '.'); // 只保留一个小数点
+		value = filter.repeatedChar(value, '-'); // 只保留一个负号
+		value = value.indexOf('-') > 0 ? '-' + value.replace('-', '') : value; // 把负号提到最前面
 		return value;
 	},
     
