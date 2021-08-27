@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Form | 表单布局</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css"><!--日历控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-picker.css"><!--Picker选择器-->
+    <link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.css"><!--图标库-->
+    <link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <!--<script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>-->
+    <!--[if lt IE 9]>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/html5shiv/r29/html5.min.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/rem/1.3.4/js/rem.min.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/json2/20160511/json2.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <style>
+        body{ max-width: 800px; margin: 0 auto;  }
+        .wrap{ padding: 15px 20px; }
+        header{ margin: 15px auto; text-align: center; }
+        h1{ color: #08ba61; }
+        h3{margin: 50px auto 15px auto; border-bottom: 3px solid #f25824; padding: 0;}
+        h3>span{ padding: 5px 10px; border: 2px solid #f25824; color: #f25824; border-radius: 4px; }
+        .control__module{ margin-top: 25px; border: 2px solid #08ba61; border-radius: 2px; color: #08ba61; }
+        .control__caption{ margin-bottom: 5px; }
+        .control__caption h4{ display: inline-block; padding: 5px 12px; border: 2px solid #08ba61; border-top: 0; border-left: 0; color: #08ba61; font-weight: 18px;}
+        .control__operation,
+        .control__content{ padding: 10px 15px; }
+        .control__operation{ }
+        .control__content{ margin-top: 15px; }
+
+        .control__operation-group{ margin-top: 10px; }
+        .control__operation-group:first-child{ margin-top: 0; }
+    </style>
+
+    <div class="wrap">
+        <header>
+            <h1>Form 表单布局</h1>
+        </header>
+        <main>
+
+            <h3><span>基础表单</span></h3>
+            <section class="code">
+                <div class="code__title">代码结构</div>
+                <div class="code__doc">
+<pre>
+    [总布局]
+    ne-form> eform-order + eform-caption + eform-content + eform-button
+   
+    [各部分]
+    eform-order > 序号
+    eform-caption > 文字内容
+    eform-content > eform-row > erow-column > item-box > item-l + item-r + item-cell.absolute.has-cell-btn[data-type="must"][data-type="tip"][data-type="cross"]
+    eform-button > button
+    
+    [item-r 的几咱组合]
+    item-r>input
+    item-r>input+em.r-unit{右侧单位}
+    item-r>input+em.r-unit.has-cell-cross{右侧单位} （右侧有输入框打叉图标）
+    item-r>input+em.r-unit.r-tel>a[class="hover"][href="tel:电话号码"] (电话号码)
+
+    [item-cell 的几种组合]
+    item-cell.absolute
+    item-cell>button
+    item-cell[data-type="must"]{必填项红色星号*}
+    item-cell[data-type="tip"]{右侧提示文字}
+    item-cell[data-type="cross"]{输入框配套的打叉图标,用于清空输入框}
+
+    [其中]
+    · erow-column, item-box 可选
+    
+    [class属性值]
+    ne-form的class属性值：.theme-popular.has-border.dotted.has-icon-left.has-must-left.has-must-aline
+    eform-button的class属性值：child-w-100.child-no-border 
+
+    [class说明]
+    ·   .theme-popular 表示输入框无边框的流行样式
+        .has-border 表示有边框, .dotted 表示边框为虚线， 
+        .has-icon-left 表示图标居于文字左侧,  
+        .has-must-aline 表示星号必填要对齐(可以让“部分行有星号，部分行无星号时”输入框统一对齐)
+        .has-must-left 表示星号必填居于文字左侧
+        .child-w-100 子元素宽度100%
+        .child-no-border 子元素无边框
+
+</pre>
+                </div>
+            </section>
+
+
+            <section class="layout ne-form has-border dotted has-must-aline">
+                <div class="eform-caption">布局如下</div>
+                <div class="eform-content">
+                    <div class="eform-row">
+                        <div class="item-l"><label>标题</label></div>
+                        <div class="item-r">
+                            <span>
+                                纯文字，单行或多行<br>
+                                纵横中文网,最热门的免费小说网站,提供玄幻小说、网游小说、言情小说、穿越小说、都市小说等免费小说在线阅读与下载。大神作品齐聚纵横,最新章节每日更新。
+                            </span>
+                        </div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>用户姓名</label></div>
+                        <div class="item-r">
+                            <i class="fa fa-user-o"></i>
+                            <input type="text" placeholder="单行输入" onblur="this.placeholder='单行输入'" onfocus="this.placeholder=''">
+                        </div>
+                    </div><!--/.eform-row-->       
+                    <div class="eform-row">
+                        <div class="item-l"><label>楼盘名称</label></div>
+                        <div class="item-r">
+                            <textarea placeholder="多行输入" onblur="this.placeholder='多行输入'" onfocus="this.placeholder=''"></textarea>
+                        </div>
+                        <div class="item-cell"><button type="button">右侧按钮</button></div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>幢号</label></div>
+                        <div class="item-r">
+                            <input type="text" placeholder="只读属性,且禁止手机调起输入法" onblur="this.placeholder='只读属性,且禁止手机调起输入法'" onfocus="this.placeholder='';this.blur()" readonly>
+                        </div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>楼层</label></div>
+                        <div class="item-r">
+                            <input type="text" placeholder="禁止操作" onblur="this.placeholder='禁止操作'" onfocus="this.placeholder='';this.blur()" disabled>
+                        </div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>下拉</label></div>
+                        <div class="item-r">
+                            <input type="text" placeholder="打叉图标" onblur="this.placeholder='打叉图标'" onfocus="this.placeholder=''">
+                        </div>
+                        <div class="item-cell" data-type="cross"></div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>建筑面积</label></div>
+                        <div class="item-r">
+                            <input type="text" placeholder="右则单位" onblur="this.placeholder='右侧单位'" onfocus="this.placeholder=''">
+                            <em class="r-unit">m²</em>
+                        </div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>土地面积</label></div>
+                        <div class="item-r">
+                            <input type="text" placeholder="右则单位+打叉图标" onblur="this.placeholder='右侧单位'" onfocus="this.placeholder=''">
+                            <em class="r-unit has-cell-cross">m²</em>
+                        </div>
+                        <div class="item-cell" data-type="cross"></div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>购房合同</label></div>
+                        <div class="item-r">
+                            <input type="text" placeholder="右侧按钮+打叉图标+右侧按钮" onblur="this.placeholder='右侧单位'" onfocus="this.placeholder=''">
+                            <em class="r-unit has-cell-cross">m²</em>
+                        </div>
+                        <div class="item-cell has-cell-btn" data-type="cross"></div>
+                        <div class="item-cell"><button type="button">右侧按钮</button></div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>手机号码</label></div>
+                        <div class="item-r">
+                            <input type="text" placeholder="右侧电话图标" onblur="this.placeholder='右侧电话图标'" onfocus="this.placeholder=''">
+                            <em class="r-tel"><a class="hover" href="tel:18050314962"></a></em>
+                        </div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>储藏间面积</label></div>
+                        <div class="item-r">
+                            <input type="text" placeholder="星号必填" onblur="this.placeholder='星号必填'" onfocus="this.placeholder=''">
+                        </div>
+                        <div class="item-cell" data-type="must">*</div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>房产价值</label></div>
+                        <div class="item-r">
+                            <input type="text" placeholder="文字提示" onblur="this.placeholder='文字提示'" onfocus="this.placeholder=''">
+                        </div>
+                        <div class="item-cell" data-type="tip">最多允许100万元</div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>咨询时间</label></div>
+                        <div class="item-r">
+                            <div class="item-box"><input type="text" placeholder="开始日期" onblur="this.placeholder='开始日期'" onfocus="this.placeholder=''"></div>
+                            <div class="item-box w-auto">至</div>
+                            <div class="item-box"><input type="text" placeholder="结束日期" onblur="this.placeholder='结束日期'" onfocus="this.placeholder=''"></div>
+                        </div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="erow-column">
+                            <div class="item-l"><label>姓名</label></div>
+                            <div class="item-r">
+                                <input type="text" placeholder="第一列" onblur="this.placeholder='第一列'" onfocus="this.placeholder=''">
+                            </div>
+                        </div><!--/.erow-column-->
+                        <div class="erow-column">
+                            <div class="item-l"><label>性别</label></div>
+                            <div class="item-r">
+                                <input type="text" placeholder="第二列" onblur="this.placeholder='第二列'" onfocus="this.placeholder=''">
+                            </div>
+                        </div><!--/.erow-column-->
+                    </div><!--/.eform-row-->
+                </div><!--/.eform-content-->
+                <div class="eform-button">
+                    <button type="button" class="ne-btn only-text red"><i class="fa fa-trash"></i>删除</button>
+                    <button type="button" class="ne-btn only-text blue"><i class="fa fa-save"></i>保存</button>
+                    <button type="button" class="ne-btn only-text green"><i class="fa fa-file-pdf-o"></i>查看电子版</button>
+                    <button type="button" class="ne-btn only-text green"><i class="fa fa-file-pdf-o"></i>查看电子签字版</button>
+                    <button type="button" class="ne-btn only-text purple"><i class="fa fa-send-o"></i>提醒经办人签字</button>
+                </div><!--/.eform-button-->
+            </section><!--/.layout-->
+        </main>
+    </div><!--/.wrap-->
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/libs/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-form.js"></script><!--表单布局-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-picker.js"></script><!--Picker选择器-->
+    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
+	<!--<script type="text/javascript" href="highlight/highlight.min.js"></script>--><!--代码高亮-->
+    <script type="text/javascript">
+        /*+----------------全局变量----------------+*/
+        /*+----------------FUNCTION----------------+*/
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+
+            //——————————————————————————————————————————
+            //=====代码块高亮
+            hljs.initHighlightingOnLoad()
+            hljs.configure({
+                languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
+            });
+            document.querySelectorAll('pre').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+
+            
+        }); //$(function(){});
+
+    </script>
+</body>
+</html>
