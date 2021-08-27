@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Form | 表单控件</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css"><!--日历控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"><!--输入下拉控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-picker.css"><!--Picker选择器-->
+    <link type="text/css" rel="stylesheet" href="assets/test/css/demo-kuaiping.css"><!--本页样式-->
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+</head>
+<body>
+    <style>
+        body{ max-width: 1024px; margin: 0 auto; }
+        h1{  color: #1aad19; text-align: center; font-size: 32px; font-weight: bold;}
+        h2{ margin: 45px auto 5px 10px; color: #1aad19; font-size: 24px;  }
+        h2:first-child{ margin-top: 0; }
+        .group__title{ margin: 15px auto 5px auto; font-size: 14px; font-weight: bold; }
+        .panel__webname{ margin: 25px auto;  background-color: #fff; padding: 15px 25px; }
+        .webname_description{ margin-top: 25px; color: #777; font-size: 16px; }
+        .operate{ }
+        .operate__group{ }
+        .operate__caption{ margin-top: 10px;  margin-bottom: 5px; }
+        .operate__group:first-child .operate__caption{ margin-top: 0; }
+        .operate__buttons button{ margin: 0 10px 10px 0; padding: 6px 12px; border: 1px solid #555; cursor: pointer;}
+    </style>
+
+    <div class="wrap">
+        <aside>
+            <section class="panel__webname">
+                <h1>Form 表单控件</h1>
+                <div class="webname_description">
+                    表单控件，即通过指定格式的数组源，生成一组表单。其中数据源分两种：“标准配置数据” 和 “楼盘房号配置数据”。
+                </div>
+            </section>
+
+            <section class="code">
+<pre>
+    ----------------------------------------
+                    [控件使用说明]
+    ----------------------------------------
+    var example = new NeForm(); // 实例化控件
+    可调用的函数如下：
+    函数1：
+    /**
+    * 创建表单
+    * @param {string} elem 根节点ID或Class选择器字符串。eg1.'#user', eg2.'.user'
+    * @param {object} opts 参数对象 
+    */
+    example.forms(elem, options);
+
+    函数2：
+    /**
+    * 切换成手动输入
+    * @param {HTML DOM || jQuery Object} o 元素对象或jq选择器对象
+    * @param {string} limit 切换的范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
+    */
+    example.switchHandEnter(o, limit); 
+
+    
+    
+    ----------------------------------------
+                [options参数]
+    ----------------------------------------
+    其中options参数如下：
+    var options = {
+        source: dataSource, // 数据源
+        type: "standard", // 数据源类型(即数据源字段类型)。值：standard “标准表单”,即“标准配置数据”(默认), rooms “楼盘表单”,即“楼盘房号配置数据”
+        houses: { // “楼盘房号配置数据”时(可选)
+            houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
+            switches: {
+                enable: true, // 是否允许手动输入(可选), 默认true
+                scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
+            }
+        },
+        config: { // 配置项(可选)
+            animate: false, // 是否启用转圈动画特效(可选), 默认false(待实现)
+            
+            layout: { // 布局(可选)
+                theme: "popular", // 主题(可选)。值： popular 现代流行风(默认), normal 普通经典风
+                inputIcon: true, // 输入框是否使用图标(可选), 默认false
+                inputCross: true, // 输入框右侧是否有打叉图标(可选), 默认true
+                inputMust: true, // 输入框不能为空时右侧是否显示必填星号*(可选), 默认 false
+                mustAlign: "left" // 必填星号*位置, 仅当inputMust=true时有效(可选)。值：left (默认) 居左, right 居右。
+            },
+            controls: { // 控件调用(可选)
+                calendar: {  // 日历控件(可选)
+                    enable: true, // 是否启用(可选)，默认true
+                    empty: true, // 初始时日期是否为空(可选)。值：true 是(默认), false 否(当天日期)。
+                    theme: "blue", // 主题(可选)，值：green 绿色, blue 蓝色(默认)
+                    format: "YYYY-MM-DD", // 日期格式(可选)。值: "YYYY-MM-DD" 年-月-日(默认), "YYYY-MM-DD hh:mm:ss" 年-月-日 时:分:秒, "YYYY-MM-DD hh:mm" 年-月-日 时:分
+                    minDate: "1840-01-01", // 最小日期(可选)。格式须与format一样，否则会出错。 eg1. 2018-09-30  eg2. 2018-09-30 00:00:00
+                    maxDate: "2200-12-31", // 最大日期(可选)。格式须与format一样式，否则会出错。eg1. 2200-12-31  eg2. 2200-12-31 23:59:59
+                    callBack: null // 回调(可选) 
+                },
+                keyboard: { // 数字键盘控件(可选)
+                    enable: false // 是否启用(可选)，默认false
+                }
+            },
+            format: { // 校验数据格式(可选)
+                phone: { // 电话号码格式(可选)
+                    mode: "standard", // 校验模式(可选)。值： standard 标准模式，即严格校验电话格式(默认), loose 宽松模式，即只校验电话位数
+                    pattern: "mobilephone", // 验证类型(只在mode="standard"时有效)(可选)。值：mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
+                    bit: { // 校验的电话位数(只在mode="loose"时有效)(可选)
+                        from: 6, // 校验6位(可选)。与to配合使用,可与to值相等
+                        to: 12 // 校验12位(可选)。与from配合使用,可与from值相等
+                    }
+                },
+                numeric: { // 数字类型格式(可选)
+                    thousandth: false // 数字类型是否使用千分进位法，即3个数字就加一个英文逗号(可选), 默认false。优先权说明：若数据源中不存在"thousandth"字段, 则是否千分进位取决于本参数; 若数据源中有存在"thousandth"字段，则本参数自动失效。
+                }
+            }
+        }
+    }
+
+
+
+
+    ----------------------------------------
+                [数据源参数source格式]
+    ----------------------------------------
+    /**
+    --------------------------------
+    ①. 数据源类型为“标准表单”,即“标准配置数据”
+    --------------------------------
+    [字段名称]
+    title       字段名称(中文), 即显示名称
+    field       字段名称(英文), 即ID属性
+    type        输入框类型(可选)。值：文本,日期, 数字, 单选, 下拉
+    thousandth  数字类型是否使用千分进位法，即3个数字就加一个英文逗号(可选), 默认false。仅当type="数字"时有效。优先权说明：若数据源中不存在"thousandth"字段, 则是否千分进位取决于options中的thousandth参数; 若数据源中有存在"thousandth"字段，则options中的thousandth参数自动失效。
+                
+    value       初始显示值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
+    hid         初始隐藏值,即显示值对应的编号(可选)。在输入框上有属性data-bh="隐藏值"
+    unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
+    phone       是否电话类型(可选)。值：true, false 否(默认)
+    must        是否必填项(可选)。值：true 是, false 否(默认)
+    multiple    是否多行(可选)。值: true 是, false 否(默认)
+    placeholder 空占位符(可选), 默认空。仅在must=true时有效。
+    readonly    是否强制为只读(可选), 默认false
+    disabled    是否强制为禁用(可选), 默认false
+    icon    自定义图标名称(即className)(可选), 默认图标名称为field参数值
+    attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
+    */
+    /**
+    --------------------------------
+    ②.数据源类型为“楼盘表单”,即“楼盘房号配置数据”
+    --------------------------------
+    [字段说明]
+    val 表示显示值(要显示在界面上)，
+    hid 表示隐藏值(无须显示在界面上,只需隐藏起来,后续操作能取到值即可)
+    [对应关系]
+    val1 <=> column_title
+    val2 <=> column_value
+    hid6 <=> column_name
+    hid2 <=> column_type
+    [字段名称]
+    val1    显示值1：字段名称(中文)、显示名称
+    val2    显示值2：字段值(即字段名称对应的值)、显示值(输入框值)
+    val3    显示值3：右边文字，一般是单位。eg. 平方米,元,万元,元/平方米
+    val4    显示值4：提示文字，一般用于必填时若为空就提示某些信息(输入框占位符placeholder)
+    hid1    隐藏值1(不会变)：控件类型。值：空, 无, 楼盘, 幢号, 楼层, 房号, 建筑面积, 储藏间面积, 产权年限
+    hid2    隐藏值2：控件属性。值：空, 无, 日期, 数字, 单选, 下拉
+                    hid1=""时，hid2的值：空
+                    hid1="无"时，hid2的值：空, 无, 日期, 数字, 单选, 下拉
+                    hid1!="" && hid!="无"时，hid2的值：空(一般为空,也可能为其它值)
+    hid3    隐藏值3：控件属性标识。值：空, 非空。当为普通下拉类型(hid2="下拉")时，需要根据hid3获取下拉数据。
+    hid4    隐藏值4：是否多行。值：1 多行(input), 0 单行(textarea)
+    hid5    隐藏值5：是否必填。值：1 是, 0 否
+    hid6    隐藏值6：字段名称(英文)(键值)
+    [要点说明]
+    选择房号后建筑面积值要(根据后台返回的值)自动填充；
+    隐藏值1为“无”时，才须判断隐藏值2；
+    隐藏值1为“建筑面积”、“储藏间面积”时，直接采用数字类型(只能输入数字和小数点)；
+    隐藏值1为“产权年限”时，直接采用下拉类型；
+    隐藏值1为空时，(根据隐藏值4)直接采集单行或多行类型；
+    隐藏值2为空或“无”时，(根据隐藏值4)直接采集单行或多行类型；
+    保存时，要取到显示值2、隐藏值5、隐藏值6；
+    */
+</pre>
+            </section>
+        </aside>
+
+        <main>
+            <section class="enquiry">
+                <!--[========·提交询价区域·========]-->
+                <div class="grid__mortgage">
+                    <!---[++++++++·抵押物基本信息面板·++++++++]-->
+                    <div class="mortgage__basic">
+                        <!--[::::::::·静态表单模块·::::::::]-->
+                        <div class="mortgage__static"></div><!--/.mortgage__static-->
+                    </div><!--/.mortgage__basic-->
+                    <!---[++++++++·抵押物更多信息面板·++++++++]-->
+                    <div class="mortgage__more">
+                        <!--[::::::::·动态表单模块·::::::::]-->
+                        <div class="mortgage__dynamic"></div><!--/.mortgage__dynamic-->
+                        <!--[::::::::·切换输入模块·::::::::]--> <!--本模块不必手动添加,系统将自动添加-->
+                        <!--<div class="mortgage__switch"></div>--><!--/.mortgage__switch-->
+                    </div><!--/.mortgage__more-->
+                    <!---[++++++++·抵押物照片信息面板·++++++++]-->
+                    <div class="mortgage__photo"></div><!--/.mortgage__photo-->
+                </div><!--/.grid__mortgage-->
+                <div class="grid__submit ne-button flex">
+                    <button type="button" id="btn-save" class="ne-btn has-texture">确定</button>
+                </div><!--/.grid__submit-->
+                <!--[========·询价结果区域·========]-->
+                <div class="grid__result"></div><!--/.grid__result-->
+            </section><!--/.layout__enquiry-->
+
+            <section class="history">
+            </section><!--/.history-->
+        </main>
+
+        <footer>
+            <section class="operate">
+                <div class="operate__group">
+                    <div class="operate__caption">表单公用函数</div>
+                    <div class="operate__buttons">
+                        <button type="button" id="btn-isFormHasData">判断表单是否有数据</button>
+                        <button type="button" id="btn-isFormAllCanWrite">判断表单是否全部为输入类型，而不包含下拉类型</button>
+                        <button type="button" id="btn-examineForm">校验表单格式与完整性</button>
+                        <button type="button" id="btn-getFormData">获取表单数据</button>
+                    </div><!--/.operate__buttons-->
+                </div><!--/.group-->
+
+                <div class="operate__group">
+                    <div class="operate__caption">“标准表单”专用函数</div>
+                    <div class="operate__buttons">
+                        <button type="button" id="btn-getStandardFormData">获取“标准表单”数据</button>
+                    </div><!--/.operate__buttons-->
+                </div><!--/.group-->
+
+                <div class="operate__group">
+                    <div class="operate__caption">“楼盘表单”专用函数</div>
+                    <div class="operate__buttons">
+                        <button type="button" id="btn-getRoomFormData">获取“楼盘表单”数据</button>
+                        <button type="button" id="btn-isRoomFormHasData">判断“楼盘表单”是否有数据</button>
+                        <button type="button" id="btn-isRoomFormPawnTypeHouse">判断抵押物类型是否为住宅</button>
+                        <button type="button" id="btn-filterRoomFormHouseChar">过滤楼盘名称中的特殊字符</button>
+                        <button type="button" id="btn-warnRoomFormRelatedPreviousEmpty">点击关联元素中任意一个，提示用户“前面的数据是否为空”</button>
+                        <button type="button" id="btn-clearRoomFormRelatedSubordinateData">上级元素值改变，则清空下级关联元素数据</button> 
+                    </div><!--/.operate__buttons-->
+                </div><!--/.group-->
+            </section>
+        </footer>
+    </div><!--/.wrap-->
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/libs/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-form.js"></script><!--表单布局-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-picker.js"></script><!--Picker选择器-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义AJAX-->
+    <script type="text/javascript">
+        /*+----------------全局变量----------------+*/
+        //
+        var g_pggs_bh = '<%=s_pggs_bh%>'; // 评估公司编号 ajax({})
+
+
+        /*+----------------FUNCTION----------------+*/
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                     初始化事件
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====
+            var example = new NeForm(); // 实例化控件
+           
+            //——————————————————————————————————————————
+            //===== 创建常规数据表单
+            var regularJson = {
+                data:[
+                    {title:"评估目的", field:"purpose", type:"下拉", value:"抵押贷款", must:true},
+                    {title:"贷款品种", field:"loan", type:"下拉", value:"二手房按揭", must:true},
+                    {title:"客户姓名", field:"user", type:"文本", value:"张三", must:true},
+                    {title:"客户电话", field:"mobile", type:"文本", value:"18350605829", must:true, phone: true},
+                    {title:"客户备注", field:"note", type:"文本", value:"该用户很懒，没有备注", multiple: true, must:true},
+                    {title:"抵押物所在地", field:"locate", type:"下拉", value:"福建省-泉州市-丰泽区", must:true},
+                    {title:"抵押物类型", field:"category", type:"下拉", value:"住宅(有储藏间)", must:true},
+                    {title:"日期", field:"tokyo", type:"日期", value:"2021-08-31", must:false},
+                    {title:"数字", field:"tokyo", type:"数字", value:"123456789", must:false},
+                    {title:"单选", field:"tokyo", type:"单选", value:"1", must:false},
+                    {title:"千分进位", field:"money", type:"数字", value:"15000", thousandth:true},
+                    {title:"占位符", field:"unitPrice", type:"数字", value:"", placeholder:"请先输入总价", must:true},
+                    {title:"有隐藏值的", field:"totalPrice", type:"数字", value:"15000", hid:"Z1001"},
+                    {title:"自定义属性", field:"customAttr", type:"文本", value:"vip2", attribute:"data-toggle='1' data-vip='5'"}
+                ]
+            }
+
+            example.forms('.mortgage__static', {
+                source: regularJson,
+                type: "standard",
+                config: { // 配置项(可选)
+                    layout: {
+                        theme: "popular",
+                        inputIcon: true,
+                        inputCross: true,
+                        inputMust: true,
+                        mustAlign: "left"
+                    },
+                    format: {
+                        numeric: { 
+                            thousandth: false
+                        }
+                    }
+                }
+            });
+
+             
+            //——————————————————————————————————————————
+            // 创建配置数据表单
+            var conditionJson = {
+                data:[
+                    // {val1:"楼盘名称", val2:"", val3:"", val4:"请输入楼盘", hid1:"楼盘", hid2:"", hid3:"", hid4:"1", hid5:"1", hid6:"楼盘名称"},
+                    // {val1:"幢号", val2:"", val3:"", val4:"请选择幢号", hid1:"幢号", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"幢号"},
+                    // {val1:"楼层", val2:"", val3:"", val4:"请选择楼层", hid1:"楼层", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"楼层"},
+                    // {val1:"房号", val2:"", val3:"", val4:"请选择房号", hid1:"房号", hid2:"", hid3:"下拉值", hid4:"0", hid5:"1", hid6:"房号"},
+                    // {val1:"产权年限", val2:"", val3:"", val4:"请选择产权年限", hid1:"产权年限", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"产权年限"},
+                    // {val1:"建筑面积", val2:"", val3:"平方米", val4:"请输入建筑面积", hid1:"建筑面积", hid2:"", hid3:"101", hid4:"0", hid5:"1", hid6:"建筑面积"},
+                    // {val1:"储藏间面积",	val2:"", val3:"平方米", val4:"请输入储藏间面积", hid1:"储藏间面积", hid2:"", hid3:"101", hid4:"0", hid5:"1", hid6:"储藏间面积"},
+                    // {val1:"土地面积", val2:"", val3:"平方米", val4:"请输入土地面积", hid1:"无", hid2:"数字", hid3:"101", hid4:"0", hid5:"1", hid6:"土地面积"},
+                    // {val1:"日期", val2:"", val3:"", val4:"", hid1:"无", hid2:"日期", hid3:"", hid4:"0", hid5:"0", hid6:"日期"},
+                    // {val1:"数字", val2:"", val3:"", val4:"", hid1:"无", hid2:"数字", hid3:"", hid4:"0", hid5:"0", hid6:"数字"}, 
+                    // {val1:"单选", val2:"", val3:"", val4:"", hid1:"无", hid2:"单选", hid3:"", hid4:"0", hid5:"0", hid6:"单选"},
+                    // {val1:"普通下拉", val2:"", val3:"", val4:"", hid1:"无", hid2:"下拉", hid3:"我是下拉1", hid4:"0", hid5:"0", hid6:"下拉"},
+                    // {val1:"单行文本", val2:"", val3:"", val4:"", hid1:"", hid2:"", hid3:"", hid4:"0", hid5:"0", hid6:"单行文本"},
+                    // {val1:"多行文本", val2:"", val3:"", val4:"", hid1:"", hid2:"", hid3:"", hid4:"1", hid5:"0", hid6:"多行文本"}
+                    {val1:"楼盘名称", val2:"泉州浦西万达广场", val3:"", val4:"请输入楼盘", hid1:"楼盘", hid2:"", hid3:"", hid4:"1", hid5:"1", hid6:"楼盘名称"},
+                    {val1:"幢号", val2:"5幢", val3:"", val4:"请选择幢号", hid1:"幢号", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"幢号"},
+                    {val1:"楼层", val2:"3楼", val3:"", val4:"请选择楼层", hid1:"楼层", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"楼层"},
+                    {val1:"房号", val2:"302号", val3:"", val4:"请选择房号", hid1:"房号", hid2:"", hid3:"下拉值", hid4:"0", hid5:"1", hid6:"房号"},
+                    {val1:"产权年限", val2:"未满两年", val3:"", val4:"请选择产权年限", hid1:"产权年限", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"产权年限"},
+                    {val1:"建筑面积", val2:"130", val3:"平方米", val4:"请输入建筑面积", hid1:"建筑面积", hid2:"", hid3:"101", hid4:"0", hid5:"1", hid6:"建筑面积"},
+                    {val1:"储藏间面积", val2:"30", val3:"平方米", val4:"请输入储藏间面积", hid1:"储藏间面积", hid2:"", hid3:"101", hid4:"0", hid5:"1", hid6:"储藏间面积"},
+                    {val1:"土地面积", val2:"120", val3:"平方米", val4:"请输入土地面积", hid1:"无", hid2:"数字", hid3:"101", hid4:"0", hid5:"1", hid6:"土地面积"},
+                    {val1:"日期", val2:"", val3:"", val4:"", hid1:"无", hid2:"日期", hid3:"", hid4:"0", hid5:"0", hid6:"日期"},
+                    {val1:"数字", val2:"", val3:"", val4:"", hid1:"无", hid2:"数字", hid3:"", hid4:"0", hid5:"0", hid6:"数字"}, 
+                    {val1:"单选", val2:"", val3:"", val4:"", hid1:"无", hid2:"单选", hid3:"", hid4:"0", hid5:"0", hid6:"单选"},
+                    {val1:"普通下拉", val2:"", val3:"", val4:"", hid1:"无", hid2:"下拉", hid3:"我是下拉1", hid4:"0", hid5:"0", hid6:"下拉"},
+                    {val1:"单行文本", val2:"", val3:"", val4:"", hid1:"", hid2:"", hid3:"", hid4:"0", hid5:"0", hid6:"单行文本"},
+                    {val1:"多行文本", val2:"", val3:"", val4:"", hid1:"", hid2:"", hid3:"", hid4:"1", hid5:"0", hid6:"多行文本"}
+                ]
+            }
+  
+            example.forms('.mortgage__dynamic', {
+                source: conditionJson,
+                type: "rooms",
+                houses: {
+                    houseRightButton: true,
+                    switches: {
+                        enable: true, 
+                        scope: "related"
+                    }
+                },
+                config: { // 配置项(可选)
+                    layout: {
+                        theme: "popular",
+                        inputIcon: true,
+                        inputCross: true,
+                        inputMust: true,
+                        mustAlign: "left"
+                    }
+                }
+               
+            });
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         按钮事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====“判断表单是否有数据”按钮
+            $('#btn-isFormHasData').on('click', function(){
+                var result = example.isFormHasData('.mortgage__static');
+                console.log('表单是否有数据：', result);
+            });
+
+
+            
+            //——————————————————————————————————————————
+            //=====“判断表单是否全部为输入类型，而不包含下拉类型”按钮
+            $('#btn-isFormAllCanWrite').on('click', function(){
+                var result = example.isFormAllCanWrite('.mortgage__static');
+                console.log('表单是否全部为输入类型：', result);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====“校验表单格式与完整性”按钮
+            $('#btn-examineForm').on('click', function(){
+                var result = example.examineForm('.mortgage__static');
+                console.log('表单完整性：', result);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====“获取表单数据”按钮
+            $('#btn-getFormData').on('click', function(){
+                var result1 = example.getFormData('.mortgage__static');
+                console.log('静态表单数据：', result1);
+                var result2 = example.getFormData('.mortgage__dynamic');
+                console.log('动态表单数据：', result2);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //====='获取“标准表单”数据'按钮
+            $('#btn-getStandardFormData').on('click', function(){
+                var result = example.getStandardFormData('.mortgage__static');
+                console.log('标准表单数据：', result);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //====='获取“楼盘表单”数据'按钮
+            $('#btn-getRoomFormData').on('click', function(){
+                var result = example.getRoomFormData('.mortgage__dynamic');
+                console.log('楼盘表单数据：', result);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //====='判断“楼盘表单”是否有数据'按钮
+            $('#btn-isRoomFormHasData').on('click', function(){
+                var result = example.isRoomFormHasData('.mortgage__dynamic');
+                console.log('楼盘表单是否有数据：', result);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====“判断抵押物类型是否为住宅”按钮
+            $('#btn-isRoomFormPawnTypeHouse').on('click', function(){
+                var result = example.isRoomFormPawnTypeHouse('.mortgage__dynamic');
+                console.log('押物类型是否为住宅：', result);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====“过滤楼盘名称中的特殊字符”按钮
+            $('#btn-filterRoomFormHouseChar').on('click', function(){
+                var ls_lpmc = $('#house').val();
+                var result = example.filterRoomFormHouseChar(ls_lpmc);
+                console.log('楼盘名称过滤特殊字符后的值：', result);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====“点击关联元素中任意一个，提示用户“前面的数据是否为空”按钮
+            $('#btn-warnRoomFormRelatedPreviousEmpty').on('click', function(){
+                console.log('1请在实际DOM对象点击事件中测试此功能！');
+            });
+
+
+            //——————————————————————————————————————————
+            //=====“点击关联元素中任意一个，提示用户“前面的数据是否为空”按钮
+            $('#btn-clearRoomFormRelatedSubordinateData').on('click', function(){
+                console.log('2请在实际DOM对象点击事件中测试此功能！');
+            });
+
+
+
+
+
+            
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         系列事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====抵押物所在地下拉
+            $('.mortgage__static').on('click', '#locate', function(){
+                var $this = $(this);
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    var areaJson = {
+                        data:[
+                            {province:"福建省", provinceId:"P1001",  data:[
+                                    {city:"福州市", cityId:"C1001", data:[
+                                            {county:"鼓楼区", countyId:"Q2001"}, 
+                                            {county:"台江区", countyId:"Q2002"}
+                                        ]
+                                    },
+                                    {city:"泉州市", cityId:"C1002", data:[
+                                            {county:"丰泽区", countyId:"Q1001"}, 
+                                            {county:"鲤城区", countyId:"Q1002"}, 
+                                            {county:"洛江区", countyId:"Q1003"}, 
+                                            {county:"泉港区", countyId:"Q1004"}, 
+                                            {county:"惠安县", countyId:"Q1005"}, 
+                                            {county:"安溪县", countyId:"Q1006"}, 
+                                            {county:"永春县", countyId:"Q1007"}, 
+                                            {county:"德化县", countyId:"Q1008"}, 
+                                            {county:"石狮市", countyId:"Q1009"}, 
+                                            {county:"晋江市", countyId:"Q1010"}, 
+                                            {county:"南安市", countyId:"Q1011"}
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                    
+                    /*
+                    //START AJAX
+                    var areaJson = {}
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "获取抵押物所在地下拉数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "pggs_bh": g_pggs_bh,
+                            "sjlb": "zzxj"
+                        },
+                        success: function(res){
+                            // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            if(res == '') return;
+                            areaJson = JSON.parse(res);
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    //END AJAX
+                    */
+
+                    // 有数据，显示下拉
+                    $this.neuiPicker({
+                        caption: "选择抵押物所在地",
+                        source: areaJson,
+                        format: {
+                            value: ["province", "city", "county"],
+                            // hid: ["provinceId", "cityId", "countyId"],
+                            forbid: "disabled"
+                        },
+                        joint: "-",
+                        cascade: true,
+                        district: true,
+                        onConfirm: function (e) {
+                            // example.clearRoomFormRelatedSubordinateData(null, e.value, e.oldValue); // 清空楼盘名称、幢号、楼层、房号等数据
+                        }
+                    })
+
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+            
+
+
+            //——————————————————————————————————————————
+            //=====抵押物类型下拉
+            $(document).on('click', '#category', function(){
+                var $this = $(this);
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    var cateJson = {
+                        "data":[
+                            {"dyw_type_bh":"1001", "dyw_type_mc":"住宅(无储藏间)", "dyw_type_bz":""},
+                            {"dyw_type_bh":"1002", "dyw_type_mc":"住宅(有储藏间)", "dyw_type_bz":""},
+                            {"dyw_type_bh":"1003", "dyw_type_mc":"其他房产", "dyw_type_bz":"如：车位、车库、店面、写字楼、商场、soho、别墅、工业房产地、国有土地使用权等"}
+                        ]
+                    }
+
+                    /*
+                    //START AJAX
+                    var cateJson = {}
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "获取抵押物类型下拉数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "pggs_bh": g_pggs_bh,
+                            "sjlb": "zzxj"
+                        },
+                        success: function(res){
+                            // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            if(res == '') return;
+                            cateJson = JSON.parse(res);
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    //END AJAX
+                    */
+                    neuiInputsearch({
+                        source: cateJson,
+                        format: ["dyw_type_bh", "dyw_type_mc"],
+                        notes: "dyw_type_bz",
+                        onConfirm: function(e){
+                            selectChange(e);
+                        }
+                    }, $this)
+
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+            function selectChange(e){
+                var isHasData = example.isRoomFormHasData('.mortgage__dynamic'); // “楼盘表单”是否有数据
+                if(e.value != e.oldValue){ // 新老值不一样
+                    if(isHasData){
+                        neuiDialog.alert({
+                            animate: true,
+                            message: '您有在测试物信息未保存，确定更改抵押物类型？',
+                            buttons: ['确定', '取消'],
+                            callBack: function(ret){
+                                if(ret == 1){
+                                    fnChangeData();
+                                }else{
+                                    $('#category').val(e.oldValue).attr('data-bh', e.oldId);
+                                }
+                            }
+                        })
+                    }else{
+                        fnChangeData();
+                    }
+                }
+                function fnChangeData(){
+                    console.log('开始改变数据了');
+                }
+            }
+            
+
+
+            //——————————————————————————————————————————
+            //=====楼盘名称下拉
+            $('.mortgage__dynamic').on('input', '#house', function(){
+                var $this = $(this);
+                var ls_area = $('#locate').val(),
+                    ls_lpmc = example.filterRoomFormHouseChar($(this).val());
+                var arr = [ ls_area, ls_lpmc ];
+                console.log('数组：', arr);
+                // 开始执行
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    var houseJson = {
+                        "data":[
+                            {"value":"中骏四季家园"},
+                            {"value":"泉州浦西万达广场"},
+                            {"value":"卓辉金色外滩"},
+                            {"value":"中骏世界家"},
+                            {"value":"鼎胜大观"}
+                        ]
+                    }
+                    /*
+                    //START AJAX
+                    var houseJson = {}
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "获取楼盘下拉数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "pggs_bh": g_pggs_bh,
+                            "sjlb": "zzxj",
+                            "area": ls_area,
+                            "lpmc": ls_lpmc 
+                        },
+                        success: function(res){
+                            // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            if(res == '') return;
+                            houseJson = JSON.parse(res);
+                            var json = houseJson;
+                            if(typeof json.return != 'undefined'){ // 限制次数
+                                neuiDialog.alert({
+                                    message: json.return,
+                                    buttons: ['确定']
+                                })
+                                isHoldOn = false;
+                                return;
+                            }
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    //END AJAX
+                    */
+                    neuiInputsearch({
+                        source: houseJson,
+                        onConfirm: function(e){
+                            example.clearRoomFormRelatedSubordinateData($this, e.value, e.oldValue); // 清空下级关联元素数据
+                            var ls_lpmc_new = e.value; // 楼盘名称新值
+                            // 后台返回楼盘名称对应的抵押物所在地
+                            var ls_area_new = '福建省-泉州市-晋江市';
+                            /*
+                            //START AJAX
+                            var ls_area_new = '';
+                            var isHoldOn = true;
+                            ajax({
+                                heading: "获取楼盘名称对应抵押物所在地",
+                                debug: false,
+                                async: false, // 取数方式. true 异步, false 同步(默认)
+                                type: "GET",
+                                dataType: "html",
+                                cache: false,
+                                url: "",
+                                data: {
+                                    "action": "",
+                                    "user": "<%=s_user%>",
+                                    "sjk": "<%=s_sjk%>",
+                                    "pggs_bh": g_pggs_bh,
+                                    "sjlb": "zzxj",
+                                    "area": ls_area,
+                                    "lpmc": ls_lpmc_new
+                                },
+                                success: function(res){
+                                    // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    if(res == '') return;
+                                    ls_area_new = res;
+                                },
+                                error: function(res){
+                                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                },
+                                beforeSend: function(XMLHttpRequest){ },
+                                complete: function(XMLHttpRequest, textStatus){ }
+                            })
+                            if(!isHoldOn){
+                                neui.destroyAnimate();
+                                return;
+                            }
+                            //END AJAX
+                            */
+
+                            $('#locate').val(ls_area_new); // 赋值
+                        }
+                    }, $this)
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====幢号下拉
+            $(document).on('click', '#build.click-hand', function(){
+                var $this = $(this);
+                var ls_area = $('#locate').val(),
+                    ls_lpmc = example.filterRoomFormHouseChar($('#house').val());
+                var arr = [ ls_area, ls_lpmc ];
+                console.log('数组：', arr);
+                // 提示用户前面的数据是否为空
+                var tips = example.warnRoomFormRelatedPreviousEmpty($(this));
+                if(tips != ''){
+                    neuiDialog.alert({
+                        animate: true,
+                        message: tips,
+                        buttons: ['确定']
+                    })
+                    return;
+                }
+
+                // 开始执行
+                neui.showAnimate();
+                setTimeout(function(){       
+                    // 后台返回
+                    var buildJson = {
+                        "data":[
+                            // {"mc":""},
+                            {"mc":"3幢"},
+                            {"mc":"4幢"},
+                            {"mc":"5幢"},
+                            {"mc":"6幢"},
+                            {"mc":"7幢"}
+                        ]
+                    }
+                    /*
+                    //START AJAX
+                    var buildJson = {}
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "获取幢号下拉数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "pggs_bh": g_pggs_bh,
+                            "sjlb": "zzxj",
+                            "area": ls_area,
+                            "lpmc": ls_lpmc
+                        },
+                        success: function(res){
+                            // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            if(res == '') return;
+                            buildJson = JSON.parse(res);
+                            var json = buildJson;
+                            if(typeof json.return != 'undefined'){ // 限制次数
+                                neuiDialog.alert({
+                                    message: json.return,
+                                    buttons: ['确定']
+                                })
+                                isHoldOn = false;
+                                return;
+                            }
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    //END AJAX
+                    */
+
+                    // 无数据，切换成手动输入
+                    if(!checker.checkJsonHasData(buildJson)){ // 无数据
+                        example.switchHandEnter($this); // 切换成手动输入
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // 有数据，显示下拉
+                    $this.neuiPicker({
+                        caption: "选择幢号",
+                        source: buildJson,
+                        format: {
+                            value: ["mc"]
+                        },
+                        onConfirm: function (e) {
+                            example.clearRoomFormRelatedSubordinateData($this, e.value, e.oldValue); // 清空下级关联元素数据
+                        }
+                    })
+
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====楼层下拉
+            $(document).on('click', '#floor.click-hand', function(){
+                var $this = $(this);
+                var ls_area = $('#locate').val(),
+                    ls_lpmc = example.filterRoomFormHouseChar($('#house').val()),
+                    ls_dong = $('#build').val();
+                var arr = [ ls_area, ls_lpmc, ls_dong ];
+                console.log('数组：', arr);
+
+                // 提示用户前面的数据是否为空
+                var tips = example.warnRoomFormRelatedPreviousEmpty($(this));
+                if(tips != ''){
+                    neuiDialog.alert({
+                        animate: true,
+                        message: tips,
+                        buttons: ['确定']
+                    })
+                    return;
+                }
+                // 开始执行
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    var floorJson = {
+                        "data":[
+                            {"mc":"1楼"},
+                            {"mc":"2楼"},
+                            {"mc":"3楼"},
+                            {"mc":"4楼"}
+                        ]
+                    }
+                     /*
+                    //START AJAX
+                    var floorJson = {}
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "获取楼层下拉数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "pggs_bh": g_pggs_bh,
+                            "sjlb": "zzxj",
+                            "area": ls_area,
+                            "lpmc": ls_lpmc,
+                            "dong": ls_dong
+                        },
+                        success: function(res){
+                            // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            if(res == '') return;
+                            floorJson = JSON.parse(res);
+                            var json = floorJson;
+                            if(typeof json.return != 'undefined'){ // 限制次数
+                                neuiDialog.alert({
+                                    message: json.return,
+                                    buttons: ['确定']
+                                })
+                                isHoldOn = false;
+                                return;
+                            }
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    //END AJAX
+                    */
+
+                    // 无数据，切换成手动输入
+                    if(!checker.checkJsonHasData(floorJson)){ // 无数据
+                        example.switchHandEnter($this); // 切换成手动输入
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // 有数据，显示下拉
+                    $this.neuiPicker({
+                        caption: "选择楼层",
+                        source: floorJson,
+                        format: {
+                            value: ["mc"]
+                        },
+                        onConfirm: function (e) {
+                            example.clearRoomFormRelatedSubordinateData($this, e.value, e.oldValue); // 清空下级关联元素数据
+                        }
+                    })
+
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====房号下拉
+            $(document).on('click', '#room.click-hand', function(){
+                var $this = $(this);
+                var ls_area = $('#locate').val(),
+                    ls_lpmc = example.filterRoomFormHouseChar($('#house').val()),
+                    ls_dong = $('#build').val(),
+                    ls_dong_lc = $('#floor').val();
+                var arr = [ ls_area, ls_lpmc, ls_dong, ls_dong_lc ];
+                console.log('数组：', arr);
+
+                // 提示用户前面的数据是否为空
+                var tips = example.warnRoomFormRelatedPreviousEmpty($(this));
+                if(tips != ''){
+                    neuiDialog.alert({
+                        animate: true,
+                        message: tips,
+                        buttons: ['确定']
+                    })
+                    return;
+                }
+                // 开始执行
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    var roomJson = {
+                        "data":[
+                            {"mc":"201号"},
+                            {"mc":"302号"},
+                            {"mc":"403号"},
+                            {"mc":"505号"}
+                        ]
+                    }
+                     /*
+                    //START AJAX
+                    var roomJson = {}
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "获取房号下拉数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "pggs_bh": g_pggs_bh,
+                            "sjlb": "zzxj",
+                            "area": ls_area,
+                            "lpmc": ls_lpmc,
+                            "dong": ls_dong,
+                            "lc": ls_dong_lc
+                        },
+                        success: function(res){
+                            // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            if(res == '') return;
+                            roomJson = JSON.parse(res);
+                            var json = roomJson;
+                            if(typeof json.return != 'undefined'){ // 限制次数
+                                neuiDialog.alert({
+                                    message: json.return,
+                                    buttons: ['确定']
+                                })
+                                isHoldOn = false;
+                                return;
+                            }
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    //END AJAX
+                    */
+
+                    // 无数据，切换成手动输入
+                    if(!checker.checkJsonHasData(roomJson)){ // 无数据
+                        example.switchHandEnter($this); // 切换成手动输入
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // 有数据，显示下拉
+                    $this.neuiPicker({
+                        caption: "选择房号",
+                        source: roomJson,
+                        format: {
+                            value: ["mc"]
+                        },
+                        onConfirm: function (e) {
+                            example.clearRoomFormRelatedSubordinateData($this, e.value, e.oldValue); // 清空下级关联元素数据
+                            var ls_house_mc = e.value; // 房号
+                            // 后台返回对应的建筑面积
+                            var ls_jzmj = '120.5';
+                            /*
+                            //START AJAX
+                            var ls_jzmj = '';
+                            var isHoldOn = true;
+                            ajax({
+                                heading: "获取房号对应的建筑面积",
+                                debug: false,
+                                async: false, // 取数方式. true 异步, false 同步(默认)
+                                type: "GET",
+                                dataType: "html",
+                                cache: false,
+                                url: "",
+                                data: {
+                                    "action": "",
+                                    "user": "<%=s_user%>",
+                                    "sjk": "<%=s_sjk%>",
+                                    "pggs_bh": g_pggs_bh,
+                                    "sjlb": "zzxj",
+                                    "area": ls_area,
+                                    "lpmc": ls_lpmc,
+                                    "dong": ls_dong,
+                                    "lc": ls_dong_lc,
+                                    "house_mc": ls_house_mc
+                                },
+                                success: function(res){
+                                    // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    if(res == '') return;
+                                    var json = JSON.parse(res);
+                                    ls_jzmj = json.jzmj;
+                                },
+                                error: function(res){
+                                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                },
+                                beforeSend: function(XMLHttpRequest){ },
+                                complete: function(XMLHttpRequest, textStatus){ }
+                            })
+                            if(!isHoldOn){
+                                neui.destroyAnimate();
+                                return;
+                            }
+                            //END AJAX
+                            */
+
+                            if(ls_jzmj == 0 || ls_jzmj == ''){
+                                // neuiDialog.alert({
+                                //     message: '请填写建筑面积',
+                                //     buttons: ['确定'],
+                                //     callBack: function(){
+                                //         $('#jzmj').focus();
+                                //         var scrollT = $('#jzmj').offset().top - 50;
+                                //         $('html, body').animate({scrollTop: scrollT}, 'slow');
+                                //     }
+                                // })
+                            }else{
+                                $('#jzmj').val(ls_jzmj);
+                            }
+                        }
+                    })
+
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====产权年限下拉
+            $(document).on('click', '#property.click-hand', function(){
+                var $this = $(this);
+                var ls_area = $('#locate').val()
+                var arr = [ ls_area ];
+                console.log('数组：', arr);
+
+                // 开始执行
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    var propertyJson = {
+                        "data":[
+                            {"value":"已满两年"},
+                            {"value":"未满两年"},
+                            {"value":"二手房按揭"}
+                        ]
+                    }
+                     /*
+                    //START AJAX
+                    var propertyJson = {}
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "获取产权年限下拉数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "pggs_bh": g_pggs_bh,
+                            "sjlb": "zzxj",
+                            "area": ls_area
+                        },
+                        success: function(res){
+                            // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            if(res == '') return;
+                            propertyJson = JSON.parse(res);
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    //END AJAX
+                    */
+
+                    // 无数据，切换成手动输入
+                    if(!checker.checkJsonHasData(propertyJson)){ // 无数据
+                        example.switchHandEnter($this, 'self'); // 切换成手动输入(仅当前元素)
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // 有数据，显示下拉
+                    $this.neuiPicker({
+                        caption: "选择产权年限",
+                        source: propertyJson,
+                        format: {
+                            value: ["value"]
+                        }
+                    })
+
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====普通下拉
+            $(document).on('click', '.click-dropdown', function(){
+                var $this = $(this);
+                var ls_area = $('#locate').val();
+                var ls_hid3 = $(this).attr('data-hid3'); // 隐藏值3
+                var arr = [ ls_area, ls_hid3 ];
+                console.log('数组：', arr);
+
+                // 开始执行
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    var singleDropJson = {
+                        "data":[
+                            {"mc":"普通下拉1"},
+                            {"mc":"普通下拉2"},
+                            {"mc":"普通下拉3"}
+                        ]
+                    }
+                     /*
+                    //START AJAX
+                    var singleDropJson = {}
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "获取普通下拉数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "pggs_bh": g_pggs_bh,
+                            "sjlb": "zzxj",
+                            "area": ls_area,
+                            "listbm": ls_hid3
+                        },
+                        success: function(res){
+                            // if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            if(res == '') return;
+                            singleDropJson = JSON.parse(res);
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    //END AJAX
+                    */
+
+                    // 有数据，显示下拉
+                    $this.neuiPicker({
+                        caption: "选择普通下拉",
+                        source: singleDropJson,
+                        format: {
+                            value: ["mc"]
+                        }
+                    })
+
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+        });
+    </script>
+
+
+</body>
+</html>
