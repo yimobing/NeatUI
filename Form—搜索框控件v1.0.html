@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Form | 搜索框控件</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+</head>
+<body>
+    <style>
+        body{ max-width: 800px; margin: 0 auto;  }
+        .wrap{ padding: 15px 20px; }
+        header{ margin: 15px auto; text-align: center; }
+        h1{ color: #08ba61; }
+        h3{margin: 50px auto 15px auto; border-bottom: 3px solid #f25824; padding: 0;}
+        h3>span{ padding: 5px 10px; border: 2px solid #f25824; color: #f25824; border-radius: 4px; }
+        .control__module{ margin-top: 25px; border: 2px solid #08ba61; border-radius: 2px; color: #08ba61; }
+        .control__caption{ margin-bottom: 5px; }
+        .control__caption h4{ display: inline-block; padding: 5px 12px; border: 2px solid #08ba61; border-top: 0; border-left: 0; color: #08ba61; font-weight: 18px;}
+        .control__operation,
+        .control__content{ padding: 10px 15px; }
+        .control__operation{ }
+        .control__content{ margin-top: 15px; }
+
+        .control__operation-group{ margin-top: 10px; }
+        .control__operation-group:first-child{ margin-top: 0; }
+    </style>
+
+    <div class="wrap">
+        <header>
+            <h1>Form 搜索框控件</h1>
+        </header>
+        <main>
+            <section class="control">
+                <div class="control__module">
+                    <div class="control__caption"><h4>搜索框控件</h4></div>
+                    <div class="control__operation">
+                        <button type="button" class="ne-btn has-texture" id="btn-generate-search">点击生成搜索框</button>
+                        <button type="button" class="ne-btn has-texture" id="btn-close-search">点击关闭搜索框</button>
+                    </div><!--/.control__operation-->
+                    <div class="control__content">
+                        <div class="search__form"></div>
+                    </div><!--/.control__content-->
+                </div><!--/.control__module-->
+            </section><!--/.control-->
+
+        </main>
+    </div><!--/.wrap-->
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/libs/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui-form.js"></script><!--表单布局-->
+    <script type="text/javascript">
+        /*+----------------全局变量----------------+*/
+        /*+----------------FUNCTION----------------+*/
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                    搜索框控件
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====生成搜索框按钮 
+            $('#btn-generate-search').on('click', function(){
+                /**
+                 * 自定义数据源参数说明：
+                    · type 搜索类型. input 单行输入框(默认), textarea 多行输入框, drop 下拉, radio 单选, checkbox 多选
+                    · label 搜索项文本
+                    · name 搜索项(或输入框)ID(可选)
+                    · class 搜索项(或输入框)Class(可选)
+                    · hid 	默认隐藏值(可选). 只当搜索类型为单选时有效
+                    · value 默认显示值(可选). 只当搜索类型为单行、多行输入、单选、下拉时有效.
+                    · readonly 是否只读(可选). true 是, false 否(默认)
+                    · placeholder 提示文字(可选). 只当搜索类型为单行、多行输入时有效.
+                    · group 复合型输入框,即多个输入框组合的数组(可选). 常见于开始日期、结束日期组合
+                        label 文本描述(可选)
+                        name 输入框ID(可选)
+                        class 输入框Class(可选)
+                        value 默认值(可选)
+                        placeholder 提示文字(可选)
+                        readonly 是否只读(可选). true 是, false 否(默认)
+                    · data 内层循环数组(可选). 只当搜索类型为单选、多选时有效.
+                        value 显示值
+                        id 隐藏值(可选)
+                        checked 是否默认选中(可选), 只当搜索类型为单选或多选时有效. true 是, false 否(默认). 注意:单选时如果有多条记录是选中的,则系统会强制只有第一个选中,其它皆不选中
+                */
+
+                //第1步，生成搜索框
+                var _html = neuiSearchBox.getForm({
+                    enableLocale: false, //是否启用本地演示数据源. true 是(默认), false 否
+                    source: [  //自定义数据源
+                        {"type":"input", "label":"精准搜索", "name":"s-user", "placeholder":"输入会员ID搜索"},
+                        {"type":"textarea", "label":"备注", "name":"s-notes"},
+                        {"type":"input", "label":"咨询日期", "group": [
+                            {"label":"自", "name":"s-startDate", "class":"nedate", "value":"2021-03-06", "placeholder":"开始日期", "readonly": true},
+                            {"label":"至", "name":"s-endDate", "class":"nedate", "value":"2021-03-31", "placeholder":"结束日期", "readonly": true}
+                        ]},
+                        {"type":"drop", "label":"所在地区(下拉)", "name":"s-area" , "value":"福建省-泉州市-丰泽区"},
+                        {"type":"radio", "label":"职业(单选)", "name":"s-duty", "hid":"1001", "value":"白领", "data":[
+                            {"id":"1000", "value":"不限"},
+                            {"id":"1001", "value":"医生"},
+                            {"id":"1002", "value":"教师"},
+                            {"id":"1003", "value":"白领"},
+                            {"id":"1003", "value":"蓝领"},
+                            {"id":"1003", "value":"工人"}
+                        ]},
+                        {"type":"radio", "label":"年级(单选)", "name":"s-grade", "data":[
+                            {"id":"1000", "value":"不限", "checked": true},
+                            {"id":"1001", "value":"一年级"},
+                            {"id":"1002", "value":"二年级"},
+                            {"id":"1003", "value":"三年级"},
+                            {"id":"1003", "value":"四年级"},
+                            {"id":"1003", "value":"五年级"}
+                        ]},
+                        {"type":"checkbox", "label":"年龄(多选)", "name":"s-age", "data":[
+                            {"id":"1001", "value":"0-6岁", "checked": true},
+                            {"id":"1002", "value":"7-16岁", "checked": true},
+                            {"id":"1003", "value":"17-25岁", "checked": true},
+                            {"id":"1004", "value":"26-40岁"},
+                            {"id":"1005", "value":"40-50岁"},
+                            {"id":"1006", "value":"50-70岁"},
+                            {"id":"1007", "value":"70岁以上"},
+                        ]}
+                    ]
+                })
+
+                $('.search__form').empty().append(_html);
+
+                //第2步，加载搜索框事件
+                neuiSearchBox.doneEvent();
+            });
+
+
+            //——————————————————————————————————————————
+            //=====关闭搜索框按钮
+            $('#btn-close-search').on('click', function(){
+                $('.search__form').empty();
+            });
+
+
+
+
+
+
+            
+        }); //$(function(){});
+
+    </script>
+</body>
+</html>
