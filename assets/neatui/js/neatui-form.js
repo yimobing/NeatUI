@@ -1199,10 +1199,18 @@
                     dropNode = document.getElementById('btn-dropdown');
                 if(manualNode == null || dropNode == null) return;
                 manualNode.addEventListener('click', function(){ // 切换成手动输入
-                    _this.switchToHand('related');
+                    if(typeof neui != 'undefined' && typeof neui.showAnimate === 'function') neui.showAnimate();
+                    setTimeout(function(){
+                        _this.switchToHand('related');
+                        if(typeof neui != 'undefined' && typeof neui.destroyAnimate === 'function') neui.destroyAnimate();
+                    }, 100)
                 })
                 dropNode.addEventListener('click', function(){ // 切换成下拉，即取消手动输入
-                    _this.switchToSelect('related');
+                    if(typeof neui != 'undefined' && typeof neui.showAnimate === 'function') neui.showAnimate();
+                    setTimeout(function(){
+                        _this.switchToSelect('related');
+                        if(typeof neui != 'undefined' && typeof neui.destroyAnimate === 'function') neui.destroyAnimate();
+                    }, 100)
                 })
             }
         },
