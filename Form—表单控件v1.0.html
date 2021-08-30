@@ -86,7 +86,8 @@
             houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
             switches: {
                 enable: true, // 是否允许手动输入(可选), 默认true
-                scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
+                hasExchangeModule: true, // 是否加载切换输入模块(可选), 默认true。值为true时将在最底部加载“如查无数据，请选择手动输入”、“取消手动输入”
+                isPropertyAssociated: false // 产权年限是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素
             }
         },
         config: { // 配置项(可选)
@@ -372,8 +373,9 @@
                 houses: {
                     houseRightButton: true,
                     switches: {
-                        enable: true, 
-                        scope: "related"
+                        enable: true,
+                        hasExchangeModule: true,
+                        isPropertyAssociated: false
                     }
                 },
                 config: { // 配置项(可选)
@@ -845,6 +847,7 @@
                             {"mc":"7幢"}
                         ]
                     }
+
                     /*
                     //START AJAX
                     var buildJson = {}
@@ -903,9 +906,6 @@
                     $this.neuiPicker({
                         caption: "选择幢号",
                         source: buildJson,
-                        format: {
-                            value: ["mc"]
-                        },
                         onConfirm: function (e) {
                             example.clearRoomFormRelatedSubordinateData($this, e.value, e.oldValue); // 清空下级关联元素数据
                         }
@@ -1010,9 +1010,6 @@
                     $this.neuiPicker({
                         caption: "选择楼层",
                         source: floorJson,
-                        format: {
-                            value: ["mc"]
-                        },
                         onConfirm: function (e) {
                             example.clearRoomFormRelatedSubordinateData($this, e.value, e.oldValue); // 清空下级关联元素数据
                         }
@@ -1120,9 +1117,6 @@
                     $this.neuiPicker({
                         caption: "选择房号",
                         source: roomJson,
-                        format: {
-                            value: ["mc"]
-                        },
                         onConfirm: function (e) {
                             example.clearRoomFormRelatedSubordinateData($this, e.value, e.oldValue); // 清空下级关联元素数据
                             var ls_house_mc = e.value; // 房号
@@ -1261,10 +1255,7 @@
                     // 有数据，显示下拉
                     $this.neuiPicker({
                         caption: "选择产权年限",
-                        source: propertyJson,
-                        format: {
-                            value: ["value"]
-                        }
+                        source: propertyJson
                     })
 
                     neui.destroyAnimate();
