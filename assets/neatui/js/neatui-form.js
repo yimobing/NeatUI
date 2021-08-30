@@ -121,7 +121,9 @@
                     houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
                     switches: {
                         enable: true, // 是否允许手动输入(可选), 默认true
-                        scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
+                        // scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
+                        hasExchangeModule: true, // 是否加载切换输入模块(可选), 默认true。值为true时将在最底部加载“如查无数据，请选择手动输入”、“取消手动输入”
+                        isPropertyAssociated: false // 产权年限是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素
                     }
                 },
                 config: { // 配置项(可选)
@@ -928,6 +930,7 @@
                         }
 
                         if (hid1 == '产权年限') {
+                            if(me.$opts.houses.switches.isPropertyAssociated) className += ' clear-relation'; // 产权年限是关联元素 testing
                             className += ' click-hand click-property';
                             ids = 'property';
                             icons = ' icon-clock';
@@ -1005,7 +1008,7 @@
 
             tools.removeAllChildren(me.$obj); // 先清空元素内容
             tools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
-            this.loadExchangeModule(me);
+            if(me.$opts.houses.switches.hasExchangeModule) this.loadExchangeModule(me); //testing
         },
 
 
@@ -1230,6 +1233,7 @@
 
             // 设置元素可写入
             var setCanWrite = function(el){
+                if(pale == 'related' && el.className.indexOf('click-property') >= 0) return; // 排除掉产权年限(即使切换范围是关联元素，产权年限也不切换输入)
                 var _placeholder = typeof el.getAttribute('placeholder') == 'undefined' ? '' : el.getAttribute('placeholder').toString().replace(/选择/g, '输入'),
                     _onblur = typeof el.getAttribute('onblur') == 'undefined' ? '' : el.getAttribute('onblur').toString().replace(/选择/g, '输入'),
                     _onfocus = typeof el.getAttribute('onfocus') == 'undefined' ? '' : el.getAttribute('onfocus').toString().replace(/(this\.blur\(\))/g, '').replace(/([\;]+)/g, ';');
