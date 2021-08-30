@@ -36,8 +36,8 @@ if(typeof jQuery == 'undefined'){
 				source: {}, // 单列数据源(object型或字符型)，第1列的数据源。1、字符型：值china, 当选择器为省市区县三级联动且使用系统数据源时,只需填值china即可. 2、object型标准格式: {data:[{value:"显示值", id:"隐藏值", disabled:"是否禁用项,布尔型"}]}, 其中：id、disabled可选
 				columns: [], // 多列数据源(数组型)(可选)。第2、3、4...列的数据源组成数组. eg. [{}, {}, {}]
 				format: { // 自定义数据源字段(Object对象)(可选)。注意：每个数据源的字段必须一样，不能数据源1字段是a，数据源2字段是b
-                    value: ["value"], // 显示值字段(数组型)
-					hid: ["id"], // 隐藏值字段(数组型)(可选)
+                    value: ["value"], // 显示值字段(数组型)。默认数据中字段为value或mc都可以。
+					hid: ["id"], // 隐藏值字段(数组型)(可选)。默认数据中字段为id或bh都可以。
                     forbid: "disabled" // 项禁用字段(字符型)(可选)
                 },
 				autoFill: true, // 点确定时是否自动填充值到输入框元素(可选),默认true
@@ -195,8 +195,11 @@ if(typeof jQuery == 'undefined'){
 						var _value = dFormat.hid[0],
 							_label = dFormat.value[0],
 							_disabled = dFormat.forbid;
-						var value = typeof items[_value] == 'undefined' ? level1Ids : items[_value],
-							label = typeof items[_label] == 'undefined' ? 'undefined' : items[_label],
+						// edit 20210830-1 下4行
+						// var value = typeof items[_value] == 'undefined' ? level1Ids : items[_value],
+						// 	label = typeof items[_label] == 'undefined' ? '' : items[_label],
+						var value = typeof items[_value] == 'undefined' ? (typeof items["id"] == 'undefined' ? ( typeof items["bh"] == 'undefined' ? level1Ids : items["bh"]) : items["id"] ) : items[_value],
+							label = typeof items[_label] == 'undefined' ? (typeof items["value"] == 'undefined' ? ( typeof items["mc"] == 'undefined' ? 'undefined' : items["mc"]) : items["value"] ) : items[_label],
 							disabled = typeof items[_disabled] == 'undefined' ? false : (items[_disabled] === true ? true : false);
 						if(label == 'undefined'){
 							var errs = '警告！自定义数据源字段format参数的字段名' + _label + '有错误，请检查！';
@@ -223,8 +226,11 @@ if(typeof jQuery == 'undefined'){
 							var _value = dFormat.hid[0],
 								_label = dFormat.value[0],
 								_disabled = dFormat.forbid;
-							var value = typeof items[_value] == 'undefined' ? level1Ids : items[_value],
-								label = typeof items[_label] == 'undefined' ? '' : items[_label],
+							// edit 20210830-1 下4行
+							// var value = typeof items[_value] == 'undefined' ? level1Ids : items[_value],
+							// 	label = typeof items[_label] == 'undefined' ? '' : items[_label],
+							var value = typeof items[_value] == 'undefined' ? (typeof items["id"] == 'undefined' ? ( typeof items["bh"] == 'undefined' ? level1Ids : items["bh"]) : items["id"] ) : items[_value],
+								label = typeof items[_label] == 'undefined' ? (typeof items["value"] == 'undefined' ? ( typeof items["mc"] == 'undefined' ? 'undefined' : items["mc"]) : items["value"] ) : items[_label],
 								disabled = typeof items[_disabled] == 'undefined' ? false : (items[_disabled] === true ? true : false);
 							if(label == ''){
 								var errs = '警告！自定义数据源字段format参数的字段名有错误，请检查！';
