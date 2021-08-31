@@ -155,7 +155,8 @@
     placeholder 空占位符(可选), 默认空。仅在must=true时有效。
     readonly    是否强制为只读(可选), 默认false
     disabled    是否强制为禁用(可选), 默认false
-    icon    自定义图标名称(即className)(可选), 默认图标名称为field参数值
+    icon        自定义图标名称(即className)(可选), 默认图标名称为field参数值
+    button      自定义右侧按钮(可选)。格式：{id:"按钮ID属性(可选)", class:"按钮Class属性(可选)", text:"按钮名称(可选)"}
     attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
     */
     /**
@@ -308,7 +309,9 @@
                     {title:"千分进位", field:"money", type:"数字", value:"15000", thousandth:true},
                     {title:"占位符", field:"unitPrice", type:"数字", value:"", placeholder:"请先输入总价", must:true},
                     {title:"有隐藏值的", field:"totalPrice", type:"数字", value:"15000", hid:"Z1001"},
-                    {title:"自定义属性", field:"customAttr", type:"文本", value:"vip2", attribute:"data-toggle='1' data-vip='5'"}
+                    {title:"自定义属性", field:"customAttr", type:"文本", value:"vip2", attribute:"data-toggle='1' data-vip='5'"},
+                    {title:"有右侧单位", field:"hasUnit", type:"数字", value:"15000", unit:"元/m²"},
+                    {title:"有右侧按钮", field:"rightBtn", type:"数字", must: true, value:"1200000", unit:"元", button:{id:"btn-query-price", class:"btn-query", text:"获取价格"}}
                 ]
             }
 
