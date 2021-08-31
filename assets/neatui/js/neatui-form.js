@@ -175,7 +175,7 @@
             // --------添加class属性--------
             me.$obj.className += ' ne-configuration ne-form';
             me.$obj.className += me.$opts.config.layout.theme != 'popular' ? '' : ' theme-popular';
-            me.$obj.className += me.$opts.config.layout.inputMust && me.$opts.config.layout.mustAlign == 'left' ? ' has-must-left' : '';
+            me.$obj.className += me.$opts.config.layout.inputMust && me.$opts.config.layout.mustAlign == 'left' ? ' has-must-left' : ' has-must-aline';
             // ·--------校验数据格式--------
             var source = me.$opts.source;
             if(!tools.isJsonObject(source)){
@@ -692,8 +692,8 @@
                     readonly = typeof items["readonly"] == 'undefined' ? false : items["readonly"] === true ? true : false,
                     disabled = typeof items["disabled"] == 'undefined' ? false : items["disabled"] === true ? true : false,
                     icon = typeof items["icon"] == 'undefined' ? field : items["icon"],
+                    buttons = typeof items["button"] == 'undefined' ? null : items["button"],
                     attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"];
-
                 //
                 var _LHtml = '', // 左边内容
                     _RHtml = '', // 右边内容
@@ -749,13 +749,23 @@
                     _dataHideStr = hid.toString().replace(/([ ]+)/g, '') === '' ? '' : ' data-bh="' + hid + '"';
                     _readonlyStr = !readonly ? '' : ' readonly',
                     _disabledStr = !disabled ? '' : ' disabled',
-                    _btnStr = '', // 按钮
+                    //_btnStr = '', // 按钮
                     _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
                     _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
                     _unitClass = !me.$opts.config.layout.inputCross ? '' : ' has-cell-cross';
                     _telAClass = phone == '' ? '' : !tools.isTel(value, me.$opts.config.format.phone) ? '' : ' class="hover"';
-                    _crossClass = ''; // me.$opts.houses.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
+                    // _crossClass = ''; // me.$opts.houses.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
                     _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
+                var _btnStr = ''; // 右侧按钮
+                var _crossClass = '';
+                if(buttons != null){
+                    var _btnIdStr = typeof buttons.id == 'undefined' ? '' : ' id="' + buttons.id + '"',
+                        _btnClassStr = typeof buttons.class == 'undefined' ? '' : ' class="' + buttons.class + '"',
+                        _btnText = typeof buttons.text == 'undefined' ? '右侧按钮' : (buttons.text.toString().replace(/([ ]+)/g, '') === '' ? '右侧按钮' : buttons.text);
+                    _btnStr = '<div class="item-cell" data-type="button"><button type="button"' + _btnIdStr + _btnClassStr + '>' + _btnText + '</button></div>';
+                    _crossClass = ' has-cell-btn has-cell-btn-word-' + _btnText.length;
+                }
+
                 var _attrListStr = ' id="' + ids + '"' + _classNameStr + _dataHideStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr; // 所有公用属性串
                 //
                 var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="icon icon-' + icon + '"></i>'),
@@ -907,7 +917,7 @@
                                 icons = ' icon-house';
                                 // boxWidth = '100%';
                                 if(me.$opts.houses.houseRightButton)
-                                    _BtHtml = '<div class="item-cell"><button type="button" id="btn-query-house">查询</button></div>';
+                                    _BtHtml = '<div class="item-cell" data-type="button"><button type="button" id="btn-query-house">查询</button></div>';
                             }else{
                                 className += ' click-hand';
                                 readonly = true;
