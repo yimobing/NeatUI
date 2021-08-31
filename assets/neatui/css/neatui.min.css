@@ -1710,6 +1710,22 @@ pre, pre code {
 /*+================================================================================+*/
 /*                                 房贷计算器分期金额
 /*+================================================================================+*/
+.payments{ }
+.payments__nodata{
+	margin-top: 15px;
+	color: #1b9af7;
+	font-size: 18px;
+	font-weight: bold;
+}
+.payments__subtitle{
+	margin-top: -5px;
+    text-align: center;
+    color: #1b9af7;
+    font-size: 16px;
+}
+.payments__content{ 
+    margin-top: 10px; 
+}
 .stages{ padding: 5px 8px; border-bottom: 1px solid #f5f5f5; }
 .stages__term{ width: 80px; }
 .stages__money{ -webkit-flex: 1; -moz-flex: 1; -o-flex: 1; flex: 1; width: 100%; text-align: right; }
