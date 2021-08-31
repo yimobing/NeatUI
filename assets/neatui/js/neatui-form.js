@@ -783,7 +783,7 @@
                 }
                 // 节点拼接
                 _LHtml += _inputStr;
-                _RHtml += _btnStr + _crossStr + _mustStr;
+                _RHtml += _crossStr + _btnStr + _mustStr;
                 _UHtml += _unitStr + _phoneStr;
                 _IcoHtml += _iconStr;
                 // 拼接HTML
