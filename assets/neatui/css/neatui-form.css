@@ -267,19 +267,19 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 /*右边单位*/
 .item-r .r-unit{
 	position: absolute;
-    right: 10px;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    -moz-transform: translateY(-50%);
-    -o-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
-    background-color: #fff;
-    padding: 7px 7px;
-    color: #999;
-    font-size: 12px;
+	right: 10px;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+	-moz-transform: translateY(-50%);
+	-o-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+	/* background-color: #fff; */
+	/* padding: 7px 7px; */
+	color: #999;
+	font-size: 12px;
 }
-.item-r .r-unit.has-cell-cross{ right: 32px; }
+.item-r .r-unit.has-cell-cross{ right: 36px; }
 
 /*右边电话*/
 .item-r .r-tel{
