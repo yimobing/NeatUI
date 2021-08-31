@@ -5,7 +5,7 @@
  * 说明：兼容IE8+
  * Author: Mufeng
  * Date: 2021.01.09
- * Update: 2021.08.24
+ * Update: 2021.08.31
  */
 
 /*+--------------------------------+*/
@@ -274,10 +274,12 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     -o-transform: translateY(-50%);
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
-    font-size: 12px;
+    background-color: #fff;
+    padding: 7px 7px;
     color: #999;
+    font-size: 12px;
 }
-.item-r .r-unit.has-cell-cross{ right: 35px; }
+.item-r .r-unit.has-cell-cross{ right: 32px; }
 
 /*右边电话*/
 .item-r .r-tel{
@@ -379,7 +381,11 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     background-size: 12px auto;
     cursor: pointer;
 }
-.item-cell[data-type="cross"].has-cell-btn{ right: 60px!important; }
+.item-cell[data-type="cross"].has-cell-btn{ right: 50px!important; } /*按钮2个字*/
+.item-cell[data-type="cross"].has-cell-btn-word-4{ right: 76px!important; } /*按钮4个字*/
+.item-cell[data-type="cross"].has-cell-btn-word-6{ right: 102px!important; } /*按6个字*/
+.item-cell[data-type="cross"].has-cell-btn-word-8{ right: 128px!important; } /*按8个字*/
+
 
 
 /*+--------输入框图标--------+*/
@@ -524,6 +530,8 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .ne-form.has-must-aline .item-cell[data-type="cross"]{ right: 10px!important; }
 .ne-form.has-must-aline .item-cell[data-type="cross"].has-cell-btn{ right: 92px!important; }
 
+
+
 /*+----------------主题----------------+*/
 /*+--------主题1：流行（输入框无边线）--------+*/
 .ne-form.theme-popular{ border: 0; }
@@ -543,7 +551,16 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .ne-form.has-border.has-must-left .item-cell[data-type="must"]{ left: 5px; }
 .ne-form.has-border.has-must-aline .item-r{ padding-right: 15px; }
 .ne-form.has-border.has-must-aline .item-r>em{ right: 25px; }
-.ne-form.has-border.has-must-aline .item-r>em.has-cell-cross{ right: 55px; }
+.ne-form.has-border.has-must-aline .item-r>em.has-cell-cross{ right: 50px; }
+
+.ne-form.has-must-aline.theme-popular .item-cell{ right: -18px; }
+.ne-form.has-must-aline.theme-popular .item-r>em{ right: 30px; }
+.ne-form.has-must-aline.theme-popular .item-r>em.r-tel.has-cell-cross{ right: 35px; }
+.ne-form.has-must-aline.theme-popular .item-cell[data-type="cross"]{ right: 0px!important; }
+.ne-form.has-must-aline.theme-popular .item-cell[data-type="cross"].has-cell-btn{ right: 50px!important; } /*按钮2个字*/
+.ne-form.has-must-aline.theme-popular .item-cell[data-type="cross"].has-cell-btn-word-4{ right: 76px!important; } /*按钮4个字*/
+.ne-form.has-must-aline.theme-popular .item-cell[data-type="cross"].has-cell-btn-word-6{ right: 102px!important; } /*按6个字*/
+.ne-form.has-must-aline.theme-popular .item-cell[data-type="cross"].has-cell-btn-word-8{ right: 128px!important; } /*按8个字*/
 
 
 
