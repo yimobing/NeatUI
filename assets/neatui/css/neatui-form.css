@@ -542,6 +542,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .ne-form.theme-popular .item-r{ border: 0; }
 .ne-form.theme-popular input,
 .ne-form.theme-popular textarea{ border: 0; }
+.ne-form.theme-popular .item-cell>button{ height: 28px; line-height: 28px;}
 
 
 
