@@ -5,7 +5,7 @@
  * 说明：兼容IE8+
  * Author: Mufeng
  * Date: 2021.01.09
- * Update: 2021.08.31
+ * Update: 2021.09.01
  */
 
 /*+--------------------------------+*/
@@ -763,6 +763,17 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .ne-configuration .icon{
     background: transparent url('') no-repeat scroll center center / 100% auto;
 }
+.icon-quotation{ background-image: url('../img/config_mod_icon_no.png')!important; }
+.icon-inquirer{ background-image: url('../img/config_mod_icon_user.png')!important; }
+.icon-enterprise{ background-image: url('../img/config_mod_icon_company.png')!important; }
+.icon-purpose{ background-image: url('../img/config_mod_icon_purpose.png')!important; }
+.icon-category{ background-image: url('../img/config_mod_icon_category.png')!important; }
+.icon-breed{ background-image: url('../img/config_mod_icon_loan.png')!important; }
+.icon-username{ background-image: url('../img/config_mod_icon_user.png')!important; }
+.icon-tel{ background-image: url('../img/config_mod_icon_tel.png')!important; }
+.icon-tel.hover{ background-image: url('../img/config_mod_icon_tel_blue.png')!important; }
+.icon-mobile{ background-image: url('../img/config_mod_icon_mobile.png')!important; }
+
 .icon-house{ background-image: url('../img/config_mod_icon_loupan.png')!important; }
 .icon-build{ background-image: url('../img/config_mod_icon_build.png')!important; }
 .icon-floor{ background-image: url('../img/config_mod_icon_floor.png')!important; }
@@ -771,14 +782,8 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .icon-metre{ background-image: url('../img/config_mod_icon_area.png')!important; }
 .icon-calendar{ background-image: url('../img/config_mod_icon_calendar.png')!important; }
 .icon-numeric{ background-image: url('../img/config_mod_icon_numeral.png')!important; }
-.icon-tel{ background-image: url('../img/config_mod_icon_tel.png')!important; }
-.icon-tel.hover{ background-image: url('../img/config_mod_icon_tel_blue.png')!important; }
-.icon-mobile{ background-image: url('../img/config_mod_icon_mobile.png')!important; }
-.icon-loan{ background-image: url('../img/config_mod_icon_loan.png')!important; }
-.icon-user{ background-image: url('../img/config_mod_icon_user.png')!important; }
-.icon-locate{ background-image: url('../img/config_mod_icon_locate.png')!important; }
-.icon-category{ background-image: url('../img/config_mod_icon_category.png')!important; }
-.icon-purpose{ background-image: url('../img/config_mod_icon_purpose.png')!important; }
+.icon-locate,
+.icon-area{ background-image: url('../img/config_mod_icon_locate.png')!important; }
 .icon-drop{ background-image: url('../img/config_mod_icon_drop.png')!important; }
 .icon-text{ background-image: url('../img/config_mod_icon_text.png')!important; }
 .icon-textarea{ background-image: url('../img/config_mod_icon_multiple.png')!important; }
