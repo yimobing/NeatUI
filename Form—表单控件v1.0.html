@@ -296,9 +296,12 @@
             //===== 创建常规数据表单
             var regularJson = {
                 data:[
+                    {title:"询价单号", field:"quotation", type:"文本", value:"", readonly:true},
+                    {title:"询价人", field:"inquirer", type:"文本", value:"", readonly:true},
+                    {title:"询价单位", field:"enterprise", type:"文本", value:"", readonly:true},
                     {title:"评估目的", field:"purpose", type:"下拉", value:"抵押贷款", must:true},
-                    {title:"贷款品种", field:"loan", type:"下拉", value:"二手房按揭", must:true},
-                    {title:"客户姓名", field:"user", type:"文本", value:"张三", must:true},
+                    {title:"贷款品种", field:"breed", type:"下拉", value:"二手房按揭", must:true},
+                    {title:"客户姓名", field:"username", type:"文本", value:"张三", must:true},
                     {title:"客户电话", field:"mobile", type:"文本", value:"18350605829", must:true, phone: true},
                     {title:"客户备注", field:"note", type:"文本", value:"该用户很懒，没有备注", multiple: true, must:true},
                     {title:"抵押物所在地", field:"locate", type:"下拉", value:"福建省-泉州市-丰泽区", must:true},
