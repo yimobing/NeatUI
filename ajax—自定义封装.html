@@ -88,7 +88,7 @@
                 // 后台返回
                 var userJson = { "name":"张三", "sex":"男", "age":"14"}
                 /*
-                //START AJAX
+                // START AJAX
                 var userJson = {}
                 var isHoldOn = true;
                 ajax({
@@ -120,7 +120,7 @@
                     return {}
                     // return;
                 }
-                //END AJAX
+                // END AJAX
                 */
 
 
@@ -134,7 +134,7 @@
                 setTimeout(function(){
                     //后台返回
                     /*
-                    //START AJAX
+                    // START AJAX
                     var isHoldOn = true;
                     ajax({
                         heading: "保存XX数据",
@@ -165,7 +165,7 @@
                         neui.destroyAnimate();
                         return;
                     }
-                    //END AJAX
+                    // END AJAX
                     */
                     flag = parseInt(1); //1 成功, 0 失败
                     if(!flag) msg = '保存失败';
@@ -175,7 +175,7 @@
                         message: msg,
                         buttons: ['确定'],
                         callBack: function(){
-                            if(flag){ //成功
+                            if(flag){ // 成功
                                 //..
                             }
                         }
@@ -192,7 +192,7 @@
                 //——————————————————————————————————————————
                 //
                 /*
-                //START AJAX
+                // START AJAX
                 var json = {}
                 $.ajax({
                     async: false, // 取数方式. true 异步(默认), false 同步
@@ -213,7 +213,7 @@
                     beforeSend: function(XMLHttpRequest){ },
                     complete: function(XMLHttpRequest, textStatus){ }
                 })
-                //END AJAX
+                // END AJAX
                 */
 
 
