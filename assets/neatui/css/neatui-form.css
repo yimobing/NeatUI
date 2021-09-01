@@ -377,7 +377,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     transform: translateY(-50%);
     width: 32px;
     height: 32px;
-    background: #fff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAWUlEQVQoU2NkIBEwQtULQOkPOPTD5ZE1TGBgYChgYGBA1wRSDJeDaQAZjCKBZDOKQcga0DWB+Bi2omtA1gRiYziRYg3I/iDoJJI8jU0xLEqwBivJEUd0AgEAxykeDaN0dGcAAAAASUVORK5CYII=') 50% 50% no-repeat;
+    background: #fff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAQRJREFUSEvt1sENwjAMBdDfCWAjGAU2MBswgpkAuglshiIFKZg29jeVemlvqCUvdu3UA1a6hpVcbDBE5Apgp6qXJV6DiJwAHFT13K73k+r64B3Awz7MbqRZ66aq0oXLzSXwZo1RVUvUX9dscf2De2jZQbeqM3gEdWE27VE0BEdxBg3DHs6iFDyHZ1AatjiAF4DS85Mt0+v71FndRFnWptFUxCbq8jN1wtERt+8UwLOmmsYpeKqQMocMlepe9WbwUMSRlmFxF46gn7Zh8OhHItwyUTzyWQyjTOSTMJPeudPJi7w3+tCR2k1Qo08d9vZ2RmLnLZP2ox1/3KrOgt7/NtjL0GL33wsOyB+ZX7jRAAAAAElFTkSuQmCC') 50% 50% no-repeat;
     background-size: 12px auto;
     cursor: pointer;
 }
