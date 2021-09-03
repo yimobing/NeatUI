@@ -254,7 +254,7 @@
             //END AJAX
             */
 
-            // 转化并赋值 edit 20210828-1
+            // 转化并赋值 edit 20210828-1 
             var years = parseInt(loanJson["daikuan_nianxian"]);
             if(isNaN(years)) years = 0;
             var months = years * 12,
@@ -264,7 +264,7 @@
             $('#c-loanAmount').val(format.thousandth(convert.yuan2TenThousand(loanJson["daikuan_je"]))); // 贷款总额
             $('#c-loanCategory').val(loanJson["dkpz"]); // 贷款品种
             $('#c-loanYears').val(yearText).attr('value', yearText).attr('data-value', months); // 贷款年限
-            $('#c-loanRate').val(loanJson["lilv"]); // 贷款利率
+            $('#c-loanRate').val(parseFloat(loanJson["lilv"]) * 100); // 贷款利率 edit 20210903-1
             $('#c-loanPayBackMethod').val(loanJson["huankuan_fangshi"]); // 还款方式
             
             // 计算结果
@@ -493,6 +493,12 @@
                         payEveryMonth = format.thousandth(parseFloat(payEveryMonth).toFixed(digit));
                         principalInterestTotal = format.thousandth(convert.yuan2TenThousand(principalInterestTotal, 'round', digit));
                         interestTotal = format.thousandth(convert.yuan2TenThousand(interestTotal, 'round', digit));
+                        // 特殊情况 add 20210903-2
+                        if(isNaN(payEveryMonth.toString().replace(/,/g, ''))){ // 利率为0时
+                            payEveryMonth = 0; // 月供等于0
+                            principalInterestTotal = amount; // 本息合计等于本金
+                            interestTotal = 0; // 总支付利息等于0
+                        }
                         // 赋值1
                         $('#in-loanAmount').val(amount); // 贷款总额(单位：万元)
                         $('#in-monthTotal').val(month); // 还款月数(单位：万元)
