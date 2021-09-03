@@ -2099,7 +2099,7 @@ var convert = {
 		}else{
 			if(ps_isEmptyTips) percent = "如30%，请输入0.3";
 		}
-		return percent == '' ? '' : percent + '%';
+		return percent === '' ? '' : percent + '%'; // 这里一定要3个等号，不然0也会被当成是空
 	},
 
 
