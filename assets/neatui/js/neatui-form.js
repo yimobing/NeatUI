@@ -7,7 +7,7 @@
  * Author: ChenMufeng
  * QQ: 1614644937
  * Date: 2021.03.06
- * Update: 2021.08.09
+ * Update: 2021.09.02
  */
 
 /*———————————————————————————————————————————————————————————————————————————————————————————————
@@ -392,11 +392,18 @@
             if(tips1 != ''){
                 var tips = '请' + chooseText + '：' + tips1.substr(0, tips1.length - 1);
                 if(tools.isExistDialogControl()){
-                    neuiDialog.alert({
+                    // neuiDialog.alert({
+                    //     zIndex: ps_dialog_zIndex,
+                    //     animate: true,
+                    //     message: tips,
+                    //     buttons: ['确定']
+                    // })
+                    neuiDialog.notice({
                         zIndex: ps_dialog_zIndex,
                         animate: true,
                         message: tips,
-                        buttons: ['确定']
+                        theme: 'danger',
+                        location: 'top'
                     })
                 }else{
                     alert(tips);
@@ -687,6 +694,7 @@
                     placeholder = items["placeholder"] == 'undefined' ? null : items["placeholder"],
                     unit = typeof items["unit"] == 'undefined' ? '' : items["unit"],
                     phone = typeof items["phone"] == 'undefined' ? false : items["phone"] === true ? true : false,
+                    chat = typeof items["chat"] == 'undefined' ? false : items["chat"] === true ? true : false,
                     must = typeof items["must"] == 'undefined' ? false : items["must"] === true ? true : false,
                     multiple = typeof items["multiple"] == 'undefined' ? false : items["multiple"] === true ? true : false,
                     readonly = typeof items["readonly"] == 'undefined' ? false : items["readonly"] === true ? true : false,
@@ -734,9 +742,17 @@
                     className += ' click-hand';
                     readonly = true;
                 }
+                if(type == '空位'){
+                    tagName = 'div';
+                    className = field;
+                    className += ' blank';
+                }
                 //
                 if(phone){
                     className += ' click-tel';
+                }
+                if(chat){
+                    className += ' click-weixin';
                 }
                 
                 //
@@ -770,7 +786,8 @@
                 //
                 var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="icon icon-' + icon + '"></i>'),
                     _unitStr = unit == '' ? '' : '<em class="r-unit' + _unitClass + '">' + unit + '</em>',
-                    _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a' + _telAClass + '></a></em>';
+                    _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a' + _telAClass + ' href="tel:' + value + '"></a></em>',
+                    _chatStr = chat == '' ? '' : '<em class="r-weixin' + _unitClass + '"><a></a></em>';
                 var _crossStr = ( types == 'text' && me.$opts.config.layout.inputCross ) ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' : '',
                     _mustStr = must && me.$opts.config.layout.inputMust ? '<div class="item-cell" data-type="must">*</div>' : '';
                 //
@@ -781,10 +798,13 @@
                 if(tagName == 'textarea'){
                     _inputStr = '<textarea' + _attrListStr + '>' + value + '</textarea>';
                 }
+                if(tagName == 'div'){
+                    _inputStr = '<div' + _attrListStr + '>' + value + '</div>';
+                }
                 // 节点拼接
                 _LHtml += _inputStr;
                 _RHtml += _crossStr + _btnStr + _mustStr;
-                _UHtml += _unitStr + _phoneStr;
+                _UHtml += _unitStr + _phoneStr + _chatStr;
                 _IcoHtml += _iconStr;
                 // 拼接HTML
                 _outerHtml += [
@@ -1117,8 +1137,10 @@
                        var className = child.className;
                         if(tools.isTel(value, me.$opts.config.format.phone)){
                             child.className += className.indexOf('hover') >= 0 ? '' : 'hover';
+                            child.setAttribute('href', 'tel:' + value);
                         }else{
                             child.className = '';
+                            child.removeAttribute('href');
                         }
                     }
                 })   
@@ -1163,6 +1185,15 @@
                             if(tagname == 'input' || tagname == 'textarea'){
                                 child[i].value = ''; // 清空输入框值
                                 el.style = 'display: none;'; // 隐藏打叉图标
+                            }
+                            if(typeof child[i].className != 'undefined' && child[i].className.indexOf('r-tel') >= 0){ // 电话图标不再高亮
+                                var grand = child[i].children;
+                                for(var k = 0; k < grand.length; k++){
+                                    if(grand[k].tagName.toString().toLocaleLowerCase() == 'a'){
+                                        grand[k].className = '';
+                                        grand[k].removeAttribute('href');
+                                    }
+                                }
                             }
                         }
                     })
