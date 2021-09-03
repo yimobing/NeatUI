@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>正则表达式提取数据</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="">
+</head>
+<body>
+    <div class="wrap">
+        <header></header>
+        <main></main>
+        <footer></footer>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====正则表达式提取原始字符串的用户姓名、用户编号、电话、微信二维码图片等
+            // 原始字符串
+            var str = '系统自动回复 2017-12-12 12:05:31 <i class="contact-note">如有异议，请联系</i>：<em class="username">李梓楹</em>18029413143<a class="icon icon-phone hover" href="tel:18029413143"></a>电话<a class="icon icon-weixin small" data-user_hm="123" data-user_xm="张三" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"></a><img class="userewm" src="ewm.png">';
+
+            // 正则提取
+            var userArr = str.match(/<em(.*?)>(.+?)<\/em>/gi); // 匹配联系人
+            var aTagArr = str.match(/<a.+?>(.*?)<\/a>/gi); // 匹配a标签
+            // 字符串(带标签)
+            var userStr = '', // 联系人字符串
+                telStr = '', // 电话字符串
+                weixinStr = ''; // 微信字符串
+            // 字符串(纯文本)
+            var userNameText = '', // 用户姓名
+                userHmText = ''; // 用户编号
+            if(userArr != null){
+                userStr = userArr[0];
+                userNameText = userStr.replace(/<em(.*?)>(.+?)<\/em>/gi, '$2');
+            }
+            if(aTagArr != null){
+                telStr = aTagArr[0];
+                if(aTagArr.length >=2) weixinStr = aTagArr[1];
+            }
+            userHmText = weixinStr.replace(/.*?data-user_hm=[\"|\'](.*?)[\"|\'].*/gi, '$1');
+            //
+            var ls_text = str.toString().replace(/(.*?)(<a.+?>(.*?)<\/a>.*)/gi, '$1').replace(/(\d{11,12})/g, ''); // 提取a标签之前的内容并过滤电话号码
+            // var ls_text2 = ls_value.toString().replace(/(.*?)<a.+?>.*?<\/a>.*/gi, '$1').replace(/(\d{11,12})/g, ''); // 提取a标签之前的内容并过滤电话号码
+            var telephone = str.replace(/(.*?)(<a.+?href=[\"|\']tel\:(.*?)[\"|\'].*>(.*?)<\/a>.*)/gi, '$3'), // 获取a标签href属性值
+                qrCodeImage = str.replace(/.*?<img.*?src=[\"|\'](.*?)[\"|\'].*?>.*?/gi, '$1'); // 微信二维码图片
+
+            console.log('联系人数组：', userArr, '\nA标签数组：', aTagArr);
+            console.log('联系人EM标签：', userStr, '\n电话A标签：', telStr, '\n微信A标签：', weixinStr);
+            console.log('用户姓名：', userNameText, '\n用户编号：', userHmText);
+            console.log('------------------------');
+            console.log('纯字符串：', ls_text);
+            // console.log('纯字符串2：', ls_text2);
+            console.log('------------------------');
+            console.log('电话：', telephone, '\n微信二维码图片：', qrCodeImage);
+
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====正则表达式提取原始字符串的用户姓名、用户编号、电话、微信二维码图片等
+            // 原始字符串
+            var str = '张三15905067628<a class="icon icon-phone hover" href="tel:15905067628"></a><a class="icon icon-weixin" data-user_hm="123" data-user_xm="张三" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"></a>';
+            var aTagArr = str.match(/<a.+?>.*?<\/a>/gi);
+           
+            var telStr = '', weixinStr = '';
+            if(aTagArr != null){
+                telStr = aTagArr[0];
+                if(aTagArr.length >= 2) weixinStr = aTagArr[1];
+            }
+
+            var telephone = telStr.toString().replace(/<a.+?href=[\"|\']tel\:(.+?)[\"|\'].*?>.*?<\/a>/gi, '$1');
+                wxDataAttr = weixinStr == '' ? '' : weixinStr.toString().replace(/<a.+?(data-(.+?).*)>.*?<\/a>/gi, '$1');
+            console.log('A标签数组：', aTagArr);
+            console.log('电话：', telephone, '\n微信data-*属性：', wxDataAttr);
+
+            // var a = Math.pow( (1+ 4.9/1200), 360);
+            // console.log('a值：', a);
+
+
+
+
+
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
