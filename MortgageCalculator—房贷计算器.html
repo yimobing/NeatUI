@@ -214,7 +214,7 @@
                 "dkpz":"商业贷", 
                 "huankuan_fangshi":"等额本息",
                 "daikuan_nianxian":"30",
-                "lilv":"5.2",
+                "lilv":"0.052",
                 "yuegong_je":"4942"
             }
 
@@ -254,17 +254,25 @@
             //END AJAX
             */
 
-            // 转化并赋值 edit 20210828-1 
+            // 转化并赋值 edit 20210828-1 20210904-3
             var years = parseInt(loanJson["daikuan_nianxian"]);
             if(isNaN(years)) years = 0;
             var months = years * 12,
                 yearText = years == 0 ? '' : years + '年(' + months + '期)';
+            var ls_daikuan_je = loanJson["daikuan_je"].toUpperCase().replace(/([ ]+)/g, '') === '' ? '' : parseFloat(loanJson["daikuan_je"]); // 贷款总额
+            if(ls_daikuan_je !== ''){
+                ls_daikuan_je = format.thousandth(convert.yuan2TenThousand(ls_daikuan_je, 'round', 2));
+                if(convert.zeroString2Empty(ls_daikuan_je) === '') ls_daikuan_je = '';
+            }
+            var ls_lilv = parseFloat(loanJson["lilv"]) * 100;
+            ls_lilv = ls_lilv.toFixed(2);
+            if(isNaN(ls_lilv)) ls_lilv = '';
             $('#c-housePrice').val(format.thousandth(convert.yuan2TenThousand(g_pgjz)));
             $('#c-loanMix').val(convert.decimal2Percent(loanJson["anjie_chengshu"])).attr('data-value', loanJson["anjie_chengshu"]); // 按揭成数
-            $('#c-loanAmount').val(format.thousandth(convert.yuan2TenThousand(loanJson["daikuan_je"]))); // 贷款总额
+            $('#c-loanAmount').val(ls_daikuan_je); // 贷款总额。四舍五入保留两位小数
             $('#c-loanCategory').val(loanJson["dkpz"]); // 贷款品种
             $('#c-loanYears').val(yearText).attr('value', yearText).attr('data-value', months); // 贷款年限
-            $('#c-loanRate').val(parseFloat(loanJson["lilv"]) * 100); // 贷款利率 edit 20210903-1
+            $('#c-loanRate').val(ls_lilv); // 贷款利率 四舍五入保留两位小数 edit 20210903-1
             $('#c-loanPayBackMethod').val(loanJson["huankuan_fangshi"]); // 还款方式
             
             // 计算结果
@@ -347,16 +355,16 @@
 
 
             /**
-             * 子函数：计算贷款总额
+             * 子函数：计算贷款总额 edit 20210904-3
              * @param {number} ps_price 房产总价(单位：元)
              * @param {number} ps_ratio 按揭成数(小数)
              */
-            function fnCountLoanAmount(ps_price, ps_ratio){
+             function fnCountLoanAmount(ps_price, ps_ratio){
                 var total = isNaN(ps_price) ? 0 : parseFloat(ps_price),
                     mix = isNaN(ps_ratio) ? 0 : parseFloat(ps_ratio);
                 // console.log('房产总价：', total, '\n按揭成数：', mix);
                 var amount = (total) * parseFloat(mix);
-                $('#c-loanAmount').val(amount); // 向上取整
+                $('#c-loanAmount').val(amount.toFixed(2)); // 四舍五入保留两位小数
             }
 
 
@@ -546,6 +554,9 @@
                         ls_daikuan_nianxian = $('#c-loanYears').val().toString().replace(/([\d]*)年\(([\d]*)期\)/, '$1'), // 贷款年限(单位：年)
                         ls_lilv = rate * 1200, // 利率
                         ls_yuegong_je = monthlyPayment; // 月供金额
+                    // add 20210904-3
+                    ls_daikuan_je = ls_daikuan_je.toFixed(2); // 四舍五入保留两位小数
+                    ls_lilv = ls_lilv.toFixed(4); // 四舍五入保留4位小数
                     // console.log('按揭成数：', ls_anjie_chengshu, '\n贷款总额：', ls_daikuan_je, '\n贷款品种：', ls_dkpz, '\n还款方式：', ls_huankuan_fangshi, '\n贷款年限：', ls_daikuan_nianxian, '\n利率：', ls_lilv, '\n月供：', ls_yuegong_je);
                     
                     // 开始执行
