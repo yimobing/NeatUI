@@ -32,6 +32,8 @@
 
     <div class="wrap">
         <main>
+            <h1>将网页导出图片</h1>
+            <h5>Bug说明：导出节点内如果使用到了本地图片作为背景图片，将会使画布受到污染从而无法导出，此时会报错“Uncaught DOMException: Failed to execute 'toDataURL' on 'HTMLCanvasElement': Tainted canvases may not be exported”。解决办法是：把本地图片转换成base64图片即可！</h5>
             <section class="export">
                 <button type="button" id="btn-save-web" class="blue">保存整个网页为图片</button>
                 <button type="button" id="btn-save-area" class="green">保存黄色区域为图片</button>
