@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>测度百度地图多边形</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/test-bdmap.css"><!--百度地图实例化控件-->
+    <link type="text/css" rel="stylesheet" href="assets/test/css/demo-baidumap.css">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框控件-->
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+    <!--[if lt IE 9]>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/html5shiv/r29/html5.min.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/rem/1.3.4/js/rem.min.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/json2/20160511/json2.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="wrap">
+        <div class="panel-statement">
+            <blockquote>
+                <h1>BaiduMap百度地图实例化控件</h1>
+                <p>将百度地图api进行插件化封装，方便前端开发人员直接调用，而不用再研究百度api原代码。</p>
+                <p>
+                    作者：ChenMufeng <br>
+                    Q Q : 1614644937 <br>
+                </p>
+            </blockquote>
+        </div>
+
+        <!--testing-->
+       <!--  <div id="panel"></div>
+        <div class="panel-map1" id="new-map1" style="width: 100%; height: 500px;"></div>
+        <button type="button" id="btn-delete-poly">删除多边形覆盖物</button>
+ -->
+        
+
+        <div class="panel-demo">
+            <div class="grid-one">
+                <div class="grid-title">矢量图形（相对定位absolute）（线、多边形、圆）</div>
+                <div class="grid-content">
+                    <div class="grid-box">
+                        <span>多边形</span><input type="text" id="poly101" value="118.613509,24.889385">
+                    </div>
+                </div>
+            </div><!--/.grid-one-->
+        </div><!--/.panel-demo-->
+    </div><!--/.wrap-->
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=2COzFaICuIyVj7V3VetKfmdRVnX8BhVr"></script><!--百度地图api文件-->
+
+    <script type="text/javascript" src="assets/neatui/js/test-bdmap.js"></script><!--百度地图实例化控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框插件-->
+    <script type="text/javascript">
+
+    
+        /*+----------------------------------------+*/
+        //=====矢量图形testing1
+        //多边形
+        $('#poly101').neuiBaiduMap('init', {
+            city: '泉州市',
+            isNumc: false, //地图中心点是根据城市还是坐标来设置. true 根据坐标(默认), false 根据城市
+            label: '泉州第五中学',
+            width: 800,
+            height: 500,
+            image: {
+                draged: true
+            },
+            // showMode: 'normal', //显示方式(可选). normal 固定显示,即在绑定节点上直接显示, click 点击显示(默认)
+            window:{
+                position: 'absolute',
+                pickup: true,
+                pickBtnText: '保存学校坐标', //
+                closed: true,
+                polygon: { // 多边形覆盖物(可选)
+                    enable: true, // 是否启用多边形覆盖物(可选),默认false
+                    editable: true, // 是否开启编辑功能(可选),默认true. true时可拖动改变多边形区域
+                    // points: null, // 多边形所有点组成的数组(可选),默认null. eg. ["16.387112, 39.920977", "116.385243, 39.913063", "116.394226, 39.917988", "116.401772, 39.921364", "116.41248, 39.927893"]
+                    points: ["118.614128,24.889374", "118.613581,24.888984", "118.613077,24.889439", "118.613167,24.889628", "118.613693,24.890196", "118.613948,24.88966", "118.614011,24.889882"],
+                    // 当多边形一个点也不存在时(points=null或空),系统将默认以中心点坐标为中心在指定范围内创建N个点
+                    poiPoint: null, // 多边形中心点坐标(可选),默认null表示地图中心点
+                    poiRadius: 3000,  // 指定范围M米(半径为M米内的POI)(可选),默认1000米
+                    poiNum: 5, // 多边形点数N个(列举出N个POI)(可选),默认10个
+
+                    // 按钮文本
+                    labelText: '拖动多边形上的小正方形，可更改学区范围', // 提示文本(可选)
+                    btnNewText: '创建学区范围', // 新建按钮文本(可选)
+                    btnDelText: '删除学区范围', // 删除按钮文本(可选)
+                    btnSaveText: '保存学区范围', // 保存按钮文本(可选)
+                    // 回调
+                    btnNewCallBack: function(e){ // 新建按钮回调
+                        console.log('新建多边形e：', e)
+                    },
+                    btnDelCallBack: function(e){  // 删除按钮回调
+                        console.log('删除多边形e：', e)
+                    },
+                    btnSaveCallBack: function(e){  // 保存按钮回调
+                        console.log('保存多边形e：', e)
+                    },
+                    editCallBack: function(e){ // 多边形开启编辑功能时的回调函数. e是一组坐标数组,格式: [{lng: 116.403955, lat: 39.915112}, {lng: 116.403955, lat: 39.915112}]
+                        console.log('编辑多边形e：', e);
+                    }
+                }
+            },
+            openCityControl: false,
+            openMapTypeControl: false,
+            openCopyrightControl: false,
+            openOverViewControl: false
+        });
+
+
+
+
+
+        //======================================
+       /*  //start testing1
+        var map = new BMap.Map("new-map1");
+        var mPoint = new BMap.Point(116.404, 39.915);
+        map.centerAndZoom(mPoint, 20);
+        map.enableScrollWheelZoom();        //启用滚轮缩放
+
+        displayPOI();
+
+        // 获取中心点坐标指定范围内的N个点
+        function displayPOI(){
+            var myGeo = new BMap.Geocoder(); // 创建地址解析实例
+            var locateOptions = {
+                poiRadius : 100,  // 半径为M米内的POI，默认100米
+                numPois : 5 // 列举出N个POI，默认10个
+            }
+            // var cir = new BMap.Circle(mPoint, 500)
+            // map.addOverlay(cir); // 添加一个圆形覆盖物
+            // map.removeOverlay(cir); // 立即移除圆形覆盖物(因为界面上不需要显示)
+            var polyPointArray = []; // 多边形点数组
+            myGeo.getLocation(mPoint, function mCallback(rs){
+                var allPois = rs.surroundingPois;       // 获取全部POI(该点半径为100米内有6个POI点)
+                for(i = 0; i < allPois.length; ++i){
+                    map.addOverlay(new BMap.Marker(allPois[i].point)); // 添加标注点 
+                    var title = allPois[i].title, // 地址名称(标题)
+                        address = allPois[i].address, // 地址
+                        // url = allPois[i].url, // 链接地址
+                        point = allPois[i].point; // 地址位置
+                    var lng = point.lng, 
+                        lat = point.lat;
+                    console.log('标题：', title, '\n地址：', address, '\n经度：', lng, '\n纬度：', lat);
+                    console.log('-------------------------------');
+                    polyPointArray.push(new BMap.Point(lng, lat));
+                }       
+                // 绘制面
+                // polyPointArray = [
+                //     new BMap.Point(116.387112, 39.920977),
+                //     new BMap.Point(116.385243, 39.913063),
+                //     new BMap.Point(116.394226, 39.917988),
+                //     new BMap.Point(116.401772, 39.921364),
+                //     new BMap.Point(116.41248, 39.927893)
+                // ];
+                var ply = new BMap.Polygon(polyPointArray, {
+                    strokeColor: 'blue',
+                    strokeWeight: 2,
+                    strokeOpacity: 0.5
+                })
+                ply.enableEditing(); // 设置可编辑
+                ply.name = 'duobianxing';
+                map.addOverlay(ply); // 添加覆盖物
+                
+                ply.addEventListener("lineupdate", function(e){ // 多边形编辑时监听事件
+                    console.log('e:', e)
+                    console.log('点数组：', ply.getPath())
+                })
+                // console.log('polyPointArray:', polyPointArray)
+            }, locateOptions) 
+        }
+
+
+        // 删除多边形覆盖物
+        $('#btn-delete-poly').on('click', function(){
+            var allOverlay = map.getOverlays();
+            allOverlay.map(function(item){
+                console.log('name：', item.name)
+                if(item.name === 'duobianxing'){
+                    console.log('删我了')
+        
+                    map.removeOverlay(item);
+                }
+            })
+        })
+        //end testing */
+
+        
+
+    </script>
+</body>
+</html>
