@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>骨架屏 | 网页占位符、预加载图片</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+<body>
+
+    <style type="text/css">
+        .timeline-item {
+            background: #fff;
+            border: 1px solid;
+            border-color: #e5e6e9 #dfe0e4 #d0d1d5;
+            border-radius: 3px;
+            padding: 12px;
+            margin: 0 auto;
+            max-width: 472px;
+            min-height: 200px;
+        }
+        @keyframes placeHolderShimmer{
+            0%{
+                background-position: -468px 0
+            }
+            100%{
+                background-position: 468px 0
+            }
+        }
+        .animated-background {
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+            animation-iteration-count: infinite;
+            animation-name: placeHolderShimmer;
+            animation-timing-function: linear;
+            background: #f6f7f8;
+            background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+            background-size: 800px 104px;
+            height: 96px;
+            position: relative;
+        }
+        .background-masker {
+            background: #fff;
+            position: absolute;
+        }
+        /* Every thing below this is just positioning */
+        .background-masker.header-top,
+        .background-masker.header-bottom,
+        .background-masker.subheader-bottom {
+            top: 0;
+            left: 40px;
+            right: 0;
+            height: 10px;
+        }
+        .background-masker.header-left,
+        .background-masker.subheader-left,
+        .background-masker.header-right,
+        .background-masker.subheader-right {
+            top: 10px;
+            left: 40px;
+            height: 8px;
+            width: 10px;
+        }
+        .background-masker.header-bottom {
+            top: 18px;
+            height: 6px;
+        }
+        .background-masker.subheader-left,
+        .background-masker.subheader-right {
+            top: 24px;
+            height: 6px;
+        }
+        .background-masker.header-right,
+        .background-masker.subheader-right {
+            width: auto;
+            left: 300px;
+            right: 0;
+        }
+        .background-masker.subheader-right {
+            left: 230px;
+        }
+        .background-masker.subheader-bottom {
+            top: 30px;
+            height: 10px;
+        }
+        .background-masker.content-top,
+        .background-masker.content-second-line,
+        .background-masker.content-third-line,
+        .background-masker.content-second-end,
+        .background-masker.content-third-end,
+        .background-masker.content-first-end {
+            top: 40px;
+            left: 0;
+            right: 0;
+            height: 6px;
+        }
+        .background-masker.content-top {
+            height:20px;
+        }
+        .background-masker.content-first-end,
+        .background-masker.content-second-end,
+        .background-masker.content-third-end{
+            width: auto;
+            left: 380px;
+            right: 0;
+            top: 60px;
+            height: 8px;
+        }
+        .background-masker.content-second-line  {
+            top: 68px;
+        }
+        .background-masker.content-second-end {
+            left: 420px;
+            top: 74px;
+        }
+        .background-masker.content-third-line {
+            top: 82px;
+        }
+        .background-masker.content-third-end {
+            left: 300px;
+            top: 88px;
+        }
+    </style>
+
+
+    <h1>自动化实现骨架屏：https://github.com/pwstrick/skeleton</h1>
+    <div>自动化生成骨架屏的方案：</div>
+    <div class="timeline-wrapper">
+        <div class="timeline-item">
+            <div class="animated-background">
+                <div class="background-masker header-top"></div>
+                <div class="background-masker header-left"></div>
+                <div class="background-masker header-right"></div>
+                <div class="background-masker header-bottom"></div>
+                <div class="background-masker subheader-left"></div>
+                <div class="background-masker subheader-right"></div>
+                <div class="background-masker subheader-bottom"></div>
+                <div class="background-masker content-top"></div>
+                <div class="background-masker content-first-end"></div>
+                <div class="background-masker content-second-line"></div>
+                <div class="background-masker content-second-end"></div>
+                <div class="background-masker content-third-line"></div>
+                <div class="background-masker content-third-end"></div>
+            </div>
+        </div>
+    </div><!--/.timeline-wrapper-->
+</body>
+</html>
