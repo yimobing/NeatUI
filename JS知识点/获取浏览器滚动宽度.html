@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>JS获取浏览器滚动条的宽度（兼容不同浏览器）</title>
+	<script  src="https://cdn.staticfile.org/jquery/1.8.1/jquery.min.js"></script>
+</head>
+<body>
+	<div class="wrap">
+		<header>
+			<h1>JS获取浏览器滚动条的宽度（兼容不同浏览器）</h1>
+		</header>
+	</div><!--/.wrap-->
+	<script>
+
+		function getScrollbarWidth(){
+			var selector = '#testDiv'; //选择器
+			var dom = document.createElement('div'); //创建一个Div
+			var styles = {
+				width: '100px',
+				height: '200px',
+				overflowY: 'scroll', //让它有滚动条
+				borderWidth: '4px',
+				borderColor: 'blue',
+				borderStyle: 'solid'
+			}
+			
+			for(var i in styles) dom.style[i] = styles[i]; //添加各种属性（样式）
+			dom.setAttribute('id', selector.toString().replace(/[\#\.]/g, '')); //添加ID属性
+			dom.innerText = '苏东坡生于北宋年间，是唐宋八大家之一。'; //添加文本
+			document.body.appendChild(dom); //拼接节点
+
+			
+			//各种宽度
+			var innerWidth = $(selector).innerWidth(); //内部宽度(包含padding，即：width + 2*padding)
+			var outerWidth = $(selector).outerWidth(); //外部宽度(包含padding+border，即： width + 2*padding + 2*border)
+			var borderWidth = (outerWidth - innerWidth) / 2; //边框宽度（方法1）
+			//var borderWidth = dom.style.borderWidth.search('px') ? dom.style.borderWidth.replace(/px/g, '') : dom.style.borderWidth; //边框宽度（方法2）
+
+			var clientWidth = dom.clientWidth; //可视区域宽度
+			var offsetWidth = dom.offsetWidth; //实际区域宽度
+			var scrollbarWidth = offsetWidth - clientWidth - 2 * borderWidth; //垂直滚动条宽度
+
+			var resultStr = 'offsetWidth：' + offsetWidth + '\nclientWidth：' + clientWidth + '\nborderWidth：' + borderWidth + '\nscrollbarWidth：' + scrollbarWidth;
+			console.log(resultStr);
+			//alert(resultStr);
+
+			//dom.remove(); //移除节点(让人不可见,因为已经算出滚动条宽度了)
+			return scrollbarWidth;
+		}
+
+
+		console.log('滚动条宽度：', getScrollbarWidth());
+
+	</script>
+	
+</body>
+</html>

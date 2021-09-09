@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,address=no">
+    <meta name="application-name" content="快评">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>JS获取URL参数</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+<body>
+    <script>
+         
+        /**
+         * JS获取URL参数
+         * 截取URL字符串的某个参数值
+         * @param {*}　ps_key 参数名(可缺省). 若本参数在字符串中不存存，则返回null, 若本参数缺省或空，则返回字符串中各个参数组成的对象
+         * @param {＊}　ps_url URL字符串(可缺省).若本参数缺省或空, 则会自动读取当前浏览器中的ps_url
+         * @return {*}　返回对应参数值或所有参数组成的对象
+         * 注：location.search 返回当前URL的查询部分（即问号 ? 之后的部分）
+         * eg. 假设：
+         * 当前页面URL：'http://www.yy.com?englisth=90&math=70'
+         * 有一字符串：var str = 'http://www.xx.com?action=1234&username=张三&sex=男'
+         * var action = getUrlParams('action', str); //结果：1234
+         * var action = getUrlParams('', str); //结果：{action:"1234", username:"张三", sex:"男"}
+         * var action = getUrlParams('english'); //结果：90
+         * var action = getUrlParams(); //结果：{englisth:"90", math:"70"}
+         */
+         function getUrlParams(ps_key, ps_url){
+            ps_url = (typeof ps_url == 'undefined' || ps_url.toString().replace(/([ ]+)/g, '') == '') ? location.search : ps_url.replace(/(.*?)\?(.*?)$/, '?$2');
+            ps_url = ps_url.replace(/^\?/,'').split('&');
+            var paramsObj = {};
+            for(var i = 0, iLen = ps_url.length; i < iLen; i++){
+                var param = ps_url[i].split('=');
+                if(param[0].toString().replace(/([ ]+)/g, '') != '') paramsObj[param[0]] = param[1];
+            }
+            if(ps_key){
+                return paramsObj[ps_key] || null;
+            }
+            return paramsObj;
+        }
+        var url = '../abc.aspx?action=1234&a=5&b=6';
+        var action = getUrlParams('action', url);
+        console.log('action值:', action); //结果：1234
+
+</script>
+</body>
+</html>
