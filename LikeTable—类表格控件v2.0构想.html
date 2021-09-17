@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>LikeTable  | 类表格控件v2.0</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+<body>
+    <style>
+        /*+--------------------------------+*/
+        html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color:rgba(0, 0, 0, 0); } 
+        *:not(input,textarea) {-webkit-touch-callout: none; -webkit-user-select: none; }
+        html{font-size: 20px;}
+        @media only screen and (min-width: 400px){html{font-size: 21.33333333px!important;} } 
+        @media only screen and (min-width: 414px){html{font-size: 21px!important;} }
+        @media only screen and (min-width: 480px){html{font-size: 25.6px!important;} }
+        body{background-color: #fff; line-height: 1.5; font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', '-apple-system-font', 'Helvetica Neue', 'sans-serif'; font-size: .7rem; color: #212121; overflow-x: hidden; overflow-y: auto; }
+        *{margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        header, footer, main, section, menu, nav, article, aside, hgroup, summary, details, figcaption, figure{display: block;}
+        a { text-decoration: none; -webkit-tap-highlight-color: rgba(0,0,0,0); }
+        a img { border: 0 }
+        /*+-------------元素外观-------------------+*/
+        button, input[type="text"], textarea{font-size: 14px; color: inherit; outline: 0; -moz-appearance: none; -webkit-appearance: none; -o-ppearance: none; -ms-appearance: none; appearance: none; background-color: transparent; overflow: hidden; text-overflow: ellipsis; resize: none; } 
+        button{ overflow: visible; text-transform: none; }
+        select{ text-transform: none; }
+        ol, ul, li{ list-style: none; }
+        a{ color: inherit; text-decoration: none; background-color: transparent; }
+        i, em{ font-style: normal; }
+        /*+-------------元素属性-------------------+*/
+        /*+readoly+*/
+        input:read-only, input[readonly], span[readonly], textarea[readonly]{background-color: #fff!important; -webkit-text-fill-color: inherit; -webkit-text-stroke: 1px solid #d6e9c6; filter: alpha(opacity=100); -webkit-opacity: 1; opacity: 1; filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100); }
+        /*+disabled+*/
+        /*默认的，ios中input,textarea属性disabled时字体会变成灰色*/
+        input:disabled, input[disabled], textarea:disabled, textarea[disabled]{background-color: #f4f4f4!important; -webkit-text-fill-color: inherit; -webkit-text-stroke: 1px solid #d6e9c6; filter: alpha(opacity=100); filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100); -webkit-opacity: 1; opacity: 1; /*默认透明度0.3，故一定要加opacity:1*/ cursor: not-allowed!important; }
+        /*+placeholder+*/
+        ::-webkit-input-placeholder{color: #afafaf; font-size: 0.6rem; } 
+        ::-moz-placeholder{color: #afafaf; font-size: 0.6rem; } 
+        :-moz-placeholder{color: #afafaf; font-size: 0.6rem; } 
+        :-ms-input-placeholder{color: #afafaf; font-size: 0.6rem; } 
+        div:empty::before, span:empty::before{content: attr(placeholder); color: #afafaf; font-size: 0.6rem; }
+        /*+--------------代码块------------------+*/
+        code, kbd, pre, samp {font-family: Monaco,Menlo,Consolas,"Courier New",FontAwesome,monospace; } 
+        code, pre {font-size: 14px; background-color: #f8f8f8; -webkit-touch-callout: default; /*允许系统默认菜单*/ -webkit-user-select: text; /*允许用户选择文本*/ tab-size: 2; }
+        pre {display: block; padding: 16px; margin: 16px 0; line-height: 1.6; word-break: break-all; word-wrap: break-word; color: #555; border: 1px solid #dedede; border-radius: 0; } 
+        pre, pre code { white-space: pre-wrap;}
+        /*+--------------------------------+*/
+        body{ max-width: 1024px; }
+
+    </style>
+
+    <div class="wrap">
+        <section class="code">
+            <pre>
+            ****************************************************************
+                                类表格 LikeTable v2.0 构想
+            ****************************************************************
+            var table = neuiLikeTable({
+                source: {} // 数据源
+                options: {} // 表格配置项
+            })
+
+            var options = {
+
+                columns: [ // 各列配置。每一列的配置项是一个JSON对象。
+                    {
+                        //..
+                    },
+                    {
+                        //--------参数1
+                        title: "用户名", // 列标题(中文)。
+                        subtitle: "", // 列副标题(可选)，默认空。
+                        field: "username", // 列字段(英文)。
+                        hide: "", // 列字段隐藏值(英文)。一些列的字段可能有“名称”和“编号”两个，此时本参数填编号，field参数填名称。
+                        mode: "input", // 显示方式(可选), 默认input。
+                                        // 值：input 单行文本, textarea 多行文本, span 纯文本, button 按钮, choice 选择框(单选或多选)。
+                        type: "string", // 值类型(可选)，默认string。
+                                        // 值：string 普通文本, int 整数(int[positive] 正整数, int[negative] 负整数), float 小数(float[positive] 正小数, float[negative] 负小数), date 日期, percent 百分数。
+                        width: 50, // 宽(可选)，默认50。
+                        height: "auto", // 高(可选)，默认auto
+                        align: "left", // 水平对齐方式，默认left。值：left 左对齐, center 居中对齐, right 右对齐。
+                        placeholder: "", // 空占位符(可选)，默认空。
+                        must: false, // 是否必填(可选)，默认false。
+                        unique: false, // 是否唯一值，即每一行该列值是否唯一，不能重复(可选)，默认false。
+                        unit: "", // 右侧单位(可选)，默认空。
+                        readonly: false, // 是否只读(可选)，默认false。常用于单元格点击弹出下拉数据。
+                        disabled: false, // 是否禁用(可选)，默认false。常用于不允许输入的情况，比如已有数据不允许更改，但添加新记录时又可更改。
+
+                        //--------参数2
+                        border: true, // 是否有边框，仅针对输入框有效(可选)，默认true。
+                        display: true, // 是否显示列(可选)，默认true。
+                        sticky: false, // 是否置顶列，即置于所有列前面(可选)，默认false。
+                        subtotal: false, // 是否需要小计(可选)，默认false。
+                        icon: { // 图标(可选)
+                            place: "right", // 图标位置(可选)， 默认right。值： right 右, left 左。
+                            path: "" // 图标文件完整路径(若使用FontAwesome等图标库，则只需填写图标库对应名称)。如：img/avatar.png
+                        },
+                        theme: { // 外观样式(可选)
+                            fontSize: 14, // 字体大小(可选)，默认14px
+                            fontWeight: "normal", // 字体加粗(可选)，默认normal。值：normal 正常, bold 加粗。
+                            fontColor: "auto", // 文字颜色(可选)，默认auto表示黑色。
+                            theadBgColor: "auto", // 列头背景色(可选)，默认auto。
+                            theadFontColor: "auto", // 列头文字颜色(可选)，默认auto。
+                            theadArrowColor: "auto" // 列头排序箭头颜色(可选)，默认auto。
+                        },
+
+                        //--------参数3：少用但很实用
+                        value: "", // 默认值(可选)，默认空。值不为空时，当前列单元格的显示值将不再取自数据源，而是直接为本参数值。
+                        hidden:
+
+                       
+
+                    }
+                ]
+            }
+            </pre>
+        </section>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            
+
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
