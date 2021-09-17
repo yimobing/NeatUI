@@ -1209,6 +1209,39 @@ var utilities = {
     removeNode: function(node){
         // node.remove();
         node.parentNode.removeChild(node);
+    },
+
+
+
+    /**
+     * 获取浏览器滚动条宽度
+     * [适用性] 适用于指定区域内容溢出时出现了滚动条，此时就可以用本方法获取滚动条宽度
+     * [兼容性] 兼容IE5+
+     * @returns {number} 返回滚动条宽度值。一般各大浏览器滚动条的值均在17-21之间
+     */
+    getScrollbarWidth: function(){
+        var w = 0;
+        if(/msie/.test(navigator.userAgent.toLocaleLowerCase())){
+            var $textarea1 = $('<textarea cols="10" rows="2"></textarea>').css({ position: 'absolute', top: -1000, left: -1000 }).appendTo('body'),
+                $textarea2 = $('<textarea cols="10" rows="2" style="overflow: hidden;"></textarea>').css({ position: 'absolute', top: -1000, left: -1000 }).appendTo('body');
+            w = $textarea1.width() - $textarea2.width() + 2;
+            $textarea1.add($textarea2).remove();
+        }else{
+            var $div = $('<div>').css({
+                width: 100,
+                height: 100,
+                overflow: 'auto',
+                position: 'absolute',
+                top: -1000,
+                left: -1000
+            }).prependTo('body').append('<div>').find('div').css({
+                width: '100%',
+                height: 200
+            });
+            w = 100 - $div.width();
+            $div.parent().remove();
+        }
+        return w;
     }
 
     
