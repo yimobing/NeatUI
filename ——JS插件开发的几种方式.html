@@ -15,8 +15,14 @@
 //                    jQuery extend 封装控件1
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // jQuery 插件开发
-;(function ($) {   
-    //...
+;(function ($) {
+
+    var defaults = {
+        // 这里是控件默认参数
+    };
+
+    var settings = {};
+
     // 定义methods对象
     var methods = {
         init: function(options){
@@ -24,7 +30,7 @@
             var defaults = {
                 // 这里是控件默认参数
             }
-            var settings = $.extend(true, {}, defaults, options || {});
+            settings = $.extend(true, {}, defaults, options || {});
    
             //...
 
@@ -37,6 +43,19 @@
         },
         event2: function(userName, userSex, userAge){ // 函数2
             //...
+        }
+    };
+
+    // 内部对象，对象中的函数仅供内部使用，故用下划线_开头表示私有函数
+    var helpers = {
+        _aaa: function(){
+
+        },
+        _bbb: function(){
+
+        },
+        _ccc: function(){
+
         }
     };
 
