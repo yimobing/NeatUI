@@ -807,7 +807,8 @@
             getOverLay: function () {
                 // var box = this.myPolygon ? this.myPolygon : this.overlays[this.overlays.length - 1];
                 var box = this.overlays.length == 0 ? this.myPolygon : this.overlays[this.overlays.length - 1];
-                var coordinateArr = typeof box == 'undefined' ? [] : typeof box.Ao == 'undefined' ? [] : box.Ao;
+                // var coordinateArr = typeof box == 'undefined' ? [] : typeof box.Ao == 'undefined' ? [] : box.Ao;
+                var coordinateArr = typeof box == 'undefined' ? [] : box.getPath();
                 // console.log('box:', box)
                 // console.log('最后一个覆盖物信息：', coordinateArr);
             },
