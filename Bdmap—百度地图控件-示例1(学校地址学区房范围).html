@@ -40,6 +40,7 @@
             <div class="bdmap__draw">
                 <button type="button" data-type="del" id="btn-poly-del">删除学区范围</button>
                 <button type="button" data-type="save" id="btn-poly-save">保存学区范围</button>
+                <button type="" id="btn-temp" style="display: none;">ASP.NET刷新页面(type属性要放空)</button><!--add 20210923-1-->
             </div><!--/.bdmap__draw-->
         </div><!--/.bdmap__editor-->
         <div class="bdmap__map">
@@ -193,9 +194,13 @@
                 allOverlay.map(function(item, index){
                     if(item.name === 'duobianxing'){
                         // console.log('item：', item);
-                        arr.push(item.Ao);
+                        // console.log('path：', item.getPath());
+                        // arr.push(item.ha); // !!!不要使用.ha,因为这个参数名称百度会经常变动 edit 20210923-1
+                        arr.push(item.getPath())
                     }
                 })
+
+
                 // console.log('tempArr:', arr)
                 // 将经纬度坐标转化成字符串型数组
                 var coordArr = [ ];
@@ -804,7 +809,7 @@
                 var box = this.overlays.length == 0 ? this.myPolygon : this.overlays[this.overlays.length - 1];
                 var coordinateArr = typeof box == 'undefined' ? [] : typeof box.Ao == 'undefined' ? [] : box.Ao;
                 // console.log('box:', box)
-                console.log('最后一个覆盖物信息：', coordinateArr);
+                // console.log('最后一个覆盖物信息：', coordinateArr);
             },
 
             /**
@@ -1106,7 +1111,6 @@
                         {"zuobiao":"118.612986, 24.912294"},
                         {"zuobiao":"118.606302, 24.906198"},
                         {"zuobiao":"118.601991, 24.904035"},
-                        {"zuobiao":"118.598829, 24.908361"},
                         {"zuobiao":"118.598829, 24.908361"}
                     ]}
                 ]
@@ -1352,9 +1356,9 @@
             $('#btn-poly-save').on('click', function(){
                 // edit 20210622-1 下8行
                 var ls_ditu_suofang = tools.getZoom(); // 获取地图缩放级别
-                console.log('当前地图缩放级别：', ls_ditu_suofang);
+                // console.log('当前地图缩放级别：', ls_ditu_suofang);
                 var coordArr = tools.getPolyCoordinateData();  // 获取学区范围坐标数据
-                console.log('保存时coordArr：', coordArr);
+                // console.log('保存时coordArr：', coordArr);
                 // 开始执行
                 var marks = '', tips = '保存地图缩放级别成功';
                 var flag = '', msg = '保存成功';
@@ -1490,7 +1494,8 @@
                         buttons: ['确定'],
                         callBack: function(){
                             if(flag){
-                                window.location.reload(); // 重载页面
+                                // window.location.reload(); // 重载页面
+                                document.getElementById('btn-temp').click(); // ASP.NET中 使用这个 add 20210923-1
                             }
                         }
                     })
