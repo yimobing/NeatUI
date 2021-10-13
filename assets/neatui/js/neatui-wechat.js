@@ -155,7 +155,7 @@
 	 */
 	MyChat.prototype.doneEvent = function(e){
 		var me = this;
-
+		var zIndex = me.opts.aside.zIndex;
 		// =====重算滚动区域高度
 		//var height = e.eleMain.css('height').toString().replace(/px/g, '') - 50;
 		//me.opts.roll.scrollHeight = height; //test1
@@ -324,27 +324,40 @@
 			me.sendMessage(index, value);
 		})
 		// 消息图片预览事件
-		$(me.messageRoot).off('click', '.cose__text img').on('click', '.cose__text img', function(){ // 部分ios中事件委托为document时不执行
+		$(me.messageRoot).off('click', '.cose__text img').on('click', '.cose__text img', function(e){ // 部分ios中事件委托为document时不执行
+			e.stopPropagation(); //必须!阻止冒泡(否则图片预览时第2次无法预览)
 			var bigImgArr = [], smallImgArr = [];
 			var imgSrc = $(this).attr('data-pic-url-big');
-			$('.cose__one').each(function(){
-				var $img = $('.cose__text img', this);
-				if($img.length > 0){
-					var smallImgSrc = $img.attr('src'), bigImgSrc = $img.attr('data-pic-url-big');
-					if(typeof bigImgSrc == 'undefined' || bigImgSrc == '') bigImgSrc = smallImgSrc; //若大图为空，则取小图当作大图
-					if(smallImgSrc != '') smallImgArr.push(smallImgSrc);
-					if(bigImgSrc != '') bigImgArr.push(bigImgSrc);
+			if(checkMobileDevice()){
+				$('.cose__one').each(function(){
+					var $img = $('.cose__text img', this);
+					if($img.length > 0){
+						var smallImgSrc = $img.attr('src'), bigImgSrc = $img.attr('data-pic-url-big');
+						if(typeof bigImgSrc == 'undefined' || bigImgSrc == '') bigImgSrc = smallImgSrc; //若大图为空，则取小图当作大图
+						if(smallImgSrc != '') smallImgArr.push(smallImgSrc);
+						if(bigImgSrc != '') bigImgArr.push(bigImgSrc);
+					}
+				})
+				//console.log('小图地址：', smallImgArr, '\n大图数组：', bigImgArr)
+				if(typeof wx != 'undefined'){
+					if(typeof wx.previewImage != 'undefined'){
+						parent.parent.parent.parent.parent.wx.previewImage({ // 多个parent,保证多个iframe嵌套时可正常预览图片
+							current: imgSrc, // 当前图片地址
+							urls: bigImgArr // 所有图片地址
+						})
+					}
 				}
-			})
-			//console.log('小图地址：', smallImgArr, '\n大图数组：', bigImgArr)
-			if(typeof wx != 'undefined'){
-				if(typeof wx.previewImage != 'undefined'){
-					parent.parent.parent.parent.parent.wx.previewImage({ // 多个parent,保证多个iframe嵌套时可正常预览图片
-						current: imgSrc, // 当前图片地址
-						urls: bigImgArr // 所有图片地址
-					})
-				}
+			}else{
+				if(typeof $(this).neuiPreviewImage !== 'function') return;
+				$(this).neuiPreviewImage({
+					imgSource: imgSrc, // 图片地址
+					degrees: 45, // 每次旋转度数
+					direction: 'wise', // 点击图片时旋转方向. wise 顺时针(默认), anti 逆时针
+					showCloseButton:true, // 是否显示关闭按钮,默认true
+					zIndex: zIndex + 1 // 层级
+				})
 			}
+
 		})
 		
 
