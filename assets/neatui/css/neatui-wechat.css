@@ -474,13 +474,22 @@ body{
 }
 .talk__textbox{ width: 78%\9; }
 .talk__send{ width: 15%\9; }
-.talk__more,
-.talk__switch,
-.talk__press{ display: none\9!important; }
 .talk__send button{ padding: 20px 15px\9!important; }
 .chat__talk div[contenteditable=true]{
     min-height: 60px\9!important;
     border: 1px solid #ddd\9!important;
+}
+
+
+
+/*+================================================================================+*/
+/*                                    pc端时
+/*+================================================================================+*/
+@media screen and (min-width: 640px){
+    /*隐藏图片上传、语音等功能*/
+    .talk__more,
+    .talk__switch,
+    .talk__press{ display: none!important; }
 }
 
 
