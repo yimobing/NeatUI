@@ -561,16 +561,35 @@ var utilities = {
             })
             setStyle(el)
         }
-        if(window.VBArray && window.addEventListener) { //IE9
-            el.attachEvent("onkeydown", function() {
-            var key = window.event.keyCode;
-                if(key == 8 || key == 46) delayedResize(el);
+        // if(window.VBArray && window.addEventListener) { //IE9
+        //     el.attachEvent("onkeydown", function() {
+        //     var key = window.event.keyCode;
+        //         if(key == 8 || key == 46) delayedResize(el);
             
-            });
-            el.attachEvent("oncut", function(){
-                delayedResize(el);
-            })//处理粘贴
-        }
+        //     });
+        //     el.attachEvent("oncut", function(){
+        //         delayedResize(el);
+        //     })//处理粘贴
+        // }
+        if(window.VBArray) { // IE
+			if(window.addEventListener){
+				el.addEventListener("keydown", function() {
+					var key = window.event.keyCode;
+					if(key == 8 || key == 46) delayedResize(el);
+				});
+				el.addEventListener("cut", function(){  // 处理粘贴
+					delayedResize(el);
+				})
+			}else if(el.attachEvent){
+				el.attachEvent("onkeydown", function() {
+					var key = window.event.keyCode;
+					if(key == 8 || key == 46) delayedResize(el);
+				});
+				el.attachEvent("oncut", function(){  // 处理粘贴
+					delayedResize(el);
+				})
+			}
+		}
     },
 
 
