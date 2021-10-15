@@ -1513,8 +1513,8 @@
 	 * @returns {string} 返回标准化日期字符串
 	 */
 	 function dateFormat(dateTime, formatStr){
-		 var me = this;
-		var dateTime = isIOSDevice() ? dateTime.toString().replace(/-/g, '/') :  dateTime; // 短横线-换成斜杠/以兼容ios
+		var me = this;
+		var dateTime = isIOSDevice() || isIeBrowser() ? dateTime.toString().replace(/-/g, '/') :  dateTime; // 短横线-换成斜杠/以兼容ios和ie
 		var formatStr = typeof formatStr == 'undefined' ? 'yyyy-MM-dd HH:mm:ss' : formatStr;
 		var dateParse = Date.parse(new Date(dateTime));//转成时间戳
 		var time = new Date(dateParse);//再转成标准时间
@@ -1551,6 +1551,15 @@
 	function isIOSDevice(){
 		return /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase()) ? true : false;
 	};
+
+
+	/**
+	 * 判断是否ie浏览器
+	 * @returns {boolean} 返回布尔值. true 是, false 否
+	 */
+	function isIeBrowser(){
+		return window.ActiveXObject || "ActiveXObject" in window ? true : false;
+	}
 
 	/**
 	 * 获取嵌入页面距离浏览器顶部的距离
