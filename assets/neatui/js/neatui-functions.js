@@ -1706,8 +1706,9 @@ var checker = {
 	*/
 	checkIsIE:function(){
 		// var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+		return ( window.ActiveXObject || "ActiveXObject" in window ) ? true : false; // 方法1
         // return !('reversed' in document.createElement('ol')); // 方法1
-		return ( window.ActiveXObject || "ActiveXObject" in window ) ? true : false; // 方法2
+        // return window.VBArray ? true : false; // 方法2
     },
     
 
