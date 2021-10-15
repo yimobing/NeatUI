@@ -1701,13 +1701,13 @@ var checker = {
     
 
     /**
-	* 检测是否IE浏览器
+	* 检测是否IE浏览器(ie5-ie11,edge)
 	* @returns {Booleans} 返回布尔值. true 是ie, false 非ie
 	*/
 	checkIsIE:function(){
-		var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串 
-		var isIE = window.ActiveXObject || "ActiveXObject" in window;
-		return isIE ? true : false;
+		// var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+        // return !('reversed' in document.createElement('ol')); // 方法1
+		return ( window.ActiveXObject || "ActiveXObject" in window ) ? true : false; // 方法2
     },
     
 
