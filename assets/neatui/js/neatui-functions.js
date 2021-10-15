@@ -1274,8 +1274,8 @@ var calendar = {
 	 */
 	getNumberOfDays:function(date1, date2){//获得天数
 		if(!this.isDateString(date1) || !this.isDateString(date2)) return 0;
-		var a1 = Date.parse(new Date(date1));
-		var a2 = Date.parse(new Date(date2));
+		var a1 = Date.parse(new Date(date1.replace(/-/g, '/')));
+		var a2 = Date.parse(new Date(date2.replace(/-/g, '/')));
 		var day = parseInt((a2-a1)/ (1000 * 60 * 60 * 24));//核心：时间戳相减，然后除以天数
 		return day;
 	},
@@ -1314,7 +1314,7 @@ var calendar = {
 	 * eg. var a="2017/12/31 23:12:54"; console.log(dateFormat(a));
 	 */
 	dateFormat:function(dateTime, formatStr){
-		var dateTime = /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase()) ? dateTime.toString().replace(/-/g, '/') :  dateTime; // 短横线-换成斜杠/以兼容ios
+		var dateTime = ( /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase()) || (window.ActiveXObject || "ActiveXObject" in window) ) ? dateTime.toString().replace(/-/g, '/') :  dateTime; // 短横线-换成斜杠/以兼容ios和ie
 		var formatStr = typeof formatStr == 'undefined' ? 'yyyy-MM-dd HH:mm:ss' : formatStr;
 		var dateParse = Date.parse(new Date(dateTime));//转成时间戳
 		var time = new Date(dateParse);//再转成标准时间
