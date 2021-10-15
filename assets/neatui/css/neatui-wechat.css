@@ -455,6 +455,7 @@ body{
 /*+================================================================================+*/
 /*                                    兼容ie
 /*+================================================================================+*/
+/*ie9及ie9-*/
 .cose__avatar,
 .cose__content{
     display: inline-block;
@@ -478,6 +479,29 @@ body{
 .chat__talk div[contenteditable=true]{
     min-height: 60px\9!important;
     border: 1px solid #ddd\9!important;
+}
+
+/* IE10+ CSS styles go here */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .cose__avatar,
+    .cose__content{
+        display: inline-block;
+        vertical-align: top;
+    }
+    .cose__avatar{ width: 12%; }
+    .cose__content{ width: 85%; margin-left: 3%; }
+    .talk__group,
+    .talk__textbox{
+        display: inline-block;
+        vertical-align: top;
+    }
+    .talk__textbox{ width: 78%; }
+    .talk__send{ width: 15%; margin-top: -30px; }
+    .talk__send button{ padding: 20px 15px!important; }
+    .chat__talk div[contenteditable=true]{
+        min-height: 60px!important;
+        border: 1px solid #ddd!important;
+    }
 }
 
 
