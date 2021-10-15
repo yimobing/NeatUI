@@ -577,6 +577,7 @@
 	     * @returns {string} 返回过滤后的新字符串
          */
         me.filterRoomFormHouseChar = function(str){
+            if(typeof str == 'undefined') return '';
             var str = str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g,''); //过滤css
             str = str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g,''); //过滤JS
             str = str.replace(/<[^<>]+?>/g,'');  //过滤html标签
