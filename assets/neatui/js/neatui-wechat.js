@@ -1616,58 +1616,76 @@
 	*/
 	function expandTextArea(el, opt){
 		var defaults = {
-		   initHeight: 28,
-		   maxHeight: 120
-	   }
-	   var settings = $.extend(true, {}, defaults, opt || {} );
-	   var _height = typeof opt == 'undefined' ? null : isNaN(parseInt(opt.initHeight)) ? null : parseInt(opt.initHeight),
-		   _maxHeight = typeof opt == 'undefined' ? null : isNaN(parseInt(opt.maxHeight)) ? null : parseInt(opt.maxHeight);
-	   var _isContinue = true;
-	   if(el instanceof jQuery) el = el[0]; //jq对象转化成js对象
-	   var setStyle = function(el, h){
-		   if(!_isContinue) return;
-		   el.style.height = 'auto';
-		   el.style.height = ( typeof h == 'undefined' || h == null ? el.scrollHeight : parseInt(h.toString().replace(/px/g, '')) )  + 'px';
-		   el.style.maxHeight = ( typeof h == 'undefined' || h == null ? el.scrollHeight : parseInt(h.toString().replace(/px/g, '')) )  + 'px';
-		   // console.log(el.scrollHeight);
-		   //限制最大高度
-		   var _elHeight = parseInt(el.style.height.toString().replace(/px/g, ''));
-		   //console.log('输入框高度：', _elHeight, '-限制最大高度：', _maxHeight);
-		   if(_maxHeight != null){
-			   if(_elHeight >= _maxHeight){
-				   el.style.height = _maxHeight;
-				   el.style.maxHeight = _maxHeight;
-				   //console.log('超过了')
-				   _isContinue = false;
-			   }
-		   }
-	   }
-	   var delayedResize = function(el) {
-		   window.setTimeout(function(){
-			   setStyle(el)
-		   }, 0)
-	   }
-	   if(el.addEventListener){
-		   el.addEventListener('input',function(){
-			   setStyle(el)
-		   },false);
-		   setStyle(el, _height)
-	   }else if(el.attachEvent){
-		   el.attachEvent('onpropertychange',function(){
-			   setStyle(el)
-		   })
-		   setStyle(el)
-	   }
-	   if(window.VBArray && window.addEventListener) { //IE9
-		   el.attachEvent("onkeydown", function() {
-		   var key = window.event.keyCode;
-			   if(key == 8 || key == 46) delayedResize(el);
-		   
-		   });
-		   el.attachEvent("oncut", function(){
-			   delayedResize(el);
-		   })//处理粘贴
-	   }
+			initHeight: 28,
+			maxHeight: 120
+		}
+		var settings = $.extend(true, {}, defaults, opt || {} );
+		var _height = typeof opt == 'undefined' ? null : isNaN(parseInt(opt.initHeight)) ? null : parseInt(opt.initHeight),
+			_maxHeight = typeof opt == 'undefined' ? null : isNaN(parseInt(opt.maxHeight)) ? null : parseInt(opt.maxHeight);
+		var _isContinue = true;
+		if(el instanceof jQuery) el = el[0]; //jq对象转化成js对象
+		var setStyle = function(el, h){
+			if(!_isContinue) return;
+			el.style.height = 'auto';
+			el.style.height = ( typeof h == 'undefined' || h == null ? el.scrollHeight : parseInt(h.toString().replace(/px/g, '')) )  + 'px';
+			el.style.maxHeight = ( typeof h == 'undefined' || h == null ? el.scrollHeight : parseInt(h.toString().replace(/px/g, '')) )  + 'px';
+			// console.log(el.scrollHeight);
+			//限制最大高度
+			var _elHeight = parseInt(el.style.height.toString().replace(/px/g, ''));
+			//console.log('输入框高度：', _elHeight, '-限制最大高度：', _maxHeight);
+			if(_maxHeight != null){
+				if(_elHeight >= _maxHeight){
+					el.style.height = _maxHeight;
+					el.style.maxHeight = _maxHeight;
+					//console.log('超过了')
+					_isContinue = false;
+				}
+			}
+		}
+		var delayedResize = function(el) {
+			window.setTimeout(function(){
+				setStyle(el)
+			}, 0)
+		}
+		if(el.addEventListener){
+			el.addEventListener('input',function(){
+				setStyle(el)
+			},false);
+			setStyle(el, _height)
+		}else if(el.attachEvent){
+			el.attachEvent('onpropertychange',function(){
+				setStyle(el)
+			})
+			setStyle(el)
+		}
+		// if(window.VBArray && window.addEventListener) { // IE9
+		// 	el.attachEvent("onkeydown", function() {
+		// 			var key = window.event.keyCode;
+		// 			if(key == 8 || key == 46) delayedResize(el);
+		// 	});
+		// 	el.attachEvent("oncut", function(){
+		// 		delayedResize(el);
+		// 	}) // 处理粘贴
+		// }
+	   	if(window.VBArray) { // IE
+			if(window.addEventListener){
+				el.addEventListener("keydown", function() {
+					var key = window.event.keyCode;
+					if(key == 8 || key == 46) delayedResize(el);
+				});
+				el.addEventListener("cut", function(){  // 处理粘贴
+					delayedResize(el);
+				})
+			}else if(el.attachEvent){
+				el.attachEvent("onkeydown", function() {
+					var key = window.event.keyCode;
+					if(key == 8 || key == 46) delayedResize(el);
+				});
+				el.attachEvent("oncut", function(){  // 处理粘贴
+					delayedResize(el);
+				})
+			}
+		}
 	};
 	
 	
