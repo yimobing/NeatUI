@@ -210,7 +210,7 @@
             var loanJson = {
                 "return":"ok", 
                 "anjie_chengshu":"0.8", 
-                "daikuan_je":"900000", 
+                "daikuan_je":"90000", 
                 "dkpz":"商业贷", 
                 "huankuan_fangshi":"等额本息",
                 "daikuan_nianxian":"30",
@@ -469,7 +469,7 @@
                         tips += label + '、';
                     }
                 })
-                if(tips != ''){
+                if(tips != ''){ //testing
                     neuiDialog.notice({
                         message: '请填写：' + tips.substr(0, tips.length - 1),
                         theme: 'danger',
@@ -554,6 +554,8 @@
                         ls_daikuan_nianxian = $('#c-loanYears').val().toString().replace(/([\d]*)年\(([\d]*)期\)/, '$1'), // 贷款年限(单位：年)
                         ls_lilv = rate * 1200, // 利率
                         ls_yuegong_je = monthlyPayment; // 月供金额
+                    if(ls_lilv.toString().replace(/([ ]+)/g, '') === '' || isNaN(ls_lilv)) ls_lilv = 0;
+                    if(ls_daikuan_je.toString().replace(/([ ]+)/g, '') === '') ls_daikuan_je = 0;
                     // add 20210904-3
                     ls_daikuan_je = ls_daikuan_je.toFixed(2); // 四舍五入保留两位小数
                     ls_lilv = ls_lilv.toFixed(4); // 四舍五入保留4位小数
