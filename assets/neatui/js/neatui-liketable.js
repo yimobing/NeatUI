@@ -1336,6 +1336,7 @@
 		if(ps_obj.length == 0) return error;
 		var rowArr = [];
 		ps_obj.find('.list-one').not('.list-summary').each(function(i){ //行(不包含小计行、合计行)
+			if($(this).children().length == 0) return false; // 中断循环
 			var ls_row_index = i;
 			var ls_hang_hao = ls_row_index + 1;
 			var columnArr = [];
