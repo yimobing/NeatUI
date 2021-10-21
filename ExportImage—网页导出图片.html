@@ -24,6 +24,11 @@
     <style>
         body{ max-width: 640px; margin: 0 auto; padding: 25px 10px; }
         .wrap{ padding: 10px 15px; }
+        .head{
+            position: fixed; top: 0; left: 0; right: 0; background-color: #fff; padding: 10px 15px; border: 1px solid #ddd;
+        }
+        .main{ padding-top: 30px; }
+
         .export{ margin-bottom: 25px; }
         button{ padding: 5px 10px; background-color: #f5f5f5; color: #fff; border: 0; border-radius: 4px;}
         button.blue{ background-color: #80c0ef; }
@@ -31,11 +36,13 @@
     </style>
 
     <div class="wrap">
-        <main>
+        <header class="head">
+            <button type="button" id="btn-save-web" class="blue">保存整个网页为图片</button>
+        </header>
+        <main class="main">
             <h1>将网页导出图片</h1>
             <h5>Bug说明：导出节点内如果使用到了本地图片作为背景图片，将会使画布受到污染从而无法导出，此时会报错“Uncaught DOMException: Failed to execute 'toDataURL' on 'HTMLCanvasElement': Tainted canvases may not be exported”。解决办法是：把本地图片转换成base64图片即可！</h5>
             <section class="export">
-                <button type="button" id="btn-save-web" class="blue">保存整个网页为图片</button>
                 <button type="button" id="btn-save-area" class="green">保存黄色区域为图片</button>
             </section>
 
@@ -53,6 +60,11 @@
                     <h4 style="color: #000; ">Hello world!</h4>
                 </div><!--/.test-->
             </section>
+            <article>
+                极目新闻记者 姚岗据通报，10月20日，湖北省天门市新增2例外省输入本地新冠肺炎确诊病例（两人行动轨迹相同)，病例分型分别为轻型和普通型。两人为广东省广州市人。21日，其中一名确诊病例伍先生告诉极目新闻记者，10月9日至11日，他曾在内蒙古额济纳旗游玩，与此前被确诊的8人旅行团存在轨迹重叠。伍先生称，他从13日开始咳嗽，但自己以为是老毛病又犯了，压根没想到是被感染了，直到返程途中经过湖北主动去做核酸检测才被发现。 极目新闻记者 姚岗据通报，10月20日，湖北省天门市新增2例外省输入本地新冠肺炎确诊病例（两人行动轨迹相同)，病例分型分别为轻型和普通型。两人为广东省广州市人。21日，其中一名确诊病例伍先生告诉极目新闻记者，10月9日至11日，他曾在内蒙古额济纳旗游玩，与此前被确诊的8人旅行团存在轨迹重叠。伍先生称，他从13日开始咳嗽，但自己以为是老毛病又犯了，压根没想到是被感染了，直到返程途中经过湖北主动去做核酸检测才被发现。 极目新闻记者 姚岗据通报，10月20日，湖北省天门市新增2例外省输入本地新冠肺炎确诊病例（两人行动轨迹相同)，病例分型分别为轻型和普通型。两人为广东省广州市人。21日，其中一名确诊病例伍先生告诉极目新闻记者，10月9日至11日，他曾在内蒙古额济纳旗游玩，与此前被确诊的8人旅行团存在轨迹重叠。伍先生称，他从13日开始咳嗽，但自己以为是老毛病又犯了，压根没想到是被感染了，直到返程途中经过湖北主动去做核酸检测才被发现。 极目新闻记者 姚岗据通报，10月20日，湖北省天门市新增2例外省输入本地新冠肺炎确诊病例（两人行动轨迹相同)，病例分型分别为轻型和普通型。两人为广东省广州市人。21日，其中一名确诊病例伍先生告诉极目新闻记者，10月9日至11日，他曾在内蒙古额济纳旗游玩，与此前被确诊的8人旅行团存在轨迹重叠。伍先生称，他从13日开始咳嗽，但自己以为是老毛病又犯了，压根没想到是被感染了，直到返程途中经过湖北主动去做核酸检测才被发现。
+
+
+            </article>
         </main>
     </div><!--/.wrap-->
 
@@ -63,7 +75,18 @@
     <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script type="text/javascript" src="assets/style/libs/jquery.html2canvas.min.js"></script><!--网页转成图片控件-->
     <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
     <script type="text/javascript">
+        //——————————————————————————————————————————
+        var scrollDistance = 0;
+    
+        //——————————————————————————————————————————
+        $(window).on('scroll', function(){
+            var scrollTop = $(window).scrollTop();
+            if(scrollTop > 0){
+                scrollDistance = scrollTop;
+            }
+        });
 
 
         //——————————————————————————————————————————
@@ -79,20 +102,9 @@
                 }
         */
 
-        //——————————————————————————————————————————
-        //=====示例1：保存整个网页为图片
-        var btnAll = document.getElementById('btn-save-web');
-        btnAll.addEventListener('click', function(){
-            neui.exportWeb2Image({
-                element: 'body',
-                filename: '用户资料.png',
-                caption: '长按保存图片'
-            })
-        });
-
 
         //——————————————————————————————————————————
-        //=====示例2：保存黄色区域为图片
+        //=====示例1：保存黄色区域为图片
         var btnYellow = document.getElementById('btn-save-area');
         btnYellow.addEventListener('click', function(){
             neui.exportWeb2Image({
@@ -101,6 +113,40 @@
                 caption: '长按保存图片'
             });
         });
+
+
+
+        //——————————————————————————————————————————
+        //=====示例2：保存整个网页为图片
+        var btnAll = document.getElementById('btn-save-web');
+        btnAll.addEventListener('click', function(){
+            utilities.elementScrollTo({
+                element: window,
+                top: 0, // 先滚到顶部
+                left: 0,
+                behavior: 'instant',
+                callback: function(){ // 回调
+
+                    // 导出图片
+                    neui.exportWeb2Image({
+                        element: '.wrap',
+                        filename: '用户资料.png',
+                        caption: '长按保存图片',
+                        closeCallBack: function(){
+                            // 再滚回原位置
+                            window.scrollTo({
+                                top: scrollDistance,
+                                left: 0,
+                                behavior: "smooth"
+                            })
+                        }
+                    })
+                    
+                }
+            })
+        });
+
+
 
 
     </script>
