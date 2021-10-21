@@ -1261,6 +1261,42 @@ var utilities = {
             $div.parent().remove();
         }
         return w;
+    },
+
+    /**
+    * element.scrollTo()回调函数
+    * 即：为scrollTo函数添加滚动完成回调的办法
+    * @param {object} options 参数
+    */
+    elementScrollTo: function(options){
+        var defaults = {
+            element: window, // 节点(可选),默认window
+            top: 0, // 上距(可选),默认0
+            left: 0, // 左距(可选),默认0
+            behavior: "auto", // 滚动方式(可选)。值：instant, smooth, auto(默认)
+            callback: null // 回调(可选),默认null
+        }
+        var settings = $.extend(true, {}, defaults, options || {});
+        var element = settings.element,
+            top = settings.top,
+            left = settings.left,
+            behavior = settings.behavior,
+            callback = settings.callback;
+        element.scrollTo({
+            top: top,
+            left: left,
+            behavior: behavior
+        });
+        if(!callback) return;
+        if(element === window ? element.scrollY === 0 : element.scrollTop === 0) return callback();
+        var running = function (event) {
+            var top = this === window ? this.scrollY : this.scrollTop;
+            if(top === 0){
+                this.removeEventListener("scroll", running);
+                return callback();
+            }
+        }
+        element.addEventListener("scroll", running, false)
     }
 
     
