@@ -22,26 +22,36 @@
 
 <body>
 
-    <!--add 20210723-1-->
+    <!--add 20211022-1-->
     <style>
         /*隐藏百度地图版权信息*/
         .BMap_cpyCtrl { display: none; }
         .anchorBL { display: none; }
+         /*+-------------------------+*/
+        .bdmap__picker>div{ display: inline-block; vertical-align: top; margin-left: 35px; }
+        .bdmap__picker>div:first-child{ margin-left: 0; }
     </style>
 
     <div class="bdmap" id="allmap">
-        <div class="bdmap__editor">
+        <div class="bdmap__editor"><!--edit 20211022-1-->
             <div class="bdmap__picker">
-                当前学校坐标 <input type="text" id="c-locate">
-                <button type="button" data-type="copy" id="btn-pick-copy">复制</button>
-                <button type="button" data-type="save" id="btn-pick-save">保存学校坐标</button>
-                <label> (拖动点标记可更改坐标) </label>
-            </div>
-            <div class="bdmap__draw">
-                <button type="button" data-type="del" id="btn-poly-del">删除学区范围</button>
-                <button type="button" data-type="save" id="btn-poly-save">保存学区范围</button>
+                <div class="bdmap__coord">
+                    当前学校坐标 <input type="text" id="c-locate">
+                    <button type="button" data-type="copy" id="btn-pick-copy">复制</button>
+                    <button type="button" data-type="save" id="btn-pick-save">保存学校坐标</button>
+                    <label> (拖动点标记可更改坐标) </label>
+                </div><!--/.bdmap__coord-->
+                <div class="bdmap__btn">
+                    <button type="button" data-type="del" id="btn-poly-del">删除学区范围</button>
+                    <button type="button" data-type="save" id="btn-poly-save">保存学区范围</button>
+                </div><!--/.bdmap__btn-->
                 <button type="" id="btn-temp" style="display: none;">ASP.NET刷新页面(type属性要放空)</button><!--add 20210923-1-->
-            </div><!--/.bdmap__draw-->
+                <div class="bdmap__locate">
+                    <label>陌生小区，边界难画？请使用：</label>
+                    <button type="button" data-type="save" id="btn-locate">地点定位</button>
+                </div><!--/.bdmap__locate-->
+            </div><!--/.bdmap__picker-->
+            <div class="bdmap__draw"></div><!--/.bdmap__draw-->
         </div><!--/.bdmap__editor-->
         <div class="bdmap__map">
             <div id="map"></div>
@@ -1583,6 +1593,30 @@
                 })
             });
 
+
+
+
+
+            //——————————————————————————————————————————
+            //=====地点定位按钮 add 20211022-1
+            $('#btn-locate').on('click', function(){
+                // 使用IFRAME打开
+                var linkUrl = 'Bdmap—百度地图控件-示例3(城市住宅小区边界).html'; // ajax({})
+                neui.openIframe({
+                    url: linkUrl,
+                    caption: '地点定位',
+                    // top: '1%',
+                    // width: '98%',
+                    // titleHeight: 45,
+                    // titleFontSize:'18px',
+                    // showCross: true,
+                    // crossDirection: 'right',
+                    closeCallBack: function(){ 
+                        // window.location.reload(); // 重载页面
+                        document.getElementById('btn-temp').click(); // ASP.NET中 使用这个
+                    }
+                })
+            });
 
 
 
