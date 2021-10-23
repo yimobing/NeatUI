@@ -505,57 +505,57 @@
                             var flag = '', msg = '保存成功';
                             neui.showAnimate();
                             setTimeout(function(){              
-                                // // 1. 保存地图缩放级别(这个页面要再保存，防止跟父页面起冲突)
-                                // // 后台返回
-                                // /*
-                                // // START AJAX
-                                // var isHoldOn = true;
-                                // ajax({
-                                //     heading: "保存地图缩放级别",
-                                //     debug: false,
-                                //     async: false, // 取数方式. true 异步, false 同步(默认)
-                                //     type: "GET",
-                                //     dataType: "html",
-                                //     cache: false,
-                                //     url: "../fwh_pub/jk_xuexiao_xq.ashx",
-                                //     data: {
-                                //         "action": "wh_xuexiao_ditu_suofang_ins",
-                                //         "menu_bh": "<%=s_menu_bh%>",
-                                //         "user": "<%=s_user%>",
-                                //         "sjk": "<%=s_sjk%>",
-                                //         "xuexiao_bh": g_xuexiao_bh,
-                                //         "ditu_suofang": ls_ditu_suofang
-                                //     },
-                                //     success: function(res){
-                                //         if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                                //         var json = JSON.parse(res);
-                                //         marks = json.return == 'ok' ? 1 : 0;
-                                //         if(!marks) tips = json.data;
-                                //     },
-                                //     error: function(res){
-                                //         if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                                //     },
-                                //     beforeSend: function(XMLHttpRequest){ },
-                                //     complete: function(XMLHttpRequest, textStatus){ }
-                                // })
-                                // if(!isHoldOn){
-                                //     neui.destroyAnimate();
-                                //     return;
-                                // }
-                                // // END AJAX
-                                // */
-                                // marks = parseInt(1); // 1 成功, 0 失败
-                                // if(!marks) tips = '保存地图缩放级别失败';
+                                // 1. 保存地图缩放级别(这个页面要再保存，防止跟父页面起冲突)
+                                // 后台返回
+                                /*
+                                // START AJAX
+                                var isHoldOn = true;
+                                ajax({
+                                    heading: "保存地图缩放级别",
+                                    debug: false,
+                                    async: false, // 取数方式. true 异步, false 同步(默认)
+                                    type: "GET",
+                                    dataType: "html",
+                                    cache: false,
+                                    url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                                    data: {
+                                        "action": "wh_xuexiao_ditu_suofang_ins",
+                                        "menu_bh": "<%=s_menu_bh%>",
+                                        "user": "<%=s_user%>",
+                                        "sjk": "<%=s_sjk%>",
+                                        "xuexiao_bh": g_xuexiao_bh,
+                                        "ditu_suofang": ls_ditu_suofang
+                                    },
+                                    success: function(res){
+                                        if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                        var json = JSON.parse(res);
+                                        marks = json.return == 'ok' ? 1 : 0;
+                                        if(!marks) tips = json.data;
+                                    },
+                                    error: function(res){
+                                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    },
+                                    beforeSend: function(XMLHttpRequest){ },
+                                    complete: function(XMLHttpRequest, textStatus){ }
+                                })
+                                if(!isHoldOn){
+                                    neui.destroyAnimate();
+                                    return;
+                                }
+                                // END AJAX
+                                */
+                                marks = parseInt(1); // 1 成功, 0 失败
+                                if(!marks) tips = '保存地图缩放级别失败';
                 
-                                // if(!marks){ // 失败才提示
-                                //     neuiDialog.alert({
-                                //         caption: '提示',
-                                //         message: tips,
-                                //         buttons: ['确定']
-                                //     })
-                                //     neui.destroyAnimate();
-                                //     return;
-                                // }
+                                if(!marks){ // 失败才提示
+                                    neuiDialog.alert({
+                                        caption: '提示',
+                                        message: tips,
+                                        buttons: ['确定']
+                                    })
+                                    neui.destroyAnimate();
+                                    return;
+                                }
 
                                 // 2、保存学区坐标
                                 var ls_weizhi =  "2" + Math.ceil(Math.random() * 10) + Math.ceil(Math.random() * 1000); // 生成随机数
