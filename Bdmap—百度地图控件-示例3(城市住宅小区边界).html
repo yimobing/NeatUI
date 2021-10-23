@@ -566,7 +566,7 @@
                                     });
                                 }
                                 var ls_data = JSON.stringify(coordJson);
-                                
+
                                 // 后台返回
                                 /*
                                 // START AJAX
@@ -602,22 +602,20 @@
                                 })
                                 if(!isHoldOn){
                                     neui.destroyAnimate();
-                                    // return;
-                                    // 注意：在for循环中要这样写,才能在后台错误时中断执行
-                                    flag = 0; // 1 成功, 0 失败
-                                    isGoOn = false;
+                                    return;
                                 }
                                 // END AJAX
                                 */
                                 flag = parseInt(1); // 1 成功, 0 失败
-                                if(!flag) msg = '保存失败';
+                                if(!flag) msg = '保存失败，该地点已存在！';
                                 
                                 neuiDialog.alert({
-                                    caption: '提示',
                                     message: msg,
                                     buttons: ['确定']
                                 })
+
                                 neui.destroyAnimate();
+
                             }, 100)
                         }
                     }
