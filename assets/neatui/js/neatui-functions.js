@@ -2399,6 +2399,25 @@ var convert = {
             }
         }
         return (ps_num_arr_str instanceof Array ? resultWeekArr : resultWeekArr[0]);
+    },
+
+
+    /**
+     * 将科学计数法转化成数字或字符串
+     * @param {string} 科学计数法的字符串
+     * @returns {number} 返回正常数字字符串
+     * eg. 1.5E+0006 <=> 1500000
+     * eg. 1.32e+006 <=> 1320000
+     */
+    scientific2String: function(a) {
+        return a.replace(/^(\d+)(?:.(\d+))*e(\+)(\d+)/gi, function(_, a, a1, p, n){
+            a1 = a1 || ''
+            if (p === '-' && n > 0) {
+                return '0.' + '0'.repeat(n - 1) + a + a1
+            } else {
+                return a + (a1.length > n ? a1.substr(0, n) + '.' + a1.substr(n) : a1 + '0'.repeat(n - a1.length))
+            }
+        })
     }
 
 }; //END CONVERT 对象
