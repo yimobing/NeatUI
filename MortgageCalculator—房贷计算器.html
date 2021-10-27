@@ -292,7 +292,7 @@
                 "huankuan_fangshi":"等额本息",
                 "daikuan_nianxian":"20",
                 "lilv":"0.049",
-                "lilv_gjj":"0.0325",
+                "lilv_gjj":"0.0325", // testing1
                 "yuegong_je":"6108.20"
             }
 
@@ -633,8 +633,8 @@
                 if(ps_dkpz.indexOf("组合贷") >= 0){ // 组合贷
                     $('.block__compose').show();
                     $('.block__rate').hide();
-                    if($('#c-commercialRate').val() == '') $('#c-commercialRate').val(commerceRate);
-                    if($('#c-fundsRate').val() == '') $('#c-fundsRate').val(fundRate);
+                    if(ps_load_time != 'init' && $('#c-commercialRate').val() == '') $('#c-commercialRate').val(commerceRate);
+                    if(ps_load_time != 'init' && $('#c-fundsRate').val() == '') $('#c-fundsRate').val(fundRate);
                 }else if(ps_dkpz.indexOf("商业贷") >= 0){
                     $('.block__compose').hide();
                     $('.block__rate').show();
@@ -814,17 +814,19 @@
                         $('.payback__principal').show().siblings().hide(); // 显示区域
                     }
 
-                    // 传递给后台的参数
+               
+                    
+                    // 传递给后台的参数 edit 20211027-1 下25行
                     var ls_anjie_chengshu = $('#c-loanMix').attr('data-value'), // 按揭成数
                         ls_daikuan_je = parseFloat(amount1.toString().replace(/,/g, '')), // 商业性贷款金额,万元转成元
                         ls_dkpz = cate, // 贷款品种
                         ls_huankuan_fangshi = method, // 还款方式
                         ls_daikuan_nianxian = $('#c-loanYears').val().toString().replace(/([\d]*)年\(([\d]*)期\)/, '$1'), // 贷款年限(单位：年)
                         ls_lilv = (rate1 * 1200) / 100, // 商业性贷款利率(年利率)
-                        ls_yuegong_je = monthlyPayment; // 商业性月供金额
+                        ls_yuegong_je = parseFloat(monthlyPayment1).toFixed(digit); // 商业性月供金额
                     var ls_daikuan_je_gjj = parseFloat(amount2.toString().replace(/,/g, '')), // 公积金贷款金额
                         ls_lilv_gjj = (rate2 * 1200) / 100, // 公积金贷款利率(年利率)
-                        ls_yuegong_je_gjj = monthlyPayment; // 公积金月供金额
+                        ls_yuegong_je_gjj = parseFloat(monthlyPayment2).toFixed(digit); // 公积金月供金额
                     // 转化
                     if(ls_daikuan_je.toString().replace(/([ ]+)/g, '') === '') ls_daikuan_je = 0;
                     ls_daikuan_je = ls_daikuan_je.toFixed(digit); // 四舍五入保留N位小数
@@ -836,8 +838,12 @@
                     if(ls_lilv_gjj.toString().replace(/([ ]+)/g, '') === '' || isNaN(ls_lilv_gjj)) ls_lilv_gjj = 0;
                     ls_lilv_gjj = ls_lilv_gjj.toFixed(4); // 四舍五入保留4位小数
 
+                    if(isNaN(ls_yuegong_je)) ls_yuegong_je = 0;
+                    if(isNaN(ls_yuegong_je_gjj)) ls_yuegong_je_gjj = 0;
+    
                     // console.log('按揭成数：', ls_anjie_chengshu, '\n贷款品种：', ls_dkpz, '\n还款方式：', ls_huankuan_fangshi, '\n贷款年限：', ls_daikuan_nianxian, '\n月供：', ls_yuegong_je);
                     // console.log('商业性贷款金额：', ls_daikuan_je, '\n公积金贷款金额：', ls_daikuan_je_gjj, '\n商业性利率：', ls_lilv, '\n公积金利率：', ls_lilv_gjj);
+                    // console.log('商业性月供：', ls_yuegong_je, '\n公积金月供：', ls_yuegong_je_gjj);
                    
                     // 开始执行
                     var flag = '', msg = '保存成功';
