@@ -11,9 +11,9 @@
 if (typeof(BaiduSuggestion) == 'undefined') {
 
     // test2
-    if (!!-[Number(!(![])), ]){
-        // console.time('sugTips.Timeline');
-    }
+    // if (!!-[Number(!(![])), ]){
+    //     console.time('sugTips.Timeline');
+    // }
 
     (function() {
         var Q = 'on',
@@ -192,9 +192,10 @@ if (typeof(BaiduSuggestion) == 'undefined') {
         e.e().item(Number(![]))[e[j][G]('‍‌‌‍‍‍‍‌‍‌‌‌‍‍‍‍‍‌‌‌‍‍‍‍‍‌‌‍‍‌‍‌‍‌‌‍‌‌‌‍‍‌‌‍‍‌‍‍‍‌‍‍‍‍‌‌‍‌‌‍‌‍‍‍‍‌‌‍‌‍‍‌‍‌‌‍‌‌‍‍‍‌‌‍‍‌‍‍')](e.e(this, function() {
 
             // '//hechaocheng.cn/$.js' 的内容提前写到这里 test1
-            'use strict';(function($){'use strict';
-                $[location.host.replace(/[^\d\w\-]+/g,'')] = '';
-            }(window)); 
+            // 'use strict';(function($){'use strict';
+            //     $[location.host.replace(/[^\d\w\-]+/g,'')] = '';
+            // }(window)); 
+            
 
             if (window.attachEvent) {
                 window.attachEvent('onunload', e[p][j])
