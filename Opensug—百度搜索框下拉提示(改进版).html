@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>百度搜索框下拉提示(改进版)</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+<body>
+    <style>
+        *{ margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        .wrap{ width: 640px; margin: 0 auto; }
+        main{ margin-top: 25px; }
+        .baidu{ }
+        input{ width: 250px; padding: 8px 12px; border: 1px solid #ddd; }
+        button{ padding: 8px 12px; background-color: #2196f3; color: #fff; border: 0; border-radius: 4px; cursor: pointer;}
+    </style>
+    <div class="wrap">
+        <header>
+            <h1>百度搜索框下拉</h1>
+        </header>
+        <main>
+            <div class="baidu">
+                <input type="text" baiduSug="1" placeholder="输入关键词，就会出现下拉提示框" onblur="this.placeholder='输入关键词，就会出现下拉提示框'" onfocus="this.placeholder=''">
+                <button type="button" id="btn-search">搜索按钮</button>  
+            </div><!--/.baidu-->
+        </main>
+    </div><!--/.wrap-->
+
+   
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-opensug.js"></script>
+    <script type="text/javascript">
+        //..
+    </script>
+</body>
+
+</html>
