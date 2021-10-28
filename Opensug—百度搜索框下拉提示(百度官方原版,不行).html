@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>百度搜索框下拉提示(百度官方原版,不行)</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <h1>百度搜索框下拉提示，百度官方原版，不行，有问题</h1>
+        </header>
+        <main>
+            <div class="baidu">
+                <form action="http://www.baidu.com/baidu" target="_blank">
+                    <table bgcolor="#FFFFFF">
+                        <tr>
+                            <td>
+                                <input name=tn type=hidden value=baidu>
+                                <a href="http://www.baidu.com/"><img src="http://img.baidu.com/img/logo-80px.gif"alt="Baidu" align="bottom" border="0"></a>
+                                <input type="text" name="word" id="keyword" size="30" baiduSug="2">
+                                <input type="submit" value="百度搜索">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+            <!--/.baidu-->
+        </main>
+    </div>
+    <!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui-opensug_v_original.js"></script>
+    <script type="text/javascript">
+        //..
+
+        // BaiduSuggestion.bind('keyword',{
+        //     "XOffset":0, //提示框位置横向偏移量,单位px
+        //     "YOffset":0, //提示框位置纵向偏移量,单位px
+        //     "width":350, //提示框宽度，单位px
+        //     "fontColor":"#03c", //提示框文字颜色
+        //     "fontColorHI":"#FFF", //提示框高亮选择时文字颜色
+        //     "fontSize":"12px", //文字大小
+        //     "fontFamily":"宋体", //文字字体
+        //     "borderColor":"#03c", //提示框的边框颜色
+        //     "bgcolorHI":"#fd0", //提示框高亮选择的颜色
+        //     "sugSubmit":false //选中提示框中词条时是否提交表单
+        //     }[,confirmCallback]);
+
+
+        typeof(BaiduSuggestion)!="undefined" && (BaiduSuggestion)instanceof(Object)&&typeof(BaiduSuggestion)=="object"&&document.getElementById("keyword")?BaiduSuggestion.bind("keyword", {  // Input ID
+            "XOffset": "-4",             // Proposal frame position X offset, unit px.
+            "YOffset": "-5",             // Prompt box position vertical Y offset, unit px.
+            "width": "",                  // Prompt box width, unit px.
+            "fontColor": "#FF0000",       // Prompt text color.
+            "fontColorHI": "#0000FF",     // Prompt box highlight text color when selected.
+            "fontSize": "14px",           // font size
+            "fontFamily": "Microsoft YaHei",    // Text fontFamily.
+            "borderColor": "#008000",     // Prompt box border color.
+            "bgcolorHI": "#FF6600",       // Prompt box highlights the selected color.
+            "sugSubmit": false,             // Whether to submit the form when the entry in the prompt box is selected.
+            "source":"attayo | baidu | book | car | car2 | google | haoso | kugou | lagou | mgtv | naver | qunar | rambler | sm | soft | taobao | weibo | yahoo | yandex | youku | [customize]" // customize = https://{URL}/?{query}=, Default Baidu.
+        }, function(Callback){
+
+        })
+
+        : 
+        null;
+
+
+    </script>
+
+</body>
+
+</html>
