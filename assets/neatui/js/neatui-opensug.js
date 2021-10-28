@@ -12,7 +12,7 @@ if (typeof(BaiduSuggestion) == 'undefined') {
 
     // test2
     if (!!-[Number(!(![])), ]){
-        console.time('sugTips.Timeline');
+        // console.time('sugTips.Timeline');
     }
 
     (function() {
