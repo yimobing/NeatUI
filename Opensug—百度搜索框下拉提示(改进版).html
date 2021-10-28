@@ -21,7 +21,10 @@
         *{ margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         .wrap{ width: 640px; margin: 0 auto; }
         main{ margin-top: 25px; }
-        .baidu{ }
+        .method{ margin-top: 15px; }
+        .caption{ padding: 15px; font-size: 18px; font-weight: 600;} 
+        .notes{ margin-top: 10px; }
+        h1{ font-size: 24px; color: #ff0000; font-weight: bold; }
         input{ width: 250px; padding: 8px 12px; border: 1px solid #ddd; }
         button{ padding: 8px 12px; background-color: #2196f3; color: #fff; border: 0; border-radius: 4px; cursor: pointer;}
     </style>
@@ -30,21 +33,112 @@
             <h1>百度搜索框下拉</h1>
         </header>
         <main>
-            <div class="baidu">
-                <input type="text" baiduSug="1" placeholder="输入关键词，就会出现下拉提示框" onblur="this.placeholder='输入关键词，就会出现下拉提示框'" onfocus="this.placeholder=''">
-                <button type="button" id="btn-search">搜索按钮</button>  
-            </div><!--/.baidu-->
+            <section class="method">
+                <h3 class="caption">
+                    调用方法1：<br>
+                    简单方式——方便的将"百度搜索框（带提示功能）"直接加入到您的网页中
+                </h3>
+                <div class="content">
+                    <input type="text" baiduSug="0" placeholder="输入关键词，就会出现下拉提示框" onblur="this.placeholder='输入关键词，就会出现下拉提示框'" onfocus="this.placeholder=''">
+                    <button type="button" id="btn-search1">搜索按钮</button>  
+                </div><!--/.content-->
+                <div class="notes">
+<pre>
+为需要添加"百度搜索框提示"功能的&lt;input&gt;标签添加baiduSug属性。例如：
+&lt;input type="text" name="word" baiduSug="1|0"&gt;
+baiduSug = 1，用户选中下拉词条时默认会执行表单提交动作；
+baiduSug = 0，用户选中下拉词条时不执行表单提交动作。
+注：当在静态页面.html中时 baiduSug = 0或1没啥区别，当在asp.net中时因为aspx页面有form标签，baiduSug = 0或1就有区别了，0不会刷新页面，1会刷新页面。
+</pre>
+                </div><!--/.notes-->
+            </section><!--/.method-->
+
+
+            <section class="method">
+                <h3 class="caption">
+                    调用方法2：<br>
+                    自定义方式——提供"百度搜索框提示"API，打造您的个性化搜索框提示功能！
+                </h3>
+                <div class="content">
+                    <input type="text" id="keyword" placeholder="输入关键词，就会出现下拉提示框" onblur="this.placeholder='输入关键词，就会出现下拉提示框'" onfocus="this.placeholder=''">
+                    <button type="button" id="btn-search2">搜索按钮</button>  
+                </div><!--/.content-->
+                <div class="notes">
+<pre>
+在Javascript程序中调用BaiduSuggestion.bind()方法将"百度搜索框提示"功能和页面上的元素进行绑定，格式：
+
+BaiduSuggestion.bind(inputObj|inputId,[params],[confirmCallback]);
+
+[具体形式]
+BaiduSuggestion.bind(’inputObj’,{
+"XOffset":0, //提示框位置横向偏移量,单位px
+"YOffset":0, //提示框位置纵向偏移量,单位px
+"width":350, //提示框宽度，单位px
+"fontColor":"#03c", //提示框文字颜色
+"fontColorHI":"#FFF", //提示框高亮选择时文字颜色
+"fontSize":"12px", //文字大小
+"fontFamily":"宋体", //文字字体
+"borderColor":"#03c", //提示框的边框颜色
+"bgcolorHI":"#fd0", //提示框高亮选择的颜色
+"sugSubmit":false //选中提示框中词条时是否提交表单
+}[,confirmCallback]);
+
+[参数说明]
+inputObj|inputId: 为需要绑定搜索框提示功能的input对象或input对象的id。
+params: 绑定搜索框提示功能时用到的参数，必须以Json形式给出,例如：
+confirmCallback(txt): 当用户选择提示中具体选项时的回调函数，txt为用户选择的内容。
+</pre>
+                </div><!--/.notes-->
+            </section><!--/.baidu-->
+            
         </main>
     </div><!--/.wrap-->
 
-   
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-opensug.js"></script><!--百度搜索框下拉提示-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-opensug.js?v=20211028-2"></script><!--百度搜索框下拉提示-->
     <script type="text/javascript">
-        //..
+
+        //——————————————————————————————————————————
+        //=====搜索按钮
+        document.getElementById('btn-search1').addEventListener('click', function(){
+            alert('欢迎使用百度搜索框下拉提示功能！这里是自定义的代码1')
+        });
+
+
+        //——————————————————————————————————————————
+        //=====搜索按钮
+        document.getElementById('btn-search2').addEventListener('click', function(){
+            alert('欢迎使用百度搜索框下拉提示功能！这里是自定义的代码2')
+        });
+
+
+        //——————————————————————————————————————————
+        // 调用方法2
+        var eleId = "keyword"; // 绑定input元素的id
+        if( typeof(BaiduSuggestion) != "undefined" && BaiduSuggestion instanceof Object && typeof BaiduSuggestion =="object" && document.getElementById(eleId) )
+        {
+            BaiduSuggestion.bind(eleId, {  // 绑定的输入框元素ID
+                "source": "baidu", // 绑定的数据源。默认baidu
+                // "source": "attayo | baidu | book | car | car2 | google | haoso | kugou | lagou | mgtv | naver | qunar | rambler | sm | soft | taobao | weibo | yahoo | yandex | youku | [customize]", // customize = https://{URL}/?{query}=, Default Baidu.
+                "sugSubmit": false, // 选中提示框中词条时是否提交表单
+                "XOffset": 0, // 提示框位置横向偏移量,单位px
+                "YOffset": 0, // 提示框位置纵向偏移量,单位px
+                "width": 350, // 提示框宽度，单位px
+                "fontColor": "#333", // 提示框文字颜色
+                "fontColorHI": "#FFF", // 提示框高亮选择时文字颜色
+                "fontSize": "14px", // 文字大小
+                "fontFamily": "Microsoft YaHei", // 文字字体
+                "borderColor": "#222", // 提示框的边框颜色
+                "bgcolorHI": "#4e6ef2" // 提示框高亮选择的颜色
+                
+            }, function(Callback){
+                alert('选中词条后的回调函数');
+            })
+        }
+
+
     </script>
 </body>
-
 </html>
