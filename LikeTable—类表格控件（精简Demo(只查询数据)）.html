@@ -226,13 +226,24 @@
 		/*+-------------FUNCTION---------------+*/
 		/**
 		 * 函数：加载数据
+		 * @param {object} options 参数
 		 */
-		 function loadData(){
+		 function loadData(options){
+			var defaults = {
+				resetOrder: false // 是否重置序号,默认false
+			}
+			var settings = $.extend(true, {}, defaults, options || {});
 			neui.showAnimate();
 			setTimeout(function(){
 				var listJson = getListData(1); 
 				var pages = getListPage();
 				createTableList(listJson, pages);
+				// 重置序号
+				if(settings.resetOrder){
+					$('.section-history .list-one').each(function(index){
+						$('.col-order>span', this).text(index + 1);
+					})
+				}
 				neui.destroyAnimate();
 			}, 100)
 		}
@@ -728,7 +739,7 @@
 					return;
 				}
 				//刷新数据
-				loadData(); 
+				loadData({ resetOrder: true }); 
 			});
 
 
