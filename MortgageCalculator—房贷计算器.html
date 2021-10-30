@@ -19,11 +19,12 @@
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"><!--输入下拉-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-picker.css"><!--Picker选择器--> <!--add 20211030-1-->
     <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
     <!--<script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>-->
 </head>
 <body>
-    <!--edit 20211026-1-->
+    <!--edit 20211030-1-->
     <style>
         body{ max-width: 640px; margin: 0 auto; padding: 3px; background-color: #f4f4f4; }
         /*+--------+*/
@@ -34,6 +35,13 @@
         .item-box{ display: -webkit-box; display: -moz-box; display: -webkit-flex; display: flex; display: box; align-items: center; margin-bottom: 5px; margin-left: 0!important; }
         .item-box label{ display: block; width: 50px; margin-right: 8px; text-align: right; }
         .item-box .item-cell[data-type="must"]{ right: -25px; }
+        /*+--------+*/
+        .block__quote{ margin-top: 5px; }
+        .block__quote .item-box .item-cell[data-type="must"]{ right: -15px; }
+        #c-wayRate{ width: 100px; }
+        .block__quote .item-r{ align-items: center; vertical-align: middle; }
+        .block__quote  .item-box{ margin-top: 0!important; }
+        .block__quote .item-box:first-child{ margin-right: 8px; }
         /*计算表单*/
         .caculate {  }
         .caculate__form{ padding: 8px; background-color: #fff; border-radius: 4px; }
@@ -53,11 +61,18 @@
         .payback .item-r input{ padding-right: 45px; text-align: right; }
         .payback .item-r.block .r-unit{ top: 25%; }
         .payback .cut{ margin: 5px 0 5px 0; margin-right: 8px; text-align: right; color: rgb(189, 187, 187); font-size: 12px; }
+        
+        /*+--------+*/
+        .theme-popular .item-box{ border-bottom: 1px solid #ddd; }
+        .theme-popular .block__compose,
+        .theme-popular .block__quote{ border: 0; }
+        .theme-popular .block__compose .eform-row{ border: 0; }
+        .theme-popular .row__way{ border: 0!important; }
     </style>
-    <div class="wrap"><!--edit 20211026-1-->
+    <div class="wrap"><!--edit 20211030-1-->
         <main>
             <section class="caculate">
-                <div class="caculate__form ne-form">
+                <div class="caculate__form ne-form theme-popular">
                     <div class="eform-row">
                         <div class="item-l"><label>贷款品种</label></div>
                         <div class="item-r"><input type="text" id="c-loanCategory" value="商业贷" placeholder="比如：商业贷"  onblur="this.placeholder='比如：商业贷'" onfocus="this.placeholder=''" readonly></div>
@@ -103,6 +118,29 @@
                             </div><!--/.item-r-->
                         </div><!--/.eform-row-->
                     </div><!--/.block__compose-->
+
+                    <div class="block__quote">
+                        <div class="eform-row row__way">
+                            <div class="item-l"><label>利率方式</label></div>
+                            <div class="item-r">
+                                <div class="item-box">
+                                    <input type="text" id="c-wayText" value="" placeholder="请选择利率方式" onblur="this.placeholder='请选择利率方式'" onfocus="this.placeholder=''" readonly>
+                                </div><!--/.item-box-->
+                                <div class="item-box w-auto">
+                                    <input type="text" id="c-wayRate" value="0" data-type="float[positive]" placeholder="利率" onblur="this.placeholder='利率'" onfocus="this.placeholder=''">
+                                    <em class="r-unit">%</em>
+                                </div><!--/.item-box-->
+                            </div><!--/.item-r-->
+                        </div><!--/.eform-row-->
+                        <div class="eform-row">
+                            <div class="item-l"><label>基点</label></div>
+                            <div class="item-r">
+                                <input type="text" id="c-commercialBasicPoint" value="0" data-type="int[negative]" placeholder="请填写基点，只能正整数" onblur="this.placeholder='请填写基点，只能正整数'" onfocus="this.placeholder=''">
+                                <em class="r-unit">BP(‱)</em>
+                            </div>
+                            <!--<div class="item-cell" data-type="must">*</div>-->
+                        </div><!--/.eform-row-->
+                    </div><!--/.block__quote-->
 
                     <div class="eform-row block__rate">
                         <div class="item-l"><label>贷款利率</label></div>
@@ -228,6 +266,7 @@
     <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
     <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
     <script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-picker.js"></script><!--Picker选择器--><!--add 20211030-1-->
     <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
     <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--AJAX自定义封装-->
     <script type="text/javascript">
@@ -242,14 +281,70 @@
         // var g_ygdh = '<%=s_ygdh%>'; // 预估单号
         // var g_pgjz = '<%=s_pgzj%>'; // 评估总价
 
-        // edit 20211026-1
-        var commerceRate = 4.9; // 商业贷默认利率
-        var fundRate = 3.25; // 公积金贷默认利率
+        
+
+        // edit 20211030-1 
         var digit = 2; // 统一设置保留的小数位数
         var counter = 0; // 计数器
+        var rateMethod = '最新报价利率(LPR)'; // 利率方式默认值
+        // 默认利率
+        var rateJson = get_data_rate();
+        var commerceRate = parseFloat(convert.decimal2Percent(rateJson["lilv_jz"], 'round').toString().replace(/%/g, '')); // 商业贷利率
+        var fundRate = parseFloat(convert.decimal2Percent(rateJson["lilv_gjj"], 'round')); // 公积金贷利率
+        var lprRate = parseFloat(convert.decimal2Percent(rateJson["lilv_lpr"], 'round').toString().replace(/%/g, '')); // LPR利率
+
+      
 
 
         /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 获取贷款利率数据 add 20211030-1
+         * @param {object} 返回一维数组
+         */
+        function get_data_rate(){
+            // 后台返回
+            var json = { "return":"ok", "lsh_id":"L1001", "lilv_jz":"0.0490", "lilv_gjj":"0.0325", "lilv_lpr":"0.0465" }
+            /*
+            //START AJAX
+            var json = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取贷款利率数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "GET",
+                dataType: "html",
+                cache: false,
+                url: "../../fwh_pub/jk_jiaoyi.ashx",
+                data: {
+                    "action": "sel_jiaoyi_pub_daikuan_lilv",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>"
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    json = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return {}
+            }
+            //END AJAX
+            */
+            return json;
+        }
+
+
+
+
+
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,9 +354,12 @@
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
             //=====获取按揭数据
-            // 后台返回
+            // 后台返回 20211030-1
             var loanJson = {
                 "return":"ok",
+                "lilv_fangshi":"最新报价利率(LPR)", // 利率方式
+                "lilv_jz":"0.0465", // 利率方式对应值
+                "jidian":"0", // 基点
                 // ①商业贷
                 // "anjie_chengshu":"0.8", 
                 // "daikuan_je":"500000",
@@ -291,7 +389,7 @@
                 "dkpz":"组合贷", 
                 "huankuan_fangshi":"等额本息",
                 "daikuan_nianxian":"20",
-                "lilv":"0.049",
+                "lilv":"0.0465",
                 "lilv_gjj":"0.0325", // testing1
                 "yuegong_je":"6108.20"
             }
@@ -366,10 +464,24 @@
             var ls_gjj_lilv = parseFloat(loanJson["lilv_gjj"]) * 100;
             ls_gjj_lilv = ls_gjj_lilv.toFixed(digit);
             if(isNaN(ls_gjj_lilv)) ls_gjj_lilv = '';
+
+            // 利率方式、利率方式对应值、基点
+            var ls_lilv_fangshi = loanJson["lilv_fangshi"],
+                ls_lilv_jz = loanJson["lilv_jz"],
+                ls_jidian = loanJson["jidian"];
+            if(ls_lilv_fangshi.toString().replace(/([ ]+)/g, '') === '') ls_lilv_fangshi = rateMethod;
+            if(ls_lilv_jz.toString().replace(/([ ]+)/g, '') === '') ls_lilv_jz = 0;
+            ls_lilv_jz = convert.decimal2Percent(ls_lilv_jz, 'round').toString().replace(/%/,'');
+            if(ls_jidian.toString().replace(/([ ]+)/g, '') === '') ls_jidian = 0;
+            ls_jidian = convert.decimal2Percent(ls_jidian, 'round').toString().replace(/%/,'');
+            
             // 赋值
             $('#c-housePrice').val(format.thousandth(convert.yuan2TenThousand(g_pgjz)));
             $('#c-loanMix').val(convert.decimal2Percent(loanJson["anjie_chengshu"])).attr('data-value', loanJson["anjie_chengshu"]); // 按揭成数
             $('#c-loanCategory').val(loanJson["dkpz"]); // 贷款品种
+            $('#c-wayText').val(ls_lilv_fangshi); // 利率方式
+            $('#c-wayRate').val(ls_lilv_jz); // 利率方式对应值
+            $('#c-commercialBasicPoint').val(ls_jidian); // 基点
             $('#c-loanYears').val(yearText).attr('value', yearText).attr('data-value', months); // 贷款年限
             $('#c-loanPayBackMethod').val(loanJson["huankuan_fangshi"]); // 还款方式
 
@@ -390,14 +502,17 @@
             // 根据贷款品种显示不同区域
             fnShowSomeBlockAndSignRate(dkpz, 'init');
             // 计算结果
-            fnCalculateResult();
+            fnRunSave();
             
 
 
 
 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                            限制输入类型                                      
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
-            //=====限制输入类型：只允许输入正整数
+            //=====只允许输入正整数
             $('[data-type="int[positive]"]').on('input', function(){
                 var value = $(this).val();
                 value = restrict.onlyInterval(value);
@@ -405,8 +520,18 @@
             });
 
 
+
             //——————————————————————————————————————————
-            //=====限制输入类型：只允许输入正小数
+            //=====只允许输入正负整数 add 20211030-1
+            $('[data-type="int[negative]"]').on('input', function(){
+                var value = $(this).val();
+                value = restrict.negativeInterval(value);
+                $(this).val(value);
+            });
+
+
+            //——————————————————————————————————————————
+            //=====只允许输入正小数
             $('[data-type="float[positive]"]').on('input', function(){
                 var value = $(this).val();
                 value = restrict.onlyFloat(value);
@@ -423,7 +548,7 @@
 
 
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //+                                                            系列事件                                       
+            //+                                                            输入、聚焦、失焦事件                                     
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
             //=====房产总价输入事件
@@ -464,6 +589,7 @@
             });
 
 
+
             //——————————————————————————————————————————
             //=====贷款总额失焦事件 add 20211026-1
             $('#c-loanAmount').on('blur', function(){
@@ -490,9 +616,35 @@
 
 
 
+            //——————————————————————————————————————————
+            //=====利率方式对应值输入事件 add 20211030-1
+            $('#c-wayRate').on('input', function(){
+                fnCountPointRate($(this));
+            });
 
 
 
+            //——————————————————————————————————————————
+            //=====基点输入事件 add 20211030-1
+            $('#c-commercialBasicPoint').on('input', function(){
+                fnCountPointRate($(this));
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====贷款利率、商业性利率输入事件 add 20211030-1
+            $('#c-loanRate, #c-commercialRate').on('input', function(){
+                fnCountPointRate($(this));
+            });
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                            下拉事件                                       
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
             //=====按揭成数下拉 edit 20211026-1
             $('#c-loanMix').on('click', function(){
@@ -509,20 +661,39 @@
                     {"value":"90%"},
                     {"value":"100%"}
                 ]}  
-                neuiInputsearch({
+                // neuiInputsearch({
+                //     source: mixJson,
+                //     event: "click",
+                //     onConfirm: function(e){
+                //         var $ele = $(e.dom),
+                //             value = e.value;
+                //         var newValue = value.toString().replace(/([%|成])/g, '');
+                //         var mix = value.indexOf('%') >= 0 ? parseFloat(newValue) / 100 : (value.indexOf('成') >= 0 ? parseFloat(newValue) / 10 : newValue);
+                //         $ele.attr('data-value', mix); // 小数. eg. 10% 或 1成 就是 0.1
+
+                //         var total = parseFloat($('#c-housePrice').val().toString().replace(/,/g, ''));
+                //         fnCountLoanAmount(total, mix);
+                //     }
+                // }, $this)
+
+                $(this).neuiPicker({
+                    caption: "按揭成数",
                     source: mixJson,
-                    event: "click",
-                    onConfirm: function(e){
-                        var $ele = $(e.dom),
-                            value = e.value;
+                    format: {
+                        value: ["value"],
+                        hid: ["id"],
+                        forbid: "disabled"
+                    },
+                    onConfirm: function (e) {
+                        var value = e.value;
                         var newValue = value.toString().replace(/([%|成])/g, '');
                         var mix = value.indexOf('%') >= 0 ? parseFloat(newValue) / 100 : (value.indexOf('成') >= 0 ? parseFloat(newValue) / 10 : newValue);
-                        $ele.attr('data-value', mix); // 小数. eg. 10% 或 1成 就是 0.1
+                        $this.attr('data-value', mix); // 小数. eg. 10% 或 1成 就是 0.1
 
                         var total = parseFloat($('#c-housePrice').val().toString().replace(/,/g, ''));
                         fnCountLoanAmount(total, mix);
                     }
-                }, $this)
+                })
             });
 
 
@@ -538,14 +709,65 @@
                     {"value":"公积金贷"},
                     {"value":"组合贷"}
                 ]}
-                neuiInputsearch({
+                // neuiInputsearch({
+                //     source: categoryJson,
+                //     event: "click",
+                //     onConfirm: function(e){
+                //         var value = e.value;
+                //         fnShowSomeBlockAndSignRate(e.value);
+                //     }
+                // }, $this)
+
+                $(this).neuiPicker({
+                    caption: "贷款品种",
                     source: categoryJson,
-                    event: "click",
-                    onConfirm: function(e){
-                        var value = e.value;
+                    format: {
+                        value: ["value"],
+                        hid: ["id"],
+                        forbid: "disabled"
+                    },
+                    onConfirm: function (e) {
                         fnShowSomeBlockAndSignRate(e.value);
                     }
-                }, $this)
+                })
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====利率方式下拉 add 20211030-1
+            $('#c-wayText').on('click', function(){
+                var $this = $(this);
+                var  rateJson = get_data_rate();
+                var tmp_lilv_lpr = rateJson["lilv_lpr"], // LPR利率
+                    tmp_lilv_jz= rateJson["lilv_jz"], // 基准利率
+                    tmp_liliv_gjj = rateJson["lilv_gjj"]; // 公积金利率
+                // 基准利率N倍
+                var tmp_lilv_jz_11 = parseFloat(tmp_lilv_jz) * 1.1,
+                    tmp_lilv_jz_105 = parseFloat(tmp_lilv_jz) * 1.05,
+                    tmp_lilv_jz_085 = parseFloat(tmp_lilv_jz) * 0.85;
+                var wayJson = {"data":[
+                    {"value":"最新报价利率(LPR) ", "id": tmp_lilv_lpr },
+                    {"value":"基准利率", "id": tmp_lilv_jz },
+                    {"value":"基准利率1.1倍", "id": tmp_lilv_jz_11 },
+                    {"value":"基准利率1.05倍","id": tmp_lilv_jz_105 },
+                    {"value":"基准利率85折", "id": tmp_lilv_jz_085 }
+                ]}
+                $(this).neuiPicker({
+                    caption: "利率方式",
+                    source: wayJson,
+                    format: {
+                        value: ["value"],
+                        hid: ["id"],
+                        forbid: "disabled"
+                    },
+                    onConfirm: function (e) {
+                        // console.log('e：', e)
+                        var ls_lilv_fangshi = e.value, ls_lilv_jz = e.id;
+                        $('#c-wayRate').val(convert.decimal2Percent(ls_lilv_jz, 'round', 2).toString().replace(/%/g, '')); // 利率方式对应值赋值
+                        fnCountPointRate($('#c-wayRate')); // 重算商业性利率
+                    }
+                })
             });
 
 
@@ -581,20 +803,32 @@
                     {"value":"25年(300期)"},
                     {"value":"30年(360期)"},
                 ]}  
-                neuiInputsearch({
+                // neuiInputsearch({
+                //     source: yearJson,
+                //     event: "click",
+                //     onConfirm: function(e){
+                //         var $ele = $(e.dom),
+                //             value = e.value;
+                //         var newValue = value.toString().replace(/([\d]*)年\(([\d]*)期\)/, '$2');
+                //         $ele.attr('data-value', newValue);
+                //     }
+                // }, $this)
+
+                $(this).neuiPicker({
+                    caption: "贷款年限",
                     source: yearJson,
-                    event: "click",
-                    onConfirm: function(e){
-                        var $ele = $(e.dom),
-                            value = e.value;
+                    format: {
+                        value: ["value"],
+                        hid: ["id"],
+                        forbid: "disabled"
+                    },
+                    onConfirm: function (e) {
+                        var value = e.value;
                         var newValue = value.toString().replace(/([\d]*)年\(([\d]*)期\)/, '$2');
-                        $ele.attr('data-value', newValue);
+                        $this.attr('data-value', newValue);
                     }
-                }, $this)
+                })
             });
-
-
-
 
 
 
@@ -614,15 +848,107 @@
 
 
 
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                            按钮事件                                       
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
             //=====开始计算并保存按钮
             $('#btn-confirm').on('click', function(){
-                fnCalculateResult();
+                fnRunSave();
             });
 
 
 
 
+
+            //——————————————————————————————————————————
+            //=====等额本息查看分期金额按钮 edit 20211026-1
+            $('#btn-view-stage-amount-interest').on('click', function(){ 
+                var cate = $('#c-loanCategory').val(), // 贷款品种
+                    method = $('#c-loanPayBackMethod').val(), // 还款方式
+                    month = parseInt($('#c-loanYears').attr('data-value')); // 贷款年限(单位：月)   
+                var amount1 = 0, // 商业性贷款金额(单位：元)
+                    rate1 = 0, // 商业性贷款利率(年利率)
+                    amount2 = 0, // 公积金贷款利率(年利率)
+                    rate2 = 0; // 公积金贷款利率(年利率)
+                if(cate.indexOf("组合贷") >= 0){ // 组合贷
+                    amount1 = parseFloat(convert.tenThousand2Yuan($('#c-commercialAmount').val().replace(/,/g, '')));
+                    rate1 = $('#c-commercialRate').val();
+                    amount2 = parseFloat(convert.tenThousand2Yuan($('#c-fundsAmount').val().replace(/,/g, '')));
+                    rate2 = $('#c-fundsRate').val();
+                }else{ // 商业贷、公积金贷
+                    amount1 =  parseFloat(convert.tenThousand2Yuan($('#c-loanAmount').val().replace(/,/g, ''))),
+                    rate1 = parseFloat($('#c-loanRate').val());
+                    amount2 = 0;
+                    rate2 = 0;
+                }
+                var arr = [ method, month, amount1,  rate1, amount2, rate2 ];
+                 // console.log('数组：', arr);
+                neui.installmentPayment({
+                    payment: "等额本息", // 还款方式(可选)。值：本额本息(默认), 等额本金
+                    month: month, // 贷款期数(可选), 单位：期(或月)。默认240。比如：15年就是15*12=180期, 20年就是20*12=240期, 30年就是30*12=360期
+                    total: amount1, // 贷款总额(可选), 单位：元。默认900000(即90万元)
+                    rate: rate1, // 贷款年利率(可选), 单位：%。默认4.9%
+                    // 组合贷时，下面填写公积金贷款金额与年利率
+                    total2: amount2, // 贷款总额(可选), 单位：元。默认0
+                    rate2: rate2, // 公积金贷款年利率(可选), 单位：%。默认0%
+                    //
+                    digit: 2, // 保留小数位数(可选), 默认2
+                    caption: "分期详情" // 窗口标题(可选), 默认空(系统会自动添加成"XX分期金额")
+                })
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====等额本金查看分期金额按钮 edit 20211026-1
+            $('#btn-view-stage-amount-principal').on('click', function(){ 
+                var cate = $('#c-loanCategory').val(), // 贷款品种
+                    method = $('#c-loanPayBackMethod').val(), // 还款方式
+                    month = parseInt($('#c-loanYears').attr('data-value')); // 贷款年限(单位：月)
+                var amount1 = 0, // 商业性贷款金额(单位：元)
+                    rate1 = 0, // 商业性贷款利率(年利率)
+                    amount2 = 0, // 公积金贷款利率(年利率)
+                    rate2 = 0; // 公积金贷款利率(年利率)
+                if(cate.indexOf("组合贷") >= 0){ // 组合贷
+                    amount1 = parseFloat(convert.tenThousand2Yuan($('#c-commercialAmount').val().replace(/,/g, '')));
+                    rate1 = $('#c-commercialRate').val();
+                    amount2 = parseFloat(convert.tenThousand2Yuan($('#c-fundsAmount').val().replace(/,/g, '')));
+                    rate2 = $('#c-fundsRate').val();
+                }else{ // 商业贷、公积金贷
+                    amount1 =  parseFloat(convert.tenThousand2Yuan($('#c-loanAmount').val().replace(/,/g, ''))),
+                    rate1 = parseFloat($('#c-loanRate').val());
+                    amount2 = 0;
+                    rate2 = 0;
+                }
+                var arr = [ method, month, amount1,  rate1, amount2, rate2 ];
+                // console.log('数组：', arr);
+                neui.installmentPayment({
+                    payment: "等额本金", // 还款方式(可选)。值：本额本息(默认), 等额本金
+                    month: month, // 贷款期数(可选), 单位：期(或月)。默认240。比如：15年就是15*12=180期, 20年就是20*12=240期, 30年就是30*12=360期
+                    total: amount1, // 贷款总额(可选), 单位：元。默认900000(即90万元)
+                    rate: rate1, // 贷款年利率(可选), 单位：%。默认4.9%
+                    // 组合贷时，下面填写公积金贷款金额与年利率
+                    total2: amount2, // 贷款总额(可选), 单位：元。默认0
+                    rate2: rate2, // 公积金贷款年利率(可选), 单位：%。默认0%
+                    //
+                    digit: 2, // 保留小数位数(可选), 默认2
+                    caption: "分期详情" // 窗口标题(可选), 默认空(系统会自动添加成"XX分期金额")
+                })
+            });
+
+
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                            子函数集合                                       
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
             /**
              * 根据贷款品种显示不同区域,并给贷款利率赋值 add 20211026-1
@@ -633,20 +959,24 @@
                 if(ps_dkpz.indexOf("组合贷") >= 0){ // 组合贷
                     $('.block__compose').show();
                     $('.block__rate').hide();
+                    $('.block__quote').show();
                     if(ps_load_time != 'init' && $('#c-commercialRate').val() == '') $('#c-commercialRate').val(commerceRate);
                     if(ps_load_time != 'init' && $('#c-fundsRate').val() == '') $('#c-fundsRate').val(fundRate);
-                }else if(ps_dkpz.indexOf("商业贷") >= 0){
+                }else if(ps_dkpz.indexOf("商业贷") >= 0){ // 商业贷
                     $('.block__compose').hide();
                     $('.block__rate').show();
+                    $('.block__quote').show();
                     if(ps_load_time != 'init') $('#c-loanRate').val(commerceRate);
-                }else{
+                }else{ // 公积金贷
                     $('.block__compose').hide();
                     $('.block__rate').show();
+                    $('.block__quote').hide();
                     if(ps_load_time != 'init') $('#c-loanRate').val(fundRate);
                 }
             }
 
 
+            //——————————————————————————————————————————
             /**
              * 子函数：计算贷款总额 edit 20211026-1
              * @param {number} ps_price 房产总价(单位：元)
@@ -662,6 +992,7 @@
             }
 
 
+            //——————————————————————————————————————————
             /**
              * 计算商业性贷款金额及公积金贷款金额 add 20211026-1
              * [注]： 优先保持公积金贷款金额不变
@@ -692,11 +1023,134 @@
             }
 
 
+            //——————————————————————————————————————————
+            /**
+             * 根据利率方式计算基点、贷款利率、商业利率 add 20211030-1
+             * @param {HTML DOM} o 当前节点jQ对象或DOM对象
+             */
+             function fnCountPointRate(o){
+                var $dom = o instanceof jQuery ? o : $(o);
+                var eleId = $dom.attr('id');
+                // console.log('eleId：', eleId);
+                var tmp_value = parseFloat($dom.val()),
+                    tmp_lilv_jz = parseFloat($('#c-wayRate').val()), // 利率方式对应值
+                    tmp_jidian = (parseFloat($('#c-commercialBasicPoint').val()) / 100).toFixed(2); // 基点.eg. 55就是0.55
+                    // tmp_lilv_shangye = parseFloat($('#commercialRate').val()); // 商业性利率
+                    // tmp_lilv = parseFloat($('#loanRate').val()); // 
+                // 转化
+                if(isNaN(tmp_value)) tmp_value = 0;
+                if(isNaN(tmp_lilv_jz)) tmp_lilv_jz = 0;
+                if(isNaN(tmp_jidian)) tmp_jidian = 0;
+                // 根据输入框元素计算：相加或相减
+                if(eleId == 'c-wayRate' || eleId == 'c-commercialBasicPoint'){ // 利率方式对应值、基点输入时，改变贷款利率或商业性利率一栏
+                    var sum = (parseFloat(tmp_lilv_jz) + parseFloat(tmp_jidian)).toFixed(2);
+                    // console.log('基准：', tmp_lilv_jz, '\n基点：', tmp_jidian, '\n相加和：',sum);
+                    // console.log('-------------')
+                    if($('#c-loanRate').is(':visible')) $('#c-loanRate').val(sum);
+                    if($('#c-commercialRate').is(':visible')) $('#c-commercialRate').val(sum);
+                }
+                else if(eleId == 'c-loanRate' || eleId == 'c-commercialRate'){ // 贷款利率、商业性利率输入时，改变基点一栏
+                    var minus = ( (parseFloat(tmp_value) - parseFloat(tmp_lilv_jz)).toFixed(2) )  * 1000000 / 10000; // 相当于 * 100
+                    // console.log('基准：', tmp_lilv_jz, '\n商业性利率：', tmp_value, '\n相减差：',minus);
+                    // console.log('-------------')
+                    $('#c-commercialBasicPoint').val(minus);
+                }
+            }
 
+
+
+
+            //——————————————————————————————————————————
+            /**
+             * 房贷计算器
+             * @param {object} option 贷款总额、年限、利率、还款方式等参数组成的对象
+             * @returns {object} 返回贷款总额、还款月数、月供金额、首月还款、每月递减、本息合计、总支付利息等参数组成的对象。注：返回值没有千位进位,即去掉了逗号
+             */
+            function fnCalculateMortgage(option){
+                var decimals = 2; // 保留小数位数
+                var defaults = {
+                    method: "等额本息", // 还款方式. 等额本息, 等额本金
+                    month: 0, // 贷款年限(单位：月)
+                    amount: 0, // 贷款总额(单位：元)
+                    rate: 0 // 贷款利率(月利率). 月利率 = 年利率 / 12。如年利率5.2%,则月利率=5.2/1200
+                }
+                var settings = $.extend(true, {}, defaults, option || {});
+                var amount = parseFloat(settings.amount),
+                    month = parseInt(settings.month),
+                    rate = parseFloat(settings.rate),
+                    method = settings.method;
+                var arr = [ amount, month, rate, method ]
+                // console.log('数组：', arr);
+                
+                // 变量
+                var monthlyPayment = 0; // 月供金额
+                    payEveryMonth = 0, // 每月还款
+                    payFirstMonth = 0, // 首月还款
+                    cutPerMonth = 0, // 每月递减
+                    interestTotal = 0, // 总支付利息
+                    principalInterestTotal = 0; // 本息合计
+
+                // 等额本息
+                if(method.indexOf('等额本息') >= 0){
+                    payEveryMonth = ( amount * rate * Math.pow(1 + rate, month) ) / ( Math.pow(1 + rate, month) - 1 ); // 每月还款
+                    interestTotal = payEveryMonth * month - amount; // 总支付利息,
+                    principalInterestTotal = payEveryMonth * month; // 本息合计
+                    // 转化
+                    amount = format.thousandth(convert.yuan2TenThousand(amount));
+                    month = format.thousandth(month);
+                    payEveryMonth = format.thousandth(parseFloat(payEveryMonth).toFixed(decimals));
+                    principalInterestTotal = format.thousandth(convert.yuan2TenThousand(principalInterestTotal, 'round', decimals));
+                    interestTotal = format.thousandth(convert.yuan2TenThousand(interestTotal, 'round', decimals));
+                    // 特殊情况
+                    if(isNaN(payEveryMonth.toString().replace(/,/g, ''))){ // 利率为0时
+                        payEveryMonth = 0; // 月供等于0
+                        principalInterestTotal = amount; // 本息合计等于本金
+                        interestTotal = 0; // 总支付利息等于0
+                    }
+                    //
+                    monthlyPayment = payEveryMonth;
+                }
+
+                // 等额本金
+                if(method.indexOf('等额本金') >= 0){
+                    payFirstMonth = amount * (1 + month * rate) / month; // 首月还款(单位：元)
+                    cutPerMonth = amount * rate / month; // 每月递减(单位：元)
+                    interestTotal =  amount * rate * (month + 1) / 2; // 总支付利息
+                    principalInterestTotal = amount + amount * rate * (month + 1) / 2; // 本息合计
+                    // 转化
+                    amount = format.thousandth(convert.yuan2TenThousand(amount));
+                    month = format.thousandth(month);
+                    payFirstMonth = format.thousandth(parseFloat(payFirstMonth).toFixed(decimals));
+                    cutPerMonth = format.thousandth(parseFloat(cutPerMonth).toFixed(decimals));
+                    principalInterestTotal = format.thousandth(convert.yuan2TenThousand(principalInterestTotal, 'round', decimals));
+                    interestTotal = format.thousandth(convert.yuan2TenThousand(interestTotal, 'round', decimals));
+                    //
+                    monthlyPayment = payFirstMonth;
+                }
+
+                // 返回值, 去掉千分进位(即去掉逗号)
+                return {
+                    amount: amount.toString().replace(/,/g, ''), // 贷款总额(单位：万元)
+                    month: month.toString().replace(/,/g, ''),  // 还款月数(单位：月)
+                    monthlyPayment: monthlyPayment.toString().replace(/,/g, ''), // 月供金额,每月还款(单位：元)
+                    principalInterestTotal: principalInterestTotal.toString().replace(/,/g, ''), // 本息合计(单位：万元，保留N位小数)
+                    interestTotal: interestTotal.toString().replace(/,/g, ''), // 总支付利息(单位：万元，保留N位小数)
+                    // 等额本息
+                    payEveryMonth: payEveryMonth.toString().replace(/,/g, ''), // 每月还款
+                    // 等额本金
+                    payFirstMonth: payFirstMonth.toString().replace(/,/g, ''), // 首月还款(单位：元, 保留N位小数)
+                    cutPerMonth: cutPerMonth.toString().replace(/,/g, '') // 每月递减(单位：元, 保留N位小数)
+                }            
+            }
+
+
+
+            //——————————————————————————————————————————
             /**
              * 计算按揭结果 edit 20211026-1
-             */
-             function fnCalculateResult(){
+             * 开始计算并保存事件
+              */
+             function fnRunSave(){
                 counter++;
                 // 校验数据完整性
                 var tips = '';
@@ -710,11 +1164,13 @@
                         isMust = $('[data-type="must"]', this).length > 0 ? true : false;
                         if(isMust && value.toString().replace(/([ ]+)/g, '') === '') tips += label + '、';
                     }else{
+                        var $row = $(this);
                         $(this).find('.item-box').each(function(){
                             if($(this).is(':visible')){
                                 label = $('label', this).attr('data-text');
                                 value = $('input:text', this).val();
                                 isMust = $('[data-type="must"]', this).length > 0 ? true : false;
+                                if(typeof label == 'undefined') label = $row.find('label').text();
                                 if(isMust && value.toString().replace(/([ ]+)/g, '') === '') tips += label + '、';
                             }  
                         })
@@ -814,12 +1270,14 @@
                         $('.payback__principal').show().siblings().hide(); // 显示区域
                     }
 
-               
                     
                     // 传递给后台的参数 edit 20211027-1 下25行
                     var ls_anjie_chengshu = $('#c-loanMix').attr('data-value'), // 按揭成数
                         ls_daikuan_je = parseFloat(amount1.toString().replace(/,/g, '')), // 商业性贷款金额,万元转成元
                         ls_dkpz = cate, // 贷款品种
+                        ls_lilv_fangshi = $('#c-wayText').val(), // 利率方式
+                        ls_lilv_jz = (parseFloat($('#c-wayRate').val()) * 10000 / 1000000).toFixed(4), // 利率方式对应值，四舍五入保留4位小数
+                        ls_jidian = (parseFloat($('#c-commercialBasicPoint').val()) * 10000 / 1000000).toFixed(2), // 基点，保留2位小数
                         ls_huankuan_fangshi = method, // 还款方式
                         ls_daikuan_nianxian = $('#c-loanYears').val().toString().replace(/([\d]*)年\(([\d]*)期\)/, '$1'), // 贷款年限(单位：年)
                         ls_lilv = (rate1 * 1200) / 100, // 商业性贷款利率(年利率)
@@ -828,6 +1286,9 @@
                         ls_lilv_gjj = (rate2 * 1200) / 100, // 公积金贷款利率(年利率)
                         ls_yuegong_je_gjj = parseFloat(monthlyPayment2).toFixed(digit); // 公积金月供金额
                     // 转化
+                    if(isNaN(ls_lilv_jz)) ls_lilv_jz = 0;
+                    if(isNaN(ls_jidian)) ls_jidian = 0;
+                    
                     if(ls_daikuan_je.toString().replace(/([ ]+)/g, '') === '') ls_daikuan_je = 0;
                     ls_daikuan_je = ls_daikuan_je.toFixed(digit); // 四舍五入保留N位小数
                     if(ls_lilv.toString().replace(/([ ]+)/g, '') === '' || isNaN(ls_lilv)) ls_lilv = 0;
@@ -840,10 +1301,17 @@
 
                     if(isNaN(ls_yuegong_je)) ls_yuegong_je = 0;
                     if(isNaN(ls_yuegong_je_gjj)) ls_yuegong_je_gjj = 0;
-    
+
+                    // 根据贷款品种再次重置值
+                    if(cate.indexOf("公积金贷") >= 0){ // 公积金贷时
+                        ls_lilv_jz = 0;
+                        ls_jidian = 0;
+                    }
+
                     // console.log('按揭成数：', ls_anjie_chengshu, '\n贷款品种：', ls_dkpz, '\n还款方式：', ls_huankuan_fangshi, '\n贷款年限：', ls_daikuan_nianxian, '\n月供：', ls_yuegong_je);
                     // console.log('商业性贷款金额：', ls_daikuan_je, '\n公积金贷款金额：', ls_daikuan_je_gjj, '\n商业性利率：', ls_lilv, '\n公积金利率：', ls_lilv_gjj);
                     // console.log('商业性月供：', ls_yuegong_je, '\n公积金月供：', ls_yuegong_je_gjj);
+                    // console.log('利率方式：', ls_lilv_fangshi, '\n利率方式对应值：', ls_lilv_jz, '\n基点：', ls_jidian);
                    
                     // 开始执行
                     var flag = '', msg = '保存成功';
@@ -870,6 +1338,9 @@
                             "dkpz": ls_dkpz,
                             "huankuan_fangshi": ls_huankuan_fangshi,
                             "daikuan_nianxian": ls_daikuan_nianxian,
+                            "lilv_fangshi": ls_lilv_fangshi,
+                            "lilv_jz": ls_lilv_jz,
+                            "jidian": ls_jidian,
                             "lilv": ls_lilv,
                             "lilv_gjj": ls_lilv_gjj,
                             "yuegong_je": ls_yuegong_je,
@@ -917,172 +1388,6 @@
                     neui.destroyAnimate();
                 }, 100)
             }
-
-
-
-            /**
-             * 房贷计算器
-             * @param {object} option 贷款总额、年限、利率、还款方式等参数组成的对象
-             * @returns {object} 返回贷款总额、还款月数、月供金额、首月还款、每月递减、本息合计、总支付利息等参数组成的对象。注：返回值没有千位进位,即去掉了逗号
-             */
-            function fnCalculateMortgage(option){
-                var decimals = 2; // 保留小数位数
-                var defaults = {
-                    method: "等额本息", // 还款方式. 等额本息, 等额本金
-                    month: 0, // 贷款年限(单位：月)
-                    amount: 0, // 贷款总额(单位：元)
-                    rate: 0 // 贷款利率(月利率). 月利率 = 年利率 / 12。如年利率5.2%,则月利率=5.2/1200
-                }
-                var settings = $.extend(true, {}, defaults, option || {});
-                var amount = parseFloat(settings.amount),
-                    month = parseInt(settings.month),
-                    rate = parseFloat(settings.rate),
-                    method = settings.method;
-                var arr = [ amount, month, rate, method ]
-                // console.log('数组：', arr);
-                
-                // 变量
-                var monthlyPayment = 0; // 月供金额
-                    payEveryMonth = 0, // 每月还款
-                    payFirstMonth = 0, // 首月还款
-                    cutPerMonth = 0, // 每月递减
-                    interestTotal = 0, // 总支付利息
-                    principalInterestTotal = 0; // 本息合计
-
-                // 等额本息
-                if(method.indexOf('等额本息') >= 0){
-                    payEveryMonth = ( amount * rate * Math.pow(1 + rate, month) ) / ( Math.pow(1 + rate, month) - 1 ); // 每月还款
-                    interestTotal = payEveryMonth * month - amount; // 总支付利息,
-                    principalInterestTotal = payEveryMonth * month; // 本息合计
-                    // 转化
-                    amount = format.thousandth(convert.yuan2TenThousand(amount));
-                    month = format.thousandth(month);
-                    payEveryMonth = format.thousandth(parseFloat(payEveryMonth).toFixed(decimals));
-                    principalInterestTotal = format.thousandth(convert.yuan2TenThousand(principalInterestTotal, 'round', decimals));
-                    interestTotal = format.thousandth(convert.yuan2TenThousand(interestTotal, 'round', decimals));
-                    // 特殊情况
-                    if(isNaN(payEveryMonth.toString().replace(/,/g, ''))){ // 利率为0时
-                        payEveryMonth = 0; // 月供等于0
-                        principalInterestTotal = amount; // 本息合计等于本金
-                        interestTotal = 0; // 总支付利息等于0
-                    }
-                    //
-                    monthlyPayment = payEveryMonth;
-                }
-
-                // 等额本金
-                if(method.indexOf('等额本金') >= 0){
-                    payFirstMonth = amount * (1 + month * rate) / month; // 首月还款(单位：元)
-                    cutPerMonth = amount * rate / month; // 每月递减(单位：元)
-                    interestTotal =  amount * rate * (month + 1) / 2; // 总支付利息
-                    principalInterestTotal = amount + amount * rate * (month + 1) / 2; // 本息合计
-                    // 转化
-                    amount = format.thousandth(convert.yuan2TenThousand(amount));
-                    month = format.thousandth(month);
-                    payFirstMonth = format.thousandth(parseFloat(payFirstMonth).toFixed(decimals));
-                    cutPerMonth = format.thousandth(parseFloat(cutPerMonth).toFixed(decimals));
-                    principalInterestTotal = format.thousandth(convert.yuan2TenThousand(principalInterestTotal, 'round', decimals));
-                    interestTotal = format.thousandth(convert.yuan2TenThousand(interestTotal, 'round', decimals));
-                    //
-                    monthlyPayment = payFirstMonth;
-                }
-
-                // 返回值, 去掉千分进位(即去掉逗号)
-                return {
-                    amount: amount.toString().replace(/,/g, ''), // 贷款总额(单位：万元)
-                    month: month.toString().replace(/,/g, ''),  // 还款月数(单位：月)
-                    monthlyPayment: monthlyPayment.toString().replace(/,/g, ''), // 月供金额,每月还款(单位：元)
-                    principalInterestTotal: principalInterestTotal.toString().replace(/,/g, ''), // 本息合计(单位：万元，保留N位小数)
-                    interestTotal: interestTotal.toString().replace(/,/g, ''), // 总支付利息(单位：万元，保留N位小数)
-                    // 等额本息
-                    payEveryMonth: payEveryMonth.toString().replace(/,/g, ''), // 每月还款
-                    // 等额本金
-                    payFirstMonth: payFirstMonth.toString().replace(/,/g, ''), // 首月还款(单位：元, 保留N位小数)
-                    cutPerMonth: cutPerMonth.toString().replace(/,/g, '') // 每月递减(单位：元, 保留N位小数)
-                }            
-            }
-
-
-
-
-
-            //——————————————————————————————————————————
-            //=====等额本息查看分期金额按钮 edit 20211026-1
-            $('#btn-view-stage-amount-interest').on('click', function(){ 
-                var cate = $('#c-loanCategory').val(), // 贷款品种
-                    method = $('#c-loanPayBackMethod').val(), // 还款方式
-                    month = parseInt($('#c-loanYears').attr('data-value')); // 贷款年限(单位：月)   
-                var amount1 = 0, // 商业性贷款金额(单位：元)
-                    rate1 = 0, // 商业性贷款利率(年利率)
-                    amount2 = 0, // 公积金贷款利率(年利率)
-                    rate2 = 0; // 公积金贷款利率(年利率)
-                if(cate.indexOf("组合贷") >= 0){ // 组合贷
-                    amount1 = parseFloat(convert.tenThousand2Yuan($('#c-commercialAmount').val().replace(/,/g, '')));
-                    rate1 = $('#c-commercialRate').val();
-                    amount2 = parseFloat(convert.tenThousand2Yuan($('#c-fundsAmount').val().replace(/,/g, '')));
-                    rate2 = $('#c-fundsRate').val();
-                }else{ // 商业贷、公积金贷
-                    amount1 =  parseFloat(convert.tenThousand2Yuan($('#c-loanAmount').val().replace(/,/g, ''))),
-                    rate1 = parseFloat($('#c-loanRate').val());
-                    amount2 = 0;
-                    rate2 = 0;
-                }
-                var arr = [ method, month, amount1,  rate1, amount2, rate2 ];
-                 // console.log('数组：', arr);
-                neui.installmentPayment({
-                    payment: "等额本息", // 还款方式(可选)。值：本额本息(默认), 等额本金
-                    month: month, // 贷款期数(可选), 单位：期(或月)。默认240。比如：15年就是15*12=180期, 20年就是20*12=240期, 30年就是30*12=360期
-                    total: amount1, // 贷款总额(可选), 单位：元。默认900000(即90万元)
-                    rate: rate1, // 贷款年利率(可选), 单位：%。默认4.9%
-                    // 组合贷时，下面填写公积金贷款金额与年利率
-                    total2: amount2, // 贷款总额(可选), 单位：元。默认0
-                    rate2: rate2, // 公积金贷款年利率(可选), 单位：%。默认0%
-                    //
-                    digit: 2, // 保留小数位数(可选), 默认2
-                    caption: "分期详情" // 窗口标题(可选), 默认空(系统会自动添加成"XX分期金额")
-                })
-            });
-
-
-
-
-
-            //——————————————————————————————————————————
-            //=====等额本金查看分期金额按钮 edit 20211026-1
-            $('#btn-view-stage-amount-principal').on('click', function(){ 
-                var cate = $('#c-loanCategory').val(), // 贷款品种
-                    method = $('#c-loanPayBackMethod').val(), // 还款方式
-                    month = parseInt($('#c-loanYears').attr('data-value')); // 贷款年限(单位：月)
-                var amount1 = 0, // 商业性贷款金额(单位：元)
-                    rate1 = 0, // 商业性贷款利率(年利率)
-                    amount2 = 0, // 公积金贷款利率(年利率)
-                    rate2 = 0; // 公积金贷款利率(年利率)
-                if(cate.indexOf("组合贷") >= 0){ // 组合贷
-                    amount1 = parseFloat(convert.tenThousand2Yuan($('#c-commercialAmount').val().replace(/,/g, '')));
-                    rate1 = $('#c-commercialRate').val();
-                    amount2 = parseFloat(convert.tenThousand2Yuan($('#c-fundsAmount').val().replace(/,/g, '')));
-                    rate2 = $('#c-fundsRate').val();
-                }else{ // 商业贷、公积金贷
-                    amount1 =  parseFloat(convert.tenThousand2Yuan($('#c-loanAmount').val().replace(/,/g, ''))),
-                    rate1 = parseFloat($('#c-loanRate').val());
-                    amount2 = 0;
-                    rate2 = 0;
-                }
-                var arr = [ method, month, amount1,  rate1, amount2, rate2 ];
-                // console.log('数组：', arr);
-                neui.installmentPayment({
-                    payment: "等额本金", // 还款方式(可选)。值：本额本息(默认), 等额本金
-                    month: month, // 贷款期数(可选), 单位：期(或月)。默认240。比如：15年就是15*12=180期, 20年就是20*12=240期, 30年就是30*12=360期
-                    total: amount1, // 贷款总额(可选), 单位：元。默认900000(即90万元)
-                    rate: rate1, // 贷款年利率(可选), 单位：%。默认4.9%
-                    // 组合贷时，下面填写公积金贷款金额与年利率
-                    total2: amount2, // 贷款总额(可选), 单位：元。默认0
-                    rate2: rate2, // 公积金贷款年利率(可选), 单位：%。默认0%
-                    //
-                    digit: 2, // 保留小数位数(可选), 默认2
-                    caption: "分期详情" // 窗口标题(可选), 默认空(系统会自动添加成"XX分期金额")
-                })
-            });
 
     
     
