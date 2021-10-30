@@ -39,9 +39,9 @@
 	<style>
 		body{overflow-y: hidden;}
 		/*+搜索区域+*/
-		.section-search{position: relative; width: 98%; margin: 0 auto;}
-		.section-search i.fa{position: absolute; left: 8px; top: 50%; -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%); -o-transform: translateY(-50%); transform: translateY(-50%); color: #999;}
-		.section-history{margin-top: 15px;}
+		.search{position: relative; width: 98%; margin: 0 auto;}
+		.search i.fa{position: absolute; left: 8px; top: 50%; -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%); -o-transform: translateY(-50%); transform: translateY(-50%); color: #999;}
+		.history{margin-top: 15px;}
 		.block-search .eform-one{width: 15%; display: inline-block; *display: inline; _display: inline; zoom: 1; vertical-align: middle;}
 		.block-search .eform-l,
 		.block-search .eform-r{float: left;}
@@ -51,8 +51,8 @@
 	</style>
 	<div class="wrap">
 		<main>
-			<section class="section-search"></section><!--/.section-search-->
-			<section class="section-history"></section><!--/.section-history-->
+			<section class="search"></section><!--/.search-->
+			<section class="history"></section><!--/.history-->
 		</main>
 	</div><!--/.wrap-->
 
@@ -225,7 +225,7 @@
 
 		/*+-------------FUNCTION---------------+*/
 		/**
-		 * 函数：加载数据
+		 * 函数：加载数据 edit 20211030-1
 		 * @param {object} options 参数
 		 */
 		 function loadData(options){
@@ -233,17 +233,14 @@
 				resetOrder: false // 是否重置序号,默认false
 			}
 			var settings = $.extend(true, {}, defaults, options || {});
+			if(settings.resetOrder){ // 重置序号
+				$.privateProperty.pageCurpage['history'] = 1;
+			}
 			neui.showAnimate();
 			setTimeout(function(){
 				var listJson = getListData(1); 
 				var pages = getListPage();
 				createTableList(listJson, pages);
-				// 重置序号
-				if(settings.resetOrder){
-					$('.section-history .list-one').each(function(index){
-						$('.col-order>span', this).text(index + 1);
-					})
-				}
 				neui.destroyAnimate();
 			}, 100)
 		}
@@ -256,7 +253,7 @@
 		* @param {number} pageCount 分页总页数
 		*/
 		function createTableList(dataJson, pageCount){
-			$('.section-history').neuiLikeTable({
+			$('.history').neuiLikeTable({
 				setJson: g_setJson, //列字段配置json
 				dataJson: dataJson, //表格数据json
 				pagination: {
@@ -347,7 +344,7 @@
 							'</div>',
 						'</div>'
 					].join('\r\n');
-			$('.section-search').empty().append(_html);
+			$('.search').empty().append(_html);
 		}
 
 
@@ -738,8 +735,9 @@
 					})
 					return;
 				}
-				//刷新数据
-				loadData({ resetOrder: true }); 
+
+				//刷新数据，并重置序号  edit 20211030-1
+				loadData({ resetOrder: true });
 			});
 
 
