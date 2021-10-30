@@ -33,25 +33,25 @@
         body{overflow:hidden;}
         .wrap{width:100%;padding:8px 10px;}
         /*+-----------搜索区域------------------+*/
-        .section-top{margin-bottom:8px;} 
-        .section-top>div{display:inline-block; *display:inline; _display:inline; *zoom:1; }
+        .operate{margin-bottom:8px;} 
+        .operate>div{display:inline-block; *display:inline; _display:inline; *zoom:1; }
         .operate-button{position:fixed; z-index:50; top:15px; right:45px; } 
         .operate-button>button[type="button"]{height:28px; line-height:28px; cursor: pointer;}
 
-        .section-search{}
+        .search{}
         .collist{margin-left:4px;}
         .collist .label label{width:auto;}
         .collist button[type="button"]{height:28px; line-height:28px; border-radius:0;}
     </style>
 
     <div class="wrap">
-        <div class="section-search"></div><!--/.section-search-->
-        <div class="section-top">
+        <div class="search"></div><!--/.search-->
+        <div class="operate">
             <div class="operate-button">
                 <button type="button" id="btn-save-all" class="ne-btn has-texture no-border no-bg-img red">全部保存</button>
             </div><!--/.operate-button-->
-        </div><!--/.section-top-->
-        <div class="section-history"></div><!--/.section-history-->
+        </div><!--/.operate-->
+        <div class="history"></div><!--/.history-->
     </div><!--/.wrap--> 
     
   
@@ -71,7 +71,7 @@
     /*+-----------------------------示例---------------------------+*/
     /*
     * 几个插件内部自定义的函数非常有用,如下（以下示例中 $tableDom为指定表格根节点，当只有一张表格时$tableDom为可选项）
-
+        · $.privateProperty.pageCurpage['history'] = 1; //重置序号
         · neuiLikeTable.addOneRow($tableDom); //新建一空行
         · neuiLikeTable.insertOneRow(source, $tableDom); //新建一空行或非空行. source为数据源. source为空时(即''或{})则新建空行,非空时(如{name:"张三"})则新建非空行
         · neuiLikeTable.deleteOneRow(5, $tableDom); //删除某一行. 5代表该行索引值
@@ -93,7 +93,7 @@
 
     /*+-----------------------------全局变量---------------------------+*/
     //=====
-    var $rootNode = $('.section-history'); //列表根节点
+    var $rootNode = $('.history'); //列表根节点
     var $tableDom = ''; //指定表格根节点(多张表格时必须指定,单张表格时可选). 请在创建表格的函数中进行赋值.
 
     //=====
@@ -252,7 +252,7 @@
 
     /*+--------------------------------+*/
     //=====加载搜索区域(调用搜索框插件)
-    $('.section-search').neuiSearchBox($searchJson);
+    $('.search').neuiSearchBox($searchJson);
 
 
 
@@ -271,7 +271,7 @@
         headSubWrap:true, //表头单位是否换行(不想换行时请确保列足够宽,否则依然会自动换行(可选).默认true
         rowHeight:"auto", //表身行高, auto 自动（默认）, 其它大于0的数字如：30 表示高30px.(可选)
         tbodyHeight:"auto", //自定义表格内容高度. auto 自动(默认). 其它大于0的数字如：300 表示高300px.(可选)
-        topHeight: "auto", //$('.section-top').outerHeight(true) + $('.section-search').outerHeight(true), //表格以外上面部分高度(如header部分(可选). auto 自动(默认)，系统会自动计算表格距离顶部的距离; 其它大于0的数字如：150 表示高150px.
+        topHeight: "auto", //$('.operate').outerHeight(true) + $('.search').outerHeight(true), //表格以外上面部分高度(如header部分(可选). auto 自动(默认)，系统会自动计算表格距离顶部的距离; 其它大于0的数字如：150 表示高150px.
         botHeight:"auto", //表格以外下面部分高度（不含分页部分）(如footer部分).  auto 自动,即高度为0 (默认), 其它大于0的数字如：100 表示高100px.(可选)
         nestDepth:1, //表格列表数据json嵌套层次.默认1.(有几个Data就是几层嵌套).(可选)
         pendMethod:"empty", //数据添加方(可选). empty 清空(默认), insert 追加并插入到最后面
