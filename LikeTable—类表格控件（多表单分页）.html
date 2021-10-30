@@ -42,44 +42,44 @@
     /*+-------------------------------+*/
     #container{margin-top: 60px;/* padding:0px 15px; */}
     #main{padding-bottom:55px;}
-    .section-tab{position:fixed;z-index:15;top:0;left:0;right:0;margin:0 auto 35px auto;height:50px;text-align:center;/* box-shadow:0 1px 6px #c8c5c5; */}
-    .section-tab>div{float:left;width:50%;line-height:50px; background-color:#f5f5f5; border:1px solid #d9d5d5; border-top:0; font-size:18px; cursor:pointer; }
-    .section-tab>div:first-child{border-right:0; border-left:0;}
-    .section-tab>div.on{background-color:#fff; border-bottom:0; font-weight:bold;}
-    .section-operate span{position:absolute; z-index:20; top:18px; color:#888; cursor: pointer;}
-    .section-operate span:hover{color:#1296db;}
-    .section-operate span:first-child{left:30%;}
-    .section-operate span+span{right:20%;}
-    .section-operate span em{display:none;}
+    .tab{position:fixed;z-index:15;top:0;left:0;right:0;margin:0 auto 35px auto;height:50px;text-align:center;/* box-shadow:0 1px 6px #c8c5c5; */}
+    .tab>div{float:left;width:50%;line-height:50px; background-color:#f5f5f5; border:1px solid #d9d5d5; border-top:0; font-size:18px; cursor:pointer; }
+    .tab>div:first-child{border-right:0; border-left:0;}
+    .tab>div.on{background-color:#fff; border-bottom:0; font-weight:bold;}
+    .operate span{position:absolute; z-index:20; top:18px; color:#888; cursor: pointer;}
+    .operate span:hover{color:#1296db;}
+    .operate span:first-child{left:30%;}
+    .operate span+span{right:20%;}
+    .operate span em{display:none;}
 
-    .section-search{padding:0 15px;}
-    .section-subtotal{position:fixed; z-index:16; left:0; right:0; bottom:45px; width:100%; margin:0 auto; padding:10px 15px; background-color:#f7f7f7; border:1px solid #ddd; border-left:0; border-right:0; box-shadow:0 -2px 8px 0 #e6dfdf; text-align: left; font-size:18px; }
-    .section-subtotal.empty{background-color:#fff; border:0; box-shadow:none;}
-    .section-subtotal-1{bottom:0;}
-    .section-subtotal .title{font-weight: bold; color:#ff0000;}
-    .section-subtotal em{margin:0 8px; font-style:italic; font-weight: bold;}
+    .sesearch{padding:0 15px;}
+    .subtotal{position:fixed; z-index:16; left:0; right:0; bottom:45px; width:100%; margin:0 auto; padding:10px 15px; background-color:#f7f7f7; border:1px solid #ddd; border-left:0; border-right:0; box-shadow:0 -2px 8px 0 #e6dfdf; text-align: left; font-size:18px; }
+    .subtotal.empty{background-color:#fff; border:0; box-shadow:none;}
+    .subtotal-1{bottom:0;}
+    .subtotal .title{font-weight: bold; color:#ff0000;}
+    .subtotal em{margin:0 8px; font-style:italic; font-weight: bold;}
   </style>
 
   <div class="wrap"><!--edit 20200407-2 20200408-1-->
-    <div id="tab" class="section-tab">
+    <div id="tab" class="tab">
         <div class="tab tab-one on" data-click-times="1">未回复</div>
         <div class="tab tab-two" data-click-times="0">已回复</div>
-    </div><!--/.section-tab-->
-    <div id="operate" class="section-operate">
+    </div><!--/.tab-->
+    <div id="operate" class="operate">
         <span id="btn-refresh-unreply"><i class="fa fa-refresh"></i><em>刷新</em></span>
     </div><!--/#operate-->
     <div id="container">
         <div id="header">
-            <div class="section-search" style="display: none;"></div><!--/.section-search-->
+            <div class="sesearch" style="display: none;"></div><!--/.sesearch-->
         </div><!--/#header-->
         <div id="main">
-            <div class="section-unreply"></div><!--/.section-unreply-->
-            <div class="section-replyed" style="display: none;"></div><!--/.section-replyed-->
+            <div class="unreply"></div><!--/.unreply-->
+            <div class="replyed" style="display: none;"></div><!--/.replyed-->
         </div><!--/#main-->
     </div><!--/#container-->
     <div id="footer">
-        <div class="section-subtotal section-subtotal-1"></div><!--/.section-subtotal-->
-        <div class="section-subtotal section-subtotal-2"></div><!--/.section-subtotal-->
+        <div class="subtotal subtotal-1"></div><!--/.subtotal-->
+        <div class="subtotal subtotal-2"></div><!--/.subtotal-->
     </div><!--/#footer-->
   </div><!--/.wrap--> 
   
@@ -245,7 +245,7 @@
         }
     }
     //=====调用搜索框插件加载搜索区域
-    $('.section-search').neuiSearchBox($searchJson);
+    $('.sesearch').neuiSearchBox($searchJson);
     
     /*+--------------------------------+*/
     //=====[表格列字段json](未回复) edit 20200407-2 20200408-3
@@ -484,7 +484,7 @@
      * add 20200407-2 20200408-1
      */
      function createSubtotalRow(json){
-        var node = $g_tab_index == 1 ? '.section-subtotal-1' : '.section-subtotal-2'
+        var node = $g_tab_index == 1 ? '.subtotal-1' : '.subtotal-2'
         if(!json || $.isEmptyObject(json)) {
             $(node).show().siblings().hide();
             if($(node).children().length == 0) $(node).addClass('empty');
@@ -537,9 +537,9 @@
      * @param {*} pagerJson 分页总页数
      */
     function createTableData(setJson,dataJson,pagerJson,pageCount){
-        var node = '.section-unreply';
+        var node = '.unreply';
         if($g_tab_index == 2) { //选项卡索引值: 1 未回复, 2 已回复
-            node = '.section-replyed'
+            node = '.replyed'
             pagerJson.enable = true; //启用分页
         }
         pagerJson.pageCount = pageCount; //改变分页页码
@@ -792,7 +792,7 @@
 
         /*+--------------------------------------------------------+*/
         //=====选项卡切换
-        $('.section-tab>div').on('click',function(){
+        $('.tab>div').on('click',function(){
             var clickTimes = parseInt($(this).attr('data-click-times')) + 1;
             $(this).attr('data-click-times', clickTimes).addClass('on').siblings().removeClass('on');
             var index = $(this).index() + 1; //选项卡索引
@@ -816,9 +816,9 @@
                     createSubtotalRow($subJson);
 
                     //状态设置
-                    $('.section-search').hide(); //隐藏搜索区域
+                    $('.sesearch').hide(); //隐藏搜索区域
                     $('.pagelist').hide(); //隐藏分页
-                    $('.section-operate').show(); //显示刷新图标区域
+                    $('.operate').show(); //显示刷新图标区域
 
                 }else{ //index=2 edit 20200408-1
 
@@ -847,9 +847,9 @@
                     */
 
                     //状态设置
-                    $('.section-search').show(); //显示搜索区域
+                    $('.sesearch').show(); //显示搜索区域
                     $('.pagelist').show(); //显示分页区域
-                    $('.section-operate').hide(); //隐藏刷新图标区域
+                    $('.operate').hide(); //隐藏刷新图标区域
                     createSubtotalRow({});  //加载空合计行
                 }
 
@@ -886,7 +886,7 @@
 
 
                 $this.children(i).removeClass('fa-spin');
-                $('.section-search').hide(); //隐藏搜索区域
+                $('.sesearch').hide(); //隐藏搜索区域
                 $('.pagelist').hide(); //隐藏分页
 
                 neui.destroyAnimate();
