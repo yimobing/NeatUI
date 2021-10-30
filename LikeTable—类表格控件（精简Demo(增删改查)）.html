@@ -38,8 +38,8 @@
 	<style>
 		body{font-size: 14px; overflow-y: hidden;}
 		/*+搜索区域+*/
-		.section-search{position: relative; width: 98%; margin: 0 auto;  /*text-align: center;*/}
-		.section-search i.fa{position: absolute; left: 8px; top: 50%; -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%); -o-transform: translateY(-50%); transform: translateY(-50%); color: #999;}
+		.search{position: relative; width: 98%; margin: 0 auto;  /*text-align: center;*/}
+		.search i.fa{position: absolute; left: 8px; top: 50%; -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%); -o-transform: translateY(-50%); transform: translateY(-50%); color: #999;}
 		.block-search{display: inline-block; *display: inline; _display: inline; zoom: 1; margin: 0 auto; padding: 10px 15px; border: 1px solid #ddd; border-radius: 4px;}
 		.block-search .eform-one{display: inline-block; *display: inline; _display: inline; zoom: 1; vertical-align: middle; margin-left: 15px;}
 		.block-search .eform-one:first-child{margin-left: 0;}
@@ -53,21 +53,21 @@
         .search-one #s-groupNo, 
         .search-one #s-groupName{width: 250px;}
 		/*操作区域*/
-		.section-operation{margin-top: 10px;}
-		.section-operation button{width: auto!important; min-width: 90px; margin-left: 10px; padding: 0 5px;}
-		.section-operation button:first-child{margin-left: 0;}
-		.section-operation i.fa{margin-right: 5px; font-size: 12px;}
+		.operation{margin-top: 10px;}
+		.operation button{width: auto!important; min-width: 90px; margin-left: 10px; padding: 0 5px;}
+		.operation button:first-child{margin-left: 0;}
+		.operation i.fa{margin-right: 5px; font-size: 12px;}
 		/*列表区域*/
-		.section-history{margin-top: 15px;}
+		.history{margin-top: 15px;}
 	</style>
 	<div class="wrap">
 		<main>
-			<section class="section-search"></section><!--/.section-search-->
-			<section class="section-operation">
+			<section class="search"></section><!--/.search-->
+			<section class="operation">
 				<button type="button" class="ne-btn green" id="btn-add-one"><i class="fa fa-plus"></i>新增</button>
 				<button type="button" class="ne-btn blue" id="btn-save-all"><i class="fa fa-save"></i>全部保存</button>
 			</section>
-			<section class="section-history"></section><!--/.section-history-->
+			<section class="history"></section><!--/.history-->
 		</main>
 	</div><!--/.wrap-->
 
@@ -86,7 +86,7 @@
 	
 	<script type="text/javascript">
 		/*+-------------全局变量---------------+*/
-		var $rootNode = $('.section-history'); //列表根节点
+		var $rootNode = $('.history'); //列表根节点
 		
 		//=====接收地址栏参数 (后台返回 ajax({}) )
 		var g_menu_bh = ''; //getQueryVariable("m"); //菜单编号
@@ -196,9 +196,17 @@
 
 		/*+-------------FUNCTION---------------+*/
 		/**
-		 * 函数：加载数据
+		 * 函数：加载数据 edit 20211030-1
+		 * @param {object} options 参数
 		 */
-		 function loadData(){
+		 function loadData(options){
+			var defaults = {
+				resetOrder: false // 是否重置序号,默认false
+			}
+			var settings = $.extend(true, {}, defaults, options || {});
+			if(settings.resetOrder){ // 重置序号
+				$.privateProperty.pageCurpage['history'] = 1;
+			}
 			neui.showAnimate();
 			setTimeout(function(){
 				var source = get_data_list(1); 
@@ -249,7 +257,7 @@
 				}
 			})
 
-			if($rootNode.is(':visible')) $('.section-operation').show();
+			if($rootNode.is(':visible')) $('.operation').show();
 			else $rootNode.hide();
 		}
 
@@ -275,7 +283,7 @@
 							'</div><!--/.search-one-->',
 						'</div>'
 					].join('\r\n');
-			$('.section-search').empty().append(_html);
+			$('.search').empty().append(_html);
 		}
 
 
@@ -642,7 +650,8 @@
 				g_dyw_type_fz_bh = ls_dyw_type_fz_bh;
 				g_dyw_type_fz_mc = ls_dyw_type_fz_mc;
 
-                loadData(); //加载数据
+				//加载数据，并重置序号 edit 20211030-1
+                loadData({ resetOrder: true });
 			});
 
 
