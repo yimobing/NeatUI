@@ -68,6 +68,20 @@
         .theme-popular .block__quote{ border: 0; }
         .theme-popular .block__compose .eform-row{ border: 0; }
         .theme-popular .row__way{ border: 0!important; }
+
+        /*+---线条美化-----+*/
+        .theme-popular .item-cell[data-type="must"]{ right: -10px!important; }
+        .theme-popular .item-box .item-cell[data-type="must"]{ right: -15px!important; }
+        .theme-popular .row__totalMoney{ border-bottom: 0!important; }
+        .theme-popular .row__totalMoney .item-r{ /* padding-left: 62px; */ border-bottom: 1px solid #ddd; }
+        .theme-popular .row__partMoney{ border-bottom: 1px solid #ddd!important; }
+        .theme-popular .row__partMoney .item-l>label{ display: none; }
+        .theme-popular .row__partMoney .item-box:last-child{ margin-bottom: 0; border-bottom: 0!important; }
+        .theme-popular .row__point{ border-bottom: 0!important; }
+        .theme-popular .row__point .item-r{ /* padding-left: 70px; */ border-bottom: 1px solid #ddd; }
+        .theme-popular .row__partRate{ border-bottom: 1px solid #ddd!important; }
+        .theme-popular .row__partRate .item-box:last-child{ margin-bottom: 0; border-bottom: 0!important; }
+
     </style>
     <div class="wrap"><!--edit 20211030-1-->
         <main>
@@ -90,7 +104,7 @@
                         <div class="item-r"><input type="text" id="c-loanMix" value="70%" data-value="0.7" placeholder="比如：10%表示1成" onblur="this.placeholder='比如：10%表示1成'" onfocus="this.placeholder=''" readonly></div>
                         <div class="item-cell" data-type="must">*</div>
                     </div><!--/.eform-row-->
-                    <div class="eform-row">
+                    <div class="eform-row row__totalMoney">
                         <div class="item-l"><label>贷款总额</label></div>
                         <div class="item-r">
                             <input type="text" id="c-loanAmount" data-type="float[positive]" placeholder="手输或房产总价、按揭成数计算" onblur="this.placeholder='手输或房产总价、按揭成数'" onfocus="this.placeholder=''">
@@ -100,7 +114,7 @@
                     </div><!--/.eform-row-->
 
                     <div class="block__compose" style="display: none">
-                        <div class="eform-row">
+                        <div class="eform-row row__partMoney">
                             <div class="item-l"><label>贷款金额</label></div>
                             <div class="item-r block">
                                 <div class="item-box">
@@ -132,7 +146,7 @@
                                 </div><!--/.item-box-->
                             </div><!--/.item-r-->
                         </div><!--/.eform-row-->
-                        <div class="eform-row">
+                        <div class="eform-row row__point">
                             <div class="item-l"><label>基点</label></div>
                             <div class="item-r">
                                 <input type="text" id="c-commercialBasicPoint" value="0" data-type="int[negative]" placeholder="请填写基点，只能正整数" onblur="this.placeholder='请填写基点，只能正整数'" onfocus="this.placeholder=''">
@@ -152,7 +166,7 @@
                     </div><!--/.eform-row-->
 
                     <div class="block__compose" style="display: none">
-                        <div class="eform-row">
+                        <div class="eform-row row__partRate">
                             <div class="item-l"><label>贷款利率</label></div>
                             <div class="item-r block">
                                 <div class="item-box">
@@ -384,7 +398,7 @@
 
                 // ③组合贷
                 "anjie_chengshu":"0.8", 
-                "daikuan_je":"500000",
+                "daikuan_je":"50000",
                 "daikuan_je_gjj":"500000",
                 "dkpz":"组合贷", 
                 "huankuan_fangshi":"等额本息",
@@ -431,7 +445,7 @@
             */
 
 
-            // 转化并赋值 edit 20211026-1 下N行
+            // 转化并赋值 edit 20211101-1 下N行
             var dkpz = loanJson["dkpz"]; // 贷款品种
             var years = parseInt(loanJson["daikuan_nianxian"]);
             if(isNaN(years)) years = 0;
@@ -440,20 +454,22 @@
             // 商业性贷款金额
             var ls_daikuan_je = loanJson["daikuan_je"].toUpperCase().replace(/([ ]+)/g, '') === '' ? '' : parseFloat(loanJson["daikuan_je"]); // 商业性贷款金额
             if(ls_daikuan_je !== ''){
-                ls_daikuan_je = convert.yuan2TenThousand(ls_daikuan_je, 'round', digit);
+                var dots = convert.yuan2TenThousand(ls_daikuan_je, 'round').toString().indexOf('.') >= 0 ? digit : 0;
+                ls_daikuan_je = convert.yuan2TenThousand(ls_daikuan_je, 'round', dots);
                 if(convert.zeroString2Empty(ls_daikuan_je) === '') ls_daikuan_je = '';
             }
             // 公积金贷款金额
             var ls_gjj_daikuan_je = loanJson["daikuan_je_gjj"].toUpperCase().replace(/([ ]+)/g, '') === '' ? '' : parseFloat(loanJson["daikuan_je_gjj"]); // 公积金贷款金额
             if(ls_gjj_daikuan_je !== ''){
-                ls_gjj_daikuan_je = convert.yuan2TenThousand(ls_gjj_daikuan_je, 'round', 2);
+                var dots = convert.yuan2TenThousand(ls_gjj_daikuan_je, 'round').toString().indexOf('.') >= 0 ? digit : 0;
+                ls_gjj_daikuan_je = convert.yuan2TenThousand(ls_gjj_daikuan_je, 'round', dots);
                 if(convert.zeroString2Empty(ls_gjj_daikuan_je) === '') ls_gjj_daikuan_je = '';
             }
             // 贷款总额：商业性贷款金额 + 公积金贷款金额
             var tmp_daikuan_je = parseFloat(ls_daikuan_je) == '' ? 0 : ( isNaN(parseFloat(ls_daikuan_je)) ? 0 : parseFloat(ls_daikuan_je) );
             var tmp_gjj_daikuan_je = parseFloat(ls_gjj_daikuan_je)  == '' ? 0 : ( isNaN(parseFloat(ls_gjj_daikuan_je)) ? 0 : parseFloat(ls_gjj_daikuan_je) );
             var ls_daikuan_ze = tmp_daikuan_je + tmp_gjj_daikuan_je;
-            ls_daikuan_ze = ls_daikuan_ze.toFixed(digit);
+            ls_daikuan_ze = ls_daikuan_ze.toString().indexOf('.') >= 0 ? ls_daikuan_ze.toFixed(digit) : ls_daikuan_ze;
             if(isNaN(ls_daikuan_ze)) ls_daikuan_ze = '';
 
             // 商业性利率
@@ -591,26 +607,33 @@
 
 
             //——————————————————————————————————————————
-            //=====贷款总额失焦事件 add 20211026-1
+            //=====贷款总额失焦事件 add 20211101-1
             $('#c-loanAmount').on('blur', function(){
                 var amountMoney = parseFloat($(this).val().toString().replace(/,/g, '')),
                     fundsMoney = parseFloat($('#c-fundsAmount').val().toString().replace(/,/g, ''));
                 if(isNaN(amountMoney)) amountMoney = 0;
                 if(isNaN(fundsMoney)) fundsMoney = 0;
                 if(amountMoney != 0 && fundsMoney > amountMoney) { // 如果公积金贷款金额 大于 贷款总额
-                    $('#c-fundsAmount').val(format.thousandth(amountMoney.toFixed(digit))); // 四舍五入保留N位小数
+                    fundsMoney = amountMoney;
+                    if(fundsMoney.toString().indexOf('.') >= 0) fundsMoney = fundsMoney.toFixed(digit);
+                    $('#c-fundsAmount').val(format.thousandth(fundsMoney)); // 公积金贷款金额赋值，四舍五入保留N位小数
                 }
-                if(amountMoney != '') $(this).val(format.thousandth(amountMoney.toFixed(digit))); // 四舍五入保留N位小数
+                // 贷款总额赋值
+                var amountMoney = amountMoney == '' || amountMoney == 0 ? '' : (amountMoney.toString().indexOf('.') >= 0 ? amountMoney = amountMoney.toFixed(digit) : amountMoney);
+                $(this).val(format.thousandth(amountMoney)); // 贷款总额赋值，四舍五入保留N位小数
             });
 
 
 
             //——————————————————————————————————————————
-            //=====商业性贷款金额、公积金贷款金额失焦事件 add 20211026-1
+            //=====商业性贷款金额、公积金贷款金额失焦事件 add 20211101-1
             $('#c-commercialAmount, #c-fundsAmount').on('blur', function(){
                 var money = parseFloat($(this).val().toString().replace(/,/g, ''));
                 if(isNaN(money)) money = 0;
-                if(money != '') $(this).val(format.thousandth(money.toFixed(digit))); // 保留N位小数
+                if(money != '' && money != 0){
+                    if(money.toString().indexOf('.') >= 0) money = money.toFixed(digit);
+                    $(this).val(format.thousandth(money)); // 保留N位小数
+                }
             });
 
 
@@ -994,7 +1017,7 @@
 
             //——————————————————————————————————————————
             /**
-             * 计算商业性贷款金额及公积金贷款金额 add 20211026-1
+             * 计算商业性贷款金额及公积金贷款金额 add 20211101-1
              * [注]： 优先保持公积金贷款金额不变
              * [计算公式]： 商业性贷款金额 = 贷款总额 - 公积金贷款金额
              * @param {Number} ps_amount_money 贷款总额
@@ -1012,12 +1035,14 @@
                     if(changeColumn == 'shangYeDai'){
                         var money = amountMoney  - fundsMoney; 
                         if(money < 0) money = 0;
-                        $('#c-commercialAmount').val(format.thousandth(money.toFixed(digit))); // 商业性贷款金额
+                        if(money != 0 && money.toString().indexOf('.') >= 0) money = money.toFixed(digit);
+                        $('#c-commercialAmount').val(format.thousandth(money)); // 商业性贷款金额
                     }
                     if(changeColumn == 'gongJiJinDai'){
                         var money = amountMoney  - commercialMoney; 
                         if(money < 0) money = 0;
-                        $('#c-fundsAmount').val(format.thousandth(money.toFixed(digit))); // 公积金贷款金额
+                        if(money != 0 && money.toString().indexOf('.') >= 0) money = money.toFixed(digit);
+                        $('#c-fundsAmount').val(format.thousandth(money)); // 公积金贷款金额
                     }
                 }
             }
