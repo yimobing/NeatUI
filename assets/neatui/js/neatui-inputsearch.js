@@ -6,7 +6,7 @@
 * Website: https://github.com/yimobing/neatui
 * Author: chenMufeng
 * Date: 2021.07.01
-* Update: 2021.07.20
+* Update: 2021.11.04
 */
 
 
@@ -440,6 +440,37 @@
             nodeDiv.style.top = top + 'px';
             tools.insertAfter(nodeDiv, valCell); // valCell.after(nodeDiv); 在后面插入节点
         }
+        
+        // 当控件下边缘已到达网页底部且视觉上被遮挡住时 add 20211104
+        var nodeH = parseFloat(window.getComputedStyle(nodeDiv).height.toString().replace(/px/g, '')), // 元素高
+            winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight, // 视窗高，浏览器网页可视区域高
+            scrollH = document.documentElement.scrollHeight || document.body.scrollHeight, // 网页卷起来的高，网页文档高
+            scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop || 0; // 浏览器滚动条滚动的距离
+            offsetTop = tools.getTop(nodeDiv); // 元素上边距离距离视窗的偏移量
+        var distanceTop = offsetTop - scrollTop; // 元素距离视窗顶部的距离 = 元素上边距离距离视窗的偏移量 - 浏览器滚动条滚动的距离
+        // console.log('元素高：', nodeH);
+        // console.log('视窗高：', winH);
+        // console.log('网页卷起来的高：', scrollH);
+        // console.log('浏览器滚动条滚动的距离：', scrollTop);
+        // console.log('元素上边距离距离视窗的偏移量：', offsetTop);
+        // console.log('元素距离视窗顶部的距离：', distanceTop);
+        // var formula1 = nodeH + ' + ' + distanceTop + ' = ' + (distanceTop + nodeH) + ' >= ' + winH + ' ?';
+        // console.log('①元素下边会被视窗挡住的条件为：元素高 + 元素距离视窗顶部的距离 >= 视窗高')
+        // console.log('即公式：', formula1);
+        // var formula2 = winH + ' + ' + scrollTop + ' = ' + (winH + scrollTop) + ' >= ' + scrollH + ' ?';
+        // console.log('②滚动条滚动到底部的条件：视窗高 + 浏览器滚动条滚动的距离 >= 网页卷起来的高');
+        // console.log('即公式：', formula2);
+        // console.log('--------------------------');
+        if(nodeH + distanceTop >= winH){
+            // console.log('高度大于了，元素被遮挡了，部分看不见了');
+            window.scrollTo({
+                top: scrollH,
+                left: 0,
+                behavior: 'instant'
+            })
+        }  
+        
+        
 
         // 全局赋值
         me.$root = document.getElementsByClassName(net.idClass)[0]; // 根节点
