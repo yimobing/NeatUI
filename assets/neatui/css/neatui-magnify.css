@@ -17,7 +17,7 @@
 
  @charset "utf-8";
 .magnify-modal {
-  position: absolute;
+  position: fixed;
   z-index: 1090;
   width: 320px;
   height: 320px;
