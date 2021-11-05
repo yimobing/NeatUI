@@ -114,6 +114,7 @@ function exitFullscreen() {
 }
 
 /**
+ * 提取图片地址中的图片名称
  * Get the image name from its url
  * @param {String} url - The image src
  * @return {String}
@@ -204,6 +205,8 @@ var $W = $(window),
   EVENT_NS = '.' + NS,
   // Plugin default options
   DEFAULTS = {
+    // 若图片文字描述为空时，是否自动从图片地址中提取图片名作为描述(可选)，默认true add by chr 20211105
+    getImageTitleAuto: true,
     // Enable modal to drag
     draggable: true,
     // Enable modal to resize
@@ -243,6 +246,7 @@ var $W = $(window),
       'next',
       'actualSize',
       'rotateRight'
+      // 'rotateLeft'
     ],
     // Customize button icon
     icons: {
@@ -962,8 +966,9 @@ Magnify.prototype = {
 
   },
 
+  // edit by chr 20211105
   setImageTitle: function (url) {
-    var title = this.groupData[this.groupIndex].caption || getImageNameFromUrl(url);
+    var title = this.groupData[this.groupIndex].caption || ( this.options.getImageTitleAuto ? getImageNameFromUrl(url) : '');
     this.$title.html(title);
   },
   jump: function (step) {
@@ -1489,16 +1494,7 @@ $.fn.magnify = function (options, method) {
 // add by chr 20211103
 $.fn.neuiMagnify = function(options){
     // method值：OUTER 外部 表示Click事件写在前端, INNER 内部 表示Click事件写在控件里面
-    var method =  typeof options.source == 'undefined' ? 'INNER' : 'OUTER';
-                // ( 
-                //   $.isEmptyObject(options.source) ? 
-                //     'INNER' : 
-                //     (
-                //       $.isArray(options.source.urls) && options.source.current.toString().replace(/([ ]+)/g, '') !== '' ? 
-                //       'OUTER' :
-                //       'INNER'
-                //     ) 
-                // );
+    var method =  typeof options.source == 'undefined' ? 'INNER' : 'OUTER';              
     // console.log('method：', method);
     var tips = '';
     if(method == 'OUTER'){
