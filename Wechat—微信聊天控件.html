@@ -265,7 +265,7 @@
         
         //——————————————————————————————————————————
         /**
-         * 校验是否pc端 add 20211013-1
+         * 校验是否pc端 add 20211105-1
          */
          var isDevicePc =  function(){
             var userAgentInfo = navigator.userAgent.toLowerCase();
@@ -324,7 +324,7 @@
             //——————————————————————————————————————————
             //=====检测IE版本，如果太低，则中断执行 add 20211105-1
             var ieVersion = parseInt(checkIesVersion());
-            if(isNaN(ieVersion)) ieVersion = - 1;
+            if(isNaN(ieVersion)) ieVersion = -1;
             // console.log('版本：', ieVersion);
             if(ieVersion > 0 && ieVersion <= 8){
                 alert('对不起，你正在使用老掉牙的IE' + ieVersion + '浏览器，请升级至IE9以上版本');
@@ -439,7 +439,7 @@
                         showBackText: false, // 是否显示返回按钮的文字(可选),默认true
                         capWrap: false, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
                         // zIndex: 999 // 层级,默认999(可选)
-                        offset: { // add 20211013-1
+                        offset: { // add 20211105-1
                             left: isDevicePc() ? ($(window).width() - 400) / 2 : 0,
                             right: isDevicePc() ? ($(window).width() - 400) / 2 : 0,
                             top: 0,

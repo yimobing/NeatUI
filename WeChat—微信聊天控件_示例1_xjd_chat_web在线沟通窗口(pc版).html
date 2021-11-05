@@ -61,10 +61,10 @@
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
     <script type="text/javascript" src="assets/style/libs/jquery-1.8.3.min.js"></script>
-    <script type="text/javascript" src="assets/style/libs/bluebird.min.js"></script><!--ie时支持promise add 20211013-1-->
-    <script type="text/javascript" src="assets/neatui/js/neatui.min.js?v=20211013-1"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/style/libs/bluebird.min.js"></script><!--ie时支持promise add 20211105-1-->
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js?v=20211105-1"></script><!--前端框架-->
     <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-wechat.js?v=20211013-1"></script><!--聊天控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-wechat.js?v=20211105-1"></script><!--聊天控件-->
     <script type="text/javascript" src="assets/neatui/js/neatui-magnify.js"></script><!--图片放大预览控件-->
     <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义AJAX-->
     <script type="text/javascript">
@@ -298,7 +298,7 @@
 
         //——————————————————————————————————————————
         /**
-         * 校验是否pc端 add 20211013-1
+         * 校验是否pc端 add 20211105-1
          */
         var isDevicePc =  function(){
             var userAgentInfo = navigator.userAgent.toLowerCase();
@@ -358,7 +358,7 @@
             //——————————————————————————————————————————
             //=====检测IE版本，如果太低，则中断执行 add 20211105-1
             var ieVersion = parseInt(checkIesVersion());
-            if(isNaN(ieVersion)) ieVersion = - 1;
+            if(isNaN(ieVersion)) ieVersion = -1;
             // console.log('版本：', ieVersion);
             if(ieVersion > 0 && ieVersion <= 8){
                 alert('对不起，你正在使用老掉牙的IE' + ieVersion + '浏览器，请升级至IE9以上版本');
@@ -417,7 +417,7 @@
                         back: false, //是否显示返回按钮(可选),默认false
                         capWrap: true, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
                         // zIndex: 999 // 层级,默认999(可选)
-                        offset: { // add 20211013-1
+                        offset: { // add 20211105-1
                             left: isDevicePc() ? ($(window).width() - 400) / 2 : 0,
                             right: isDevicePc() ? ($(window).width() - 400) / 2 : 0,
                             top: 0,
