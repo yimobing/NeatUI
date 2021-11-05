@@ -192,7 +192,8 @@
           
           // 可选参数
           zIndex: 1090, // 层级(可选)，默认1090
-          title: true, // 是否显示图片对应的标题(文字说明)(可选)，默认true
+          title: true, // 是否显示图片文字描述(可选)，默认true
+          getImageTitleAuto: true, // 若图片文字描述为空时，是否自动从图片地址中提取图片名作为描述(可选)，默认true
           modalWidth: 400, // 窗口最小宽度(可选)，默认320
           modalHeight: 400, // 窗口最小高度(可选)，默认320
           initMaximized: false, // 窗口初始时是否最大化(可选)，默认false
@@ -284,63 +285,6 @@
             current: imgSrc, // 当前图片大图地址。eg. car.jpg
             urls: imgArr, // 所有图片大图地址数组。eg. [ car.jpg, bus.jpg, bike.jpg ]
             words: wordArr // 所有图片文字描述数组(可选)。eg. [ '汽车', '公交车', '自行车' ]
-          },
-          
-          // 可选参数
-          zIndex: 1090, // 层级(可选)，默认1090
-          title: true, // 是否显示图片对应的标题(文字说明)(可选)，默认true
-          modalWidth: 400, // 窗口最小宽度(可选)，默认320
-          modalHeight: 400, // 窗口最小高度(可选)，默认320
-          initMaximized: false, // 窗口初始时是否最大化(可选)，默认false
-          fixedContent: false, // 窗口是否固定到屏幕中间(可选)，默认false。true 时，即使页面出现滚动条，窗口也不会随之滚动
-          keyboard: true, // 是否启用键盘左右方向键翻页(可选)，默认true。
-          resizable: true, // 窗口大小是否可改变(可选)，默认true。true 时，当鼠标移到窗口边缘,出现改变大小的双箭头图标供改变窗口大小
-          draggable: true, // 窗口是否可拖动(可选)，默认true。
-          movable: true,
-          headerToolbar: [ // 顶部工具栏开单(可选)
-            'minimize', // 最小化按钮
-            'maximize', // 最大化按钮
-            'close' // 关闭按钮
-          ],
-          footerToolbar: [ // 底部工具栏开单(可选)
-            'zoomIn', // 放大(可选)
-            'zoomOut', // 缩小(可选)
-            'prev', // 向前翻(可选)
-            'fullscreen', // 全屏(可选)
-            'next', // 向后翻(可选)
-            'actualSize', // 实际尺寸(可选)
-            'rotateRight', // 顺时针旋转(可选)
-            'rotateLeft', // 逆时针旋转(可选)
-            'myCustomButton1' // 自定义按钮1(可选)
-          ],
-          customButtons: { // 底部工具栏自定义按钮(可选)，需footerToolbar中有myCustomButton
-            myCustomButton1: {
-              text: '自定义按钮1', // 按钮文字(可选)
-              title: '你瞅啥1', // 鼠标移动到按钮上显示的文字(可选)
-              click: function (context, e) { // 点击按钮时自定义操作(可选)
-                alert('clicked the custom button1');
-              }
-            }
-          },
-          callbacks: { // 回调(可选)
-            beforeOpen: function (obj, data) { // 窗口打开前(可选)
-              // console.log('beforeOpen')
-            },
-            opened: function (obj, data) { // 窗口打开后(可选)
-              // console.log('opened')
-            },
-            beforeClose: function (obj, data) { // 窗口关闭前(可选)
-              // console.log('beforeClose')
-            },
-            closed: function (obj, data) { // 窗口关闭后(可选)
-              // console.log('closed')
-            },
-            beforeChange: function (context, index) { // 翻页前(可选)
-              // console.log('beforeChange： ', context, index)
-            },
-            changed: function (context, index) { // 翻页后(可选)
-              // console.log('changed：', context, index)
-            }
           }
         })
 
