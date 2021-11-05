@@ -16,7 +16,7 @@
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-wechat.css"><!--聊天控件-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-previewImage.css"><!--图片放大预览旋转-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-magnify.css"><!--图片放大预览控件(pc时)-->
     <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
     <!--<script type="text/javascript" charset="gb2312" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" charset="gb2312" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>-->
@@ -74,8 +74,9 @@
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
     <script type="text/javascript" src="assets/style/libs/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/style/libs/bluebird.min.js"></script><!--pc时让ie支持promise-->
     <script type="text/javascript" src="assets/neatui/js/neatui-wechat.js"></script><!--聊天控件-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-previewImage.js"></script><!--图片放大预览旋转-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-magnify.js"></script><!--图片放大预览控件(pc时)-->
     <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义ajax-->
     <script type="text/javascript">
         /*+----------------全局变量----------------+*/
@@ -86,6 +87,199 @@
         var g_chat_latest_date = ''; // 聊天最新消息时间, 默认为第一次调用聊天历史消息时间
         var g_chat_history_times = 0; // 聊天历史消息调用的次数,默认0次
 
+        /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 获取聊天历史消息
+         * @param {number} ps_nowpage 当前页码,默认1(可选)
+         * @returns {object} 返回数组对象
+         */
+            function get_data_chat_history(ps_nowpage){
+            if(g_chat_history_times == 0) g_chat_history_times = 1;
+            else g_chat_history_times = 2;
+            var ls_open_page_num = ps_nowpage; // 当前页码
+            var ls_every_page_count = g_chat_pagesize; // 每页记录数
+            // 后台返回
+            var chatHistoryJson = {
+                "return":"ok", "time":"2021-04-07 21:42:38", "data":[
+                    {"chat_bh":"C1001", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"这个话很牛b", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
+                    {"chat_bh":"C1002", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"看你们聊得很开心", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
+                    {"chat_bh":"C1003", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"哪能这样说呢", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
+                    {"chat_bh":"C1004", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"看你们聊得很开心", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
+                    {"chat_bh":"C1005", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"test//img/img_purple.png", "value2":"", "check_word":"0", "check_voice":"0", "check_pic":"1", "create_time":"2020-12-31 14:52:17"},
+                    {"chat_bh":"C1006", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"您看这个可以吗，帮我掌掌眼", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
+                    {"chat_bh":"C1007", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"这个设计不错，让设计部的同事都过来学习下", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"}
+                ]
+            }
+        
+            /*
+            //START AJAX
+            var chatHistoryJson = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取聊天历史消息",
+                debug: false,
+                type: "POST",
+                url: "../../fwh_pub/jk_pic_chat.ashx",
+                data: {
+                    "action": "sel_v2_xjd_chat_lssj",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk %>",
+                    "open_page_num": ls_open_page_num, // 当前页码
+                    "every_page_count": ls_every_page_count, // 每页记录数
+                    "xjdh": g_xjdh,
+                    "dyw_xh": g_dyw_xh,
+                    "time": g_chat_start_date
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    //if(res == '') return;
+                    chatHistoryJson = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                return {};
+            }
+            //END AJAX
+            */
+            var ls_time = chatHistoryJson["time"];
+            //全局赋值
+            g_chat_start_date = ls_time; 
+            if(g_chat_history_times == 1) g_chat_latest_date = ls_time;
+
+            return chatHistoryJson;
+        }
+    
+
+        /**
+         * 获取聊天最新消息
+         * @returns {object | promise} 返回数组对象或返回Promise对象
+         */
+        function get_data_chat_news(){
+
+            // ①.同步时返回Object对象
+            // // 后台返回
+            // var chatNewlyJson = {
+            //     "return":"ok", "time":"2021-04-09 18:55:32", "data":[
+            //         {"chat_bh":"C1001", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"很无聊啊现在", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
+            //         {"chat_bh":"C1002", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"这个进度还可以啦", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"}
+            //     ]
+            // }
+            // /*
+            // //START AJAX
+            // var chatNewlyJson = {}
+            // var isHoldOn = true;
+            // ajax({
+            //     heading: "获取聊天最新消息",
+            //     debug: false,
+            //     type: "POST",
+            //     async: false, // false 同步取数, true 异步取数
+            //     url: "../../fwh_pub/jk_pic_chat.ashx",
+            //     data: {
+            //         "action": "sel_v2_xjd_chat_new",
+            //         "user": "<%=s_user%>",
+            //         "sjk": "<%=s_sjk %>",
+            //         "xjdh": g_xjdh,
+            //         "dyw_xh": g_dyw_xh,
+            //         "time": g_chat_latest_date
+            //     },
+            //     success: function(res){
+            //         if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+            //         //if(res == '') return;
+            //         chatNewlyJson = JSON.parse(res);
+            //     },
+            //     error: function(res){
+            //         if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+            //     },
+            //     beforeSend: function(XMLHttpRequest){ },
+            //     complete: function(XMLHttpRequest, textStatus){ }
+            // })
+            // if(!isHoldOn){
+            //     return {};
+            // }
+            // //END AJAX
+            // */
+            // g_chat_latest_date = chatNewlyJson["time"];   // 全局赋值
+            // return chatNewlyJson;
+
+            //②. 异步时返回Promise对象
+            return new Promise(function(resolve, reject){
+                // · 前台模拟异步
+                setTimeout(function(){
+                    var chatNewlyJson = {
+                        "return":"ok", "time":"2021-04-09 18:55:32", "data":[
+                            {"chat_bh":"C1001", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"很无聊啊现在", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
+                            {"chat_bh":"C1002", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"这个进度还可以啦", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"}
+                        ]
+                    }
+                    resolve(chatNewlyJson);  // 成功，使用resolve()返回所有数据
+                    // reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+                }, 2000)
+
+                // ·后台返回
+                /*
+                //START AJAX
+                var chatNewlyJson = {}
+                var isHoldOn = true;
+                ajax({
+                    heading: "获取聊天最新消息",
+                    debug: false,
+                    type: "POST",
+                    async: true, // false 同步取数, true 异步取数
+                    url: "../../fwh_pub/jk_pic_chat.ashx",
+                    data: {
+                        "action": "sel_v2_xjd_chat_new",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk %>",
+                        "xjdh": g_xjdh,
+                        "dyw_xh": g_dyw_xh,
+                        "time": g_chat_latest_date
+                    },
+                    success: function(res){
+                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        //if(res == '') return;
+                        chatNewlyJson = JSON.parse(res);
+                        g_chat_latest_date = chatNewlyJson["time"]; // 全局赋值
+                        resolve(chatNewlyJson); // 成功，使用resolve()返回所有数据
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    return {}
+                }
+                //END AJAX
+                */
+            })
+            
+        }
+
+        
+        //——————————————————————————————————————————
+        /**
+         * 校验是否pc端 add 20211013-1
+         */
+         var isDevicePc =  function(){
+            var userAgentInfo = navigator.userAgent.toLowerCase();
+            //console.log(userAgentInfo);
+            var Agents = ["mobile","android","iphone","sysbian","windows phone","iPad","ipod","blackberry"];
+            var flag = false;
+            for(var i=0; i<Agents.length; i++){
+                if(userAgentInfo.indexOf(Agents[i])>=0){
+                    flag = true;
+                    break;
+                }
+            }
+            return flag ? false : true;
+        }
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +288,7 @@
             //------------------------------------------------------------------------------------------------
             //                                             START 微信聊天窗口
             //------------------------------------------------------------------------------------------------
-            /*+----------------------------------------+*/
+            //——————————————————————————————————————————
             //=====微信聊天窗口按钮 
             $('#btn-aside-touch').on('click', function(){
                 // ·1、获取聊天当前用户数据
@@ -199,7 +393,14 @@
                         cross: true, //是否显示关闭图标(可选),默认false
                         back: true, //是否显示返回按钮(可选),默认false
                         showBackText: false, // 是否显示返回按钮的文字(可选),默认true
-                        capWrap: false //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+                        capWrap: false, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+                        // zIndex: 999 // 层级,默认999(可选)
+                        offset: { // add 20211013-1
+                            left: isDevicePc() ? ($(window).width() - 400) / 2 : 0,
+                            right: isDevicePc() ? ($(window).width() - 400) / 2 : 0,
+                            top: 0,
+                            bottom: 0
+                        }
                     },
                     roll: { // 上拉滚动参数
                         // 前台提供的变量
@@ -318,181 +519,7 @@
 
 
 
-            /*+----------------FUNCTION----------------+*/
-            /**
-             * 获取聊天历史消息
-             * @param {number} ps_nowpage 当前页码,默认1(可选)
-             * @returns {object} 返回数组对象
-             */
-            function get_data_chat_history(ps_nowpage){
-                if(g_chat_history_times == 0) g_chat_history_times = 1;
-                else g_chat_history_times = 2;
-                var ls_open_page_num = ps_nowpage; // 当前页码
-                var ls_every_page_count = g_chat_pagesize; // 每页记录数
-                // 后台返回
-                var chatHistoryJson = {
-                    "return":"ok", "time":"2021-04-07 21:42:38", "data":[
-                        {"chat_bh":"C1001", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"这个话很牛b", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
-                        {"chat_bh":"C1002", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"看你们聊得很开心", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
-                        {"chat_bh":"C1003", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"哪能这样说呢", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
-                        {"chat_bh":"C1004", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"看你们聊得很开心", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
-                        {"chat_bh":"C1005", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"test//img/img_purple.png", "value2":"", "check_word":"0", "check_voice":"0", "check_pic":"1", "create_time":"2020-12-31 14:52:17"},
-                        {"chat_bh":"C1006", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"您看这个可以吗，帮我掌掌眼", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
-                        {"chat_bh":"C1007", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"这个设计不错，让设计部的同事都过来学习下", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"}
-                    ]
-                }
-            
-                /*
-                //START AJAX
-                var chatHistoryJson = {}
-                var isHoldOn = true;
-                ajax({
-                    heading: "获取聊天历史消息",
-                    debug: false,
-                    type: "POST",
-                    url: "../../fwh_pub/jk_pic_chat.ashx",
-                    data: {
-                        "action": "sel_v2_xjd_chat_lssj",
-                        "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk %>",
-                        "open_page_num": ls_open_page_num, // 当前页码
-                        "every_page_count": ls_every_page_count, // 每页记录数
-                        "xjdh": g_xjdh,
-                        "dyw_xh": g_dyw_xh,
-                        "time": g_chat_start_date
-                    },
-                    success: function(res){
-                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        //if(res == '') return;
-                        chatHistoryJson = JSON.parse(res);
-                    },
-                    error: function(res){
-                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                    },
-                    beforeSend: function(XMLHttpRequest){ },
-                    complete: function(XMLHttpRequest, textStatus){ }
-                })
-                if(!isHoldOn){
-                    return {};
-                }
-                //END AJAX
-                */
-                var ls_time = chatHistoryJson["time"];
-                //全局赋值
-                g_chat_start_date = ls_time; 
-                if(g_chat_history_times == 1) g_chat_latest_date = ls_time;
-
-                return chatHistoryJson;
-            }
-        
-
-            /**
-             * 获取聊天最新消息
-             * @returns {object | promise} 返回数组对象或返回Promise对象
-             */
-            function get_data_chat_news(){
-
-                // ①.同步时返回Object对象
-                // // 后台返回
-                // var chatNewlyJson = {
-                //     "return":"ok", "time":"2021-04-09 18:55:32", "data":[
-                //         {"chat_bh":"C1001", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"很无聊啊现在", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
-                //         {"chat_bh":"C1002", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"这个进度还可以啦", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"}
-                //     ]
-                // }
-                // /*
-                // //START AJAX
-                // var chatNewlyJson = {}
-                // var isHoldOn = true;
-                // ajax({
-                //     heading: "获取聊天最新消息",
-                //     debug: false,
-                //     type: "POST",
-                //     async: false, // false 同步取数, true 异步取数
-                //     url: "../../fwh_pub/jk_pic_chat.ashx",
-                //     data: {
-                //         "action": "sel_v2_xjd_chat_new",
-                //         "user": "<%=s_user%>",
-                //         "sjk": "<%=s_sjk %>",
-                //         "xjdh": g_xjdh,
-                //         "dyw_xh": g_dyw_xh,
-                //         "time": g_chat_latest_date
-                //     },
-                //     success: function(res){
-                //         if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                //         //if(res == '') return;
-                //         chatNewlyJson = JSON.parse(res);
-                //     },
-                //     error: function(res){
-                //         if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                //     },
-                //     beforeSend: function(XMLHttpRequest){ },
-                //     complete: function(XMLHttpRequest, textStatus){ }
-                // })
-                // if(!isHoldOn){
-                //     return {};
-                // }
-                // //END AJAX
-                // */
-                // g_chat_latest_date = chatNewlyJson["time"];   // 全局赋值
-                // return chatNewlyJson;
-
-                //②. 异步时返回Promise对象
-                return new Promise(function(resolve, reject){
-                    // · 前台模拟异步
-                    setTimeout(function(){
-                        var chatNewlyJson = {
-                            "return":"ok", "time":"2021-04-09 18:55:32", "data":[
-                                {"chat_bh":"C1001", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"很无聊啊现在", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
-                                {"chat_bh":"C1002", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"这个进度还可以啦", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"}
-                            ]
-                        }
-                        resolve(chatNewlyJson);  // 成功，使用resolve()返回所有数据
-                        // reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
-                    }, 2000)
-
-                    // ·后台返回
-                    /*
-                    //START AJAX
-                    var chatNewlyJson = {}
-                    var isHoldOn = true;
-                    ajax({
-                        heading: "获取聊天最新消息",
-                        debug: false,
-                        type: "POST",
-                        async: true, // false 同步取数, true 异步取数
-                        url: "../../fwh_pub/jk_pic_chat.ashx",
-                        data: {
-                            "action": "sel_v2_xjd_chat_new",
-                            "user": "<%=s_user%>",
-                            "sjk": "<%=s_sjk %>",
-                            "xjdh": g_xjdh,
-                            "dyw_xh": g_dyw_xh,
-                            "time": g_chat_latest_date
-                        },
-                        success: function(res){
-                            if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                            //if(res == '') return;
-                            chatNewlyJson = JSON.parse(res);
-                            g_chat_latest_date = chatNewlyJson["time"]; // 全局赋值
-                            resolve(chatNewlyJson); // 成功，使用resolve()返回所有数据
-                        },
-                        error: function(res){
-                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                            reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
-                        },
-                        beforeSend: function(XMLHttpRequest){ },
-                        complete: function(XMLHttpRequest, textStatus){ }
-                    })
-                    if(!isHoldOn){
-                        return {}
-                    }
-                    //END AJAX
-                    */
-                })
-                
-            }
-
+            //——————————————————————————————————————————
             /**
              * 微信聊天上传图片操作
              */
@@ -561,7 +588,6 @@
 
                 }) // END PROMISE
             }
-
 
             
         }); //$(function(){});
