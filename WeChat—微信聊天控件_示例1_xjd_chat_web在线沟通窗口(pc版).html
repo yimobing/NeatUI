@@ -322,6 +322,7 @@
         var checkIesVersion = function(){
             var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串 
             var isIE = window.ActiveXObject || "ActiveXObject" in window;
+            console.log('isIE：', isIE)
             if (isIE)  
             { 
                 var reIE = new RegExp("MSIE (\\d+\\.\\d+);"); 
@@ -357,13 +358,14 @@
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————  
             //——————————————————————————————————————————
             //=====检测IE版本，如果太低，则中断执行 add 20211105-1
-            var ieVersion = parseInt(checkIesVersion());
-            if(isNaN(ieVersion)) ieVersion = -1;
+            //winform中webBrowser控件嵌入网页会把ie11误判为ie7,故注释掉本段代码
+            // var ieVersion = parseInt(checkIesVersion());
+            // if(isNaN(ieVersion)) ieVersion = -1;
             // console.log('版本：', ieVersion);
-            if(ieVersion > 0 && ieVersion <= 8){
-                alert('对不起，你正在使用老掉牙的IE' + ieVersion + '浏览器，请升级至IE9以上版本');
-                return;
-            }
+            // if(ieVersion > 0 && ieVersion <= 8){
+            //     alert('对不起，你正在使用老掉牙的IE' + ieVersion + '浏览器，请升级至IE9以上版本');
+            //     return;
+            // }
 
 
             //——————————————————————————————————————————
