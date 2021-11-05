@@ -328,6 +328,10 @@
 			e.stopPropagation(); //必须!阻止冒泡(否则图片预览时第2次无法预览)
 			var bigImgArr = [], smallImgArr = [];
 			var imgSrc = $(this).attr('data-pic-url-big');
+			var imgArr = [ ];
+			$('.cose__text img').each(function(){
+				imgArr.push($(this).attr('data-pic-url-big'));
+			})
 			if(checkMobileDevice()){
 				$('.cose__one').each(function(){
 					var $img = $('.cose__text img', this);
@@ -348,14 +352,26 @@
 					}
 				}
 			}else{
-				if(typeof $(this).neuiPreviewImage !== 'function') return;
-				$(this).neuiPreviewImage({
-					imgSource: imgSrc, // 图片地址
-					degrees: 45, // 每次旋转度数
-					direction: 'wise', // 点击图片时旋转方向. wise 顺时针(默认), anti 逆时针
-					showCloseButton:true, // 是否显示关闭按钮,默认true
-					zIndex: zIndex + 1 // 层级
-				})
+				if(typeof $(this).neuiMagnify !== 'function'){
+					window.open(imgSrc, '_blank'); // 打窗口中打开
+					return;
+				}
+				// console.log('imgSrc:', imgSrc, '\nimgArr：', imgArr)
+				$(this).neuiMagnify({
+					source: {
+						current: imgSrc,
+						urls: imgArr
+					},
+					footerToolbar: [
+						'zoomIn',
+						'zoomOut',
+						'prev',			
+						'next',
+						'actualSize',
+						'rotateRight',
+						'rotateLeft'
+					]
+				});
 			}
 
 		})
