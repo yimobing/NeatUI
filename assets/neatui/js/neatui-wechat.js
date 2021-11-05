@@ -3,9 +3,7 @@
  * 微信聊天控件
  */
 
-
-(function($){
-
+;(function($){
 	// Element.scrollTo() 兼容ie
 	if (!window.scrollTo) {
 		window.scrollTo = function(option) {
@@ -328,20 +326,17 @@
 			e.stopPropagation(); //必须!阻止冒泡(否则图片预览时第2次无法预览)
 			var bigImgArr = [], smallImgArr = [];
 			var imgSrc = $(this).attr('data-pic-url-big');
-			var imgArr = [ ];
-			$('.cose__text img').each(function(){
-				imgArr.push($(this).attr('data-pic-url-big'));
-			})
+			$('.cose__one').each(function(){
+				var $img = $('.cose__text img', this);
+				if($img.length > 0){
+					var smallImgSrc = $img.attr('src'), bigImgSrc = $img.attr('data-pic-url-big');
+					if(typeof bigImgSrc == 'undefined' || bigImgSrc == '') bigImgSrc = smallImgSrc; //若大图为空，则取小图当作大图
+					if(smallImgSrc != '') smallImgArr.push(smallImgSrc);
+					if(bigImgSrc != '') bigImgArr.push(bigImgSrc);
+				}
+			});
+			// console.log('当前图片：', imgSrc, '\n所有图片大图数组：', bigImgArr);
 			if(checkMobileDevice()){
-				$('.cose__one').each(function(){
-					var $img = $('.cose__text img', this);
-					if($img.length > 0){
-						var smallImgSrc = $img.attr('src'), bigImgSrc = $img.attr('data-pic-url-big');
-						if(typeof bigImgSrc == 'undefined' || bigImgSrc == '') bigImgSrc = smallImgSrc; //若大图为空，则取小图当作大图
-						if(smallImgSrc != '') smallImgArr.push(smallImgSrc);
-						if(bigImgSrc != '') bigImgArr.push(bigImgSrc);
-					}
-				})
 				//console.log('小图地址：', smallImgArr, '\n大图数组：', bigImgArr)
 				if(typeof wx != 'undefined'){
 					if(typeof wx.previewImage != 'undefined'){
@@ -356,12 +351,12 @@
 					window.open(imgSrc, '_blank'); // 打窗口中打开
 					return;
 				}
-				// console.log('imgSrc:', imgSrc, '\nimgArr：', imgArr)
 				$(this).neuiMagnify({
 					source: {
 						current: imgSrc,
-						urls: imgArr
+						urls: bigImgArr
 					},
+					getImageTitleAuto: false,
 					footerToolbar: [
 						'zoomIn',
 						'zoomOut',
@@ -757,7 +752,6 @@
 		var self = this;
 		var defaults = {
 			caption: "", // 标题,可自定义HTML(可选)
-
 			toper: "", //顶部,自定义HTML(可选).
 			content: "", // 内容,可自定义HTML(可选)
 			footer: "", //底部,自定义HTML(可选).
@@ -1620,7 +1614,7 @@
 		}
 		return flag;
 	};
-    
+
 
 
 	/**
