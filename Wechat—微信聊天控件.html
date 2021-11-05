@@ -302,8 +302,8 @@
                             //alert('点我开始上传图片');
                             // 返回小图、大图组成的对象. 可1张或多张图片
                             /*  
-                                var ls_pic_url = 'assets/test/img/img_blue.png', // 小图
-                                    ls_pic_url_big = 'assets/test/img/img_blue.png'; // 大图
+                                var ls_pic_url = 'test//img/img_blue.png', // 小图
+                                    ls_pic_url_big = 'test//img/img_blue.png'; // 大图
                                 // ①. 返回单张图片
                                 // return {thumb: ls_pic_url, picture: ls_pic_url_big};
                                 // ②.返回多张图片
@@ -336,7 +336,7 @@
                         {"chat_bh":"C1002", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"看你们聊得很开心", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
                         {"chat_bh":"C1003", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"哪能这样说呢", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
                         {"chat_bh":"C1004", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"看你们聊得很开心", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
-                        {"chat_bh":"C1005", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"assets/test/img/img_purple.png", "value2":"", "check_word":"0", "check_voice":"0", "check_pic":"1", "create_time":"2020-12-31 14:52:17"},
+                        {"chat_bh":"C1005", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"test//img/img_purple.png", "value2":"", "check_word":"0", "check_voice":"0", "check_pic":"1", "create_time":"2020-12-31 14:52:17"},
                         {"chat_bh":"C1006", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"您看这个可以吗，帮我掌掌眼", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
                         {"chat_bh":"C1007", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"这个设计不错，让设计部的同事都过来学习下", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"}
                     ]
@@ -509,14 +509,14 @@
                             if(i == 0)
                                 var oneImgJson = {
                                     data:[
-                                        {"pic_bh":"1001", "pic_url":"assets/test/img/img_gray.png", "pic_url_big":"assets/test/img/img_blue.png"}
+                                        {"pic_bh":"1001", "pic_url":"test//img/img_gray.png", "pic_url_big":"test//img/img_blue.png"}
                                     ]
                                 }
                             if(i == 1)
                                 var oneImgJson = {
                                     data:[
-                                        {"pic_bh":"1001", "pic_url":"assets/test/img/img_blue.png", "pic_url_big":"assets/test/img/img_gray.png"},
-                                        //{"pic_bh":"1001", "pic_url":"assets/test/img/img_blue.png", "pic_url_big":""}
+                                        {"pic_bh":"1001", "pic_url":"test//img/img_blue.png", "pic_url_big":"test//img/img_gray.png"},
+                                        //{"pic_bh":"1001", "pic_url":"test//img/img_blue.png", "pic_url_big":""}
                                     ]
                                 }
                             sendOneImageToUser(JSON.stringify(oneImgJson), countPic);
