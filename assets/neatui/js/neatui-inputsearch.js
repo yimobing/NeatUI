@@ -28,8 +28,8 @@
     var net = {};
 
     // 两种调用方式：
-    // 1.外部方式调用： XX(elem, options);
-    // 2.内部方式调用： $('#elem').on('input', function() { XX(options, $('#elem')); })
+    // 1.内部方式调用(即Click等事件写在控件里面)： XX(elem, options);
+    // 2.外部方式调用(即Click等事件写在前台页面)： $('#elem').on('input', function() { XX(options, $('#elem')); })
     var neuiInputsearch = function(elem, options){
         var obj = tools.isJsonObject(options) ? 
         typeof elem === 'string' ? tools.getIdClassNameStrDom(elem): (elem instanceof jQuery ? elem : null)
@@ -167,7 +167,7 @@
         }
     };
 
-    // 自定义控件参数(仅限控件内部使用)
+    // 自定义控件参数(仅限控件里面使用)
     net.idClass = 'neInputsearch'; // 根节点id或class属性值
     
 
@@ -253,7 +253,7 @@
         this.$ids = document.getElementById(selector);
         this.$classes = document.getElementsByClassName(selector);
         //
-        this.$method = method; // 调用方式。 值： "OUTER" 内部调用,  "INNER" 外部调用
+        this.$method = method; // 调用方式。 值： "OUTER" 外部调用,  "INNER" 内部调用
         this.$selector = selector; // 输入框元素节点ID或CLass属性值(不含选择器符号井号#或点号.). eg. 'floor'
         this.$elem = elem; // 输入框元素节点ID或Class属性值(含选择器符号井号#或点号.). eg.'#floor', '.floor'
         this.$elements = this.$ids == null ? this.$classes : [this.$ids]; // 输入框元素DOM对象集合（所有元素，数组对象）

@@ -93,7 +93,7 @@
             ----------------------------------------
                         · 使用方法
             ----------------------------------------
-            // 方法1、外部调用，即“根据控件事件触发方式及返回的数据源”调用控件
+            // 方法1、内部调用，即“根据控件事件触发方式及返回的数据源”调用控件(Click等事件写在控件里面)
             neuiInputsearch('#area', {
                 event: 'input', // 指定事件为input输入事件或click点击事件
                 inputBack: function(e){ //
@@ -106,7 +106,7 @@
             });
 
 
-            // 方法2、内部调用，即“在on input 或 on input 事件中指定数据源”调用控件
+            // 方法2、外部调用，即“在on input 或 on input 事件中指定数据源”调用控件(Click等事件写在前台页面)
             $('#area').on('input', function(){
                 var $this = $(this);
                 neuiInputsearch({
