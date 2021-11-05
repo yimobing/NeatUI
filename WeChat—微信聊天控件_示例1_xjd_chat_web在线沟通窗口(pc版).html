@@ -295,39 +295,84 @@
         }
 
 
+
+        //——————————————————————————————————————————
+        /**
+         * 校验是否pc端 add 20211013-1
+         */
+        var isDevicePc =  function(){
+            var userAgentInfo = navigator.userAgent.toLowerCase();
+            //console.log(userAgentInfo);
+            var Agents = ["mobile","android","iphone","sysbian","windows phone","iPad","ipod","blackberry"];
+            var flag = false;
+            for(var i=0; i<Agents.length; i++){
+                if(userAgentInfo.indexOf(Agents[i])>=0){
+                    flag = true;
+                    break;
+                }
+            }
+            return flag ? false : true;
+        }
+
+
+        /**
+        * 检测ie版本号 add 20211105-1
+        * @returns {number|string} 若是ie浏览器则返回对应版本号(整数), 否则返回一段文字
+        */
+        var checkIesVersion = function(){
+            var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串 
+            var isIE = window.ActiveXObject || "ActiveXObject" in window;
+            if (isIE)  
+            { 
+                var reIE = new RegExp("MSIE (\\d+\\.\\d+);"); 
+                reIE.test(userAgent); 
+                var banben = parseFloat(RegExp["$1"]); 
+                if(userAgent.indexOf('MSIE 6.0')!=-1){
+                    return 6;
+                }else if(banben == 7){ 
+                    return 7; //ie7或ie5
+                }else if(banben == 8){ 
+                    return 8;
+                }else if(banben == 9){ 
+                    return 9;
+                }else if(banben == 10){ 
+                    return 10;
+                } else if(userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)){ 
+                    return 11;
+                }else{ 
+                    return 0; //IE版本过低(ie5以下版本)
+                }
+            }else{
+                return '抱歉，不是IE浏览器，无法检测IE版本';
+            } 
+        }
+
+
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         $(function(){
             
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //                                                   系列事件
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————  
+            //——————————————————————————————————————————
+            //=====检测IE版本，如果太低，则中断执行 add 20211105-1
+            var ieVersion = parseInt(checkIesVersion());
+            if(isNaN(ieVersion)) ieVersion = - 1;
+            // console.log('版本：', ieVersion);
+            if(ieVersion > 0 && ieVersion <= 8){
+                alert('对不起，你正在使用老掉牙的IE' + ieVersion + '浏览器，请升级至IE9以上版本');
+                return;
+            }
+
+
             //——————————————————————————————————————————
             //=====打开在线沟通窗口
             neui.showAnimate();
             setTimeout(function(){
                 fnOpenTouch();
                 neui.destroyAnimate();
-            }, 100)
-
-
-            //——————————————————————————————————————————
-            /**
-             * 校验是否pc端 add 20211013-1
-             */
-             var isDevicePc =  function(){
-                var userAgentInfo = navigator.userAgent.toLowerCase();
-                //console.log(userAgentInfo);
-                var Agents = ["mobile","android","iphone","sysbian","windows phone","iPad","ipod","blackberry"];
-                var flag = false;
-                for(var i=0; i<Agents.length; i++){
-                    if(userAgentInfo.indexOf(Agents[i])>=0){
-                        flag = true;
-                        break;
-                    }
-                }
-                return flag ? false : true;
-            }
+            }, 100);        
 
 
             //——————————————————————————————————————————
