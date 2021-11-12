@@ -97,7 +97,7 @@
     <script type="text/javascript" src="assets/neatui/js/neatui-loadmore.js"></script><!--上拉加载更多-->
     <script type="text/javascript">
         /*+----------------全局变量----------------+*/
-        var PAGESIZE = 10; //每页数量
+        var PAGESIZE = 10; // 每页数量
 
         /*+----------------FUNCTION----------------+*/
         /**
@@ -105,7 +105,7 @@
          * @param {number} ps_curpage 当前页码
          * @returns {Promise} 返回第N页对应的Promise对象. 其中resolve(res)中的res为数据源
          */
-        var count = 0; //count 模拟请求次数
+        var count = 0; // count 模拟请求次数
         function get_data_history(ps_curpage){
 
             //************************
@@ -116,7 +116,7 @@
                 setTimeout(function(){
                     count++;
                     if(count < 2)
-                        //后台返回
+                        // 后台返回
                         var json = {
                             data:[
                                         
@@ -280,6 +280,7 @@
         /**
          * 创建历史列表
          * @param {object} ps_source 数据源
+         * @param {number} ps_nowpage 当前页码
          */
         function create_list_history(ps_source, ps_nowpage){
             if(!ps_source || $.isEmptyObject(ps_source)) return;
