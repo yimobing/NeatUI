@@ -623,7 +623,7 @@ var utilities = {
         // 故解决思路是：移动端把所有空格替换成空，在pc端把所有空格替换成一个&nbsp;
         if(typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
             output = output.replace(/\t/g, ''); // 制表符替换成空
-            output = output.replace(/([\s]+)/g, ''); // 多个空格替换成空
+            output = output.replace(/([\s]+)/g, ' '); // 多个空格替换成成一个空格
         }else{ // pc端时
             output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
             output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
@@ -1867,7 +1867,7 @@ var filter = {
             ps_str = ps_str.replace(/<[^<>]+?>/g, ''); //过滤标签
             ps_str = ps_str.replace(/\ +/g, ''); //去掉空格
             ps_str = ps_str.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); //去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格
-            ps_str = ps_str.replace(/[\r\n]+?/g, ''); //去掉换行
+            ps_str = ps_str.replace(/[\r\n]+?/g, ' '); //去掉换行(变成一个空格)
         }
         if(typeof utilities.htmlEncode == 'function') ps_str = utilities.htmlEncode(ps_str); //标签转化成字符串
         return ps_str;
