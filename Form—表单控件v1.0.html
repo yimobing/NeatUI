@@ -436,7 +436,10 @@
             //——————————————————————————————————————————
             //=====“校验表单格式与完整性”按钮
             $('#btn-examineForm').on('click', function(){
-                var result = example.examineForm('.mortgage__static');
+                var result = example.examineForm('.mortgage__static', { // 其它参数(可选)
+                popup: true, // 表单格式错误或信息不完整时是否弹出提示信息(可选)，默认true
+                zIndex: 999 // 提示信息的对话框层级(可选)，999
+                });
                 console.log('表单完整性：', result);
             });
 
