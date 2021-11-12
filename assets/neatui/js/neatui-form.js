@@ -446,7 +446,7 @@
                     var isThousands = typeof txt.getAttribute('data-thousand') == 'undefined' ? false : txt.getAttribute('data-thousand') == 'true' ? true : false; // 是否千分进位
                     var value = '';
                     if(type == null || type == 'text') {
-                        value = txt.value;
+                        value = tools.filterHtmlCode(txt.value);
                         if(isThousands) value = value.toString().replace(/\,/g, ''); // 去掉逗号 test1
                     }
                     else if(type == 'checkbox') {
@@ -700,9 +700,10 @@
                     multiple = typeof items["multiple"] == 'undefined' ? false : items["multiple"] === true ? true : false,
                     readonly = typeof items["readonly"] == 'undefined' ? false : items["readonly"] === true ? true : false,
                     disabled = typeof items["disabled"] == 'undefined' ? false : items["disabled"] === true ? true : false,
+                    display = typeof items["display"] == 'undefined' ? true : items["display"] === false ? false : true,
                     icon = typeof items["icon"] == 'undefined' ? field : items["icon"],
                     buttons = typeof items["button"] == 'undefined' ? null : items["button"],
-                    attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"];
+                    attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"];                 
                 //
                 var _LHtml = '', // 左边内容
                     _RHtml = '', // 右边内容
@@ -766,6 +767,7 @@
                     _dataHideStr = hid.toString().replace(/([ ]+)/g, '') === '' ? '' : ' data-bh="' + hid + '"';
                     _readonlyStr = !readonly ? '' : ' readonly',
                     _disabledStr = !disabled ? '' : ' disabled',
+                    _displayStyle = display ? '' : ' style="display: none"',
                     //_btnStr = '', // 按钮
                     _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
                     _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
@@ -809,7 +811,7 @@
                 _IcoHtml += _iconStr;
                 // 拼接HTML
                 _outerHtml += [
-                    '<div class="eform-row">',
+                    '<div class="eform-row row-' + ids + '"' + _displayStyle + '>',
                         '<div class="item-l">',
                             ( me.$opts.config.layout.theme != 'popular' ? '' : _IcoHtml ),
                             '<label>' + title + '</label>',
@@ -1926,6 +1928,74 @@
             if(typeof neuiDialog == 'undefined') return false;
             if(typeof neuiDialog.alert !== 'function') return false;
             return true;
+        },
+
+
+        /**
+         * 过滤HTML代码
+         * @param {string} str 原字符串
+         * @param {boolean} isHTML 是否要过滤标签、css、js、换行、空格等多余内容, 默认true(可选). false时虽然不过滤但会将标签转义成字符
+         * @returns {string} 返回新字符串
+         */
+        filterHtmlCode: function(ps_str, isHTML){
+            var flag = typeof isHTML == 'undefined' ? true : (isHTML === false ? false : true);
+            if(flag){
+                if(typeof ps_str == 'undefined' || ps_str == null) return '';
+                var ps_str = ps_str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); //过滤css
+                ps_str = ps_str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g, ''); //过滤js
+                ps_str = ps_str.replace(/<[^<>]+?>/g, ''); //过滤标签
+                // ps_str = ps_str.replace(/\ +/g, ''); //去掉空格
+                ps_str = ps_str.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); //去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格
+                ps_str = ps_str.replace(/[\r\n]+?/g, ' '); //去掉换行(变成一个空格)
+            }
+            if(typeof this.encodeHtml == 'function') ps_str = this.encodeHtml(ps_str); //标签转化成字符串
+            return ps_str;
+        },
+
+
+
+         /**
+         * 将标签转换成字符串（即HTML编码）
+         * HTML与字符串互转义
+         * @param {string} ps_str 含有标签的字符串
+         * @returns {string} 返回不含标签的字符串
+         * eg1.将 < 转义成 &lt; eg2.将 > 转义成 &gt;
+         */
+        encodeHtml: function(ps_str){
+            var temp = document.createElement("div");
+            (temp.textContent != null) ? (temp.textContent = ps_str) : (temp.innerText = ps_str);
+            // 转义替换
+            var output = temp.innerHTML.toString().replace(/\'/g, '&apos;').replace(/\"/g, '&quot;') // 单双引号转义
+            // 回车换行替换成<br>
+            output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
+            output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
+            // <br>替换成<p>
+            if(output.indexOf('<br>') > -1){
+                // 让p标签成对出现
+                output = output.replace(/\<br\>/g, '</p><p>');
+                output = output.replace(/^(?!\<.*)/g, '<p>');
+                output = output.replace(/(?!\>.*)$/g, '</p>');
+                // 替换中间没有内容的空标签. eg.<p></p>
+                output = output.replace(/(\<p\>\<\/p\>)/g, '');
+            }
+            // 其它替换
+            // 注：部分ios中手写输入时即使过滤掉所有空格了还会出现一个空格，如果把空格转换成&nbsp;的话数据库中会有&nbsp;导致搜索等功能匹配不了。
+            // 故解决思路是：移动端把所有空格替换成空，在pc端把所有空格替换成一个&nbsp;
+            if(typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
+                output = output.replace(/\t/g, ''); // 制表符替换成空
+                output = output.replace(/([\s]+)/g, ' '); // 多个空格替换成一个空格
+            }else{ // pc端时
+                output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
+                output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
+            }
+            output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');  // div标签换成p
+            // 字符串化+斜杠处理
+            output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
+            output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
+            output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
+            //
+            temp = null;
+            return output;
         }
 
     }; // END tools
