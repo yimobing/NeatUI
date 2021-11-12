@@ -86,10 +86,13 @@
                 //——————————————————————————————————————————
                 //=====获取数据时
                 // 后台返回
-                var userJson = { "name":"张三", "sex":"男", "age":"14"}
+                var json = { 
+                    "return":"ok", 
+                    "name":"张三", "sex":"男", "age":"14" 
+                }
                 /*
                 // START AJAX
-                var userJson = {}
+                var json = {}
                 var isHoldOn = true;
                 ajax({
                     heading: "获取XX数据",
@@ -107,7 +110,7 @@
                     success: function(res){
                         if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
                         // if(res == '') return;
-                        userJson = JSON.parse(res);
+                        json = JSON.parse(res);
                     },
                     error: function(res){
                         if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -171,7 +174,7 @@
                     if(!flag) msg = '保存失败';
 
                     neuiDialog.alert({
-                        caption: '提示',
+                        // caption: '提示',
                         message: msg,
                         buttons: ['确定'],
                         callBack: function(){
@@ -276,7 +279,7 @@
                     }
 
                     neuiDialog.alert({
-                        caption: '提示',
+                        // caption: '提示',
                         message: msg,
                         buttons: ['确定']
                     })
@@ -349,7 +352,7 @@
                     } // END 外层FOR
 
                     neuiDialog.alert({
-                        caption: '提示',
+                        // caption: '提示',
                         message: msg,
                         buttons: ['确定']
                     })
