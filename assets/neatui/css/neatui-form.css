@@ -558,6 +558,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     border: 0; 
     border-bottom: 1px solid #ddd;
 }
+.ne-form.theme-popular .eform-row.flex-start .item-l{ padding-top: 8px; }
 .ne-form.theme-popular .item-r{ border: 0; }
 .ne-form.theme-popular input,
 .ne-form.theme-popular textarea{ border: 0; }
