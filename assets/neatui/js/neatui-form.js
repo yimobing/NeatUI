@@ -2297,6 +2297,8 @@ var neuiSearchBox = {
                 //单选
                 $('.search-box-main-radio .option').on('click', function(){
                     $(this).addClass('checked').siblings().removeClass('checked');
+                    var value = $(this).text();
+                    $(this).parents('.search-box-main-radio').siblings('.search-box-head-radio').find('.search-box-head-value').text(value);
                 })
                 //多选
                 $('.search-box-main-checkbox .option').on('click', function(){
