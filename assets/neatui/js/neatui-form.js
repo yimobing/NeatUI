@@ -701,6 +701,7 @@
                     readonly = typeof items["readonly"] == 'undefined' ? false : items["readonly"] === true ? true : false,
                     disabled = typeof items["disabled"] == 'undefined' ? false : items["disabled"] === true ? true : false,
                     display = typeof items["display"] == 'undefined' ? true : items["display"] === false ? false : true,
+                    align = typeof items["align"] == 'undefined' ? '' : items["align"],
                     icon = typeof items["icon"] == 'undefined' ? field : items["icon"],
                     buttons = typeof items["button"] == 'undefined' ? null : items["button"],
                     attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"];                 
@@ -768,6 +769,7 @@
                     _readonlyStr = !readonly ? '' : ' readonly',
                     _disabledStr = !disabled ? '' : ' disabled',
                     _displayStyle = display ? '' : ' style="display: none"',
+                    _rowClassName = align == 'top' ? ' flex-start' : '',
                     //_btnStr = '', // 按钮
                     _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
                     _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
@@ -811,7 +813,7 @@
                 _IcoHtml += _iconStr;
                 // 拼接HTML
                 _outerHtml += [
-                    '<div class="eform-row row-' + ids + '"' + _displayStyle + '>',
+                    '<div class="eform-row row-' + ids + _rowClassName + '"' + _displayStyle + '>',
                         '<div class="item-l">',
                             ( me.$opts.config.layout.theme != 'popular' ? '' : _IcoHtml ),
                             '<label>' + title + '</label>',
