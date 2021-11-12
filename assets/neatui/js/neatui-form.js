@@ -345,14 +345,19 @@
          * 校验表单格式与完整性
          * 符合ne-form格式的表单都可以用此校验方法
          * @param {Selector String || jQuery Object || HTML DOM} o 表单根节点选择器字符串或dom对象或jq选择器对象。
-         * @param {number} ps_dialog_zIndex 对话框层级(可选),默认999
+         * @param {number} options 对话框层级、是否弹出对话框等参数组成的对象(可选)。
          * @returns {boolean} 返回布尔值. true 数据正常, false 数据异常
          */
-        me.examineForm = function(o, ps_dialog_zIndex){
+        me.examineForm = function(o, options){
             var tips1 = '';
             var tips2 = '';
             var isAllRead = true; // true 表示所有输入框为只读
-            var zIndex = typeof ps_dialog_zIndex == 'undefined' ? 999 : isNaN(parseInt(ps_dialog_zIndex)) ? 999 : parseInt(ps_dialog_zIndex);
+            var defaults = {
+                popup: true, // 表单格式错误或信息不完整时是否弹出提示信息(可选)，默认true
+                zIndex: 999 // 提示信息的对话框层级(可选)，999
+            }
+            var settings = $.extend(true, {}, defaults, options || {} );
+            var zIndex = typeof settings.zIndex == 'undefined' ? 999 : isNaN(parseInt(settings.zIndex)) ? 999 : parseInt(settings.zIndex);
             o = tools.anyToDomObject(o);
             var child = tools.getChildElement(o);
             Array.from(child).forEach(function(el){
@@ -390,38 +395,42 @@
             var chooseText = isAllRead ? '选择' : '填写';
             // 校验数据完整性
             if(tips1 != ''){
-                var tips = '请' + chooseText + '：' + tips1.substr(0, tips1.length - 1);
-                if(tools.isExistDialogControl()){
-                    // neuiDialog.alert({
-                    //     zIndex: ps_dialog_zIndex,
-                    //     animate: true,
-                    //     message: tips,
-                    //     buttons: ['确定']
-                    // })
-                    neuiDialog.notice({
-                        zIndex: ps_dialog_zIndex,
-                        animate: true,
-                        message: tips,
-                        theme: 'danger',
-                        location: 'top'
-                    })
-                }else{
-                    alert(tips);
+                if(settings.popup){
+                    var tips = '请' + chooseText + '：' + tips1.substr(0, tips1.length - 1);
+                    if(tools.isExistDialogControl()){
+                        // neuiDialog.alert({
+                        //     zIndex: zIndex,
+                        //     animate: true,
+                        //     message: tips,
+                        //     buttons: ['确定']
+                        // })
+                        neuiDialog.notice({
+                            zIndex: zIndex,
+                            animate: true,
+                            message: tips,
+                            theme: 'danger',
+                            location: 'top'
+                        })
+                    }else{
+                        alert(tips);
+                    }
                 }
                 return false;
             }
             // 校验数据格式：校验电话
             if(tips2 != ''){
-                var tips = '请' + chooseText + '正确的：' + tips2.substr(0, tips2.length - 1);
-                if(tools.isExistDialogControl()){
-                    neuiDialog.alert({
-                        zIndex: ps_dialog_zIndex,
-                        animate: true,
-                        message: tips,
-                        buttons: ['确定']
-                    })
-                }else{
-                    alert(tips);
+                if(settings.popup){
+                    var tips = '请' + chooseText + '正确的：' + tips2.substr(0, tips2.length - 1);
+                    if(tools.isExistDialogControl()){
+                        neuiDialog.alert({
+                            zIndex: zIndex,
+                            animate: true,
+                            message: tips,
+                            buttons: ['确定']
+                        })
+                    }else{
+                        alert(tips);
+                    }
                 }
                 return false;
             }
