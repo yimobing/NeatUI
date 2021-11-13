@@ -796,6 +796,9 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     cursor: pointer;
 }
 /*+--------默认图标--------+*/
+.ne-configuration .icon.fa{
+	color: #afaaaa;
+}
 .ne-configuration .icon{
     background: transparent url('') no-repeat scroll center center / 100% auto;
 }
