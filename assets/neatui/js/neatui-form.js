@@ -422,11 +422,18 @@
                 if(settings.popup){
                     var tips = '请' + chooseText + '正确的：' + tips2.substr(0, tips2.length - 1);
                     if(tools.isExistDialogControl()){
-                        neuiDialog.alert({
+                        // neuiDialog.alert({
+                        //     zIndex: zIndex,
+                        //     animate: true,
+                        //     message: tips,
+                        //     buttons: ['确定']
+                        // })
+                        neuiDialog.notice({
                             zIndex: zIndex,
                             animate: true,
                             message: tips,
-                            buttons: ['确定']
+                            theme: 'danger',
+                            location: 'top'
                         })
                     }else{
                         alert(tips);
