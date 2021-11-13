@@ -363,6 +363,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 	background: -moz-linear-gradient(top,  #fff,  #ededed);
 	filter:progid: DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ededed');
 }
+
 /*细胞星号必填*/
 .item-cell[data-type="must"]{
 	position: absolute;
@@ -763,8 +764,21 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 /*+================================================================================+*/
 /*+--------------------------------+*/
 .ne-configuration{ }
+.ne-configuration .item-cell>button.simple{
+	background: none!important;
+	padding: 0 5px!important;
+	border-color: #ada8a8!important;
+	text-shadow: none!important;
+	box-shadow: none!important;
+	font-size: 12px!important;
+	color: #ada8a8!important;
+}
+.ne-configuration .item-cell>button>i{ margin-right: 3px; font-size: 12px; }
+
 /*+--------------------------------+*/
 .ne-configuration.theme-popular .item-l{ width: 90px; }
+
+
 /*+--------切换输入--------+*/
 .switch{
     margin-top: 20px;
