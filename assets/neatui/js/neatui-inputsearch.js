@@ -236,6 +236,9 @@
                 theme: "text", // 关闭按钮样式(可选)。值：text 文字按钮(默认), image 图标按钮
                 direction: "default" // 关闭按钮位置(可选)。值： default 底部居中(默认), topCenter 顶部居中, leftTop 左上角, rightTop 右上角, leftBottom 左下角, rightBottom 右下角。
             },
+
+            // 控件关闭 add 20211113-1
+            besidesClose: [ ], // 指定点击页面其它地方关闭控件时排除哪些节点，即点击这些节点不会关闭控件(可选)，默认空数组。数组元素可以是选择器字符串、JQ对象或DOM对象。eg. ['#id1', '#id2', '.className1', $('#btn1'), document.getElementById('id1') ]
    
             // 回调
             onConfirm: function(e){ // 选择某一项后的回调(可选)。e 格式：{dom: "当前输入框元素DOM对象", id: "新的隐藏值", value: "新的显示值", oldId: "旧的隐藏值", oldValue: "旧的显示值"}
@@ -507,10 +510,34 @@
         me.chooseButton(valCell); // 点击关闭按钮关闭控件
         document.onclick = function(event){ // 点击页面其它地方关闭控件
             var target = event.target || event.srcElement;
-            var closest1 = target.closest('.' + net.idClass); // 控件节点
+            var closest1 = target.closest('.' + net.idClass); // 控件节点 
             var closest2 = target.closest(me.$elem); // 输入框元素节点
-            if( (closest1 == null && closest2 == null) || (!closest1 && !closest2)){
-                me.removeControl();
+            // edit 20211113-1
+            // if( (closest1 == null && closest2 == null) || (!closest1 && !closest2)){
+            //     me.removeControl();
+            // }
+            var isCanClose = true; // 是否能关闭控件
+            if(target == closest1 || target == closest2) isCanClose = false;
+            for(var i = 0; i < me.$opts.besidesClose.length; i++){
+                // if(target == target.closest(me.$opts.besidesClose[i])){
+                //     isCanClose = false;
+                //     break;
+                // }
+                var one = me.$opts.besidesClose[i];
+                var _nowSelector = one instanceof jQuery == false ?
+                        (
+                            !tools.isDomObject(one) ? one : 
+                            ( one.getAttribute('id') != null ? '#' + one.getAttribute('id') : tools.getStringClassName(one.getAttribute('class')) )
+                        )
+                        :
+                        ( one[0].getAttribute('id') != null ? '#' + one[0].getAttribute('id') : tools.getStringClassName(one[0].getAttribute('class')) )
+                if(target == target.closest(_nowSelector)){
+                    isCanClose = false;
+                    break;
+                }   
+            }
+            if(isCanClose){
+                me.removeControl();   
             }
         }
     },
