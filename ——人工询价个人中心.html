@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>个人中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.css"><!--FontAwesome图标-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+</head>
+<body>
+    <style>
+        /*+---------------- ---------------+*/
+        body{width: 98.5%; max-width: 640px; margin: 0 auto; background-color: #f4f4f4; font-size: 16px; }
+        *{margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -moz-box-sizing: border-box; outline: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); -webkit-tap-highlight-color:rgba(0, 0, 0, 0); -webkit-text-size-adjust: none; } 
+        *:not(input, textarea){-webkit-touch-callout: none; -webkit-user-select: none; }
+        .wrap{ padding: 5px 0; }
+        /*+---------------- ---------------+*/
+        .user{ }
+        .user__form{ padding: 15px 15px; background-color: #fff; }
+        .user__form .item-l{ width: 60px!important; }
+        .user__btn{ margin-top: 10px; }
+        .user__btn button{ width: 100%; }
+
+    </style>
+
+    <div class="wrap">
+        <main>
+            <section class="user ne-form theme-popular">
+                <div class="user__form"></div><!--/.user__form-->
+                <div class="user__btn">
+                    <button type="button" id="btn-save" class="ne-btn has-texture blue">保存</button>
+                </div><!--/.user__btn-->
+            </section>
+        </main>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/libs/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-form.js"></script><!--表单布局-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义AJAX-->
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+        
+
+
+
+        /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 获取用户信息
+         * @returns {object} 返回一维对象
+         */
+        function get_data_user(){
+            // 后台返回
+            var json = {
+                "return":"ok", "user_bh":"237809", "user_xm":"张三", "user_tel":"18050164328"
+            }
+            /*
+            // START AJAX
+            var json = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取用户信息",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "GET",
+                dataType: "html",
+                cache: false,
+                url: "",
+                data: {
+                    "action": "",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>"
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    json = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return {}
+            }
+            // END AJAX
+            */
+            return json;
+        }
+
+    
+        /*+————————————————FUNCTION————————————————+*/
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====获取用户数据
+            var userJson = get_data_user();
+            var userNo = userJson["user_bh"],
+                userName = userJson["user_xm"],
+                userTel = userJson["user_tel"];
+
+
+
+            //——————————————————————————————————————————
+            //======创建表单
+            var example = new NeForm(); // 实例化控件
+            var regularJson = {
+                data:[
+                    {title:"用户号", field:"userNo", type:"文本", value: userNo, readonly:true, icon:"fa-info" },
+                    {title:"姓名", field:"username", type:"文本", value: userName, must:true },
+                    {title:"电话", field:"mobile", type:"文本", value: userTel, must:true, phone:true },
+                ]
+            }
+            example.forms('.user__form', {
+                source: regularJson,
+                type: "standard",
+                config: { // 配置项(可选)
+                    layout: {
+                        theme: "popular",
+                        inputIcon: true,
+                        inputCross: true,
+                        inputMust: true,
+                        mustAlign: "left"
+                    }
+                }
+            });
+            
+            
+
+
+            
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         系列事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====保存按钮
+            $('#btn-save').on('click', function(){
+                var result = example.getFormData('.user__form');
+                var ls_user_xm = result["姓名"].value,
+                    ls_user_tel = result["电话"].value;
+                var arr = [ ls_user_xm, ls_user_tel ]
+                // console.log('result：', result);
+                // console.log('数组：', arr);
+                // 校验完整性
+                if(!example.examineForm('.user__form')) return;
+                // 开始执行
+                var flag = '', msg = '保存成功';
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    /*
+                    // START AJAX
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "保存用户个人信息",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "user_xm": ls_user_xm,
+                            "user_tel": ls_user_tel
+                        },
+                        success: function(res){
+                            if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            var json = JSON.parse(res);
+                            flag = json.return == 'ok' ? 1 : 0;
+                            if(!flag) msg = json.data;
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // END AJAX
+                    */
+                    flag = parseInt(1); //1 成功, 0 失败
+                    if(!flag) msg = '保存失败';
+
+                    neuiDialog.alert({
+                        message: msg,
+                        buttons: ['确定']
+                    })
+
+                    neui.destroyAnimate();
+                }, 100)
+            });
+            
+    
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>

@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>人工询价</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-loadmore.css"><!--上拉加载更多-->
+</head>
+<body>
+    <style>
+        /*+---------------- ---------------+*/
+        body{width: 98.5%; max-width: 640px; margin: 0 auto; background-color: #f4f4f4; font-size: 16px; }
+        *{margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -moz-box-sizing: border-box; outline: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); -webkit-tap-highlight-color:rgba(0, 0, 0, 0); -webkit-text-size-adjust: none; } 
+        *:not(input, textarea){-webkit-touch-callout: none; -webkit-user-select: none; }
+        .wrap{ padding: 5px 0; }
+        .ne-button{ margin-top: 8px; }
+        /*+----------------user---------------+*/
+        .user{ padding: 10px 15px; background-color: #fff; }
+        .user .eform-box{ margin-left: 12px; }
+        .user .eform-box:first-child{ margin-left: 0; }
+        .user .item-l{ width: 30px; }
+        .user.theme-popular .eform-row{ border-bottom: 0; }
+        .user.theme-popular .eform-box input{ border-bottom: 1px solid #ddd; }
+        /*+----------------tab---------------+*/
+        .tab{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; margin-top: 12px; } 
+        .tab>div{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; height: 40px; background-color: #daf0fd; color: #4c626f; text-align: center; font-size: 15px; }
+        .tab>div:first-child{border-radius: 8px 0 0 0; } 
+        .tab>div:nth-child(2){border-radius: 0 8px 0 0; } 
+        .tab>div.on{background-color: #fff; border-radius: 0; font-weight: bold; } 
+        .tab>div.on:before{position: absolute; top: -5px; left: 0; content: ''; display: inline-block; width: 100%; height: 10px; background-color: #fff; } 
+        .tab>div.on:after{content: ''; position: absolute; z-index: 1; top: 0; width: 0; height: 0; } 
+        .tab>div:first-child.on:before{border-radius: 8px 20px 0 0; } 
+        .tab>div:first-child.on:after{right: -40px; border-bottom: 40px solid #fff; border-right: 40px solid  transparent; } 
+        .tab>div:nth-child(2).on:before{border-radius: 20px 8px 0 0; } 
+        .tab>div:nth-child(2).on:after{left: -40px; border-bottom: 40px solid #fff; border-left: 40px solid transparent; }
+        .tab__latest.has-border{ border-style: solid; border-color: #fff; border-width: 0 1px 0 1px; }
+        /*+----------------content---------------+*/
+        .content{ }
+        .inquiry{ }
+        .inquiry .item-l>i{ display: none; }      
+        .ask__form,
+        .reply__form{ padding: 10px 15px 15px; background-color: #fff; }
+        .ask{ }
+        .ask__form .item-l{ width: 75px!important; }
+        .reply{ margin-top: 25px; }
+        .reply__form{ padding: 10px 15px 15px; }
+        .reply__form .item-l{ width: 75px!important; }
+        .reply__caption{ padding: 10px 0; background-color: #fff; border-bottom: 1px solid #ddd; text-align: center; font-size: 18px; font-weight: bold; }
+        .history{  }
+        .history__one{ margin-top: 20px; padding: 18px 12px; background-color: #fff; }
+        .history__one:first-child{ margin-top: 0; }
+        .block__reply{ margin-top: 8px; padding-top: 8px; border-top: 1px solid #f4f4f4; }
+        /*+----------------aside---------------+*/
+        #btn-add, #btn-filter{ position: fixed; z-index: 10; right: 5px; top: 45%; }
+        #btn-add>i{ margin-right: 5px; font-size: 16px; }
+        
+    </style>
+
+    <div class="wrap">
+        <header>
+            <section class="user ne-form theme-popular">
+                <div class="eform-row">
+                    <div class="eform-box">
+                        <div class="item-l"><label for="">姓名</label></div>
+                        <div class="item-r"><input type="text"></div>
+                    </div><!--/.eform-box-->
+                    <div class="eform-box">
+                        <div class="item-l"><label for="">电话</label></div>
+                        <div class="item-r"><input type="text"></div>
+                    </div><!--/.eform-box-->
+                    <div class="eform-box">
+                        <button type="button" id="btn-save" class="ne-btn has-texture">保存</button>
+                    </div><!--/.eform-box-->
+                </div><!--/.eform-row-->
+            </section>
+        </header>
+        <main>
+            <section class="tab">
+                <div class="tab__inquiry on">我要询价</div>
+                <div class="tab__history">历史记录</div>
+            </section>
+            <section class="content">
+                <!--[========我要询价面板========]-->
+                <div class="inquiry">
+                    <!--[::::::::询价表单区域::::::::]-->
+                    <div class="ask">
+                        <div class="ask__form"></div><!--/.ask__form-->
+                        <div class="ask__btn ne-button">
+                            <button type="button" id="btn-submit" class="ne-btn has-texture">提交询价</button>
+                        </div><!--/.ask__btn-->
+                    </div><!--/.ask-->
+                    <!--[::::::::回复表单区域::::::::]-->
+                    <div class="reply" style="display: none;">
+                        <div class="reply__caption">回复询价</div>
+                        <div class="reply__form"></div><!--/.reply__form-->
+                        <div class="reply__btn ne-button">
+                            <button type="button" id="btn-reply" class="ne-btn has-texture">回复</button>
+                        </div><!--/.reply__btn-->
+                    </div><!--/.reply-->
+                </div><!--/.inquiry-->
+                <!--[========历史记录面板========]-->
+                <div class="history" style="display: none;"></div><!--/.history-->
+            </section>
+        </main>
+        <aside>
+            <section class="sidebar-operation">
+                <button type="button" id="btn-add" class="ne-btn has-3d green" style="display: none;"><i>+</i>新增</button>
+                <button type="button" id="btn-filter" class="ne-btn has-3d green" style="display: none;">筛选</button>
+            </section>
+        </aside>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/libs/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-form.js"></script><!--表单布局-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-loadmore.js"></script><!--上拉加载更多-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义AJAX-->
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+        // 后台传递过来的变量 ajax({})
+        var g_user_role = 1; // '<%=s_jue_se%>'; // 用户角色。 0 一般用户, 1 管理员，估价师
+        var g_user_kdr = '张三'; // '<%=s_kdr%>'; // 开单人
+        var g_user_now = '张三'; // '<%=s_user%>'; // 当前用户
+        var g_xjdh = '2109270269-237809'; // '<%=s_xjdh%>'; // 询价单号
+        // 上拉更多
+        var PAGESIZE = 10; // 每页数量
+        // 搜索条件
+        var s_ksrq = ''; // 开始日期
+        var s_jsrq = ''; // 结束日期
+        var s_xjdh = ''; // 询价单号
+        var s_lpmc = ''; // 楼盘名称
+        var s_check_xjhf = ''; // 是否已回复
+
+
+    
+        /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 获取用户信息
+         * @param {string} ps_user_bh 用户编号
+         * @returns {object} 返回一维对象
+         */
+        function get_data_user(ps_user_bh){
+            // 后台返回
+            var json = {
+                "return":"ok", "user_xm":"张三", "user_tel":"18050164328"
+            }
+            /*
+            // START AJAX
+            var json = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取用户信息",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "GET",
+                dataType: "html",
+                cache: false,
+                url: "",
+                data: {
+                    "action": "",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "user_bh": ps_user_bh
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    userJson = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return {}
+            }
+            // END AJAX
+            */
+            return json;
+        }
+
+
+
+        /**
+         * 获取询价单数据
+         * @param {string} ps_xjdh 询价单号
+         * @param {object} 返回一维对象
+         */
+        var count = 0;
+        function get_data_quiry(ps_xjdh){
+            count++;
+            // 后台返回
+            if(count == 1)
+                var json = {
+                    "return":"ok",
+                    "xjdh":"", // 询价单号
+                    "xj_time":"2021-05-18 14:32:48", // 询价时间
+                    "lpmc":"泉州浦西万达广场", // 楼盘
+                    "dong": "南区住5号楼", // 栋号
+                    "dong_fh":"1305", // 房号
+                    "jiegou":"钢筋混凝土", // 结构
+                    "jzmj":"120.8", // 面积
+                    "zhuangxiu":"中等装修", // 装修
+                    "waiqiang":"帖砖", //外墙
+                    "peitao":"泉州九中、现代中学等学校一应具全，交通便利", // 配套
+                    "maijia":"总价150万元，不还价", // 卖价
+                    "user_bz":"该用户很懒，没有备注", // 询价备注
+                    "pgjz_hf_time":"2021-11-12 14:30:27", // 回复时间
+                    "pgjz_dj":"8600", // 评估单价
+                    "pgjz_zj":"125", // 评估总价
+                    "pgjz_bz":"卖价过高，不符合市场需求", // 回复备注
+                    "check_xj":"0", // 是否提交过询价
+                    "check_xjhf":"1" // 是否已回复
+                }
+            if(count >= 2)
+                var json = {
+                    "return":"ok",
+                    "xjdh":"2109270269-237809", // 询价单号
+                    "xj_time":"2021-05-18 14:32:48", // 询价时间
+                    "lpmc":"泉州浦西万达广场", // 楼盘
+                    "dong": "南区住5号楼", // 栋号
+                    "dong_fh":"1305", // 房号
+                    "jiegou":"钢筋混凝土", // 结构
+                    "jzmj":"120.8", // 面积
+                    "zhuangxiu":"中等装修", // 装修
+                    "waiqiang":"帖砖", //外墙
+                    "peitao":"泉州九中、现代中学等学校一应具全，交通便利", // 配套
+                    "maijia":"总价150万元，不还价", // 卖价
+                    "user_bz":"该用户很懒，没有备注", // 询价备注
+                    "pgjz_hf_time":"2021-11-12 14:30:27", // 回复时间
+                    "pgjz_dj":"8600", // 评估单价
+                    "pgjz_zj":"125", // 评估总价
+                    "pgjz_bz":"卖价过高，不符合市场需求", // 回复备注
+                    "check_xj":"0", // 是否提交过询价
+                    "check_xjhf":"1" // 是否已回复
+                }
+            
+            /*
+            // START AJAX
+            var json = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取询价单数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "GET",
+                dataType: "html",
+                cache: false,
+                url: "",
+                data: {
+                    "action": "",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "xjdh": ps_xjdh
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    json = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return {}
+                // return;
+            }
+            // END AJAX
+            */
+            return json;
+        }
+
+
+
+
+        /**
+         * 获取历史记录数据
+         * @returns {object} 返回数组对象
+         */
+        function get_data_history(){
+            return new Promise(function(resolve, reject){
+                // 后台返回
+                setTimeout(function(){
+                    // 模拟异步
+                    var json = {
+                        "return":"ok",
+                        "data":[
+                            {"xjdh":"2109270269-237809", "xj_time":"2021-05-18 14:32:48", "lpmc":"泉州浦西万达广场1", "dong": "南区住5号楼", "dong_fh":"1305", "jiegou":"钢筋混凝土", "jzmj":"120.8", "zhuangxiu":"中等装修", "waiqiang":"帖砖", "peitao":"泉州九中、现代中学等学校一应具全，交通便利", "maijia":"总价150万元，不还价", "user_bz":"该用户很懒，没有备注", "pgjz_hf_time":"2021-11-12 14:30:27", "pgjz_dj":"8600", "pgjz_zj":"125", "pgjz_bz":"卖价过高，不符合市场需求", "check_xj":"0", "check_xjhf":"1"},
+                            {"xjdh":"2109270270-237809", "xj_time":"2021-05-18 23:52:16", "lpmc":"泉州浦西万达广场2", "dong": "南区住5号楼", "dong_fh":"1305", "jiegou":"钢筋混凝土", "jzmj":"120.8", "zhuangxiu":"中等装修", "waiqiang":"帖砖", "peitao":"泉州九中、现代中学等学校一应具全，交通便利", "maijia":"总价150万元，不还价", "user_bz":"该用户很懒，没有备注", "pgjz_hf_time":"2021-11-12 14:30:27", "pgjz_dj":"8600", "pgjz_zj":"125", "pgjz_bz":"卖价过高，不符合市场需求", "check_xj":"0", "check_xjhf":"1"},
+                            {"xjdh":"2109270285-237809", "xj_time":"2021-07-25 09:12:43", "lpmc":"泉州浦西万达广场3", "dong": "南区住5号楼", "dong_fh":"1305", "jiegou":"钢筋混凝土", "jzmj":"120.8", "zhuangxiu":"中等装修", "waiqiang":"帖砖", "peitao":"泉州九中、现代中学等学校一应具全，交通便利", "maijia":"总价150万元，不还价", "user_bz":"该用户很懒，没有备注", "pgjz_hf_time":"2021-11-12 14:30:27", "pgjz_dj":"8600", "pgjz_zj":"125", "pgjz_bz":"卖价过高，不符合市场需求", "check_xj":"0", "check_xjhf":"1"}
+                        ]
+                    }
+
+                    resolve(json);  // 成功，使用resolve()返回所有数据
+                    // reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+                }, 1000)
+                
+                /*
+                //START AJAX
+                var json = {}
+                var isHoldOn = true;
+                ajax({
+                    heading: "获取历史数据",
+                    debug: false,
+                    type: "POST",
+                    async: true, // false 同步取数, true 异步取数. !!!注意：请使用异步取数,否则将出现阻塞线程使系统卡顿的情况
+                    url: "",
+                    data: {
+                        "action": "",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk %>"
+                    },
+                    success: function(res){
+                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        //if(res == '') return;
+                        json = JSON.parse(res);
+                        resolve(json); // 成功，使用resolve()返回所有数据
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        reject('ERROR，连接错误！'); // 错误，使用reject返回错误信息
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    return {}
+                }
+                //END AJAX
+                */
+            })
+        }
+
+
+
+        //========================================
+        /**
+         * 给“我要询价”表单赋值，并控制区域状态
+         * @param {object} ps_source 数据源
+         */
+        function assignQuiryForm(ps_source){
+            var json = ps_source;
+            var ls_xjdh = json["xjdh"], // 询价单号
+                ls_check_xj = json["check_xj"], // 是否提交询价
+                ls_check_xjhf = json["check_xjhf"]; // 是否回复过
+
+            // 询价表单
+            $('#oddNumber').val(ls_xjdh); // 询价单号
+            $('#oddTime').val(json["xj_time"]); // 询价时间
+            $('#house').val(json["lpmc"]); // 楼盘名称
+            $('#build').val(json["dong"]); // 栋号
+            $('#room').val(json["dong_fh"]); // 房号
+            $('#structure').val(json["jiegou"]); // 结构
+            $('#metre').val(json["jzmj"]); // 面积
+            $('#decoration').val(json["zhuangxiu"]); // 装修
+            $('#wall').val(json["waiqiang"]); // 外墙
+            $('#belong').val(json["peitao"]); // 配套
+            $('#price').val(json["maijia"]); // 卖价
+            $('#notes').val(json["user_bz"]); // 询价备注
+            // 回复表单
+            $('#unitPrice').val(json["pgjz_dj"]);  // 评估单价
+            $('#totalPrice').val(json["pgjz_zj"]); // 评估总价
+            $('#comment').val(json["pgjz_bz"]); // 回复备注
+        }
+
+
+        
+
+        /**
+         * “我要询价”表单权限控制
+         * @param {string} ps_xjdh 询价单号
+         */
+        function controlAuthorize(ps_xjdh){
+            // 显示状态
+            if(ps_xjdh.toString().replace(/([ ]+)/g, '') !== ''){ // 有询价单号时
+                $('.row-oddNumber, .row-oddTime').show(); // 显示“询价单号”、“询价时间”两栏
+                $('#btn-submit, #btn-reply').addClass('blue'); // “提交询价”、“回复”按钮高起来
+                if(parseInt(ls_check_xj) == 1){ // 已提交过询价的，不能再更改
+                    $('.ask__btn').hide(); // 隐藏“提交询价”按钮
+                    $('.ask__form').find('input, textarea').attr('readonly', true); // 输入框只读
+                }
+                // 权限控制
+                if(g_user_role == 1){ // 管理员、评估师时
+                    $('.reply').show(); // 显示“询价回复”区域
+                }
+                if(g_user_kdr != '' && g_user_kdr != g_user_now){ // 当前用户不是开发单人时
+                    $('#btn-submit').hide(); // 隐藏“提交询价”按钮、“新增”按钮
+                    $('#btn-add').hide(); // 隐藏“新增”按钮
+                }else{
+                    $('#btn-add').show(); // 显示“新增”按钮
+                }
+            }
+        }
+
+
+
+        /**
+         * 创建历史记录列表
+         * @param {object} ps_source 数据源
+         * @param {number} ps_nowpage 当前页码
+         */
+        function create_list_history(ps_source, ps_nowpage){
+            if(!ps_source || $.isEmptyObject(ps_source)) return;
+            if(typeof ps_source.data == 'undefined') return;
+            var node = '.history';
+            var _html = '';
+            $.each(ps_source.data, function(i, items){
+                var j = i + 1;
+                var xuhao = PAGESIZE * (ps_nowpage - 1) + j;
+
+                var ls_xjdh = items["xjdh"],
+                    ls_xj_time = items["xj_time"],
+                    ls_dyw = items["lpmc"] + '/' + items["dong"] + '/' + items["dong_fh"] + '/' + items["jiegou"] + '/' + items["jzmj"] + 'm²/' + items["zhuangxiu"];
+                    ls_waiqiang = items["waiqiang"],
+                    ls_peitao = items["peitao"],
+                    ls_maijia = items["maijia"],
+                    ls_user_bz = items["user_bz"],
+                    ls_check_xj = items["check_xj"],
+                    //
+                    ls_pgjz_dj = items["pgjz_dj"],
+                    ls_pgjz_zj = items["pgjz_zj"],
+                    ls_pgjz_bz = items["pgjz_bz"],
+                    ls_pgjz_hf_time = items["pgjz_hf_time"],
+                    ls_check_hf = items["check_xjhf"];
+                var _replyStyle = parseInt(ls_check_hf) == 1 ? '' : ' style="display: none"';
+                _html += [
+                    '<div class="history__one ne-form" data-xjdh="' + ls_xjdh + '">',
+                        '<div class="eform-order">' + xuhao + '</div>',
+                        '<div class="eform-content">',
+                            '<div class="eform-row">',
+                                '<div class="item-l"><label>询价单号：</label></div>',
+                                '<div class="item-r"><span>' + ls_xjdh + '</span></div>',
+                            '</div><!--/.eform-row-->',
+                            '<div class="eform-row">',
+                                '<div class="item-l"><label>询价时间：</label></div>',
+                                '<div class="item-r"><span>' + ls_xj_time + '</span></div>',
+                            '</div><!--/.eform-row-->',
+                            '<div class="eform-row flex-start">',
+                                '<div class="item-l"><label>房产信息：</label></div>',
+                                '<div class="item-r"><span>' + ls_dyw + '</span></div>',
+                            '</div><!--/.eform-row-->',
+                            '<div class="eform-row flex-start">',
+                                '<div class="item-l"><label>外墙：</label></div>',
+                                '<div class="item-r"><span>' + ls_waiqiang + '</span></div>',
+                            '</div><!--/.eform-row-->',
+                            '<div class="eform-row flex-start">',
+                                '<div class="item-l"><label>配套：</label></div>',
+                                '<div class="item-r"><span>' + ls_peitao + '</span></div>',
+                            '</div><!--/.eform-row-->',
+                            '<div class="eform-row flex-start">',
+                                '<div class="item-l"><label>卖价：</label></div>',
+                                '<div class="item-r"><span>' + ls_maijia + '</span></div>',
+                            '</div><!--/.eform-row-->',
+                            '<div class="eform-row flex-start">',
+                                '<div class="item-l"><label>询价备注：</label></div>',
+                                '<div class="item-r"><span>' + ls_user_bz + '</span></div>',
+                            '</div><!--/.eform-row-->',
+                            '<div class="block__reply"' + _replyStyle +'>',
+                                '<div class="eform-row">',
+                                    '<div class="item-l"><label>评估单价：</label></div>',
+                                    '<div class="item-r"><span>' + ls_pgjz_dj + '元/m²</span></div>',
+                                '</div><!--/.eform-row-->',
+                                '<div class="eform-row">',
+                                    '<div class="item-l"><label>评估总价：</label></div>',
+                                    '<div class="item-r"><span>' + ls_pgjz_zj + '万元</span></div>',
+                                '</div><!--/.eform-row-->',
+                                '<div class="eform-row flex-start">',
+                                    '<div class="item-l"><label>回复备注：</label></div>',
+                                    '<div class="item-r"><span>' + ls_pgjz_bz + '</span></div>',
+                                '</div><!--/.eform-row-->',
+                                '<div class="eform-row">',
+                                    '<div class="item-l"><label>回复时间：</label></div>',
+                                    '<div class="item-r"><span>' + ls_pgjz_hf_time + '</span></div>',
+                                '</div><!--/.eform-row-->',
+                            '</div><!--/.block__reply-->',
+                        '</div><!--/.eform-content-->',
+                    '</div><!--/.history__one-->'
+                ].join('\r\n')
+            })
+
+            if($(node).length > 0) $(node).append(_html);
+        }
+
+
+        
+
+        //========================================
+        /**
+         * 加载“我要询价”面板数据
+         * @param {string} ps_xjdh 询价单号
+         */
+        function load_inquiry(ps_xjdh){   
+            // 表单赋值
+            var inquiryJson = get_data_quiry(ps_xjdh);
+            assignQuiryForm(inquiryJson);
+            controlAuthorize(ps_xjdh);
+        }
+
+
+        /**
+         * 加载“历史记录”面板数据
+         */
+        function load_history(){
+            $('.history').neuiLoadmore({
+                scrollArea: window, // 滑动区域, 默认绑定元素自身(可选). 可选时也默认绑定元素自身. 值: window(全局滚动), 'self' 绑定元素自身(局部滚动)
+                scrollHeight: 0, // 自定义滑动区域高度,默认0(可选). 当scrollArea绑定的元素不是window时,则必须手动设置本参数值,否则控件不会执行.
+
+                // 拼接节点
+                // 列拼接节点有多个时,写成数组的形式.eg.['.dom1', '.dom2']
+                // 列表拼接节点有只有一个时填空
+                pingSelector: '', // 自定义列表拼接节点,默认空(可选). 一般用于TAB选项卡且列表拼接根节点有多个时. 
+
+                // 注①：当 autoLoad=true, cleanUp=true 时, 则：页面一打开就会清空滑动区域已有数据,且马上加载第1页数据
+                autoLoad: true, // 是否自动加载,默认true(可选). true时如果文档高度小于可视高度则无须下滚就会自动加载第1页数据, false时须下滚才加载第1页数据
+                cleanUp: false, // 是否先清空滑动区域已有数据,默认true(可选). true时只对第1页有效 test
+                
+                pagesize: PAGESIZE, // 每页记录数(可选), 默认20
+                threshold: 50, // 提前加载距离(正整数,可选),默认加载区高度2/3. 比如到底部边缘上方50px时提前加载
+                distance: 50, // 拉动距离,默认50(可选). 用于解决“由于部分Android中UC和QQ浏览器头部有地址栏，并且一开始滑动页面隐藏地址栏时，无法触发scroll和resize”的Bug
+                delay: 0, // 转圈延迟时间,单位:毫秒(可选),默认0。本地调试用，只为看到转圈效果.
+                labelDown: { // 下滚文本(可选)
+                    more: '↑上拉加载更多', // 底部时默认文字(可选)
+                    load: '加载中', // 加载(可选)
+                    nodata: '抱歉，暂无数据', // 无数据(第1页就没有数据)(可选)
+                    empty: '没有更多了'// 没有更多了(第2,3,4..页时没有数据)(可选)
+                },
+                labelUp: { // 上滚文本(可选)
+                    more: '↓下拉刷新',
+                    update: '↑释放更新',
+                    load: '加载中'
+                },
+                getData: function(e){ //从前台获取并返回数据源. 参数e为当前页码等组成的一维对象. 注意：返回格式为Object对象或Promise对象, 即若AJAX为同步则返回消息数据Object一维对象; 若AJAX为异步,则返回消息数据写在resolve()中的Promise对象
+                    // console.log('当前页码：', e.curpage)
+                    return get_data_history(e.curpage);
+                },
+
+                loadDownFn: function (e) { // 下方函数,默认空(可选). 参数e为数据源、当前页码等组成的一维对象
+                    create_list_history(e.source, e.curpage);
+                },    
+                loadUpFn : function(e){ // 上方函数,默认空(可选). 参数e为数据源、当前页码等组成的一维对象
+                    //console.log('e:', e)
+                    create_list_history(e.source, e.curpage);
+                }
+                
+            })
+        }
+
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          创建表单                                         
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====
+            var example = new NeForm(); // 实例化控件
+           
+            //——————————————————————————————————————————
+            //=====询价表单数据
+            var askFormJson = {
+                data:[
+                    {title:"询价单号", field:"oddNumber", type:"文本", readonly:true, display:false },
+                    {title:"询价时间", field:"oddTime", type:"文本", readonly:true, display:false },
+                    {title:"楼盘", field:"house", type:"文本", value:"", multiple:true, placeholder:"如：浦西万达广场", align:"top", must:true },
+                    {title:"栋号", field:"build", type:"文本", value:"", placeholder:"如：南区住5号楼", must:true },
+                    {title:"房号", field:"room", type:"文本", value:"", placeholder:"如：1305", must:true },
+                    {title:"结构", field:"structure", type:"文本", value:"", placeholder:"房屋结构", must:true },
+                    {title:"面积", field:"metre", type:"数字", value:"", unit:"m²", placeholder:"储藏间面积请折算成建筑面积的一半", must:true},
+                    {title:"装修", field:"decoration", type:"文本", value:"", placeholder:"室内装修情况", must:true },
+                    {title:"外墙", field:"wall", type:"文本", value:"", multiple:true, placeholder:"外墙装修情况", align:"top", must:true },
+                    {title:"配套", field:"belong", type:"文本", value:"", multiple:true, placeholder:"楼盘周边配套信息", align:"top", must:true },
+                    {title:"卖价", field:"price", type:"文本", value:"", multiple:true, placeholder:"房屋单价、总价等价格信息", align:"top", must:true },
+                    {title:"备注", field:"notes", type:"文本", value:"", multiple:true, align:"top"}
+                ]
+            }
+            example.forms('.ask__form', {
+                source: askFormJson,
+                type: "standard",
+                config: { // 配置项(可选)
+                    layout: {
+                        theme: "popular",
+                        inputIcon: true,
+                        inputCross: true,
+                        inputMust: true,
+                        mustAlign: "left"
+                    },
+                    format: {
+                        numeric: { 
+                            thousandth: false
+                        }
+                    }
+                }
+            });
+
+
+            //——————————————————————————————————————————
+            //=====回复表单数据
+            var askFormJson = {
+                data:[
+                    {title:"评估单价", field:"unitPrice", type:"数字", value:"", unit: "元/m²", must:true },
+                    {title:"评估总价", field:"totalPrice", type:"数字", value:"", unit: "万元", must:true },
+                    {title:"备注", field:"comments", type:"文本", value:"", multiple:true }
+                ]
+            }
+            example.forms('.reply__form', {
+                source: askFormJson,
+                type: "standard",
+                config: { // 配置项(可选)
+                    layout: {
+                        theme: "popular",
+                        inputIcon: true,
+                        inputCross: true,
+                        inputMust: true,
+                        mustAlign: "left"
+                    },
+                    format: {
+                        numeric: { 
+                            thousandth: false
+                        }
+                    }
+                }
+            });
+
+
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                面板数据展示、权限控制
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====[我要询价面板] 加载询价数据
+            load_inquiry(g_xjdh);
+
+            
+            //——————————————————————————————————————————
+            //=====选项卡切换、面板切换
+            $('.tab').children().on('click', function(){
+                var index = $(this).index();
+                switchTab(index + 1);
+            });
+
+
+            //——————————————————————————————————————————
+            //=====[历史记录面板] 查看单个抵押物
+            $('.history').on('click', '.history__one', function(){
+                var ls_xjdh = $(this).attr('data-xjdh');
+                // console.log('询价单号：', ls_xjdh);
+                switchTab(1, ls_xjdh); // 显示“我要询价”面板
+            });
+
+
+            /**
+             * 显示某个切片
+             * @param {number} ps_tab_no 要显示哪个切片. 1 表示第1个切片, 2 表示第2个切片, 以此类推
+             * @param {string} ps_xjdh 询价单号(可选)。
+             */
+            var switchTab = function(ps_tab_no, ps_xjdh){
+                var index = ps_tab_no - 1;
+                $('.tab').children().eq(index).addClass('on').siblings().removeClass('on');
+                $('.content').children().eq(index).show().siblings().hide();
+                if(ps_tab_no == 1){
+                    $('#btn-add').show(); // 显示“新增”按钮
+                    $('#btn-filter').hide(); // 隐藏“筛选”按钮
+                    load_inquiry(ps_xjdh); // 加载“我要询价”面板数据
+                    $('html, body').animate({scrollTop: 0 }, 'slow'); // 滚动到顶部
+                }else if(ps_tab_no == 2){
+                    $('#btn-add').hide(); // 隐藏“新增”按钮
+                    $('#btn-filter').show(); // 显示“筛选”按钮
+                    load_history(); // 加载历史数据
+                }
+            }
+
+
+
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                  输入框事件                                   
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====输入框失焦时表单如果完整，“提交询价”按钮亮起来
+            $('.ask__form').find('input, textarea').on('input blur', function(){
+                var $btn = $('#btn-submit');
+                if(example.examineForm('.ask__form'))
+                    $btn.addClass('blue');
+                else 
+                    $btn.removeClass('blue');    
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====输入框失焦时表单如果完整，“回复”按钮亮起来
+            $('.reply__form').find('input, textarea').on('input blur', function(){
+                var $btn = $('#btn-reply');
+                if(example.examineForm('.reply__form'))
+                    $btn.addClass('blue');
+                else 
+                    $btn.removeClass('blue');    
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====面积输入事件、评估单价输入事件、评估总价输入事件
+            if($('.reply').is(':visible')){ // 仅当“回复表单区域”显示时
+                $('#metre, #unitPrice, #totalPrice').on('input', function(){
+                    var $this = $(this);
+                    var id = $(this).attr('id');
+                    // console.log('id：', id);
+                    var jzmj = $('#metre').val(),
+                        pgdj = $('#unitPrice').val(),
+                        pgzj = $('#totalPrice').val();
+                    if(id == 'metre' || id == 'unitPrice'){ // 面积、评估单价时，计算评估总价并赋值
+                        var temp_pgzj = parseFloat(jzmj) * parseFloat(pgdj);
+                        if(isNaN(temp_pgzj)) temp_pgzj = 0;
+                        temp_pgzj = convert.yuan2TenThousand(temp_pgzj, 'ceil'); // 元转成万元，向下取整
+                        // if(convert.zeroString2Empty(temp_pgzj) === '') temp_pgzj = '';
+                        $('#totalPrice').val(temp_pgzj);
+                    }
+                    if(id == 'totalPrice'){ // 评估总价时，计算评估单价并赋值
+                        var temp_jzmj = convert.zeroString2Empty(jzmj) == '' ? 0 : parseFloat(jzmj);
+                        if(isNaN(temp_jzmj)) temp_jzmj = 0;
+                        var temp_pgzj = parseFloat(convert.tenThousand2Yuan(pgzj)); // 万元转化成元
+                        var temp_pgdj = temp_jzmj == 0 ? '' : ( temp_pgzj / temp_jzmj );
+                        if(isNaN(temp_pgdj)) temp_pgdj = 0;
+                        temp_pgdj = Math.ceil(temp_pgdj); // 向下取整
+                        // if(convert.zeroString2Empty(temp_pgdj) === '') temp_pgdj = '';
+                        $('#unitPrice').val(temp_pgdj);
+                    }               
+                });
+            }
+
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         系列事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====新增按钮
+            $('#btn-add').on('click', function(){
+                alert(333);
+                $('.ask__form').find('input, textarea').val('');
+                $('#btn-submit').removeClass('blue');
+            });
+
+
+            
+            //——————————————————————————————————————————
+            //=====筛选按钮
+            $('#btn-filter').on('click', function(){
+                alert(555);
+            });
+
+
+            //——————————————————————————————————————————
+            //=====提交询价按钮
+            $('#btn-submit').on('click', function(){
+                // 取值
+                var result = example.getFormData('.ask__form');
+                // console.log('result：', result);
+                var ls_xjdh = result["询价单号"].value,
+                    ls_xj_time = result["询价时间"].value,
+                    ls_lpmc = result["楼盘"].value,
+                    ls_dong = result["栋号"].value,
+                    ls_dong_fh = result["房号"].value,
+                    ls_jiegou = result["结构"].value,
+                    ls_jzmj = result["面积"].value,
+                    ls_zhuangxiu = result["装修"].value,
+                    ls_waiqiang = result["外墙"].value,
+                    ls_peitao = result["配套"].value,
+                    ls_maijia = result["卖价"].value,
+                    ls_user_bz = result["备注"].value;
+                var arr = [ ls_xjdh, ls_xj_time, ls_lpmc, ls_dong, ls_dong_fh, ls_jiegou, ls_jzmj, ls_zhuangxiu, ls_waiqiang, ls_peitao, ls_maijia, ls_user_bz ]
+                // console.log('数组：', arr);
+                // 校验完整性
+                if(!example.examineForm('.ask__form')) return;
+                // 开始执行
+                var flag = '', msg = '提交询价成功';
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    var res_xjdh = '2111123708-237809';
+                    /*
+                    // START AJAX
+                    var res_xjdh = '';
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "保存询价数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "xjdh": ls_xjdh,
+                            "lpmc": ls_lpmc,
+                            "dong": ls_dong,
+                            "dong_fh": ls_dong_fh,
+                            "jiegou": ls_jiegou,
+                            "jzmj": ls_jzmj,
+                            "zhuangxiu": ls_zhuangxiu,
+                            "waiqiang": ls_waiqiang,
+                            "peitao": ls_peitao,
+                            "maijia": ls_maijia,
+                            "user_bz": ls_user_bz
+                        },
+                        success: function(res){
+                            if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            var json = JSON.parse(res);
+                            flag = json.return == 'ok' ? 1 : 0;
+                            if(!flag) msg = json.data;
+                            else res_xjdh = json["xjdh"];
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // END AJAX
+                    */
+                    flag = parseInt(1); //1 成功, 0 失败
+                    if(!flag) msg = '提交询价失败';
+
+                    neuiDialog.alert({
+                        message: msg,
+                        buttons: ['确定'],
+                        callBack: function(){
+                            if(flag){
+                                load_inquiry(res_xjdh); // 重载数据
+                            }
+                        }
+                    })
+
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====回复按钮
+            $('#btn-reply').on('click', function(){
+                // 取值
+                var result1 = example.getFormData('.ask__form'),
+                    result2 = example.getFormData('.reply__form');
+                // console.log('result：', result);
+                var ls_xjdh = result1["询价单号"].value,
+                    ls_pgjz_dj = result2["评估单价"].value,
+                    ls_pgjz_zj = result2["评估总价"].value,
+                    ls_bz = result2["备注"].value;
+                var arr = [ ls_xjdh,ls_pgjz_dj, ls_pgjz_zj, ls_bz ]
+                // console.log('数组：', arr);
+                // 校验完整性
+                if(!example.examineForm('.reply__form')) return;
+                // 开始执行
+                var flag = '', msg = '回复成功';
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    /*
+                    // START AJAX
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "回复询价",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "xjdh": ls_xjdh,
+                            "pgjz_dj": ls_pgjz_dj,
+                            "pgjz_zj": ls_pgjz_zj,
+                            "bz": ls_bz
+                        },
+                        success: function(res){
+                            if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            var json = JSON.parse(res);
+                            flag = json.return == 'ok' ? 1 : 0;
+                            if(!flag) msg = json.data;
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // END AJAX
+                    */
+                    flag = parseInt(1); //1 成功, 0 失败
+                    if(!flag) msg = '回复失败';
+
+                    neuiDialog.alert({
+                        message: msg,
+                        buttons: ['确定']
+                    })
+
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
