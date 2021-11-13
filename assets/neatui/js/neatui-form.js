@@ -797,9 +797,17 @@
                 var _crossClass = '';
                 if(buttons != null){
                     var _btnIdStr = typeof buttons.id == 'undefined' ? '' : ' id="' + buttons.id + '"',
-                        _btnClassStr = typeof buttons.class == 'undefined' ? '' : ' class="' + buttons.class + '"',
-                        _btnText = typeof buttons.text == 'undefined' ? '右侧按钮' : (buttons.text.toString().replace(/([ ]+)/g, '') === '' ? '右侧按钮' : buttons.text);
-                    _btnStr = '<div class="item-cell" data-type="button"><button type="button"' + _btnIdStr + _btnClassStr + '>' + _btnText + '</button></div>';
+                        _btnIconStr = typeof buttons.icon == 'undefined' ? '' : '<i class="fa ' + buttons.icon + '"></i>'
+                        _btnAppearName = typeof buttons.appearance == 'undefined' ? '' : buttons.appearance,
+                        _btnClassName = typeof buttons.class == 'undefined' ? '' : buttons.class,
+                        _btnText = typeof buttons.text == 'undefined' ? '右侧按钮' : (buttons.text.toString().replace(/([ ]+)/g, '') === '' ? '右侧按钮' : buttons.text);     
+                    var _btnClassStr = _btnAppearName == '' && _btnClassName == '' ? '' : ' class="' + _btnClassName + ' ' + _btnAppearName + '"';
+                    _btnStr = [
+                        '<div class="item-cell" data-type="button">',
+                            '<button type="button"' + _btnIdStr + _btnClassStr + '>' + _btnIconStr + _btnText + '</button>',
+                        '</div>'
+                    ].join('\r\n');
+                    
                     _crossClass = ' has-cell-btn has-cell-btn-word-' + _btnText.length;
                 }
 
