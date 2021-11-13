@@ -813,7 +813,8 @@
 
                 var _attrListStr = ' id="' + ids + '"' + _classNameStr + _dataHideStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr; // 所有公用属性串
                 //
-                var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="icon icon-' + icon + '"></i>'),
+                var _icoClassName = icon.indexOf('fa-') >= 0 ? 'icon fa ' + icon : 'icon icon-' + icon;
+                var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="' + _icoClassName + '"></i>'),
                     _unitStr = unit == '' ? '' : '<em class="r-unit' + _unitClass + '">' + unit + '</em>',
                     _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a' + _telAClass + ' href="tel:' + value + '"></a></em>',
                     _chatStr = chat == '' ? '' : '<em class="r-weixin' + _unitClass + '"><a></a></em>';
