@@ -174,6 +174,9 @@
                     direction: "default" // 关闭按钮位置(可选)。值： default 底部居中(默认), topCenter 顶部居中, leftTop 左上角, rightTop 右上角, leftBottom 左下角, rightBottom 右下角。
                 },
 
+                // 控件关闭 add 20211113-1
+                besidesClose: [ ], // 指定点击页面其它地方关闭控件时排除哪些节点，即点击这些节点不会关闭控件(可选)，默认空数组。数组元素可以是选择器字符串、JQ对象或DOM对象。eg. ['#id1', '#id2', '.className1', $('#btn1'), document.getElementById('id1') ]
+
                 // 回调
                 onConfirm: function(e){ // 选择某一项后的回调(可选)。e 格式：{dom: "当前输入框元素DOM对象", id: "新的隐藏值", value: "新的显示值", oldId: "旧的隐藏值", oldValue: "旧的显示值"}
                 },
@@ -409,7 +412,7 @@
                         <div class="title"><span>房产询价联动下拉</span></div>
                         <div class="content">
                             <p><span>楼盘名称</span> <textarea id="i-house"></textarea></p>
-                            <p><span>幢号</span><input type="text" id="i-build" readonly></p>
+                            <p><span>幢号</span><input type="text" id="i-build" readonly> <button type="button" id="btn-choose-build">选择幢号</button></p>
                             <p><span>楼层</span><input type="text" id="i-floor" readonly></p>
                             <p><span>房号</span><input type="text" id="i-room" readonly></p>
                         </div><!--/.content-->
@@ -637,9 +640,11 @@
 
             //——————————————————————————————————————————
             //=====幢号下拉
-            $('#i-build').on('click', function(){
+            $('#btn-choose-build').on('click', function(){
                 var $this = $(this);
+                var $input = $(this).siblings('input');
                 neuiInputsearch({
+                    besidesClose: [ $this ],
                     source: {
                         data:[
                             {value:"一幢"},
@@ -654,7 +659,7 @@
                             $('#i-floor, #i-room').val('');
                         }
                     }
-                }, $this)
+                }, $input)
             });
 
 
