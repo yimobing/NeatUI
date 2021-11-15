@@ -98,10 +98,11 @@ neuiDialog.alert({
 neuiDialog.alert({
     animate: true,
     // caption: '提示',
-    message: '确认删除',
-    buttons: ['确定', '取消'],
+    message: '确认删除吗？',
+    buttons: ['取消', '确定'],
+    btnColor:['gray','green'],
     callBack: function(ret){
-        if(ret == 1){
+        if(ret == 2){
 
         }
     }
