@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>在线沟通消息</title>
+    <title>Tab | 选项卡</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.css"><!--图标库-->
@@ -28,7 +28,7 @@
         *{margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -moz-box-sizing: border-box; outline: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); -webkit-tap-highlight-color:rgba(0, 0, 0, 0); -webkit-text-size-adjust: none; } 
         *:not(input, textarea){-webkit-touch-callout: none; -webkit-user-select: none; }
         /*+----------------tab---------------+*/
-        .tab{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; margin-top: 12px; } 
+        .tab{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; margin-top: 8px; } 
         .tab>div{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; height: 40px; background-color: #daf0fd; color: #4c626f; text-align: center; font-size: 15px; }
         .tab>div:first-child{border-radius: 8px 0 0 0; } 
         .tab>div:nth-child(2){border-radius: 0 8px 0 0; } 
@@ -39,21 +39,60 @@
         .tab>div:first-child.on:after{right: -40px; border-bottom: 40px solid #fff; border-right: 40px solid  transparent; } 
         .tab>div:nth-child(2).on:before{border-radius: 20px 8px 0 0; } 
         .tab>div:nth-child(2).on:after{left: -40px; border-bottom: 40px solid #fff; border-left: 40px solid transparent; }
+        /*边线处理*/
+        .tab>div.on + div{ border-style: solid; border-color: #fff; border-width: 0 1px 0 0; }
+        .tab>div + div + div.on::after{ height: 40px; left: -140px; border-left: 1px solid #fff; }
+        /*+----------------search---------------+*/
+        .search{ position: fixed; z-index: 1; top: 60px; right: 0px; padding: 10px 8px; text-align: right; color: #777; }
+         .search button{ display: inline-block!important; width: 60px!important; padding: 0!important; background: none; border: 0; font-size: 13px; }
+         .search button>i{ margin-right: 5px; font-size: 12px; }
         /*+----------------history---------------+*/
         .history{min-height: 50px; /* background-color: #fff; */ } 
         .history__one{ position: relative; margin-bottom: 15px; } 
         .history__one .eform-content{padding: 20px 10px 8px 25px; background-color: #fff; border-radius: 8px 8px 0 0; } 
-        .history__one:first-child .eform-content{border-top-left-radius: 0; border-top-right-radius: 0; } 
-        .history__one .eform-button{ margin-top: 1px; border-radius: 0 0 8px 8px;}
-        .history__one .eform-button button{color: #759d89!important;}
+        .history__one:first-child .eform-content{border-top-left-radius: 0; border-top-right-radius: 0; }
+        .history__one .eform-button{ margin-top: 1px; border-radius: 0 0 8px 8px; }
+        .history__one .eform-button button{color: #759d89!important; }
+        .history__one .eform-button button span+i{ margin-left: 5px; }
     </style>
 
+    <!--[IE时的选项卡样式]-->
+    <!--[if IE]>
+        <style>
+            .tab>div{
+                display: inline-block;
+                width: 32.5%;
+                line-height: 40px;
+                cursor: default;
+            }
+            .eform-row{ }
+            .eform-row .item-l,
+            .eform-row .item-r{
+                display: inline-block;
+                *display: inline;
+                _display: inline;
+                *zoom: 1;
+                vertical-align: top;
+            }
+            .eform-row .item-l{ width: 15%; margin-right: 2%; }
+            .eform-row .item-r{ width: auto; max-width: 78%; }
+        </style>
+    <![endif]-->
+
     <div class="wrap">
-       <section class="tab">
-           <div class="on">未读消息</div>
-           <div>最近消息</div>
-       </section>
-       <section class="history"></section>
+        <main>
+            <section class="tab">
+                <div class="on">未读消息</div>
+                <div>已读消息</div>
+                <div>最近消息</div>
+            </section>
+            <section class="history"></section>
+        </main>
+        <aside class="sidebar">
+            <section class="search">
+                <button type="button" class="ne-btn has-texture blue" id="btn-filter"><i class="fa fa-filter"></i><span>筛选</span></button>
+            </section>
+        </aside>
     </div><!--/.wrap-->
 
 
@@ -180,7 +219,7 @@
                             '</div>',
                         '</div><!--/.eform-content-->',
                         '<div class="eform-button child-w-100 child-no-border" data-xjdh="' + items["xjdh"] + '" data-dyw-xh="' + items["dyw_xh"] + '" data-check-user-kd="' + items["check_user_kd"] + '">',
-                            '<button type="button" class="ne-btn only-text btn-view"><i class="fa fa-eye"></i><span>查看</span></button>',
+                            '<button type="button" class="ne-btn only-text btn-view"><span>查看</span><i class="fa fa-chevron-right"></i></button>',
                         '</div><!--/.eform-button-->',
                     '</div><!--/.history__one-->'
                 ].join('\r\n');
