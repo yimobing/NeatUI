@@ -27,7 +27,25 @@
         body{width: 98.5%; max-width: 640px; margin: 0 auto; background-color: #f4f4f4; font-size: 16px; }
         *{margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -moz-box-sizing: border-box; outline: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); -webkit-tap-highlight-color:rgba(0, 0, 0, 0); -webkit-text-size-adjust: none; } 
         *:not(input, textarea){-webkit-touch-callout: none; -webkit-user-select: none; }
-        /*+----------------tab---------------+*/
+        /*+----------------tab 选项卡---------------+*/
+        .wrap{ }
+        h3{ margin: 15px auto 5px auto; text-align: center; font-size: 24px;  }
+        /*+----------------slice 切片组---------------+*/
+        .slice{ margin-bottom: 10px; padding: 10px 8px; background-color: #fff; }
+        .slice__content{ border-style: solid; border-color: #eaeaea; border-width: 0 1px 1px 1px; border-radius: 4px; }
+        .slice__one,
+        .slice__item{ display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: flex; display: box; }
+        .slice__one{ border-top: 1px solid #eaeaea; }
+        .slice__title,
+        .slice__item>div{ padding: 7px 10px; font-size: 14px; }
+        .slice__title{ width: 80px; background-color: #f5f5f5; color: #2b2d2d; border-right: 1px solid #eaeaea; }
+        .slice__item{ width: 100%; flex: 1; -webkit-flex: 1; -moz-flex: 1; -o-flex: 1; }
+        .slice__item>div{position: relative; width: 100%; background: linear-gradient(to bottom, #fff, #fffcfc, #fdfcfc); background: -moz-linear-gradient(top, #fff, #fffcfc, #fdfcfc); background: -o-linear-gradient(top, #fff, #fffcfc, #fdfcfc); background: -webkit-linear-gradient(top, #fff, #fffcfc, #fdfcfc); border-left: 1px solid #eaeaea; text-align: center; color: #9a9595; cursor: pointer; } 
+        .slice__item>div.on{background: linear-gradient(to bottom, #fff, #f5eeee); background: -moz-linear-gradient(top, #fff, #f5eeee); background: -o-linear-gradient(top, #fff, #f5eeee); background: -webkit-linear-gradient(top, #fff, #f5eeee); color: #00bfff; font-weight: bold; } 
+        .slice__item>div:first-child{ border-left: 0; } 
+        .slice__item>div>span{ margin-left: 3px; } 
+        .slice__item>div>em{position: absolute; top: 3px; right: 3px; min-width: 20px; height: 20px; line-height: 20px; background-color: #fff; border-radius: 100%; border: 1px solid #ff0000; color: #ff0000; font-size: 10px; font-weight: 500; }
+        /*+----------------tab 选项卡---------------+*/
         .tab{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; margin-top: 8px; } 
         .tab>div{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; height: 40px; background-color: #daf0fd; color: #4c626f; text-align: center; font-size: 15px; }
         .tab>div:first-child{border-radius: 8px 0 0 0; } 
@@ -42,6 +60,9 @@
         /*边线处理*/
         .tab>div.on + div{ border-style: solid; border-color: #fff; border-width: 0 1px 0 0; }
         .tab>div + div + div.on::after{ height: 40px; left: -140px; border-left: 1px solid #fff; }
+
+        
+
         /*+----------------search---------------+*/
         .search{ position: fixed; z-index: 1; top: 60px; right: 0px; padding: 10px 8px; text-align: right; color: #777; }
          .search button{ display: inline-block!important; width: 60px!important; padding: 0!important; background: none; border: 0; font-size: 13px; }
@@ -54,6 +75,8 @@
         .history__one .eform-button{ margin-top: 1px; border-radius: 0 0 8px 8px; }
         .history__one .eform-button button{color: #759d89!important; }
         .history__one .eform-button button span+i{ margin-left: 5px; }
+
+        
     </style>
 
     <!--[IE时的选项卡样式]-->
@@ -81,11 +104,50 @@
 
     <div class="wrap">
         <main>
+
+            <h3>切片组</h3>
+            <section class="slice">
+                <div class="slice__content">
+                    <div class="slice__one">
+                        <div class="slice__title">询价状态</div>
+                        <div class="slice__item">
+                            <div class="btn-unreply on" data-tag="1"><span>未回复</span><em id="news-unreply">2</em></div>
+                            <div id="btn-replyed" data-tag="2"><span>已回复</span></div>
+                        </div>
+                    </div><!--/.slice__one-->
+                    <div class="slice__one">
+                        <div class="slice__title">委托状态</div>
+                        <div class="slice__item">
+                            <div class="btn-unreceive" data-tag="3"><span>未接单</span><em id="news-unreceive">410</em></div>
+                            <div id="btn-receiving" data-tag="4"><span>在接单</span><em id="news-receiving">30</em></div>
+                            <div id="btn-received" data-tag="5"><span>已完成</span></div>
+                        </div>
+                    </div><!--/.slice__one-->
+                    <div class="slice__one">
+                        <div class="slice__title">勘察状态</div>
+                        <div class="slice__item">
+                            <div class="btn-unspot" data-tag="6"><span>待勘察</span><em id="news-unspot">25</em></div>
+                            <div id="btn-spoting" data-tag="7"><span>在勘察</span><em id="news-spoting">100</em></div>
+                            <div id="btn-spoted" data-tag="8"><span>已勘察</span></div>
+                        </div>
+                    </div><!--/.slice__one-->
+                    <div class="slice__one">
+                        <div class="slice__title">报告状态</div>
+                        <div class="slice__item">
+                            <div class="btn-unreport" data-tag="9"><span>已通知待出报告</span><em id="news-unreport">20</em></div>
+                            <div id="btn-reported" data-tag="10"><span>已通知已出报告</span></div>
+                        </div>
+                    </div><!--/.slice__one-->
+                </div><!--/.slice__content-->
+            </section>
+
+            <h3>选项卡</h3>
             <section class="tab">
                 <div class="on">未读消息</div>
                 <div>已读消息</div>
                 <div>最近消息</div>
             </section>
+
             <section class="history"></section>
         </main>
         <aside class="sidebar">
