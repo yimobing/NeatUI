@@ -161,7 +161,8 @@
     align       垂直对齐方式(可选)，默认垂直居中。top 垂直居上
     icon        自定义图标名称(即className)(可选), 默认图标名称为field参数值。图标可以是font-awesome图标。eg. "fa-user-o"
     button      自定义右侧按钮(可选)。格式：{id:"按钮ID属性(可选)", class:"按钮Class属性(可选)", text:"按钮名称(可选)", icon:"图标名(可选),如fa-pencil", appearance:"按钮样式(可选),值：3d 立体感, simple 简单的"}
-    attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'" 
+    attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
+    group       自定义相邻的N行同属一个某个分组，以划分区块(可选)。eg.若有相认的多行定义group="user"，则将会用 '< class="block__user"></div>' 将这些行包起来。
     */
     /**
     --------------------------------
@@ -300,35 +301,35 @@
             //===== 创建常规数据表单
             var regularJson = {
                 data:[
-                    {title:"文本", field:"texts", type:"文本", value:""},
-                    {title:"日期", field:"tokyo", type:"日期", value:"2021-08-31"},
-                    {title:"数字", field:"tokyo", type:"数字", value:"123456789"},
-                    {title:"单选", field:"tokyo", type:"单选", value:"1"},
-                    {title:"下拉", field:"drops", type:"下拉", value:""},
-                    {title:"空位", field:"space", type:"空位", value:"这里是空白区域，可自定义内容"},
+                    {title:"文本", field:"texts", type:"文本", value:"" },
+                    {title:"日期", field:"tokyo", type:"日期", value:"2021-08-31" },
+                    {title:"数字", field:"tokyo", type:"数字", value:"123456789" },
+                    {title:"单选", field:"tokyo", type:"单选", value:"1" },
+                    {title:"下拉", field:"drops", type:"下拉", value:"" },
+                    {title:"空位", field:"space", type:"空位", value:"这里是空白区域，可自定义内容" },
                     //
-                    {title:"电话", field:"mobile", type:"文本", value:"18350605829", phone: true},
-                    {title:"微信", field:"weixin", type:"文本", value:"", chat: true},
-                    {title:"电话+微信", field:"moWx", type:"文本", value:"18350605829", phone: true, chat: true},
+                    {title:"电话", field:"mobile", type:"文本", value:"18350605829", phone: true },
+                    {title:"微信", field:"weixin", type:"文本", value:"", chat: true },
+                    {title:"电话+微信", field:"moWx", type:"文本", value:"18350605829", phone: true, chat: true },
 
-                    {title:"千分进位", field:"money", type:"数字", value:"15000", thousandth:true},
-                    {title:"占位符", field:"unitPrice", type:"数字", value:"", placeholder:"请先输入总价", must:true},
-                    {title:"有隐藏值的", field:"totalPrice", type:"数字", value:"15000", hid:"Z1001"},
-                    {title:"自定义属性", field:"customAttr", type:"文本", value:"vip2", attribute:"data-toggle='1' data-vip='5'"},
-                    {title:"有右侧单位", field:"hasUnit", type:"数字", value:"15000", unit:"元/m²"},
-                    {title:"有右侧按钮", field:"rightBtn", type:"数字", must: true, value:"1200000", unit:"元", button:{id:"btn-query-price", class:"btn-query", text:"获取价格"}},
-                    {title:"整行只读", field:"whole", type:"文本", value:"这里整行只读", rowRead: true},
+                    {title:"千分进位", field:"money", type:"数字", value:"15000", thousandth:true },
+                    {title:"占位符", field:"unitPrice", type:"数字", value:"", placeholder:"请先输入总价", must:true },
+                    {title:"有隐藏值的", field:"totalPrice", type:"数字", value:"15000", hid:"Z1001" },
+                    {title:"自定义属性", field:"customAttr", type:"文本", value:"vip2", attribute:"data-toggle='1' data-vip='5'" },
+                    {title:"有右侧单位", field:"hasUnit", type:"数字", value:"15000", unit:"元/m²" },
+                    {title:"有右侧按钮", field:"rightBtn", type:"数字", must: true, value:"1200000", unit:"元", button:{id:"btn-query-price", class:"btn-query", text:"获取价格"} },
+                    {title:"整行只读", field:"whole", type:"文本", value:"这里整行只读", rowRead: true },
                     //
-                    {title:"询价单号", field:"quotation", type:"文本", value:"", readonly:true},
-                    {title:"询价人", field:"inquirer", type:"文本", value:"", readonly:true},
-                    {title:"询价单位", field:"enterprise", type:"文本", value:"", readonly:true},
-                    {title:"评估目的", field:"purpose", type:"下拉", value:"抵押贷款", must:true},
-                    {title:"贷款品种", field:"breed", type:"下拉", value:"二手房按揭", must:true},
-                    {title:"客户姓名", field:"username", type:"文本", value:"张三", must:true},
-                    {title:"客户电话", field:"mobile", type:"文本", value:"18350605829", must:true, phone: true, chat: true},
-                    {title:"客户备注", field:"note", type:"文本", value:"该用户很懒，没有备注", multiple: true, must:true},
-                    {title:"抵押物所在地", field:"locate", type:"下拉", value:"福建省-泉州市-丰泽区", must:true},
-                    {title:"抵押物类型", field:"category", type:"下拉", value:"住宅(有储藏间)", must:true}
+                    {title:"询价单号", field:"quotation", type:"文本", value:"", readonly:true },
+                    {title:"询价人", field:"inquirer", type:"文本", value:"", readonly:true },
+                    {title:"询价单位", field:"enterprise", type:"文本", value:"", readonly:true },
+                    {title:"评估目的", field:"purpose", type:"下拉", value:"抵押贷款", must:true },
+                    {title:"贷款品种", field:"breed", type:"下拉", value:"二手房按揭", must:true },
+                    {title:"客户姓名", field:"username", type:"文本", value:"张三", must:true },
+                    {title:"客户电话", field:"mobile", type:"文本", value:"18350605829", must:true, phone: true, chat: true },
+                    {title:"客户备注", field:"note", type:"文本", value:"该用户很懒，没有备注", multiple: true, must:true },
+                    {title:"抵押物所在地", field:"locate", type:"下拉", value:"福建省-泉州市-丰泽区", must:true },
+                    {title:"抵押物类型", field:"category", type:"下拉", value:"住宅(有储藏间)", must:true }
                 ]
             }
 
