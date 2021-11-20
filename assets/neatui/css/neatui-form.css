@@ -5,7 +5,7 @@
  * 说明：兼容IE8+
  * Author: Mufeng
  * Date: 2021.01.09
- * Update: 2021.09.02
+ * Update: 2021.11.20
  */
 
 /*+--------------------------------+*/
@@ -78,11 +78,20 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     display: box;
     align-items: center;
     position: relative;
-    margin-top: 5px;
+    /* margin-top: 5px; */
+    padding: 2.5px 0;
 }
-.eform-row:first-child{ margin-top: 0; }
+.eform-row:first-child{ /* margin-top: 0; */ padding-top: 0; }
 .eform-row.flex-start{ align-items: flex-start; } /*垂直顶部对齐*/
 .eform-row .w-auto{ width: auto!important; }
+.eform-row.onlyRead .item-r,
+.eform-row.onlyRead .item-r *{
+	background: #fffffe!important;
+	color: #857373!important;
+	opacity: .8!important;;
+	filter: alpha(opacity=80)!important;
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80)!important;
+}
 .erow-column{
 	display: -webkit-box;
     display: -moz-box;
@@ -110,25 +119,26 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 /*+--------内部元素--------+*/
 /*+placeholder+*/
 .eform-row ::-webkit-input-placeholder{
-	color: #afafaf;
+	/* color: #bfbfbf; */
+	color: #e2dcdc;
 	font-size: 12px;
 }
 .eform-row ::-moz-placeholder{
-	color: #afafaf;
+	color: #e2dcdc;
 	font-size: 12px;
 }
 .eform-row :-moz-placeholder{
-	color: #afafaf;
+	color: #e2dcdc;
 	font-size: 12px;
 }
 .eform-row :-ms-input-placeholder{
-	color: #afafaf;
+	color: #e2dcdc;
 	font-size: 12px;
 }
 .eform-row div:empty::before,
 .eform-row span:empty::before{
 	content: attr(placeholder);
-	color: #afafaf;
+	color: #e2dcdc;
 	font-size: 12px;
 }
 

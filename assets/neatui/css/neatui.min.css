@@ -4,7 +4,7 @@
 * 小巧UI前端框架
 * Author：mufeng
 * Date: 2021.01.11
-* Update: 2021.08.24
+* Update: 2021.11.20
 *================================================*/
 
 /*+================================================================================+*/
@@ -146,25 +146,26 @@ textarea[disabled]{
 }
 /*+placeholder+*/
 ::-webkit-input-placeholder{
-	color: #afafaf;
+	/* color: #bfbfbf; */
+	color: #e2dcdc;
 	font-size: 0.6rem;
 }
 ::-moz-placeholder{
-	color: #afafaf;
+	color: #e2dcdc;
 	font-size: 0.6rem;
 }
 :-moz-placeholder{
-	color: #afafaf;
+	color: #e2dcdc;
 	font-size: 0.6rem;
 }
 :-ms-input-placeholder{
-	color: #afafaf;
+	color: #e2dcdc;
 	font-size: 0.6rem;
 }
 div:empty::before,
 span:empty::before{
 	content: attr(placeholder);
-	color: #afafaf;
+	color: #e2dcdc;
 	font-size: 0.6rem;
 }
 
