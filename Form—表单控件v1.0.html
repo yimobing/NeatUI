@@ -155,7 +155,8 @@
     multiple    是否多行(可选)。值: true 是, false 否(默认)
     placeholder 空占位符(可选), 默认空。仅在must=true时有效。
     readonly    是否强制为只读(可选), 默认false
-    disabled    是否强制为禁用(可选), 默认false
+    disabled    是否强制为禁用(可选), 默认false。true时 readonly参数值也将被强制置为true。
+    rowRead     是否整行只读(可选), 默认false。true 时整行将以比较灰的背景色和灰的文字颜色显示，以和可写入的行区分开来。true时 readonly参数值也将被强制置为true。
     display     是否显示(可选)，即该行是否显示(可选), 默认true。
     align       垂直对齐方式(可选)，默认垂直居中。top 垂直居上
     icon        自定义图标名称(即className)(可选), 默认图标名称为field参数值。图标可以是font-awesome图标。eg. "fa-user-o"
@@ -316,6 +317,7 @@
                     {title:"自定义属性", field:"customAttr", type:"文本", value:"vip2", attribute:"data-toggle='1' data-vip='5'"},
                     {title:"有右侧单位", field:"hasUnit", type:"数字", value:"15000", unit:"元/m²"},
                     {title:"有右侧按钮", field:"rightBtn", type:"数字", must: true, value:"1200000", unit:"元", button:{id:"btn-query-price", class:"btn-query", text:"获取价格"}},
+                    {title:"整行只读", field:"whole", type:"文本", value:"这里整行只读", rowRead: true},
                     //
                     {title:"询价单号", field:"quotation", type:"文本", value:"", readonly:true},
                     {title:"询价人", field:"inquirer", type:"文本", value:"", readonly:true},

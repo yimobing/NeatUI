@@ -720,7 +720,8 @@
                     align = typeof items["align"] == 'undefined' ? '' : items["align"],
                     icon = typeof items["icon"] == 'undefined' ? field : items["icon"],
                     buttons = typeof items["button"] == 'undefined' ? null : items["button"],
-                    attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"];                 
+                    attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"],
+                    rowRead = typeof items["rowRead"] == 'undefined' ? false : items["rowRead"] === true ? true : false;
                 //
                 var _LHtml = '', // 左边内容
                     _RHtml = '', // 右边内容
@@ -775,6 +776,10 @@
                 }
                 
                 //
+                if(disabled) readonly = true;
+                if(rowRead) readonly = true;
+                
+                //
                 var chooseText = placeholder != null && placeholder.toString().replace(/([ ]+)/g, '') != '' ? placeholder :  (!readonly ? '请填写' : '请选择'); //+title 
                     _looseFocusStr = !readonly ?  '' : ';this.blur()';
                 var _classNameStr = ' class="' + className + '"',
@@ -786,6 +791,7 @@
                     _disabledStr = !disabled ? '' : ' disabled',
                     _displayStyle = display ? '' : ' style="display: none"',
                     _rowClassName = align == 'top' ? ' flex-start' : '',
+                    _rowClassName += rowRead ? ' onlyRead' : '',
                     //_btnStr = '', // 按钮
                     _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
                     _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
