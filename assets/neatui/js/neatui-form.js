@@ -57,20 +57,26 @@
             [字段名称]
             title       字段名称(中文), 即显示名称
             field       字段名称(英文), 即ID属性
-            type        输入框类型(可选)。值：文本,日期, 数字, 单选, 下拉
+            type        输入框类型(可选)。值：文本, 日期, 数字, 单选, 下拉, 空位。注：空位表示没任何输入框，只是空白区域，可自定义内容。
             thousandth  数字类型是否使用千分进位法，即3个数字就加一个英文逗号(可选), 默认false。仅当type="数字"时有效。优先权说明：若数据源中不存在"thousandth"字段, 则是否千分进位取决于options中的thousandth参数; 若数据源中有存在"thousandth"字段，则options中的thousandth参数自动失效。
                         
             value       初始显示值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
             hid         初始隐藏值,即显示值对应的编号(可选)。在输入框上有属性data-bh="隐藏值"
             unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
             phone       是否电话类型(可选)。值：true, false 否(默认)
+            chat        是否微信类型(可选)。值：true, false 否(默认)
             must        是否必填项(可选)。值：true 是, false 否(默认)
             multiple    是否多行(可选)。值: true 是, false 否(默认)
             placeholder 空占位符(可选), 默认空。仅在must=true时有效。
             readonly    是否强制为只读(可选), 默认false
-            disabled    是否强制为禁用(可选), 默认false
-            icon    自定义图标名称(即className)(可选), 默认图标名称为field参数值
-            attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"         
+            disabled    是否强制为禁用(可选), 默认false。true时 readonly参数值也将被强制置为true。
+            rowRead     是否整行只读(可选), 默认false。true 时整行将以比较灰的背景色和灰的文字颜色显示，以和可写入的行区分开来。true时 readonly参数值也将被强制置为true。
+            display     是否显示(可选)，即该行是否显示(可选), 默认true。
+            align       垂直对齐方式(可选)，默认垂直居中。top 垂直居上
+            icon        自定义图标名称(即className)(可选), 默认图标名称为field参数值。图标可以是font-awesome图标。eg. "fa-user-o"
+            button      自定义右侧按钮(可选)。格式：{id:"按钮ID属性(可选)", class:"按钮Class属性(可选)", text:"按钮名称(可选)", icon:"图标名(可选),如fa-pencil", appearance:"按钮样式(可选),值：3d 立体感, simple 简单的"}
+            attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
+            group       自定义相邻的N行同属一个某个分组，以划分区块(可选)。eg.若有相认的多行定义group="user"，则将会用 '< class="block__user"></div>' 将这些行包起来。       
 
             --------------------------------
             ②.数据源类型为“楼盘表单”,即“楼盘房号配置数据”
@@ -695,6 +701,7 @@
         createStandardForm: function(me){
             var source = me.$opts.source;
             var _outerHtml = '';
+            var groupArr = [ ];
             // 循环项
             for(var i = 0; i < source.data.length; i++){
                 var items = source.data[i];
@@ -721,13 +728,15 @@
                     icon = typeof items["icon"] == 'undefined' ? field : items["icon"],
                     buttons = typeof items["button"] == 'undefined' ? null : items["button"],
                     attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"],
-                    rowRead = typeof items["rowRead"] == 'undefined' ? false : items["rowRead"] === true ? true : false;
+                    rowRead = typeof items["rowRead"] == 'undefined' ? false : items["rowRead"] === true ? true : false,
+                    group = typeof items["group"] == 'undefined' ? '' : items["group"].toString().replace(/([ ]+)/g, '');
                 //
                 var _LHtml = '', // 左边内容
                     _RHtml = '', // 右边内容
                     _UHtml = '', // 单位、电话内容
                     _IcoHtml = ''; // 图标内容
-                
+                // 分组
+                if(group !== '') groupArr.push(group);
                 // 输入框
                 var tagName = !multiple ? 'input' : 'textarea', // 标签类型。值：input(默认), radio, textarea
                     types = 'text', // type属性。值: text 文本(默认), number 数字, checkbox 复选(单选、多选)
@@ -789,9 +798,11 @@
                     _dataHideStr = hid.toString().replace(/([ ]+)/g, '') === '' ? '' : ' data-bh="' + hid + '"';
                     _readonlyStr = !readonly ? '' : ' readonly',
                     _disabledStr = !disabled ? '' : ' disabled',
+                    _groupStr = group === '' ? '' : ' data-group="' + group + '"',
                     _displayStyle = display ? '' : ' style="display: none"',
                     _rowClassName = align == 'top' ? ' flex-start' : '',
                     _rowClassName += rowRead ? ' onlyRead' : '',
+                   
                     //_btnStr = '', // 按钮
                     _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
                     _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
@@ -818,6 +829,7 @@
                 }
 
                 var _attrListStr = ' id="' + ids + '"' + _classNameStr + _dataHideStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr; // 所有公用属性串
+                var _rowAttrListStr = ' ' + _groupStr;
                 //
                 var _icoClassName = icon.indexOf('fa-') >= 0 ? 'icon fa ' + icon : 'icon icon-' + icon;
                 var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="' + _icoClassName + '"></i>'),
@@ -844,7 +856,7 @@
                 _IcoHtml += _iconStr;
                 // 拼接HTML
                 _outerHtml += [
-                    '<div class="eform-row row-' + ids + _rowClassName + '"' + _displayStyle + '>',
+                    '<div class="eform-row row-' + ids + _rowClassName + '"' + _rowAttrListStr + _displayStyle + '>',
                         '<div class="item-l">',
                             ( me.$opts.config.layout.theme != 'popular' ? '' : _IcoHtml ),
                             '<label>' + title + '</label>',
@@ -862,6 +874,16 @@
      
             tools.removeAllChildren(me.$obj); // 先清空元素内容
             tools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
+
+            // 分组
+            var sortArr = groupArr.delRepeated();
+            if(sortArr.length != 0){
+                window.jQuery || alert('GROUP属性需使用到jQuery的wrapAll()，请先引入jQuery');
+                for(var k = 0; k < sortArr.length; k++){
+                    var a = sortArr[k];
+                    $('[data-group="' + a + '"]').wrapAll('<div class="block__' + a + '"></div>');
+                }
+            }
         },
 
 
@@ -2047,7 +2069,29 @@
                 callback.apply(this, [this[i], i, this]);
             }
         }
-    };   
+    };
+
+
+    //================================================================
+    //                      自定义原生对象
+    //================================================================
+    /**
+     * 数组去重
+     * @returns {Array} 返回去重后的新数组
+     */
+    if(!Array.prototype.delRepeated){
+        Array.prototype.delRepeated = function(){ 
+            var arr = [];    // 定义一个临时数组 
+            for(var i = 0; i < this.length; i++){    // 循环遍历当前数组 
+                // 判断当前数组下标为i的元素是否已经保存到临时数组 
+                // 如果已保存，则跳过，否则将此元素保存到临时数组中 
+                if(arr.indexOf(this[i]) == -1){ 
+                    arr.push(this[i]); 
+                } 
+            } 
+            return arr; 
+        }
+    }
 
     //================================================================
     //                      返回对象
@@ -2061,6 +2105,7 @@
 /*———————————————————————————————————————————————————————————————————————————————————————————————
  *                                   二、搜索框控件(jQuery)
 ———————————————————————————————————————————————————————————————————————————————————————————————*/
+window.jQuery || alert('使用neuiSearchBox须先引入jQuery');
 var neuiSearchBox = {
     /**
      * 获取表单
