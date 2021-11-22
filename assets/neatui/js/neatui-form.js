@@ -76,7 +76,7 @@
             icon        自定义图标名称(即className)(可选), 默认图标名称为field参数值。图标可以是font-awesome图标。eg. "fa-user-o"
             button      自定义右侧按钮(可选)。格式：{id:"按钮ID属性(可选)", class:"按钮Class属性(可选)", text:"按钮名称(可选)", icon:"图标名(可选),如fa-pencil", appearance:"按钮样式(可选),值：3d 立体感, simple 简单的"}
             attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
-            group       自定义相邻的N行同属一个某个分组，以划分区块(可选)。eg.若有相认的多行定义group="user"，则将会用 '< class="block__user"></div>' 将这些行包起来。
+            group       自定义相邻的N行同属一个某个分组，以划分区块(可选)。eg.若有相认的多行定义group="user"，则将会用 '<div class="block__user"></div>' 将这些行包起来。
             combine     将相邻的多行合并成一行(可选). eg. 假设有“抵押净值单价”、“抵押净值总价”两行，两行都设置combine属性值为“抵押净值”，则这两行都会有一个共同的标题“抵押净值”。 
 
             --------------------------------
@@ -389,6 +389,14 @@
                     // console.log('mustNode：', mustNode, '\ntelNode：', telNode);
                     // console.log('label：', label, '\nisMust：',isMust, '\nisPhone：',isPhone);
                     // console.log('-------------')
+                    //
+                    if(el.className.indexOf('block__') >= 0){ // 分组的行 group test3
+                        label = tools.getPrevElement(txt.parentNode).querySelector('label').innerText;
+                    }
+                    if(txt.parentNode.className.indexOf('item-box') >= 0){ // 合并的行 combine
+                        label += tools.getPrevElement(txt).innerText;
+                    }
+                    //
                     if(isMust && value.toString().replace(/([ ]+)/g, '') === ''){
                         tips1 += label + '、';
                         if(readonly != '' && readonly != 'readonly' && readonly != 'true') isAllRead = false;
@@ -464,7 +472,7 @@
             Array.from(child).forEach(function(el){
                 var lbNode = el.querySelector('label'),
                     inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
-                Array.from(inputNode).forEach(function(txt){
+                Array.from(inputNode).forEach(function(txt){        
                     var type = txt.getAttribute('type');
                     var isThousands = typeof txt.getAttribute('data-thousand') == 'undefined' ? false : txt.getAttribute('data-thousand') == 'true' ? true : false; // 是否千分进位
                     var value = '';
@@ -480,6 +488,14 @@
                         className = txt.className == null ? '' : txt.className,
                         bh = txt.getAttribute('data-bh') == null ? '' : txt.getAttribute('data-bh');
                         hide = txt.getAttribute('data-hide') == null ? (txt.getAttribute('data-hid1') == null ? '' : txt.getAttribute('data-hid1')) : txt.getAttribute('data-hide'); // 隐藏值1(不会变)
+                    //
+                    if(el.className.indexOf('block__') >= 0){ // 分组的行 group test3
+                        title = tools.getPrevElement(txt.parentNode).querySelector('label').innerText;
+                    }
+                    if(txt.parentNode.className.indexOf('item-box') >= 0){ // 合并的行 combine
+                        title += tools.getPrevElement(txt).innerText;
+                    }
+                    //
                     var oneJson = { title: title, bh: bh, value: value, id: id, className: className, node: txt }
                     if(hide.toString().replace(/([ ]+)/g, '') != '' && hide != '无') json[hide] = oneJson;
                     else json[title] = oneJson;
@@ -873,7 +889,7 @@
                             _UHtml,
                         '</div>',
                         _RHtml,
-                    '</div><!--/.eform-row-->'
+                    '</div>'
                 ].join('\r\n');
 
             } // END FOR
@@ -881,18 +897,19 @@
             tools.removeAllChildren(me.$obj); // 先清空元素内容
             tools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
 
-            // 分组
+            // 分组的行 group test3
             var sortArr = groupArr.delRepeated();
             if(sortArr.length != 0){
-                window.jQuery || alert('GROUP属性需使用到jQuery的wrapAll()，请先引入jQuery');
+                window.jQuery || alert('GROUP属性需使用到jQuery的wrapAll()，请先引入jq库文件');
                 for(var k = 0; k < sortArr.length; k++){
                     var _text = sortArr[k];
                     $('[data-group="' + _text + '"]').wrapAll('<div class="block__' + _text + '"></div>');
                 }
             }
-            // 合并
+            // 合并的行 combine test3
             var bindArr = combineArr.delRepeated();
             if(bindArr.length != 0){
+                window.jQuery || alert('COMBINE属性需使用到jQuery，请先引入jq库文件');
                 for(var k = 0; k < bindArr.length; k++){
                     var _label = bindArr[k]; 
                     var _bHtml = '';
@@ -919,9 +936,8 @@
                     var _aHtml = [
                         '<div class="eform-row' + _tmpClassStr + '">',
                             '<div class="item-l"><label>' + _label + '</label></div>',
-                            '<div class="item-r block">',
-                                _bHtml,
-                            '<div><!--/.item-r-->'
+                            '<div class="item-r block">' + _bHtml + '</div>',
+                        '</div>'
                     ].join('\r\n')
                     $('[data-combine="' + _label + '"]').last().after(_aHtml);
                     $('[data-combine="' + _label + '"]').remove();
@@ -1307,17 +1323,25 @@
             Array.from(inputNode).forEach(function(el, i){
                 el.addEventListener('input', function(){ // 输入事件
                     var value = this.value;
-                    var next = tools.getNextElement(this.parentNode);
-                    if(next != null){
+                    // var cross = tools.getNextElement(this.parentNode);
+                    var cross = this.parentNode.parentNode.querySelector('[data-type="cross"]');
+                    if(this.parentNode.className.indexOf('item-box') >= 0){ // 合并的行 combine test3
+                        cross = this.parentNode.querySelector('[data-type="cross"]');
+                    }
+                    if(cross != null){
                         // 打叉图标根据需要显示或隐藏
-                        this.value.toString().replace(/([ ]+)/g, '') !== '' ? next.style = '' : next.style = 'display: none;';
+                        this.value.toString().replace(/([ ]+)/g, '') !== '' ? cross.style = '' : cross.style = 'display: none;';
                     }
                 })
                 el.addEventListener('click', function(){ // 点击事件
                     var _this = this;
-                    var next = tools.getNextElement(this.parentNode);
+                    // var cross = tools.getNextElement(this.parentNode);
+                    var cross = this.parentNode.parentNode.querySelector('[data-type="cross"]');
+                    if(this.parentNode.className.indexOf('item-box') >= 0){ // 合并的行 combine test3
+                        cross = this.parentNode.querySelector('[data-type="cross"]');
+                    }
                     var oldValue = this.value;
-                    if(next != null){
+                    if(cross != null){
                         // 打叉图标根据需要显示或隐藏
                         var intervals = null;
                         var seconds = 0;
@@ -1327,7 +1351,7 @@
                             // console.log('老值：', oldValue, '\n新值：', newValue, '\n当前秒数：', seconds);
                             // console.log('---------------')
                             if(newValue != oldValue){
-                                newValue.toString().replace(/([ ]+)/g, '') !== '' ? next.style = '' :  next.style = 'display: none;';
+                                newValue.toString().replace(/([ ]+)/g, '') !== '' ? cross.style = '' :  cross.style = 'display: none;';
                             }
                             if(seconds > 6){ // N秒后关闭定时器
                                 clearInterval(intervals);
