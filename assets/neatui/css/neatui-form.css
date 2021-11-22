@@ -171,10 +171,6 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     width: 100%;
 }
 .item-r.block{ display: block; }
-/*多列*/
-.item-r .item-box{ position: relative; width: 100%; margin-left: 5px; color: #888; font-size: 14px; }
-.item-r .item-box:first-child{ margin-left: 0; }
-.item-r .item-box.center{ text-align: center; }
 
 /*纯文字*/
 .item-r>span,
@@ -489,6 +485,38 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .eform-button.child-w-100>button:first-child{ margin-left: 0; }
 
 
+/*多列*/
+.item-r .item-box{ position: relative; width: 100%; margin-left: 5px; color: #888; font-size: 14px; }
+.item-r .item-box:first-child{ margin-left: 0; }
+.item-r .item-box.center{ text-align: center; }
+.item-r.block .item-box{
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	display: box;
+	align-items: center;
+	margin: 5px 0 0;
+}
+.item-r.block .item-box:first-child{ margin-top: 0; }
+.item-r.block .item-box>span{
+	width: auto;
+	text-align: right;
+}
+.item-r.block .item-box>input,
+.item-r.block .item-box>textarea{
+	-webkit-flex: 1;
+	-moz-flex: 1;
+	-o-flex: 1;
+	flex: 1;
+	width: 100%;
+	margin-left: 8px;
+}
+.item-r.block .item-box .item-cell[data-type="must"]{
+	right: -16px;
+}
+
 /*+----------------边框线----------------+*/
 /*+--------实边框线--------+*/
 .ne-form.has-border{
@@ -519,6 +547,10 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 	border-left: 1px solid #d7d7d7;
 }
 .ne-form.has-border .item-r>.fa{ left: 15px; }
+.ne-form.has-border .item-r.block .item-box .item-cell[data-type="must"]{
+	right: -24px;
+}
+
 
 
 /*+--------点线边框线--------+*/
@@ -552,6 +584,10 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     top: 12px\9;
     transform: translateY(0)\9;
 }
+.ne-form.has-must-left .item-r.block .item-box .item-cell[data-type="must"]{
+    left: -20px;
+}
+
 /*+星号统一对齐+*/
 .ne-form.has-must-aline .item-r{ padding-right: 10px; }
 .ne-form.has-must-aline .item-r>em{ right: 20px; }
@@ -559,6 +595,10 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .ne-form.has-must-aline .item-cell.absolute{ right: 20px; }
 .ne-form.has-must-aline .item-cell[data-type="cross"]{ right: 10px!important; }
 .ne-form.has-must-aline .item-cell[data-type="cross"].has-cell-btn{ right: 92px!important; }
+.ne-form.has-must-aline .item-r.block .item-box .item-cell[data-type="must"]{
+	right: -25px;
+}
+
 
 
 
