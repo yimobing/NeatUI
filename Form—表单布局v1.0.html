@@ -68,7 +68,10 @@
     eform-order > 序号
     eform-caption > 文字内容
     eform-content > eform-row > erow-column > item-box > item-l + item-r + item-cell.absolute.has-cell-btn[data-type="must"][data-type="tip"][data-type="cross"]
+    eform-content > eform-row > item-r.block > item-box > label + input || textarea + item-cell[data-type="must"]
+
     eform-button > button
+    
     
     [item-r 的几咱组合]
     item-r>input
@@ -199,6 +202,23 @@
                             <div class="item-box"><input type="text" placeholder="开始日期" onblur="this.placeholder='开始日期'" onfocus="this.placeholder=''"></div>
                             <div class="item-box w-auto">至</div>
                             <div class="item-box"><input type="text" placeholder="结束日期" onblur="this.placeholder='结束日期'" onfocus="this.placeholder=''"></div>
+                        </div>
+                    </div><!--/.eform-row-->
+                    <div class="eform-row">
+                        <div class="item-l"><label>市场价值</label></div>
+                        <div class="item-r block">
+                            <div class="item-box">
+                                <label>单价</label>
+                                <input type="text" placeholder="市场价值单价" onblur="this.placeholder='市场价值单价'" onfocus="this.placeholder=''">
+                                <em class="r-unit">元/平方米</em>
+                                <div class="item-cell" data-type="must">*</div>
+                            </div>
+                            <div class="item-box">
+                                <label>总价</label>
+                                <input type="text" placeholder="市场价值总价" onblur="this.placeholder='市场价值总价'" onfocus="this.placeholder=''">
+                                <em class="r-unit">万元</em>
+                                <div class="item-cell" data-type="must">*</div>
+                            </div>
                         </div>
                     </div><!--/.eform-row-->
                     <div class="eform-row">
