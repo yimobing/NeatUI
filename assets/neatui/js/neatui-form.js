@@ -76,7 +76,8 @@
             icon        自定义图标名称(即className)(可选), 默认图标名称为field参数值。图标可以是font-awesome图标。eg. "fa-user-o"
             button      自定义右侧按钮(可选)。格式：{id:"按钮ID属性(可选)", class:"按钮Class属性(可选)", text:"按钮名称(可选)", icon:"图标名(可选),如fa-pencil", appearance:"按钮样式(可选),值：3d 立体感, simple 简单的"}
             attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
-            group       自定义相邻的N行同属一个某个分组，以划分区块(可选)。eg.若有相认的多行定义group="user"，则将会用 '< class="block__user"></div>' 将这些行包起来。       
+            group       自定义相邻的N行同属一个某个分组，以划分区块(可选)。eg.若有相认的多行定义group="user"，则将会用 '< class="block__user"></div>' 将这些行包起来。
+            combine     将相邻的多行合并成一行(可选). eg. 假设有“抵押净值单价”、“抵押净值总价”两行，两行都设置combine属性值为“抵押净值”，则这两行都会有一个共同的标题“抵押净值”。 
 
             --------------------------------
             ②.数据源类型为“楼盘表单”,即“楼盘房号配置数据”
@@ -702,6 +703,7 @@
             var source = me.$opts.source;
             var _outerHtml = '';
             var groupArr = [ ];
+            var combineArr = [ ];
             // 循环项
             for(var i = 0; i < source.data.length; i++){
                 var items = source.data[i];
@@ -729,7 +731,8 @@
                     buttons = typeof items["button"] == 'undefined' ? null : items["button"],
                     attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"],
                     rowRead = typeof items["rowRead"] == 'undefined' ? false : items["rowRead"] === true ? true : false,
-                    group = typeof items["group"] == 'undefined' ? '' : items["group"].toString().replace(/([ ]+)/g, '');
+                    group = typeof items["group"] == 'undefined' ? '' : items["group"].toString().replace(/([ ]+)/g, ''),
+                    combine = typeof items["combine"] == 'undefined' ? '' : items["combine"].toString().replace(/([ ]+)/g, '');
                 //
                 var _LHtml = '', // 左边内容
                     _RHtml = '', // 右边内容
@@ -737,6 +740,8 @@
                     _IcoHtml = ''; // 图标内容
                 // 分组
                 if(group !== '') groupArr.push(group);
+                // 合并
+                if(combine !== '') combineArr.push(combine);
                 // 输入框
                 var tagName = !multiple ? 'input' : 'textarea', // 标签类型。值：input(默认), radio, textarea
                     types = 'text', // type属性。值: text 文本(默认), number 数字, checkbox 复选(单选、多选)
@@ -799,6 +804,7 @@
                     _readonlyStr = !readonly ? '' : ' readonly',
                     _disabledStr = !disabled ? '' : ' disabled',
                     _groupStr = group === '' ? '' : ' data-group="' + group + '"',
+                    _combineStr = combine === '' ? '' : ' data-combine="' + combine + '"',
                     _displayStyle = display ? '' : ' style="display: none"',
                     _rowClassName = align == 'top' ? ' flex-start' : '',
                     _rowClassName += rowRead ? ' onlyRead' : '',
@@ -829,7 +835,7 @@
                 }
 
                 var _attrListStr = ' id="' + ids + '"' + _classNameStr + _dataHideStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr; // 所有公用属性串
-                var _rowAttrListStr = ' ' + _groupStr;
+                var _rowAttrListStr = ' ' + _groupStr + ' ' + _combineStr;
                 //
                 var _icoClassName = icon.indexOf('fa-') >= 0 ? 'icon fa ' + icon : 'icon icon-' + icon;
                 var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="' + _icoClassName + '"></i>'),
@@ -880,10 +886,48 @@
             if(sortArr.length != 0){
                 window.jQuery || alert('GROUP属性需使用到jQuery的wrapAll()，请先引入jQuery');
                 for(var k = 0; k < sortArr.length; k++){
-                    var a = sortArr[k];
-                    $('[data-group="' + a + '"]').wrapAll('<div class="block__' + a + '"></div>');
+                    var _text = sortArr[k];
+                    $('[data-group="' + _text + '"]').wrapAll('<div class="block__' + _text + '"></div>');
                 }
             }
+            // 合并
+            var bindArr = combineArr.delRepeated();
+            if(bindArr.length != 0){
+                for(var k = 0; k < bindArr.length; k++){
+                    var _label = bindArr[k]; 
+                    var _bHtml = '';
+                    var _tmpClassName = [ ];
+                    $('[data-combine="' + _label + '"]').each(function(){
+                        var _tmpArr = $(this).attr('class').replace(/(eform-row)/g, '').split(' ');
+                        for(var m = 0; m < _tmpArr.length; m++){
+                            if(_tmpArr[m].toString().replace(/([ ]+)/g) !== '') _tmpClassName.push(_tmpArr[m]);
+                        }
+                        var _text = $('.item-l>label', this).text().toString().replace(new RegExp(_label, 'g'), '');
+                        var _cHtml = $('.item-r', this).html();
+                        $('.item-r', this).nextAll().each(function(){
+                            _cHtml += $(this)[0].outerHTML;
+                        })
+                        _bHtml += [
+                            '<div class="item-box">',
+                                '<label>' + _text + '</label>',
+                                _cHtml,
+                            '</div>'
+                        ].join('\r\n')
+                    })  
+                    _tmpClassStr = ' ' + _tmpClassName.delRepeated().join(' ');
+                    // console.log('_tmpClassStr:', _tmpClassStr)
+                    var _aHtml = [
+                        '<div class="eform-row' + _tmpClassStr + '">',
+                            '<div class="item-l"><label>' + _label + '</label></div>',
+                            '<div class="item-r block">',
+                                _bHtml,
+                            '<div><!--/.item-r-->'
+                    ].join('\r\n')
+                    $('[data-combine="' + _label + '"]').last().after(_aHtml);
+                    $('[data-combine="' + _label + '"]').remove();
+                }
+            }
+     
         },
 
 
@@ -1018,7 +1062,7 @@
                         }
 
                         if (hid1 == '产权年限') {
-                            if(me.$opts.houses.switches.isPropertyAssociated) className += ' clear-relation'; // 产权年限是关联元素 testing
+                            if(me.$opts.houses.switches.isPropertyAssociated) className += ' clear-relation'; // 产权年限是关联元素 test2
                             className += ' click-hand click-property';
                             ids = 'property';
                             icons = ' icon-clock';
@@ -1096,7 +1140,7 @@
 
             tools.removeAllChildren(me.$obj); // 先清空元素内容
             tools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
-            if(me.$opts.houses.switches.hasExchangeModule) this.loadExchangeModule(me); //testing
+            if(me.$opts.houses.switches.hasExchangeModule) this.loadExchangeModule(me); //test2
         },
 
 
