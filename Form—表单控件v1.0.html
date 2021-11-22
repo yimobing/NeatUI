@@ -162,7 +162,7 @@
     icon        自定义图标名称(即className)(可选), 默认图标名称为field参数值。图标可以是font-awesome图标。eg. "fa-user-o"
     button      自定义右侧按钮(可选)。格式：{id:"按钮ID属性(可选)", class:"按钮Class属性(可选)", text:"按钮名称(可选)", icon:"图标名(可选),如fa-pencil", appearance:"按钮样式(可选),值：3d 立体感, simple 简单的"}
     attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
-    group       自定义相邻的N行同属一个某个分组，以划分区块(可选)。eg.若有相认的多行定义group="user"，则将会用 '< class="block__user"></div>' 将这些行包起来。
+    group       自定义相邻的N行同属一个某个分组，以划分区块(可选)。eg.若有相认的多行定义group="user"，则将会用 '<div class="block__user"></div>' 将这些行包起来。
     combine     将相邻的多行合并成一行(可选). eg. 假设有“抵押净值单价”、“抵押净值总价”两行，两行都设置combine属性值为“抵押净值”，则这两行都会有一个共同的标题“抵押净值”。
     */
     /**
@@ -314,14 +314,19 @@
                     {title:"电话+微信", field:"moWx", type:"文本", value:"18350605829", phone: true, chat: true },
 
                     {title:"千分进位", field:"money", type:"数字", value:"15000", thousandth:true },
-                    {title:"占位符", field:"unitPrice", type:"数字", value:"", placeholder:"请先输入总价", must:true },
-                    {title:"有隐藏值的", field:"totalPrice", type:"数字", value:"15000", hid:"Z1001" },
+                    {title:"占位符", field:"hasPlace", type:"数字", value:"", placeholder:"请先输入总价", must:true },
+                    {title:"有隐藏值的", field:"hasHid", type:"数字", value:"15000", hid:"Z1001" },
                     {title:"自定义属性", field:"customAttr", type:"文本", value:"vip2", attribute:"data-toggle='1' data-vip='5'" },
                     {title:"有右侧单位", field:"hasUnit", type:"数字", value:"15000", unit:"元/m²" },
                     {title:"有右侧按钮", field:"rightBtn", type:"数字", must: true, value:"1200000", unit:"元", button:{id:"btn-query-price", class:"btn-query", text:"获取价格"} },
                     {title:"整行只读", field:"whole", type:"文本", value:"这里整行只读", rowRead: true },
-                    {title:"市场价值单价", field:"unitPrice", type:"文本", value:"", unit:"元/平方米", combine:"市场价值", must: true },
-                    {title:"市场价值总价", field:"totalPrice", type:"文本", value:"", unit:"万元", combine:"市场价值", must: true },
+
+                    {title:"客人1", field:"userke1", type:"文本", value:"", group:"keren", must: true },
+                    {title:"客人2", field:"userke2", type:"文本", value:"", group:"keren", must: true },
+
+
+                    {title:"市场价值单价", field:"unitPrice", type:"数字", value:"", unit:"元/平方米", combine:"市场价值", must: true },
+                    {title:"市场价值总价", field:"totalPrice", type:"数字", value:"", unit:"万元", combine:"市场价值", must: true },
                 
                     //
                     {title:"询价单号", field:"quotation", type:"文本", value:"", readonly:true },
@@ -444,8 +449,8 @@
             //=====“校验表单格式与完整性”按钮
             $('#btn-examineForm').on('click', function(){
                 var result = example.examineForm('.mortgage__static', { // 其它参数(可选)
-                popup: true, // 表单格式错误或信息不完整时是否弹出提示信息(可选)，默认true
-                zIndex: 999 // 提示信息的对话框层级(可选)，999
+                    popup: true, // 表单格式错误或信息不完整时是否弹出提示信息(可选)，默认true
+                    zIndex: 999 // 提示信息的对话框层级(可选)，999
                 });
                 console.log('表单完整性：', result);
             });
