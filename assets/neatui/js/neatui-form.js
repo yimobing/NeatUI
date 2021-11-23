@@ -63,7 +63,7 @@
             value       初始显示值(可选), 默认空。当type="单选"时, value="1"表示选中, value="0"表示不选中
             hid         初始隐藏值,即显示值对应的编号(可选)。在输入框上有属性data-bh="隐藏值"
             unit        右边文字,一般是单位(可选), 默认空。eg. 平方米,元,万元,元/平方米
-            phone       是否电话类型(可选)。值：true, false 否(默认)
+            phone       是否电话类型(可选)。值：true, false 否(默认)。true时，允许value属性带非电话的字符,控件会自动提取value值中的电话号码作为电话。
             chat        是否微信类型(可选)。值：true, false 否(默认)
             must        是否必填项(可选)。值：true 是, false 否(默认)
             multiple    是否多行(可选)。值: true 是, false 否(默认)
