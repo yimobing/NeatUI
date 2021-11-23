@@ -875,6 +875,24 @@ var utilities = {
         return str;
     },
 
+
+
+    /**
+     * 提取电话号码，包括固话或手机号
+     * 注：只提取第一次出现的电话号码
+     * @param {string} ps_str 字符串
+     * @returns {number} 返回电话号码
+     * 注：原字符串如 '张三15905067628这个老客户0595-23935812很有17380125232毛病<a class="icon icon-phone hover" href="tel:15905067628"></a><a class="icon icon-weixin" data-user_hm="123" data-user_xm="张三" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"></a>';
+     */
+     pickupTel: function(ps_str){
+        if(ps_str == null) return '';
+        var str = ps_str.toString().replace(/^(.*?)([\d\-]+)(.*)/g, '$2').toString().replace(/\-/g, '');
+        str = /^[0-9]+$/.test(str.toString()) ? str : ''; // 纯数字时是电话则返回电话，否则返回空
+        return str;
+    },
+
+
+
     /**
      * 将一维数组中相邻元素组合成数组，并返回重组后的二维数组
      * 即：将一维数组相邻元素相减(相减的值为指定值)，相减的值相同的元素组合成数组
@@ -1672,7 +1690,7 @@ var checker = {
      */
     checkIsNumeric: function(ps_str){
         var reg = /^[0-9]+$/;
-        return reg.test(ps_str.toString()) ? true : false;reg.test
+        return reg.test(ps_str.toString()) ? true : false;
     },
 
 
