@@ -824,6 +824,7 @@
                     _displayStyle = display ? '' : ' style="display: none"',
                     _rowClassName = align == 'top' ? ' flex-start' : '',
                     _rowClassName += rowRead ? ' onlyRead' : '',
+                    _rowClassName += rowRead ? (unit != '' || phone || chat ? ' has-right-content' : ' no-right-content') : '',
                    
                     //_btnStr = '', // 按钮
                     _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
