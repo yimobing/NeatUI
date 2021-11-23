@@ -829,7 +829,7 @@
                     _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
                     _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
                     _unitClass = !me.$opts.config.layout.inputCross ? '' : ' has-cell-cross';
-                    _telAClass = phone == '' ? '' : !tools.isTel(value, me.$opts.config.format.phone) ? '' : ' class="hover"';
+                    _telAClass = phone == '' ? '' : !tools.isTel(tools.pickTel(value), me.$opts.config.format.phone) ? '' : ' class="hover"';
                     // _crossClass = ''; // me.$opts.houses.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
                     _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
                 var _btnStr = ''; // 右侧按钮
@@ -856,7 +856,7 @@
                 var _icoClassName = icon.indexOf('fa-') >= 0 ? 'icon fa ' + icon : 'icon icon-' + icon;
                 var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="' + _icoClassName + '"></i>'),
                     _unitStr = unit == '' ? '' : '<em class="r-unit' + _unitClass + '">' + unit + '</em>',
-                    _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a' + _telAClass + ' href="tel:' + value + '"></a></em>',
+                    _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a' + _telAClass + ' href="tel:' + tools.pickTel(value) + '"></a></em>',
                     _chatStr = chat == '' ? '' : '<em class="r-weixin' + _unitClass + '"><a></a></em>';
                 var _crossStr = ( types == 'text' && me.$opts.config.layout.inputCross ) ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' : '',
                     _mustStr = must && me.$opts.config.layout.inputMust ? '<div class="item-cell" data-type="must">*</div>' : '';
@@ -1253,7 +1253,7 @@
                     if(next != null){
                        var child = tools.getFirstChildElement(next);
                        var className = child.className;
-                        if(tools.isTel(value, me.$opts.config.format.phone)){
+                        if(tools.isTel(tools.pickTel(value), me.$opts.config.format.phone)){
                             child.className += className.indexOf('hover') >= 0 ? '' : 'hover';
                             child.setAttribute('href', 'tel:' + value);
                         }else{
@@ -2119,6 +2119,19 @@
             //
             temp = null;
             return output;
+        },
+
+        /**
+         * 提取字符串中的电话号码，包括固话或手机号
+         * 注：只提取第一次出现的电话号码
+         * @param {string} ps_str 字符串
+         * @returns {number} 返回电话号码
+         */
+        pickTel: function(ps_str){
+            if(ps_str == null) return '';
+            var str = ps_str.toString().replace(/^(.*?)([\d\-]+)(.*)/g, '$2').toString().replace(/\-/g, '');
+            str = /^[0-9]+$/.test(str.toString()) ? str : ''; // 纯数字时是电话则返回电话，否则返回空
+            return str;
         }
 
     }; // END tools
