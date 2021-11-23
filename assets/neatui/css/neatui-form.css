@@ -5,7 +5,7 @@
  * 说明：兼容IE8+
  * Author: Mufeng
  * Date: 2021.01.09
- * Update: 2021.11.20
+ * Update: 2021.11.23
  */
 
 /*+--------------------------------+*/
@@ -82,16 +82,35 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     padding: 2.5px 0;
 }
 .eform-row:first-child{ /* margin-top: 0; */ padding-top: 0; }
-.eform-row.flex-start{ align-items: flex-start; } /*垂直顶部对齐*/
+.eform-row.flex-start{align-items: flex-start;} /*垂直顶部对齐*/
+.eform-row.flex-start .item-r>.blank{
+	align-items: flex-start;
+	padding-top: 8px;
+	padding-bottom: 6px;
+}
 .eform-row .w-auto{ width: auto!important; }
-.eform-row.onlyRead .item-r,
-.eform-row.onlyRead .item-r *{
+.eform-row.onlyRead.no-right-content .item-r,
+.eform-row.onlyRead.no-right-content .item-r *{
 	background: #fffffe!important;
 	color: #857373!important;
 	opacity: .8!important;;
 	filter: alpha(opacity=80)!important;
 	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80)!important;
 }
+
+.eform-row.onlyRead.has-right-content .item-r input,
+.eform-row.onlyRead.has-right-content .item-r textarea,
+.eform-row.onlyRead.has-right-content .item-r div,
+.eform-row.onlyRead.has-right-content .item-r span
+{
+	background: #fffffe!important;
+	color: #857373!important;
+	opacity: .8!important;;
+	filter: alpha(opacity=80)!important;
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80)!important;
+}
+
+
 .erow-column{
 	display: -webkit-box;
     display: -moz-box;
@@ -177,11 +196,21 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .item-r>div{ 
     color: #555;
     font-size: 14px;
+	padding: 0 8px;
 }
 /*空位、空白区域*/
 .item-r>.blank{
 	min-height: 35px;
+	 position: relative; 
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    display: box;
+    align-items: center; 
 }
+
 /*输入框*/
 .item-r input[type="text"],
 .item-r input[type="password"],
@@ -295,6 +324,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .item-r .r-tel,
 .item-r .r-weixin{
 	position: absolute;
+	z-index: 1;
     right: 10px;
     top: 50%;
     -webkit-transform: translateY(-50%);
