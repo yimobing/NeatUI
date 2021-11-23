@@ -92,7 +92,8 @@
             }
 
             var telephone = telStr.toString().replace(/<a.+?href=[\"|\']tel\:(.+?)[\"|\'].*?>.*?<\/a>/gi, '$1');
-                wxDataAttr = weixinStr == '' ? '' : weixinStr.toString().replace(/<a.+?(data-(.+?).*)>.*?<\/a>/gi, '$1');
+                // wxDataAttr = weixinStr == '' ? '' : weixinStr.toString().replace(/<a.+?(data-(.+?).*)>.*?<\/a>/gi, '$1');
+                wxDataAttr = str.toString().replace(/.*?<a.+?(data-(.+?).*)>.*?<\/a>/gi, '$1');
             console.log('-------------------------------------------');
             console.log('A标签数组：', aTagArr);
             console.log('电话：', telephone, '\n微信data-*属性：', wxDataAttr);
@@ -106,13 +107,30 @@
             //——————————————————————————————————————————
             //=====正则表达式提取电话(手机或固话)
             // 原始字符串
-            var str = '张三15905067628这个老客户0595-23935812很有17380125232毛病<a class="icon icon-phone hover" href="tel:15905067628"></a><a class="icon icon-weixin" data-user_hm="123" data-user_xm="张三" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"></a>';
+            var str = '张三15905067628这个老客户0595-23935812很有17380125232毛病<a class="icon icon-phone hover" href="tel:15905067628"></a><a class="icon icon-weixin" data-user_hm="123" data-user_xm="张三" id="222" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"></a>';
             var tel = str.toString().replace(/^(.*?)([\d\-]+)(.*)/g, '$2').toString().replace(/\-/g, '');
             tel = /^[0-9]+$/.test(tel.toString()) ? tel : ''; // 纯数字时是电话则返回电话，否则返回空
 
-
             console.log('-------------------------------------------');
             console.log('原字符串：', str, '\n\n提取到的电话为：', tel);
+            
+
+
+            //——————————————————————————————————————————
+            //=====提取data-*属性字符串
+            var str = '张三15905067628这个老客户0595-23935812很有17380125232毛病<a class="icon icon-phone hover" href="tel:15905067628"></a><a class="icon icon-weixin" data-user_hm="123" data-user_xm="张三" id="222" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"></a>';
+            var dataStr = str.toString().replace(/.*?<a.+?(data-(.+?).*)>.*?<\/a>/gi, '$1');
+            console.log('-------------------------------------------');
+            console.log('原字符串：', str, '\ndata属性字符串：', dataStr);
+
+
+           
+            //——————————————————————————————————————————
+            //=====提取某个属性，比如id属性
+            var str = 'data-user_hm="123" data-user_xm="张三" id="222" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"';
+            var idStr = str.replace(/(.*?)(id=[\"|\'](.*?)[\"|\'])(.*)/gi, '$2');
+            console.log('-------------------------------------------');
+            console.log('原字符串：', str, '\nid属性字符串：', idStr);
 
 
 
