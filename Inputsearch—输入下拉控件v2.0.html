@@ -85,7 +85,10 @@
                         · 控件配置
             ----------------------------------------
             [核心方法及配置]
-            neuiInputsearch(elem, options); 或 neuiInputsearch(options, elem);
+            neuiInputsearch(elem, options); 
+            或 
+            neuiInputsearch(options, elem);
+
             [参数说明]
             elem 为当前输入框元素dom节点 例如'#area', '.area'，或jq对象 例如$('#area'), $('.area')
             options 为一个OBJECT类型的JSON对象
@@ -110,7 +113,7 @@
             $('#area').on('input', function(){
                 var $this = $(this);
                 neuiInputsearch({
-                    source: { data: [{username:"小明", age:"18"}, {username:"小王", age:"20"} ]}, // 指定数组源
+                    source: { data: [{username:"小明", age:"18"}, {username:"小王", age:"20"} ]}, // 指定数据源
                     //...
                     //...options其它参数
                 }, $this)
