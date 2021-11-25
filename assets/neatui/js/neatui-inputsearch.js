@@ -28,15 +28,15 @@
     var net = {};
 
     // 两种调用方式：
-    // 1.内部方式调用(即Click等事件写在控件里面)： XX(elem, options);
-    // 2.外部方式调用(即Click等事件写在前台页面)： $('#elem').on('input', function() { XX(options, $('#elem')); })
+    // 1. "INNER" 内部方式调用(即Click等事件写在控件里面)： XX(elem, options);
+    // 2. "OUTER" 外部方式调用(即Click等事件写在前台页面)： $('#elem').on('input', function() { XX(options, $('#elem')); })
     var neuiInputsearch = function(elem, options){
         var obj = tools.isJsonObject(options) ? 
         typeof elem === 'string' ? tools.getIdClassNameStrDom(elem): (elem instanceof jQuery ? elem : null)
         : 
         options; 
         obj = obj instanceof jQuery ? obj[0] : obj; // 输入框元素DOM对象
-        var caller = tools.isJsonObject(options) ? "OUTER" : "INNER"; // 调用方式
+        var caller = tools.isJsonObject(options) ? "INNER" : "OUTER"; // 调用方式
         var opts = tools.isJsonObject(options) ? options : elem;
         var ele = tools.isJsonObject(options) ? 
                 (typeof elem === 'string' ? elem : (elem instanceof jQuery ? elem.selector : null))
@@ -297,7 +297,7 @@
      */
     inputDrop.prototype.init = function(){
         var me = this;
-        if(me.$method == 'OUTER'){
+        if(me.$method == "INNER"){
             Array.from(me.$elements).forEach(function(element, i){
                 // element.addEventListener(me.$opts.event, function(){
                 //     me.createControl(element);
@@ -306,7 +306,7 @@
                     me.createControl(element);
                 })
             })
-        } else if(me.$method == 'INNER'){
+        } else if(me.$method == "OUTER"){
             me.createControl(me.$obj);
         }
     };
@@ -322,7 +322,7 @@
             fFieldBz = opts.notes;
         // 判断数据源
         var inputValue = tools.getElementValue(valCell); // 当前输入框元素的值
-        var dataSource = me.$method == 'OUTER' ? opts.inputBack({value: inputValue}) : source;
+        var dataSource = me.$method == "INNER" ? opts.inputBack({value: inputValue}) : source;
         if(typeof dataSource == 'undefined'){
             tools.dialogs('前台未指定数据源，或输入时未返回数据源！');
             return;
