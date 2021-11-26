@@ -64,15 +64,15 @@
             var telephone = str.replace(/(.*?)(<a.+?href=[\"|\']tel\:(.*?)[\"|\'].*>(.*?)<\/a>.*)/gi, '$3'), // 获取a标签href属性值
                 qrCodeImage = str.replace(/.*?<img.*?src=[\"|\'](.*?)[\"|\'].*?>.*?/gi, '$1'); // 微信二维码图片
 
-            console.log('-------------------------------------------');
-            console.log('联系人数组：', userArr, '\nA标签数组：', aTagArr);
-            console.log('联系人EM标签：', userStr, '\n电话A标签：', telStr, '\n微信A标签：', weixinStr);
-            console.log('用户姓名：', userNameText, '\n用户编号：', userHmText);
-            console.log('------------------------');
-            console.log('纯字符串：', ls_text);
-            // console.log('纯字符串2：', ls_text2);
-            console.log('------------------------');
-            console.log('电话：', telephone, '\n微信二维码图片：', qrCodeImage);
+            // console.log('-------------------------------------------');
+            // console.log('联系人数组：', userArr, '\nA标签数组：', aTagArr);
+            // console.log('联系人EM标签：', userStr, '\n电话A标签：', telStr, '\n微信A标签：', weixinStr);
+            // console.log('用户姓名：', userNameText, '\n用户编号：', userHmText);
+            // console.log('------------------------');
+            // console.log('纯字符串：', ls_text);
+            // // console.log('纯字符串2：', ls_text2);
+            // console.log('------------------------');
+            // console.log('电话：', telephone, '\n微信二维码图片：', qrCodeImage);
 
 
 
@@ -94,9 +94,9 @@
             var telephone = telStr.toString().replace(/<a.+?href=[\"|\']tel\:(.+?)[\"|\'].*?>.*?<\/a>/gi, '$1');
                 // wxDataAttr = weixinStr == '' ? '' : weixinStr.toString().replace(/<a.+?(data-(.+?).*)>.*?<\/a>/gi, '$1');
                 wxDataAttr = str.toString().replace(/.*?<a.+?(data-(.+?).*)>.*?<\/a>/gi, '$1');
-            console.log('-------------------------------------------');
-            console.log('A标签数组：', aTagArr);
-            console.log('电话：', telephone, '\n微信data-*属性：', wxDataAttr);
+            // console.log('-------------------------------------------');
+            // console.log('A标签数组：', aTagArr);
+            // console.log('电话：', telephone, '\n微信data-*属性：', wxDataAttr);
 
             // var a = Math.pow( (1+ 4.9/1200), 360);
             // console.log('a值：', a);
@@ -107,21 +107,55 @@
             //——————————————————————————————————————————
             //=====正则表达式提取电话(手机或固话)
             // 原始字符串
-            var str = '张三15905067628这个老客户0595-23935812很有17380125232毛病<a class="icon icon-phone hover" href="tel:15905067628"></a><a class="icon icon-weixin" data-user_hm="123" data-user_xm="张三" id="222" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"></a>';
-            var tel = str.toString().replace(/^(.*?)([\d\-]+)(.*)/g, '$2').toString().replace(/\-/g, '');
-            tel = /^[0-9]+$/.test(tel.toString()) ? tel : ''; // 纯数字时是电话则返回电话，否则返回空
-
+            var ps_str = "李小龙，趣闻如今，<a class=\"icon icon-phone hover\" href=\"tel:0595 22889688\"></a><a class=\"icon icon-weixin small\" data-user_hm=\"237809\" data-user_xm=\"小龙\" data-user_tx=\"头像\" data-user_tel=\"1758055690\" data-user_dw=\"单位\"></a>是国际武术大师，1806300490，是他的电话，记好了";  
+            var str = pickupTel(ps_str);
+            var arr = pickupTel(ps_str, {type: "all"});
             console.log('-------------------------------------------');
-            console.log('原字符串：', str, '\n\n提取到的电话为：', tel);
+            console.log('原字符串：', ps_str, '\n\n提取到的电话为：', str);
+            console.log('匹配到的所有电话：', arr);
             
+            /**
+             * 提取电话号码，包括固话或手机号
+             * 注：只提取第一次出现的电话号码
+             * @param {string} ps_str 字符串
+             * @param {object} options 参数对象。
+             * @returns {string || number || null || array} 返回值：options参数type="first"时返回空或第一次出现的电话号码; options参数type="all"时返回null或所有电话号码数成的数组
+             * 原字符串eg.
+                var ps_str = "李小龙，趣闻如今，<a class=\"icon icon-phone hover\" href=\"tel:\"></a><a class=\"icon icon-weixin small\" data-user_hm=\"237809\" data-user_xm=\"小龙\" data-user_tx=\"头像\" data-user_tel=\"1\" data-user_dw=\"单位\"></a>是国际武术大师，1806300490，是他的电话，记好了";
+             */
+            function pickupTel(ps_str, options){
+                var defaults = {
+                    type: "first" // 返回值类型. first 第一次出现的电话号码(默认), all 全部电话号码
+                }
+                var settings = $.extend({}, defaults, options || {});
+                // 正则匹配固话和手机号码. eg. 23935863, 0595-23935863, 0595 23935863, 1806300490, 01806300490, 0861806300490, +861806300490
+                var reg1 = /^(.*?)((((0|\+)?86(\s{1})?)?0?\d{2,3}([\-|\s]?))?[\d]{7,8})(.*)/gi; // 匹配第一次出现
+                var reg2 = /(((0|\+)?86(\s{1})?)?0?\d{2,3}([\-|\s]?))?[\d]{7,8}/gi; // 匹配所有
+                var str = '';
+                if(reg1.test(ps_str)){
+                    str = ps_str.toString().replace(reg1, '$2').toString().replace(/([\-|\s]+)/g, '');
+                }
+                var arr = ps_str.match(reg2); // 匹配所有。值为null 或 数组           
+                if(settings.type == 'first'){
+                    return str; // 返回值为空或第一次出现的电话号码
+                }
+                else if(settings.type == 'all'){
+                    return arr; // 返回值为null或所有电话号码数成的数组
+                }
+                else{
+                    return '';
+                }
+            }
+
+
 
 
             //——————————————————————————————————————————
             //=====提取data-*属性字符串
             var str = '张三15905067628这个老客户0595-23935812很有17380125232毛病<a class="icon icon-phone hover" href="tel:15905067628"></a><a class="icon icon-weixin" data-user_hm="123" data-user_xm="张三" id="222" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"></a>';
             var dataStr = str.toString().replace(/.*?<a.+?(data-(.+?).*)>.*?<\/a>/gi, '$1');
-            console.log('-------------------------------------------');
-            console.log('原字符串：', str, '\ndata属性字符串：', dataStr);
+            // console.log('-------------------------------------------');
+            // console.log('原字符串：', str, '\ndata属性字符串：', dataStr);
 
 
            
@@ -129,8 +163,8 @@
             //=====提取某个属性，比如id属性
             var str = 'data-user_hm="123" data-user_xm="张三" id="222" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"';
             var idStr = str.replace(/(.*?)(id=[\"|\'](.*?)[\"|\'])(.*)/gi, '$2');
-            console.log('-------------------------------------------');
-            console.log('原字符串：', str, '\nid属性字符串：', idStr);
+            // console.log('-------------------------------------------');
+            // console.log('原字符串：', str, '\nid属性字符串：', idStr);
 
 
 
