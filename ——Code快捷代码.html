@@ -78,7 +78,6 @@ i, em{ font-style: normal; }
 //======普通对话框
 neuiDialog.alert({
     animate: true,
-    // caption: '提示',
     message: '保存成功',
     buttons: ['确定']
 })
@@ -86,7 +85,6 @@ neuiDialog.alert({
 //=====有回调的对话框
 neuiDialog.alert({
     animate: true,
-    // caption: '提示',
     message: msg,
     buttons: ['确定'],
     callBack: function(ret){
@@ -97,10 +95,8 @@ neuiDialog.alert({
 //=====确认对话框
 neuiDialog.alert({
     animate: true,
-    // caption: '提示',
     message: '确认删除吗？',
-    buttons: ['取消', '确定'],
-    btnColor:['gray','green'],
+    buttons: ['确定', '取消'],
     callBack: function(ret){
         if(ret == 2){
 

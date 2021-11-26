@@ -130,12 +130,12 @@
 
 
                 //——————————————————————————————————————————
-                //=====增、删、改操作
+                //=====增、改操作
                 // 开始执行
-                var flag = '', msg = '保存成功';
                 neui.showAnimate();
                 setTimeout(function(){
-                    //后台返回
+                    var flag = '', msg = '保存成功';
+                    // 后台返回
                     /*
                     // START AJAX
                     var isHoldOn = true;
@@ -174,7 +174,6 @@
                     if(!flag) msg = '保存失败';
 
                     neuiDialog.alert({
-                        // caption: '提示',
                         message: msg,
                         buttons: ['确定'],
                         callBack: function(){
@@ -188,6 +187,73 @@
                 }, 100)
 
 
+
+
+                //——————————————————————————————————————————
+                //=====删除操作
+                // 开始执行
+                neuiDialog.alert({
+                    animate: true,
+                    message: '确认删除吗？',
+                    buttons: ['确定', '取消'],
+                    callBack: function(ret){
+                        if(ret == 1){       
+                            neui.showAnimate();
+                            setTimeout(function(){
+                                var flag = '', msg = '删除成功';
+                                // 后台返回
+                                /*
+                                // START AJAX
+                                var isHoldOn = true;
+                                ajax({
+                                    heading: "删除xx数据",
+                                    debug: false,
+                                    async: false, // 取数方式. true 异步, false 同步(默认)
+                                    type: "GET",
+                                    dataType: "html",
+                                    cache: false,
+                                    url: "",
+                                    data: {
+                                        "action": "",
+                                        "user": "<%=s_user%>",
+                                        "sjk": "<%=s_sjk%>"
+                                    },
+                                    success: function(res){
+                                        if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                        var json = JSON.parse(res);
+                                        flag = json.return == 'ok' ? 1 : 0;
+                                        if(!flag) msg = json.data;
+                                    },
+                                    error: function(res){
+                                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    },
+                                    beforeSend: function(XMLHttpRequest){ },
+                                    complete: function(XMLHttpRequest, textStatus){ }
+                                })
+                                if(!isHoldOn){
+                                    neui.destroyAnimate();
+                                    return;
+                                }
+                                // END AJAX
+                                */
+                                flag = parseInt(1); //1 成功, 0 失败
+                                if(!flag) msg = '删除失败';
+
+                                neuiDialog.alert({
+                                    message: msg,
+                                    buttons: ['确定'],
+                                    callBack: function(){
+                                        if(flag){ // 成功
+                                            //..
+                                        }
+                                    }
+                                })
+
+                                neui.destroyAnimate();
+                            }, 100)
+                        }
+                    }
+                })
 
                 //==========================================
                 //                  3、原始AJAX调用示例
