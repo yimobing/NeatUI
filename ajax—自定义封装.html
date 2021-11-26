@@ -154,6 +154,7 @@
                         },
                         success: function(res){
                             if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            // if(res == '') return;
                             var json = JSON.parse(res);
                             flag = json.return == 'ok' ? 1 : 0;
                             if(!flag) msg = json.data;
@@ -220,6 +221,7 @@
                                     },
                                     success: function(res){
                                         if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                        // if(res == '') return;
                                         var json = JSON.parse(res);
                                         flag = json.return == 'ok' ? 1 : 0;
                                         if(!flag) msg = json.data;
