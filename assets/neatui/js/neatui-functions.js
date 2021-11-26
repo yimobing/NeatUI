@@ -881,14 +881,33 @@ var utilities = {
      * 提取电话号码，包括固话或手机号
      * 注：只提取第一次出现的电话号码
      * @param {string} ps_str 字符串
-     * @returns {number} 返回电话号码
-     * 注：原字符串如 '张三15905067628这个老客户0595-23935812很有17380125232毛病<a class="icon icon-phone hover" href="tel:15905067628"></a><a class="icon icon-weixin" data-user_hm="123" data-user_xm="张三" data-user_tx="头像" data-user_tel="185943134713" data-user_dw="评估公司单位"></a>';
-     */
-     pickupTel: function(ps_str){
-        if(ps_str == null) return '';
-        var str = ps_str.toString().replace(/^(.*?)([\d\-]+)(.*)/g, '$2').toString().replace(/\-/g, '');
-        str = /^[0-9]+$/.test(str.toString()) ? str : ''; // 纯数字时是电话则返回电话，否则返回空
-        return str;
+     * @param {object} options 参数对象。
+     * @returns {string || number || null || array} 返回值：options参数type="first"时返回空或第一次出现的电话号码; options参数type="all"时返回null或所有电话号码数成的数组
+     * 原字符串eg.
+        var ps_str = "李小龙，趣闻如今，<a class=\"icon icon-phone hover\" href=\"tel:\"></a><a class=\"icon icon-weixin small\" data-user_hm=\"237809\" data-user_xm=\"小龙\" data-user_tx=\"头像\" data-user_tel=\"1\" data-user_dw=\"单位\"></a>是国际武术大师，1806300490，是他的电话，记好了";
+    */
+    pickupTel: function(ps_str, options){
+        var defaults = {
+            type: "first" // 返回值类型. first 第一次出现的电话号码(默认), all 全部电话号码
+        }
+        var settings = $.extend({}, defaults, options || {});
+        // 正则匹配固话和手机号码. eg. 23935863, 0595-23935863, 0595 23935863, 1806300490, 01806300490, 0861806300490, +861806300490
+        var reg1 = /^(.*?)((((0|\+)?86(\s{1})?)?0?\d{2,3}([\-|\s]?))?[\d]{7,8})(.*)/gi; // 匹配第一次出现
+        var reg2 = /(((0|\+)?86(\s{1})?)?0?\d{2,3}([\-|\s]?))?[\d]{7,8}/gi; // 匹配所有
+        var str = '';
+        if(reg1.test(ps_str)){
+            str = ps_str.toString().replace(reg1, '$2').toString().replace(/([\-|\s]+)/g, '');
+        }
+        var arr = ps_str.match(reg2); // 匹配所有。值为null 或 数组           
+        if(settings.type == 'first'){
+            return str; // 返回值为空或第一次出现的电话号码
+        }
+        else if(settings.type == 'all'){
+            return arr; // 返回值为null或所有电话号码数成的数组
+        }
+        else{
+            return '';
+        }
     },
 
 
