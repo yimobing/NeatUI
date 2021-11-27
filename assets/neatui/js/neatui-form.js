@@ -764,7 +764,8 @@
                     attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"],
                     rowRead = typeof items["rowRead"] == 'undefined' ? false : items["rowRead"] === true ? true : false,
                     group = typeof items["group"] == 'undefined' ? '' : items["group"].toString().replace(/([ ]+)/g, ''),
-                    combine = typeof items["combine"] == 'undefined' ? '' : items["combine"].toString().replace(/([ ]+)/g, '');
+                    combine = typeof items["combine"] == 'undefined' ? '' : items["combine"].toString().replace(/([ ]+)/g, ''),
+                    press = typeof items["press"] == 'undefined' ? null : items["press"];
                 //
                 var _LHtml = '', // 左边内容
                     _RHtml = '', // 右边内容
@@ -813,6 +814,10 @@
                     className = field;
                     className += ' blank';
                 }
+                if(type == '按钮'){
+                    tagName = 'button';
+                    className = field;
+                }
                 //
                 if(phone){
                     className += ' click-tel';
@@ -828,7 +833,8 @@
                 //
                 var chooseText = placeholder != null && placeholder.toString().replace(/([ ]+)/g, '') != '' ? placeholder :  (!readonly ? '请填写' : '请选择'); //+title 
                     _looseFocusStr = !readonly ?  '' : ';this.blur()';
-                var _classNameStr = ' class="' + className + '"',
+                var _classStr = className,
+                    _styleStr = '',
                     _placeholderStr = !must ? '' : ' placeholder="' + chooseText + '"',
                     _blurStr = !must ? '' : ' onblur="this.placeholder=\'' + chooseText + '\'"';
                     _focusStr = !must ? ( !readonly ? '' : ' onfocus="this.blur()"') : ' onfocus="this.placeholder=\'\'' + _looseFocusStr + '"',
@@ -867,7 +873,22 @@
                     _crossClass = ' has-cell-btn has-cell-btn-word-' + _btnText.length;
                 }
 
-                var _attrListStr = ' id="' + ids + '"' + _classNameStr + _dataHideStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr; // 所有公用属性串
+                if(press != null){
+                    var isLb = typeof press.labeled == 'undefined' ? false : (press.labeled === true ? true : false),
+                        aln = typeof press.align == 'undefined' ? '' : (press.align != 'center' ? '' : press.align),
+                        uLine = typeof press.underline == 'undefined' ? false : (press.underline === true ? true : false),
+                        ace = typeof press.appearance == 'undefined' ? '' : press.appearance;
+                        color = typeof press.color == 'undefined' ? '' : press.color;                
+                    if(!isLb) title = '';     
+                    if(aln == 'center') _classStr += ' is-text-center';
+                    if(uLine) _classStr += ' is-text-underline';
+                    if(ace != '') _classStr += ' is-bt-' + ace;
+                    _styleStr += '; color:' + color + '!important; border: 1px solid ' + color + '!important;';  
+                }
+                    
+                var _classNameStr = ' class="' + _classStr + '"';
+                var _stylesStr = _styleStr == '' ? '' : ' style="' + _styleStr + '"';
+                var _attrListStr = ' id="' + ids + '"' + _classNameStr + _dataHideStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr + _stylesStr; // 所有公用属性串
                 var _rowAttrListStr = ' ' + _groupStr + ' ' + _combineStr;
                 //
                 var _icoClassName = icon.indexOf('fa-') >= 0 ? 'icon fa ' + icon : 'icon icon-' + icon;
@@ -887,6 +908,13 @@
                 }
                 if(tagName == 'div'){
                     _inputStr = '<div' + _attrListStr + '>' + value + '</div>';
+                }
+                if(tagName == 'button'){
+                    _crossStr = '';
+                    _mustStr = '';
+                    _unitStr = '';
+                    var _icoStr = press == null ? '' : (typeof press.icon == 'undefined' ? '' : '<i class="fa ' + press.icon + '"></i>');
+                    _inputStr = '<button type="button"' + _attrListStr + '>' + _icoStr + value + '</button>';
                 }
                 // 节点拼接
                 _LHtml += _inputStr;
