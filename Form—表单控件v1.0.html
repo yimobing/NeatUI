@@ -57,15 +57,25 @@
     ----------------------------------------
     var example = new NeForm(); // 实例化控件
     可调用的函数如下：
+
     函数1：
+    /**
+    *  获取表单HTML
+    *  @param {object} options 参数对象
+    *  @returns {HTML} 返回表单HTML字符串
+    */
+    var html = examineForm.getFormHTML(options);
+
+
+    函数2：
     /**
     * 创建表单
     * @param {string} elem 根节点ID或Class选择器字符串。eg1.'#user', eg2.'.user'
-    * @param {object} opts 参数对象 
+    * @param {object} options 参数对象 
     */
     example.forms(elem, options);
 
-    函数2：
+    函数3：
     /**
     * 切换成手动输入
     * @param {HTML DOM || jQuery Object} o 元素对象或jq选择器对象
@@ -86,7 +96,10 @@
             houseRightButton: false, // 是否楼盘名称右侧显示查询按钮(可选), 默认 false
             switches: {
                 enable: true, // 是否允许手动输入(可选), 默认true
-                hasExchangeModule: true, // 是否加载切换输入模块(可选), 默认true。值为true时将在最底部加载“如查无数据，请选择手动输入”、“取消手动输入”
+                hasExchangeModule: true, // 是否加载切换输入模块(可选), 默认true。模块样式：“如查无数据，请选择手动输入”、“取消手动输入”。
+                // hasExchangeModule参数值为true时：
+                // 如果页面有存在一个自定义一个div节点，且该节点的class属性含有"switch"，则“切换输入模块”将加载到该div节点中；
+                // 如果页面不存在该div节点，则“切换输入模块”将在最底部加载。
                 isPropertyAssociated: false // 产权年限是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素
             }
         },
@@ -360,6 +373,8 @@
                     }
                 }
             });
+
+
 
              
             //——————————————————————————————————————————
