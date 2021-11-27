@@ -114,6 +114,22 @@
             保存时，要取到显示值2、隐藏值5、隐藏值6；
         */
        
+        /**
+         * 获取表单HTML
+         */
+        me.getFormHTML = function(options){
+            var _className = 'ne-tmp-form';
+            var node = document.createElement('div');
+            node.className = _className;
+            node.style.display = 'none';
+            var o = document.getElementsByTagName('body')[0];
+            tools.insertAfter(node, o);
+            this.forms('.' + _className, options);
+            var _html = node.innerHTML;
+            node.remove();
+            return _html;
+        },
+
 
         /**
          * 创建表单
