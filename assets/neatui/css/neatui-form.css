@@ -333,7 +333,8 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 	text-decoration: underline!important;
 }
 
-.item-r button.is-bt-simple{
+.item-r button.is-bt-simple,
+.item-r button.is-bt-pure{
 	background: none!important;
 	border: 1px solid #ada8a8!important;
 	border-radius: 2px;
@@ -341,6 +342,9 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 	box-shadow: none!important;
 	font-size: 12px!important;
 	color: #606060!important;
+}
+.item-r button.is-bt-pure{
+	border: 0!important;
 }
 
 

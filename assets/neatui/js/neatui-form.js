@@ -878,12 +878,15 @@
                         aln = typeof press.align == 'undefined' ? '' : (press.align != 'center' ? '' : press.align),
                         uLine = typeof press.underline == 'undefined' ? false : (press.underline === true ? true : false),
                         ace = typeof press.appearance == 'undefined' ? '' : press.appearance;
-                        color = typeof press.color == 'undefined' ? '' : press.color;                
+                        color = typeof press.color == 'undefined' ? '' : press.color;
+                    _styleStr += 'color:' + color + '!important;';
+                    if(ace != 'pure'){
+                        _styleStr += 'border: 1px solid ' + color + '!important;'
+                    }
                     if(!isLb) title = '';     
                     if(aln == 'center') _classStr += ' is-text-center';
                     if(uLine) _classStr += ' is-text-underline';
                     if(ace != '') _classStr += ' is-bt-' + ace;
-                    _styleStr += '; color:' + color + '!important; border: 1px solid ' + color + '!important;';  
                 }
                     
                 var _classNameStr = ' class="' + _classStr + '"';
@@ -913,6 +916,9 @@
                     _crossStr = '';
                     _mustStr = '';
                     _unitStr = '';
+                    if(press == null){
+                        title = '';
+                    }
                     var _icoStr = press == null ? '' : (typeof press.icon == 'undefined' ? '' : '<i class="fa ' + press.icon + '"></i>');
                     _inputStr = '<button type="button"' + _attrListStr + '>' + _icoStr + value + '</button>';
                 }
