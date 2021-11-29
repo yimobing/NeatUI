@@ -132,6 +132,15 @@
 
 
         /**
+         * 加载表单事件 add 20211129-1
+         */
+        me.donFormEvent = function(){
+            formUI.callControls(me);
+            formUI.doneEvents(me);
+        },
+
+
+        /**
          * 创建表单
          * @param {string} elem 根节点ID或Class选择器字符串。eg1.'#user', eg2.'.user'
          * @param {object} opts 参数对象 
@@ -384,44 +393,52 @@
             o = tools.anyToDomObject(o);
             var child = tools.getChildElement(o);
             Array.from(child).forEach(function(el){
-                var lbNode = el.querySelector('label'),
-                    mustNode = el.querySelector('[data-type="must"]'),
-                    telNode= el.querySelector('.r-tel'),
-                    inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
-                Array.from(inputNode).forEach(function(txt){
-                    var type = txt.getAttribute('type');
-                    var readonly = txt.getAttribute('readonly');
-                    var value = '';
-                    if(type == null || type == 'text') {
-                        value = txt.value;
-                    }
-                    else if(type == 'checkbox') {
-                        value = txt.checked ? 1 : 0;
-                    }
-                    var label = lbNode.innerText,
-                        hid5 = txt.getAttribute('data-hid5') == null ? '0' : txt.getAttribute('data-hid5'), // 隐藏值5, 表示是否必填项. 1 必填, 0 选填
-                        isMust = mustNode == null ? (hid5 == '1' ? true : false ) : true,
-                        isPhone = telNode == null ? false : true;
-                    // console.log('mustNode：', mustNode, '\ntelNode：', telNode);
-                    // console.log('label：', label, '\nisMust：',isMust, '\nisPhone：',isPhone);
-                    // console.log('-------------')
-                    //
-                    if(el.className.indexOf('block__') >= 0){ // 分组的行 group test3
-                        label = tools.getPrevElement(txt.parentNode).querySelector('label').innerText;
-                    }
-                    if(txt.parentNode.className.indexOf('item-box') >= 0){ // 合并的行 combine
-                        label += tools.getPrevElement(txt).innerText;
-                    }
-                    //
-                    if(isMust && value.toString().replace(/([ ]+)/g, '') === ''){
-                        tips1 += label + '、';
-                        if(readonly != '' && readonly != 'readonly' && readonly != 'true') isAllRead = false;
-                    }
-                    if(isMust && isPhone && !tools.isTel(value, me.$opts.config.format.phone)){
-                        tips2 += label + '、';
-                        if(readonly != '' && readonly != 'readonly' && readonly != 'true') isAllRead = false;
-                    }
-                })
+                if(tools.getElementStyle(el).display != 'none'){ // 若该行可见 add 20211129-1 本行
+                    var lbNode = el.querySelector('label'),
+                        mustNode = el.querySelector('[data-type="must"]'),
+                        telNode= el.querySelector('.r-tel'),
+                        inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
+                    Array.from(inputNode).forEach(function(txt){
+                        var type = txt.getAttribute('type');
+                        var readonly = txt.getAttribute('readonly');
+                        var value = '';
+                        if(type == null || type == 'text') {
+                            value = txt.value;
+                        }
+                        else if(type == 'checkbox') {
+                            value = txt.checked ? 1 : 0;
+                        }
+                        var label = lbNode.innerText,
+                            hid5 = txt.getAttribute('data-hid5') == null ? '0' : txt.getAttribute('data-hid5'), // 隐藏值5, 表示是否必填项. 1 必填, 0 选填
+                            isMust = mustNode == null ? (hid5 == '1' ? true : false ) : true,
+                            isPhone = telNode == null ? false : true;
+                        // console.log('mustNode：', mustNode, '\ntelNode：', telNode);
+                        // console.log('label：', label, '\nisMust：',isMust, '\nisPhone：',isPhone);
+                        // console.log('-------------')
+                        //
+                        if(el.className.indexOf('block__') >= 0){ // 分组的行 group test3
+                            label = tools.getPrevElement(txt.parentNode).querySelector('label').innerText;
+                            // add 20211129-1
+                            var eleFather = txt.parentNode.parentNode;
+                            mustNode = eleFather.querySelector('[data-type="must"]');
+                            telNode = eleFather.querySelector('.r-tel');
+                            isMust = mustNode == null ? (hid5 == '1' ? true : false ) : true;
+                            isPhone = telNode == null ? false : true;
+                        }
+                        if(txt.parentNode.className.indexOf('item-box') >= 0){ // 合并的行 combine
+                            label += tools.getPrevElement(txt).innerText;
+                        }
+                        //
+                        if(isMust && value.toString().replace(/([ ]+)/g, '') === ''){
+                            tips1 += label + '、';
+                            if(readonly != '' && readonly != 'readonly' && readonly != 'true') isAllRead = false;
+                        }
+                        if(isMust && isPhone && !tools.isTel(value, me.$opts.config.format.phone)){
+                            tips2 += label + '、';
+                            if(readonly != '' && readonly != 'readonly' && readonly != 'true') isAllRead = false;
+                        }
+                    })
+                }
             })
             var chooseText = isAllRead ? '选择' : '填写';
             // 校验数据完整性
@@ -1629,6 +1646,30 @@
     //                      工具库
     //================================================================
     var tools = {
+
+        /**
+         * 原生js获取元素style属性 add 20211129-1
+         * [用途]：原生js获取元素margin外边距、内边距padding
+         * [注意]：返回值中的各个属性值带单位px
+         * 兼容性：兼容IE、火狐、谷歌
+         * @param {HTML DOM} o DOM元素。
+         * @returns {object} 返回元素的各种css属性组成的数组。
+         * [示例]
+            var div = document.getElementById("user");
+            var style = getElementStyle(div);
+            alert(style.marginTop);
+        */
+        getElementStyle: function(o){
+            //  兼容IE和火狐谷歌等的写法
+            if (window.getComputedStyle) {
+                var style = getComputedStyle(o, null);
+            } else {
+                style = o.currentStyle; // 兼容IE
+            }
+            return style;
+        },
+
+
         /**
          * 判断是否JSON对象
          * @param {object} ps_obj 目标对象
