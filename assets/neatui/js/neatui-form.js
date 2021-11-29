@@ -134,7 +134,7 @@
         /**
          * 加载表单事件 add 20211129-1
          */
-        me.donFormEvent = function(){
+        me.doneFormEvent = function(){
             formUI.callControls(me);
             formUI.doneEvents(me);
         },
