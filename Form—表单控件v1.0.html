@@ -65,10 +65,17 @@
     *  @param {object} options 参数对象
     *  @returns {HTML} 返回表单HTML字符串
     */
-    var html = examineForm.getFormHTML(options);
+    var html = example.getFormHTML(options);
+
+    函数2：常与getFormHTML()函数配合使用
+    example.donFormEvent(); // 加载表单事件
+    //eg.
+    var html = example.getFormHTML(options);
+    $('.layout').append(html);
+    example.donFormEvent();
 
 
-    函数2：
+    函数3：
     /**
     * 创建表单
     * @param {string} elem 根节点ID或Class选择器字符串。eg1.'#user', eg2.'.user'
@@ -76,7 +83,7 @@
     */
     example.forms(elem, options);
 
-    函数3：
+    函数4：
     /**
     * 切换成手动输入
     * @param {HTML DOM || jQuery Object} o 元素对象或jq选择器对象
