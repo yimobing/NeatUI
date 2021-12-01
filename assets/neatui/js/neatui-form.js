@@ -982,7 +982,9 @@
                     var _label = bindArr[k]; 
                     var _bHtml = '';
                     var _tmpClassName = [ ];
+                    var isVisible = true;
                     $('[data-combine="' + _label + '"]').each(function(){
+                        if($(this).is(':visible') === false) isVisible = false;
                         var _tmpArr = $(this).attr('class').replace(/(eform-row)/g, '').split(' ');
                         for(var m = 0; m < _tmpArr.length; m++){
                             if(_tmpArr[m].toString().replace(/([ ]+)/g) !== '') _tmpClassName.push(_tmpArr[m]);
@@ -1001,8 +1003,9 @@
                     })  
                     _tmpClassStr = ' ' + _tmpClassName.delRepeated().join(' ');
                     // console.log('_tmpClassStr:', _tmpClassStr)
+                    var _tmpStyle = isVisible ? '' : ' style="display: none"';
                     var _aHtml = [
-                        '<div class="eform-row' + _tmpClassStr + '">',
+                        '<div class="eform-row' + _tmpClassStr + '"' + _tmpStyle + '>',
                             '<div class="item-l"><label>' + _label + '</label></div>',
                             '<div class="item-r block">' + _bHtml + '</div>',
                         '</div>'
