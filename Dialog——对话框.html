@@ -35,6 +35,7 @@
 		<section class="grid-demo-dialog flex">
 			<button type="button" class="ne-btn l-2x" id="btn_dialog_tips1">提示窗1(默认)</button>
 			<button type="button" class="ne-btn l-2x" id="btn_dialog_tips2">提示窗2(黑色)</button>
+			<button type="button" class="ne-btn l-2x" id="btn_dialog_tips3">提示窗3(红色)</button>
 		</section>
 		<!--/grid-demo-opetate-->
 
@@ -383,6 +384,18 @@
 				maskOpacity: 1
 			})
 		});
+
+
+		/*+------------------------+*/
+		//=====内容提示窗3事件
+		$('#btn_dialog_tips3').on('click', function () {
+			neuiDialog.notice({
+				message: '请输入用户名、密码',
+				theme: 'danger',
+				location: 'top'
+			})
+		});
+		
 
 
 
