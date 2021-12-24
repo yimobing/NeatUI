@@ -1702,7 +1702,7 @@ var checker = {
     
 
     /**
-     * 判断字符串是否为纯数字
+     * 判断字符串是否为纯数字、判断是否数字类型
      * @param {string} ps_str 字符串
      * @returns {boolean} 返回布尔值. true 是纯数字, false 不是纯数字
      * eg. 11 是纯数字, 11., 11.5, 11.53不是纯数字
