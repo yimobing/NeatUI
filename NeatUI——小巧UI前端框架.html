@@ -744,7 +744,7 @@
                 })
 
 
-                // 快捷调用代码
+                // 快捷调用代码1：以弹出窗口方式打开
                 /* neui.openIframe({
                     url: linkUrl,
                     caption: '添加房产',
@@ -756,7 +756,25 @@
                     // crossDirection: 'right',
                     closeCallBack: function(){ }
                 }) */
-                
+
+
+                // 快捷调用代码2：以内嵌方式打开
+                /* neui.openIframe({
+                    url: linkUrl,
+                    caption: '',
+                    element: '#charts',
+                    position: 'relative',
+                    mask: false,
+                    showCross: false,
+                    params: {
+                        frameRadius: false, 
+                        frameBorder: false,
+                        animation:{ 
+                            enable: true,
+                            
+                        }
+                    }
+                }) */  
             });
 
 
