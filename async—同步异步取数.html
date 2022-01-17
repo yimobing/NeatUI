@@ -230,7 +230,8 @@
                 complete: function(XMLHttpRequest, textStatus){ }
             })
             if(!isHoldOn){
-                return {}
+                // return {}
+                return defer.reject();
             }
             //END AJAX
             */
