@@ -219,7 +219,7 @@
                 },
                 success: function(res){
                     if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                    //if(res == '') return;
+                    // if(res == '') return;
                     studentJson = JSON.parse(res);
                     defer.resolve(studentJson); // 成功，使用defer.resolve()返回数据
                 },
