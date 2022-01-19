@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>CSS三角形</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+<body>
+    <style>
+        *{margin: 0; padding: 0; box-sizing: border-box; outline: none; } 
+        input{width: 150px; height: 35px; line-height: 35px; padding: 0 8px; border: 1px solid #a678f8; border-radius: 2px; } 
+        em{ font-style: normal; }
+        /*+----------------------------------------+*/
+        body{ max-width: 1024px; margin: 0 auto; background-color: #f4f4f4; padding: 10px 5px; }
+        .module__caption{ margin-bottom: 10px; color: #ff0000; text-align: center; font-size: 24px; font-weight: bold; }
+        .module__describe{ background-color: #fff; padding: 15px 20px; }
+        .module__describe span{ display: block; font-size: 18px; font-weight: bold; }
+        .module__describe:after{ content: ''; display: block; clear: both; }
+        .module__describe img{ float: left; margin-right: 15px; }
+        .module__content{ }
+        .module__content .block{
+            background-color: #fff;
+            margin-top: 8px;
+            padding: 25px 15px;
+            border-radius: 4px;
+        }
+        .angle__layout{ }
+        .angle__code{ margin-top: 10px; border-radius: 4px; }
+
+        /*+----------------------------------------+*/
+        /*+三角形箭头+*/
+        .triangle{
+            display: -webkit-box;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: box;
+            align-items: center;
+            position: relative;
+            width: 200px;
+        }
+        
+        .triangle>label{
+            width: 0px;
+        }
+        .triangle>input{
+            width: 100%;
+            -webkit-flex: 1;
+            -moz-flex: 1;
+            -o-flex: 1;
+            flex: 1;
+        }
+
+        .triangle:after{
+            content: '';
+            position: absolute;
+            z-index: 1;
+            right: 10px;
+            top: 50%;
+            display: inline-block;  
+            /* -webkit-transform: translateY(-50%) rotate(-45deg);
+            -moz-transform: translateY(-50%) rotate(-45deg);
+            -o-transform: translateY(-50%) rotate(-45deg);
+            transform: translateY(-50%) rotate(-45deg); */
+            -webkit-transform: translateY(-50%);
+            -moz-transform: translateY(-50%);
+            -o-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+
+        /*+向上三角形箭头+*/
+        .triangle-up:after{
+            width: 6px;
+            height: 6px; 
+            border-style: solid;
+            border-color: #666;
+            border-width: 1px 1px 0 0; /* 1px 表示上、右两条边, 0 表示下、左两条边 */
+            -webkit-transform: rotate(-45deg);
+            -moz-transform: rotate(-45deg);
+            -o-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+        }
+        /*+向右三角形箭头+*/
+        .triangle-right:after{
+            width: 6px;
+            height: 6px; 
+            border-style: solid;
+            border-color: #666; /* 1px 表示上、右两条边, 0 表示下、左两条边 */
+            border-width: 1px 1px 0 0;
+            -webkit-transform: rotate(45deg);
+            -moz-transform: rotate(45deg);
+            -o-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+        /*+向下三角形箭头+*/
+        .triangle-down:after{
+            width: 6px;
+            height: 6px; 
+            border-style: solid;
+            border-color: #666;
+            border-width: 0 0 1px 1px; /* 0 表示上、右两条边, 1px 表示下、左两条边 */
+            -webkit-transform: rotate(-45deg);
+            -moz-transform: rotate(-45deg);
+            -o-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+        }
+        /*+向左三角形箭头+*/
+        .triangle-left:after{
+            width: 6px;
+            height: 6px; 
+            border-style: solid;
+            border-color: #666;
+            border-width: 0 0 1px 1px; /* 0 表示上、右两条边, 1px 表示下、左两条边 */
+            -webkit-transform: rotate(45deg);
+            -moz-transform: rotate(45deg);
+            -o-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+    </style>
+
+    <div class="wrap">
+        <main>
+            <section class="angle">
+                <div class="module">
+                    <div class="module__caption">一、三角形箭头</div>
+                    <div class="module__describe">
+                        <span>原理</span>
+                        <p>将一个正方形以对角线(左上角、右下角画一条斜线)分成两个空心的三角形，利用这两个三角形进行旋转45度，即可得到向上、向右、向下、向左等多种三角形箭头。(如下图)</p>
+                        <p>1、两根黄线组成的三角形，经过旋转负45度成为上三角形，旋转正45度成为右三角形</p>
+                        <p>2、两根绿线组成的三角形，经过旋转负45度成为下三角形，旋转正45度成为左三角形</p>
+                        <div><img src="../test/img/angle_arrow.png"></div>
+                    </div><!--/.module__describe-->
+                    <div class="module__content">
+                        <div class="block">
+                            <div class="angle__layout">
+                                <div class="triangle triangle-up"><label></label><input type="text" value="向上三角形箭头"></div>
+                            </div><!--/.angle__content-->
+                            <div class="angle__code">
+<pre>
+.triangle-up:after{
+    width: 6px;
+    height: 6px; 
+    border-style: solid;
+    border-color: #666;
+    border-width: 1px 1px 0 0; /* 1px 表示上、右两条边, 0 表示下、左两条边 */
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+</pre>
+                            </div><!--/.angle__code-->
+                        </div><!--/.block-->
+                        <div class="block">
+                            <div class="angle__layout">
+                                <div class="triangle triangle-right"><label></label><input type="text" value="向右三角形箭头"></div>
+                            </div><!--/.angle__content-->
+                            <div class="angle__code">
+<pre>
+.triangle-right:after{
+    width: 6px;
+    height: 6px; 
+    border-style: solid;
+    border-color: #666;
+    border-width: 1px 1px 0 0; /* 1px表示上、右两条边, 0 表示下、左两条边 */
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+</pre>
+                            </div><!--/.angle__code-->
+                        </div><!--/.block-->
+
+                        <div class="block">
+                            <div class="angle__layout">
+                                <div class="triangle triangle-down"><label></label><input type="text" value="向下三角形箭头"></div>
+                            </div><!--/.angle__content-->
+                            <div class="angle__code">
+<pre>
+    .triangle-down:after{
+        width: 6px;
+        height: 6px; 
+        border-style: solid;
+        border-color: #666;
+        border-width: 0 0 1px 1px; /* 0 表示上、右两条边, 1px 表示下、左两条边 */
+        -webkit-transform: rotate(-45deg);
+        -moz-transform: rotate(-45deg);
+        -o-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+    }
+</pre>
+                            </div><!--/.angle__code-->
+                        </div><!--/.block-->
+
+
+                        <div class="block">
+                            <div class="angle__layout">
+                                <div class="triangle triangle-left"><label></label><input type="text" value="向左三角形箭头"></div>
+                            </div><!--/.angle__content-->
+                            <div class="angle__code">
+<pre>
+.triangle-left:after{
+    width: 6px;
+    height: 6px; 
+    border-style: solid;
+    border-color: #666;
+    border-width: 0 0 1px 1px; /* 0 表示上、右两条边, 1px 表示下、左两条边 */
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+</pre>
+                            </div><!--/.angle__code-->
+                        </div><!--/.block-->
+
+                    </div><!--/.module__content-->
+                </div><!--/.module-->
+            </section><!--/.angle-->
+        </main>
+    </div><!--/.wrap-->
+
+
+
+
+    <link type="text/css" rel="stylesheet" href="../highlight/styles/monokai-sublime.css"><!--代码高亮-->
+    <script type="text/javascript" src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
+	<!--<script type="text/javascript" href="../highlight/highlight.min.js"></script>--><!--代码高亮-->
+    <script type="text/javascript">
+        //代码块高亮
+        hljs.initHighlightingOnLoad()
+        hljs.configure({
+            languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
+        });
+        document.querySelectorAll('pre').forEach((block) => {
+            hljs.highlightBlock(block);
+        });
+    </script>
+
+</body>
+</html>
