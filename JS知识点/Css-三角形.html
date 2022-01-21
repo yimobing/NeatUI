@@ -18,16 +18,19 @@
 </head>
 <body>
     <style>
-        *{margin: 0; padding: 0; box-sizing: border-box; outline: none; } 
+        *{ margin: 0; padding: 0; box-sizing: border-box; outline: none; } 
         input{width: 150px; height: 35px; line-height: 35px; padding: 0 8px; border: 1px solid #a678f8; border-radius: 2px; } 
         em{ font-style: normal; }
+        hr{ margin: 25px auto; border-width: 5px; color: #a678f8;  }
         /*+----------------------------------------+*/
         body{ max-width: 1024px; margin: 0 auto; background-color: #f4f4f4; padding: 10px 5px; }
-        .module__caption{ margin-bottom: 10px; color: #ff0000; text-align: center; font-size: 24px; font-weight: bold; }
+        .module{ margin-bottom: 50px; }
+        .module__caption{ margin-bottom: 35px; color: #ff0000; text-align: center; font-size: 24px; font-weight: bold; }
         .module__describe{ background-color: #fff; padding: 15px 20px; }
-        .module__describe span{ display: block; font-size: 18px; font-weight: bold; }
+        .module__describe .bold{ display: block; font-size: 18px; font-weight: bold; }
         .module__describe:after{ content: ''; display: block; clear: both; }
         .module__describe img{ float: left; margin-right: 15px; }
+        .module__describe p{ margin: 25px 0 5px 0; }
         .module__content{ }
         .module__content .block{
             background-color: #fff;
@@ -38,9 +41,9 @@
         .angle__layout{ }
         .angle__code{ margin-top: 10px; border-radius: 4px; }
 
-        /*+----------------------------------------+*/
+        /*+-----------------三角形箭头-----------------------+*/
         /*+三角形箭头+*/
-        .triangle{
+        .arrow{
             display: -webkit-box;
             display: -moz-box;
             display: -ms-flexbox;
@@ -51,10 +54,10 @@
             width: 200px;
         }
         
-        .triangle>label{
+        .arrow>label{
             width: 0px;
         }
-        .triangle>input{
+        .arrow>input{
             width: 100%;
             -webkit-flex: 1;
             -moz-flex: 1;
@@ -62,7 +65,7 @@
             flex: 1;
         }
 
-        .triangle:after{
+        .arrow:after{
             content: '';
             position: absolute;
             z-index: 1;
@@ -80,7 +83,7 @@
         }
 
         /*+向上三角形箭头+*/
-        .triangle-up:after{
+        .arrow-up:after{
             width: 6px;
             height: 6px; 
             border-style: solid;
@@ -92,7 +95,7 @@
             transform: rotate(-45deg);
         }
         /*+向右三角形箭头+*/
-        .triangle-right:after{
+        .arrow-right:after{
             width: 6px;
             height: 6px; 
             border-style: solid;
@@ -104,7 +107,7 @@
             transform: rotate(45deg);
         }
         /*+向下三角形箭头+*/
-        .triangle-down:after{
+        .arrow-down:after{
             width: 6px;
             height: 6px; 
             border-style: solid;
@@ -116,7 +119,7 @@
             transform: rotate(-45deg);
         }
         /*+向左三角形箭头+*/
-        .triangle-left:after{
+        .arrow-left:after{
             width: 6px;
             height: 6px; 
             border-style: solid;
@@ -127,15 +130,70 @@
             -o-transform: rotate(45deg);
             transform: rotate(45deg);
         }
+
+        
+        /*+-----------------实心三角形-----------------------+*/
+        .triangle{ margin: 35px auto 10px; }
+        /*+小边框的三角形+*/
+        .triangle__demo-border-tiny{
+            width: 80px;
+            height: 80px;
+            border-width: 3px;
+            border-style: solid;
+            border-color: orange;
+        }
+
+        /*+大边框的三角形+*/
+        .triangle__demo-border-large{
+            width: 80px;
+            height: 80px;
+            border-width: 25px;
+            border-style: solid;
+            border-color: red blue yellow green;
+        }
+
+        /*+无边框的三角形+*/
+        .triangle__demo-border-none{
+            width: 0;
+            height: 0;
+            border-width: 25px;
+            border-style: solid;
+            border-color: red blue yellow green;
+        }
+
+        /*+向上的实心三角形+*/
+        .triangle__up{
+            width: 0;
+            height: 0;
+            border-width: 25px;
+            border-style: solid;
+            border-color: transparent transparent yellow transparent;
+        }
+        .triangle__up-final{
+            width: 0;
+            height: 0;
+            border-width: 0 40px 40px 40px;
+            border-style: solid;
+            border-color: transparent transparent yellow transparent;
+        }
+
     </style>
 
     <div class="wrap">
         <main>
+            <h1>CSS三角形</h1>
+            <h5>参考：</h5>
+            <h6>
+                https://www.jianshu.com/p/9a463d50e441 <br>
+                https://www.cnblogs.com/chengxs/p/11406278.html
+            </h6>
+
+            <hr>
             <section class="angle">
                 <div class="module">
                     <div class="module__caption">一、三角形箭头</div>
                     <div class="module__describe">
-                        <span>原理</span>
+                        <span class="bold">原理</span>
                         <p>将一个正方形以对角线(左上角、右下角画一条斜线)分成两个空心的三角形，利用这两个三角形进行旋转45度，即可得到向上、向右、向下、向左等多种三角形箭头。(如下图)</p>
                         <p>1、两根黄线组成的三角形，经过旋转负45度成为上三角形，旋转正45度成为右三角形</p>
                         <p>2、两根绿线组成的三角形，经过旋转负45度成为下三角形，旋转正45度成为左三角形</p>
@@ -144,11 +202,11 @@
                     <div class="module__content">
                         <div class="block">
                             <div class="angle__layout">
-                                <div class="triangle triangle-up"><label></label><input type="text" value="向上三角形箭头"></div>
-                            </div><!--/.angle__content-->
+                                <div class="arrow arrow-up"><label></label><input type="text" value="向上三角形箭头"></div>
+                            </div><!--/.angle__layout-->
                             <div class="angle__code">
 <pre>
-.triangle-up:after{
+.arrow-up:after{
     width: 6px;
     height: 6px; 
     border-style: solid;
@@ -164,11 +222,11 @@
                         </div><!--/.block-->
                         <div class="block">
                             <div class="angle__layout">
-                                <div class="triangle triangle-right"><label></label><input type="text" value="向右三角形箭头"></div>
-                            </div><!--/.angle__content-->
+                                <div class="arrow arrow-right"><label></label><input type="text" value="向右三角形箭头"></div>
+                            </div><!--/.angle__layout-->
                             <div class="angle__code">
 <pre>
-.triangle-right:after{
+.arrow-right:after{
     width: 6px;
     height: 6px; 
     border-style: solid;
@@ -185,11 +243,11 @@
 
                         <div class="block">
                             <div class="angle__layout">
-                                <div class="triangle triangle-down"><label></label><input type="text" value="向下三角形箭头"></div>
-                            </div><!--/.angle__content-->
+                                <div class="arrow arrow-down"><label></label><input type="text" value="向下三角形箭头"></div>
+                            </div><!--/.angle__layout-->
                             <div class="angle__code">
 <pre>
-    .triangle-down:after{
+    .arrow-down:after{
         width: 6px;
         height: 6px; 
         border-style: solid;
@@ -207,11 +265,11 @@
 
                         <div class="block">
                             <div class="angle__layout">
-                                <div class="triangle triangle-left"><label></label><input type="text" value="向左三角形箭头"></div>
-                            </div><!--/.angle__content-->
+                                <div class="arrow arrow-left"><label></label><input type="text" value="向左三角形箭头"></div>
+                            </div><!--/.angle__layout-->
                             <div class="angle__code">
 <pre>
-.triangle-left:after{
+.arrow-left:after{
     width: 6px;
     height: 6px; 
     border-style: solid;
@@ -228,6 +286,82 @@
 
                     </div><!--/.module__content-->
                 </div><!--/.module-->
+
+                <div class="module">
+                    <div class="module__caption">二、实心三角形</div>
+                    <div class="module__describe">
+                        <p>我们平常使用border最普遍的情况——往往只给border一个较小的宽度（通常为1-2px）；然而这样的日常用法就会容易让大家对border的形成方式产生误解，即认为元素的border是由四个矩形边框拼接而成。（如下图）</p>
+                        <div class="triangle triangle__demo-border-tiny"></div>
+<pre>
+    .triangle__demo-border-tiny{
+        width: 80px;
+        height: 80px;
+        border-width: 1px;
+        border-style: solid;
+        border-color: orange;
+    }
+</pre>
+                        <p>然而事实并不是这样。实际上，元素的border是由三角形组合而成，为了说明这个问题，我们可以增大border的宽度，并为各border边设置不同的颜色。（如下图）</p>
+                        <div class="triangle triangle__demo-border-large"></div>
+<pre>
+.triangle__demo-border-large{
+    width: 80px;
+    height: 80px;
+    border-width: 25px;
+    border-style: solid;
+    border-color: red blue yellow green;
+}
+</pre>
+                        <p>既然如此，那么更进一步，把元素的内容尺寸设置为0会发生什么情况呢？我们将惊奇地发现，此时元素由上下左右4个三角形“拼接”而成！（如下图）</p>
+                        <div class="triangle triangle__demo-border-none"></div>
+<pre>
+.triangle__demo-border-large{
+    width: 0;
+    height: 0;
+    border-width: 25px;
+    border-style: solid;
+    border-color: red blue yellow green;
+}
+</pre>
+
+                    <p>
+                        那么，为了实现最终的效果，即保留最下方的三角形，还应该怎么做？很简单，我们只需要把其它border边的颜色设置为白色或透明色。(如下图)
+                    </p>
+                    <div class="triangle triangle__up"></div>
+<pre>
+    .triangle__up{
+        width: 0;
+        height: 0;
+        border-width: 25px;
+        border-style: solid;
+        border-color: transparent transparent yellow transparent;
+    }
+</pre>
+
+                    <p>Duang~ 最终的简单三角形就绘制出来了。同理，如果想要得到其它边上的三角形，只需要将剩余的border边颜色设置为白色或透明色即可。</p>
+                    <p>不过，被“隐藏”的上border仍然占据着空间，要想使得绘制出的三角形尺寸最小化，还需要将上border的宽度设置为0（其它情况同理）（如下图）</p>
+                    <div class="triangle triangle__up-final"></div>
+
+<pre>
+    .triangle__up-final{
+        width: 0;
+        height: 0;
+        border-width: 0 40px 40px 40px;
+        border-style: solid;
+        border-color: transparent transparent yellow transparent;
+    }
+</pre>
+
+                    </div><!--/.module__describe-->
+                    <div class="module__content">
+                        <div class="block">
+                            <div class="angle__layout">
+                                <span class="triangle triangle_up"></span>
+                            </div><!--/.angle__layout-->
+                            <div class="angle__code"></div><!--/.angle__code-->
+                        </div><!--/.block-->
+                    </div><!--/.module__content-->
+                </div>
             </section><!--/.angle-->
         </main>
     </div><!--/.wrap-->
