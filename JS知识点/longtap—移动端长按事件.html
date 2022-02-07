@@ -1,0 +1,297 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<title>移动端长按事件</title>
+	</head>
+	<body>
+
+		<style>
+				html,body{
+					margin: 0;
+					padding: 0;
+					box-sizing: border-box;
+				}
+				body{
+					max-width: 640px;
+					margin: 0 auto;
+				}
+				.tax{
+					width: 95%;
+					margin: 0 auto;
+					/*禁止选择文本,禁止复制。长按时当前区域的文本不会被选中，但会导致其它区域的文本被选中*/
+					-webkit-user-select: none;
+					-moz-user-select: none;
+					user-select: none;
+					-webkit-touch-callout: none;
+					-moz-touch-callout: none;
+					touch-callout: none;
+				}
+				.tax__item{
+					display: -moz-box;
+					display: -webkit-box;
+					display: -webkit-flex;
+					display: -ms-flexbox;
+					display: flex;
+					display: box;
+					margin-top: 10px;
+					border-bottom: 1px solid #eaeaea;
+				}
+				.tax__item>label{
+					display: block;
+					width: 120px;
+				}
+				.tax__item>span{
+					display: block;
+					width: 100%;
+					-webkit-flex: 1;
+					-moz-flex: 1;
+					-o-flex: 1;
+					flex: 1;
+				}
+
+				.product{
+					width: 100%;
+					padding: 10px 15px;
+					border: 1px solid red;
+				}
+				.changan{
+					margin: 15px auto;
+					padding: 15px 0;
+					border: 2px solid blue;
+				}
+				.scroll{
+					margin-top: 15px;
+				}
+		</style>
+
+		<div class="wrap">	
+			<div class="tax">
+				<div class="tax__item"><label>个人所得税1</label><span>15000元</span></div>
+				<div class="tax__item"><label>个人所得税2</label><span>15000元</span></div>
+				<div class="tax__item"><label>个人所得税3</label><span>15000元</span></div>
+				<div class="tax__item"><label>个人所得税4</label><span>15000元</span></div>
+				<div class="tax__item"><label>个人所得税5</label><span>15000元</span></div>
+				<div class="tax__item"><label>个人所得税6</label><span>15000元</span></div>
+			</div>
+
+			<div class="product">这里是产品</div>
+			<div id="changan" class="changan">长按我，执行长按事件</div>
+
+
+			<div class="scroll">这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域这里是滚动区域</div>
+		</div><!--/.wrap-->
+
+	
+
+		<script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script type="text/javascript">
+
+			//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+			//									移动端长按事件测试1
+			//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+			//——————————————————————————————————————————
+			//=====控件封装
+			// https://www.jianshu.com/p/11bb9629aa09
+			var touchY = 0;
+			var isLongClick = false; // 是否为长按事件, 默认false
+			$.fn.longTap = function(fn){
+				var $this = this;
+				var timer = undefined;
+				return $this.each(function(){
+
+					// 监听按下屏幕的事件
+					this.addEventListener('touchstart', function(e){
+						var _this = this;
+						isLongClick = false;
+						// timer = setTimeout(fn(this), 500); // 长按事件超过800ms，则执行传入的方法
+						timer = setTimeout(function(){ fn(_this); }, 500); // 长按事件超过N毫秒，则执行传入的方法
+						// e.preventDefault(); // 避免长按出现复制、搜一搜等菜单
+
+						var touch = e.touches[0];
+						touchY = touch.clientY;	
+					}, false)
+
+					// 长按移动事件排除
+					this.addEventListener('touchmove', function(e){
+						clearTimeout(timer);
+						timer = 0;
+						// e.preventDefault(); // 避免长按出现复制、搜一搜等菜单
+						// preventDefault会阻止页面正常滚动,故要让滚动事件可正常执行
+						var touch = e.touches[0];
+						if(Math.abs(touch.clientY - touchY) < 10){
+							e.preventDefault();
+						}
+					}, false)
+
+					// 监听离开屏幕事件
+					this.addEventListener('touchend', function(e){
+						clearTimeout(timer); // 长按事件少于N毫秒，则不会执行传入的方法
+						if(timer != 0 && isLongClick == false){
+							alert('点击事件结束2');
+						}else{
+							alert('长按事件结束2')
+						}
+						return false;
+					}, false)
+
+					// 禁止长按出现菜单(复制、搜一搜)
+					this.addEventListener('contextmenu', function(e){
+						// alert('菜单')
+						e.preventDefault();
+					})
+
+				})
+			}
+
+
+			//——————————————————————————————————————————
+			//=====个人所得税长按
+			$('.tax__Item').longTap(function(e){
+				isLongClick = true;
+				// console.log('e对象：', e);
+				alert('长按事件开始1');
+				//e.remove();
+			});
+
+
+
+
+
+
+			//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+			//									移动端长按事件测试2
+			//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+			//——————————————————————————————————————————
+			//=====空间封装
+			// https://segmentfault.com/a/1190000018078417
+			/**
+		     * 用touch事件模拟点击、左滑、右滑、上拉、下拉等时间，
+		     * 是利用touchstart和touchend两个事件发生的位置来确定是什么操作。
+		     * 例如：
+		     * 1、touchstart和touchend两个事件的位置基本一致，也就是没发生位移，那么可以确定用户是想点击按钮等。
+		     * 2、touchend在touchstart正左侧，说明用户是向左滑动的。
+		     * 利用上面的原理，可以模拟移动端的各类事件。
+		    **/
+		   const EventUtil = (function() {
+
+			    //支持事件列表
+			    let eventArr = ['eventswipeleft', 'eventswiperight', 'eventslideup', 'eventslidedown', 'eventclick', 'eventlongpress'];
+
+			    //touchstart事件，delta记录开始触摸位置
+			    function touchStart(event) {
+			      this.delta = {};
+			      this.delta.x = event.touches[0].pageX;
+			      this.delta.y = event.touches[0].pageY;
+			      this.delta.time = new Date().getTime();
+			    }
+
+			    /**
+			     * touchend事件，计算两个事件之间的位移量
+			     * 1、如果位移量很小或没有位移，看做点击事件
+			     * 2、如果位移量较大，x大于y，可以看做平移，x>0,向右滑，反之向左滑。
+			     * 3、如果位移量较大，x小于y，看做上下移动，y>0,向下滑，反之向上滑
+			     * 这样就模拟的移动端几个常见的时间。
+			     * */
+			    function touchEnd(event) {
+			      let delta = this.delta;
+			      delete this.delta;
+			      let timegap = new Date().getTime() - delta.time;
+			      delta.x -= event.changedTouches[0].pageX;
+			      delta.y -= event.changedTouches[0].pageY;  
+			      if (Math.abs(delta.x) < 5 && Math.abs(delta.y) < 5) {
+			        if (timegap < 1000) {
+			          if (this['eventclick']) {
+			            this['eventclick'].map(function(fn){
+			              fn(event);
+			            });
+			          }
+			        } else {
+			          if (this['eventlongpress']) {
+			            this['eventlongpress'].map(function(fn){
+			              fn(event);
+			            });
+			          }
+			        }
+			        return;
+			      }
+			      if (Math.abs(delta.x) > Math.abs(delta.y)) {
+			        if (delta.x > 0) {
+			          if (this['eventswipeleft']) {
+			            this['eventswipeleft'].map(function(fn){
+			              fn(event);
+			            });
+			          }
+			        } else {
+			          this['eventswiperight'].map(function(fn){
+			            fn(event);
+			          });
+			        }
+			      } else {
+			        if (delta.y > 0) {
+			          if (this['eventslidedown']) {
+			            this['eventslidedown'].map(function(fn){
+			              fn(event);
+			            });
+			          }
+			        } else {
+			          this['eventslideup'].map(function(fn){
+			            fn(event);
+			          });
+			        }
+			      }
+			    }
+
+			    function bindEvent(dom, type, callback) {
+			      if (!dom) {
+			        console.error('dom is null or undefined');
+			      }
+			      let flag  = eventArr.some(key => dom[key]);
+			      if (!flag) {
+			        dom.addEventListener('touchstart', touchStart);
+			        dom.addEventListener('touchend', touchEnd);
+			      }
+			      if (!dom['event' + type]) {
+			        dom['event' + type] = [];
+			      }
+			      dom['event' + type].push(callback);
+			    }
+
+			    function removeEvent(dom, type, callback) {
+			      if (dom['event' + type]) {
+			        for(let i = 0; i < dom['event' + type].length; i++) {
+			          if (dom['event' + type][i] === callback) {
+			            dom['event' + type].splice(i, 1);
+			            i--;
+			          }
+			        }
+			        if (dom['event' + type] && dom['event' + type].length === 0) {
+			          delete dom['event' + type];
+			          let flag  = eventArr.every(key => !dom[key]);
+			          if (flag) {
+			            dom.removeEventListener('touchstart', touchStart);
+			            dom.removeEventListener('touchend', touchEnd);
+			          }
+			        }
+			      }
+			    }
+			    return {
+			      bindEvent,
+			      removeEvent
+			    }
+		   })();
+
+
+
+		   //——————————————————————————————————————————
+		   //=====控件调用
+		   var dom = document.querySelector('#changan');
+		   EventUtil.bindEvent(dom, 'longpress', function(){
+		   		alert('长按我啦')
+		   });
+
+
+
+		</script>
+	</body>
+</html>
