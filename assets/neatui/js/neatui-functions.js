@@ -2264,8 +2264,9 @@ var convert = {
 		var isEmptyTips = typeof ps_isEmptyTips == 'undefined' ? false : ps_isEmptyTips == true ? true : false;
 		var wanYuan = '';
 		if($.trim(ps_str) != ''){
-				//wanYuan = ps_str / 10000;
-				wanYuan = ps_str * 1000000 / 10000000000; //解决小数乘法bug
+                var str = parseFloat(ps_str.toString().replace(/[^0-9\.]/ig, '')); // 去掉非数字的字符,只保留数字及小数点点号
+				// wanYuan = str / 10000;
+				wanYuan = str * 1000000 / 10000000000; //解决小数乘法bug
 			if(method == 'round'){
 				if(digit >= 0) wanYuan = wanYuan.toFixed(digit);
 			}
@@ -2287,8 +2288,9 @@ var convert = {
 		if($.trim(ps_str) == '') return '';
 		var yuan = '';
 		var digit = typeof ps_digit == 'undefined' ? -1 : parseInt(ps_digit);
-		//yuan = ps_str * 10000;
-		yuan = ps_str * 10000000000 / 1000000; //解决小数乘法bug
+        var str = parseFloat(ps_str.toString().replace(/[^0-9\.]/ig, '')); // 去掉非数字的字符,只保留数字及小数点点号
+		// yuan = str * 10000;
+		yuan = str * 10000000000 / 1000000; // 解决小数乘法bug
 		if(parseInt(digit) > 0) yuan = yuan.toFixed(parseInt(digit));
         if(parseInt(digit) == 0) yuan = Math.floor(yuan);
         if(isNaN(yuan)) yuan = '';
