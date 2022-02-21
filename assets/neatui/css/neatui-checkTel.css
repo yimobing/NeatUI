@@ -1,0 +1,163 @@
+/**
+* [手机号码验证]
+* Author: mufeng
+* Date: 2022.02.21
+* Update: 2022.02.21
+*/
+
+html,body{font-size: 16px;}
+body{max-width: 640px; margin: 0 auto;}
+*{margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -moz-box-sizing: border-box; outline: none;}
+
+/*+--------------------------------+*/
+/*placeholder*/
+/*input label*/
+::-webkit-input-placeholder{
+	font-size: 0.6rem;
+	color: #e2dcdc;
+}
+::-moz-placeholder{
+	font-size: 0.6rem;
+	color: #e2dcdc;
+}
+:-moz-placeholder{
+	font-size: 0.6rem;
+	color: #e2dcdc;
+}
+:-ms-input-placeholder{
+	font-size: 0.6rem;
+	color: #e2dcdc;
+}
+/*div span label*/
+div:empty::before,
+span:empty::before{
+	content: attr(placeholder);
+	color: #e2dcdc;
+	font-size: 0.6rem;
+}
+
+/*+--------------------------------+*/
+header{margin: 15px auto 15px auto;}
+h1{
+    text-align: center;
+    font-size: 24px;
+    color: #555;
+}
+
+.section-verify{
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px 15px;
+}
+.grid-form{
+}
+
+.item{
+    position: relative;
+    margin-bottom: 8px;
+}
+.item-input{
+    position: relative;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    display: box;
+    
+    height: 40px;
+    line-height: 40px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #e5e5e5;
+    border-radius: 3px;
+}
+.item-input .internel-code{
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    display: box;
+    align-items: center;
+    justify-content: center;
+
+    width: 50px;
+    border-right: 1px solid #eaeaea;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+.item-input input[type="text"]{
+    width: 100%;
+    flex: 1;
+    -webkit-flex: 1;
+    -moz-flex: 1;
+    -o-flex: 1;
+    -ms-flex: 1;
+    padding: 0 12px;
+    border: 0;
+}
+.item-input input[type="text"]:focus{
+    border-color: #98caef;
+}
+.item-input.error input[type="text"]:focus{
+    border-color: #ec7e7e;
+}
+.item-button,
+.item-check{
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+.item-check{
+    right: 8px;
+}
+.item-check-2{
+    right: 90px;
+}
+.item-check .check-text{
+    padding: 4px 8px;
+    background-color: #f13333;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 12px;
+}
+.item-check .check-ico{
+    color: #04be02;
+}
+.item-button{
+}
+.item-button button{
+    height: 40px;
+    line-height: 40px;
+    padding: 0 8px;
+    background: #04be02;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    color: #fff;
+}
+.grid-button{
+    margin-top: 15px;
+}
+.grid-button button{
+    width: 100%;
+    padding: 10px 0;
+    background-color: #64b4ef;
+    border: 0;
+    border-radius: 4px;
+    color: #fff;
+}
+
+button[type="button"]:disabled,
+button[type="button"][disabled]{
+    background-color: #eee;
+    border: 1px solid #e5e5e5;
+    color: #afa8a8;
+}
