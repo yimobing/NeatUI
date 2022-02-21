@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>手机号码验证</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-checkTel.css">
+    <link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.css">
+    <!--<script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>-->
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <h1>手机号码验证</h1>
+        </header>
+        <main>
+            <section class="section-verify">
+                <div class="grid-form">
+                    <div class="item">
+                        <div class="item-input">
+                            <div class="internel-code">+86</div>
+                            <input type="text" id="i-tel" placeholder="手机号码" onblur="this.placeholder='手机号码'" onfocus="this.placeholder=''">
+                        </div>
+                        <div class="item-check">
+                            <div class="check-text" style="display: none;">手机号码格式错误</div>
+                            <div class="check-ico"style="display: none;"><i class="fa fa-check-square-o"></i></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="item-input"><input type="text" id="i-code" placeholder="短信验证码" onblur="this.placeholder='短信验证码'" onfocus="this.placeholder=''"></div>
+                        <div class="item-check item-check-2">
+                            <div class="check-text" style="display: none;">验证码错误</div>
+                            <div class="check-ico" style="display: none;"><i class="fa fa-check-square-o"></i></div>
+                        </div>
+                        <div class="item-button"><button type="button" id="btn-getCode" disabled>获取验证码</button></div>
+                    </div>
+                </div><!--/.grid-form-->
+                <div class="grid-button"><button type="button" id="btn-confirm" disabled>立即验证</button></div>
+            </section>
+        </main>
+    </div><!--/.wrap-->
+
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/libs/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+        //=====输入框数据错误时的提示信息
+        var g_error_arr_tel = { empty:"请输入手机号码", wrong:"手机号码错误"};
+        var g_error_arr_code = { empty:"请输入6位短信验证码", wrong:"短信验证码错误"}
+        var regPhone = /^1(3|4|5|7|8|9)[0-9]\d{8}$/; // 正则表达式：验证手机号码
+        var regCode = /^\d{6}$/; // 正则表达式：验证短信验证码
+
+
+        /*+----------------FUNCTION----------------+*/
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //——————————————————————————————————————————
+            //=====手机号码聚焦时
+            $('#i-tel').on('focus', function(){
+                var ls_tel = $(this).val();
+                var ls_msg_empty = g_error_arr_tel.empty
+                if(ls_tel == '')
+                    $(this).parent().siblings().children('.check-text').text(ls_msg_empty).show();
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====手机号码输入时
+            $('#i-tel').on('input', function(){
+                var ls_msg_empty = g_error_arr_tel.empty,
+                    ls_msg_wrong = g_error_arr_tel.wrong;
+                var ls_tel = $(this).val();
+                var $text = $(this).parent().siblings().children('.check-text');
+                if(ls_tel == ''){
+                    $(this).parent().siblings().children('.check-text').text(ls_msg_empty).show();
+                }else{
+                    if(!regPhone.test(ls_tel)){
+                        $text.text(ls_msg_wrong).show().siblings().hide();
+                        $('#btn-getCode').attr('disabled', true);
+                    }else{
+                        $text.hide().siblings().show();
+                        $('#btn-getCode').removeAttr('disabled');
+                    }
+                }
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====短信验证码聚焦时
+            $('#i-code').on('focus', function(){
+                var ls_tel = $('#i-tel').val(),
+                    ls_code = $(this).val();
+                var ls_msg_empty = g_error_arr_code.empty;
+                if(ls_code == '')
+                    $(this).parent().siblings().children('.check-text').text(ls_msg_empty).show();
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====短信验证码输入时
+            $('#i-code').on('input', function(){
+                var ls_msg_empty = g_error_arr_code.empty,
+                    ls_msg_wrong = g_error_arr_code.wrong;
+                var ls_tel = $('#i-tel').val(),
+                    ls_code = $(this).val();
+                var $text = $(this).parent().siblings().children('.check-text');
+                if(ls_tel == '' || !regPhone.test(ls_tel)){
+                    $('#i-tel').focus();
+                }else{
+                    if(ls_code == ''){
+                        $(this).parent().siblings().children('.check-text').text(ls_msg_empty).show();
+                    }else{
+                        if(!regCode.test(ls_code)){
+                            $text.text(ls_msg_wrong).show().siblings().hide();
+                            $('#btn-confirm').attr('disabled', true);
+                        }else{
+                            $text.hide().siblings().show();
+                            $('#btn-confirm').removeAttr('disabled');
+                        }
+                    }
+                }
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====获取验证码按钮
+            $('#btn-getCode').on('click', function(){
+                var $this = $(this);
+                var ls_tel = $('#i-tel').val();
+                var flag = '', msg = '手机验证码已发送，请注意查看短信';
+                // 后台返回
+                /*
+                // START AJAX
+                $.ajax({
+                    async: false, // 取数方式. true 异步(默认), false 同步
+                    type: "GET",
+                    dataType: "html",
+                    cache: false,
+                    url: "",
+                    data: {
+                        "action": "",
+                    },
+                    success: function(res){
+                        if(!res || $.isEmptyObject(res)) return;
+                        var json = JSON.parse(res);
+                        flag = json.return == 'ok' ? 1 : 0;
+                        if(!flag) msg = json.data;
+                    },
+                    error: function(res){ },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                // END AJAX
+                */
+                flag = parseInt(1); //1 成功, 0 失败
+                if(!flag) msg = '手机验证码发送失败';
+               
+                if(flag){
+                    alert(msg);
+                    //开始倒计时
+                    var ints = 60; //倒计时时间(单位：秒)
+                    var interval = null;
+                    interval = setInterval((function target(){
+                        $this.text(ints + '秒后重新发送').attr('disabled', true).parent().siblings('.item-check').css('right', $this.outerWidth(true) + 10);
+                        ints--;
+                        //console.log('count:', ints);
+                        if(ints == -1){
+                            clearInterval(interval);
+                            $this.text('获取验证码').removeAttr('disabled').parent().siblings('.item-check').removeAttr('style');
+                        }
+                        return target;
+                    })(), 1000)
+                }
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====立即验证按钮
+            $('#btn-confirm').on('click', function(){
+                alert('立即验证')
+                // window.location.href = '';
+            });
+
+
+            
+        });
+    </script>
+</body>
+</html>
