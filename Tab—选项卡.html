@@ -47,19 +47,25 @@
         .slice__item>div>em{position: absolute; top: 3px; right: 3px; min-width: 20px; height: 20px; line-height: 20px; background-color: #fff; border-radius: 100%; border: 1px solid #ff0000; color: #ff0000; font-size: 10px; font-weight: 500; }
         /*+----------------tab 选项卡---------------+*/
         .tab{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; margin-top: 8px; } 
-        .tab>div{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; height: 40px; background-color: #daf0fd; color: #4c626f; text-align: center; font-size: 15px; }
+        .tab>div{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; height: 40px; padding: 0 3px;background-color: #daf0fd; color: #4c626f; text-align: center; font-size: 15px; }
         .tab>div:first-child{border-radius: 8px 0 0 0; } 
-        .tab>div:nth-child(2){border-radius: 0 8px 0 0; } 
         .tab>div.on{background-color: #fff; border-radius: 0; font-weight: bold; } 
         .tab>div.on:before{position: absolute; top: -5px; left: 0; content: ''; display: inline-block; width: 100%; height: 10px; background-color: #fff; } 
         .tab>div.on:after{content: ''; position: absolute; z-index: 1; top: 0; width: 0; height: 0; } 
-        .tab>div:first-child.on:before{border-radius: 8px 20px 0 0; } 
-        .tab>div:first-child.on:after{right: -40px; border-bottom: 40px solid #fff; border-right: 40px solid  transparent; } 
-        .tab>div:nth-child(2).on:before{border-radius: 20px 8px 0 0; } 
-        .tab>div:nth-child(2).on:after{left: -40px; border-bottom: 40px solid #fff; border-left: 40px solid transparent; }
+        .tab>div>span,
+        .tab>div>em{ display: block; }
+        .tab>div>span{ width: 100%; }
+        .tab>div>em{ width: 26px; height: 22px; line-height: 22px; border-bottom: 1px solid #d4a2a2; color: #d4a2a2; font-size: 10px; }
+        .tab.little>div:nth-child(2){border-radius: 0 8px 0 0; } 
+        .tab.little>div:first-child.on:before{border-radius: 8px 20px 0 0; } 
+        .tab.little>div:first-child.on:after{right: -40px; border-bottom: 40px solid #fff; border-right: 40px solid  transparent; } 
+        .tab.little>div:nth-child(2).on:before{border-radius: 20px 8px 0 0; } 
+        .tab.little>div:nth-child(2).on:after{left: -40px; border-bottom: 40px solid #fff; border-left: 40px solid transparent; }
         /*边线处理*/
-        .tab>div.on + div{ border-style: solid; border-color: #fff; border-width: 0 1px 0 0; }
-        .tab>div + div + div.on::after{ height: 40px; left: -140px; border-left: 1px solid #fff; }
+        .tab.little>div.on + div{ border-style: solid; border-color: #fff; border-width: 0 1px 0 0; }
+        .tab.little>div + div + div.on::after{ height: 40px; left: -140px; border-left: 1px solid #fff; }
+        .tab.multiple>div{ border-left: 1px solid #fff; }
+        .tab.multiple>div:first-child{ border-left: 0; }
 
         
 
@@ -141,11 +147,29 @@
                 </div><!--/.slice__content-->
             </section>
 
-            <h3>选项卡</h3>
-            <section class="tab">
+            <h3>选项卡1(1-3个)</h3>
+            <section class="tab little">
                 <div class="on">未读消息</div>
                 <div>已读消息</div>
                 <div>最近消息</div>
+            </section>
+
+            <h3>选项卡2(3个以上,无数量)</h3>
+            <section class="tab multiple">
+                <div class="on">待分配</div>
+                <div>待接单</div>
+                <div>在接单</div>
+                <div>已接单</div>
+                <div>已完成</div>
+            </section>
+
+            <h3>选项卡3(3个以上,有数量)</h3>
+            <section class="tab multiple">
+                <div class="on"><span>待分配</span><em>857</em></div>
+                <div><span>待接单</span><em>603</em></div>
+                <div><span>在接单</span><em>561</em></div>
+                <div><span>已接单</span><em>38</em></div>
+                <div><span>已完成</span><em>9</em></div>
             </section>
 
             <section class="history"></section>
