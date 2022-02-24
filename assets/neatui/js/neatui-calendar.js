@@ -294,41 +294,91 @@ var neuiCalendar = {
 			var valDay = this.getYear()+'-12-31';
 			return valDay;
 	},
+    
 	
 	/**
-	 * 获取当前日期前N天的日期(一般n小于30)
+	 * 获取当前日期前N天的日期
 	 * @param {Number} numc 前N天
 	 * @param {Boolean} 月份、天数小于10时，是否前面补零, 默认true(可选)
-	 * eg. 昨天 numc = 2, 前天 numc = 3
+	 * eg. 昨天 numc = 1, 前天 numc = 2
 	 */
-	getPrevNDay:function(numc, zeroFill){ 
-		var isFilled = typeof zeroFill == 'undefined' ? true : (zeroFill == false ? false : true); //默认true
-		var numc = typeof(numc) == 'undefined' ? 0 : numc;
-		var nowDay = this.getDay(isFilled); //当日(如7号,10号)
-		var nowMonth = this.getMonth(isFilled); //当前月
-		var lastMonth = parseInt(nowMonth - 1); //上一个月
-		var lastMonthLastDay = this.getMonthLastDay(true, lastMonth); //上个月的最后一天(格式:年-月-日,如2018-4-30)
-		var	lastDay = lastMonthLastDay.substring(lastMonthLastDay.lastIndexOf('-')+1); //上个月最后一天(格式:日,如30号)
-		var nDay = 0; //前n天的日期(如前n天是13号)
-		var prevNDay = '';
-		if(numc!=0){
-			var result = nowDay - numc + 1;
-			if(result>0){ //前n天还是当前月
-				nDay = parseInt(nowDay - numc + 1);
-				if(isFilled){
-					if(nDay < 10) nDay = '0' + nDay;
-				}
-				prevNDay = this.getYear() + '-' + nowMonth + '-' + nDay;
-			}else{ //前n天是上个月
-				nDay = parseInt(lastDay) + parseInt(result);
-				if(isFilled){
-					if(nDay < 10) nDay = '0' + nDay;
-					if(lastMonth < 10) lastMonth = '0' + lastMonth;
-				}
-				prevNDay = this.getYear() + '-' + lastMonth + '-' + nDay;
-			}
-		}
-		return prevNDay;
+     getPrevNDay: function(numc, zeroFill){ 
+		// var isFilled = typeof zeroFill == 'undefined' ? true : (zeroFill == false ? false : true); // 默认true
+		// var numc = typeof(numc) == 'undefined' ? 0 : numc;
+		// var nowDay = this.getDay(isFilled); // 当日(如7号,10号)
+		// var nowMonth = this.getMonth(isFilled); // 当前月
+		// var lastMonth = parseInt(nowMonth - 1); // 上一个月
+		// var lastMonthLastDay = this.getMonthLastDay(true, lastMonth); // 上个月的最后一天(格式:年-月-日,如2018-4-30)
+		// var	lastDay = lastMonthLastDay.substring(lastMonthLastDay.lastIndexOf('-')+1); // 上个月最后一天(格式:日,如30号)
+		// var nDay = 0; // 前n天的日期(如前n天是13号)
+		// var prevNDay = '';
+		// if(numc!=0){
+		// 	var result = nowDay - numc + 1;
+		// 	if(result>0){ // 前n天还是当前月
+		// 		nDay = parseInt(nowDay - numc + 1);
+		// 		if(isFilled){
+		// 			if(nDay < 10) nDay = '0' + nDay;
+		// 		}
+		// 		prevNDay = this.getYear() + '-' + nowMonth + '-' + nDay;
+		// 	}else{ // 前n天是上个月
+		// 		nDay = parseInt(lastDay) + parseInt(result);
+		// 		if(isFilled){
+		// 			if(nDay < 10) nDay = '0' + nDay;
+		// 			if(lastMonth < 10) lastMonth = '0' + lastMonth;
+		// 		}
+		// 		prevNDay = this.getYear() + '-' + lastMonth + '-' + nDay;
+		// 	}
+		// }
+		// return prevNDay;
+
+        function doHandleDate(d){
+        　　var m = d;
+        　　if(d.toString().length == 1 && isFilled){
+        　　　　m = "0" + d;
+        　　}
+        　　return m;
+        }
+        var isFilled = typeof zeroFill == 'undefined' ? true : (zeroFill == false ? false : true); // 默认true
+        if(typeof numc == 'undefined') numc = 0;
+        if(numc > 0) numc = 0 - numc; // 正数变成负数.这行是关键代码1
+        var today = new Date();
+        var targetday_milliseconds = today.getTime() + 1000 * 60 * 60 * 24 * numc;
+        today.setTime(targetday_milliseconds); // 注意，这行是关键代码2
+        var tYear = today.getFullYear();
+        var tMonth = today.getMonth();
+        var tDate = today.getDate();
+        tMonth = doHandleDate(tMonth + 1);
+        tDate = doHandleDate(tDate);
+        return tYear + "-" + tMonth + "-" + tDate;
+	},
+
+
+    /**
+	 * 获取当前日期后N天的日期
+	 * @param {Number} numc 后N天
+	 * @param {Boolean} 月份、天数小于10时，是否前面补零, 默认true(可选)
+	 * eg. 明天 numc = 1, 后天 numc = 2
+	 */
+     getNextNDay: function(numc, zeroFill){
+        function doHandleDate(d){
+        　　var m = d;
+        　　if(d.toString().length == 1 && isFilled){
+        　　　　m = "0" + d;
+        　　}
+        　　return m;
+        }
+        var isFilled = typeof zeroFill == 'undefined' ? true : (zeroFill == false ? false : true); // 默认true
+        if(typeof numc == 'undefined') numc = 0;
+        if(numc < 0) numc = 0 - numc; // 负数变成正数.这行是关键代码1
+        var today = new Date();
+        var targetday_milliseconds = today.getTime() + 1000 * 60 * 60 * 24 * numc;
+        today.setTime(targetday_milliseconds); // 注意，这行是关键代码2
+        var tYear = today.getFullYear();
+        var tMonth = today.getMonth();
+        var tDate = today.getDate();
+        tMonth = doHandleDate(tMonth + 1);
+        tDate = doHandleDate(tDate);
+        return tYear + "-" + tMonth + "-" + tDate;
 	}
 	
 }; 
