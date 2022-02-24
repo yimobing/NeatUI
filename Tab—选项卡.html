@@ -283,6 +283,8 @@
             var nowpage = typeof parameter.curpage == 'undefined' ? 1 : (parameter.curpage == '' ? 1 : parameter.curpage); // !!!页码标记
             var node = ROOTNODE;
             var _html = '';
+            if(!ps_source || $.isEmptyObject(ps_source)) return;
+            if(typeof ps_source.data == 'undefined') return;
             $.each(ps_source.data, function(i, items){
                 var ls_xuhao = (nowpage - 1) * PAGESIZE + (i + 1);
                 _html += [
