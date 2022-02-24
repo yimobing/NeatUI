@@ -1450,22 +1450,22 @@ var calendar = {
 	 * eg. getDay(0) 当天,  getDay(7)) 7天后, getDay(-7) 7天前
 	 */
 	getDay:function(day){
-		function doHandleMonth(month){
-		　　var m = month;
-		　　if(month.toString().length == 1){
-		　　　　m = "0" + month;
+		function doHandleDate(d){
+		　　var m = d;
+		　　if(d.toString().length == 1){
+		　　　　m = "0" + d;
 		　　}
 		　　return m;
 		}
 		if(typeof day == 'undefined') day = 0;
 		var today = new Date();
 		var targetday_milliseconds=today.getTime() + 1000*60*60*24*day;
-		today.setTime(targetday_milliseconds); //注意，这行是关键代码
+		today.setTime(targetday_milliseconds); // 注意，这行是关键代码
 		var tYear = today.getFullYear();
 		var tMonth = today.getMonth();
 		var tDate = today.getDate();
-		tMonth = doHandleMonth(tMonth + 1);
-		tDate = doHandleMonth(tDate);
+		tMonth = doHandleDate(tMonth + 1);
+		tDate = doHandleDate(tDate);
 		return tYear + "-" + tMonth + "-" + tDate;
 	},
 
