@@ -179,7 +179,7 @@
 
                 // ·后台返回
                 /*
-                //START AJAX
+                // START AJAX
                 var json = {}
                 var isHoldOn = true;
                 ajax({
@@ -209,7 +209,7 @@
                 if(!isHoldOn){
                     return {}
                 }
-                //END AJAX
+                // END AJAX
                 */
             })
 
@@ -237,7 +237,7 @@
 
             // // 后台返回(实际)
             // /*
-            // //START AJAX
+            // // START AJAX
             // var json = {}
             // var isHoldOn = true;
             // ajax({
@@ -266,7 +266,7 @@
             // if(!isHoldOn){
             //     return {}
             // }
-            // //END AJAX
+            // // END AJAX
             // */
             
             // return defer.promise(); // 返回Deferred(延迟)的Promise对象
@@ -344,7 +344,7 @@
                     update: '↑释放更新',
                     load: '加载中'
                 },
-                getData: function(e){ //从前台获取并返回数据源. 参数e为当前页码等组成的一维对象. 注意：返回格式为Object对象或Promise对象, 即若AJAX为同步则返回消息数据Object一维对象; 若AJAX为异步,则返回消息数据写在resolve()中的Promise对象
+                getData: function(e){ // 从前台获取并返回数据源. 参数e为当前页码等组成的一维对象. 注意：返回格式为Object对象或Promise对象, 即若AJAX为同步则返回消息数据Object一维对象; 若AJAX为异步,则返回消息数据写在resolve()中的Promise对象
                     // console.log('当前页码：', e.curpage)
                     return get_data_history(e.curpage);
                 },
