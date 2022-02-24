@@ -201,11 +201,11 @@
 
         /*+————————————————FUNCTION————————————————+*/
         /**
-         * 获取聊天消息数据 edit 20210422-1
+         * 获取历史记录数据
          * @param {number} ps_curpage 当前页码(可选),默认1
          * @returns {Promise} 返回第N页对应的Promise对象. 其中resolve(res)中的res为数据源
          */
-        function get_data_message(ps_curpage){
+         function get_data_message(ps_curpage){
             var ls_sjlb = TABINDEX,
                 ls_open_page_num = typeof ps_curpage == 'undefined' ? 1 : ( isNaN(parseInt(ps_curpage)) ? 1 : (parseInt(ps_curpage)) );
                 ls_every_page_count = PAGESIZE;
@@ -230,18 +230,21 @@
 
                 // ·后台返回
                 /*
-                //START AJAX
+                // START AJAX
                 var json = {}
                 var isHoldOn = true;
                 ajax({
-                    heading: "获取聊天消息数据",
+                    heading: "获取XX数据",
                     debug: false,
-                    url: "../../fwh_pub/jk_pic_chat.ashx",
+                    async: true, // 取数方式. true 异步, false 同步(默认)
+                    type: "GET",
+                    dataType: "html",
+                    cache: false,
+                    url: "",
                     data: {
-                        "action": "sel_v2_xjd_chat_msgs_lssj",
+                        "action": "",
                         "user": "<%=s_user%>",
                         "sjk": "<%=s_sjk%>",
-                        "sjlb": ls_sjlb,
                         "open_page_num": ls_open_page_num, // 当前页码
                         "every_page_count": ls_every_page_count // 每页记录数
                     },
@@ -259,20 +262,23 @@
                     complete: function(XMLHttpRequest, textStatus){ }
                 })
                 if(!isHoldOn){
+                    // neui.destroyAnimate();
                     return {}
                 }
-                //END AJAX
+                // END AJAX
                 */
             })
         }
 
 
+
+        //================================================================
         /**
-         * 创建聊天消息列表
+         * 创建历史记录列表
          * @param {object} ps_source 数据源
          * @param {object} ps_params 当前页码等组成的一维对象
          */
-        function create_list_message(ps_source, ps_params){
+        function create_history(ps_source, ps_params){
             var parameter = typeof ps_params == 'undefined' ? {} : ps_params;
             var nowpage = typeof parameter.curpage == 'undefined' ? 1 : (parameter.curpage == '' ? 1 : parameter.curpage); // !!!页码标记
             var node = ROOTNODE;
@@ -318,7 +324,7 @@
 
 
         /**
-         * 加载数据 edit 20210422-1
+         * 加载数据
          */
         function load_data(){
             neui.showAnimate();
@@ -344,7 +350,7 @@
                         return get_data_message(e.curpage)
                     },
                     loadDownFn: function (e) {
-                        create_list_message(e.source, {curpage: e.curpage})
+                        create_history(e.source, {curpage: e.curpage})
                     }
                 })
                 neui.destroyAnimate();
