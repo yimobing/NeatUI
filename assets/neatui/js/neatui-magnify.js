@@ -710,12 +710,15 @@ Magnify.prototype = {
       this.isOpened = true;
       this.isMaximized = true;
     } else {
-      // Make the modal in windows center
+      // edit by chr 2022.03.15
+      // Make the modal in windows center 
       modal.css({
         width: modalWidth,
         height: modalHeight,
-        left: (winWidth - modalWidth) / 2 + scrollLeft + 'px',
-        top: (winHeight - modalHeight) / 2 + scrollTop + 'px'
+        // left: (winWidth - modalWidth) / 2 + scrollLeft + 'px',
+        // top: (winHeight - modalHeight) / 2 + scrollTop + 'px'
+        left: (winWidth - modalWidth) / 2 + 'px',
+        top: (winHeight - modalHeight) / 2 + 'px'
       });
     }
   },
@@ -764,11 +767,14 @@ Magnify.prototype = {
     minWidth = this.options.fixedModalSize ? this.options.modalWidth : Math.round(minWidth);
     minHeight = this.options.fixedModalSize ? this.options.modalHeight : Math.round(minHeight);
 
+    // edit by chr 2022.03.15
     var modalCSSObj = {
       width: minWidth + 'px',
       height: minHeight + 'px',
-      left: (winWidth - minWidth) / 2 + scrollLeft + 'px',
-      top: (winHeight - minHeight) / 2 + scrollTop + 'px'
+      // left: (winWidth - minWidth) / 2 + scrollLeft + 'px',
+      // top: (winHeight - minHeight) / 2 + scrollTop + 'px'
+      left: (winWidth - minWidth) / 2 + 'px',
+      top: (winHeight - minHeight) / 2 + 'px'
     };
 
     // Add modal init animation
