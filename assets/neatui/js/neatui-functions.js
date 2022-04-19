@@ -1753,16 +1753,16 @@ var checker = {
 	 * 判断浏览器类型(ie,firefox,google chrome,safari,opera)
 	 * @returns {string} 返回浏览器标识名
 	 */
-	checkBrowserType:function(){ //
-		var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串 
-        var isOpera = userAgent.indexOf("Opera") > -1; //判断是否Opera浏览器 
-        //var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera; //判断是否IE浏览器 
+	checkBrowserType: function(){
+		var userAgent = navigator.userAgent; // 取得浏览器的userAgent字符串 
+        var isOpera = userAgent.indexOf("Opera") > -1; // 判断是否Opera浏览器 
+        // var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera; // 判断是否IE浏览器 
         var isIE = window.ActiveXObject || "ActiveXObject" in window;
-        //var isEdge = userAgent.indexOf("Windows NT 6.1; Trident/7.0;") > -1 && !isIE; //判断是否IE的Edge浏览器 
-        var isEdge = userAgent.indexOf("Edge") > -1; //判断是否IE的Edge浏览器
-        var isFF = userAgent.indexOf("Firefox") > -1; //判断是否Firefox浏览器 
-        var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1; //判断是否Safari浏览器 
-        var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1&&!isEdge; //判断Chrome浏览器 
+        // var isEdge = userAgent.indexOf("Windows NT 6.1; Trident/7.0;") > -1 && !isIE; // 判断是否IE的Edge浏览器 
+        var isEdge = userAgent.indexOf("Edge") > -1; // 判断是否IE的Edge浏览器
+        var isFF = userAgent.indexOf("Firefox") > -1; // 判断是否Firefox浏览器 
+        var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1; // 判断是否Safari浏览器 
+        var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1&&!isEdge; // 判断Chrome浏览器 
         if (isIE)  
         { 
             var reIE = new RegExp("MSIE (\\d+\\.\\d+);"); 
@@ -1771,7 +1771,7 @@ var checker = {
             if(userAgent.indexOf('MSIE 6.0')!=-1){
                 return "ie6";
             }else if(banben == 7){ 
-                return "ie7"; //ie7或ie5
+                return "ie7"; // ie7或ie5
             }else if(banben == 8){ 
                 return "ie8";
             }else if(banben == 9){ 
@@ -1781,14 +1781,14 @@ var checker = {
             } else if(userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)){ 
                 return "ie11";
             }else{ 
-                return "0"; //IE版本过低(ie5以下版本)
+                return "0"; // IE版本过低(ie5以下版本)
             } 
         }        
-        if (isFF) { return "firefox";} 
-        if (isOpera) { return "opera";} 
-        if (isSafari) { return "safari";} 
-        if (isChrome) { return "chrome";} 
-        if (isEdge) { return "edge";}
+        if (isFF) { return "firefox"; } 
+        if (isOpera) { return "opera"; } 
+        if (isSafari) { return "safari"; } 
+        if (isChrome) { return "chrome"; } 
+        if (isEdge) { return "edge"; }
     },
     
 
