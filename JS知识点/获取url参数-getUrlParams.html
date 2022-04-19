@@ -21,9 +21,9 @@
         /**
          * JS获取URL参数
          * 截取URL字符串的某个参数值
-         * @param {*}　ps_key 参数名(可缺省). 若本参数在字符串中不存存，则返回null, 若本参数缺省或空，则返回字符串中各个参数组成的对象
-         * @param {＊}　ps_url URL字符串(可缺省).若本参数缺省或空, 则会自动读取当前浏览器中的ps_url
-         * @return {*}　返回对应参数值或所有参数组成的对象
+         * @param {string}　ps_key 参数名(可选). 若本参数在字符串中不存存，则返回null, 若本参数缺省或空，则返回字符串中各个参数组成的对象
+         * @param {string}　ps_url URL字符串(可选). 若本参数缺省或空, 则会自动读取当前浏览器中的ps_url
+         * @return {string}　返回对应参数值或所有参数组成的对象
          * 注：location.search 返回当前URL的查询部分（即问号 ? 之后的部分）
          * eg. 假设：
          * 当前页面URL：'http://www.yy.com?englisth=90&math=70'
