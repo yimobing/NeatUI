@@ -260,7 +260,10 @@
                             '<span class="date">' + items["date"] + '</span>'+
                         '</a>';
             })
-            if($(node).length > 0) $(node).append(_html);
+            if($(node).length > 0){
+                if(ps_nowpage == 1) $(node).empty();
+                $(node).append(_html);
+            }
         }
 
 
