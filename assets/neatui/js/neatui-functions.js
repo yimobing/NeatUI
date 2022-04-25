@@ -6,6 +6,27 @@
  * Update: 2021.07.20
  */
 
+
+/**
+ * --------------------------------------------------------------------------------------------------------------------
+ *  [函数库说明]
+ *  本函数库提供如下对象用于调用：
+    拓展prototype兼容ie
+    JQ小插件
+    IEHacker
+    utilities
+    sortingAlgorithm
+    calendar
+    checker
+    filter
+    restrict
+    format
+    convert
+    merge
+ * --------------------------------------------------------------------------------------------------------------------
+ */
+
+
 //=====================================================================================================================
 //                                                 拓展prototype兼容ie
 //=====================================================================================================================
@@ -1334,10 +1355,116 @@ var utilities = {
             }
         }
         element.addEventListener("scroll", running, false)
+    },
+
+
+
+    /**
+     * 数组排序
+     * @param {Array} arr 原数组
+     * @param {string} method 排序方式(可选)，默认asc。值： asc 升序， desc 降序
+     * @returns {Array} 返回排序后的新数组
+     */
+    arraySort: function(arr, method){
+        var sorting = typeof method == 'undefined' ? 'asc' : (method == 'desc' ? 'desc' : 'asc');
+        var upArr = sortingAlgorithm.quickSort(arr, method);
+        if(sorting == 'desc'){
+            var downArr = [];
+            for(var i = upArr.length - 1; i >=0; i--){
+                downArr.push(upArr[i]);
+            }
+            return downArr;
+        }else{
+            return upArr;
+        }
+    }
+    
+}; // END UTILITIES对象
+
+
+
+
+
+
+
+//=====================================================================================================================
+//                                                  sortingAlgorithm 排序算法对象
+//=====================================================================================================================
+var sortingAlgorithm = {
+    /**
+     * “快速排序”算法：对数组进行升序排序
+     * @param {Array} arr 原数组
+     * @returns {Array} 返回排序后的新数组
+     * [参考] https://www.ruanyifeng.com/blog/2011/04/quicksort_in_javascript.html
+     * [方法]
+        (1)在数据集之中，选择一个元素作为"基准"(pivot)。
+        (2)所有小于"基准"的元素，都移到"基准"的左边，所有大于"基准"的元素都移到"基准"的右边。
+        (3)对"基准"左边和右边的两个子集，不断重复第一步和第二步，直到所有子集只剩下一个元素为止。
+    * [eg]
+        数组[101, 98, 498, 230, 589, 16, 9, 320, 259] 排序后得到 
+    */
+    quickSort: function(arr) {
+        if (arr.length <= 1) return arr;
+        var left = [], right = [];
+        var index = Math.floor(arr.length / 2); // 基准元素
+        // 方法1 
+        var pivot = arr.splice(index, 1)[0]; // splice取基准元素，同时删掉原数组中的基准元素(原数组发生变化,没了基准元素)
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] < pivot) left.push(arr[i]);
+            else right.push(arr[i]);
+        }
+        // 方法2
+        // var pivot = arr[index];
+        // var excludes = [];
+        // for(var i = 0; i < arr.length; i++){ // 删掉基准元素，将没了基准元素的元素放到一个新数组中
+        //     if(arr[i] != pivot) excludes.push(arr[i]);
+        // }
+        // for(var i = 0; i < excludes.length; i++){ // 比较新数组中所有元素与基准元素的大小
+        //     if(excludes[i] < pivot) left.push(excludes[i]);
+        //     else right.push(excludes[i]);
+        // }
+        // 递归重复上述过程
+        return this.quickSort(left).concat(pivot, this.quickSort(right));
+    },
+
+
+
+    /**
+     * “冒泡排序”算法：对数组进行升序排序
+     * @param {Array} arr 原数组
+     * @returns {Array} 返回排序后的新数组
+     */
+    bubbleSort: function(arr) {
+        var len = arr.length;
+        var i;
+        var j;
+        // 方法1
+        var stop;
+        for (i = 0; i < len - 1; i++) {
+            for (j = 0, stop = len - 1 - i; j < stop; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    swap(arr, j, j + 1);
+                }
+            }
+        }
+        // 方法二
+        // for(i = 0; i < len; i++){
+        //     for(j = i + 1; j < len; j++){
+        //         if(arr[i] > arr[j]){
+        //             var temp = arr[j];
+        //             arr[j] = arr[i];
+        //             arr[i] = temp;
+        //         }
+        //     }
+        // }
+        return arr;
     }
 
-    
-}; //END UTILITIES对象
+
+}; // END SORTING ALGORITHM 对象
+
+
+
 
 
 
@@ -1517,7 +1644,7 @@ var calendar = {
         return (ps_num_arr_str instanceof Array ? resultWeekArr : resultWeekArr[0]);
     }
 
-};  //END CALENDAR对象
+};  // ND CALENDAR对象
 
 
 
@@ -1879,7 +2006,7 @@ var checker = {
     }
    
 
-}; //END CHECKER对象
+}; // END CHECKER对象
 
 
 
@@ -2008,7 +2135,7 @@ var filter = {
         return ps_str;
     }   
     
-}; //END FILTER对象
+}; // END FILTER对象
 
 
 
@@ -2132,7 +2259,7 @@ var restrict = {
         return value;
     }
 
-}; //END RESTRICT 对象
+}; // END RESTRICT 对象
 
 
 
@@ -2156,7 +2283,7 @@ var format = {
         return arr[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (arr.length <= 1 ? '':  '.' + arr[1]);
     }
 
-}; //END FORMAT
+}; // END FORMAT 对象
 
 
 //=====================================================================================================================
@@ -2459,7 +2586,7 @@ var convert = {
         })
     }
 
-}; //END CONVERT 对象
+}; // END CONVERT 对象
 
 
 
@@ -2696,4 +2823,4 @@ var merge = {
     }
 
 
-};
+}; // END MERGE 对象
