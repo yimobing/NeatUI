@@ -180,6 +180,7 @@ main{
     padding: 10px 0 25px 0;
     background-color: #fff;
     border-radius: 8px;
+    overflow: hidden;
     /* border: 2px solid #e06620; */
  
 }
@@ -203,6 +204,8 @@ main{
 }
 */
 
+
+
 .tools__one:after{
     content: '';
     display: inline-block;
@@ -210,30 +213,29 @@ main{
     z-index: 1;
     top: -6px;
     right: -26px;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 0 40px 40px 40px;
-    border-radius: 0 0 0 0;
-    border-color: transparent transparent #e06620 transparent;
+    width: 80px;
+    height: 35px;
+    background-color: #e06620;
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);
     -o-transform: rotate(45deg);
     transform: rotate(45deg);
 }
 
+
 .tools__one:first-child:after{
-   border-bottom-color: #f9561f; 
+   background-color: #f9561f; 
 }
 .tools__one:nth-child(2):after{
-   border-bottom-color: #f1a790; 
+   background-color: #727095; 
 }
 .tools__one:nth-child(3):after{
-   border-bottom-color: #34ca9d; 
+   background-color: #34ca9d; 
 }
 .tools__one:nth-child(4):after{
-   border-bottom-color: #66c1ff; 
+   background-color: #66c1ff; 
 }
+
 .tools__one:nth-child(2n+1){
     margin-left: 0;
 }
@@ -257,6 +259,13 @@ main{
     /* background-color: #00dbdd; */
     border-radius: 20%;
     text-align: center;
+}
+
+.tools__image.bottom{
+    position: absolute;
+    z-index: 1;
+    right: 4px;
+    bottom: 4px;
 }
 .tools__image img{
     display: block;
@@ -385,29 +394,33 @@ main{
 
 
 
-/*+二手房专用+*/
-.agent{
+/*+通用导航菜单+*/
+.nav{
 
 }
-.agent__caption{
+.nav__caption{
     
 }
-.agent__list{
+.nav__list{
+    
+}
+.nav__one{
     display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
-    display；-webkit-flex;
+    display: -webkit-flex;
     display: flex;
     display: box;
     align-items: center;
     
     position: relative;
+    margin-top: 10px;
     padding: 10px 15px;
     background-color: #fff;
     border-radius: 4px;
 }
 
-.agent__list:after{
+.nav__one:after{
     content: '';
     position: absolute;
     right: 10px;
@@ -428,40 +441,70 @@ main{
     -o-transform: rotate(45deg);
     transform: rotate(45deg);
 }
-.agent__image{
+.nav__image{
     width: 35px;
     height: 35px;
     /* background-color: #f2e790;*/
     border-radius: 2px;
 }
 
-.agent__image img{
+.nav__image img{
     display: block;
     width: 100%;
     height: 100%;
     overflow: hidden;
 }
+.nav__flag{
+    margin: 0 10px;
+    color: #66c1ff;
+    text-align: center;
+    font-size: .75rem;
+    font-weight: bold;
+}
 
-.agent__detail{
+
+
+.nav__detail{
     -webkit-flex: 1;
     -moz-flex: 1;
     -o-flex: 1;
     flex: 1;
     width: 100%;
-    margin-left: 15px;
+    margin-left: 10px;
     
 }
-.agent__title{
+.nav__title{
+    position: relative;
     font-size: .9rem;
     font-weight: bold;
 }
-.agent__describe{
+
+.nav__hot{
+    position: absolute;
+    top: -6px;
+    width: 28px;
+    height: 20px;
+    line-height: 16px;
+    margin: 0 6px;
+    background-color: #ff8b8b;
+    color: #ff8e8e;
+
+    border-radius: 2px 2px 16px 2px;
+    color: #fff;
+    text-align: center;
+    font-size: .6rem;
+    font-style: italic;
+    font-weight: normal;
+}
+
+
+.nav__describe{
     margin-top: 8px;
     color: #888;
     font-size: .625rem;
 }
 
-.agent__link{
+.nav__link{
     position: absolute;
     z-index: 1;
     top: 0;
@@ -470,7 +513,9 @@ main{
     width: 100%;
     height: 100%;
 }
-.agent__link a{
+
+
+.nav__link a{
     display: block;
     width: 100%;
     height: 100%;
