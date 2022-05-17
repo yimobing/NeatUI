@@ -28,11 +28,13 @@ body{
     background-color: #f2f2f2;
 }
 .wrap{
-    padding: 0 8px;
+    
 }
 
+main{
+    padding: 0 8px;
+}
 .composing{
-    margin-top: 25px;
     margin-bottom: 50px;
 }
 .composing section{
@@ -40,15 +42,35 @@ body{
     margin-bottom: 10px;
 }
 .caption{
-    display: inline-block;
-    margin-bottom: 15px;
+    /* display: inline-block; */
+    margin-bottom: 10px;
     padding-bottom: 4px;
-    border-bottom: 3px solid #a09797;
-    border-radius: 0 0 2px 2px;
+    border-bottom: 1px solid #b2aaaa;
+    border-radius: 0;
     color: #444;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
 }
+
+
+/*+--------------------banner轮播图--------------------+*/
+.banner{
+    width: 100%;
+    height: auto;
+}
+.banner ul{
+    list-style-type: none;
+}
+.banner ul>li{
+    
+}
+
+.banner ul>li>img{
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 
 /*+--------------------缩略图方式--------------------+*/
 .news{
@@ -62,11 +84,18 @@ body{
     padding: 0 8px;
     background-color: #fff;
     border-radius: 4px;
+
+    margin-top: 15px!important;
 }
 .news__image{
     width: 20px;
     height: 20px;
-    border: 1px solid blue;
+}
+.news__image img{
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 .news__list{
     -webkit-flex: 1;
@@ -91,17 +120,20 @@ body{
     height: 28px;
     line-height: 28px;
     color: #666;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    word-wrap: break-word;
-    word-break: break-all;
 }
 .news__list ul>li>a{
     display: block;
     width: 100%;
     height: 100%;
+    color: #777;
     text-decoration: none;
     font-size: .65rem;
+    
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 @keyframes moveUp{
@@ -144,12 +176,17 @@ body{
     position: relative;
     width: 48%;
     margin-left: 4%;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     padding: 10px 0 25px 0;
     background-color: #fff;
     border-radius: 8px;
     /* border: 2px solid #e06620; */
  
+}
+
+.tools__one:nth-child(3n),
+.tools__one:nth-child(4n){
+    margin-bottom: 0;
 }
 /*
 .tools__one:first-child{
@@ -177,12 +214,26 @@ body{
     height: 0;
     border-style: solid;
     border-width: 0 40px 40px 40px;
-    border-radius: 0 0 0 8%;
+    border-radius: 0 0 0 0;
     border-color: transparent transparent #e06620 transparent;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
     transform: rotate(45deg);
-    
 }
 
+.tools__one:first-child:after{
+   border-bottom-color: #f9561f; 
+}
+.tools__one:nth-child(2):after{
+   border-bottom-color: #f1a790; 
+}
+.tools__one:nth-child(3):after{
+   border-bottom-color: #34ca9d; 
+}
+.tools__one:nth-child(4):after{
+   border-bottom-color: #66c1ff; 
+}
 .tools__one:nth-child(2n+1){
     margin-left: 0;
 }
@@ -203,9 +254,15 @@ body{
     width: 35px;
     height: 35px;
     margin: 10px auto;
-    background-color: #00dbdd;
+    /* background-color: #00dbdd; */
     border-radius: 20%;
     text-align: center;
+}
+.tools__image img{
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 .tools__title{
     text-align: center;
@@ -239,7 +296,7 @@ body{
 
 /*+银行产品+*/
 .product{
-    padding: 15px 10px; 
+    padding: 10px 10px 15px; 
     background-color: #fff;
     border-radius: 6px;
 }
@@ -286,8 +343,15 @@ body{
     width: 35px;
     height: 35px;
     margin: 0 auto;
+    padding: 2px;
     background-color: #fff;
     border-radius: 100%;
+}
+.product__image img{
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 .product__title{
     -webkit-flex: 1;
@@ -342,11 +406,40 @@ body{
     background-color: #fff;
     border-radius: 4px;
 }
+
+.agent__list:after{
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-style: solid;
+    border-color: #b2aeae;
+    border-width: 1px 1px 0 0;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
 .agent__image{
-    width: 50px;
-    height: 50px;
-    background-color: #f2e790;
+    width: 35px;
+    height: 35px;
+    /* background-color: #f2e790;*/
     border-radius: 2px;
+}
+
+.agent__image img{
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .agent__detail{
@@ -385,3 +478,16 @@ body{
 
 
 /*+--------------------列表方式--------------------+*/
+
+
+
+
+
+/*+--------------------媒体查询--------------------+*/
+@media screen and (max-width: 414px){
+    .tools__title,
+    .product__title,
+    .agent__title{
+        font-size: .8rem;
+    }
+}
