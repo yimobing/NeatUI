@@ -177,6 +177,36 @@
             border-color: transparent transparent yellow transparent;
         }
 
+
+        /*+CSS3圆角三角形+*/
+        .triangle__radius-right{
+            position: relative;
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            background-color: yellow;
+            border-radius: 12px;
+            color: #777;
+            text-align: center;
+            overflow: hidden;
+        }
+        .triangle__radius-right:after{
+            content: '';
+            display: inline-block;
+            position: absolute;
+            z-index: 1;
+            top: -6px;
+            right: -26px;
+            width: 80px;
+            height: 35px;
+            background-color: blue;
+            -webkit-transform: rotate(45deg);
+            -moz-transform: rotate(45deg);
+            -o-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+ 
     </style>
 
     <div class="wrap">
@@ -361,7 +391,53 @@
                             <div class="angle__code"></div><!--/.angle__code-->
                         </div><!--/.block-->
                     </div><!--/.module__content-->
-                </div>
+
+                </div><!--/.module-->
+
+
+                <div class="module">
+                    <div class="module__caption">CSS3实现圆角三角形</div>
+                    <div class="module__describe">
+                        思路：父级给一个圆角，里面(after伪属性)用一个矩形并旋转一下，然后设置父级元素超出隐藏(overflow:hidden)
+                    </div>
+                    <div class="module__content">
+                        <div class="block">
+                            <div class="angle__layout">
+                                <div class="triangle__radius-right">圆角三角形(右上角)</div>
+                            </div>
+                            <div class="angle__code">
+<pre>
+    .triangle__radius-right{
+        position: relative;
+        width: 100px;
+        height: 100px;
+        line-height: 100px;
+        background-color: yellow;
+        border-radius: 12px;
+        color: #777;
+        text-align: center;
+        overflow: hidden;
+    }
+    .triangle__radius-right:after{
+        content: '';
+        display: inline-block;
+        position: absolute;
+        z-index: 1;
+        top: -6px;
+        right: -26px;
+        width: 80px;
+        height: 35px;
+        background-color: blue;
+        -webkit-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+</pre>
+                            </div><!--/.angle__code-->
+
+                </div><!--/.module-->
+
             </section><!--/.angle-->
         </main>
     </div><!--/.wrap-->
