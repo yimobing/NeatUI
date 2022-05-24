@@ -516,7 +516,7 @@
         }
         me.opts.loadUpFn(callback);
         me.resetLoad();
-        me.unlock(); // 解锁loadDownFn里锁定的情况
+        if(fnCheckHasData(source, me)) me.unlock(); // 解锁loadDownFn里锁定的情况 edit 20220524-1
         // me.noneData(false); // 解锁loadDownFn里无数据的情况 test1
     }
   
