@@ -38,14 +38,14 @@ h5{font-size:20px;color:#0ce;border-bottom:1px solid #0ce;padding-bottom:8px;}
 
     <section class="panel-demo"><!--调用日历控件，初始值自定义-->
     	<h5>调用日历控件，初始值自定义</h5>
-    	<div class="demo-one"><span>当前日期</span><input type="text" class="jedate" id="nowTime" readonly></div><!--demo-one-->
-      <div class="demo-one"><span>当前日期前N天(eg.前7天)</span><input type="text" class="jedate" id="prevNDay" readonly></div><!--demo-one-->
-      <div class="demo-one"><span>本月第一天</span><input type="text" class="jedate" id="monthFirstDay" readonly></div><!--demo-one-->
-      <div class="demo-one"><span>本月最后一天</span><input type="text" class="jedate" id="monthLastDay" readonly></div><!--demo-one-->
-      <div class="demo-one"><span>本季度第一天</span><input type="text" class="jedate" id="quarterStartDay" readonly></div><!--demo-one-->
-      <div class="demo-one"><span>本季度最后一天</span><input type="text" class="jedate" id="quarterEndDay" readonly></div><!--demo-one-->
-      <div class="demo-one"><span>本年度第一天</span><input type="text" class="jedate" id="yearFirstDay" readonly></div><!--demo-one-->
-      <div class="demo-one"><span>本年度最后一天</span><input type="text" class="jedate" id="yearLastDay" readonly></div><!--demo-one-->
+    	<div class="demo-one"><span>当前日期</span><input type="text" class="neDate" id="nowTime" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>当前日期前N天(eg.前7天)</span><input type="text" class="neDate" id="prevNDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本月第一天</span><input type="text" class="neDate" id="monthFirstDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本月最后一天</span><input type="text" class="neDate" id="monthLastDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本季度第一天</span><input type="text" class="neDate" id="quarterStartDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本季度最后一天</span><input type="text" class="neDate" id="quarterEndDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本年度第一天</span><input type="text" class="neDate" id="yearFirstDay" readonly></div><!--demo-one-->
+      <div class="demo-one"><span>本年度最后一天</span><input type="text" class="neDate" id="yearLastDay" readonly></div><!--demo-one-->
     </section><!--/panel-demo-->
 			
     <section class="panel-demo"><!--不调用日历控件-->
@@ -76,8 +76,8 @@ h5{font-size:20px;color:#0ce;border-bottom:1px solid #0ce;padding-bottom:8px;}
 		* @param callBack 回调函数(可缺省)
 		
 		注意：调用日历控件的标签如input标签不能有value属性，如：<input type="text" value="2018-07-25">，不然会报错
-		eg1. 多个标签调用日历控件<=>含有class="jedate"的标签都调用日历控件
-		$('.jedate').each(function(){
+		eg1. 多个标签调用日历控件<=>含有class="neDate"的标签都调用日历控件
+		$('.neDate').each(function(){
 			//neuiCalendar.neDate($(this)); //默认日期为当天，如：2018-07-25
 			//neuiCalendar.neDate($(this),false); //默认日期为空
 			//neuiCalendar.neDate($(this),{"empty":true,"theme":"blue"}); //默认日期为当天，主题为蓝色
@@ -110,7 +110,7 @@ h5{font-size:20px;color:#0ce;border-bottom:1px solid #0ce;padding-bottom:8px;}
 		
 		/*+------------2.调用日历控件，初始值自定义----------------+*/
 		//=====调用日历控件（多个标签调用）
-		$('.jedate').each(function(){
+		$('.neDate').each(function(){
 			neuiCalendar.neDate($(this));
 		});
 		//=====当前日期
