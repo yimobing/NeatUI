@@ -16,6 +16,7 @@
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-wechat.css"><!--聊天控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-magnify.css"><!--图片放大预览控件(pc时)-->
     <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
     <!--<script type="text/javascript" charset="gb2312" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
@@ -80,6 +81,9 @@
     <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义ajax-->
     <script type="text/javascript">
         /*+----------------全局变量----------------+*/
+        // 全局变量 ajax({})
+        var g_xjdh = '<%=s_xjdh%>';
+        var g_dyw_xh = '<%=s_dyw_xh%>';
 
         //=====在线沟通
         var g_chat_pagesize = 10; // 聊天翻页每页记录数
@@ -89,11 +93,100 @@
 
         /*+————————————————FUNCTION————————————————+*/
         /**
+         * 获取用户数据
+         * @returns {object} 返回一维数组
+         */
+        function get_data_user(){
+            // 后台返回
+            var json = {
+                "return":"ok", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生"
+            }
+            /*
+            // START AJAX
+            var json = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取聊天当前用户数据",
+                debug: false,
+                type: "POST",
+                url: "../../fwh_pub/jk_pic_chat.ashx",
+                data: {
+                    "action": "sel_v2_xjd_chat_user_msgs",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk %>",
+                    "user_bh": "<%=s_user%>"
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    json = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                return {}
+            }
+            // END AJAX
+            */
+           return json;
+        }
+
+
+
+
+        /**
+         * 获取抵押物信息
+         * @returns {object} 返回一维数组
+         */
+        function get_data_pawn(){
+            // 后台返回
+            var json = { "return":"ok", "bank_mc":"中国建设银行股份有限公司泉州分公司", "dyw_add":"1、住宅/泉州万科城（一期）/1号楼/2/201/126.09平方米/已满2年"}
+            /*
+            // START AJAX
+            var json = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取聊天抵押物数据",
+                debug: false,
+                type: "POST",
+                url: "../../fwh_pub/jk_pic_chat.ashx",
+                data: {
+                    "action": "sel_v2_xjd_chat_dyw_add",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk %>",
+                    "xjdh": g_xjdh,
+                    "dyw_xh": g_dyw_xh
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    //if(res == '') return;
+                    json = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                return {}
+            }
+            // END AJAX
+            */
+            return json;
+        }
+
+
+        /**
          * 获取聊天历史消息
          * @param {number} ps_nowpage 当前页码,默认1(可选)
          * @returns {object} 返回数组对象
          */
-            function get_data_chat_history(ps_nowpage){
+        function get_data_chat_history(ps_nowpage){
             if(g_chat_history_times == 0) g_chat_history_times = 1;
             else g_chat_history_times = 2;
             var ls_open_page_num = ps_nowpage; // 当前页码
@@ -112,7 +205,7 @@
             }
         
             /*
-            //START AJAX
+            // START AJAX
             var chatHistoryJson = {}
             var isHoldOn = true;
             ajax({
@@ -144,7 +237,7 @@
             if(!isHoldOn){
                 return {};
             }
-            //END AJAX
+            // END AJAX
             */
             var ls_time = chatHistoryJson["time"];
             //全局赋值
@@ -170,7 +263,7 @@
             //     ]
             // }
             // /*
-            // //START AJAX
+            // // START AJAX
             // var chatNewlyJson = {}
             // var isHoldOn = true;
             // ajax({
@@ -201,7 +294,7 @@
             // if(!isHoldOn){
             //     return {};
             // }
-            // //END AJAX
+            // // END AJAX
             // */
             // g_chat_latest_date = chatNewlyJson["time"];   // 全局赋值
             // return chatNewlyJson;
@@ -222,7 +315,7 @@
 
                 // ·后台返回
                 /*
-                //START AJAX
+                // START AJAX
                 var chatNewlyJson = {}
                 var isHoldOn = true;
                 ajax({
@@ -256,7 +349,7 @@
                 if(!isHoldOn){
                     return {}
                 }
-                //END AJAX
+                // END AJAX
                 */
             })
             
@@ -335,92 +428,25 @@
             //——————————————————————————————————————————
             //=====微信聊天窗口按钮 
             $('#btn-aside-touch').on('click', function(){
-                // ·1、获取聊天当前用户数据
-                // 后台返回
-                var chatUserJson = {
-                    "return":"ok", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生"
-                }
-                /*
-                //START AJAX
-                var chatUserJson = {}
-                var isHoldOn = true;
-                ajax({
-                    heading: "获取聊天当前用户数据",
-                    debug: false,
-                    type: "POST",
-                    url: "../../fwh_pub/jk_pic_chat.ashx",
-                    data: {
-                        "action": "sel_v2_xjd_chat_user_msgs",
-                        "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk %>",
-                        "user_bh": "<%=s_user%>"
-                    },
-                    success: function(res){
-                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        //if(res == '') return;
-                        chatUserJson = JSON.parse(res);
-                    },
-                    error: function(res){
-                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                    },
-                    beforeSend: function(XMLHttpRequest){ },
-                    complete: function(XMLHttpRequest, textStatus){ }
-                })
-                if(!isHoldOn){
-                    return {};
-                }
-                //END AJAX
-                */
-
-                // ·2、获取抵押物信息
-                // 后台返回
-                var pawnJson = { "return":"ok", "dyw_add":"1、住宅/泉州万科城（一期）/1号楼/2/201/126.09平方米/已满2年"}
-                /*
-                //START AJAX
-                var pawnJson = {}
-                var isHoldOn = true;
-                ajax({
-                    heading: "获取聊天抵押物数据",
-                    debug: false,
-                    type: "POST",
-                    url: "../../fwh_pub/jk_pic_chat.ashx",
-                    data: {
-                        "action": "sel_v2_xjd_chat_dyw_add",
-                        "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk %>",
-                        "xjdh": g_xjdh,
-                        "dyw_xh": g_dyw_xh
-                    },
-                    success: function(res){
-                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        //if(res == '') return;
-                        pawnJson = JSON.parse(res);
-                    },
-                    error: function(res){
-                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                    },
-                    beforeSend: function(XMLHttpRequest){ },
-                    complete: function(XMLHttpRequest, textStatus){ }
-                })
-                if(!isHoldOn){
-                    return {};
-                }
-                //END AJAX
-                */
-                var ls_xjdh = '2103310567-237809';
-                //var ls_xjdh = g_xjdh; // ajax({})
-                var ls_dyw_add = pawnJson["dyw_add"];
-
-                // · 3、创建顶部信息
+                var chatUserJson = get_data_user(); // 获取聊天当前用户数据
+                var pawnJson = get_data_pawn(); // 获取抵押物信息
+                var ls_xjdh = g_xjdh,
+                    ls_dyw_add = pawnJson["dyw_add"],
+                    ls_bank_mc = pawnJson["bank_mc"];
+                // · 1、创建顶部信息
                 var _topHtml = [
                     '<div class="collateral" style="margin-top: 10px; padding: 0 5px; font-size: 12px">',
                         '<div class="collateral___info">',
                             '<div class="eform-row">',
-                                '<div class="item-l"><label>询价单号</label></div>',
+                                '<div class="item-l" style="width: 0; margin-right: 0; padding-left: 0;"><label style="width: 0"></label></div>',
+                                '<div class="item-r"><span style="text-align: left">' + ls_bank_mc + '</span></div>',
+                            '</div>',
+                            '<div class="eform-row" style="display: none">',
+                                '<div class="item-l" style="width: auto"><label>询价单号：</label></div>',
                                 '<div class="item-r"><span>' + ls_xjdh + '</span></div>',
                             '</div>',
                             '<div class="eform-row flex-start">',
-                                '<div class="item-l"><label>抵押物信息</label></div>',
+                                '<div class="item-l" style="width: auto"><label>抵押物信息：</label></div>',
                                 '<div class="item-r"><span>' + ls_dyw_add + '</span></div>',
                             '</div>',
                         '</div><!--/.collateral___info-->',
@@ -428,7 +454,7 @@
                 ].join('\r\n');
 
 
-                // 4、调用聊天控件
+                // 2、调用聊天控件
                 $(this).neuiWechat({
                     aside: { // 侧栏窗口参数
                         // 前台提供的变量
@@ -501,7 +527,7 @@
                             var flag = '', msg = '消息发送成功';
                             //后台返回
                             /*
-                            //START AJAX
+                            // START AJAX
                             var isHoldOn = true;
                             ajax({
                                 heading: "发送文字聊天消息(保存询价单聊天表)",
@@ -533,7 +559,7 @@
                                 neui.destroyAnimate();
                                 return;
                             }
-                            //END AJAX
+                            // END AJAX
                             */
                             flag = parseInt(1); //1 成功, 0 失败
                             if(!flag) msg = '消息发送失败';
@@ -571,7 +597,166 @@
                 var allImgJson = {data:[]} // 这个要放外面,若放内部,则会出现undefined情况(把setTimeout去掉时)
                 return new Promise(function(resolve, reject){
                     // · 后台实际操作
-                    // START
+                    // 后台返回
+                    // 开始图片上传 START JAJAx
+                    var isContinue = true;
+                    var localIds, li_count, up_i;
+                    var i;
+                    var u = navigator.userAgent, app = navigator.appVersion,
+                        isAndroid = u.indexOf('ndroid') > -1 || u.indexOf('Linux') > -1,
+                        isIos = !!u.match(/\(i[^;]+;( u;)? CPU.+Mac OS X/);
+                    isIos = true;
+                    // ①.start android 安卓端
+                    if(isIos == false){
+                        parent.parent.parent.parent.parent.wx.chooseImage({
+                            sizeType: ['compressed'],
+                            sourceType: ['album', 'camera'],
+                            success: function(res){
+                                localIds = res.localIds;
+                                li_count = res.localIds.length;
+                                if(li_count > 0){
+                                    neuiDialog.alert({
+                                        animate: true,
+                                        message: '您确定要上传(' + li_count.toString() + ')张图片吗？',
+                                        buttons: ['确定', '取消'],
+                                        zIndex: 1000, // 自定义遮罩层级
+                                        callBack: function(){
+                                            if(ret == 1){
+                                                up_i = 0;
+                                                for(i = 0; i < li_count; i++){
+                                                    parent.parent.parent.parent.parent.wx.uploadImage({
+                                                        localId: localIds[i],
+                                                        isShowProgressTips: 1,
+                                                        success: function(res){
+                                                            var serverId = res.serverId;
+                                                            up_i = up_i + 1;
+                                                            $.ajax({
+                                                                async: false, // 取数方式. true 异步(默认), false 同步
+                                                                type: "POST",
+                                                                dataType: "html",
+                                                                cache: false,
+                                                                url: "../../fwh_pub/jk_pic_chat.ashx",
+                                                                data: {
+                                                                    "action": "uploadImage_chat_pic",
+                                                                    "user": "<%=s_user%>",
+                                                                    "sjk": "<%=s_sjk%>",
+                                                                    "serverId": serverId,
+                                                                    "localId": localIds[up_i - 1],
+                                                                    "li_count": li_count.toString(),
+                                                                    "up_i": up_i.toString(),
+                                                                    "user_bh": "<%=s_user%>",
+                                                                    "xjdh": g_xjdh,
+                                                                    "dyw_xh": g_dyw_xh
+                                                                },
+                                                                success: function(res){
+                                                                    sendOneImageToUser(res, li_count);
+                                                                },
+                                                                error: function(res){ },
+                                                                beforeSend: function(XMLHttpRequest){ },
+                                                                complete: function(XMLHttpRequest, textStatus){ }
+                                                            })
+
+                                                            if(up_i == li_count){ 
+                                                                //..
+                                                            }
+                                                        },
+                                                        fail: function(res){
+                                                            reject("图片上传失败，请重试");
+                                                            isContinue = false;
+                                                        },
+                                                        complete: function(res){ }
+                                                    })
+                                                } // FOR
+                                                // if(confirm('您确定要上传(' + li_count.toString() + ')张图片吗？')) { }
+                                            } // RET
+                                        } // CALLBACK
+                                    })
+                                } // IF
+                            }
+                        })
+                    }
+                    // end android 安卓端
+
+                    // ②.start ios/iphone 苹果端
+                    if(isIos == true){
+                        parent.parent.parent.parent.parent.wx.chooseImage({
+                            sizeType: ['compressed'],
+                            sourceType: ['album', 'camera'],
+                            success: function(res){
+                                localIds = res.localIds;
+                                li_count = res.localIds.length;
+                                if(li_count > 0){
+                                    neuiDialog.alert({
+                                        animate: true,
+                                        message: '您确定要上传(' + li_count.toString() + ')张图片吗？',
+                                        buttons: ['确定', '取消'],
+                                        zIndex: 1000, // 自定义遮罩层级
+                                        callBack: function(){
+                                            if(ret == 1){
+                                                aabbcc();
+                                            }
+                                        }
+                                    })
+                                }
+                            },
+                            fail: function(res){ },
+                            complete: function(res){ }
+                        });
+                        i = 0;
+                        var aabbcc = function(){
+                            if(i < li_count){
+                                parent.parent.parent.parent.parent.wx.uploadImage({
+                                    localId: localIds[i],
+                                    isShowProgressTips: 1,
+                                    success: function(res){
+                                        var serverId = res.serverId;
+                                        $.ajax({
+                                            async: false, // 取数方式. true 异步(默认), false 同步
+                                            type: "POST",
+                                            dataType: "html",
+                                            cache: false,
+                                            url: "../../fwh_pub/jk_pic_chat.ashx",
+                                            data: {
+                                                "action": "uploadImage_chat_pic",
+                                                "user": "<%=s_user%>",
+                                                "sjk": "<%=s_sjk%>",
+                                                "serverId": serverId,
+                                                "localId": localIds[i],
+                                                "li_count": li_count.toString(),
+                                                "up_i": i.toString(),
+                                                "user_bh": "<%=s_user%>",
+                                                "xjdh": g_xjdh,
+                                                "dyw_xh": g_dyw_xh
+                                            },
+                                            success: function(res){
+                                                sendOneImageToUser(res, li_count);
+                                            },
+                                            error: function(res){ },
+                                            beforeSend: function(XMLHttpRequest){ },
+                                            complete: function(XMLHttpRequest, textStatus){ }
+                                        })
+                                        i = i + 1;
+                                        if(i == li_count){
+                                            // location.reload(true);
+                                        }
+                                        aabbcc();
+                                    },
+                                    fail: function(res){
+                                        reject("图片上传失败，请重试");
+                                        isContinue = false;
+                                    }
+                                })
+                            }
+                        }
+                    }
+                    // end ios/iphone 苹果端
+
+                    if(isContinue == true){
+                        // alert('上传成功');
+                    }
+
+                    // 开始图片上传 END JAJAx
+
 
                     // · 前台模拟操作(生产环境下请注释掉本段代码)
                     setTimeout(function(){ // 模拟异步
