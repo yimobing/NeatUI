@@ -1587,7 +1587,12 @@ pre, pre code {
 	display: box;
 	justify-content: center;
 }
-.ne-aside .as-lay-footer button[type="button"]{ width: 100%; margin-left: 4px; }
+.ne-aside .as-lay-footer button[type="button"]{ 
+	width: 100%;
+	height: 45px;
+	line-height: 45px;
+	margin-left: 4px; 
+}
 .ne-aside .as-lay-footer button[type="button"]:first-child{ margin-left: 0; }
 
 /*+-----------顶部杂项-------------+*/
