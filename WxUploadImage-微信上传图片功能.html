@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>微信上传图片功能</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+    <!--<script type="text/javascript" charset="gb2312" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" charset="gb2312" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>-->
+    <script type="text/javascript" charset="gb2312" src="assets/style/libs/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" charset="gb2312" src="assets/style/libs/jweixin-1.0.0.js"></script>
+    <script type="text/javascript">
+        wx.config({
+            debug: false,
+            appId: '<%=s_corpId%>',
+            timestamp: '<%=s_nonceStr%>',
+            nonceStr: '<%=s_nonceStr%>',
+            signature: '<%=s_signature%>',
+            jsApiList: [
+                'scanQRCode',
+                'checkJsApi',
+                'chooseImage',
+                'previewImage',
+                'downloadImage',
+                'getNetworkType',
+                'openLocation',
+                'getLocation',
+                'uploadImage',
+                'closeWindow'
+            ]
+        })
+        wx.ready(function(){
+            //测试
+        })
+    </script>
+</head>
+<body>
+    <style>
+        .release__picture{
+            /*
+            display: -webkit-box;
+            display: -moz-box;
+            display；-ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            display: box;
+            */
+            margin-top: 25px;
+        }
+        .release__picture:after{
+            content: '';
+            display: block;
+            clear: both;
+        }
+
+        .picture__add,
+        .picture__list>ul>li{
+            width: 58px;
+            height: 58px;
+        }
+        .picture__add{
+            float: left;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+            border-radius: 2px; 
+            cursor: pointer;
+            background: transparent url('assets/style/img/mod_icon_plus.png') center / 100% auto no-repeat scroll;
+            background-size: 22px auto;
+        }
+
+
+        .picture__list{
+        
+        }
+        .picture__list>ul:after{
+            content: '';
+            display: block;
+            clear: both;
+        }
+        .picture__list>ul>li{
+            position: relative;
+            float: left;
+            margin: 0 5px 5px 0;
+            background-size: 100% 100%;
+            background-position: 50% 50%;
+            background-repeat: no-repeat;
+        }
+        .picture__list>ul>li>img{
+            display: block;
+            width: 100%;
+            height: 100%;
+            max-height: 100%;
+            overflow: hidden;
+        }
+        .picture__list>ul>li>i{
+            position: absolute;
+            z-index: 1;
+            top: 0;
+            right: 0;
+            display: block; 
+            width: 18px;
+            height: 18px;
+            background: transparent url('assets/style/img/mod_icon_del_solid@80px.png') 50% 50% / 100% auto no-repeat scroll;
+            cursor: pointer;
+        }
+
+    </style>
+
+
+    <div class="wrap">
+         <!--[========图片上传区域=======]-->
+         <div class="release__picture">
+            <div class="picture__add"></div><!--/.picture__add-->
+            <div class="picture__list"></div><!--/.picture__list-->
+        </div><!--/.release__picture-->
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/style/libs/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义AJAX-->
+
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+    
+        /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 创建图片列表
+         * @param {object} ps_source 图片数据源
+         */
+         function createImageList(ps_source){
+            if(!ps_source || $.isEmptyObject(ps_source)) return;
+            if(typeof ps_source.data.length == 'undefined') return;
+            var node = '.picture__list',
+                _html = '';
+            $.each(ps_source.data, function(i, items){
+                var isShowDel = items["pic_del"] == '1' ? true : false,
+                    picNumber = items["pic_bh"],
+                    smallPic = items["pic_url"],
+                    bigPic = items["pic_url_big"];
+                _html += [
+                    '<li data-pic-bh="' + picNumber + '" data-pic-url-big="' + bigPic + '" style="background-image:url(' + smallPic + ')">',
+                        '<img src="' + smallPic + '">',
+                        (
+                            !isShowDel ? '' : '<i class="icon-del"></i>'
+                        ),
+                    '</li>'
+                ].join('\r\n')
+            })
+            _html += '';
+            if($(node).length > 0) {
+                if($(node).children('ul').length == 0) {
+                    _html = '<ul>' + _html + '</ul>';
+                    $(node).append(_html);
+                }  
+                else{
+                    $(node).children('ul').append(_html);
+                }   
+            }
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+             //——————————————————————————————————————————
+            /**
+             * 公用函数：校验信息完整性与数据格式
+             * @param {boolean} 返回布尔值。 true 数据完整且数式正确, false 数据不完整或格式错误
+             */
+             var isInfoCompleted = function(){
+                // 校验完整性
+                var tips = '';
+                //...
+                //
+                if(tips != ''){
+                    // neuiDialog.alert({
+                    //     message: '请填写：' + tips.substring(0, tips.length - 1),
+                    //     buttons: ['确定']
+                    // })
+                    neuiDialog.notice({
+                        message: '请填写：' + tips.substring(0, tips.length - 1),
+                        theme: 'danger',
+                        maskOpacity: 1,
+                        location: 'top'
+                    })
+                    return false;
+                }
+                return true;
+            }
+
+
+
+            //——————————————————————————————————————————
+            //=====上传图片按钮、加号按钮
+            $('.picture__add').on('click', function(){
+                // 校验完整性
+                if(!isInfoCompleted()) return; // testing
+                // 执行保存
+                fnSaveData().then(function(res){
+                    var xqbh = res["xqbh"],
+                        msg = res["message"];
+                    // 执行上传
+                    fnUploadImage(xqbh).then(function(res){
+                        // alert('成功');
+                    }); 
+                }).catch(function(err){
+                    neuiDialog.alert({
+                        message: err,
+                        buttons: ['确定']
+                    })
+                })
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            /**
+             * 函数：保存操作
+             * @returns {Promise} 返回Promise对象. 成功时{xqbh:"需求编号", message:"成功提示信息"}, 失败时 直接返回失败信息
+             */
+             function fnSaveData(){
+                return new Promise(function(resolve, reject){
+                    // 获取数据
+                    //..
+                    //
+                    var arr = [  ]
+                    // console.log('数组：', arr);
+                    // 开始执行
+                    neui.showAnimate();
+                    setTimeout(function(){    
+                        var flag = '', msg = '发布成功';
+                        // 后台返回
+                        var res_xqbh = '20222206081523-237809'; // 需求编号
+                        /*
+                        // START AJAX
+                        var res_xqbh = '';
+                        var isHoldOn = true;
+                        ajax({
+                            heading: "保存数据",
+                            debug: false,
+                            async: false, // 取数方式. true 异步, false 同步(默认)
+                            type: "POST",
+                            dataType: "html",
+                            cache: false,
+                            url: "",
+                            data: {
+                                "action": "",
+                                "user": "<%=s_user%>",
+                                "sjk": "<%=s_sjk%>"
+                            },
+                            success: function(res){
+                                if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                // if(res == '') return;
+                                var json = JSON.parse(res);
+                                flag = json.return == 'ok' ? 1 : 0;
+                                if(!flag) msg = json.data;
+                                else res_xqbh = json.xqbh;
+                            },
+                            error: function(res){
+                                if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            },
+                            beforeSend: function(XMLHttpRequest){ },
+                            complete: function(XMLHttpRequest, textStatus){ }
+                        })
+                        if(!isHoldOn){
+                            neui.destroyAnimate();
+                            return;
+                        }
+                        // END AJAX
+                        */
+                        flag = parseInt(1); // 1 成功, 0 失败
+                        if(!flag) msg = '发布失败';
+
+                        if(flag){
+                            resolve({"xqbh": res_xqbh, "message": msg});
+                        }
+                        else{
+                            reject(msg);
+                        }
+
+                        neui.destroyAnimate();
+                    }, 100)
+                })
+            }
+
+
+
+
+
+            //——————————————————————————————————————————
+            /**
+             * 函数：上传图片
+             * @param {string} ps_xqbh 需求编号
+             */
+             function fnUploadImage(ps_xqbh){
+                var allImgJson = {data:[ ] } // 这个要放外面,若放内部,则会出现undefined情况(把setTimeout去掉时)
+                return new Promise(function(resolve, reject){
+                    // · 后台实际操作
+                    // 后台返回
+                    /*
+                    // --------START 开始图片上传--------
+                    var isContinue = true;
+                    var localIds, li_count, up_i;
+                    var i;
+                    var u = navigator.userAgent, app = navigator.appVersion,
+                        isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
+                        isIos = !!u.match(/\(i[^;]+;( u;)? CPU.+Mac OS X/);
+                    isIos = true;
+                    // ①.start android 安卓端
+                    if(isIos == false){
+                        wx.chooseImage({
+                            sizeType: ['compressed'],
+                            sourceType: ['album', 'camera'],
+                            success: function(res){
+                                localIds = res.localIds;
+                                li_count = res.localIds.length; // 图片数量
+                                if(li_count > 0){
+                                    neuiDialog.alert({
+                                        animate: true,
+                                        message: '您确定要上传(' + li_count.toString() + ')张图片吗？',
+                                        buttons: ['确定', '取消'],
+                                        zIndex: 1000, // 自定义遮罩层级
+                                        callBack: function(){
+                                            if(ret == 1){
+                                                up_i = 0;
+                                                for(i = 0; i < li_count; i++){
+                                                    wx.uploadImage({
+                                                        localId: localIds[i],
+                                                        isShowProgressTips: 1,
+                                                        success: function(res){
+                                                            var serverId = res.serverId;
+                                                            up_i = up_i + 1;
+                                                            $.ajax({
+                                                                async: false, // 取数方式. true 异步(默认), false 同步
+                                                                type: "GET",
+                                                                dataType: "html",
+                                                                cache: false,
+                                                                url: "../fwh_pub/jk_pic.ashx",
+                                                                data: {
+                                                                    "action": "fjx_uploadImage",
+                                                                    "user": "<%=s_user%>",
+                                                                    "sjk": "<%=s_sjk%>",
+                                                                    "serverId": serverId,
+                                                                    "localId": localIds[up_i - 1],
+                                                                    "li_count": li_count.toString(),
+                                                                    "up_i": up_i.toString(),
+                                                                    "xqbh": ps_xqbh
+                                                                },
+                                                                success: function(res){
+                                                                    insertOneImage(res, li_count);
+                                                                },
+                                                                error: function(res){ },
+                                                                beforeSend: function(XMLHttpRequest){ },
+                                                                complete: function(XMLHttpRequest, textStatus){ }
+                                                            })
+
+                                                            if(up_i == li_count){ 
+                                                                //..
+                                                            }
+                                                        },
+                                                        fail: function(res){
+                                                            reject("图片上传失败，请重试");
+                                                            isContinue = false;
+                                                        },
+                                                        complete: function(res){ }
+                                                    })
+                                                } // FOR
+                                                // if(confirm('您确定要上传(' + li_count.toString() + ')张图片吗？')) { }
+                                            } // RET
+                                        } // CALLBACK
+                                    })
+                                } // IF
+                            }
+                        })
+                    }
+                    // end android 安卓端
+
+                    // ②.start ios/iphone 苹果端
+                    if(isIos == true){
+                        wx.chooseImage({
+                            sizeType: ['compressed'],
+                            sourceType: ['album', 'camera'],
+                            success: function(res){
+                                localIds = res.localIds;
+                                li_count = res.localIds.length;
+                                if(li_count > 0){
+                                    neuiDialog.alert({
+                                        animate: true,
+                                        message: '您确定要上传(' + li_count.toString() + ')张图片吗？',
+                                        buttons: ['确定', '取消'],
+                                        zIndex: 1000, // 自定义遮罩层级
+                                        callBack: function(){
+                                            if(ret == 1){
+                                                aabbcc();
+                                            }
+                                        }
+                                    })
+                                }
+                            },
+                            fail: function(res){ },
+                            complete: function(res){ }
+                        });
+                        i = 0;
+                        var aabbcc = function(){
+                            if(i < li_count){
+                                wx.uploadImage({
+                                    localId: localIds[i],
+                                    isShowProgressTips: 1,
+                                    success: function(res){
+                                        var serverId = res.serverId;
+                                        $.ajax({
+                                            async: false, // 取数方式. true 异步(默认), false 同步
+                                            type: "GET",
+                                            dataType: "html",
+                                            cache: false,
+                                            url: "../fwh_pub/jk_pic.ashx",
+                                            data: {
+                                                "action": "fjx_uploadImage",
+                                                "user": "<%=s_user%>",
+                                                "sjk": "<%=s_sjk%>",
+                                                "serverId": serverId,
+                                                "localId": localIds[i],
+                                                "li_count": li_count.toString(),
+                                                "up_i": i.toString(),
+                                                "xqbh": ps_xqbh
+                                            },
+                                            success: function(res){
+                                                insertOneImage(res, li_count);
+                                            },
+                                            error: function(res){ },
+                                            beforeSend: function(XMLHttpRequest){ },
+                                            complete: function(XMLHttpRequest, textStatus){ }
+                                        })
+                                        i = i + 1;
+                                        if(i == li_count){
+                                            // location.reload(true);
+                                        }
+                                        aabbcc();
+                                    },
+                                    fail: function(res){
+                                        reject("图片上传失败，请重试");
+                                        isContinue = false;
+                                    }
+                                })
+                            }
+                        }
+                    }
+                    // end ios/iphone 苹果端
+
+                    if(isContinue == true){
+                        // alert('上传成功');
+                    }
+                    // --------END 结束图片上传--------
+                    */
+
+                    
+                    // ·前台模拟操作(生产环境下请注释掉本段代码)
+                    setTimeout(function(){ // 模拟异步
+                        var countPic = 3; // 总计N张图片
+                        for(var i = 0; i < countPic; i++){
+                            if(i == 0)
+                                var oneImgJson = {
+                                    "pic_up": "1",
+                                    data:[
+                                        {"pic_bh":"1001", "pic_url":"assets/style/img/mod_photo_blue.png", "pic_url_big":"assets/style/img/mod_photo_gray.png", "pic_del":"1"}
+                                        // ,{"pic_bh":"1002", "pic_url":"assets/style/img/mod_photo_blue.png", "pic_url_big":"assets/style/img/mod_photo_gray.png", "pic_del":"1"}
+                                    ]
+                                }
+                            else
+                                var oneImgJson = {
+                                    "pic_up": "1",
+                                    data:[
+                                        {"pic_bh":"1001", "pic_url":"assets/style/img/mod_photo_gray.png", "pic_url_big":"assets/style/img/mod_photo_blue.png", "pic_del":"1"}
+                                        // ,{"pic_bh":"1002", "pic_url":"assets/style/img/mod_photo_gray.png", "pic_url_big":"assets/style/img/mod_photo_blue.png", "pic_del":"1"}
+                                    ]
+                                }
+
+                            insertOneImage(JSON.stringify(oneImgJson), countPic);
+                        }
+                    }, 1000)
+
+
+
+                    // ·函数：插入单张图片
+                    // @param {string} msg 一维对象字符串
+                    // @param {number} total 图片总数
+                    // @returns {Promise} 返回Promise对象(内含“上传成功”的提示信息)
+                    function insertOneImage(msg, total){
+                        var isGoOn = true;
+                        var errors = '';
+                        if(msg == ''){
+                            errors = '图片为空1';
+                            isGoOn = false;
+                        }
+                        var json = {}
+                        if(isGoOn) json = JSON.parse(msg);
+                        if(isGoOn && $.isEmptyObject(json)){
+                            errors = '图片为空2';
+                            isGoOn = false;
+                        }
+                        if(isGoOn && typeof json.data == 'undefined'){
+                            errors = '图片不含data属性';
+                            isGoOn = false;
+                        }
+                        if(isGoOn && json.data.length == 0){
+                            errors = '图片data为空';
+                        }
+                        if(errors != ''){
+                            reject('上传后返回的信息有误：' + errors); // 错误，使用reject返回错误信息
+                        }else{
+                            var source = json.data[0];
+                            allImgJson.data.push(source);
+                        }
+                        if(allImgJson.data.length == total){
+                            createImageList(allImgJson);
+                            resolve('上传成功');  // 成功，使用resolve()返回所有图片数据
+                        }
+                    }
+                }) // END PROMISE
+            }
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====预览图片、放大图片
+            $('.picture__list').on('click', 'li', function(e){
+                e.stopPropagation();
+                var $this = $(this);
+                var imgSrc = $(this).attr('data-pic-url-big'); // 当前图片(取大图)
+                var smallImgArr = [], // 小图地址数组
+                    bigImgArr = []; // 大图地址数组
+                $('li', $this.parent()).each(function(){
+                    var bigImgSrc = $(this).attr('data-pic-url-big'),
+                        smallImgSrc = $(this).css('background-image').split('\(')[1].replace(/\)|\"/ig, ''); // $(this).find('img').attr('src');
+                    smallImgArr.push(smallImgSrc);
+                    if(typeof bigImgSrc == 'undefined' || bigImgSrc == '') bigImgSrc = smallImgSrc; // 若大图为空，则取小图当大图
+                    bigImgArr.push(bigImgSrc);
+                })
+                console.log('当前图片：',imgSrc, '\n小图地址数组：', smallImgArr, '\n大图地址数组：', bigImgArr);
+                wx.previewImage({
+                    current: imgSrc, // 当前图片
+                    urls: bigImgArr // 所有图片数组
+                })
+            });
+
+
+
+
+            
+            //——————————————————————————————————————————
+            //=====删除图片
+            $('.picture__list').on('click', 'li>.icon-del', function(e){
+                e.stopPropagation();
+                var $li = $(this).parents('li');
+                var ls_xqbh = '',
+                    ls_pic_bh = $li.attr('data-pic-bh');
+                // console.log('需求编号：', ls_xqbh, '\n图片编号：', ls_pic_bh);
+                neuiDialog.alert({
+                    animate: true,
+                    message: '确认删除该图片吗？',
+                    buttons: ['确定', '取消'],
+                    callBack: function(ret){
+                        if(ret == 1){       
+                            neui.showAnimate();
+                            setTimeout(function(){
+                                var flag = '', msg = '删除成功';
+                                // 后台返回
+                                /*
+                                // START AJAX
+                                var isHoldOn = true;
+                                ajax({
+                                    heading: "删除图片",
+                                    debug: false,
+                                    async: false, // 取数方式. true 异步, false 同步(默认)
+                                    type: "GET",
+                                    dataType: "html",
+                                    cache: false,
+                                    url: "",
+                                    data: {
+                                        "action": "",
+                                        "user": "<%=s_user%>",
+                                        "sjk": "<%=s_sjk%>",
+                                        "xqbh": ls_xqbh,
+                                        "pic_bh": ls_pic_bh
+                                    },
+                                    success: function(res){
+                                        if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                        // if(res == '') return;
+                                        var json = JSON.parse(res);
+                                        flag = json.return == 'ok' ? 1 : 0;
+                                        if(!flag) msg = json.data;
+                                    },
+                                    error: function(res){
+                                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    },
+                                    beforeSend: function(XMLHttpRequest){ },
+                                    complete: function(XMLHttpRequest, textStatus){ }
+                                })
+                                if(!isHoldOn){
+                                    neui.destroyAnimate();
+                                    return;
+                                }
+                                // END AJAX
+                                */
+                                flag = parseInt(1); // 1 成功, 0 失败
+                                if(!flag) msg = '删除失败';
+
+                                neuiDialog.alert({
+                                    message: msg,
+                                    buttons: ['确定'],
+                                    callBack: function(){
+                                        if(flag){ // 成功
+                                            $li.remove(); // 界面上移除
+                                        }
+                                    }
+                                })
+
+                                neui.destroyAnimate();
+                            }, 100)
+                        }
+                    }
+                })
+            });
+
+
+
+            
+    
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
