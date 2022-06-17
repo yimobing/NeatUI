@@ -301,6 +301,42 @@ if (!Element.prototype.closest) {
 
 
 
+/**
+ * 获取DOM节点的HTML代码
+ * 用户在界面上输入的数据使用 JQ的.html()方法 无法获取到输入框中的值，使用本控件可解决这个问题
+ * 使用方法：
+ * eg1. $("#divID").getHtml(); 
+ * eg2. $(".divClassName").getHtml();
+ */
+;(function ($) {
+    var oldHTML = $.fn.html;
+    $.fn.getHtml = function () {
+        if (arguments.length) return oldHTML.apply(this, arguments);
+        $("input, textarea, button", this).each(function () {
+            this.setAttribute('value', this.value);
+        });
+        $("input", this).each(function () {
+            this.setAttribute('value', this.value);
+            this.innerText = this.value;
+        });
+        $(":radio,:checkbox", this).each(function () {
+            // im not really even sure you need to do this for "checked"
+            // but what the heck, better safe than sorry
+            if (this.checked) this.setAttribute('checked', 'checked');
+            else this.removeAttribute('checked');
+        });
+        $("option", this).each(function () {
+            // also not sure, but, better safe...
+            if (this.selected) this.setAttribute('selected', 'selected');
+            else this.removeAttribute('selected');
+        });
+        return oldHTML.apply(this);
+    };
+    // optional to override real .html() if you want
+    // $.fn.html = $.fn.formhtml;
+})(jQuery);
+
+
 
 
 
