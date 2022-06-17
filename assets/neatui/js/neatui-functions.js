@@ -312,11 +312,10 @@ if (!Element.prototype.closest) {
     var oldHTML = $.fn.html;
     $.fn.formatHtml = function () {
         if (arguments.length) return oldHTML.apply(this, arguments);
-        $("input, textarea, button", this).each(function () {
+        $("input, button", this).each(function () {
             this.setAttribute('value', this.value);
         });
         $("textarea", this).each(function () {
-            this.setAttribute('value', this.value);
             this.innerText = this.value;
         });
         $(":radio,:checkbox", this).each(function () {
