@@ -305,17 +305,17 @@ if (!Element.prototype.closest) {
  * 获取DOM节点的HTML代码
  * 用户在界面上输入的数据使用 JQ的.html()方法 无法获取到输入框中的值，使用本控件可解决这个问题
  * 使用方法：
- * eg1. $("#divID").getHtml(); 
- * eg2. $(".divClassName").getHtml();
+ * eg1. $("#divID").formatHtml(); 
+ * eg2. $(".divClassName").formatHtml();
  */
 ;(function ($) {
     var oldHTML = $.fn.html;
-    $.fn.getHtml = function () {
+    $.fn.formatHtml = function () {
         if (arguments.length) return oldHTML.apply(this, arguments);
         $("input, textarea, button", this).each(function () {
             this.setAttribute('value', this.value);
         });
-        $("input", this).each(function () {
+        $("textarea", this).each(function () {
             this.setAttribute('value', this.value);
             this.innerText = this.value;
         });
