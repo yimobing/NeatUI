@@ -408,8 +408,8 @@
                         checked 是否默认选中(可选), 只当搜索类型为单选或多选时有效. true 是, false 否(默认). 注意:单选时如果有多条记录是选中的,则系统会强制只有第一个选中,其它皆不选中
                 */
                 var _contentHtml = neuiSearchBox.getForm({
-                    enableLocale: false, //是否启用本地演示数据源. true 是(默认), false 否
-                    source: [  //自定义数据源
+                    enableLocale: false, // 是否启用本地演示数据源. true 是(默认), false 否
+                    source: [  // 自定义数据源
                         {"type":"input", "label":"精准搜索", "name":"s-user", "placeholder":"输入会员ID搜索"},
                         {"type":"input", "label":"负责人", "name":"s-person", "placeholder":"请选择负责人", "readonly":true},
                         {"type":"textarea", "label":"备注", "name":"s-notes"},
@@ -448,83 +448,84 @@
 
 
                 neui.openAside({
-                    caption: "侧栏搜索", // 标题,可自定义HTML(可选)
+                    caption: "侧栏搜索", //  标题,可自定义HTML(可选)
                     
-                    content: _contentHtml, // 内容,可自定义HTML(可选)
-                    toper: '', //顶部,自定义HTML(可选).
-                    footer: '', //底部,自定义HTML(可选).
+                    content: _contentHtml, //  内容,可自定义HTML(可选)
+                    toper: '', // 顶部,自定义HTML(可选).
+                    footer: '', // 底部,自定义HTML(可选).
 
-                    //关闭按钮 
-                    cross: true, //是否显示关闭图标(可选),默认true
-                    showCrossText: true, //是否显关闭按钮的文字(可选),默认false
-                    showCrossIcon: true, //是否显示关闭按钮的图标(可选),默认true
-                    crossTextWord: '完成', //关闭按钮的文字(可选),默认'完成'
+                    // 关闭按钮 
+                    cross: true, // 是否显示关闭图标(可选),默认true
+                    showCrossText: true, // 是否显关闭按钮的文字(可选),默认false
+                    showCrossIcon: true, // 是否显示关闭按钮的图标(可选),默认true
+                    crossTextWord: '完成', // 关闭按钮的文字(可选),默认'完成'
 
-                    //返回按钮
-			        back: true, //是否显示返回按钮(可选),默认false
-                    showBackText: true, //是否显示返回按钮的文字(可选),默认false
-                    backTextWord: '返回', //自定义返回按钮的文字(可选),默认'返回'
-                    showBackIcon: true, //是否显示返回按钮的图标(可选),默认true
+                    // 返回按钮
+			        back: true, // 是否显示返回按钮(可选),默认false
+                    showBackText: true, // 是否显示返回按钮的文字(可选),默认false
+                    backTextWord: '返回', // 自定义返回按钮的文字(可选),默认'返回'
+                    showBackIcon: true, // 是否显示返回按钮的图标(可选),默认true
                     
-                    //标题栏
-                    capWrap: false, //标题是否单独一行(可选),默认false. 值为false时,标题将与顶部的关闭、返回按钮在同一行
-                    capThick: false, //标题文字是否加粗(可选),默认false.
-                    capLine: false, //标题栏是否添加下边线条好与内容部分分隔开(可选),默认false
-                    capShadow: false, //标题栏是否有阴影(可选),默认false
-                    capAlign: 'auto', //标题文字水平对齐方式(可选). 默认auto.其它值：left 左对齐, right 右对齐, center 居中对齐, auto 系统自动.
-                    capFontSize: 'auto', //标题文字大小(可选),默认auto. eg. 18或18px
+                    // 标题栏
+                    capWrap: false, // 标题是否单独一行(可选),默认false. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+                    capThick: false, // 标题文字是否加粗(可选),默认false.
+                    capLine: false, // 标题栏是否添加下边线条好与内容部分分隔开(可选),默认false
+                    capShadow: false, // 标题栏是否有阴影(可选),默认false
+                    capAlign: 'auto', // 标题文字水平对齐方式(可选). 默认auto.其它值：left 左对齐, right 右对齐, center 居中对齐, auto 系统自动.
+                    capFontSize: 'auto', // 标题文字大小(可选),默认auto. eg. 18或18px
 
-                    botLine: false, //底部栏是否添加上边线条好与内容部分隔开(可选),默认false.
-                    botShadow: false, //底部栏是否有阴影(可选),默认false
+                    botLine: false, // 底部栏是否添加上边线条好与内容部分隔开(可选),默认false.
+                    botShadow: false, // 底部栏是否有阴影(可选),默认false
 
-                    adaptive: false, //窗口是否自适应内容大小(可选). true 是, false 否(默认)
-                    adapWidth: 'auto', //窗口自适应大小时的最大宽度(可选). 默认auto. (本参数仅在pc端时有效). 格式：数值或带px或带百分号的字符串, eg.200, '200px, '80%'
-                    frozen: true, //是否冻结顶部、中间及底部,即各部分是否使用绝对定位(可选). true 是(默认), false 否. false时控件大小自适应内容
-                    //按钮参数有两种格式
-                    buttons: ["重置", "完成", "提交"],  // 按钮(可选)
-                    /* buttons: [ // 按钮(可选)
+                    adaptive: false, // 窗口是否自适应内容大小(可选). true 是, false 否(默认)
+                    adapWidth: 'auto', // 窗口自适应大小时的最大宽度(可选). 默认auto. (本参数仅在pc端时有效). 格式：数值或带px或带百分号的字符串, eg.200, '200px, '80%'
+                    frozen: true, // 是否冻结顶部、中间及底部,即各部分是否使用绝对定位(可选). true 是(默认), false 否. false时控件大小自适应内容
+                    // 按钮参数有两种格式
+                    buttons: ["重置", "完成", "提交"],  //  按钮(可选)
+                    /* buttons: [ //  按钮(可选)
                     	{text: "重置", name: "btn-reset", width: "100%", class: "ne-btn", backColor: "", foreColor: "", radius: "0"},
                     	{text: "完成", name: "btn-complete", width: "100%", class: "ne-btn info", backColor: "", foreColor: "", radius: "0"}
                     ], */
-                    buttonAutoWidth: false, //当只有一个按钮时按钮是否根据内容自动调整宽度(可选),默认false. 值为true时,buttons参数中设置的按钮宽度将不起作用
-                    buttonClingFoot: true, //按钮是否紧帖底部(可选),默认true. false时按钮与底部将有一定的距离
-                    showButton: true, //是否显示按钮(可选),默认true
+                    buttonAutoWidth: false, // 当只有一个按钮时按钮是否根据内容自动调整宽度(可选),默认false. 值为true时,buttons参数中设置的按钮宽度将不起作用
+                    buttonClingFoot: true, // 按钮是否紧帖底部(可选),默认true. false时按钮与底部将有一定的距离
+                    showButton: true, // 是否显示按钮(可选),默认true
     
-                    offset: { //位置偏移,由此可设置窗口位置(可选)
+                    offset: { // 位置偏移,由此可设置窗口位置(可选)
                         left: 50,
                         right: 0,
                         top: 0,
                         bottom: 0
                     },
-                    radius: 0, //圆角边框值(可选)
-                    zIndex: 4, //层级z-index(可选)
-                    animate: { //动画(可选)
-                        enable: true, //是否启用
-                        direction: 'left' //动画方向(可选). left 向左(默认), right 向右, top 向上, bottom 向下
+                    radius: 0, // 圆角边框值(可选)
+                    zIndex: 4, // 层级z-index(可选)
+                    maskOpacity: 0.6, //  遮罩透明度(可选),  默认0.6. 值：0到1. 0 表示完全透明, 1 完全不透明.
+                    animate: { // 动画(可选)
+                        enable: true, // 是否启用
+                        direction: 'left' // 动画方向(可选). left 向左(默认), right 向右, top 向上, bottom 向下
                     },
-                    //noneSelfClickClose: true, //是否点击窗口以外区域就关闭窗口(可选),默认true. 值为false时常用于多个侧栏嵌套时,除第1个侧栏外其它侧栏要求点击非窗口区域就关闭窗口
-                    //btnClickClose: false, //是否一点击按钮就关闭窗口(可选),默认false. 值为true时用于无须校验数据等其它操作,此时须前台手动调用函数才会关闭窗口
-                    //供前台调用
-                    //closeAside: function(){ }, //关闭当前窗口, 供btnCallBack等回调函数调用,用来关闭窗口(可选)
-                    //closeAll: function(){ }, //关闭所有窗口, 供btnCallBack等回调函数调用,用来关闭窗口(可选)
-                    //回调
-                    crossCallBack: function(e){ }, // 打叉关闭图标回调(可选). e格式: {eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
-			        backCallBack: function(e){ }, // 返回按钮回调(可选). e格式: {eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
-                    openCallBack: function(e){ //创建完成后的回调. e格式: {eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
-                        //console.log('e:', e);
-                        neuiSearchBox.doneEvent(); //加载搜索框事件
-                    },
-                    btnCallBack: function(ret, e){ //按钮回调(可选). ret 按钮索引值+1, e格式：{eleBtn:"当前按钮节点", eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
+                    // noneSelfClickClose: true, // 是否点击窗口以外区域就关闭窗口(可选),默认true. 值为false时常用于多个侧栏嵌套时,除第1个侧栏外其它侧栏要求点击非窗口区域就关闭窗口
+                    // btnClickClose: false, // 是否一点击按钮就关闭窗口(可选),默认false. 值为true时用于无须校验数据等其它操作,此时须前台手动调用函数才会关闭窗口
+                    // 供前台调用
+                    // closeAside: function(){ }, // 关闭当前窗口, 供btnCallBack等回调函数调用,用来关闭窗口(可选)
+                    // closeAll: function(){ }, // 关闭所有窗口, 供btnCallBack等回调函数调用,用来关闭窗口(可选)
+                    // 回调
+                    crossCallBack: function(e){ }, //  打叉关闭图标回调(可选). e格式: {eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
+			        backCallBack: function(e){ }, //  返回按钮回调(可选). e格式: {eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
+                    openCallBack: function(e){ // 创建完成后的回调. e格式: {eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
                         // console.log('e:', e);
+                        neuiSearchBox.doneEvent(); // 加载搜索框事件
+                    },
+                    btnCallBack: function(ret, e){ // 按钮回调(可选). ret 按钮索引值+1, e格式：{eleBtn:"当前按钮节点", eleRoot:"根节点", eleLay:"layer节点", eleMain:"中间主体节点", eleTop:"顶部节点", eleFoot:"底部节点"}
+                        //  console.log('e:', e);
                         var self = this;
                         if(ret == 1){ }
                         if(ret == 2){
                             alert('这里会执行一系列事件，最后调用内置函数以关闭窗口');
-                            //..
+                            // ..
                         }
 
-                        self.closeAside(); //关闭当前窗口
-                        //self.closeAll(); //关闭所有窗口
+                        self.closeAside(); // 关闭当前窗口
+                        // self.closeAll(); // 关闭所有窗口
                     }
                 })
 
