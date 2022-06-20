@@ -951,8 +951,13 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     background: transparent url('') no-repeat scroll center center / 100% auto;
 }
 .icon-quotation{ background-image: url('../img/config_mod_icon_no.png')!important; }
+
+.icon-user,
 .icon-inquirer{ background-image: url('../img/config_mod_icon_user.png')!important; }
-.icon-enterprise{ background-image: url('../img/config_mod_icon_company.png')!important; }
+
+.icon-enterprise,
+.icon-company{ background-image: url('../img/config_mod_icon_company.png')!important; }
+
 .icon-purpose{ background-image: url('../img/config_mod_icon_purpose.png')!important; }
 .icon-category{ background-image: url('../img/config_mod_icon_category.png')!important; }
 .icon-breed{ background-image: url('../img/config_mod_icon_loan.png')!important; }
@@ -965,12 +970,30 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
 .icon-build{ background-image: url('../img/config_mod_icon_build.png')!important; }
 .icon-floor{ background-image: url('../img/config_mod_icon_floor.png')!important; }
 .icon-room{ background-image: url('../img/config_mod_icon_room.png')!important; }
+
+.icon-property,
 .icon-clock{ background-image: url('../img/config_mod_icon_property.png')!important; }
+
+.icon-jzmj,
+.icon-ccjmj,
+.icon-floorage,
+.icon-acreage,
 .icon-metre{ background-image: url('../img/config_mod_icon_area.png')!important; }
+
 .icon-calendar{ background-image: url('../img/config_mod_icon_calendar.png')!important; }
 .icon-numeric{ background-image: url('../img/config_mod_icon_numeral.png')!important; }
+
 .icon-locate,
 .icon-area{ background-image: url('../img/config_mod_icon_locate.png')!important; }
+
 .icon-drop{ background-image: url('../img/config_mod_icon_drop.png')!important; }
 .icon-text{ background-image: url('../img/config_mod_icon_text.png')!important; }
 .icon-textarea{ background-image: url('../img/config_mod_icon_multiple.png')!important; }
+.icon-price{ background-image: url('../img/config_mod_icon_price.png')!important; }
+.icon-unitPrice{ background-image: url('../img/config_mod_icon_unitPrice.png')!important; }
+.icon-totalPrice{ background-image: url('../img/config_mod_icon_totalPrice.png')!important; }
+
+.icon-rate,
+.icon-mortgage,
+.icon-pledge,
+.icon-pawn{ background-image: url('../img/config_mod_icon_pledge.png')!important; }
