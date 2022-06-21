@@ -1224,6 +1224,9 @@
                 }
                 //
                 var _boxWClass = ''; // boxWidth == '' ? '' : (boxWidth == '100%' ? ' w-100' : ''); // 宽
+                if(tagName == 'textarea'){
+                    _boxWClass += ' flex-start';
+                }
                 var _iconStr = icons == '' || me.$opts.config.layout.inputIcon === false ? '' : '<i class="icon' + icons + '"></i>'; // 图标
                 //
                 var _crossClass = me.$opts.houses.houseRightButton && _BtHtml != '' ? ' has-cell-btn' : '';
