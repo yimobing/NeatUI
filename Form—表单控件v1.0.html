@@ -108,7 +108,11 @@
                 // hasExchangeModule 参数值为true时：
                 // 如果页面有存在一个自定义一个div节点，且该节点的class属性含有"switch"，则“切换输入模块”将加载到该div节点中；
                 // 如果页面不存在该div节点，则“切换输入模块”将在最底部加载。
-                isPropertyAssociated: false // 产权年限是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素
+                // 关联元素
+                isPropertyAssociated: false, // 产权年限是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素; 值为true时，当楼盘名称、幢号、楼层、房号等上级元素值发生变化时，将清空当前元素的值。
+                isFloorageAssociated: false, // 建筑面积是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素; 值为true时，当楼盘名称、幢号、楼层、房号等上级元素值发生变化时，将清空当前元素的值。
+                isStorageAssociated: false, // 储藏间面积是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素; 值为true时，当楼盘名称、幢号、楼层、房号等上级元素值发生变化时，将清空当前元素的值。
+                isCrossClearValue: true // 点击打叉图标时，是否清空关联元素的值(可选), 默认true
             }
         },
         config: { // 配置项(可选)
@@ -184,6 +188,7 @@
     button      自定义右侧按钮(可选)。格式：{id:"按钮ID属性(可选)", class:"按钮Class属性(可选)", text:"按钮名称(可选)", icon:"图标名(可选),如fa-pencil", appearance:"按钮样式(可选),值：3d 立体感, simple 简单的"}
     press       自定义按钮样式(仅当type="按钮"时有效)(可选)。格式：{ labeled:"是否隐藏左侧的标题栏(可选), 默认false", underline:"是否有下划线(可选),默认false", align: "按钮水平对齐(可选),默认left。值 left, center", color: "按钮文字颜色,颜色值如red, green",  icon:"图标名(可选),如fa-pencil", appearance:"按钮外观(可选), 值: 3d 立体感(默认), simple 简单的, pure 纯文本(没边线)"}
     attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
+    associate   是否为楼盘、幢号、楼层、房号、建筑面积、储藏间面积、产权联系等元素的关联元素(可选), 默认false
     group       自定义相邻的N行同属一个某个分组，以划分区块(可选)。eg.若有相认的多行定义group="user"，则将会用 '<div class="block__user"></div>' 将这些行包起来。
     combine     将相邻的多行合并成一行(可选). eg. 假设有“抵押净值单价”、“抵押净值总价”两行，两行都设置combine属性值为“抵押净值”，则这两行都会有一个共同的标题“抵押净值”。
     */
@@ -363,7 +368,7 @@
                     {title:"客户姓名", field:"username", type:"文本", value:"张三 17350166038", must:true, phone: true },
                     {title:"客户电话", field:"mobile", type:"文本", value:"18350605829", must:true, phone: true, chat: true, rowRead:true },
                     {title:"客户备注", field:"note", type:"文本", value:"该用户很懒，没有备注", multiple: true, must:true },
-                    {title:"抵押物所在地", field:"locate", type:"下拉", value:"福建省-泉州市-丰泽区", must:true },
+                    {title:"抵押物所在地", field:"locate", type:"下拉", value:"福建省-泉州市-丰泽区", must:true, associate:true },
                     {title:"抵押物类型", field:"category", type:"下拉", value:"住宅(有储藏间)", must:true }
                 ]
             }
@@ -412,10 +417,10 @@
                     {val1:"幢号", val2:"5幢", val3:"", val4:"请选择幢号", hid1:"幢号", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"幢号"},
                     {val1:"楼层", val2:"3楼", val3:"", val4:"请选择楼层", hid1:"楼层", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"楼层"},
                     {val1:"房号", val2:"302号", val3:"", val4:"请选择房号", hid1:"房号", hid2:"", hid3:"下拉值", hid4:"0", hid5:"1", hid6:"房号"},
-                    {val1:"产权年限", val2:"未满两年", val3:"", val4:"请选择产权年限", hid1:"产权年限", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"产权年限"},
                     {val1:"建筑面积", val2:"130", val3:"平方米", val4:"请输入建筑面积", hid1:"建筑面积", hid2:"", hid3:"101", hid4:"0", hid5:"1", hid6:"建筑面积"},
                     {val1:"储藏间面积", val2:"30", val3:"平方米", val4:"请输入储藏间面积", hid1:"储藏间面积", hid2:"", hid3:"101", hid4:"0", hid5:"1", hid6:"储藏间面积"},
                     {val1:"土地面积", val2:"120", val3:"平方米", val4:"请输入土地面积", hid1:"无", hid2:"数字", hid3:"101", hid4:"0", hid5:"1", hid6:"土地面积"},
+                    {val1:"产权年限", val2:"未满两年", val3:"", val4:"请选择产权年限", hid1:"产权年限", hid2:"", hid3:"", hid4:"0", hid5:"1", hid6:"产权年限"},
                     {val1:"日期", val2:"", val3:"", val4:"", hid1:"无", hid2:"日期", hid3:"", hid4:"0", hid5:"0", hid6:"日期"},
                     {val1:"数字", val2:"", val3:"", val4:"", hid1:"无", hid2:"数字", hid3:"", hid4:"0", hid5:"0", hid6:"数字"}, 
                     {val1:"单选", val2:"", val3:"", val4:"", hid1:"无", hid2:"单选", hid3:"", hid4:"0", hid5:"0", hid6:"单选"},
@@ -433,7 +438,10 @@
                     switches: {
                         enable: true,
                         hasExchangeModule: true,
-                        isPropertyAssociated: false
+                        isPropertyAssociated: true,
+                        isFloorageAssociated: true,
+                        isStorageAssociated: true,
+                        isCrossClearValue: true
                     }
                 },
                 config: { // 配置项(可选)
@@ -647,7 +655,7 @@
                         cascade: true,
                         district: true,
                         onConfirm: function (e) {
-                            // example.clearRoomFormRelatedSubordinateData(null, e.value, e.oldValue); // 清空楼盘名称、幢号、楼层、房号等数据
+                            example.clearRoomFormRelatedSubordinateData(null, e.value, e.oldValue); // 清空楼盘名称、幢号、楼层、房号等下级关联元素数据
                         }
                     })
 
