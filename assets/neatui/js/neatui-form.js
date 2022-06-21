@@ -155,7 +155,10 @@
                         enable: true, // 是否允许手动输入(可选), 默认true
                         // scope: "related", // 切换成手动输入的元素范围(可选)。值：related 仅限关联元素(默认), self 仅限自身元素, all 所有使用下拉选择的元素
                         hasExchangeModule: true, // 是否加载切换输入模块(可选), 默认true。值为true时将在最底部加载“如查无数据，请选择手动输入”、“取消手动输入”
-                        isPropertyAssociated: false // 产权年限是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素
+                        isPropertyAssociated: false, // 产权年限是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素
+                        isFloorageAssociated: false, // 建筑面积是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素; 值为true时，当楼盘名称、幢号、楼层、房号等上级元素值发生变化时，将清空当前元素的值。
+                        isStorageAssociated: false, // 储藏间面积是否为关联元素(可选), 默认false。值为false时表示只有楼盘名称、幢号、楼层、房号才是关联元素; 值为true时，当楼盘名称、幢号、楼层、房号等上级元素值发生变化时，将清空当前元素的值。
+                        isCrossClearValue: true // 点击打叉图标时，是否清空关联元素的值(可选), 默认true
                     }
                 },
                 config: { // 配置项(可选)
@@ -715,7 +718,15 @@
                 var next = document.querySelectorAll('.clear-relation');
                 Array.from(next).forEach(function(el){
                     if(newValue.toString().replace(/([ ]+)/g, '') != oldValue.toString().replace(/([ ]+)/g, '')){
-                        el.value = '';
+                        el.value = ''; // 清空下级关联元素的值
+                        // 隐藏下级关联元素右侧的打叉图标 add 20220621-1
+                        var brotherNodes = tools.getAllSiblingElement(el.parentNode); // add 20220621-1
+                        Array.from(brotherNodes).forEach(function(brothers){
+                            if(brothers.getAttribute('data-type') == 'cross'){
+                                brothers.style.display = 'none';
+                                return false;
+                            }
+                        })  
                     }
                 })
             }else{
@@ -726,7 +737,17 @@
                     Array.from(inputNode).forEach(function(txt){
                         var className = typeof txt.className == 'undefined' ? '' : txt.className;
                         if(newValue.toString().replace(/([ ]+)/g, '') != oldValue.toString().replace(/([ ]+)/g, '')){
-                            if(className.indexOf('clear-relation') >= 0) txt.value = '';
+                            if(className.indexOf('clear-relation') >= 0) {
+                                txt.value = ''; // 清空下级关联元素的值
+                                // 隐藏下级关联元素右侧的打叉图标 add 20220621-1
+                                var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
+                                Array.from(brotherNodes).forEach(function(brothers){
+                                    if(brothers.getAttribute('data-type') == 'cross'){
+                                        brothers.style.display = 'none';
+                                        return false;
+                                    }
+                                })  
+                            }
                         }
                     })
                 })
@@ -780,6 +801,7 @@
                     buttons = typeof items["button"] == 'undefined' ? null : items["button"],
                     attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"],
                     rowRead = typeof items["rowRead"] == 'undefined' ? false : items["rowRead"] === true ? true : false,
+                    associate = typeof items["associate"] == 'undefined' ? false : items["associate"] === true ? true : false,
                     group = typeof items["group"] == 'undefined' ? '' : items["group"].toString().replace(/([ ]+)/g, ''),
                     combine = typeof items["combine"] == 'undefined' ? '' : items["combine"].toString().replace(/([ ]+)/g, ''),
                     press = typeof items["press"] == 'undefined' ? null : items["press"];
@@ -841,6 +863,9 @@
                 }
                 if(chat){
                     className += ' click-weixin';
+                }
+                if(associate){ // add 20220621-1
+                    className += ' clear-relation clear-built-relation';
                 }
                 
                 //
@@ -1157,6 +1182,7 @@
                         }
 
                         if (hid1 == '建筑面积') { // 调用数字键盘
+                            if(me.$opts.houses.switches.isFloorageAssociated) className += ' clear-relation'; // 建筑面积是关联元素 test2
                             className += ' click-num click-jzmj';
                             ids = 'jzmj';
                             icons = ' icon-metre';
@@ -1165,6 +1191,7 @@
                         }
 
                         if (hid1 == '储藏间面积') { // 调用数字键盘
+                            if(me.$opts.houses.switches.isStorageAssociated) className += ' clear-relation'; // 储藏间面积是关联元素 test2
                             className += ' click-num click-ccjmj';
                             ids = 'ccjmj';
                             icons = ' icon-metre';
@@ -1359,6 +1386,7 @@
             
             // 打叉图标
             var crossNode = document.querySelectorAll('[data-type="cross"]');
+            
             Array.from(crossNode).forEach(function(el, i){
                 el.addEventListener('click', function(e){
                     e.stopPropagation();
@@ -1370,11 +1398,7 @@
                     Array.from(siblingArr).forEach(function(sib){ // 循环兄弟节点,查找到input,textarea元素并清空其值
                         var child = sib.children;
                         for(var i = 0, len = child.length; i < len; i++){
-                            var tagname = child[i].tagName.toString().toLocaleLowerCase();                          
-                            if(tagname == 'input' || tagname == 'textarea'){
-                                child[i].value = ''; // 清空输入框值
-                                el.style = 'display: none;'; // 隐藏打叉图标
-                            }
+                            var tagname = child[i].tagName.toString().toLocaleLowerCase();    
                             if(typeof child[i].className != 'undefined' && child[i].className.indexOf('r-tel') >= 0){ // 电话图标不再高亮
                                 var grand = child[i].children;
                                 for(var k = 0; k < grand.length; k++){
@@ -1384,6 +1408,51 @@
                                     }
                                 }
                             }
+                            // 清空自身元素                  
+                            if(tagname == 'input' || tagname == 'textarea'){
+                                child[i].value = ''; // 清空输入框值
+                                el.style = 'display: none;'; // 隐藏打叉图标
+                            }
+                            // 清空关联元素 add 20220621-1
+                            if(typeof child[i].className != 'undefined' && child[i].className.indexOf('clear-relation') >= 0){
+                                if(!me.$opts.houses.switches.isCrossClearValue) return;
+                                if(child[i].className.indexOf('jzmj') >= 0 || child[i].className.indexOf('ccjmj') >= 0 || child[i].className.indexOf('property') >= 0) return; // 建筑面积、储藏间面积、产权年限除外
+                                // 清空下级关联元素
+                                var next = tools.getAllNextElement(child[i].parentNode.parentNode);
+                                Array.from(next).forEach(function(el){
+                                    var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
+                                    Array.from(inputNode).forEach(function(txt){
+                                        var className = typeof txt.className == 'undefined' ? '' : txt.className;
+                                        if(className.indexOf('clear-relation') >= 0) {
+                                            txt.value = ''; // 清空下级关联元素的值
+                                            // 隐藏下级关联元素右侧的打叉图标
+                                            var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
+                                            Array.from(brotherNodes).forEach(function(brothers){
+                                                if(brothers.getAttribute('data-type') == 'cross'){
+                                                    brothers.style.display = 'none';
+                                                    return false;
+                                                }
+                                            })  
+                                        }
+                                    })
+                                })
+                                // 清空楼盘关联元素
+                                if(child[i].className.indexOf('clear-built-relation') >= 0){
+                                    var inputNode = document.querySelectorAll('.clear-relation');
+                                    Array.from(inputNode).forEach(function(txt){
+                                        txt.value = ''; // 清空下级关联元素的值
+                                        // 隐藏下级关联元素右侧的打叉图标
+                                        var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
+                                        Array.from(brotherNodes).forEach(function(brothers){
+                                            if(brothers.getAttribute('data-type') == 'cross'){
+                                                brothers.style.display = 'none';
+                                                return false;
+                                            }
+                                        })
+                                    })
+                                }
+                            }
+
                         }
                     })
                 })
