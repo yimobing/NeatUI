@@ -719,8 +719,8 @@
                 Array.from(next).forEach(function(el){
                     if(newValue.toString().replace(/([ ]+)/g, '') != oldValue.toString().replace(/([ ]+)/g, '')){
                         el.value = ''; // 清空下级关联元素的值
-                        // 隐藏下级关联元素右侧的打叉图标 add 20220621-1
-                        var brotherNodes = tools.getAllSiblingElement(el.parentNode); // add 20220621-1
+                        // 隐藏下级关联元素右侧的打叉图标 add 20220622-1
+                        var brotherNodes = tools.getAllSiblingElement(el.parentNode); // add 20220622-1
                         Array.from(brotherNodes).forEach(function(brothers){
                             if(brothers.getAttribute('data-type') == 'cross'){
                                 brothers.style.display = 'none';
@@ -731,6 +731,7 @@
                 })
             }else{
                 o = tools.anyToDomObject(o);
+                // 清空下级关联元素
                 var next = tools.getAllNextElement(o.parentNode.parentNode);
                 Array.from(next).forEach(function(el){
                     var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
@@ -739,7 +740,7 @@
                         if(newValue.toString().replace(/([ ]+)/g, '') != oldValue.toString().replace(/([ ]+)/g, '')){
                             if(className.indexOf('clear-relation') >= 0) {
                                 txt.value = ''; // 清空下级关联元素的值
-                                // 隐藏下级关联元素右侧的打叉图标 add 20220621-1
+                                // 隐藏下级关联元素右侧的打叉图标 add 20220622-1
                                 var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
                                 Array.from(brotherNodes).forEach(function(brothers){
                                     if(brothers.getAttribute('data-type') == 'cross'){
@@ -750,6 +751,22 @@
                             }
                         }
                     })
+                })
+
+                // 清空其它关联元素 add 20220622-1
+                var next = document.querySelectorAll('.beCleaned-by-built-relation');
+                Array.from(next).forEach(function(el){
+                    if(newValue.toString().replace(/([ ]+)/g, '') != oldValue.toString().replace(/([ ]+)/g, '')){
+                        el.value = ''; // 清空其它关联元素的值
+                        // 隐藏其它关联元素右侧的打叉图标
+                        var brotherNodes = tools.getAllSiblingElement(el.parentNode);
+                        Array.from(brotherNodes).forEach(function(brothers){
+                            if(brothers.getAttribute('data-type') == 'cross'){
+                                brothers.style.display = 'none';
+                                return false;
+                            }
+                        })  
+                    }
                 })
             }
         };
@@ -801,7 +818,8 @@
                     buttons = typeof items["button"] == 'undefined' ? null : items["button"],
                     attribute = typeof items["attribute"] == 'undefined' ? '' : items["attribute"],
                     rowRead = typeof items["rowRead"] == 'undefined' ? false : items["rowRead"] === true ? true : false,
-                    associate = typeof items["associate"] == 'undefined' ? false : items["associate"] === true ? true : false,
+                    superordination = typeof items["superordination"] == 'undefined' ? false : items["superordination"] === true ? true : false, // add 20220622-1
+                    subordination = typeof items["subordination"] == 'undefined' ? false : items["subordination"] === true ? true : false, // add 20220622-1
                     group = typeof items["group"] == 'undefined' ? '' : items["group"].toString().replace(/([ ]+)/g, ''),
                     combine = typeof items["combine"] == 'undefined' ? '' : items["combine"].toString().replace(/([ ]+)/g, ''),
                     press = typeof items["press"] == 'undefined' ? null : items["press"];
@@ -864,8 +882,11 @@
                 if(chat){
                     className += ' click-weixin';
                 }
-                if(associate){ // add 20220621-1
+                if(superordination){ // add 20220622-1
                     className += ' clear-relation clear-built-relation';
+                }
+                if(subordination){ // add 20220622-1
+                    className += ' beCleaned-by-built-relation';
                 }
                 
                 //
@@ -1387,9 +1408,8 @@
             //     })
             // })
             
-            // 打叉图标
+            // 打叉图标点击事件
             var crossNode = document.querySelectorAll('[data-type="cross"]');
-            
             Array.from(crossNode).forEach(function(el, i){
                 el.addEventListener('click', function(e){
                     e.stopPropagation();
@@ -1416,10 +1436,10 @@
                                 child[i].value = ''; // 清空输入框值
                                 el.style = 'display: none;'; // 隐藏打叉图标
                             }
-                            // 清空关联元素 add 20220621-1
+                            // 清空关联元素 add 20220622-1
                             if(typeof child[i].className != 'undefined' && child[i].className.indexOf('clear-relation') >= 0){
                                 if(!me.$opts.houses.switches.isCrossClearValue) return;
-                                if(child[i].className.indexOf('jzmj') >= 0 || child[i].className.indexOf('ccjmj') >= 0 || child[i].className.indexOf('property') >= 0) return; // 建筑面积、储藏间面积、产权年限除外
+                                if(child[i].className.indexOf('jzmj') >= 0 || child[i].className.indexOf('ccjmj') >= 0 || child[i].className.indexOf('property') >= 0) return; // 排除建筑面积、储藏间面积、产权年限
                                 // 清空下级关联元素
                                 var next = tools.getAllNextElement(child[i].parentNode.parentNode);
                                 Array.from(next).forEach(function(el){
@@ -1438,13 +1458,27 @@
                                             })  
                                         }
                                     })
+                                    // 清空其它关联元素
+                                    var inputNode = document.querySelectorAll('.beCleaned-by-built-relation');
+                                    console.log('aaa')
+                                    Array.from(inputNode).forEach(function(txt){
+                                        txt.value = ''; // 清空其它关联元素的值
+                                        // 隐藏其它关联元素右侧的打叉图标
+                                        var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
+                                        Array.from(brotherNodes).forEach(function(brothers){
+                                            if(brothers.getAttribute('data-type') == 'cross'){
+                                                brothers.style.display = 'none';
+                                                return false;
+                                            }
+                                        })
+                                    })   
                                 })
-                                // 清空楼盘关联元素
+                                // 清空房号配置关联元素
                                 if(child[i].className.indexOf('clear-built-relation') >= 0){
                                     var inputNode = document.querySelectorAll('.clear-relation');
                                     Array.from(inputNode).forEach(function(txt){
-                                        txt.value = ''; // 清空下级关联元素的值
-                                        // 隐藏下级关联元素右侧的打叉图标
+                                        txt.value = ''; // 清空房号配置关联元素的值
+                                        // 隐藏房号配置关联元素右侧的打叉图标
                                         var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
                                         Array.from(brotherNodes).forEach(function(brothers){
                                             if(brothers.getAttribute('data-type') == 'cross'){
@@ -1453,7 +1487,7 @@
                                             }
                                         })
                                     })
-                                }
+                                } 
                             }
 
                         }
