@@ -801,7 +801,9 @@
                 var ls_area = $('#locate').val(),
                     ls_lpmc = example.filterRoomFormHouseChar($(this).val());
                 var arr = [ ls_area, ls_lpmc ];
-                console.log('数组：', arr);
+                // console.log('数组：', arr);
+                // 校验数据
+                if(ls_lpmc.toString().replace(/\s+/g, '') === '') return; // 空白符中断. 解决移动端ios手写输入时带有多个空格导致反复触发的bug(注：这些空格子是真空格,可能是制表符或换页符,故要用\s+来匹配)
                 // 开始执行
                 neui.showAnimate();
                 setTimeout(function(){
