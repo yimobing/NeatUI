@@ -2061,14 +2061,15 @@ var filter = {
         var flag = typeof isHTML == 'undefined' ? true : (isHTML === false ? false : true);
         if(flag){
             if(typeof ps_str == 'undefined' || ps_str == null) return '';
-            var ps_str = ps_str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); //过滤css
-            ps_str = ps_str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g, ''); //过滤js
-            ps_str = ps_str.replace(/<[^<>]+?>/g, ''); //过滤标签
-            ps_str = ps_str.replace(/\ +/g, ''); //去掉空格
-            ps_str = ps_str.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); //去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格
-            ps_str = ps_str.replace(/[\r\n]+?/g, ' '); //去掉换行(变成一个空格)
+            var ps_str = ps_str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); // 过滤css
+            ps_str = ps_str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g, ''); // 过滤js
+            ps_str = ps_str.replace(/<[^<>]+?>/g, ''); // 过滤标签
+            // ps_str = ps_str.replace(/\s+/g,''); // 去掉空白符(空格、制表符、换行符等)
+            ps_str = ps_str.replace(/\ +/g, ''); // 去掉空格
+            ps_str = ps_str.replace(/[\r\n]+?/g, ' '); // 去掉换行(变成一个空格)
+            ps_str = ps_str.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); // 去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格      
         }
-        if(typeof utilities.htmlEncode == 'function') ps_str = utilities.htmlEncode(ps_str); //标签转化成字符串
+        if(typeof utilities.htmlEncode == 'function') ps_str = utilities.htmlEncode(ps_str); // 标签转化成字符串
         return ps_str;
     },
 
