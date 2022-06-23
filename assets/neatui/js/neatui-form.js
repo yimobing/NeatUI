@@ -653,13 +653,14 @@
          */
         me.filterRoomFormHouseChar = function(str){
             if(typeof str == 'undefined') return '';
-            var str = str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g,''); //过滤css
-            str = str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g,''); //过滤JS
-            str = str.replace(/<[^<>]+?>/g,'');  //过滤html标签
-            str = str.replace(/\ +/g,''); //去掉空格
-            str = str.replace(/[\r\n]+?/g,''); //去掉换行
-            str = str.replace(/&npsp;/ig, ''); //去掉npsp;
-            //str = str.replace(/[\w\d\_\-?？!！]/g,''); //过滤数字、字母、下划线、短线、问号，感叹号等
+            var str = str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g,''); // 过滤css
+            str = str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g,''); // 过滤JS
+            str = str.replace(/<[^<>]+?>/g,'');  // 过滤html标签
+            // str = str.replace(/\ +/g,''); // 去掉空格
+            // str = str.replace(/[\r\n]+?/g,''); // 去掉换行
+            str = str.replace(/\s+/g,''); // 去掉空白符(空格、制表符、换行符等)
+            str = str.replace(/&nbsp;/ig, ''); // 去掉nbsp;转义的空格
+            // str = str.replace(/[\w\d\_\-?？!！]/g,''); // 过滤数字、字母、下划线、短线、问号，感叹号等
             return str;
         };
 
