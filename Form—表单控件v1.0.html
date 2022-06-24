@@ -190,6 +190,7 @@
     attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
     superordination 当前栏的值改变时是否清空房号配置数据(楼盘、幢号等)(可选), 默认false
     subordination 房号配置数据(楼盘、幢号等)改变时是否清空当前栏的值(可选), 默认false
+    subBeCleanedValue 房号配置数据(楼盘、幢号等)改变时清空当前栏的值后马上又给它赋一个默认的值(可选)，默认空。一般用于当前栏的值被清空，但指定当前栏始终有一个默认的值。
     group       自定义相邻的N行同属一个某个分组，以划分区块(可选)。eg.若有相认的多行定义group="user"，则将会用 '<div class="block__user"></div>' 将这些行包起来。
     combine     将相邻的多行合并成一行(可选). eg. 假设有“抵押净值单价”、“抵押净值总价”两行，两行都设置combine属性值为“抵押净值”，则这两行都会有一个共同的标题“抵押净值”。
     */
@@ -401,7 +402,7 @@
             // 创建价格数据表单
             var priceJson = {
                 data:[
-                    {title:"评估单价", field:"unitPrice", type:"文本", value:"13000", unit:"元/平方米", must:true, subordination:true },
+                    {title:"评估单价", field:"unitPrice", type:"文本", value:"13000", unit:"元/平方米", must:true, subordination:true, subBeCleanedValue:"0" },
                     {title:"评估总价", field:"totalPrice", type:"文本", value:"120", unit:"万元", must:true, subordination:true }
                 ]
             }
