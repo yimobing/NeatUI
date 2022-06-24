@@ -758,7 +758,9 @@
                 var next = document.querySelectorAll('.beCleaned-by-built-relation');
                 Array.from(next).forEach(function(el){
                     if(newValue.toString().replace(/([ ]+)/g, '') != oldValue.toString().replace(/([ ]+)/g, '')){
-                        el.value = ''; // 清空其它关联元素的值
+                        var value = el.getAttribute('data-subCleaned-value'); // 被清空时的默认值
+                        if(typeof value == 'undefined') value = '';
+                        el.value = value; // 清空其它关联元素的值
                         // 隐藏其它关联元素右侧的打叉图标
                         var brotherNodes = tools.getAllSiblingElement(el.parentNode);
                         Array.from(brotherNodes).forEach(function(brothers){
@@ -821,6 +823,7 @@
                     rowRead = typeof items["rowRead"] == 'undefined' ? false : items["rowRead"] === true ? true : false,
                     superordination = typeof items["superordination"] == 'undefined' ? false : items["superordination"] === true ? true : false, // add 20220622-1
                     subordination = typeof items["subordination"] == 'undefined' ? false : items["subordination"] === true ? true : false, // add 20220622-1
+                    subBeCleanedValue = typeof items["subBeCleanedValue"] == 'undefined' ? '' : items["subBeCleanedValue"], // add 20220622-1
                     group = typeof items["group"] == 'undefined' ? '' : items["group"].toString().replace(/([ ]+)/g, ''),
                     combine = typeof items["combine"] == 'undefined' ? '' : items["combine"].toString().replace(/([ ]+)/g, ''),
                     press = typeof items["press"] == 'undefined' ? null : items["press"];
@@ -902,7 +905,8 @@
                     _placeholderStr = !must ? '' : ' placeholder="' + chooseText + '"',
                     _blurStr = !must ? '' : ' onblur="this.placeholder=\'' + chooseText + '\'"';
                     _focusStr = !must ? ( !readonly ? '' : ' onfocus="this.blur()"') : ' onfocus="this.placeholder=\'\'' + _looseFocusStr + '"',
-                    _dataHideStr = hid.toString().replace(/([ ]+)/g, '') === '' ? '' : ' data-bh="' + hid + '"';
+                    _dataHideStr = hid.toString().replace(/([ ]+)/g, '') === '' ? '' : ' data-bh="' + hid + '"',
+                    _dataSubBeCleaneStr = subordination ? ' data-subCleaned-value="' + subBeCleanedValue  + '"' : '', // add 20220622-1
                     _readonlyStr = !readonly ? '' : ' readonly',
                     _disabledStr = !disabled ? '' : ' disabled',
                     _groupStr = group === '' ? '' : ' data-group="' + group + '"',
@@ -955,7 +959,7 @@
                     
                 var _classNameStr = ' class="' + _classStr + '"';
                 var _stylesStr = _styleStr == '' ? '' : ' style="' + _styleStr + '"';
-                var _attrListStr = ' id="' + ids + '"' + _classNameStr + _dataHideStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr + _stylesStr; // 所有公用属性串
+                var _attrListStr = ' id="' + ids + '"' + _classNameStr + _dataHideStr + _dataSubBeCleaneStr + _attStr + _placeholderStr + _blurStr + _focusStr + _readonlyStr + _disabledStr + _dataThousandStr + _stylesStr; // 所有公用属性串
                 var _rowAttrListStr = ' ' + _groupStr + ' ' + _combineStr;
                 //
                 var _icoClassName = icon.indexOf('fa-') >= 0 ? 'icon fa ' + icon : 'icon icon-' + icon;
@@ -1461,9 +1465,10 @@
                                     })
                                     // 清空其它关联元素
                                     var inputNode = document.querySelectorAll('.beCleaned-by-built-relation');
-                                    console.log('aaa')
                                     Array.from(inputNode).forEach(function(txt){
-                                        txt.value = ''; // 清空其它关联元素的值
+                                        var value = txt.getAttribute('data-subCleaned-value'); // 被清空时的默认值
+                                        if(typeof value == 'undefined') value = '';
+                                        txt.value = value; // 清空其它关联元素的值
                                         // 隐藏其它关联元素右侧的打叉图标
                                         var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
                                         Array.from(brotherNodes).forEach(function(brothers){
