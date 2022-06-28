@@ -327,10 +327,21 @@
             tools.dialogs('前台未指定数据源，或输入时未返回数据源！');
             return;
         }
+        if(dataSource.toString().replace(/([ ]+)/g, '') === ''){
+            tools.dialogs('暂无数据，后台返回空字符串""');
+            return;
+        }
+        
+        // if(Object.keys(dataSource).length === 0){
+        if(JSON.stringify(dataSource) === '{}'){
+            tools.dialogs('暂无数据，后台返回空对象{}');
+            return;
+        }
         if(typeof dataSource.data == 'undefined'){
             tools.dialogs('请检查数据源是否包含data属性，正确的格式：{data:[]}');
             return;
         }
+
         // 列表HTML
         var listHtml = '';
         var liHeight = isNaN(Math.floor(opts.itemHeight)) ? 32 : Math.floor(opts.itemHeight);
