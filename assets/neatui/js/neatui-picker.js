@@ -187,6 +187,32 @@ if(typeof jQuery == 'undefined'){
 				}
 			}
 			else{ // 普通选择器：单列、多列
+				// 校验数据完整性 add 20220628-1
+				if(typeof dSource == 'undefined'){
+					alert('前台未指定数据源，或输入时未返回数据源！');
+					return;
+				}
+				if(dSource.toString().replace(/([ ]+)/g, '') === ''){
+					alert('暂无数据，后台返回空字符串""');
+					return;
+				}
+				
+				// if(Object.keys(dSource).length === 0){
+				if(JSON.stringify(dSource) === '{}'){
+					alert('暂无数据，后台返回空对象{}');
+					return;
+				}
+				if(typeof dSource.data == 'undefined'){
+					alert('请检查数据源是否包含data属性，正确的格式：{data:[]}');
+					return;
+				}
+
+				if(dSource.data.length == 0){
+					alert('对不起，暂无数据');
+					return;
+				}
+
+				// 开始执行
 				if(typeof dSource.data != 'undefined'){ // 单列
 					countLevel = 1;
 					$.each(dSource.data, function(i, items){
