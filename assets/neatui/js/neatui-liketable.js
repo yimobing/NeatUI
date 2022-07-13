@@ -1614,12 +1614,15 @@
 	/**
 	 * 重置某一行的状态列
 	 * @param {Number} ps_row_index 行索引值(可选). 值：0,1,2,3 等具体某一行的索引值, all 表示所有行
+	 * @param {String} ps_status 状态. saved 已保存(默认), unsaved 未保存
 	 * @param {object} ps_obj 当前表格对象(可选)
 	 */
-	var changeStateColumn = function(ps_row_index, ps_obj){
+	var changeStateColumn = function(ps_row_index, ps_status, ps_obj){
 		if(typeof ps_obj == 'undefined') ps_obj = $($.privateProperty.tableRootNode);
 		if(typeof ps_obj == 'undefined') return;
 		if(ps_obj.length == 0) return;
+		var status = typeof ps_status == 'undefined' ? 'saved' : (ps_status == 'unsave' ? 'unsave' : 'saved');
+		console.log('status：', status)
 		var _conObj = ps_obj.find('.list-content');
 		var oneRowArr = [ps_row_index]; //单行
 		var allRowArr = []; //所有行
@@ -1628,7 +1631,10 @@
 		var arr = typeof ps_row_index == 'undefined' || ps_row_index == 'all' ? allRowArr : oneRowArr;
 		for(var i = 0; i < arr.length; i++){
 			var _state = _conObj.children().eq(arr[i]).find('.i-t-state');
-			_state.val($.privateProperty.changedTxt).removeClass('red'); //状态更改为"已保存"
+			if(status == 'saved')
+				_state.val($.privateProperty.changedTxt).removeClass('red'); //状态更改为"已保存"
+			else
+				_state.val($.privateProperty.unchangeTxt).addClass('red'); //状态更改为"未保存"
 		}
 	}; //END FUNCTION
 
@@ -3050,10 +3056,11 @@ var neuiLikeTable = {
 	/**
 	 * 重置某一行的状态列为“已保存”
 	 * @param {Number} ps_row_index 行号索引值(可选,默认所有行). 值：0,1,2,3 等具体某一行的索引值, all 表示所有行
+	 * @param {String} ps_status 状态. saved 已保存(默认), unsaved 未保存
 	 * @param {object} ps_obj 指定表格根节点对象(当页面只有一张表格时则可选)
 	 */
-	changeRowStatus:function(ps_row_index, ps_obj){
-		$('body').changeStateColumn(ps_row_index, ps_obj);
+	changeRowStatus:function(ps_row_index, ps_status, ps_obj){
+		$('body').changeStateColumn(ps_row_index, ps_status, ps_obj);
 	},
 
 	/**
