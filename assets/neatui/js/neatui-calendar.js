@@ -715,7 +715,9 @@ var neuiCalendar = {
         if((typeof fnStr=='string')&&fnStr!=''&&that.opts.range == false){
             var reVal = jet.reMatch(fnStr), inObj={};
             $.each(jet.reMatch(that.format),function (r,val) {
-                inObj[val] = parseInt(reVal[r]);
+                if(reVal != null){
+                    inObj[val] = parseInt(reVal[r]);
+                }
             });
             strVal = inObj;
         }else {
@@ -757,7 +759,9 @@ var neuiCalendar = {
                 $.each(newArr,function (i) {
                     var inObj = {}, reVal = isunRange ? jet.reMatch(spVal[i]) : jet.reMatch(initVal);
                     $.each(reMat,function (r,val) {
-                        inObj[val] = parseInt(reVal[r]);
+                        if(reVal != null){
+                            inObj[val] = parseInt(reVal[r]);
+                        }
                     });
                     var exVal = $.extend(inObj,valobj||{});
                     ranMat.push($.extend(defObj[i],exVal));
