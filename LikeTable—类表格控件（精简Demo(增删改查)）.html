@@ -100,21 +100,21 @@
 		var g_dyw_type_fz_mc = ''; //分组名称
 
 		//=====列表及分页
-		var g_pageSize = 30; //每页几条记录
+		var PAGESIZE = 30; //每页几条记录
 		var g_setJson = { //表格列字段配置
-			headHeight:50, //表头高度. auto 自动(默认). 其它大于0的数字如：50 表示高50px. (可缺省)
-			headHasBgColor:true, //表头是否有背景色(可缺省),默认true
-			tbodyHeight:"auto", //自定义表格内容高度. auto 自动(默认). 其它大于0的数字如：300 表示高300px. (可缺省)
+			headHeight:50, //表头高度. auto 自动(默认). 其它大于0的数字如：50 表示高50px. (可选)
+			headHasBgColor:true, //表头是否有背景色(可选),默认true
+			tbodyHeight:"auto", //自定义表格内容高度. auto 自动(默认). 其它大于0的数字如：300 表示高300px. (可选)
 			topHeight: "auto", //表格以外上面部分高度(如header部分(可选). auto 自动(默认)，系统会自动计算表格距离顶部的距离; 其它大于0的数字如：150 表示高150px.
-			botHeight:"auto", //表格以外下面部分高度（不含分页部分）(如footer部分).  auto 自动,即高度为0 (默认), 其它大于0的数字如：100 表示高100px. (可缺省)
-			isSerialCol:true, //是否显示序号列. 默认true(可缺省)
-			isSorted:true, //是否启用列排序. 默认true.(可缺省)
-			isCeilLine:true, //单元格是否有边线(可缺省),默认false
+			botHeight:"auto", //表格以外下面部分高度（不含分页部分）(如footer部分).  auto 自动,即高度为0 (默认), 其它大于0的数字如：100 表示高100px. (可选)
+			isSerialCol:true, //是否显示序号列. 默认true(可选)
+			isSorted:true, //是否启用列排序. 默认true.(可选)
+			isCeilLine:true, //单元格是否有边线(可选),默认false
 			emptyDataTips:'抱歉，没有找到相应数据..', //无数据时的提示文(可选)
-			customize:{ //自定义属性(可缺省)
-				serialColumnWidth:45, //序号列宽(可缺省),默认50
-				discoloration:true, //是否隔行变色(可缺省),默认false
-				retainIllegalChar:false //单元格内容是否保留非法字符(防止向数据库写入非法字符)(可缺省). true 是, false 否(默认). false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
+			customize:{ //自定义属性(可选)
+				serialColumnWidth:45, //序号列宽(可选),默认50
+				discoloration:true, //是否隔行变色(可选),默认false
+				retainIllegalChar:false //单元格内容是否保留非法字符(防止向数据库写入非法字符)(可选). true 是, false 否(默认). false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
 			},
 			columns:[{
 					title:"分组编号",
@@ -199,7 +199,7 @@
 		 * 函数：加载数据 edit 20211030-1
 		 * @param {object} options 参数
 		 */
-		 function loadData(options){
+		 function load_data(options){
 			var defaults = {
 				resetOrder: false // 是否重置序号,默认false
 			}
@@ -229,22 +229,22 @@
 				dataJson: dataJson, //表格数据json
 				pagination: {
 					enable: true, //是否启用分页
-					pageMode: 'select', //分页方式（可缺省）。list 数字列表形式（默认），select 选择形式
-					pageSize: g_pageSize, //每页几条记录，默认25（可缺省）
+					pageMode: 'select', //分页方式（可选）。list 数字列表形式（默认），select 选择形式
+					pageSize: PAGESIZE, //每页几条记录，默认25（可选）
 					pageCount: pageCount, //总页数
 					recordCount: '', //总记录数(可选), 默认空(此时界面不显示总记录数)
-					pageSelect:{ //pageMode='select'时(可缺省)
-						allPage: false, //全部按钮（即：通过此按钮可一次性加载全部数据）(可缺省)
-						homePage: true, //首页按钮(可缺省)
-						prevPage: true, //上一页按钮(可缺省)
-						nextPage: true, //下一页按钮(可缺省)
-						lastPage: true, //最后一页（尾页）按钮(可缺省)
-						dropPage: true //下拉页码（一页页显示）按钮(可缺省)
+					pageSelect:{ //pageMode='select'时(可选)
+						allPage: false, //全部按钮（即：通过此按钮可一次性加载全部数据）(可选)
+						homePage: true, //首页按钮(可选)
+						prevPage: true, //上一页按钮(可选)
+						nextPage: true, //下一页按钮(可选)
+						lastPage: true, //最后一页（尾页）按钮(可选)
+						dropPage: true //下拉页码（一页页显示）按钮(可选)
 					},
 					callback:function(e){ //回调函数（必须）.参数e格式: {curpage:1, pagesize:20, pageCount:3}
 						//console.log('回调信息，e：',e);
 						//var curpage = e.curpage;  //当前页码
-						g_pageSize = e.pagesize; //全局赋值
+						PAGESIZE = e.pagesize; //全局赋值
 						var json = get_data_list(e.curpage);
 						return json;
 					}
@@ -295,7 +295,7 @@
 		 * @returns {Number} 返回页数
 		 */
 		function get_data_pages(){
-			var ls_every_page_count = g_pageSize;
+			var ls_every_page_count = PAGESIZE;
 			var pages = 5;
 			/*
 			//START AJAX
@@ -341,7 +341,7 @@
 		 */
 		 function get_data_list(ps_curpage){
 			var ls_open_page_num = typeof ps_curpage == 'undefined' ? 1 : ps_curpage;
-			var ls_every_page_count = g_pageSize;
+			var ls_every_page_count = PAGESIZE;
 			//后台返回
 			var listJson = {
                 "data":[    
@@ -413,8 +413,8 @@
 			neui.openIframe({
 				url: srcUrl,
 				caption: '抵押物类别分组明细',
-				top: '0.5%', //窗口距离顶部的距离(可缺省)（数字或百分比，eg.25%)
-       		 	width: '99%', //窗口宽度(可缺省)（数字或百分比，eg1.1200, eg2.98%）
+				top: '0.5%', //窗口距离顶部的距离(可选)（数字或百分比，eg.25%)
+       		 	width: '99%', //窗口宽度(可选)（数字或百分比，eg1.1200, eg2.98%）
 				closeCallBack: function(){}
 			})
 		}
@@ -530,7 +530,7 @@
 					buttons: ['确定'],
 					callBack:function(){
 						if(flag){
-							loadData(); //刷新数据
+							load_data(); //刷新数据
 						}
 					}
 				})
@@ -635,7 +635,7 @@
 
 			/*+--------------------------------------------------------+*/
 			//=====加载列表
-			loadData();
+			load_data();
 			
 
 			//+------------------------------------------------------------------------------------------------------------------------
@@ -651,7 +651,7 @@
 				g_dyw_type_fz_mc = ls_dyw_type_fz_mc;
 
 				//加载数据，并重置序号 edit 20211030-1
-                loadData({ resetOrder: true });
+                load_data({ resetOrder: true });
 			});
 
 
