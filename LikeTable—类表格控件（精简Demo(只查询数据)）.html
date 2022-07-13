@@ -95,7 +95,7 @@
 		var g_bglx_no = ''; //报告编号
 
 		//=====列表及分页
-		var g_pageSize = 30; //每页几条记录
+		var PAGESIZE = 30; //每页几条记录
 		var g_setJson = { //配置表格列字段
 			headHeight:50, //表头高度. auto 自动(默认). 其它大于0的数字如：50 表示高50px. (可缺省)
 			headHasBgColor:true, //表头是否有背景色(可缺省),默认true
@@ -225,10 +225,10 @@
 
 		/*+-------------FUNCTION---------------+*/
 		/**
-		 * 函数：加载数据 edit 20211030-1
+		 * 函数：加载数据
 		 * @param {object} options 参数
 		 */
-		 function loadData(options){
+		 function load_data(options){
 			var defaults = {
 				resetOrder: false // 是否重置序号,默认false
 			}
@@ -259,7 +259,7 @@
 				pagination: {
 					enable: true, //是否启用分页
 					pageMode: 'select', //分页方式（可缺省）。list 数字列表形式（默认），select 选择形式
-					pageSize: g_pageSize, //每页几条记录，默认25（可缺省）
+					pageSize: PAGESIZE, //每页几条记录，默认25（可缺省）
 					pageCount: pageCount, //总页数
 					recordCount: '', //总记录数(可选), 默认空(此时界面不显示总记录数)
 					pageSelect:{ //pageMode='select'时(可缺省)
@@ -273,7 +273,7 @@
 					callback:function(e){ //回调函数（必须）.参数e格式: {curpage:1, pagesize:20, pageCount:3}
 						//console.log('回调信息，e：',e);
 						//var curpage = e.curpage;  //当前页码
-						g_pageSize = e.pagesize; //全局赋值
+						PAGESIZE = e.pagesize; //全局赋值
 						var json = getListData(e.curpage);
 						return json;
 					}
@@ -480,7 +480,7 @@
 		 * @returns {Number} 返回页数
 		 */
 		 function getListPage(){
-			var ls_every_page_count = g_pageSize;
+			var ls_every_page_count = PAGESIZE;
 			//后台返回
 			var pages = 10;
 			/*
@@ -537,7 +537,7 @@
 		 */
 		 function getListData(ps_curpage){
 			var ls_open_page_num = typeof ps_curpage == 'undefined' ? 1 : ps_curpage;
-			 var ls_every_page_count = g_pageSize;
+			 var ls_every_page_count = PAGESIZE;
 			//后台返回
 			var listJson = {
 				"data":[
@@ -637,7 +637,7 @@
 
 			/*+--------------------------------------------------------+*/
 			//=====加载列表
-			//loadData();
+			//load_data();
 			
 			
 
@@ -736,8 +736,8 @@
 					return;
 				}
 
-				//刷新数据，并重置序号  edit 20211030-1
-				loadData({ resetOrder: true });
+				//刷新数据，并重置序号
+				load_data({ resetOrder: true });
 			});
 
 
