@@ -594,18 +594,18 @@
 					_editBoxStr = textVal;
 					if(navigator.appName == "Microsoft Internet Explorer"){ //解决ie浏览器中内容为空时即使设置了宽度也不占据空间的bug
 						if(textVal == ''){
-							_editBoxStr = '<span' + _dataBhStr + '>' + textVal + '</span>';
+							_editBoxStr = '<span class="' + _fieldClass + _nameClass + _borderClass + '"' + _dataBhStr + '>' + textVal + '</span>';
 						}
 					}
 				}
 				if(mode.indexOf('span') >= 0){ //span标签
-					_editBoxStr = '<span' + _dataBhStr + '>' + textVal + '</span>';
+					_editBoxStr = '<span class="' + _fieldClass + _nameClass + _borderClass + '"' + _dataBhStr + '>' + textVal + '</span>';
 				}
 				if(mode.indexOf('input') >= 0){ //单行文本
 					_editBoxStr = '<input type="text" class="' + _fieldClass + _nameClass + _borderClass + '" value="'+ textVal + '"' + _dataBhStr + _readonlyStr + _disabledStr + _placeholderStr + _focusStr + _blurStr + ' style="' + _eWidthStr + _eHeightStr + '">';
 				}
 				if(mode.indexOf('textarea') >= 0){ //多行文本
-					_editBoxStr = '<textarea class="i-t-' + field + _nameClass + _borderClass + '"' + _dataBhStr + _readonlyStr + _disabledStr + _placeholderStr + _focusStr + _blurStr + ' style="' + _eWidthStr + _eHeightStr + '">' + textVal + '</textarea>';
+					_editBoxStr = '<textarea class="' + _fieldClass + _nameClass + _borderClass + '"' + _dataBhStr + _readonlyStr + _disabledStr + _placeholderStr + _focusStr + _blurStr + ' style="' + _eWidthStr + _eHeightStr + '">' + textVal + '</textarea>';
 				}
 				if(mode.indexOf('button') >= 0){ //按钮
 					var _w = eWidth * 0.8;
