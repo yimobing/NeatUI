@@ -1622,7 +1622,7 @@
 		if(typeof ps_obj == 'undefined') return;
 		if(ps_obj.length == 0) return;
 		var status = typeof ps_status == 'undefined' ? 'saved' : (ps_status == 'unsave' ? 'unsave' : 'saved');
-		console.log('status：', status)
+		// console.log('status：', status)
 		var _conObj = ps_obj.find('.list-content');
 		var oneRowArr = [ps_row_index]; //单行
 		var allRowArr = []; //所有行
