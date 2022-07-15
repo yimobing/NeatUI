@@ -1564,6 +1564,7 @@ pre, pre code {
     top: 40px;
     bottom: 80px;
     padding: 0 10px;
+	background-color: #fff;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -1685,8 +1686,9 @@ pre, pre code {
     padding: 0 15px;
 }
 .ne-aside .aside-layer.unfreeze .as-lay-footer{
-	margin: 15px auto;
-	padding: 0 10px;
+	/* margin: 15px auto; */
+	/* padding: 0 10px; */
+	padding: 15px 10px;
 }
 
 
