@@ -1,0 +1,1048 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,initial-scale=1.0,user-scalable=no,width=device-width">
+<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<title>LikeTable | 类表格演示Demo</title>
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框控件-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css" /><!--下拉联动控件-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"><!--输入下拉控件-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-searchbox.css" /><!--搜索框控件-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-liketable.css" /><!--类表格控件-->
+<link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.min.css" /><!--图标库-->
+<link type="text/css" rel="stylesheet" href="test//css/common.css" /><!--通用布局样式-->
+<!--[if lt IE 9]>
+    <script type="text/javascript" src="assets/style/libs/html5shiv.min.js"></script>
+    <script type="text/javascript" src="assets/style/libs/respond.min.js"></script>
+    <script type="text/javascript" src="assets/style/libs/rem.min.js"></script>
+    <script type="text/javascript" src="assets/style/libs/json2.js"></script>
+<![endif]-->
+ <!--json2.js支持IE8-以下版本json与字符串互转h函数:JSON.Stringify()、 JSON.Parse()-->
+</head>
+<body>
+
+    <!--edit 20220712-1-->
+    <style>
+        /*+-----------公用------------------+*/
+        body{overflow:hidden;}
+        .wrap{width:100%;padding:8px 10px;}
+        /*+-----------搜索区域------------------+*/
+        .operate{margin-bottom:8px;} 
+        .operate>div{display:inline-block; *display:inline; _display:inline; *zoom:1; }
+        .operate-button{position:fixed; z-index:50; top:15px; right:45px; } 
+        .operate-button>button[type="button"]{height:28px; line-height:28px; cursor: pointer;}
+
+        .search{}
+        .collist{margin-left:4px;}
+        .collist .label label{width:auto;}
+        .collist button[type="button"]{height:28px; line-height:28px; border-radius:0;}
+
+        .subTotal{ margin: 15px auto; }
+        .subTotal span{ font-weight: bold; font-size: 16px; }
+    </style>
+
+    <div class="wrap">
+        <div class="search"></div><!--/.search-->
+        <div class="operate">
+            <div class="operate-button">
+                <button type="button" id="btn-save-all" class="ne-btn has-texture no-border no-bg-img red">全部保存</button>
+            </div><!--/.operate-button-->
+        </div><!--/.operate-->
+        <div class="history"></div><!--/.history-->
+        <div class="subTotal"></div><!--add 20220712-1-->
+    </div><!--/.wrap--> 
+    
+  
+<script type="text/javascript" src="assets/style/libs/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="assets/style/libs/jquery.table2excel.min.js"></script><!--表格导出EXCEL-->
+<script type="text/javascript" src="assets/style/libs/jquery.chineseDistricts.js"></script><!--省市区数据源-->
+<script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+<script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-dropdown.js"></script><!--下拉联动控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-searchbox.js"></script><!--搜索框控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-loadmore.js"></script><!--上拉加载更多控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-liketable.js"></script><!--类表格控件-->
+<script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+<script type="text/javascript">
+
+    /*+-----------------------------示例---------------------------+*/
+    /*
+    * 几个插件内部自定义的函数非常有用,如下（以下示例中 $tableDom为指定表格根节点，当只有一张表格时$tableDom为可选项）
+        · $.privateProperty.pageCurpage['history'] = 1; //重置序号
+        · neuiLikeTable.addOneRow($tableDom); //新建一空行
+        · neuiLikeTable.insertOneRow(source, $tableDom); //新建一空行或非空行. source为数据源. source为空时(即''或{})则新建空行,非空时(如{name:"张三"})则新建非空行
+        · neuiLikeTable.deleteOneRow(5, $tableDom); //删除某一行. 5代表该行索引值
+        · neuiLikeTable.setSomeColumnReadonly(["yhjcnf", "dizhi"], 0); //指定第N行(索引值)中某些列(英文字段)为只读状态
+        · neuiLikeTable.setSomeColumnCanWrite(["yhjcnf", "dizhi"], 0); //指定第N行(索引值)中某些列(英文字段)为可写状态
+        · neuiLikeTable.changeRowStatus(0, $tableDom); //更改第1行(索引值0)的“状态列”文本为“已保存”. 所有行时，0 改成 'all'
+        · neuiLikeTable.selectAllRow($tableDom); //全选
+        · neuiLikeTable.selectNoneRow($tableDom); //全不选
+        · neuiLikeTable.invertAllRow($tableDom); //反选
+        · neuiLikeTable.giveValue2SomeColumn(1, ["username","sex"], ['张三', '李四'], $tableDom); 给指定的某行某些列赋值。参数：第1个参数为行索引值，第2个参数为列字段组成的数组，第3个参数为列值组成的数组，第4个参数为表格根节点对象(可选)
+        · var json = neuiLikeTable.getTableListData($tableDom); //获取表格全部数据(所有行、列组成的json数组)
+        · var json = neuiLikeTable.getTableSelectedData($tableDom); //获取表格选中行数据（“选择”一列有打钩的行组成的json数组）
+        · var tips = neuiLikeTable.checkEmptyRow(0, $tableDom); //校验第0行各个必填列的完整性. 要检验所有行时 0 改成 'all'
+        · var tips = neuiLikeTable.checkRepeatRow($tableDom); //校验重复行(即检验第Y列第M行与第N行是否一样). 一般先设置某一列的unique=true,才使用本函数进行校验
+    */
+
+
+
+
+    /*+-----------------------------全局变量---------------------------+*/
+    //=====
+    var $rootNode = $('.history'); //列表根节点
+    var $tableDom = ''; //指定表格根节点(多张表格时必须指定,单张表格时可选). 请在创建表格的函数中进行赋值.
+
+    //=====
+    var $g_setJson = {}; //表格列字段json
+    var $g_tableJson = {}; //表格列表数据json
+    var $g_hejiJson = {}; //表格合计行数据json
+    
+    var $g_pageJson = {}; //表格分页参数json
+	var $g_pagination = true; //表格是否分页
+    var $g_pageCount = 15; //表格分页总页数
+    var $g_pageSize = 30; //每页记录数
+    var $g_recordCount = 400; //总记录数
+	var $g_exportExcel = { //导出EXCEL(只有在分页采用非“下拉加载更多”方式时生效)
+		enable: true, //是否启(可选).默认true
+		filename:'类表格演示Demo', //文件(可选).系统默认的excel文件名为：'导出报表-'
+		fileAutoTime:true, //导出的文件自动添加时间(hh:mm:ss)作为文件名的一部分。默认true
+		extension: '.xls' //拓展名。 .xls(excel 2003)(默认), .xlsx (excel 2007,2010)
+    }
+    
+    
+
+
+    /*+===============================================================+*/
+    /*                      搜索控件配置                           
+    /*+===============================================================+*/
+    /*+--------------------------------+*/
+    //=====[搜索区域参数JSON]
+    var $searchJson = {
+        putInHead:false, //是否自动创建header标签,并把搜索区域放在该标签中,默认false(可选)
+        inputBox:{ //搜索框组
+            column:5, //一行有几个，默认3
+            group:[{
+                    title:'区域',
+                    field:'area',
+                    type:'string',
+                    must:false
+                }
+            ]
+        },
+        searchButton:{ //按钮组
+            wrap:true, //按钮组是否换行显示,默认tru(可选)
+            sticky:false, //按钮组是否置顶,即是否置于搜索框组前面,默认false(可选).
+            group:[ //按钮组
+                {
+                    title:'查询', 
+                    field:'btn_query-area',
+                    width:70,
+                    relation:['区域'], //关联搜索(可选)。默认点击该按钮，会读取全部搜索框数据，但如果本参数有进行设置，则只会读取指定搜索框的数据
+                    bgColor:'#f64c59',
+                    //theme:'diamond',
+                    callback:function(e1, e2){ 
+                        //console.log('查询按钮，e值：',e);
+                        refreshDataByClickSearchButton(e2);
+                    }
+                },{
+                    title:'全选', 
+                    field:'btn_chooseAll',
+                    width:70,
+                    bgColor:'#0ce',
+                    callback:function(e1, e2){  //全选按钮
+                       neuiLikeTable.selectAllRow($tableDom);
+                    }
+                },{
+                    title:'反选', 
+                    field:'btn_chooseNone',
+                    width:70,
+                    bgColor:'#0ce',
+                    callback:function(e1, e2){  //反选按钮
+                       neuiLikeTable.invertAllRow($tableDom);
+                    }
+                },{
+                    title:'全不选', 
+                    field:'btn_reverse',
+                    width:70,
+                    bgColor:'#0ce',
+                    callback:function(e1, e2){  //全不选按钮
+                       neuiLikeTable.selectNoneRow($tableDom);
+                    }
+                },{
+                    title: '批量删除', 
+                    field: 'btn_del_batch',
+                    width: 70,
+                    bgColor: '#0ce',
+                    callback: function(e1, e2){  //批量删除按钮
+                       delAll();
+                    }
+                },{
+                    title:'增加一行', 
+                    field:'btn_add',
+                    width:70,
+                    bgColor:'#7b72e9',
+                    //theme:'diamond',
+                    callback:function(e1, e2){  //新增一行按钮
+                        var tableDom = $rootNode.find('.ne-like-table');
+                        if(tableDom.length == 0){
+                            $rootNode.neuiLikeTable({
+                                setJson: g_setJson,
+                                dataJson: {},
+                                pureRow: true //是否创建一条空行记录,即表格一条记录也没有却要凭空新增一行(可选).值：true 是, false 否(默认). 将本参数值设为true, dataJson设为空对象{}或单行数据{name:"张三"}
+                            })
+                        }else{
+                            neuiLikeTable.addOneRow(tableDom); //或$tableDom
+                        }
+                    
+                    }
+                },{
+                    title:'无价格', 
+                    field:'btn-query-noPirce',
+                    width:80,
+                    bgColor:'#f3ab26',
+                    //theme:'diamond',
+                    callback:function(e1, e2){ 
+                        refreshDataByClickSearchButton(e2);
+                    }
+                },{
+                    title:'有价格', 
+                    field:'btn-query-hasPrice',
+                    width:80,
+                    bgColor:'#888',
+                    //theme:'diamond',
+                    callback:function(e1, e2){ 
+                        refreshDataByClickSearchButton(e2);
+                    }
+                },{
+                    title:'无关联区域的楼盘', 
+                    field:'btn-query-noAreae',
+                    width:150,
+                    bgColor:'#7b72e9',
+                    //theme:'diamond',
+                    callback:function(e1, e2){ 
+                        refreshDataByClickSearchButton(e2);
+                    }
+                },{
+                    title:'全部', 
+                    field:'btn-query-all',
+                    bgColor:'#1b9af7',
+                    //theme:'diamond',
+                    callback:function(e1, e2){
+                        refreshDataByClickSearchButton(e2);
+                    }
+                },{
+                    title:'所有“选择”一列打钩的记录', 
+                    field:'btn-selected',
+                    width: 200,
+                    bgColor:'#1296db',
+                    //theme:'diamond',
+                    callback:function(e1, e2){
+                        var json = neuiLikeTable.getTableSelectedData($tableDom);
+                        alert('已勾选的记录数组成的数据\n' + JSON.stringify(json));
+                        //console.log('已勾选的记录数组成的数据:', json); 
+                    }
+                },{
+                    title:'导出EXCEL', 
+                    field:'btn-export-excel',
+                    width:80,
+                    theme:'diamond gray',
+                    callback:function(e1, e2){ 
+                       neuiLikeTable.export2Excel();
+                    }
+                }
+            ]
+        }
+    }
+
+    /*+--------------------------------+*/
+    //=====加载搜索区域(调用搜索框插件)
+    $('.search').neuiSearchBox($searchJson);
+
+
+
+
+    /*+===============================================================+*/
+    /*                      表格控件配置                           
+    /*+===============================================================+*/
+    /*+--------------------------------+*/
+    //=====[表格列字段json]
+    $g_setJson = {
+        //caption:"类表格演示Demo", //标题
+        capHTML:"", //自定义标题HTML,格式为字符串或数(可选). 一张表格时传递HTML字符串,多张表格时, 传递N张表格标题HTML组成的数组.eg. [html1,html2]
+        headHeight:"auto", //表头高度. auto 自动(默认). 其它大于0的数字如：50 表示高50px.(可选)
+        headHasBgColor:false, //表头是否有背景(可选),默认true
+        headWrap:true, //表头是否换行（一般用于有副标题时才设为true),默认true.(可选)(该属性暂时无效,不起作用)
+        headSubWrap:true, //表头单位是否换行(不想换行时请确保列足够宽,否则依然会自动换行(可选).默认true
+        rowHeight:"auto", //表身行高, auto 自动（默认）, 其它大于0的数字如：30 表示高30px.(可选)
+        tbodyHeight:"auto", //自定义表格内容高度. auto 自动(默认). 其它大于0的数字如：300 表示高300px.(可选)
+        topHeight: "auto", //$('.operate').outerHeight(true) + $('.search').outerHeight(true), //表格以外上面部分高度(如header部分(可选). auto 自动(默认)，系统会自动计算表格距离顶部的距离; 其它大于0的数字如：150 表示高150px.
+        botHeight:50, //表格以外下面部分高度（不含分页部分）(如footer部分).  auto 自动,即高度为0 (默认), 其它大于0的数字如：100 表示高100px.(可选) edit 20220712-1
+        nestDepth:1, //表格列表数据json嵌套层次.默认1.(有几个Data就是几层嵌套).(可选)
+        pendMethod:"empty", //数据添加方(可选). empty 清空(默认), insert 追加并插入到最后面
+        isSerialCol:true, //是否显示序号列. 默认tru(可选)
+        isCheckboxCol:true, //是否选择列.  默认false（可选)
+        isSorted:true, //是否启用列排序. 默认true(可选)
+        isCeilLine:false, //单元格是否有边(可选), true 是, false 否(默认)
+        isRowHeightEqual:false, //每一行的行高是否相同，默认fals(可选). 值：true 是(每一行的行高相同，即取所有行中最高的那行作为每一行的行高), false 否(每一行的行高不同，会根据每一行的内容自动调整)
+        isVerticalScrollBar:false, //是否显示浏览器垂直滚动条,默认false(即：默认浏览器垂直滚动条overflow:hidden)(仅当nestDepth=1时有效)
+        emptyDataTips:'抱歉，没有找到相应数据..', //无数据时的提示文(可选)
+        primaryKey:{ //主键列(可选)
+            field:["lsh_id","xh_self"],  //可多个字段. eg. [":lsh_id1","lsh_id2"]
+            show:true //是否显示,默认false.(可选)
+        },
+        customize:{ //自定义属(可选)
+            serialColumnWidth:50, //序号列(可选),默认50
+            discoloration:true, //是否隔行变(可选),默认false
+            retainIllegalChar:false //单元格内容是否保留非法字符(防止向数据库写入非法字符(可选). true 是, false 否(默认).  false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
+        },
+        stateColumn:{ //状态(可选)
+            show:true, //是否显示, 默认false.(可选)
+            value:"", //初始值,默认空(可选)
+            unsaveText:"未保存", //数据有更改时的文(可选)
+            savedText:"已保存" //数据无更改时的文(可选)
+        },
+        columns:[
+            /*{
+                //--------参数1：基本参数
+                title:"", //标题
+                subtitle:"", //副标(可选)
+                field:"", //英文字段显示值(如名称) (仅当mode="button"或"mark"时才可选或不填)
+                hide:"", //英文字段隐藏值(如编号)(可选). 不要与参数asHidVal同时设置
+                type:"string", //单元格类型(可选).
+                                string 字符串(默认)
+                                int 整型 (int或int[positive] 正整数, int[negative] 正负整数) 
+                                float浮点型即小数类型 (float或float[positive] 正小数, float[negative] 正负小数)
+                                date 日期类型
+                mode:"normal", //显示方式(可选).
+                                normal 普通(即纯文本,无任何标签包裹)（默认)，
+                                span 标签文本
+                                input 单行文本
+                                textarea 多行文本
+                                radio[tick] 单选“打勾”(格式:radio[tick][形状]][颜色], 形状值: square,circle; 颜色值：white,green,blue,red)
+                                radio[on-off] 开关“打勾”(格式: radio[on-off][颜色], 颜色值：green,blue,red)
+                                radio[whether] 单选“是否”, 
+                                button 按钮 
+                                mark 或 input[mark] 或 textarea[mark] 标记(用于标记多出来但又不展示数据的列).
+                choice:{yes:"1", no:"0"}，//指定单选按钮或按钮组的显示值（可选), 即当mode='radio[tick]'或mode='radio[whether]'时, 通过本参数可修改界面上显示的单选按钮文本及值. eg.单选“男女”时: {yes:"男", no:"女"} eg.单选“是否”时 {yes:"是", no:"否"}
+
+                width:50, //列宽. 默认50(可选)
+                height:"auto", //列高, auto 自动（默认）, 其它大于0的数字如：30 表示高30px(可选) 
+                must:false, //是否必填字(可选), true 是, false 否(默认)
+                unique:false, //是否唯一值(该列在每一行的值是否唯一). true 是(即该列每一行的值都应该不同), false 否(默认)
+                align:"left", //水平对齐. left 左(默认), center 中, right (可选) 
+                r_unit:"平米", //右侧单(可选)
+                r_icon:"chevron-down", //右侧箭头(采用font-awesome图标库(可选), 默认为空.
+                readonly:false, //是否只读. true 是, false 否(默认(可选)
+                disabled:false, //是否禁用. true 是, false 否(默认(可选) 
+
+                //以下几个属性，一般仅当mode="button"时有效
+                name:"btn-save", //自定义元素属性class(可选)(可多个,中间用空格隔开eg. "clear-relation click-input")（默认为：i-英文字段）
+                label:"保存", //文本名称(可选)
+                b_icon:"pencil", //按钮图标(可选)
+                b_alt:"", //按钮提示文字(即鼠标移动到上面的提示文字)(可选). 默认提示文字为 label属性值
+                b_onlyImage:false, //按钮仅显示图标(可选). true 是, false 否(默认).
+                
+                //--------参数2：补充参数
+                fontSize:"18px", //单元格文字大(可选)
+                fontColor:"red", //单元格文字颜(可选)
+                border:"all", //是否有边框(只针input,textarea输入框而言). all 有(默认), none (可选)
+                display:"all", //是否显示(可选). all 显示(默认） none 隐藏
+                sticky:true, //是否置顶(即放在所有列的最前面),默认false.(可选)
+                colHeadBgColor:'#ffc9c9', //列头背景(可选)
+                colHeadColor:'', //列头文字颜(可选)
+                colArrowColor:'rgb(177,0,0)', //列头排序箭头颜(可选)
+               
+                //--------参数3：少用但很实用的参数
+                value:"", //初始值(可选).注意：本参数存在时，将覆盖列表数据的值, 一般仅在mode='mark'或input['mark']或textarea['mark']时才使用本参数
+                asHidVal:false, //即本列数据值是否作为隐藏值(即编号)(可选), 默认false. 注：1.true时,值将写入元素的data-bh*属性中;2.不要与参数hide同时设置
+                default:"", //默认显示值(可选). 一般的,只有当新增一条记录时才使用本参数.
+                hidden:"", //默认隐藏值(即编号)(可选). 一般的,只有当新增一条记录时才使用本参数.
+
+                digit:"", //小数点位数(可选), 默认空. (一般只有浮点型数据才须指定小数点位数)
+                subtotal:false, //各行值是否需要小计(可选), 默认false
+                component:{ //其它组合，比如右侧有按钮(可选)
+                    align:"right", //位置. right 右（默认）, left 左
+                    mode:"button", //类型. button 按钮(默认), input 单行文本, textarea 多行文本
+                    label:"查询", //名称(mode="button"时为按钮名秒, mode="input"或"textarea"时为初始值)
+                    placeholder:"", //占位符（权当mode="input"或"textarea"时)
+                    name:"btn-query-house", //元素属性class
+                    width:35 //宽（px)
+                },
+                merge:{ //一级表头合并(可选)
+					direction:"next", //合并方向(可选). next 向下合并(默认), prev 向上合并
+					numeral:2 //合并的列数(可选)
+                },
+                format:'eval( ["a"] * ["b"] )', //自定义值，计算公式，即“当值是由同一行某些单元格算出来”(可选).
+                                                //其中 ["a"] * ["b"] 表示取“字段a剩以字段 b”作为结果
+                                                //注意: 中括号[]里面的字段必须使用双引号, 其它非字段的字符串使用单引号
+                                                //eg1. 总价 = ( 面积 mj * 楼盘均价 scjj ) / 10000, 结果取整数, 表达式如下：
+                                                //format:'eval( Math.floor( (parseFloat(["mj"]) * parseFloat(["scjj"])) / 10000 ) )' 
+                                                //eg2. bool型时，直接从 1 转 是, 0 转 否
+                                                //format: 'eval( parseInt(["ywdt"]) == 1 ? \'是\': \'否\' )' 
+                code:'eval(["a"] == false ? '' : 'JS代码')', //自定义JS代码，通过判断当前行某一个字段值从而对当前行每些元素进行一系列操作.
+                                                            //注意: 中括号[]里面的字段必须使用双引号, 其它非字段的字符串使用单引号
+                                                            //eg. 面积小于150的隐藏“删除”按钮。其中 $(this)指代当前行对象, .btn-delete是当前行的“删除”按钮对象
+                                                            //code: 'eval(parseFloat([\"mj\"]) > 150 ? "": "$(this).find(\'.btn-delete\').hide()" )'
+                //--------参数4：回调
+                callBack:function(e){ //回调函(可选)，一般用于输入框或按钮点击时. e 为当前按钮所在行各列的数据组成的数据. 格式: {target:"当前元素的jq对象", row: "行号", rowIndex:"行号索引值", xuhao:"序号"}
+                    //console.log('e:',e)
+                }
+                
+            },*/ 
+            {
+                title:"编号",
+                field:"xh_self",
+                width:80,
+                colHeadBgColor:'#eaeaea', 
+                colArrowColor:'rgb(75,75,75)'
+            },{
+                title:"流水号",
+                field:"lsh_id",
+                display:"none"
+            },{
+                title:"面积", 
+                subtitle:"(㎡)",
+                field:"mj",
+                type:'float',
+                width:100,
+                mode:"input",
+                border:"none",
+                disabled:true,
+                colHeadBgColor:'#ffe2dc', 
+                colArrowColor:'rgb(255,53,53)'
+            },{
+                title:"建成年份", 
+                field:"yhjcnf",
+                width:80,
+                mode:"input",
+                border:"none",
+                colHeadBgColor:'#ffc9c9', 
+                colArrowColor:'rgb(177,0,0)'
+            },{
+                title:"省市区", 
+                field:"area",
+                width:150,
+                mode:"input",
+                readonly:true,
+                colHeadBgColor:'#c0ece0', 
+                colArrowColor:'rgb(19,181,147)'
+            },{
+                title:"银行楼盘名称", 
+                field:"yhlpmc",
+                unique:true,  //值唯一
+                width:110,
+                height:58,
+                mode:"textarea",
+                border:"none"
+            },{
+                title:"地址",
+                field:"dizhi",
+                width:180,
+                height:58,
+                mode:"textarea",
+                border:"none"
+            },{
+                title:"坐落", 
+                width:180,
+                height:58,
+                field:"lpzl",
+                mode:"textarea",
+                border:"none"
+            },{
+                title:"系统楼盘", 
+                field:"qydcb_mc",
+                must:true,
+                width:130,
+                height:58,
+                mode:"textarea",
+                component:{ 
+                    align:"right",
+                    mode:"button",
+                    label:"查询", 
+                    name:"query-house ne-btn has-texture no-bg-img", //元素属性class
+                    width:35 //宽（px)
+                } 
+            },{
+                title:"有无电梯", 
+                field:"ywdt",
+                width:80,
+                mode:'input',
+                readonly:true,
+                r_icon:"chevron-down"
+            },{
+                title:"楼盘均价", 
+                field:"scjj",
+                must:true,
+                width:80,
+                type:'float',
+                mode:'input'
+            },{
+                title:"总价", 
+                field:"scjz_zj",
+                width:60,
+                type:'float',
+                mode:'input',
+                disabled:true,
+                //计算公式：单元格数据由同一行单元格算出来时, 总价 = ( 面积 mj * 楼盘均价 scjj ) / 10000, 结果取整数
+                //format:'eval( Math.floor( (parseFloat([mj])) / 10000 ) )'
+                format:'eval( Math.floor( (parseFloat(["mj"]) * parseFloat(["scjj"])) / 10000 ) )'
+            },{
+                title:"是否已完成", 
+                field:"check_wc",
+                width:80,
+                mode:'radio[tick]',
+                choice:{yes:"1", no:"0"}
+            },{
+                title:"性别", 
+                field:"sex",
+                width:150,
+                mode:'radio[whether]',
+                choice:{yes:"男", no:"女"}
+            },{
+                title:"操作", 
+                width:100,
+                mode:"button",
+                name:"btn-save ne-btn linear",
+                align:"center",
+                label:"保存",
+                b_icon:"save",
+                merge:{ //一级表头合并(可选)
+					direction:"next", //合并方向(可选). next 向下合并(默认), prev 向上合并
+					numeral:2 //合并的列数(可选)
+                },
+                callBack:function(e){
+                    saveOneRow(e);
+                }
+            },{
+                title:"操作", 
+                width:100,
+                mode:"button",
+                name:"btn-delete",
+                align:"center",
+                fontSize:"18px",
+                fontColor:"red",
+                label:"删除",
+                b_alt:"删除该行记录？",
+                b_icon:"trash",
+                b_onlyImage:true,
+                code: 'eval(parseFloat([\"mj"]) > 150 ? "": "$(this).find(\'.btn-delete\').hide()" )', //面积小于150的隐藏“删除”按钮
+                callBack:function(e){
+                    deleteOneRow(e);
+                }
+            }
+        ]
+    }
+
+
+
+
+    /*+--------------------------------+*/
+    //=====[表格分页参数json]
+    $g_pageJson = {
+        enable: $g_pagination, //是否启用分(可选)。true 是（默认），false 否. 当参数 loadMore=true时, 本参数不起作用(此时默认false)
+        loadMore: false, //分页是否使用“下拉加载更多”方式,默认false(只支持单表格,多表格尚不支持(可选). 当值为true时, 参数enable不起作用(此时默认为false)
+        pageSize: $g_pageSize, //每页几条记录，默认2(可选)
+        pageCount: $g_pageCount, //总页数（必须）
+        recordCount: $g_recordCount, //总记录数(可选), 默认空(此时界面不显示总记录数)
+        pageMode: 'select', //分页方(可选)。list 数字列表形式（默认），select 选择形式
+        pageInfos: true, //是否显示分页统计信息，默认tru(可选)
+        tinyVolume: false, //当点"全部"按钮时,数据展示方(可选). false 一次性展示(默认), true 分批次展示(此时"全部"按钮的click事件须前端自己写!).
+        pageList:{ //pageMode='list'(可选)
+            listSize: 5  //显示几个页码，默认5(可选），litSize>pageCount时显示所有页码.
+        },
+        pageSelect:{ //pageMode='select'(可选)
+            allPage: true, //全部按钮（即：通过此按钮可一次性加载全部数据(可选)
+            homePage: true, //首页按(可选)
+            prevPage: true, //上一页按(可选)
+            nextPage: true, //下一页按(可选)
+            lastPage: true, //最后一页（尾页）按(可选)
+            dropPage: true //下拉页码（一页页显示）按(可选)
+        },
+        callback:function(e){ //回调函数（必须）.e是一个包含当前页码、每页记录数、总页数等信息的json.eg {curpage:1, pagesize:20, pageCount:3}
+            //console.log('回调信息，e：',e);
+            //var curpage = e.curpage;  //当前页码
+            if(e.button == '全部') $g_pageSize = e.pagesize; //全局赋值
+            var json = refreshDataByClickPageButton(e);
+            return json;
+        }
+    }
+
+
+
+
+    /*+===============================================================+*/
+    /*                          函数                         
+    /*+===============================================================+*/
+    /*+--------------------------------------------------------+*/
+    /**
+     * 函数：加载表格数据及分页
+     * @param {json} setJson 列字段参数json
+     * @param {json} dataJson 列表数据json
+     * @param {json} pagerJson 分页参数json
+     * @param {number} pageCount 分页总页数
+     * @param {number} recordCount 总记录数
+     */
+    function createTableData(setJson, dataJson, pagerJson, pageCount, recordCount){
+        pagerJson.pageCount = pageCount;
+        pagerJson.recordCount = recordCount;
+        $rootNode.neuiLikeTable({
+            pureRow:false, //是否创建一条空行记录,即表格一条记录也没有却要凭空新增一行(可选).值：true 是, false 否(默认). 将本参数值设为true, dataJson设为空对象{}或单行数据{name:"张三"}
+            setJson:setJson, //列字段配置json
+            dataJson:dataJson, //表格数据json
+            pagination:pagerJson,
+            exportExcel:$g_exportExcel
+        })   
+        $tableDom = $rootNode.find('.ne-like-table'); //全局赋值
+    }
+
+
+
+    /**
+     * 创建合计数据栏 add 20220712-1
+     * @param {object} ps_source 数据源
+     */
+    function createTotalData(ps_source){
+       var _html = [
+            '<div class="subTotal__row">',
+                '<span>合计：</span>',
+                '<span>抵押物数量：<em>' + ps_source["dyw_sl"] + '</em></span>',
+                '<span>抵押净值总价：<em>' + ps_source["dyjz_zj"] + '</em></span>',
+            '</div>',
+       ].join('\r\n')
+       $('.subTotal').empty().append(_html);
+    }
+
+    
+	/**
+	 * 函数：点击分页按钮
+	 * @param {json} e 分页参数
+	 */
+	function refreshDataByClickPageButton(e){		
+        //console.log('分页按钮e:',e);
+        var ls_curpage = e.curpage; //当前页码
+        //后台返回对应列表数据json
+        //code
+        //..
+        //模拟分页
+        if(ls_curpage == 2)
+            $g_tableJson = {
+                "data":[ 
+                    {"xh_self":"B1016", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"}, 
+                    {"xh_self":"B1017", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1018", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1019", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1020", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1021", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1022", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1023", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1024", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1025", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+
+                    {"xh_self":"B1026", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1027", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1028", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1029", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                    {"xh_self":"B1030", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"}
+                ]
+            }
+
+
+        else 
+
+            $g_tableJson = {
+                "data":[ 
+                    {"xh_self":"B1031", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"}
+                ]
+            }
+
+
+
+        //把json数据传给插件
+        /**
+         *返回格式：
+            1.单个json 
+                eg. return tableJson
+            2.json或函数名组成的数组或嵌套数组:
+                eg. return [tableJson, getXXHTML] 
+                eg. return [tableJson, [subJson]]
+                eg. return [tableJson, [subJson, totalJson]]
+                eg. return [tableJson, [subJson], getXXHTML]
+                eg. return [tableJson, [subJson, totalJson], getXXHTML]        
+                其中:
+                tableJson  表格列表数据json
+                getXXHTML 获取表格标题自定义HTML的函数(这里只需要传递函数名)
+                subJson    小计json
+                totalJson  合计json
+        */
+        return $g_tableJson;
+    }
+    
+
+
+    /**
+     * 函数：点击搜索按钮
+     * @param {json} e 搜索参数
+     */
+    function refreshDataByClickSearchButton(e){
+        console.log('搜索按钮e:',e);
+        //后台返回总页数和列表数据json
+        //code
+        //..
+        $g_pageCount = 3;
+        $g_recordCount = 300;
+        $g_tableJson = {"data":[{"xh_self":"B1001搜索", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"}]}
+        
+        createTableData($g_setJson, $g_tableJson, $g_pageJson, $g_pageCount, $g_recordCount);
+    }
+
+
+
+
+
+    //========================================
+    /**
+     * 函数：单个保存按钮
+     * @param {object} e 某一行的json数据
+     */
+    function saveOneRow(e){
+        //console.log('单行数据：', e);
+        var ls_row_index = e["row"] - 1; //行索引值		
+        //校验完整性
+        var tips = neuiLikeTable.checkEmptyRow(ls_row_index); //只校验当前行
+        if(tips != ''){
+            if(tips != ''){
+                neuiDialog.alert({
+                    caption: '提示',
+                    message: tips,
+                    buttons: ['确定']
+                })
+                return;
+            }
+        }
+        //校验重复行
+        var tips = neuiLikeTable.checkRepeatRow();
+        if(tips != ''){
+            neuiDialog.alert({
+                caption: '提示',
+                message: tips,
+                buttons: ['确定']
+            })
+            return;
+        }
+        //开始执行
+        var saveArr = {data:[e]}
+        saveFunc(saveArr);
+    }
+
+
+    /**
+     * 函数：保存操作
+     * @param {Array} ps_arr JSON数组
+     */
+    function saveFunc(ps_arr){
+        // 开始执行
+        var flag = '', msg = '保存成功';
+        neui.showAnimate();
+        setTimeout(function(){
+            for(var i = 0; i < ps_arr.data.length; i++){
+                var row = ps_arr.data[i];
+                var ls_row_index = row["row"] - 1; //行索引值
+                var ls_area = row["area"].value, 
+                    ls_dizhi = row["dizhi"].value;
+                var oneArr = [ls_area, ls_dizhi];
+                //console.log('保存arr',oneArr);
+                // 后台返回
+                /*
+                // START AJAX
+                var isHoldOn = true;
+                ajax({
+                    heading: "保存数据",
+                    debug: false,
+                    async: false, // 取数方式. true 异步, false 同步(默认)
+                    type: "GET",
+                    dataType: "html",
+                    cache: false,
+                    url: "",
+                    data: {
+                        "action": "",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk%>"
+                    },
+                    success: function(res){
+                        if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        // if(res == '') return;
+                        var json = JSON.parse(res);
+                        flag = json.return == 'ok' ? 1 : 0;
+                        if(!flag) msg = json.data;
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    neui.destroyAnimate();
+                    return;
+                }
+                // END AJAX
+                */
+                flag = parseInt(1); // 1 成功, 0 失败
+                if(!flag) msg = '保存失败';
+
+                if(!flag) break;
+                else{
+                    neuiLikeTable.changeRowStatus(ls_row_index, $tableDom); //更改“状态列”文本
+                    neuiLikeTable.setSomeColumnReadonly(['mj'], ls_row_index); //指定第N行(索引值)中某些列(英文字段)为只读状态
+                }
+            }
+            neuiDialog.alert({
+                caption: '提示',
+                message: msg,
+                buttons: ['确定'],
+                callBack: function(){
+                    //  load_data(); // 重载数据
+                }
+            })
+            
+            neui.destroyAnimate();
+        }, 100)
+    }
+    
+
+
+
+    //========================================
+    /**
+     * 函数：单个删除按钮
+     * @param {JSON} e 某一行的json数据
+     */
+     function deleteOneRow(e){
+        // console.log('单行数据e：', e);
+        neuiDialog.alert({
+            caption: '提示',
+            message: '确认要删除该文章吗？',
+            buttons: ['确定', '取消'],
+            callBack: function(ret){
+                if(ret == 1){
+                    delFunc({data:[e]})
+                }
+            }
+        })
+    }
+
+
+
+    /**
+     * 批量删除按钮
+     */
+    function delAll(){
+        var delArr = neuiLikeTable.getTableSelectedData($tableDom); // 选中行数据
+        if(typeof delArr.data == 'undefined') return;
+        if(delArr.data.length == 0){
+            neuiDialog.alert({
+                message: '请至少勾选一篇文章',
+                buttons: ['确定']
+            })
+            return;	
+        }
+        // console.log('全部选中行：', delArr)
+        // 开始执行
+        neuiDialog.alert({
+            message: '确认要删除这' + delArr.data.length + '篇文章吗？',
+            buttons: ['确定', '取消'],
+            callBack: function(ret){
+                if(ret == 1){
+                    delFunc(delArr);
+                }
+            }
+        })
+    }
+
+
+    /**
+    * 函数：删除操作
+    * @param {Array} ps_arr 数组对象
+    */
+	function delFunc(ps_arr){
+        // 开始执行
+        var flag = '', msg = '删除成功';
+        neui.showAnimate();
+        setTimeout(function(){
+            var rowCount = 0;
+            for(var i = 0; i < ps_arr.data.length; i++){
+                var row = ps_arr.data[i];
+                var ls_row_index = row["row"] - 1; // 行索引值
+                var ls_wz_bh = row["key"].value,
+                    ls_lpmc = row["qydcb_mc"].value; //系统楼盘名称
+                var oneArr = [ ls_wz_bh, ls_lpmc ];
+                // console.log('arr:', oneArr);
+
+                if(ls_wz_bh == ''){ // 新插入未保存的记录
+                    flag = 1;
+                }else{
+                    // 后台返回
+                    /*
+                    // START AJAX
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "删除文章",
+                        debug: false,
+                        url: "",
+                        data: {
+                            "action": "",
+                            "user": "<%=s_user %>",
+                            "sjk": "<%=s_sjk%>",
+                            "wz_bh": ls_wz_bh
+                        },
+                        success: function(res){
+                            if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            var json = JSON.parse(res);
+                            flag = json.result == 'ok' ? 1 : 0;
+                            if(!flag) msg = json.result;
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest) { },
+                        complete: function(XMLHttpRequest, textStatus) { }
+                    })
+                    if(!isHoldOn) {
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // END AJAX
+                    */
+                    flag = parseInt(1); // 1 成功, 0 失败
+                    if(!flag) msg = '删除失败';
+
+                    if(!flag){
+                        break;
+                    }
+                    else{
+                        neuiLikeTable.deleteOneRow(ls_row_index - rowCount);
+                        rowCount++;
+                    }
+                }
+            }
+            
+            neuiDialog.alert({
+                caption: '提示',
+                message: msg,
+                buttons: ['确定']
+            })
+
+            neui.destroyAnimate();
+        }, 100)
+    }
+
+
+    
+
+
+
+    
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    $(function(){
+
+        /*+--------------------------------------------------------+*/
+        //======初始化加载数据
+        $g_tableJson = {
+            "data":[
+                {"xh_self":"B1001", "lsh_id":"1001", "dizhi":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼1906尊邸大厦19楼1906尊邸大厦19楼1906尊邸大厦19楼1906尊邸大厦19楼1906" , "mj":"110.50", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏广场", "dong_mc":"19", "dong_lc":"6", "house_mc":"605", "scjz_dj":"9268", "scjz_zj":"0",  "jcnf":"2020年", "ywdt":"有电梯", "scjj":"11000", "yhlpmc":"中骏广场1", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1002", "lsh_id":"1002", "dizhi":"福建省泉州市泉秀街103号" , "mj":"150.47", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"200.5",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"12000", "yhlpmc":"中骏广场2", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"0", "sex":"女"},
+                {"xh_self":"B1003", "lsh_id":"1003", "dizhi":"福建省泉州市泉秀街102号" , "mj":"88.03", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"200.5",  "jcnf":"2020年", "ywdt":"有电梯","scjj":"13000", "yhlpmc":"中骏广场3", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1004", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场4", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"0", "sex":"女"} 
+               
+                ,{"xh_self":"B1005", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场5", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1006", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场6", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"女"},
+                {"xh_self":"B1007", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场7", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1008", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场8", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1009", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场9", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1010", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场10", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1011", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场11", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1012", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场12", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1013", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场13", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1014", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场14", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                {"xh_self":"B1015", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场14", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"}
+                // ,{"xh_self":"B1016", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场16", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                // {"xh_self":"B1017", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场17", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                // {"xh_self":"B1018", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场18", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                // {"xh_self":"B1019", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场19", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                // {"xh_self":"B1020", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场20", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                // {"xh_self":"B1021", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场21", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                // {"xh_self":"B1022", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场22", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                // {"xh_self":"B1023", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场23", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"},
+                // {"xh_self":"B1024", "lsh_id":"1004", "dizhi":"福建省泉州市泉秀街104号" , "mj":"170.39", "area":"福建省-泉州市-丰泽区", "qydcb_mc":"中骏世界城", "dong_mc":"10", "dong_lc":"5", "house_mc":"508", "scjz_dj":"9803", "scjz_zj":"",  "jcnf":"2020年", "ywdt":"无电梯", "scjj":"14000", "yhlpmc":"中骏广场24", "yhjcnf":"2020年", "lpzl":"福建省泉州市丰泽区泉秀街102号尊邸大厦19楼", "check_wc":"1", "sex":"男"}
+                
+            ]
+        }
+        //$g_tableJson = {data:[]}
+        createTableData($g_setJson, $g_tableJson, $g_pageJson, $g_pageCount, $g_recordCount);
+
+
+
+        // add 20220712-1
+        var $subJson = {"dyw_sl":"80", "dyjz_zj":"540"}
+        createTotalData($subJson);
+
+
+
+
+
+        /*+--------------------------------------------------------+*/
+        //======全部保存按钮 / 批量保存按钮
+        $('#btn-save-all').on('click', function(){
+            var saveArr = neuiLikeTable.getTableListData();
+            //console.log('所有行数据:', arr);
+            //校验完整性
+            var tips = neuiLikeTable.checkEmptyRow('all', $tableDom); //校验所有行
+            if(tips != ''){
+                if(tips != ''){
+                    neuiDialog.alert({
+                        caption: '提示',
+                        message: tips,
+                        buttons: ['确定']
+                    })
+                    return;
+                }
+            }
+            //校验重复行
+            var tips = neuiLikeTable.checkRepeatRow($tableDom);
+            if(tips != ''){
+                neuiDialog.alert({
+                    caption: '提示',
+                    message: tips,
+                    buttons: ['确定']
+                })
+                return;
+            }
+            //开始执行
+            neuiDialog.alert({
+                caption: '提示',
+                message: '确认全部保存？',
+                buttons: ['确定', '取消'],
+                callBack: function(ret){
+                    if(ret == 1){
+                        saveFunc(saveArr);
+                    }
+                }
+            })
+        });
+
+
+    }); //$(function(){})
+</script>
+</body>
+</html>
