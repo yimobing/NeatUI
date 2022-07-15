@@ -523,6 +523,7 @@
             $('#btn-examineForm').on('click', function(){
                 var result = example.examineForm('.mortgage__static', { // 其它参数(可选)
                     popup: true, // 表单格式错误或信息不完整时是否弹出提示信息(可选)，默认true
+                    method: "notice", // 提示窗口形式. notice 通知消息(默认), dialog 对话框
                     zIndex: 999 // 提示信息的对话框层级(可选)，999
                 });
                 console.log('表单完整性：', result);
