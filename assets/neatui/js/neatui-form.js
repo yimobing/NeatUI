@@ -389,6 +389,7 @@
             var isAllRead = true; // true 表示所有输入框为只读
             var defaults = {
                 popup: true, // 表单格式错误或信息不完整时是否弹出提示信息(可选)，默认true
+                method: "notice", // 提示窗口形式. notice 通知消息(默认), dialog 对话框
                 zIndex: 999 // 提示信息的对话框层级(可选)，999
             }
             var settings = $.extend(true, {}, defaults, options || {} );
@@ -449,19 +450,22 @@
                 if(settings.popup){
                     var tips = '请' + chooseText + '：' + tips1.substr(0, tips1.length - 1);
                     if(tools.isExistDialogControl()){
-                        // neuiDialog.alert({
-                        //     zIndex: zIndex,
-                        //     animate: true,
-                        //     message: tips,
-                        //     buttons: ['确定']
-                        // })
-                        neuiDialog.notice({
-                            zIndex: zIndex,
-                            animate: true,
-                            message: tips,
-                            theme: 'danger',
-                            location: 'top'
-                        })
+                        if(settings.method == 'dialog'){
+                            neuiDialog.alert({
+                                animate: true,
+                                message: tips,
+                                buttons: ['确定'],
+                                zIndex: zIndex
+                            })
+                        }else{
+                            neuiDialog.notice({
+                                animate: true,
+                                message: tips,
+                                theme: 'danger',
+                                location: 'top',
+                                zIndex: zIndex
+                            })
+                        }
                     }else{
                         alert(tips);
                     }
