@@ -265,6 +265,8 @@
 			if(gZIndex > 0) $parent.css('z-index',gZIndex);
 
 
+			var prevProvinceName = prevCityName = prevCountyName = ''; // add 20220718-3
+
 			//=====选中某个下拉选项
 			child.off('click').on('click','li:not(".wrong-tips")',function(e){ //off('click) 先释放掉,不然回调函数可能执行两次
 				e.stopPropagation(); //阻止冒泡	
@@ -285,7 +287,7 @@
 				newKey = typeof newKey == "undefined" ? "" : newKey;
 				//var regNumber = /^\d+$/; //检测字符串是否为数字型
 				//console.log('newKey:',newKey,' regY:',regNumber.test(newKey));
-				if(newKey!=""){
+				if(newKey != "" && !gChain){ // edit 20220718-3
 					giveValue2SelectBox(newText, newKey, newHid); //给选择框赋值
 				}
 				if(gReact){ //联动下拉，清空关联值		
@@ -308,7 +310,13 @@
 				if(gChain){ //省市区同框联动下拉
 					var _sourceArray = [];
 					var _districtArr = gValue.split(gDelimiter);
-					var	_shengName = _districtArr[0], _shiName = _districtArr[1], _quName = gLevel != 3 ? '' : _districtArr[2];
+
+					// edit 20220718-3
+					// var	_shengName = _districtArr[0], _shiName = _districtArr[1], _quName = gLevel != 3 ? '' : _districtArr[2];
+					var	_shengName = prevProvinceName == '' ? _districtArr[0] : prevProvinceName, 
+						_shiName = prevCityName == '' ? _districtArr[1] : prevCityName,
+						_quName = gLevel != 3 ? '' : (prevCountyName == '' ? _districtArr[2] : prevCountyName);
+
 					var _shengId = '', _shiId = '', _quId = '';
 					var _shengHid = '', _shiHid = '', _quHid = '';
 					var _shiJson = _quJson = {};
@@ -322,6 +330,7 @@
 							_shengName = _shiName = _quName = gEntire;
 							_shengHid = _shiHid = _quHid = gEntire;
 							if(gCnClose) closeWidget();
+							gLevel = 1; // 当城市为“全部”时，点市就要关闭按钮 add 20220718-3	
 						}else{		
 							_shiJson = getCityJson(_shengId,citySourceArr);
 							if(_shiJson.data.length == 0){ // 当市没有值时，点省就要关闭按钮 add 20220718-1
@@ -339,6 +348,12 @@
 								}
 							}
 						}
+
+
+						// add 20220718-3
+						prevProvinceName = _shengName;
+						prevCityName = _shiName;
+						prevCountyName = _quName;
 					}
 
 					if(colIndex==1) { //城市改变时	
@@ -351,13 +366,24 @@
 							_shiHid = _quHid = gEntire;
 							//console.log('prevText:', prevText);
 							var _nameArr = prevText.split(gDelimiter);
+
+							// edit 20220718-3
+							// if(isArray(_nameArr)){
+							// 	_shengName = _nameArr[0];
+							// 	_shengId = getProvinceIDByProvinceName(_shengName);
+							// 	_shengHid = getProvinceHidByProvinceName(_shengName, provinceSourceArr);
+							// 	if(_shengId == '') _shengId = gEntire;
+							// 	if(_shengHid == '')	_shengHid = gEntire;
+							// }
 							if(isArray(_nameArr)){
-								_shengName = _nameArr[0];
+								_shengName = prevProvinceName == '' ? _nameArr[0] : prevProvinceName;
 								_shengId = getProvinceIDByProvinceName(_shengName);
 								_shengHid = getProvinceHidByProvinceName(_shengName, provinceSourceArr);
 								if(_shengId == '') _shengId = gEntire;
-								if(_shengHid == '')	_shengHid = gEntire;	
+								if(_shengHid == '')	_shengHid = gEntire;
+								gLevel = 2; // 当城市为“全部”时，点市就要关闭按钮 add 20220718-3	
 							}
+
 							if(gCnClose) closeWidget();
 						}else{	
 							_shengId = getProvinceIDByCityName(_shiName, citySourceArr);
@@ -375,7 +401,13 @@
 								_quHid = _quJson.data[0].hid;
 							}
 						}
+
+						// add 20220718-3
+						prevProvinceName = _shengName;
+						prevCityName = _shiName;
+						prevCountyName = _quName;
 					}
+
 
 					if(colIndex==2){ //区县改变时
 						_quId = newKey;
@@ -386,11 +418,24 @@
 							_quName = gEntire;
 							_quHid = gEntire;
 							var	_nameArr = prevText.split(gDelimiter);
+							// edit 20220718-3
+							// if(isArray(_nameArr)){
+							// 	_shengName = _nameArr[0];
+							// 	_shengId = getProvinceIDByProvinceName(_shengName);
+							// 	_shengHid = getProvinceHidByProvinceName(_shengName, provinceSourceArr);
+							// 	_shiName = _nameArr[1];
+							// 	_shiId = getCityIDByCityName(_shiName);
+							// 	_shiHid = getCityHidByCityName(_shiName, citySourceArr);
+							// 	if(_shengId == '') _shengId = gEntire;
+							// 	if(_shengHid == '')	_shengHid = gEntire;
+							// 	if(_shiId == '') _shiId = gEntire;
+							// 	if(_shiHid == '')_shiHid = gEntire;
+							// }
 							if(isArray(_nameArr)){
-								_shengName = _nameArr[0];
+								_shengName = prevProvinceName == '' ? _nameArr[0] : prevProvinceName;
 								_shengId = getProvinceIDByProvinceName(_shengName);
 								_shengHid = getProvinceHidByProvinceName(_shengName, provinceSourceArr);
-								_shiName = _nameArr[1];
+								_shiName = prevCityName == '' ? _nameArr[1] : prevCityName;
 								_shiId = getCityIDByCityName(_shiName);
 								_shiHid = getCityHidByCityName(_shiName, citySourceArr);
 								if(_shengId == '') _shengId = gEntire;
@@ -398,6 +443,7 @@
 								if(_shiId == '') _shiId = gEntire;
 								if(_shiHid == '')_shiHid = gEntire;
 							}
+							
 						}else{		
 							_shiId = getCityIDByCountyName(_quName, countySourceArr);
 							_shiName = getCityNameByCityId(_shiId, citySourceArr);
@@ -406,7 +452,13 @@
 							_shengName = getProvinceNameByProvinceId(_shengId, provinceSourceArr);
 							_shengHid = getProvinceHidByProvinceId(_shengId, provinceSourceArr);
 						}
+
+						// add 20220718-3
+						prevProvinceName = _shengName;
+						prevCityName = _shiName;
+						prevCountyName = _quName;
 					}
+
 
 					var _districtName = _shengName + gDelimiter + _shiName; //eg.'福建省-泉州市'
 					var _districtId = _shengId + gDelimiter + _shiId; //eg.'350000-350500'
@@ -429,8 +481,7 @@
 					//var reg = eval("/([" + gDelimiter + "]+)/g");
 					_districtHid = _districtHid.toString().replace(/undefined/g, '');
 					
-					//console.log('x1-省市区ID:',_districtId, ' \n省市区名称:',_districtName);		
-
+					//console.log('x1-省市区ID:',_districtId, ' \n省市区名称:',_districtName);
 					//将省市区下拉值中的“全部”替换成空
 					if(gEntire != '' && gCnPartEmpty){
 						//var reg = new RegExp("^\\-" + gEntire + "$", "g"); //不行
@@ -448,11 +499,23 @@
 					//console.log('x2-省市区ID:',_districtId, ' \n省市区名称:',_districtName);	
 					_sourceArray = getChainArray(_shengName,_shiName);
 					createPullDownList(_districtId, _districtName, _sourceArray); //更新下拉
-					giveValue2SelectBox(_districtName, _districtId, _districtHid); //给选择框赋值
+					
+
+					//edit 20220718-3
+					// giveValue2SelectBox(_districtName, _districtId, _districtHid); //给选择框赋值
+					if(gChain){ // 省市区县同框下拉
+						if(colIndex == (gLevel - 1)){
+							giveValue2SelectBox(_districtName, _districtId, _districtHid); //给选择框赋值
+						}
+					}else{
+						giveValue2SelectBox(_districtName, _districtId, _districtHid); //给选择框赋值
+					}
+
 					newText = _districtName;
 					newKey = _districtId;
 					newHid = _districtHid;	
 				}
+
 				
 				//调用回调函数
 				var resJson = {"id":newKey, "value":newText, "explanation":newSmZi, "oldId":oldKey, "oldValue":oldText, "prevId":prevKey, "prevValue":prevText, "object":OBJ}
