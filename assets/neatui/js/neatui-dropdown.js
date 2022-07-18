@@ -40,6 +40,11 @@
 			zIndex:0, //自定义z-index(可缺省).默认0(不起作用)
 			height: 32, //下拉项高度
 
+			// add 20220718-1
+			dropMaxHeight: 200, // 下拉区域最大高度(可选), 默认200px
+			besidesClose: [ ], // 指定点击页面其它哪些地方时不关闭控件(可选)，默认空数组。一般用于点击非输入框(比如某个按钮)时，这时如果不排除掉这个按钮会发现点了按钮没反应。
+				// 数组元素可以是选择器字符串、JQ对象或DOM对象。eg. ['#id1', '#id2', '.className1', $('#btn1'), document.getElementById('id1') ]
+
 			responseEvent:'click' //响应的事件.默认click（暂时未用到该参数）
 		};
 
@@ -102,11 +107,14 @@
 			var _ouhtml = '<div class="ne-drop-down'+nodeClassName+'">'+ _captionStr + 
 							'<div class="ne-drop-down-list"></div>'+
 						'</div>';
-			if($('.ne-drop-down').length==0) $('body').append(_ouhtml);
+			if($('.ne-drop-down').length==0){
+				// 使用after而非append拼接在body之后，避免受body中定义的css影响,特别是定义了body{ overflow: hidden; } 时可能导致控件绝对定位时被遮挡住 edit 20220718-1
+				$('body').after(_ouhtml);
+			}
 
 			//=====定位根节点
-			var parent = $('.ne-drop-down');
-			var child = parent.find('.ne-drop-down-list');
+			var $parent = $('.ne-drop-down');
+			var child = $parent.find('.ne-drop-down-list');
 
 			//=====省市区数组
 			var provinceSourceArr = []; //省份数组
@@ -242,16 +250,16 @@
 				left = left < 0 ? 0 : left;
 				width = minW;
 			}
-			if(top + parent.outerHeight(true) > $(window).outerHeight(true)){ //当默认下拉方向朝下时,如果高度超过屏幕高,则更改下拉方向为朝上
-				top = top - parent.outerHeight(true) - p_h - 1; //下拉方向:朝上
+			if(top + $parent.outerHeight(true) > $(window).outerHeight(true)){ //当默认下拉方向朝下时,如果高度超过屏幕高,则更改下拉方向为朝上
+				top = top - $parent.outerHeight(true) - p_h - 1; //下拉方向:朝上
 				if(top < 0) top = 5; //朝上超过高度时,top设为0
 			}
 			var _css = {'position':'absolute', 'left':left+'px', 'top':top+'px', 'display':'block', 'width':width}
 			if(gPosition == 'fixed'){
 				_css = {'position':'fixed', 'left':0, 'top':top+'px', 'display':'block', 'width':'100%', 'margin':'0 auto'}
 			}
-			parent.css(_css);
-			if(gZIndex > 0) parent.css('z-index',gZIndex);
+			$parent.css(_css);
+			if(gZIndex > 0) $parent.css('z-index',gZIndex);
 
 
 			//=====选中某个下拉选项
@@ -475,7 +483,7 @@
 				/**关闭控件 */
 				function closeWidget(){
 					//parent.slideUp("fast","linear"); //隐藏
-					parent.remove(); //移除
+					$parent.remove(); //移除
 				}
 				function giveValue2SelectBox(ps_text, ps_key, ps_hid){
 					assignElementValue(OBJ, ps_text);
@@ -488,22 +496,43 @@
 
 			//=====关闭按钮
 			if(settings.showCloseButton) {
-				parent.find('.ne-drop-down-close').remove();
-				parent.append('<div class="ne-drop-down-close' + ' ' + gCloseButtonAppearance + '">关闭</div>');
+				$parent.find('.ne-drop-down-close').remove();
+				$parent.append('<div class="ne-drop-down-close' + ' ' + gCloseButtonAppearance + '">关闭</div>');
 				child.addClass('no-box-shadow');
-				parent.find('.ne-drop-down-close').on('click',function(){
-					parent.remove();
+				$parent.find('.ne-drop-down-close').on('click',function(){
+					$parent.remove();
 				})
 			}
 			
-			//=====点击输入框元素以外的地方隐藏下拉区域
+			//=====点击输入框元素以外的地方隐藏下拉区域 edit 20220718-1
 			//$('body').bind('click',function(e){
 			$(document).on('click', function(e){
-				var target = $(e.target); //注:e.target.closest(selector).length==0 说明点击的不是元素selector区域,反之则是
-				if(parent.length>0){
-					if(target.closest(OBJ).length!=0) return;
-					//parent.slideUp('fast','linear'); //隐藏下拉
-					parent.remove(); //移除下拉
+				var target = $(e.target); // 注:e.target.closest(selector).length==0 说明点击的不是元素selector区域,反之则是
+				if($parent.length>0){
+					// if(target.closest(OBJ).length != 0) return;
+					var isCanClose = true; // 是否能关闭控件
+					if(target.closest(OBJ).length != 0 || target.closest($parent).length != 0) {
+						isCanClose = false;
+					}
+					for(var i = 0; i < settings.besidesClose.length; i++){
+						var one = settings.besidesClose[i];
+						var _nowSelector = one instanceof jQuery == false ?
+								(
+									!isDomObject(one) ? one : 
+									( one.getAttribute('id') != null ? '#' + one.getAttribute('id') : getStringClassName(one.getAttribute('class')) )
+								)
+								:
+								( one[0].getAttribute('id') != null ? '#' + one[0].getAttribute('id') : getStringClassName(one[0].getAttribute('class')) );		
+						if(e.target == e.target.closest(_nowSelector)){
+							isCanClose = false;
+							break;
+						}
+					}
+
+					if(isCanClose){
+						// parent.slideUp('fast','linear'); //隐藏下拉
+						$parent.remove(); // 移除下拉
+					}
 				}
 			});
 			
@@ -544,6 +573,11 @@
 				var _arrLength = ps_jsonArr.length;
 				var _highlightIndexArr = [];
 				var _inHtml = '';
+
+				// add 20220718-1
+				var maxHeight = settings.dropMaxHeight.toString().replace(/px/g, '');
+				var _ulStyle = ' style="max-height:' + maxHeight + 'px"';
+
 				for(var k=0;k<ps_jsonArr.length;k++){
 					var _dataSource = ps_jsonArr[k];
 					var _isZeroToolTip = gReact || gChain ? false : true;
@@ -552,7 +586,9 @@
 					var colW = 100/_arrLength;
 					var ieVersion = getInternetExplorerVersion();
 					if(ieVersion >=6 && ieVersion <= 7) colW = Math.floor(colW);
-					_inHtml+='<div class="ne-drop-down-column" style="width:' + colW + '%"><ul>';
+					
+					_inHtml+='<div class="ne-drop-down-column" style="width:' + colW + '%"><ul' + _ulStyle + '>'; // edit 20220718-1
+
 					//html拼接
 					var _locateIndex = 0;
 					if(typeof _standardJson.data!="undefined"){ //正确
@@ -590,11 +626,11 @@
 				child.empty().append(_inHtml);
 
 				//重置标题
-				if(gCaption != '') parent.find('.ne-drop-down-caption').text(gCaption);
-				else parent.find('.ne-drop-down-caption').remove();
+				if(gCaption != '') $parent.find('.ne-drop-down-caption').text(gCaption);
+				else $parent.find('.ne-drop-down-caption').remove();
 
 				//if(getInternetExplorerVersion() <=7 && getInternetExplorerVersion() != -1) child.css('height', parent.outerHeight(true)); 
-				parent.slideDown('fast','linear'); 
+				$parent.slideDown('fast','linear'); 
 				//定位到当前值
 				for(var k=0;k<ps_jsonArr.length;k++){
 					var _$grand = child.find('.ne-drop-down-column').eq(k).find('ul');
@@ -764,6 +800,41 @@
 		//console.log('newJsonArr:', newJsonArr);
 		//return newJsonArr;
 		return {"data":newJsonArr};
+	};
+
+
+
+
+
+	/**
+	 * 判断是否dom对象 add 20220718-1
+	 * 首先要对HTMLElement进行类型检查，因为即使在支持HTMLElement的浏览器中，类型却是有差别的，在Chrome,Opera中HTMLElement的类型为function，此时就不能用它来判断了
+	 * @param {object} ps_obj 目标对象
+	 * @returns {boolean} 返回布尔值. true 是, false 否
+	 */
+	var isDomObject = function(ps_obj){
+		return ( typeof HTMLElement === 'object' ) ?
+			ps_obj instanceof HTMLElement
+			:
+			ps_obj && typeof ps_obj === 'object' && ps_obj.nodeType === 1 && typeof ps_obj.nodeName === 'string';
+	};
+	
+
+	/**
+	 * 获取字符串对应的元素节点(供jq调用)  add 20220718-1
+	 * eg1. 'floor' <=> '.floor'
+	 * eg2. 'floor build' <=> '.floor.build'
+	 * @param {string} ps_str 字符串
+	 * @returns 返回元素节点字符串
+	 */
+	var getStringClassName = function(ps_str){
+		if(ps_str.replace(/([ ]+)/g, '') === '') return '';
+		var arr = ps_str.replace(/([ ]+)/g, ' ').split(' ');
+		var str = '';
+		for(var i = 0; i < arr.length; i++){
+			str += '.' + arr[i];
+		}
+		return str;
 	};
 
 
