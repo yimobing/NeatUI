@@ -95,7 +95,23 @@
             </div><!--/.eform-item-->
 				</div><!--/.eform-content-->
 		</section><!--/.panel-form-->
-		
+
+
+		<section class="panel-form item-layout has-border">
+    		<div class="eform-caption">点击按钮下拉</div><!--/.eform-caption-->
+			<div class="eform-content">
+				<div class="eform-item">
+					<div class="eform-box">
+						<div class="item-l"><label>楼盘名称下拉</label></div>
+						<div class="item-r item-full"><i class="fa fa-building"></i><input type="text" id="i-house"></div>
+						<div class="item-r"><button type="button" id="btn-get-house">查询</button></div>
+					</div><!--/.eform-box-->
+				</div><!--/.eform-item-->
+			</div><!--/.eform-content-->
+		</section><!--/.panel-form-->
+
+
+
 		<section class="panel-form item-layout has-border">
     		<div class="eform-caption">级联下拉</div><!--/.eform-caption-->
 			<div class="eform-content">
@@ -246,6 +262,10 @@ $(function(){
 				//callBack: function(e){}, //回调函数（大写的B，兼容旧版）
 				zIndex:0, //自定义z-index(可缺省).默认0(不起作用)
 				height: 32, //下拉项高度
+
+				dropMaxHeight: 200, // 下拉区域最大高度(可选), 默认200px
+				besidesClose: [ ], // 指定点击页面其它哪些地方时不关闭控件(可选)，默认空数组。一般用于点击非输入框(比如某个按钮)时，这时如果不排除掉这个按钮会发现点了按钮没反应。
+				// 数组元素可以是选择器字符串、JQ对象或DOM对象。eg. ['#id1', '#id2', '.className1', $('#btn1'), document.getElementById('id1') ]
 				
 				
 				responseEvent:'click' //响应的事件.默认click（暂时未用到该参数）
@@ -397,7 +417,31 @@ $(function(){
 			callBack:function(e){
 				console.log('单个下拉回调：', e);
 			}
-		})
+		});
+
+
+
+
+		/*+--------------------------------------------------------+*/
+		//=====点击查询按钮下拉、楼盘名称下拉
+		$('#btn-get-house').on('click', function(){
+			var $this = $(this);
+			var $input = $('#i-house'); // $(this).parent().siblings().find('input:text, textarea');
+			var ls_lpmc = $input.val();
+			// console.log('楼盘名称：', ls_lpmc)
+			var houseJson = {"data":[
+					{"value":"张三"}, 
+					{"value":"李四"}, 
+					{"value":"王五"}
+				]
+			}
+			neuiDropdown({
+				caption: '楼盘名称',
+				json: houseJson,
+				format: ["value"],
+				besidesClose: [ $this ] // 点击当前查询按钮时，不要关闭控件(必须)，否则控件无法显示
+			}, $input)
+		});
 	
 		
 		
