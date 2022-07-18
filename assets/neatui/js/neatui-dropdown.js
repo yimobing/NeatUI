@@ -19,7 +19,7 @@
 			areaFormat: ['province', 'city', 'county'], //地区显示值JSON格式(可缺省)
 			keyFormat: ['provinceId', 'cityId', 'countyId'], //地区隐藏值JSON格式(可缺省)
 			beautifyScrollBar: true, // 省市区同框联动时是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式 add 20220718-2
-			
+
 			//·参数：省市区三级联动下拉
 			react: false, //是否开启省市区三级联动下拉(可缺省)
 			region: 'province', //省市区三级联动下拉类型(可缺省)。province 省份（默认）, city 城市， county 区县。（仅当react=true时有效）
@@ -324,7 +324,6 @@
 							if(gCnClose) closeWidget();
 						}else{		
 							_shiJson = getCityJson(_shengId,citySourceArr);
-							console.log('gLevel：', gLevel); //testing
 							if(_shiJson.data.length == 0){ // 当市没有值时，点省就要关闭按钮 add 20220718-1
 								gLevel = 1;
 							}
@@ -343,7 +342,6 @@
 					}
 
 					if(colIndex==1) { //城市改变时	
-						console.log('aaa'); //testing
 						_shiId = newKey;
 						_shiName = newText;
 						_shiHid = newHid;
