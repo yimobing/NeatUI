@@ -18,7 +18,8 @@
 			explained: true, //下拉项是否含说明性文字(可缺省), 默认true. 值为true时选中下拉项后将自动过滤掉这些说明性文字,即输入框不会包含说明性文字)
 			areaFormat: ['province', 'city', 'county'], //地区显示值JSON格式(可缺省)
 			keyFormat: ['provinceId', 'cityId', 'countyId'], //地区隐藏值JSON格式(可缺省)
-
+			beautifyScrollBar: true, // 省市区同框联动时是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式 add 20220718-2
+			
 			//·参数：省市区三级联动下拉
 			react: false, //是否开启省市区三级联动下拉(可缺省)
 			region: 'province', //省市区三级联动下拉类型(可缺省)。province 省份（默认）, city 城市， county 区县。（仅当react=true时有效）
@@ -83,6 +84,7 @@
 				gRegion = settings.region,
 				gRelatedNode = settings.relatedNode
 				gChain = settings.chain,
+				gBeautifyScrollBar = settings.beautifyScrollBar,
 				gLevel = parseInt(settings.level) < 2 || parseInt(settings.level) > 3 ? 3 : parseInt(settings.level),
 				gDelimiter = settings.delimiter,
 				gId = settings.id,
@@ -103,6 +105,7 @@
 			var _captionStr = gCaption == '' ? '' : '<div class="ne-drop-down-caption">' + gCaption + '</div>';
 			//=====创建节点
 			var nodeClassName = gChain ? ' ne-drop-beauty ' + gCloseButtonAppearance : '';
+			nodeClassName += gBeautifyScrollBar ? ' ne-drop-beautify-scrollbar' : ''; // add 20220718-2
 			if(checkIsMobile()) nodeClassName += ' ne-drop-mobile';
 			var _ouhtml = '<div class="ne-drop-down'+nodeClassName+'">'+ _captionStr + 
 							'<div class="ne-drop-down-list"></div>'+
