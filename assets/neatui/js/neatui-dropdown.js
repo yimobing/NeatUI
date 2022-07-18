@@ -321,6 +321,10 @@
 							if(gCnClose) closeWidget();
 						}else{		
 							_shiJson = getCityJson(_shengId,citySourceArr);
+							console.log('gLevel：', gLevel); //testing
+							if(_shiJson.data.length == 0){ // 当市没有值时，点省就要关闭按钮 add 20220718-1
+								gLevel = 1;
+							}
 							if(_shiJson.data.length>0){
 								_shiId = _shiJson.data[0].bh;
 								_shiName = _shiJson.data[0].mc;
@@ -336,6 +340,7 @@
 					}
 
 					if(colIndex==1) { //城市改变时	
+						console.log('aaa'); //testing
 						_shiId = newKey;
 						_shiName = newText;
 						_shiHid = newHid;
@@ -358,6 +363,11 @@
 							_shengName = getProvinceNameByProvinceId(_shengId, provinceSourceArr);
 							_shengHid = getProvinceHidByProvinceId(_shengId, provinceSourceArr);
 							_quJson = getCountyJson(_shiId,countySourceArr);
+					
+							if(_quJson.data.length == 0){ // 当区县没有值时，点市就要关闭按钮 add 20220718-1
+								gLevel = 2;
+							}
+
 							if(_quJson.data.length>0){
 								_quId = _quJson.data[0].bh;
 								_quName = _quJson.data[0].mc;
@@ -404,6 +414,15 @@
 						_districtName =  _districtName + gDelimiter + _quName; //eg.'福建省-泉州市-丰泽区'
 						_districtId = _districtId + gDelimiter + _quId; //eg.'350000-350500-350503'
 						_districtHid = _districtHid + gDelimiter + _quHid;
+					}
+					
+					// add 20220718-1
+					// var repReg = eval('/(\-|请选择)/g'); // gDelimiter gPlaceholder
+					var repReg = eval('/(\\' + gDelimiter + '|' + gPlaceholder + ')/g');
+					if(_districtName.toString().replace(repReg, '') === ''){
+						_districtName = '';
+						_districtId = '';
+						_districtHid = '';
 					}
 
 					//var reg = eval("/([" + gDelimiter + "]+)/g");
@@ -476,6 +495,7 @@
 				if(typeof settings.callback == "function") settings.callback(resJson); //小写的回调
 				if(typeof settings.callBack == "function") settings.callBack(resJson); //大写的回调(兼容旧版)
 				
+				// 关闭控件
 				if(!gChain || colIndex == gLevel - 1){
 					closeWidget();
 				}
