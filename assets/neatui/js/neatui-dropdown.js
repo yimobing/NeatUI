@@ -553,12 +553,21 @@
 					OBJ.attr('data-provinceId', provinceHideValue);
 					OBJ.attr('data-cityId', cityHideValue);
 					OBJ.attr('data-countyId', countyHideValue);
+
+					// 回调
+					if(colIndex == gLevel - 1){
+						if(typeof settings.callback == "function") settings.callback(resJson); //小写的回调
+						if(typeof settings.callBack == "function") settings.callBack(resJson); //大写的回调(兼容旧版)
+					}
+				}else{
+					// 回调
+					if(typeof settings.callback == "function") settings.callback(resJson); //小写的回调
+					if(typeof settings.callBack == "function") settings.callBack(resJson); //大写的回调(兼容旧版)
 				}
-
-
-				if(typeof settings.callback == "function") settings.callback(resJson); //小写的回调
-				if(typeof settings.callBack == "function") settings.callBack(resJson); //大写的回调(兼容旧版)
 				
+
+
+
 				// 关闭控件
 				if(!gChain || colIndex == gLevel - 1){
 					closeWidget();
