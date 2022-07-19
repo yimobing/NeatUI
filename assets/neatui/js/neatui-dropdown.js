@@ -11,34 +11,34 @@
 
 		var defaults = {
 			//参数：公用
-			caption: '', //下拉标题(可缺省).默认空.一般只在position='fixed'时使用
-			position: 'absolute', //定位方式(可缺省). absolute 相对(默认), fixed 绝对
-			json: {}, //json数据（可缺省）。当react=true时，本参数前台传递的值失效，json自动调用省市区三级联动的数据
-			format: ["bh","mc"], //自定义json字段格式(数组)（可缺省）。eg.{"bh":"1001","mc":"张三"}。当react=true时，本参数前台传递的值失效，系统将默认使用：["bh","mc"]
-			explained: true, //下拉项是否含说明性文字(可缺省), 默认true. 值为true时选中下拉项后将自动过滤掉这些说明性文字,即输入框不会包含说明性文字)
-			areaFormat: ['province', 'city', 'county'], //地区显示值JSON格式(可缺省)
-			keyFormat: ['provinceId', 'cityId', 'countyId'], //地区隐藏值JSON格式(可缺省)
+			caption: '', //下拉标题(可选).默认空.一般只在position='fixed'时使用
+			position: 'absolute', //定位方式(可选). absolute 相对(默认), fixed 绝对
+			json: {}, //json数据(可选)。当react=true时，本参数前台传递的值失效，json自动调用省市区三级联动的数据
+			format: ["bh","mc"], //自定义json字段格式(数组)(可选)。eg.{"bh":"1001","mc":"张三"}。当react=true时，本参数前台传递的值失效，系统将默认使用：["bh","mc"]
+			explained: true, //下拉项是否含说明性文字(可选), 默认true. 值为true时选中下拉项后将自动过滤掉这些说明性文字,即输入框不会包含说明性文字)
+			areaFormat: ['province', 'city', 'county'], //地区显示值JSON格式(可选)
+			keyFormat: ['provinceId', 'cityId', 'countyId'], //地区隐藏值JSON格式(可选)
 			beautifyScrollBar: true, // 省市区同框联动时是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式 add 20220718-2
 
 			//·参数：省市区三级联动下拉
-			react: false, //是否开启省市区三级联动下拉(可缺省)
-			region: 'province', //省市区三级联动下拉类型(可缺省)。province 省份（默认）, city 城市， county 区县。（仅当react=true时有效）
-			relatedNode:{}, //省市区三级联动下拉关联节点（即省市区3个节点的ID或ClassName)(可缺省,系统会自动调用).格式.eg.{"province":"#i-t-province", "city":"#i-t-city", "county":"#i-t-county"}
+			react: false, //是否开启省市区三级联动下拉(可选)
+			region: 'province', //省市区三级联动下拉类型(可选)。province 省份（默认）, city 城市， county 区县。（仅当react=true时有效）
+			relatedNode:{}, //省市区三级联动下拉关联节点（即省市区3个节点的ID或ClassName)(可选,系统会自动调用).格式.eg.{"province":"#i-t-province", "city":"#i-t-city", "county":"#i-t-county"}
 
 			//·参数：省市区同框联动下拉
-			chain: false, //是否开启省市区同框联动下拉(可缺省).默认false
-			level: 3, //省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
-			delimiter:'-', //省市区同框联动结果值使用的分隔符(可缺省)。默认短横线-
+			chain: false, //是否开启省市区同框联动下拉(可选).默认false
+			level: 3, //省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可选)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
+			delimiter:'-', //省市区同框联动结果值使用的分隔符(可选)。默认短横线-
 
 			//·参数：公用
-			id:'', //选择框默认值（隐藏的ID等键值)（可缺省）
-			value:'', //选择框默认值（显示值）（可缺省）
+			id:'', //选择框默认值（隐藏的ID等键值)(可选)
+			value:'', //选择框默认值（显示值）(可选)
 			entire:'', //默认下拉值（即：默认下拉列表新增一个选项），当本参数不为空时，则默认输入框的值为entire的值，且系统将会在下拉中自动新增一项（且为第一项）值为本参数的值
-			showCloseButton: true, //是否显示关闭按钮(可缺省)。默认true
-			closeButtonAppearance: 'text', //关闭按钮的外观(可缺省). text 文字（默认），image 图片.
+			showCloseButton: true, //是否显示关闭按钮(可选)。默认true
+			closeButtonAppearance: 'text', //关闭按钮的外观(可选). text 文字（默认），image 图片.
 			callback: function(e){}, //回调函数(小写的b)。e.id 选中值的id(新值id), e.value 选中值的value(新值id), e.oldId 老值ID, e.oldValue 老值，e.prevId 上一个值ID, e.prevValue 上一个值, e.object 输入框对象
 			callBack: function(e){}, //回调函数（大写的B，兼容旧版)
-			zIndex:0, //自定义z-index(可缺省).默认0(不起作用)
+			zIndex:0, //自定义z-index(可选).默认0(不起作用)
 			height: 32, //下拉项高度
 
 			// add 20220718-1
@@ -219,7 +219,11 @@
 						_quName = gLevel != 3 ? '' : _arr[2];
 					}
 					//console.log("arr:",_arr);
-					composedSourceArr = getChainArray(_shengName,_shiName);
+
+					// edit 20220719-1
+					// composedSourceArr = getChainArray(_shengName, _shiName);
+					composedSourceArr = getChainArrs(_shengName, _shiId);
+
 					//console.log('省名：',_shengName,' 市名：',_shiName,' 区名：',_quName, ' arr:',composedSourceArr);
 				}
 			}else{ //单个下拉
@@ -349,7 +353,6 @@
 							}
 						}
 
-
 						// add 20220718-3
 						prevProvinceName = _shengName;
 						prevCityName = _shiName;
@@ -385,12 +388,14 @@
 							}
 
 							if(gCnClose) closeWidget();
-						}else{	
-							_shengId = getProvinceIDByCityName(_shiName, citySourceArr);
+						}else{
+							// edit 20220719-1
+							// _shengId = getProvinceIDByCityName(_shiName, citySourceArr);
+							_shengId = getProvinceIDByCityId(_shiId, citySourceArr);
 							_shengName = getProvinceNameByProvinceId(_shengId, provinceSourceArr);
 							_shengHid = getProvinceHidByProvinceId(_shengId, provinceSourceArr);
 							_quJson = getCountyJson(_shiId,countySourceArr);
-					
+							
 							if(_quJson.data.length == 0){ // 当区县没有值时，点市就要关闭按钮 add 20220718-1
 								gLevel = 2;
 							}
@@ -444,11 +449,14 @@
 								if(_shiHid == '')_shiHid = gEntire;
 							}
 							
-						}else{		
-							_shiId = getCityIDByCountyName(_quName, countySourceArr);
+						}else{
+							// edit 20220719-1
+							// _shiId = getCityIDByCountyName(_quName, countySourceArr);
+							_shiId = getCityIDByCountyID(_quId, countySourceArr);
 							_shiName = getCityNameByCityId(_shiId, citySourceArr);
 							_shiHid = getCityHidByCityId(_shiId, citySourceArr);
-							_shengId = getProvinceIDByCityName(_shiName, citySourceArr);
+							// _shengId = getProvinceIDByCityName(_shiName, citySourceArr);
+							_shengId = getProvinceIDByCityId(_shiId, citySourceArr);
 							_shengName = getProvinceNameByProvinceId(_shengId, provinceSourceArr);
 							_shengHid = getProvinceHidByProvinceId(_shengId, provinceSourceArr);
 						}
@@ -495,11 +503,12 @@
 						var reg2 = eval('/' + gEntire + '/g');
 						_districtName = _districtName.replace(reg2, '').replace(/\-undefined/g, '').replace(/undefined/g, '');	;
 					}
-					
-					//console.log('x2-省市区ID:',_districtId, ' \n省市区名称:',_districtName);	
-					_sourceArray = getChainArray(_shengName,_shiName);
+
+					//console.log('x2-省市区ID:',_districtId, ' \n省市区名称:',_districtName);
+					// edit 20220719-1
+					// _sourceArray = getChainArray(_shengName,_shiName);
+					_sourceArray = getChainArrs(_shengName, _shiId);
 					createPullDownList(_districtId, _districtName, _sourceArray); //更新下拉
-					
 
 					//edit 20220718-3
 					// giveValue2SelectBox(_districtName, _districtId, _districtHid); //给选择框赋值
@@ -631,7 +640,7 @@
 			
 			
 			/**
-			 * 获取省市区同框联动下拉数组
+			 * 获取省市区同框联动下拉数组1
 			 * @param {*} ps_shengName 省份名称
 			 * @param {*} ps_shiName 城市名称
 			 */
@@ -645,6 +654,34 @@
 						ps_shiName = _cityJson.data[0].mc;
 				}
 				var	_shiId = getCityIDByCityName(ps_shiName, citySourceArr);
+				var	_countyJson = getCountyJson(_shiId, countySourceArr);
+				//console.log('——x1省名：',_shengName, '市名：',_shiName);
+				//console.log('——x2省数组：',provinceSourceArr,' 市数组：',citySourceArr, ' 区数组：',countySourceArr)
+				//console.log('——x3省份json:',_provinceJson,' 城市json:',_cityJson, ' 区县jon:',_countyJson);
+				var _arr = [];
+				_arr.push(_provinceJson);
+				_arr.push(_cityJson);
+				if(gLevel == 3) _arr.push(_countyJson);
+				return _arr;
+			}
+
+
+
+			/**
+			 * 获取省市区同框联动下拉数组2 add 20220719-1
+			 * @param {*} ps_shengName 省份名称
+			 * @param {*} ps_shiId 城市编号
+			 */
+			 function getChainArrs(ps_shengName, ps_shiId){
+				var _provinceJson = getProvinceJson(provinceSourceArr);
+				if(ps_shengName == '' || typeof ps_shengName == 'undefined') ps_shengName = _provinceJson.data[0].mc;
+				var _shengId = getProvinceIDByProvinceName(ps_shengName, provinceSourceArr);
+				var	_cityJson = getCityJson(_shengId, citySourceArr);
+				if( ps_shiId == '' || typeof ps_shiId == 'undefined')  {
+					if(_cityJson.data.length > 0)
+						ps_shiId = _cityJson.data[0].bh;
+				}
+				var	_shiId = ps_shiId;
 				var	_countyJson = getCountyJson(_shiId, countySourceArr);
 				//console.log('——x1省名：',_shengName, '市名：',_shiName);
 				//console.log('——x2省数组：',provinceSourceArr,' 市数组：',citySourceArr, ' 区数组：',countySourceArr)
@@ -843,7 +880,7 @@
 	 * 将不符合下拉规范的json转换成标准化的json.eg. {id:'1',value:'中国'}
 	 * @param {*} ps_json 标准的json数据. eg. {"data":[{"bh":"1001","mc":"张三"},{"bh":"1001","mc":"李四"}]}
 	 * @param {*} ps_fieldArr 不标准的json字段（数组）.eg.["bh","mc"]
-	 * @param {*} ps_dataZeroTips 数据为空时是否报错(可缺省).默认true
+	 * @param {*} ps_dataZeroTips 数据为空时是否报错(可选).默认true
 	 * return 返回值为标准的json或错误信息： 标准json eg. {"data":[{"id":"1001","value":"张三"},{"id":"1001","value":"李四"}]}  
 	 */
 	var jsonChange = function(ps_json, ps_fieldArr, ps_dataZeroTips){
@@ -936,7 +973,7 @@
 	/**
 	 * 获取省份json
 	 * 数组iosProvinces是数据源中的省份数组
-	 * @param {*} arr 指定省份数据源用哪个数组（可缺省）
+	 * @param {*} arr 指定省份数据源用哪个数组(可选)
 	 */
 	var getProvinceJson = function(arr){
 		var provinceArray = typeof arr == 'undefined' || arr == null ? iosProvinces : arr;
@@ -953,7 +990,7 @@
 	 * 获取省份ID获取对应城市json
 	 * 数组iosCitys是数据源中的市数组
 	 * @param {*} ps_shengId 省份对应的编号ID
-	 * @param {*} ps_shiArr 指定城市数据源用哪个数组（可缺省）
+	 * @param {*} ps_shiArr 指定城市数据源用哪个数组(可选)
 	 */
 	var getCityJson = function(ps_shengId, ps_shiArr){
 		var _cityArr = typeof ps_shiArr == 'undefined'  || ps_shiArr == null ? iosCitys : ps_shiArr;
@@ -974,7 +1011,7 @@
 	 * 获取城市ID获取对应区县json
 	 * 数组iosCountys是数据源中的县(区)数组
 	 * @param {*} ps_shiId 市对应的编号ID
-	 * @param {*} ps_quArr 指定区县数据源用哪个数组（可缺省）
+	 * @param {*} ps_quArr 指定区县数据源用哪个数组(可选)
 	 */
 	var getCountyJson = function(ps_shiId, ps_quArr){
 		var _countyArr = typeof ps_quArr == 'undefined'  || ps_quArr == null ? iosCountys : ps_quArr;
@@ -999,7 +1036,7 @@
 	/**
 	 * 获取省份隐藏值（根据省份名称）
 	 * @param {*} ps_shengName 省份名称
-	 * @param {*} ps_shengArr 指定省份数据源用哪个数组（可缺省）
+	 * @param {*} ps_shengArr 指定省份数据源用哪个数组(可选)
 	 */
 	var getProvinceHidByProvinceName = function(ps_shengName, ps_shengArr){
 		var _provinceArr = typeof ps_shengArr == 'undefined'  || ps_shengArr == null ? iosProvinces : ps_shengArr;
@@ -1017,7 +1054,7 @@
 	/**
 	 * 获取省份编号（根据省份名称）
 	 * @param {*} ps_shengName 省份名称
-	 * @param {*} ps_shengArr 指定省份数据源用哪个数组（可缺省）
+	 * @param {*} ps_shengArr 指定省份数据源用哪个数组(可选)
 	 */
 	var getProvinceIDByProvinceName = function(ps_shengName, ps_shengArr){
 		var _provinceArr = typeof ps_shengArr == 'undefined'  || ps_shengArr == null ? iosProvinces : ps_shengArr;
@@ -1035,7 +1072,7 @@
 	/**
 	 * 获取省份编号（根据城市名称）
 	 * @param {*} ps_shiName 城市名称
-	 * @param {*} ps_shiArr 指定城市数据源用哪个数组（可缺省）
+	 * @param {*} ps_shiArr 指定城市数据源用哪个数组(可选)
 	 */
 	 var getProvinceIDByCityName = function(ps_shiName, ps_shiArr){
 		var _cityArr = typeof ps_shiArr == 'undefined'  || ps_shiArr == null ? iosCitys : ps_shiArr;
@@ -1048,11 +1085,30 @@
 		}
 		return _provinceId;
 	 };
+
+
+	 /**
+	 * 获取省份编号（根据城市名称）add 20220719-1
+	 * @param {*} ps_shiId 城市编号
+	 * @param {*} ps_shiArr 指定城市数据源用哪个数组(可选)
+	 */
+	var getProvinceIDByCityId = function(ps_shiId, ps_shiArr){
+		var _cityArr = typeof ps_shiArr == 'undefined'  || ps_shiArr == null ? iosCitys : ps_shiArr;
+		var _provinceId = '';
+		for(i=0;i<_cityArr.length;i++){
+			if(ps_shiId==_cityArr[i].id){
+				_provinceId = _cityArr[i].parentId;
+				break;
+			}
+		}
+		return _provinceId;
+	 };
+
 	 
 	 /**
 	  * 获取省份名称（根据省份ID）
 	  * @param {*} ps_shengId 省份ID
-	  * @param {*} ps_shengArr 指定省份数据源用哪个数组（可缺省）
+	  * @param {*} ps_shengArr 指定省份数据源用哪个数组(可选)
 	  */
 	 var getProvinceNameByProvinceId = function(ps_shengId, ps_shengArr){
 		var _provinceArr = typeof ps_shengArr == 'undefined'  || ps_shengArr == null ? iosProvinces : ps_shengArr;
@@ -1069,7 +1125,7 @@
 	/**
 	  * 获取省份隐藏值（根据省份ID）
 	  * @param {*} ps_shengId 省份ID
-	  * @param {*} ps_shengArr 指定省份数据源用哪个数组（可缺省）
+	  * @param {*} ps_shengArr 指定省份数据源用哪个数组(可选)
 	  */
 	 var getProvinceHidByProvinceId = function(ps_shengId, ps_shengArr){
 		var _provinceArr = typeof ps_shengArr == 'undefined'  || ps_shengArr == null ? iosProvinces : ps_shengArr;
@@ -1088,7 +1144,7 @@
 	 /**
      * 获取城市隐藏值（根据城市名称）
 	 * @param {*} ps_shiName 城市名称
-	 * @param {*} ps_shiArr指定城市数据源用哪个数组（可缺省）
+	 * @param {*} ps_shiArr指定城市数据源用哪个数组(可选)
 	 */
 	var getCityHidByCityName = function(ps_shiName, ps_shiArr){
 		var _cityArr = typeof ps_shiArr == 'undefined'  || ps_shiArr == null ? iosCitys : ps_shiArr;
@@ -1106,7 +1162,7 @@
 	 /**
      * 获取城市编号（根据城市名称）
 	 * @param {*} ps_shiName 城市名称
-	 * @param {*} ps_shiArr指定城市数据源用哪个数组（可缺省）
+	 * @param {*} ps_shiArr指定城市数据源用哪个数组(可选)
 	 */
 	var getCityIDByCityName = function(ps_shiName, ps_shiArr){
 		var _cityArr = typeof ps_shiArr == 'undefined'  || ps_shiArr == null ? iosCitys : ps_shiArr;
@@ -1123,7 +1179,7 @@
 	 /**
 	 * 获取城市编号（根据区县名称）
 	 * @param {*} ps_quName 区县值
-	 * @param {*} ps_quArr 指定区县数据源用哪个数组（可缺省）
+	 * @param {*} ps_quArr 指定区县数据源用哪个数组(可选)
 	 */
 	var getCityIDByCountyName = function(ps_quName, ps_quArr){
 		var _countyArr = typeof ps_quArr == 'undefined'  || ps_quArr == null ? iosCountys : ps_quArr;
@@ -1139,9 +1195,27 @@
 
 
 	/**
+	 * 获取城市编号（根据区县编号） add 20220719-1
+	 * @param {*} ps_quId 区县编号
+	 * @param {*} ps_quArr 指定区县数据源用哪个数组(可选)
+	 */
+	 var getCityIDByCountyID = function(ps_quId, ps_quArr){
+		var _countyArr = typeof ps_quArr == 'undefined'  || ps_quArr == null ? iosCountys : ps_quArr;
+		var _cityId = '';
+		for(i=0;i<_countyArr.length;i++){
+			if(ps_quId==_countyArr[i].id){
+				_cityId = _countyArr[i].parentId;
+				break;
+			}
+		}
+		return _cityId;
+	};
+
+
+	/**
      * 获取城市隐藏值（根据城市编号）
 	 * @param {*} ps_shiId 城市编号
-	 * @param {*} ps_shiArr 指定城市数据源用哪个数组（可缺省）
+	 * @param {*} ps_shiArr 指定城市数据源用哪个数组(可选)
 	 */
 	var getCityHidByCityId = function(ps_shiId, ps_shiArr){
 		var _cityArr = typeof ps_shiArr == 'undefined'  || ps_shiArr == null ? iosCitys : ps_shiArr;
@@ -1159,7 +1233,7 @@
 	 /**
      * 获取城市名称（根据城市编号）
 	 * @param {*} ps_shiId 城市编号
-	 * @param {*} ps_shiArr 指定城市数据源用哪个数组（可缺省）
+	 * @param {*} ps_shiArr 指定城市数据源用哪个数组(可选)
 	 */
 	var getCityNameByCityId = function(ps_shiId, ps_shiArr){
 		var _cityArr = typeof ps_shiArr == 'undefined'  || ps_shiArr == null ? iosCitys : ps_shiArr;
