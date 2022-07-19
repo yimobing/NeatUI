@@ -615,7 +615,7 @@ $(function(){
 			caption: '地区',
 			chain: true, //是否省市区同框联动.默认false
 			level: 3, //省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
-			json: $districtJson,
+			json: $districtJson, // 数据源不填时，将默认自动调用全国省市区数据源
 			//areaFormat: ["province", "city", "county"], //地区显示值JSON格式(可缺省)
 			//keyFormat: ["provinceId", "cityId", '"ountyId"], //地区隐藏值JSON格式(可缺省)
 			
