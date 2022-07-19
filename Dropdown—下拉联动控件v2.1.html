@@ -258,7 +258,7 @@ $(function(){
 				entire:'', //默认下拉值（即：默认下拉列表新增一个选项），当本参数不为空时，则默认输入框的值为entire的值，且系统将会在下拉中自动新增一项（且为第一项）值为本参数的值
 				showCloseButton: true, //是否显示关闭按钮(可缺省)。默认true
 				closeButtonAppearance: 'text', //关闭按钮的外观(可缺省). text 文字（默认），image 图片.
-				callback: function(e){}, //回调函数（小写的b或大写的B皆可）。
+				callBack: function(e){}, //回调函数（callBack或callback 小写的b或大写的B皆可）。
 				//格式：{id:"新值ID", value:"新值文本", explanation:"下拉项中的说明性文字", oldId:"", oldValue:"老值文本", prevId:"上一个值ID", prevValue:"上一个值文本", object:"当前输入框对象"}
 				//如果是省市区联动，则e的格式在上面的基础上还新增了几个属性：{provinceId:"省隐藏值", cityId:"市隐藏值", countyId:"区县隐藏值"}
 				//callBack: function(e){}, //回调函数（大写的B，兼容旧版）
@@ -489,7 +489,7 @@ $(function(){
 			showCloseButton: true,
 			//closeButtonAppearance: 'image', //关闭按钮的外观. text 文字（默认），image 图片.
 			callBack:function(e){
-				console.log('三级联动下拉回调：', e);
+				console.log('二级联动下拉回调：', e);
 			}
 		});
 
@@ -631,7 +631,7 @@ $(function(){
 			showCloseButton: true,
 			//closeButtonAppearance: 'image', //关闭按钮的外观. text 文字（默认），image 图片.
 			callBack:function(e){
-				console.log('三级联动下拉回调：', e);
+				console.log('省市区同框联动下拉回调：', e);
 			}
 		});
 		
@@ -706,7 +706,10 @@ $(function(){
 			relatedNode: $relatedNode2,
 			//id: '350000', //使用自定义数据源时输入框有默认值时不用指定id
 			value: '福建省',
-			showCloseButton: false
+			showCloseButton: false,
+			callBack: function(e){
+				console.log('省市区三级联动下拉：使用自定义数据源-省份下拉回调：',e)
+			}
 		});
 	
 		
@@ -719,7 +722,10 @@ $(function(){
 			relatedNode: $relatedNode2,
 			//id: '350500', //使用自定义数据源时输入框有默认值时不用指定id
 			value: '泉州市',
-			showCloseButton: false
+			showCloseButton: false,
+			callBack: function(e){
+				console.log('省市区三级联动下拉：使用自定义数据源-城市下拉回调：',e)
+			}
 		});
 		
 		
@@ -734,6 +740,9 @@ $(function(){
 				value: '丰泽区',
 				showCloseButton: false,
 				beautifyScrollBar: false, // 是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式
+				callBack: function(e){
+					console.log('省市区三级联动下拉：使用自定义数据源-区县下拉回调：',e)
+				}
 		});
 	
 	
