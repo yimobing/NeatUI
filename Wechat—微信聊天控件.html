@@ -606,7 +606,6 @@
                     var u = navigator.userAgent, app = navigator.appVersion,
                         isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
                         isIos = !!u.match(/\(i[^;]+;( u;)? CPU.+Mac OS X/);
-                    isIos = true;
                     // ①.start android 安卓端
                     if(isIos == false){
                         parent.parent.parent.parent.parent.wx.chooseImage({
@@ -621,7 +620,7 @@
                                         message: '您确定要上传(' + li_count.toString() + ')张图片吗？',
                                         buttons: ['确定', '取消'],
                                         zIndex: 1000, // 自定义遮罩层级
-                                        callBack: function(){
+                                        callBack: function(ret){
                                             if(ret == 1){
                                                 up_i = 0;
                                                 for(i = 0; i < li_count; i++){
@@ -692,7 +691,7 @@
                                         message: '您确定要上传(' + li_count.toString() + ')张图片吗？',
                                         buttons: ['确定', '取消'],
                                         zIndex: 1000, // 自定义遮罩层级
-                                        callBack: function(){
+                                        callBack: function(ret){
                                             if(ret == 1){
                                                 aabbcc();
                                             }
