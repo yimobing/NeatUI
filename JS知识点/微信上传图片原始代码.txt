@@ -1,0 +1,231 @@
+//=====子函数：开始上传
+function upload_image(ps_obj){
+    var $this = ps_obj.siblings('.img-list').find('ul');
+    // 接口action是根据图片类型(房产证图片或换证图片)来确定的 add 20210625-1 下4行
+    var picType = typeof ps_obj.attr('data-pic-type') == 'undefined' ? 'licence' : ps_obj.attr('data-pic-type');
+    var typeOpts = {type: picType}
+    var action = picType == 'certificate' ? "uploadImage2" : "uploadImage"; // certificate 表示换证图片
+    // console.log('action:', action);
+
+    return new Promise(function(resolve,reject){
+        // 后台返回
+        /*
+        // --------START 开始图片上传--------
+        var iscontinue = true;                    
+        var localIds;
+        var li_count;
+        var i;
+        var u = navigator.userAgent, app = navigator.appVersion;
+        var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; 
+        var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); 
+        isiOS = true;
+        var up_i;
+        //start android 安卓
+        if (isiOS == false) {
+            wx.chooseImage({
+                sizeType: ['compressed'],
+                sourceType: ['album', 'camera'],
+                success: function (res) {
+                    localIds = res.localIds; 
+                    li_count = res.localIds.length;
+                    if (li_count > 0) {
+                        neuiDialog.alert({
+                            animate: true,
+                            message: '您确定要上传(' + li_count.toString() + ')张图片吗？',
+                            buttons: ['确定', '取消'],
+                            zIndex: 200, //自定义遮罩层级                                        
+                            callBack: function(ret){
+                                if(ret == 1){
+                                    up_i = 0;
+                                    for (i = 0; i < li_count; i++) {
+                                        wx.uploadImage({
+                                            localId: localIds[i], 
+                                            isShowProgressTips: 1, 
+                                            success: function (res) {
+                                                var serverId = res.serverId; 
+                                                up_i = up_i + 1;
+                                                $.ajax({
+                                                    async: false,  
+                                                    type: "GET",
+                                                    url: "",
+                                                    dataType: "html",
+                                                    data: {
+                                                        "action": "",
+                                                        "user": "<%=s_user%>",
+                                                        "sjk": "<%=s_sjk %>",
+                                                        "serverId": serverId, 
+                                                        "localId": localIds[up_i - 1],
+                                                        "li_count": li_count.toString(), 
+                                                        "up_i": up_i.toString()
+                                                    },
+                                                    cache: false,
+                                                    beforeSend: function (XMLHttpRequest) {},
+                                                    success: function (res) {
+                                                        insertOneImage(res);
+                                                    },
+                                                    complete: function (XMLHttpRequest, textStatus) {},
+                                                    error: function () {}
+                                                })
+                                                if (up_i == li_count) {
+                                                    //..
+                                                }
+                                            },
+                                            fail: function (res) {
+                                                reject("上传图片失败，请重试");
+                                                iscontinue = false;
+                                            }
+                                        });
+
+                                    } //for
+                                    //if (confirm('您确定要上传(' + li_count.toString() + ')张图片吗？')) {   }
+                                } //ret
+                            }
+                        })
+                    } //if
+
+                }
+            });
+        }
+        //end android
+
+        //start ios iphone 苹果
+        if (isiOS == true) {
+            wx.chooseImage({
+                sizeType: ['compressed'],
+                sourceType: ['album', 'camera'],
+                success: function (res) {
+                    localIds = res.localIds; 
+                    li_count = res.localIds.length;
+                    if (li_count > 0) {
+                        neuiDialog.alert({
+                            animate: true,
+                            message: '您确定要上传(' + li_count.toString() + ')张图片吗？',
+                            buttons: ['确定', '取消'],
+                            zIndex: 200, //自定义遮罩层级
+                            callBack: function(ret){
+                                if(ret == 1){
+                                    aabbcc();
+                                }
+                            }
+                        })
+                    }
+                },
+                fail: function (res) {},
+                complete: function (res) {}
+            });
+            i = 0;
+            var aabbcc = function () {
+                if (i < li_count) {
+                    wx.uploadImage({
+                        localId: localIds[i], 
+                        isShowProgressTips: 1, 
+                        success: function (res) {
+                            var serverId = res.serverId;
+                            $.ajax({
+                                async: false,
+                                type: "GET",
+                                url: "",
+                                dataType: "html",
+                                data: {
+                                    "action": "",
+                                    "user": "<%=s_user%>",
+                                    "sjk": "<%=s_sjk %>",
+                                    "serverId": serverId, 
+                                    "localId": localIds[i],
+                                    "li_count": li_count.toString(), 
+                                    "up_i": i.toString()
+                                },
+                                cache: false,
+                                beforeSend: function (XMLHttpRequest) {},
+                                success: function (res) {
+                                    insertOneImage(res);
+                                },
+                                complete: function (XMLHttpRequest, textStatus) {},
+                                error: function () {}
+                            })
+                            i = i + 1;
+                            if (i == li_count) {
+                                //location.reload(true);
+                            }
+                            aabbcc();
+                        },
+                        fail: function (res) {
+                            reject("上传图片失败，请重试");
+                            iscontinue = false;
+                        }
+                    });
+                }
+            }
+        }
+        //end ios·
+
+        if(iscontinue == true){
+            resolve("上传成功");
+        }
+
+        // --------END 结束图片上传--------
+        */
+
+
+        //函数：插入单张图片 
+        //@param {*} msg 图片JSON数组
+        function insertOneImage(msg){
+            if(msg == '') {
+                neuiDialog.alert({
+                    animate: true,
+                    
+                    message: '错误：返回图片json为空',
+                    buttons: ['确定']
+                })
+                return;
+            }
+            var errorTips = '';
+            var json = JSON.parse(msg);
+            if(!json || $.isEmptyObject(json)) errorTips = '错误：返回图片JSON为空';
+            if(typeof json.data == 'undefined') errorTips = '返回图片JSON不含Data字段';
+            if(typeof json.data != 'undefined'){
+                if(json.data.length == 0) errorTips = '错误 ：返回图片data数组为空';
+            }
+            if(errorTips != ''){
+                neuiDialog.alert({
+                    animate: true,
+                    
+                    message: errorTips,
+                    buttons: ['确定']
+                })
+                return;
+            }   
+            var html = housing.getOneImageHtml(json.data[0], typeOpts); // edit 20210625-1
+            $this.append(html); //动态插入图片                 
+        }
+        //结束上传图片 END AJAX
+        */
+
+
+        //模拟数据上传图片
+        var oneImageJson = {
+            data:[
+                {"pic_bh":"1001", "pic_url":"./../skins/img/img_blue.png", "pic_url_big":"./../skins/img/img_blue.png", "pic_del":"1"},
+                {"pic_bh":"1002", "pic_url":"./../skins/img/img_gray.png", "pic_url_big":"./../skins/img/img_blue.png", "pic_del":"1"}
+            ]
+        }
+        //var oneImageJson = "{\"data\":[{\"pic_bh\":\"1001\", \"pic_url\":\"./../skins/img/img_blue.png\", \"pic_url_big\":\"./../skins/img/img_blue.png\", \"pic_del\":\"1\"} ] }";
+        //校验json格式
+        if(!oneImageJson || $.isEmptyObject(oneImageJson)) {
+            reject("错误：上传完后返回的图片JSON为空");
+            //return;
+        }
+        if(typeof oneImageJson.data == 'undefined') {
+            reject("错误：上传完后返回的图片JSON不含Data字段");
+            //return;
+        }
+        //界面上插入图片
+        for(var i=0; i< oneImageJson.data.length; i++){
+            var html = housing.getOneImageHtml(oneImageJson.data[i], typeOpts);
+            $this.append(html);
+        }
+        resolve("上传成功");
+
+    })
+}
+
