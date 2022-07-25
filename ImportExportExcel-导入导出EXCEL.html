@@ -29,6 +29,7 @@
             <div class="web">
                 <pre>
                     文档：https://blog.csdn.net/lgd1917/article/details/122449774
+                    http://t.zoukankan.com/javalinux-p-15631834.html
                     官网：https://sheetjs.com/
                     GitHub：https://github.com/SheetJS/sheetjs/blob/master/dist/xlsx.full.min.js
                 </pre>
@@ -68,12 +69,19 @@
         }
 
         /**
-         * 读取excel表格
+         * 读取excel表格 edit 20220725-1 test1
          */
         function readWorkbook(workbook) {
             var sheetNames = workbook.SheetNames; // 工作表名称集合
             var worksheet = workbook.Sheets[sheetNames[0]]; // 这里我们只读取第一张sheet
-            var source = XLSX.utils.sheet_to_json(worksheet);
+
+            var opts = {
+                /*'A'|number|string[]*/
+                // header: 'A', // 把表头当作表身数据来导出
+                /** Default value for null/undefined values */
+                defval: ''// 给空的单元格赋值为空字符串，避免单元格被跳过(JSON解析出来后缺少相应的key)
+            }
+            var source = XLSX.utils.sheet_to_json(worksheet, opts);
             return source;
         }
 
@@ -196,7 +204,7 @@
                             "value10": ls_value10,
                         })
                     }
-                    // console.log('tableJson：', tableJson)
+                    console.log('tableJson：', tableJson); //test1
                
                     // 开始执行
                     neui.showAnimate('正在导入，请稍侯');
