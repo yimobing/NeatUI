@@ -256,6 +256,8 @@ $(function(){
 				id:'', //选择框默认值（隐藏的ID等键值)（可缺省）
 				value:'', //选择框默认值（显示值）（可缺省）
 				entire:'', //默认下拉值（即：默认下拉列表新增一个选项），当本参数不为空时，则默认输入框的值为entire的值，且系统将会在下拉中自动新增一项（且为第一项）值为本参数的值
+				isEntireRegion: 'all', // 默认下拉值添加在哪里(可选). all 省份、城市、区县上都加(默认), province 仅加在省份上, city 仅加在城市上, county 仅加在区县上
+
 				showCloseButton: true, //是否显示关闭按钮(可缺省)。默认true
 				closeButtonAppearance: 'text', //关闭按钮的外观(可缺省). text 文字（默认），image 图片.
 				callBack: function(e){}, //回调函数（callBack或callback 小写的b或大写的B皆可）。
@@ -622,6 +624,7 @@ $(function(){
 			//id: '350000-350500-350503',
 			entire:'全部',
 			value: '福建省-泉州市-丰泽区',
+			// isEntireRegion: 'county', // 默认下拉值添加在哪里(可选). all 省份、城市、区县上都加(默认), province 仅加在省份上, city 仅加在城市上, county 仅加在区县上
 
 			isCnClose:true, //当省市区同框联动,是否点了"全部"选项后就马上填充值并关闭控件(可缺省),默认true
 			isCnPartEmpty:true, //当省市区同框联动,选中下拉值后当城市或区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省", eg3. "全部-全部-全部" 变成 "全部"
