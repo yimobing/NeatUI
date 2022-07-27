@@ -34,6 +34,7 @@
 			id:'', //选择框默认值（隐藏的ID等键值)(可选)
 			value:'', //选择框默认值（显示值）(可选)
 			entire:'', //默认下拉值（即：默认下拉列表新增一个选项），当本参数不为空时，则默认输入框的值为entire的值，且系统将会在下拉中自动新增一项（且为第一项）值为本参数的值
+			isEntireRegion: 'all', // 默认下拉值添加在哪里(可选). all 省份、城市、区县上都加(默认), province 仅加在省份上, city 仅加在城市上, county 仅加在区县上. add 20220727-1
 			showCloseButton: true, //是否显示关闭按钮(可选)。默认true
 			closeButtonAppearance: 'text', //关闭按钮的外观(可选). text 文字（默认），image 图片.
 			callback: function(e){}, //回调函数(小写的b)。e.id 选中值的id(新值id), e.value 选中值的value(新值id), e.oldId 老值ID, e.oldValue 老值，e.prevId 上一个值ID, e.prevValue 上一个值, e.object 输入框对象
@@ -90,6 +91,7 @@
 				gId = settings.id,
 				gValue = settings.value,
 				gEntire = typeof settings.entire == 'undefined' ? '' : settings.entire,
+				gEntireRegion = typeof settings.isEntireRegion  == 'undefined' ? 'all' : settings.isEntireRegion, // add 20220727-1
 				gCnClose = typeof settings.isCnClose == 'undefined' ? true : (settings.isCnClose === false ? false : true), //默认true
 				gCloseButtonAppearance = typeof settings.closeButtonAppearance == 'undefined' ? 'text' : settings.closeButtonAppearance,
 				gCnPartEmpty = typeof settings.isCnPartEmpty == 'undefined' ? false : (settings.isCnPartEmpty === true ? true : false), //默认false
@@ -703,12 +705,13 @@
 				var _arrLength = ps_jsonArr.length;
 				var _highlightIndexArr = [];
 				var _inHtml = '';
-
 				// add 20220718-1
 				var maxHeight = settings.dropMaxHeight.toString().replace(/px/g, '');
+				var _dropClassName = '';
 				var _ulStyle = ' style="max-height:' + maxHeight + 'px"';
 
-				for(var k=0;k<ps_jsonArr.length;k++){
+				for(var k = 0; k < ps_jsonArr.length; k++){
+					_dropClassName = !gChain ? '' : ( k == 0 ? ' drop-province' : k == 1 ? ' drop-city' : ' drop-county');
 					var _dataSource = ps_jsonArr[k];
 					var _isZeroToolTip = gReact || gChain ? false : true;
 					var _standardJson = jsonChange(_dataSource, gFormat, _isZeroToolTip); //标准格式json(转化成标准格式的json）。单个下拉时data空才报错，省市区三联动下拉或同框下拉不报错
@@ -717,16 +720,16 @@
 					var ieVersion = getInternetExplorerVersion();
 					if(ieVersion >=6 && ieVersion <= 7) colW = Math.floor(colW);
 					
-					_inHtml+='<div class="ne-drop-down-column" style="width:' + colW + '%"><ul' + _ulStyle + '>'; // edit 20220718-1
+					_inHtml+='<div class="ne-drop-down-column' +  _dropClassName + '" style="width:' + colW + '%"><ul' + _ulStyle + '>'; // edit 20220718-1
 
-					//html拼接
+					//html拼接 edit 20220727-1
 					var _locateIndex = 0;
 					if(typeof _standardJson.data!="undefined"){ //正确
 						var _liStyleStr = ' style="min-height:'+gHeight+'px;line-height:1.5;"';
 						var _mcArr = ps_initVal.indexOf(gDelimiter) >= 0 ? ps_initVal.split(gDelimiter) : [ps_initVal];
 						var _bhArr = ps_initId.indexOf(gDelimiter) >= 0 ? ps_initId.split(gDelimiter) : [ps_initId];
 						if(_standardJson.data.length>0){
-							if(gEntire!='') _inHtml += '<li data-bh="'+gEntire+'" data-hid="' + gEntire + '"'+_liStyleStr+'>'+gEntire+'</li>'; //系统自动加的下拉项
+							if(gEntire!='') _inHtml += '<li class="li-item-whole" data-bh="'+gEntire+'" data-hid="' + gEntire + '"'+_liStyleStr+'>'+gEntire+'</li>'; //系统自动加的下拉项
 							$.each(_standardJson.data,function(m,items){ //根据目标输入框的值自动定位到对应选项
 								//console.log('gBH:',gBh)
 								var _classNameStr = '';
@@ -743,7 +746,7 @@
 							if(gMc == _standardJson.data[_locateIndex].value) OBJ.attr('data-bh',_standardJson.data[_locateIndex].id); //如果目标输入框有值，那就给目标输入框赋data-bh
 						}else{
 							var text = gEntire == '' ? gPlaceholder : gEntire;
-							_inHtml+='<li'+_liStyleStr+'>' + text + '</li>';
+							_inHtml+='<li class="li-item-whole"' + _liStyleStr + '>' + text + '</li>';
 						}
 					}else{ //出错了
 						_inHtml+='<li class="wrong-tips">'+_standardJson+'</li>';
@@ -754,6 +757,17 @@
 
 				//显示节点
 				child.empty().append(_inHtml);
+
+				// add 20220727-1
+				if(gEntireRegion == 'province'){
+					$('.ne-drop-down-column.drop-city, .ne-drop-down-column.drop-county').find('.li-item-whole').remove();
+				}
+				if(gEntireRegion == 'city'){
+					$('.ne-drop-down-column.drop-province, .ne-drop-down-column.drop-county').find('.li-item-whole').remove();
+				}
+				if(gEntireRegion == 'county'){
+					$('.ne-drop-down-column.drop-province, .ne-drop-down-column.drop-city').find('.li-item-whole').remove();
+				}
 
 				//重置标题
 				if(gCaption != '') $parent.find('.ne-drop-down-caption').text(gCaption);
