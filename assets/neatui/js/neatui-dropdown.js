@@ -34,7 +34,7 @@
 			id:'', //选择框默认值（隐藏的ID等键值)(可选)
 			value:'', //选择框默认值（显示值）(可选)
 			entire:'', //默认下拉值（即：默认下拉列表新增一个选项），当本参数不为空时，则默认输入框的值为entire的值，且系统将会在下拉中自动新增一项（且为第一项）值为本参数的值
-			isEntireRegion: 'all', // 默认下拉值添加在哪里(可选). all 省份、城市、区县上都加(默认), province 仅加在省份上, city 仅加在城市上, county 仅加在区县上. add 20220727-1
+			isEntireRegion: 'all', // 限制默认下拉值添加在哪里(可选). all 省份、城市、区县上都加(默认), province 仅加在省份上, city 仅加在城市上, county 仅加在区县上. add 20220727-1
 			showCloseButton: true, //是否显示关闭按钮(可选)。默认true
 			closeButtonAppearance: 'text', //关闭按钮的外观(可选). text 文字（默认），image 图片.
 			callback: function(e){}, //回调函数(小写的b)。e.id 选中值的id(新值id), e.value 选中值的value(新值id), e.oldId 老值ID, e.oldValue 老值，e.prevId 上一个值ID, e.prevValue 上一个值, e.object 输入框对象
@@ -380,9 +380,10 @@
 							// 	if(_shengId == '') _shengId = gEntire;
 							// 	if(_shengHid == '')	_shengHid = gEntire;
 							// }
-							if(isArray(_nameArr)){
+							if(isArray(_nameArr)){ // edit 20220727-2
 								_shengName = prevProvinceName == '' ? _nameArr[0] : prevProvinceName;
-								_shengId = getProvinceIDByProvinceName(_shengName);
+								// _shengId = getProvinceIDByProvinceName(_shengName);
+								_shengId = getProvinceIDByProvinceName(_shengName, provinceSourceArr);
 								_shengHid = getProvinceHidByProvinceName(_shengName, provinceSourceArr);
 								if(_shengId == '') _shengId = gEntire;
 								if(_shengHid == '')	_shengHid = gEntire;
@@ -438,12 +439,13 @@
 							// 	if(_shiId == '') _shiId = gEntire;
 							// 	if(_shiHid == '')_shiHid = gEntire;
 							// }
-							if(isArray(_nameArr)){
+							if(isArray(_nameArr)){ // edit 20220727-2
 								_shengName = prevProvinceName == '' ? _nameArr[0] : prevProvinceName;
 								_shengId = getProvinceIDByProvinceName(_shengName);
 								_shengHid = getProvinceHidByProvinceName(_shengName, provinceSourceArr);
 								_shiName = prevCityName == '' ? _nameArr[1] : prevCityName;
-								_shiId = getCityIDByCityName(_shiName);
+								// _shiId = getCityIDByCityName(_shiName);
+								_shiId = getCityIDByCityName(_shiName, citySourceArr);
 								_shiHid = getCityHidByCityName(_shiName, citySourceArr);
 								if(_shengId == '') _shengId = gEntire;
 								if(_shengHid == '')	_shengHid = gEntire;
@@ -508,6 +510,7 @@
 
 					//console.log('x2-省市区ID:',_districtId, ' \n省市区名称:',_districtName);
 					// edit 20220719-1
+					
 					// _sourceArray = getChainArray(_shengName,_shiName);
 					_sourceArray = getChainArrs(_shengName, _shiId);
 					createPullDownList(_districtId, _districtName, _sourceArray); //更新下拉
@@ -710,12 +713,14 @@
 				var _dropClassName = '';
 				var _ulStyle = ' style="max-height:' + maxHeight + 'px"';
 
+				var isWholeActiveOneDrop = isWholeActiveProvince = isWholeActiveCity = isWholeActiveCounty = false; // 全部项是否高亮 add 20220727-2
+
 				for(var k = 0; k < ps_jsonArr.length; k++){
 					_dropClassName = !gChain ? '' : ( k == 0 ? ' drop-province' : k == 1 ? ' drop-city' : ' drop-county');
 					var _dataSource = ps_jsonArr[k];
 					var _isZeroToolTip = gReact || gChain ? false : true;
 					var _standardJson = jsonChange(_dataSource, gFormat, _isZeroToolTip); //标准格式json(转化成标准格式的json）。单个下拉时data空才报错，省市区三联动下拉或同框下拉不报错
-					//console.log('_dataSource:', _dataSource, ' xx_standardJson:', _standardJson);
+					// console.log('_dataSource:', _dataSource, ' xx_standardJson:', _standardJson);
 					var colW = 100/_arrLength;
 					var ieVersion = getInternetExplorerVersion();
 					if(ieVersion >=6 && ieVersion <= 7) colW = Math.floor(colW);
@@ -729,8 +734,11 @@
 						var _mcArr = ps_initVal.indexOf(gDelimiter) >= 0 ? ps_initVal.split(gDelimiter) : [ps_initVal];
 						var _bhArr = ps_initId.indexOf(gDelimiter) >= 0 ? ps_initId.split(gDelimiter) : [ps_initId];
 						if(_standardJson.data.length>0){
-							if(gEntire!='') _inHtml += '<li class="li-item-whole" data-bh="'+gEntire+'" data-hid="' + gEntire + '"'+_liStyleStr+'>'+gEntire+'</li>'; //系统自动加的下拉项
-							$.each(_standardJson.data,function(m,items){ //根据目标输入框的值自动定位到对应选项
+							if(gEntire!='')  {
+								_inHtml += '<li class="li-item-whole" data-bh="'+gEntire+'" data-hid="' + gEntire + '"'+_liStyleStr+'>'+gEntire+'</li>'; //系统自动加的下拉项
+							}
+
+							$.each(_standardJson.data,function(m, items){ //根据目标输入框的值自动定位到对应选项
 								//console.log('gBH:',gBh)
 								var _classNameStr = '';
 								if(_bhArr[k]==items.id || _mcArr[k]==items.value) { //设置高亮
@@ -740,6 +748,19 @@
 								}
 								var _hid = items.hide == 'undefined'  || typeof items.hid == 'undefined' ? '' : items.hid;
 								_inHtml+= '<li data-bh="'+items.id+'" data-hid="' + _hid + '"' + _classNameStr + _liStyleStr + ' >'+items.value+'</li>';
+
+								// add 20220727-2
+								if(gEntire){
+									if(_bhArr[k] == gEntire){
+										if(gChain){
+											if(k == 0) isWholeActiveProvince = true;
+											else if(k == 1) isWholeActiveCity = true;
+											else if(k == 2) isWholeActiveCounty = true;
+										}else{
+											isWholeActiveOneDrop = true;
+										}
+									}
+								}
 							})
 							//console.log('mc:',gMc,'\nentire:',gEntire,'json:',_standardJson.data[_locateIndex]);
 							//if(gMc!='' && gEntire=='') obj.attr('data-bh',_standardJson.data[_locateIndex].id); //如果目标输入框有值，那就给目标输入框赋data-bh
@@ -758,7 +779,21 @@
 				//显示节点
 				child.empty().append(_inHtml);
 
-				// add 20220727-1
+				// add 20220727-2
+				if(isWholeActiveOneDrop){
+					$('.ne-drop-down-column').find('.li-item-whole').addClass('on');
+				}
+				if(isWholeActiveProvince){
+					$('.ne-drop-down-column.drop-province').find('.li-item-whole').addClass('on');
+				}
+				if(isWholeActiveCity){
+					$('.ne-drop-down-column.drop-city').find('.li-item-whole').addClass('on');
+				}
+				if(isWholeActiveCounty){
+					$('.ne-drop-down-column.drop-county').find('.li-item-whole').addClass('on');
+				}
+
+				// 限制“全部”项添加在哪里 add 20220727-1
 				if(gEntireRegion == 'province'){
 					$('.ne-drop-down-column.drop-city, .ne-drop-down-column.drop-county').find('.li-item-whole').remove();
 				}
