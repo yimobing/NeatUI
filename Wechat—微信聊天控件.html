@@ -606,10 +606,12 @@
                     var u = navigator.userAgent, app = navigator.appVersion,
                         isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
                         isIos = !!u.match(/\(i[^;]+;( u;)? CPU.+Mac OS X/);
+                    // isIos = true;
+
                     // ①.start android 安卓端
                     if(isIos == false){
                         parent.parent.parent.parent.parent.wx.chooseImage({
-                            sizeType: ['compressed'],
+                            sizeType: ['original', 'compressed'],
                             sourceType: ['album', 'camera'],
                             success: function(res){
                                 localIds = res.localIds;
@@ -680,7 +682,7 @@
                     // ②.start ios/iphone 苹果端
                     if(isIos == true){
                         parent.parent.parent.parent.parent.wx.chooseImage({
-                            sizeType: ['compressed'],
+                            sizeType: ['original', 'compressed'],
                             sourceType: ['album', 'camera'],
                             success: function(res){
                                 localIds = res.localIds;
