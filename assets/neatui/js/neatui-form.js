@@ -1613,7 +1613,9 @@
                 }
             }else{
                 // 显示“取消手动输入”，隐藏“如查无数据，请选择手动输入”
-                var parent = document.getElementById('btn-manual').parentNode;
+                var eleManual = document.getElementById('btn-manual');
+                if(eleManual == null) return; // add 20220803-1
+                var parent = eleManual.parentNode;
                 parent.style.display = 'none';
                 tools.getNextElement(parent).style.display = '';
             }
