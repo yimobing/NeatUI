@@ -575,8 +575,8 @@ var utilities = {
      */
     makeTextareaExpanding:function(el, opt){
         var defaults = {
-            initHeight: 28,
-            maxHeight: 120
+            initHeight: 28, // 最小高度。若超过，则将根据文本长度自动增高
+            maxHeight: 120 // 最大高度。若超过，则将根据文本长度自动增高
         }
         var settings = $.extend(true, {}, defaults, opt || {} );
         var _height = typeof opt == 'undefined' ? null : isNaN(parseInt(opt.initHeight)) ? null : parseInt(opt.initHeight),
@@ -589,9 +589,9 @@ var utilities = {
             el.style.height = ( typeof h == 'undefined' || h == null ? el.scrollHeight : parseInt(h.toString().replace(/px/g, '')) )  + 'px';
             el.style.maxHeight = ( typeof h == 'undefined' || h == null ? el.scrollHeight : parseInt(h.toString().replace(/px/g, '')) )  + 'px';
             // console.log(el.scrollHeight);
-            //限制最大高度
+            // 限制最大高度
             var _elHeight = parseInt(el.style.height.toString().replace(/px/g, ''));
-            //console.log('输入框高度：', _elHeight, '-限制最大高度：', _maxHeight);
+            // console.log('输入框高度：', _elHeight, '-限制最大高度：', _maxHeight);
             if(_maxHeight != null){
                 if(_elHeight >= _maxHeight){
                     el.style.height = _maxHeight;
@@ -610,7 +610,9 @@ var utilities = {
             el.addEventListener('input',function(){
                 setStyle(el)
             },false);
-            setStyle(el, _height)
+            
+            // setStyle(el, _height);
+            setStyle(el); // edit 20220803-1
         }else if(el.attachEvent){
             el.attachEvent('onpropertychange',function(){
                 setStyle(el)
