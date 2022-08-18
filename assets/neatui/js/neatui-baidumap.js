@@ -37,7 +37,8 @@
                     draged: false, //图标是否可拖动,默认false(可选)
                     enable: false, //是否开启自定义图标, 默认false(可选)
                     path: 'assets/neatui/img/', //图片文件夹相对静态文件html位置,仅当enable=true时有效(可选)
-                    icon: 'bmap_locate_blue.png' //图标文件名,仅当enable=true时有效(可选)
+                    icon: 'bmap_locate_default.png', //图标文件名,仅当enable=true时有效(可选),
+                    appearance: 'black', // 标注点外观. black 黑色(默认), blue 蓝色, green 绿色, red 红色, orange 橙色 add 20220818-1
                 },
 
                 //窗口布局及显示方式
@@ -54,7 +55,7 @@
                 //控件
                 openCityControl: true, //是否开启城市切换控件,默认true(可选)
                 openMapTypeControl: true, //是否开启地图类型(即地图、卫星、混合)控件,默认true(可选)
-                openCopyrightControl: true, //是否开启版本信息控件,默认true(可选)
+                openCopyrightControl: true, //是否开启第3方版本信息控件(即第3方版权信息),默认true(可选)
                 openOverViewControl: true, //是否开启地图缩略图控件,默认true(可选)
 
                 //鼠标&视野
@@ -102,7 +103,8 @@
             var dImgDraged = typeof dImage.draged == 'undefined' ? false : (dImage.draged === true ? true : false),
                 dImgEnable = typeof dImage.enable == 'undefined' ? false : (dImage.enable === true ? true : false),
                 dImgPath = dImage.path,
-                dImgIcon = dImage.icon;
+                dImgIcon = dImage.icon,
+                dImgAppearance = dImage.appearance;
             var dPickup = dWindow.pickup,
                 dPosition = dWindow.position,
                 dClosed = dWindow.closed;
@@ -273,7 +275,8 @@
                     $.IMAGEDRAGED = dImgDraged;
                     $.IMAGEENABLE = dImgEnable;
                     $.IMAGEPATH = dImgPath;
-                    $.IMAGEICON = dImgIcon;  
+                    $.IMAGEICON = dImgIcon; 
+                    $.IMAGEAPPEARANCE = dImgAppearance; // add 20220818-1
                     //=====设置中心点、设置默认城市(城市名称或坐标经纬度)
                     if(!dEnableViewPort || (dEnableViewPort && !dAutoViewPort)){ //当不强制调整视野时,则手动设置中心点
                         var point = new BMap.Point(dLongitude, dLatitude);
@@ -375,7 +378,7 @@
                         map.addControl(cr); //添加版权控件
                         var bs = map.getBounds();   //返回地图可视区域
                         cr.addCopyright({id: 1, content: '<a class="b_copyright">' + dCopyright + '</a>', bounds: bs}); 
-                    }
+                    } 
                     //缩略地图控件
                     if(dOpenOverViewControl){
                         var overViewOpen = new BMap.OverviewMapControl({
@@ -504,7 +507,7 @@
                     description: '',
                     dragging: true,
                     isInfo: true,
-                    theme: 'blue',
+                    theme: '',
                     icon: ''
                 }
                 var defaultsOther = {
@@ -577,6 +580,7 @@
                 isInfo = utilities.getAnalysisString(isInfo, datasource) === 'false' ? false : true;
                 theme = utilities.getAnalysisString(theme, datasource);
                 icon = utilities.getAnalysisString(icon, datasource);
+                if(theme == '') theme = $.IMAGEAPPEARANCE; // add 20220818-1
                 var zwArr = coordinates.split(','),
                     longitude = zwArr.length > 0 ? zwArr[0] : '', //经度
                     latitude = zwArr.length > 1 ? zwArr[1] : ''; //纬度
@@ -1376,6 +1380,7 @@
         IMAGEENABLE: false, //是否开启自定义标注点图标
         IMAGEPATH: '', //自定义标注点图片文件夹相对静态文件html位置
         IMAGEICON: '', //自定义标注点图标名称(.png)
+        IMAGEAPPEARANCE: '', //自定义标注点外观 add 20220818-1
         ENABLEVIEWPORT: false, //是否强制调整视野,即强制地图显示到某个视野,默认false(可选). 因centerAndZoom是异步,故要使用setViewport起作用,必须设置本参数值为true.
         AUTOVIEWPORT: true //是否自动使用setViewport(), 默认true, 仅当enableViewPort=true时有效. 值：true 系统自动调整视野, false 前端手动调整视野(须自己写代码)
     })
