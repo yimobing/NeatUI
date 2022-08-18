@@ -5,7 +5,7 @@
  * Version：v1.0.0
  * Author: Mufeng
  * Date: 2020.12.03
- * Update: 2020.12.11
+ * Update: 2022.08.18
  */
 /*+-------------------------+*/
 html,body{width:100%; margin:0 auto; padding:0;}
@@ -183,14 +183,19 @@ section,article,figure{display: block;}
 }
 /*+---------标注点文本----------------+*/
 /*默认样式*/
-.BMapLabel.bdMarkerLabel{border:0!important;background:transparent!important;}
-.bdLabel{padding:8px 12px;color:#fff;background-color:#d80907;border-style:solid;border-width:1px;border-color:#d80907;border-radius:3px;box-shadow: 0 1px 2px rgba(0,0,0,.35);}
-.bdLabel.no-padding{padding:0;} /*add 20181023-4*/
-.bdLabel.blue{border-color:#1296db; background-color:#1296db;}
-.bdLabel.white{border-color:#fff; background-color:#fff;}
-.bdLabel.red{border-color:#d80907; background-color:#d80907;}
-.bdLabel.green{border-color:#82a73a; background-color:#82a73a;}
-.bdLabel.orange{border-color:#e87222; background-color:#e87222;}
+.BMapLabel.bdMarkerLabel{ left: 25px!important; top: -50px!important; border: 0!important; background: transparent!important; }
+.bdLabel{ padding: 8px 12px!important; color: #444!important; border-color: #888!important; background-color:#d80907; border-style: solid; border-width: 1px!important; border-color:#d80907; border-radius: 3px; box-shadow: 3px 2px 2px 0px rgba(0,0,0,.35); }
+.bdLabel.no-padding{ padding: 0!important; }
+.bdLabel>span{ display: inline-block; margin-bottom: 3px; font-size: 14px; font-weight: bold; }
+.bdLabel>em{ display: inline-block; margin-top: 2px; font-weight: 500; }
+.bdLabel.blue{ color: #1296db!important; border-color:#1296db!important; background-color:#1296db; }
+.bdLabel.white{ color: #fff!important; border-color:#fff!important; background-color:#fff; }
+.bdLabel.red{ color: #d80907!important; border-color:#d80907!important; background-color:#d80907; }
+.bdLabel.green{ color: #82a73a!important; border-color:#82a73a!important; background-color:#82a73a; }
+.bdLabel.orange{ color: #e87222!important; border-color:#e87222!important; background-color:#e87222; }
+
+
+
 /*当作信息窗使用时*/
 .BMapLabel.hasDetail{
 	position:relative;
@@ -228,3 +233,11 @@ section,article,figure{display: block;}
 .bdInfoWindow br{line-height:1.75;}
 .bdtitle{color:green;margin-right:5px;}
 .bdaddress{color:gray;}
+
+/*+------------ 隐藏默认的版权信息 ------------+*/
+.BMap_cpyCtrl{
+	display: none;
+}
+.anchorBL{
+	display: none;
+}
