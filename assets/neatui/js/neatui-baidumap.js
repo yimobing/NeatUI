@@ -517,7 +517,7 @@
                         //其中： A、B、C表示任意字符, 里面可含HTML代码. eg. coordinates:'<div>地区名：["title"] <br>楼盘数量：["lpsl"]个</div>'}
                         coordinates: '["coordinates"]', //经纬度坐标
                         title: '["title"]', //文字标题,标注点文字
-                        id: '["id"]', //记录主键key(可选)
+                        id: '["id"]', //记录主键key(可选)。主键可多个(中间要用空格或逗号等符号分隔开).eg. '["xjdh"] ["dyw_xh"]'
                         description: '["description"]', //描述,信息窗文字(可选)
                         dragging: '["dragging"]', //标注点是否可拖拽,默认false(可选)
                         isInfo: '["isInfo"]', //标注点是否有信息窗,默认true(可选)
@@ -543,6 +543,7 @@
                     infoOpenMethod: 'mouseover', //信息窗打开方式(可选). mouseover 鼠标经过标注点时(默认)，click 点击标注点时
                     showDetails: false, //标注点是否默认就显示详细信息,默认false(可选)
                     //回调
+                    markerHoverBack: null, //鼠标移动到标注点图标上面后触发此事件(可选). e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"} add 20220819-1
                     markerClickBack: null, //点击标注点图标后会触发此事件(可选). e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
                     markerDoubleClickBack: null, //双击标注点图标后会触发此事件(可选). e参数：{dom:"地图父节点", map:"地图实例化对象Map", zoom:"当前地图绽放级别", point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
                     labelClickBack: null, //点击标注点文字后会触发此事件(可选). 回调e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
@@ -597,6 +598,7 @@
                     isInfo = false;
                 }
                 var infoEventsFunc = others.infoEventsFunc,
+                    markerHoverBack  = others.markerHoverBack, // add 20220819-1
                     markerClickBack = others.markerClickBack,
                     markerDoubleClickBack = others.markerDoubleClickBack;
                 //创建标注点
@@ -632,7 +634,19 @@
                     if(ele.length != 0){
                         ele.val(x + ',' + y);
                     }
-                })      
+                })
+
+                //鼠标移动到标图标上后会触发此事件 add 20220819-1
+                marker.addEventListener('mouseover', function(e){
+                    if(markerHoverBack != null && typeof markerHoverBack === 'function'){
+                        //获取marker自定义属性
+                        var _id = typeof marker.dataId == 'undefined' ? '' : marker.dataId,
+                            _lng = typeof marker.dataLng == 'undefined' ? '' : marker.dataLng,
+                            _lat = typeof marker.dataLat == 'undefined' ? '' : marker.dataLat;
+                        markerHoverBack({"point":{"lng":_lng, "lat":_lat}, "id": _id});
+                    }
+                });
+
                 //点击标注图标后会触发此事件
                 marker.addEventListener('click', function(e){
                     if(markerClickBack != null && typeof markerClickBack === 'function'){
@@ -643,6 +657,7 @@
                         markerClickBack({"point":{"lng":_lng, "lat":_lat}, "id": _id});
                     }
                 })
+                
                 //双击标注图标后会触发此事件
                 marker.addEventListener('dblclick', function(e){
                     var zoom = -1;
@@ -1256,6 +1271,15 @@
                     new_str = new_str.replace(origins, ps_json[fields]);
                 }
             }
+            // testing
+            // console.log('newStr1：', new_str);
+            if(new_str.indexOf('eval') >= 0){
+                var tmpStr = new_str.replace(/(.*)eval\((.*)\)(.*)/g, '$2'); //去掉eval()
+                var pre = new_str.replace(/(.*)eval\((.*)\)(.*)/g, '$1');
+                var suffix = new_str.replace(/(.*?)eval\((.*)\)(.*?)/g, '$3');
+                // console.log('前辍：', pre, ' 后辍：', suffix);
+                new_str = pre + eval(tmpStr) + suffix;
+            }                
             return new_str;
         },
 
