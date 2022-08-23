@@ -51,6 +51,7 @@
 
                 //
                 enableEval: false, //是否允许参数值使用字符串表达式,默认false(可选)
+                onlyBasePaint: false, //个性化地图是否使用底图模式(干净清爽),默认false add 20220823-1
 
                 //控件
                 openCityControl: true, //是否开启城市切换控件,默认true(可选)
@@ -88,6 +89,7 @@
                 dMode = settings.showMode,
                 dWindow = settings.window,
                 dImage = settings.image,
+                dOnlyBasePaint = settings.onlyBasePaint, //add 20220823-1
                 dEnableEval = settings.enableEval,
                 dOpenCityControl = settings.openCityControl,
                 dOpenMapTypeControl = settings.openMapTypeControl,
@@ -270,6 +272,7 @@
 
                     //=====全局对象赋值
                     $.MAPER = map;
+                    $.MAPDOM = _this; //add 20220823-1
                     $.ENABLEVIEWPORT = dEnableViewPort;
                     $.AUTOVIEWPORT = dAutoViewPort;
                     $.IMAGEDRAGED = dImgDraged;
@@ -277,6 +280,14 @@
                     $.IMAGEPATH = dImgPath;
                     $.IMAGEICON = dImgIcon; 
                     $.IMAGEAPPEARANCE = dImgAppearance; // add 20220818-1
+
+                    //=====个性化地图 add 20220823-1
+                    if(dOnlyBasePaint){
+                        methods.setMapStyle({
+                            bases: true //是否使用底图模式(干净清爽)
+                        })
+                    }
+
                     //=====设置中心点、设置默认城市(城市名称或坐标经纬度)
                     if(!dEnableViewPort || (dEnableViewPort && !dAutoViewPort)){ //当不强制调整视野时,则手动设置中心点
                         var point = new BMap.Point(dLongitude, dLatitude);
@@ -420,7 +431,7 @@
                     //鼠标单击
                     if(settings.mouseClick){
                         map.addEventListener('click', function(e){
-                            //console.log('当前e:', e)
+                            if(e.overlay != null) return; //点标注点时中断 add 20220823-1
                             params["zoom"] = map.getZoom();
                             var longitude = e.point.lng,
                                 latitude = e.point.lat;        
@@ -436,6 +447,7 @@
                     if(settings.mouseDoubleClick){
                         map.addEventListener('dblclick', function(e){
                             //console.log('当前e:', e)
+                            if(e.overlay != null) return; //点标注点时中断 add 20220823-1
                             params["zoom"] = map.getZoom();
                             var lng = e.point.lng, lat = e.point.lat;
                             var nowParams = params;
@@ -478,6 +490,70 @@
             })
         }, 
 
+
+
+        /**
+         * 个性化地图 add 20220823-1
+         * @param {object} opts 参数对象
+         * [参考] https://lbs.baidu.com/index.php?title=open/custom
+         */
+        setMapStyle: function(opts){
+            var map = $.MAPER; //map 地图实例化对象Map
+            if(map == null){
+                console.log($.tooltip.noMapTips);
+                return;
+            }
+            var defaults = {
+                bases: false //是否使用底图模式(干净清爽), 默认false
+            }
+            var settings = $.extend(true, {}, defaults, opts || {});
+
+ 
+            var poilabelOnOff = manmadeOnOff = 'on'; // = buildingOnOff = districtlabelOnOff = 'on';
+            if(settings.bases){
+                poilabelOnOff = 'off';
+                manmadeOnOff = 'on';
+            }else{
+                poilabelOnOff = 'on';
+                manmadeOnOff = 'on';
+            }
+
+            var styleArray =  [
+                {
+                    "featureType": "poilabel",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": poilabelOnOff // 是否显示兴趣点(即常见地标性地点，如教育、医疗、娱乐、酒店、餐饮、大厦、小区等). on 是, off 否
+                    }
+                },
+                {
+                    "featureType": "manmade",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": manmadeOnOff // 是否显示所有人造区域. on 是, off 否
+                    }
+                }
+                // ,{
+                //     "featureType": "building",
+                //     "elementType": "all",
+                //     "stylers": {
+                //         "visibility": "on" // 是否显示建筑物. on 是, off 否
+                //     }
+                // },
+                // {
+                //     "featureType": "districtlabel",
+                //     "elementType": "labels",
+                //     "stylers": {
+                //         "visibility": "on" // 是否显示行政村注. on 是, off 否
+                //     }
+                // }
+            ]
+
+            //
+            map.setMapStyle({
+                styleJson: styleArray
+            })
+        },
 
         
 
@@ -647,19 +723,24 @@
                     }
                 });
 
-                //点击标注图标后会触发此事件
-                marker.addEventListener('click', function(e){
-                    if(markerClickBack != null && typeof markerClickBack === 'function'){
-                        //获取marker自定义属性
-                        var _id = typeof marker.dataId == 'undefined' ? '' : marker.dataId,
-                            _lng = typeof marker.dataLng == 'undefined' ? '' : marker.dataLng,
-                            _lat = typeof marker.dataLat == 'undefined' ? '' : marker.dataLat;
-                        markerClickBack({"point":{"lng":_lng, "lat":_lat}, "id": _id});
-                    }
+                // 标注点点击事件 edit 20220823-1
+                var time = null; // 解决双击时触发两次单击的BUG  
+                marker.addEventListener('click', function(e){ // 单击标注图标后会触发此事件
+                    clearTimeout(time); // 清除定时器
+                    time = setTimeout(function(){ // 延时一会儿
+                        // console.log('e1：', e); //test2
+                        if(markerClickBack != null && typeof markerClickBack === 'function'){
+                            //获取marker自定义属性
+                            var _id = typeof marker.dataId == 'undefined' ? '' : marker.dataId,
+                                _lng = typeof marker.dataLng == 'undefined' ? '' : marker.dataLng,
+                                _lat = typeof marker.dataLat == 'undefined' ? '' : marker.dataLat;
+                            markerClickBack({"point":{"lng":_lng, "lat":_lat}, "id": _id});
+                        }
+                    }, 300)
                 })
-                
-                //双击标注图标后会触发此事件
-                marker.addEventListener('dblclick', function(e){
+                marker.addEventListener('dblclick', function(e){ // 双击标注图标后会触发此事件
+                    clearTimeout(time); // 清除定时器
+                    // console.log('e2:', e); //test2
                     var zoom = -1;
                     if(dbClickMarkerAutoScale){
                         zoom = map.getZoom();
@@ -678,7 +759,9 @@
                         var e = {"dom":_this, "map":map, "zoom":zoom, "point":{"lng":_lng, "lat":_lat}, "id":_id};
                         markerDoubleClickBack(e);
                     }
-                })               
+                }) 
+                
+                
                 //其它
                 //marker.setAnimation(BMAP_ANIMATION_BOUNCE); //标注点使用跳动的动画
                 //marker.disableMassClear(); //禁止覆盖物在 map.clearOverlays 方法中被清除 //enableMassClear(); //允许清除
@@ -1271,7 +1354,7 @@
                     new_str = new_str.replace(origins, ps_json[fields]);
                 }
             }
-            // testing
+            // test1
             // console.log('newStr1：', new_str);
             if(new_str.indexOf('eval') >= 0){
                 var tmpStr = new_str.replace(/(.*)eval\((.*)\)(.*)/g, '$2'); //去掉eval()
