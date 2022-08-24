@@ -1,0 +1,32 @@
+[一、现象]
+
+把http项目迁到https下，百度地图不显示了。
+
+是因为在线生成的百度地图代码不支持https导致的，直接把
+<script type="text/javascript" src="http://api.map.baidu.com/api?key=&v=1.1&s=1"></script>
+改成：
+<script type="text/javascript" src="https://api.map.baidu.com/api?key=&v=1.1&s=1"></script>
+会发现虽然地图显示 却是一个静态的页面，没有功能，标注也没有显示。
+
+
+[二、探索问题]
+经过百度各种看帖子，发现正常https首先是获取getscript.js文件，这个文件里面有一个window变量HOST_TYPE，默认是0，为0时走的http，需要在引入getscript.js前让他变为1或者2，这样才能走https，具体可以查看getscript.js文件。
+
+
+
+[三、解决办法]
+通过下面两步可以让百度地图api支持https
+
+
+
+1、在页面加入 <script type="text/javascript">window.HOST_TYPE='2'</script>
+2、引入百度api，注意密钥及在url中添加参数s=1
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&s=1&ak=您的密钥"></script>
+秘钥需要到百度地图开放平台去获取：
+http://lbsyun.baidu.com/apiconsole/key
+完成这两步百度地图就可以支持https了
+
+
+参考：
+https://www.jianshu.com/p/6b04ebea55d3
+https://blog.csdn.net/weixin_45377314/article/details/109821087
