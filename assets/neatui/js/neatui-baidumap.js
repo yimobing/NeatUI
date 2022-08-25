@@ -40,6 +40,7 @@
                     icon: 'bmap_locate_default.png', //图标文件名,仅当enable=true时有效(可选),
                     appearance: 'black', // 标注点外观. black 黑色(默认), blue 蓝色, green 绿色, red 红色, orange 橙色 add 20220818-1
                 },
+                infoWindowRootNode: '.bdInfoWindow', //信息窗根节点(可选). 默认 '.bdInfoWindow'。 add 20220825-1
 
                 //窗口布局及显示方式
                 showMode: 'click', //显示方式(可选). normal 固定显示,即在绑定节点上直接显示, click 点击显示(默认)
@@ -90,6 +91,7 @@
                 dWindow = settings.window,
                 dImage = settings.image,
                 dOnlyBasePaint = settings.onlyBasePaint, //add 20220823-1
+                dInfoWindowRootNode = settings.infoWindowRootNode, //add 20220825-1
                 dEnableEval = settings.enableEval,
                 dOpenCityControl = settings.openCityControl,
                 dOpenMapTypeControl = settings.openMapTypeControl,
@@ -273,6 +275,7 @@
                     //=====全局对象赋值
                     $.MAPER = map;
                     $.MAPDOM = _this; //add 20220823-1
+                    $.MAPINFOWINDOWROOTNODE = dInfoWindowRootNode; //add 20220825-1
                     $.ENABLEVIEWPORT = dEnableViewPort;
                     $.AUTOVIEWPORT = dAutoViewPort;
                     $.IMAGEDRAGED = dImgDraged;
@@ -712,18 +715,18 @@
                     }
                 })
 
-                //鼠标移动到标图标上后会触发此事件 add 20220819-1
+                //鼠标移动到标图标上后会触发此事件 add 20220819-1 edit 20220825-1
                 marker.addEventListener('mouseover', function(e){
                     if(markerHoverBack != null && typeof markerHoverBack === 'function'){
                         //获取marker自定义属性
                         var _id = typeof marker.dataId == 'undefined' ? '' : marker.dataId,
                             _lng = typeof marker.dataLng == 'undefined' ? '' : marker.dataLng,
                             _lat = typeof marker.dataLat == 'undefined' ? '' : marker.dataLat;
-                        markerHoverBack({"point":{"lng":_lng, "lat":_lat}, "id": _id});
+                        markerHoverBack({"point":{"lng":_lng, "lat":_lat}, "id": _id, "rootNode": $.MAPINFOWINDOWROOTNODE});
                     }
                 });
 
-                // 标注点点击事件 edit 20220823-1
+                // 标注点点击事件 edit 20220823-1  20220825-1
                 var time = null; // 解决双击时触发两次单击的BUG  
                 marker.addEventListener('click', function(e){ // 单击标注图标后会触发此事件
                     clearTimeout(time); // 清除定时器
@@ -734,7 +737,7 @@
                             var _id = typeof marker.dataId == 'undefined' ? '' : marker.dataId,
                                 _lng = typeof marker.dataLng == 'undefined' ? '' : marker.dataLng,
                                 _lat = typeof marker.dataLat == 'undefined' ? '' : marker.dataLat;
-                            markerClickBack({"point":{"lng":_lng, "lat":_lat}, "id": _id});
+                            markerClickBack({"point":{"lng":_lng, "lat":_lat}, "id": _id, "rootNode": $.MAPINFOWINDOWROOTNODE});
                         }
                     }, 300)
                 })
@@ -1092,8 +1095,9 @@
             infoOpenMethod = messages.infoOpenMethod,
             infoEventsFunc = messages.infoEventsFunc;
         //创建信息窗口对象
+        var rootClassName = $.MAPINFOWINDOWROOTNODE.replace(/\./g, '').replace(/\#/g, '');
         var infoWindow = new BMap.InfoWindow(
-            '<div class="bdInfoWindow">'+description+'</div>',
+            '<div class="' + rootClassName + '">'+description+'</div>',
             {
                 //enableAutoPan:true, //是否开启信息窗口打开时地图自动移动（默认开启）
                 width: 0,     //宽度(220-730) 0 自动调整
@@ -1134,7 +1138,7 @@
                     var _id = typeof marker.dataId == 'undefined' ? '' : marker.dataId,
                         _lng = typeof marker.dataLng == 'undefined' ? '' : marker.dataLng,
                         _lat = typeof marker.dataLat == 'undefined' ? '' : marker.dataLat;
-                    infoEventsFunc({"point":{"lng":_lng, "lat":_lat}, "id": _id});
+                    infoEventsFunc({"point":{"lng":_lng, "lat":_lat}, "id": _id, "rootNode": '.' + rootClassName}); //edit 20220825-1
                 }
             });             
         }else{
@@ -1143,7 +1147,7 @@
                 var _id = typeof marker.dataId == 'undefined' ? '' : marker.dataId,
                     _lng = typeof marker.dataLng == 'undefined' ? '' : marker.dataLng,
                     _lat = typeof marker.dataLat == 'undefined' ? '' : marker.dataLat;
-                infoEventsFunc({"point":{"lng":_lng, "lat":_lat}, "id": _id});
+                infoEventsFunc({"point":{"lng":_lng, "lat":_lat}, "id": _id, "rootNode": '.' + rootClassName}); //edit 20220825-1
             }
         }
     }
@@ -1469,6 +1473,7 @@
     *                                       全局对象
     ------------------------------------------------------------------------------------------------*/
     // $.fn.extend({});
+    // edit 20220825-1
     $.extend({
         tooltip: { //提示信息
             noNodeTips: '错误！请绑定地图节点，节点必须用ID定义',
@@ -1483,6 +1488,8 @@
             MAPID: '#' + 'bdmap_' //地图本身节点id名称
         },      
         MAPER: null, //对图对象Map
+        MAPDOM: null, //地图绑定的DOM节点
+        MAPINFOWINDOWROOTNODE: '', //信息窗根节点
         IMAGEDRAGED: false, //自定义标注点图标是否可拖动
         IMAGEENABLE: false, //是否开启自定义标注点图标
         IMAGEPATH: '', //自定义标注点图片文件夹相对静态文件html位置
