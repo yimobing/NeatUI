@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Chart—交互图表演示Demo1</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/font-awesome/css/font-awesome.css"><!--图标库-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css"><!--日历-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"><!--下拉-->
+</head>
+<body>
+
+    <style>
+        *{margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -moz-box-sizing: border-box; }
+        .wrap{ padding: 10px 15px; }
+        /*+----------------  ----------------+*/
+       
+        .search{ position: relative; display: inline-block; margin-bottom: 15px;  }
+        .search__content input{ width: 130px!important; }
+        .search__operate{ }
+        /* .search__operate button{ padding: 10px 12px; background-color: #1296db; border: 0; border-radius: 2px; color: #fff; font-size: 12px; cursor: pointer; } */
+        .search__operate button:hover{ opacity: .6; filter: alpha(opacity=60); }
+        
+        .switch{ position: absolute; z-index: 999; right: 15px; top: 10px; }
+        .switch__btn{ }
+        .switch__btn button{ padding: 15px 25px; border: 1px solid #c5b9b9;  border-radius: 4px 4px 0 0; cursor: pointer; }
+        .switch__btn button i{ margin-right: 5px; }
+        .switch__item{ background-color: #fff; box-shadow: 0 2px 6px #f9f9f9; }
+        .switch__item ul{ list-style-type: none; }
+        .switch__item ul>li{ padding: 10px 12px;  border: 1px solid #ddd; border-top: 0; text-align: center; font-size: 12px; cursor: pointer; }
+        .switch__item ul>li:first-child{  }
+        .switch__item ul>li:last-child{ border-radius: 0 0 4px 4px; }
+        .switch__item ul>li:hover{ background-color: #fafafa; }
+        .switch__item ul>li>i{ margin-right: 3px; }
+        /*+----------------  ----------------+*/
+        .erow-operate{  width: auto; margin-left: 15px; }
+        .erow-operate button{ width: 100px; }
+    </style>
+
+    <div class="wrap">
+        <header>
+            <div class="search">
+                <div class="search__content">
+                    <div class="eform-row">
+                        <div class="erow-column">
+                            <div class="item-l"><label>开始日期</label></div>
+                            <div class="item-r"><input type="text" id="startDate" class="neDate" readonly></div>
+                        </div><!--/.erow-column-->
+                        <div class="erow-column">
+                            <div class="item-l"><label>开始日期</label></div>
+                            <div class="item-r"><input type="text" id="endDate" class="neDate" readonly></div>
+                        </div><!--/.erow-column-->
+                        <div class="erow-column">
+                            <div class="item-l"><label>统计类型</label></div>
+                            <div class="item-r"><input type="text" id="category" readonly></div>
+                        </div><!--/.erow-column-->
+                        <div class="erow-column">
+                            <div class="item-l"><label>统计数量</label></div>
+                            <div class="item-r"><input type="text" id="quantity" readonly></div>
+                        </div><!--/.erow-column-->
+                        <div class="erow-column">
+                            <div class="item-l"><label>图表类型</label></div>
+                            <div class="item-r"><input type="text" id="photo" readonly></div>
+                        </div><!--/.erow-column-->
+                        <div class="erow-column erow-operate">
+                            <button type="button" id="btn-query" class="ne-btn has-3d blue">查询</button>
+                        </div><!--/.erow-column-->
+                    </div><!--/.eform-row-->
+                </div><!--/.search__content-->
+                <div class="search__operate">
+                   <!--  <button type="button" id="btn-day">按日统计</button>
+                    <button type="button" id="btn-month">按月统计</button>
+                    <button type="button" id="btn-year">按年统计</button> -->
+                </div><!--/.search__operate-->
+            </div><!--/.search-->
+
+            <!-- <div class="switch">
+                <div class="switch__btn">
+                    <button type="button" class="btn-switch"><i class="fa fa-bars"></i><span>图表</span></button>
+                </div>
+				<div class="switch__item">
+					<ul>
+						<li data-type="bar"><i class="fa fa-bar-chart"></i><span>柱状图</span></li>
+						<li data-type="pie"><i class="fa fa-pie-chart"></i><span>饼状图</span></li>
+						<li data-type="line"><i class="fa fa-line-chart"></i><span>曲线图</span></li>
+					</ul>	
+				</div>
+            </div> --><!--/.switch-->
+        </header>
+        <main>
+            <div class="chart tubiao" id="graph">
+
+            </div><!--/.chart-->
+        </main>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script><!--jQ库-->
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dropdown.js"></script><!--下拉-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义AJAx-->
+    <script type="text/javascript" src="assets/highcharts/highcharts.js"></script><!--交互图控件-->
+    <script type="text/javascript" src="assets/highcharts/modules/exporting.js"></script><!--交互图导出JPG/PNG/PDF-->
+    <script type="text/javascript" src="assets/highcharts/modules/export-data.js"></script><!--交互图导出EXCEL-->
+    <!--<script type="text/javascript" src="assets/highcharts/modules/offline-exporting.js"></script>--><!--交互图离线即可导出，不需依赖插件官网所在服务器（bug:使用离线导出模块时导出PDF文件中文会乱码）-->
+    <!--<script type="text/javascript" src="assets/highcharts/convertJson2Chart.js"></script>--><!--交互图数据当前页面json转换函数-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-chart.js"></script>
+
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+        // 默认值 edit 20220824-1
+        var defaultStartDate = neuiCalendar.getYearFirstDay(); // 本年第一天
+        var defaultEndDate = neuiCalendar.getNowtime(); // 今天
+        var defaultChart = '柱状图'; // 图表类型. 值：柱状图, 曲线图, 曲线图(折线图)
+        // 查询条件 edit 20220824-1
+        var s_ksrq = defaultStartDate; // 开始日期
+        var s_jsrq = defaultEndDate; // 结束日期
+        var s_tjlx = '按日统计'; // 统计类型. 值：按日统计, 按月统计, 按年统计
+        var s_tjsl = '询价量'; // 统计数量. 值：开单量, 询价量, 委托量
+
+
+
+        /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 获取图表类型英文名 add 20220824-1
+         * @param {string} ps_chart_zh_name 图表类型中文名
+         * @returns {string} 返回图表对应英文名称
+         */
+        function get_chart_en_letter(ps_chart_zh_name){
+            var ls_type = 'bar';
+            if(ps_chart_zh_name.indexOf('柱状') >= 0) ls_type = 'bar';
+            if(ps_chart_zh_name.indexOf('曲线') >= 0) ls_type = 'line';
+            if(ps_chart_zh_name.indexOf('饼状') >= 0) ls_type = 'pie';
+            return ls_type;
+        }
+
+
+
+        /**
+        * 获取询价统计数量
+        * @returns {object} 返回数组对象
+        */
+        function get_data_quiry(){
+            // 后台返回
+            if(s_tjlx == '按日统计')
+                var json = { 
+                    "return":"ok", 
+                    "data":[
+                        {"tjlx":"2022-08-01", "tjsl":"150"},
+                        {"tjlx":"2022-08-02", "tjsl":"160"},
+                        {"tjlx":"2022-08-03", "tjsl":"280"},
+                        {"tjlx":"2022-08-04", "tjsl":"180"},
+                        {"tjlx":"2022-08-05", "tjsl":"190"},
+                        {"tjlx":"2022-08-06", "tjsl":"190"},
+                        {"tjlx":"2022-08-07", "tjsl":"145"},
+                        {"tjlx":"2022-08-08", "tjsl":"720"},
+                        {"tjlx":"2022-08-09", "tjsl":"82"},
+                        {"tjlx":"2022-08-10", "tjsl":"208"}
+                    ]
+                }
+
+            else if(s_tjlx == '按月统计')
+                var json = { 
+                    "return":"ok", 
+                    "data":[
+                        {"tjlx":"2022-01", "tjsl":"150"},
+                        {"tjlx":"2022-02", "tjsl":"160"},
+                        {"tjlx":"2022-03", "tjsl":"280"},
+                        {"tjlx":"2022-04", "tjsl":"150"},
+                        {"tjlx":"2022-05", "tjsl":"160"},
+                        {"tjlx":"2022-06", "tjsl":"280"},
+                        {"tjlx":"2022-07", "tjsl":"150"},
+                        {"tjlx":"2022-08", "tjsl":"160"},
+                        {"tjlx":"2022-09", "tjsl":"280"},
+                        {"tjlx":"2022-10", "tjsl":"150"},
+                        {"tjlx":"2022-11", "tjsl":"160"},
+                        {"tjlx":"2022-12", "tjsl":"280"}
+                    ]
+                }
+
+            else 
+                var json = { 
+                    "return":"ok", 
+                    "data":[
+                        {"tjlx":"2018", "tjsl":"150"},
+                        {"tjlx":"2019", "tjsl":"160"},
+                        {"tjlx":"2020", "tjsl":"280"},
+                        {"tjlx":"2021", "tjsl":"180"}
+                    ]
+                }
+
+            /*
+            // START AJAX
+            var json = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取询价统计数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "GET",
+                dataType: "html",
+                cache: false,
+                url: "../zsxt_jk/jk_gly/jk_rgxj_tj.ashx",
+                data: {
+                    "action": "sel_rgxj_tj",
+                    "user": "<%=s_user%>",
+                    "ksrq": s_ksrq,
+                    "jsrq": s_jsrq,
+                    "tjlx": s_tjlx,
+                    "tjsl": s_tjsl
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    json = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return {}
+            }
+            // END AJAX
+            */
+            return json;
+        }
+
+
+
+        /**
+        * 加载数据
+        * @param {string} ps_type 图表类型, bar 柱状图, pie 饼状图, line 折线图
+        */
+        function load_data(ps_type){
+            var types = typeof ps_type == 'undefined' ? 'bar' : ps_type;
+            var source = get_data_quiry();
+            if(!checker.checkJsonHasData(source)){
+                neuiDialog.alert({
+                    animate: true,
+                    message: '抱歉，没有查询到对应数据',
+                    buttons: ['确定']
+                })
+                return;
+            }
+            var yDigit = '';
+            if(types == 'pie') yDigit = 2;
+            var xText = s_tjlx,
+                yText = s_tjsl;
+            var according = '日期',
+                isRotateEnable = true,
+                isWrapEnable = false,
+                isWrapDate = false;
+            if(xText.indexOf('日') >= 0) {
+                according = '日期';
+                isRotateEnable = false;
+                isWrapEnable = true;
+                isWrapDate = true;
+            }
+            if(xText.indexOf('月') >= 0) {
+                according = '月份';
+                isRotateEnable = false;
+                isWrapEnable = true;
+                isWrapDate = true;
+            }
+            if(xText.indexOf('年') >= 0) {
+                according = '年份';
+                isRotateEnable = false;
+                isWrapEnable = false;
+                isWrapDate = false;
+            }
+
+            //
+            var options = {
+                source: source, // 数据源
+                xField: "tjlx", // 横轴(x轴)字段
+                yField: "tjsl", // 纵轴(y轴)字段
+                xText: xText, // x轴文字
+                yText: yText, // y轴文字
+                yUnit: "单", // y轴单位
+                yDigit: yDigit,
+                title: "根据 <strong>" + according + "</strong> 统计 <strong>" + yText + "</strong>", // 标题(可选)，默认空
+                subTitle: "(数据来源：快评)", // 副标题(可选)，默认空
+                dateStart: s_ksrq,
+                dateEnd: s_jsrq,
+
+                exporting: { // 自定义导出模块选项
+                    enabled: true, // 是否启用
+                    filename: "图表导出", // 导出的文件名
+                    fullScreen: true, // 导出项里是否有“全屏显示”项(可选)，默认true
+                    items: ["JPG", "PNG", "PDF", "SVG", "CSV", "XLS", "PRINT"],
+                },
+                xAxis: { // x轴
+                    rotate: { // 旋转(可选)
+                        enable: isRotateEnable, // 文字是否旋转(可选)，默认true
+                        rotation: 0 // 文字旋转角度(可选)，默认-45度。autoRotation=false时本参数失效
+                    },
+                    wrap: { // 换行(可选)
+                        enable: isWrapEnable, // 文字换行显示(可选)，默认false。 true 时文字将不旋转，且一行仅有一个字
+                        isDate: isWrapDate // 文字是否日期类型(比如2022-08-16)(可选)，默认false。true时且wrap=true，则x轴文字将顺时针旋转90度，以实现换行效果
+                    }
+                },
+                copyRight: { // 版权所有(可选)
+                    enabled: false, // 是否启用, 默认false
+                    text: "快评评估平台版权所有",
+                    href: "javascript:void(0)", // 链接
+                    position: {
+                        align: "right",
+                        x: -10,
+                        verticalAlign: "bottom",
+                        y: -5
+                    },
+                    style: {
+                        cursor: "pointer",
+                        color: "#909090",
+                        fontSize: "10px"
+                    }
+                }
+            }
+
+            $('#graph').neuiChart(types, options); // 创建图表
+        }
+
+
+
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====加载日历控件
+            $('.neDate').each(function(){
+                neuiCalendar.neDate($(this));
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====查询框初始化赋值
+            $('#startDate').val(s_ksrq); // 开始日期
+            $('#endDate').val(s_jsrq); // 结束日期
+            $('#category').val(s_tjlx); // 统计类型
+            $('#quantity').val(s_tjsl); // 统计数量
+            $('#photo').val(defaultChart); // 图表类型
+
+
+
+            //——————————————————————————————————————————
+            //=====加载数据 edit 20220824-1
+            var type = get_chart_en_letter(defaultChart);
+            load_data(type);
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         系列事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====查询按钮 edit 20220824-1
+            $('#btn-query').on('click', function(){
+                // 全局赋值
+                s_ksrq = $('#startDate').val();
+                s_jsrq = $('#endDate').val();
+                s_tjlx = $('#category').val();
+                s_tjsl = $('#quantity').val();
+
+                var ls_tblx = $('#photo').val();
+                var ls_type = get_chart_en_letter(ls_tblx);
+
+                load_data(ls_type); // 加载数据
+            });
+
+
+            //——————————————————————————————————————————
+            //=====窗口大小改变时
+            $(window).on('resize', function(){
+                load_data(); // 重载数据
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====统计类型下拉
+            $('#category').on('click', function(){
+                var $this = $(this);
+				var cateJson = {
+                    "data":[
+						{"value":"按日统计"},
+                        {"value":"按月统计"},
+                        {"value":"按年统计"}
+					]
+				}
+				neuiDropdown({
+					json: cateJson,
+					format: ["value"]
+				}, $this)
+            });
+
+
+
+
+            //——————————————————————————————————————————
+            //=====统计数量下拉
+            $('#quantity').on('click', function(){
+                var $this = $(this);
+				var quanJson = {
+                    "data":[
+						{"value":"开单量"},
+                        {"value":"询价量"},
+                        {"value":"委托量"}
+					]
+				}
+				neuiDropdown({
+					json: quanJson,
+					format: ["value"]
+				}, $this)
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====图表类型下拉
+            $('#photo').on('click', function(){
+                var $this = $(this);
+				var photoJson = {
+                    "data":[
+						{"value":"柱状图"},
+                        {"value":"饼状图"},
+                        {"value":"曲线图"}
+					]
+				}
+				neuiDropdown({
+					json: photoJson,
+					format: ["value"]
+				}, $this)
+            });
+
+
+
+
+
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
