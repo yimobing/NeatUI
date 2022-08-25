@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Chart | 统计图表</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/style/font-awesome/css/font-awesome.css"><!--图标库-->
+</head>
+<body>
+
+    <style>
+        *{margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -moz-box-sizing: border-box; }
+        .wrap{ padding: 10px 15px; }
+        /*+----------------  ----------------+*/
+       
+        .search{ position: relative; margin-bottom: 15px; height: 300px;  }
+        .search__operate{ margin: 15px;}
+        .search__operate button{ padding: 10px 12px; background-color: #1296db; border: 0; border-radius: 2px; color: #fff; font-size: 12px; cursor: pointer; }
+        .search__operate button:hover{ opacity: .6; filter: alpha(opacity=60); }
+        .switch{ position: absolute; z-index: 999; right: 15px; top: 10px; }
+        .switch__btn{ }
+        .switch__btn button{ padding: 15px 25px; border: 1px solid #c5b9b9;  border-radius: 4px 4px 0 0; cursor: pointer; }
+        .switch__btn button i{ margin-right: 5px; }
+        .switch__item{ background-color: #fff; box-shadow: 0 2px 6px #f9f9f9; }
+        .switch__item ul{ list-style-type: none; }
+        .switch__item ul>li{ padding: 10px 12px;  border: 1px solid #ddd; border-top: 0; text-align: center; font-size: 12px; cursor: pointer; }
+        .switch__item ul>li:first-child{  }
+        .switch__item ul>li:last-child{ border-radius: 0 0 4px 4px; }
+        .switch__item ul>li:hover{ background-color: #fafafa; }
+        .switch__item ul>li>i{ margin-right: 3px; }
+        /*+----------------  ----------------+*/
+    </style>
+
+    <div class="wrap">
+        <header>
+            <div class="search">
+                <div class="search__operate">
+                    <button type="button" id="btn-generate">生成图表</button>
+                    <button type="button" id="btn-generate2">生成图表2</button>
+                </div><!--/.search__operate-->
+            </div><!--/.search-->
+            <div class="switch">
+                <div class="switch__btn">
+                    <button type="button" class="btn-switch"><i class="fa fa-bars"></i><span>图表</span></button>
+                </div>
+				<div class="switch__item">
+					<ul>
+						<li data-type="bar"><i class="fa fa-bar-chart"></i><span>柱状图</span></li>
+						<li data-type="pie"><i class="fa fa-pie-chart"></i><span>饼状图</span></li>
+						<li data-type="line"><i class="fa fa-line-chart"></i><span>曲线图</span></li>
+					</ul>	
+				</div><!--switch__item-->
+            </div><!--/.switch-->
+        </header>
+        <main>
+            <div class="chart tubiao" id="graph">
+
+            </div><!--/.chart-->
+        </main>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/style/highcharts/highcharts.js"></script><!--交互图控件-->
+    <script type="text/javascript" src="assets/style/highcharts/modules/exporting.js"></script><!--交互图导出JPG/PNG/PDF-->
+    <script type="text/javascript" src="assets/style/highcharts/modules/export-data.js"></script><!--交互图导出EXCEL-->
+    <!--<script type="text/javascript" src="assets/style/highcharts/modules/offline-exporting.js"></script>--><!--交互图离线即可导出，不需依赖插件官网所在服务器（bug:使用离线导出模块时导出PDF文件中文会乱码）-->
+    <!--<script type="text/javascript" src="assets/style/highcharts/convertJson2Chart.js"></script>--><!--交互图数据当前页面json转换函数-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-chart.js"></script>
+
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+    
+        /*+————————————————FUNCTION————————————————+*/
+        function get_data_list(){
+            var json = {
+                "data":[
+                    {"tjxm":"兴业银行", "tjsz":"150", "tjdw":"万元"},
+                    {"tjxm":"建设银行", "tjsz":"250", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄", "tjsz":"350", "tjdw":"万元"},
+                    {"tjxm":"民生银行", "tjsz":"250", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄2", "tjsz":"450", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄3", "tjsz":"550", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄4", "tjsz":"650", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄5", "tjsz":"750", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄6", "tjsz":"850", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄7", "tjsz":"950", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄8", "tjsz":"1150", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄9", "tjsz":"1250", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄10", "tjsz":"1350", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄11", "tjsz":"1450", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄12", "tjsz":"1550", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄13", "tjsz":"1650", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄14", "tjsz":"1750", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄15", "tjsz":"1850", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄16", "tjsz":"1950", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄17", "tjsz":"430", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄18", "tjsz":"530", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄19", "tjsz":"540", "tjdw":"万元"},
+                    {"tjxm":"邮政储蓄20", "tjsz":"550", "tjdw":"万元"},
+                    {"tjxm":"2022-08-16", "tjsz":"560", "tjdw":"万元"}
+                ]
+            }  
+            return json;
+        }
+
+
+        function get_data_list2(){
+            var json = {
+                "data":[
+                    {"mon":"一月", "sczz":"150", "danwei":"千万"},
+                    {"mon":"二月", "sczz":"250", "danwei":"千万"},
+                    {"mon":"三月", "sczz":"350", "danwei":"千万"},
+                    {"mon":"四月", "sczz":"250", "danwei":"千万"},
+                    {"mon":"五月", "sczz":"450", "danwei":"千万"}
+                ]
+            }  
+            return json;
+        }
+
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====初始化加载
+            var options1 = {
+                source: get_data_list(), // 数据源
+                xField: "tjxm", // 横轴(x轴)字段
+                yField: "tjsz", // 纵轴(y轴)字段
+                xText: "日期", // x轴文字
+                yText: "支付金额", // y轴文字
+                yUnit: "万元", // y轴单位
+                yDigit: "0",
+                title: "根据 <strong>日期</strong> 统计 <strong>金额</strong>", // 标题(可选)，默认空
+                subTitle: "(快评询价数据)", // 副标题(可选)，默认空
+                dateStart: "2002-03-15",
+                dateEnd: "2022-06-18",
+
+                exporting: { // 自定义导出模块选项
+                    enabled: true, // 是否启用
+                    filename: "图表导出", // 导出的文件名
+                    fullScreen: true, // 导出项里是否有“全屏显示”项(可选)，默认true
+                    items: ["JPG", "PNG", "PDF", "SVG", "CSV", "XLS", "PRINT"],
+                },
+                xAxis: { // x轴
+                    rotate: { // 旋转(可选)
+                        enable: true, // 文字是否旋转(可选)，默认true
+                        rotation: 0 // 文字旋转角度(可选)，默认-45度。autoRotation=false时本参数失效
+                    },
+                    wrap: { // 换行(可选)
+                        enable: false, // 文字换行显示(可选)，默认false。 true 时文字将不旋转，且一行仅有一个字
+                        isDate: false // 文字是否日期类型(比如2022-08-16)(可选)，默认false。true时且wrap=true，则x轴文字将顺时针旋转90度，以实现换行效果
+                    }
+                },
+                copyRight: { // 版权所有(可选)
+                    enabled: false, // 是否启用, 默认false
+                    text: "小巧UI框架版权所有",
+                    href: "javascript:void(0)", // 链接
+                    position: {
+                        align: "right",
+                        x: -10,
+                        verticalAlign: "bottom",
+                        y: -5
+                    },
+                    style: {
+                        cursor: "pointer",
+                        color: "#909090",
+                        fontSize: "10px"
+                    }
+                }
+            }
+            
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         系列事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====生成图表1按钮
+            $('#btn-generate').on('click', function(){
+                $('#graph').neuiChart('bar', options1);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====生成柱状图
+            $('.switch__item [data-type="bar"]').on('click', function(){
+                $('#graph').neuiChart('bar', options1);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====生成饼状图
+            $('.switch__item [data-type="pie"]').on('click', function(){
+                $('#graph').neuiChart('pie', options1);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====生成折线图
+            $('.switch__item [data-type="line"]').on('click', function(){
+                $('#graph').neuiChart('line', options1);
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+            //——————————————————————————————————————————
+            // 生成图表2按钮
+            $('#btn-generate2').on('click', function(){
+                $('#graph').neuiChart('bar', {
+                    source: get_data_list2(), // 数据源
+                    xField: "mon", // 横轴(x轴)字段
+                    yField: "sczz", // 纵轴(y轴)字段
+                    xText: "月份", // x轴文字
+                    yText: "生产总值", // y轴文字
+                    yUnit: "千万", // y轴单位
+                    yDigit: "1",
+                    title: "根据 <strong>月份</strong> 统计 <strong>生产总值</strong>", // 标题(可选)，默认空
+                    subTitle: "(国家统计局)", // 副标题(可选)，默认空
+                    dateStart: "2019-03-15",
+                    dateEnd: "2020-06-18",
+                })
+            });
+            
+    
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
