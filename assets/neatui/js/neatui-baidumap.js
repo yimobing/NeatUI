@@ -38,7 +38,7 @@
                     enable: false, //是否开启自定义图标, 默认false(可选)
                     path: 'assets/neatui/img/', //图片文件夹相对静态文件html位置,仅当enable=true时有效(可选)
                     icon: 'bmap_locate_default.png', //图标文件名,仅当enable=true时有效(可选),
-                    appearance: 'black', // 标注点外观. black 黑色(默认), blue 蓝色, green 绿色, red 红色, orange 橙色 add 20220818-1
+                    appearance: 'black' // 标注点外观. black 黑色(默认), blue 蓝色, green 绿色, red 红色, orange 橙色 add 20220818-1
                 },
                 infoWindowRootNode: '.bdInfoWindow', //信息窗根节点(可选). 默认 '.bdInfoWindow'。 add 20220825-1
 
@@ -601,7 +601,7 @@
                     borderRadius: "3px",
                     fontFamily: "微软雅黑"
                 },
-                clearOldLays: true, //是否清空原有标注点, 默认true add 20220830-1
+                clearOldLays: true, //是否清空原有覆盖物, 默认true add 20220830-1
                 dbClickMarkerAutoScale: false, //是否开启双击标注点图标后地图缩放级别自动放大一级,默认false(可选).
                 labelEnable: true, //是否开启标注点文字,默认true(可选).
                 infoEnable: true, //是否开启信息窗,默认true(可选). 优先权大于单条数据里的isInfo字段
