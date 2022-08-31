@@ -623,6 +623,7 @@
                     coordinates: '["coordinates"]', // 经纬度坐标
                     title: '["title"]', // 文字标题,标注点文字
                     isShowTitle: true, // 是否显示文字标题(是否显示标注点文字), 默认true add 20220831-1
+                    ellipsisTitle: 'auto', // 标题长度超过指定宽度时隐藏以...代替(可选)。 默认'auto' 表示不限制. 如需让标题超过一定长度后以...代替，则设置具体的数值，如'60px'或60 add 20220831-3
                     id: '["id"]', // 记录主键key(可选)。主键可多个(中间要用空格或逗号等符号分隔开).eg. '["xjdh"] ["dyw_xh"]'
                     description: '["description"]', // 描述,信息窗文字(可选)
                     dragging: '["dragging"]', // 标注点是否可拖拽,默认false(可选)
@@ -673,6 +674,7 @@
                     id: '',
                     title: '',
                     isShowTitle: true, // add 20220831-1
+                    ellipsisTitle: 'auto', // add 20220831-3
                     description: '',
                     dragging: true,
                     isInfo: true,
@@ -695,6 +697,7 @@
                     id = defaultsData.id.field,
                     title = defaultsData.title.field,
                     showTitle = defaultsData.isShowTitle.field, // add 20220831-1
+                    ellipsisWidth = defaultsData.ellipsisTitle.field, // add 20220831-3
                     description = defaultsData.description.field,
                     dragging = defaultsData.dragging.field, 
                     isInfo = defaultsData.isInfo.field,
@@ -824,6 +827,7 @@
                         "point": point, 
                         "title": title, 
                         "showTitle": showTitle, // add 20220831-1
+                        "ellipsisTitle": ellipsisWidth, // add 20220831-3
                         "theme": theme, 
                         "style": style, 
                         "showDetails": showDetails,
@@ -1104,6 +1108,15 @@
         label.setStyle(lbStyleJson);
         //map.addOverlay(label); 
         marker.setLabel(label);
+
+        // add 202220831-3
+        // 标注点文本超过一定长度时以...代替
+        var ellipsisWidth = dataJson.ellipsisTitle.toString().replace(/px/g, '');
+        if(ellipsisWidth != 'auto' && ellipsisWidth != '' && !isNaN(parseFloat(ellipsisWidth))){
+            $('.bdLabel').find('span').css({
+                width: ellipsisWidth + 'px'
+            })
+        }
 
         //点击文本标注后会触发此事件
         label.addEventListener('click', function(e){
