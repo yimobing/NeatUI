@@ -551,17 +551,58 @@
                 //     }
                 // }
             ]
-
             //
             map.setMapStyle({
                 styleJson: styleArray
             })
         },
 
-        
+
 
         /**
-         * 创建坐标系统/创建标注点
+         * 创建坐标点 add 20220831-1
+         * 即：只创建一个标注点
+         * [适用]：适用于在有密密麻麻坐标点的地图上点击地图取坐标，此时要创建一个点在地图，这样比较明显
+         * @param {object} 配置参数
+         */
+        createOnePoint: function(opts){
+            var _this = this;
+            var map = $.MAPER; //map 地图实例化对象Map
+            if(map == null){
+                console.log($.tooltip.noMapTips);
+                return;
+            }
+            var defaults = {
+                longtitude: "", // 经度
+                latitude: "", // 纬度
+                clearFormerLays: true // 是否清除之前创建的坐标点，默认true
+            }
+            var settings = $.extend(true, {}, defaults, opts || {});
+            // 先清除指定旧点(覆盖物)
+            if(settings.clearFormerLays){
+                var allOverlay = map.getOverlays();
+                for(var n = 0; n < allOverlay.length; n++){
+                    var overlay = allOverlay[n];
+                    var lbName = typeof overlay.mydataWrap == 'undefined' ? '' : overlay.mydataWrap;
+                    if(lbName == 'onlyTag'){
+                        map.removeOverlay(overlay);
+                        break;
+                    }
+                }
+            }
+            // 再创建新点
+            var lng = settings.longtitude, lat = settings.latitude;
+            var point = new BMap.Point(lng, lat);
+            var marker = new BMap.Marker(point);
+            marker.mydataWrap = 'onlyTag';
+            map.addOverlay(marker);
+        },
+
+
+
+        /**
+         * 创建坐标系统
+         * 即：创建一系列的标注点
          * @param {object} pointJson 坐标数据
          * @param {object} paramJson 其它数据
          */
@@ -575,25 +616,26 @@
             }
             // 参数
             var defaultsOther = {
-                format: { //自定义数据源字段名称(可选). 方便后台传输任意的字段名,前端只需自定义一下即可
-                    //字段名称格式: 
-                    //除了经纬度坐标字段外只能用格式： '["字段"]' 来表示外，其它皆可用格式：'A["字段1"]B["字段2"]C'
-                    //其中： A、B、C表示任意字符, 里面可含HTML代码. eg. coordinates:'<div>地区名：["title"] <br>楼盘数量：["lpsl"]个</div>'}
-                    coordinates: '["coordinates"]', //经纬度坐标
-                    title: '["title"]', //文字标题,标注点文字
-                    id: '["id"]', //记录主键key(可选)。主键可多个(中间要用空格或逗号等符号分隔开).eg. '["xjdh"] ["dyw_xh"]'
-                    description: '["description"]', //描述,信息窗文字(可选)
-                    dragging: '["dragging"]', //标注点是否可拖拽,默认false(可选)
-                    isInfo: '["isInfo"]', //标注点是否有信息窗,默认true(可选)
-                    theme: '["theme"]', //标注点主题(可选). blue 蓝色(默认), white 白色, red 红色, green 绿色, orange 橙色
-                    icon: '["icon"]' //标注点图标(可选)
+                format: { // 自定义数据源字段名称(可选). 方便后台传输任意的字段名,前端只需自定义一下即可
+                    // 字段名称格式: 
+                    // 除了经纬度坐标字段外只能用格式： '["字段"]' 来表示外，其它皆可用格式：'A["字段1"]B["字段2"]C'
+                    // 其中： A、B、C表示任意字符, 里面可含HTML代码. eg. coordinates:'<div>地区名：["title"] <br>楼盘数量：["lpsl"]个</div>'}
+                    coordinates: '["coordinates"]', // 经纬度坐标
+                    title: '["title"]', // 文字标题,标注点文字
+                    isShowTitle: true, // 是否显示文字标题(是否显示标注点文字), 默认true add 20220831-1
+                    id: '["id"]', // 记录主键key(可选)。主键可多个(中间要用空格或逗号等符号分隔开).eg. '["xjdh"] ["dyw_xh"]'
+                    description: '["description"]', // 描述,信息窗文字(可选)
+                    dragging: '["dragging"]', // 标注点是否可拖拽,默认false(可选)
+                    isInfo: '["isInfo"]', // 标注点是否有信息窗,默认true(可选)
+                    theme: '["theme"]', // 标注点主题(可选). blue 蓝色(默认), white 白色, red 红色, green 绿色, orange 橙色
+                    icon: '["icon"]' // 标注点图标(可选)
                 },
-                style: { //标注点默认样式(可选)
+                style: { // 标注点默认样式(可选)
                     color: "#333",
                     backgroundColor: "#fff",
                     fontSize: "12px",
-                    //height : "20px",
-                    //lineHeight : "20px",
+                    // height : "20px",
+                    // lineHeight : "20px",
                     padding: "5px 8px",
                     borderWidth: "1px",
                     borderStyle: "solid",
@@ -601,18 +643,19 @@
                     borderRadius: "3px",
                     fontFamily: "微软雅黑"
                 },
-                clearOldLays: true, //是否清空原有覆盖物, 默认true add 20220830-1
-                dbClickMarkerAutoScale: false, //是否开启双击标注点图标后地图缩放级别自动放大一级,默认false(可选).
-                labelEnable: true, //是否开启标注点文字,默认true(可选).
-                infoEnable: true, //是否开启信息窗,默认true(可选). 优先权大于单条数据里的isInfo字段
-                infoOpenMethod: 'mouseover', //信息窗打开方式(可选). mouseover 鼠标经过标注点时(默认)，click 点击标注点时
-                showDetails: false, //标注点是否默认就显示详细信息,默认false(可选)
-                //回调
-                markerHoverBack: null, //鼠标移动到标注点图标上面后触发此事件(可选). e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"} add 20220819-1
-                markerClickBack: null, //点击标注点图标后会触发此事件(可选). e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
-                markerDoubleClickBack: null, //双击标注点图标后会触发此事件(可选). e参数：{dom:"地图父节点", map:"地图实例化对象Map", zoom:"当前地图绽放级别", point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
-                labelClickBack: null, //点击标注点文字后会触发此事件(可选). 回调e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
-                infoEventsFunc: null //点标注点信息窗内部DOM系列事件(可选). e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
+                clearOldLays: true, // 是否清空原有覆盖物, 默认true add 20220830-1
+                dbClickMarkerAutoScale: false, // 是否开启双击标注点图标后地图缩放级别自动放大一级,默认false(可选).
+                labelEnable: true, // 是否开启标注点文字,默认true(可选).
+                infoEnable: true, // 是否开启信息窗,默认true(可选). 优先权大于单条数据里的isInfo字段
+                infoOpenMethod: 'mouseover', // 信息窗打开方式(可选). mouseover 鼠标经过标注点时(默认)，click 点击标注点时
+                showDetails: false, // 标注点是否默认就显示详细信息,默认false(可选)
+                // 回调
+                callBack: null, // 创建完坐标点后的回调函数. e 参数：{dom:"地图父节点", map:"地图实例化对象Map", zoom:"当前地图绽放级别"} add 20220831-2
+                markerHoverBack: null, // 鼠标移动到标注点图标上面后触发此事件(可选). e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"} add 20220819-1
+                markerClickBack: null, // 点击标注点图标后会触发此事件(可选). e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
+                markerDoubleClickBack: null, // 双击标注点图标后会触发此事件(可选). e参数：{dom:"地图父节点", map:"地图实例化对象Map", zoom:"当前地图绽放级别", point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
+                labelClickBack: null, // 点击标注点文字后会触发此事件(可选). 回调e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
+                infoEventsFunc: null // 点标注点信息窗内部DOM系列事件(可选). e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"}
             }
             var others = $.extend(true, {}, defaultsOther, paramJson || {});
 
@@ -629,6 +672,7 @@
                     coordinates: '',
                     id: '',
                     title: '',
+                    isShowTitle: true, // add 20220831-1
                     description: '',
                     dragging: true,
                     isInfo: true,
@@ -650,6 +694,7 @@
                 var coordinates = defaultsData.coordinates.field,
                     id = defaultsData.id.field,
                     title = defaultsData.title.field,
+                    showTitle = defaultsData.isShowTitle.field, // add 20220831-1
                     description = defaultsData.description.field,
                     dragging = defaultsData.dragging.field, 
                     isInfo = defaultsData.isInfo.field,
@@ -709,6 +754,7 @@
                 dragging = $.IMAGEDRAGED ? dragging : false;
                 if(dragging) marker.enableDragging(); //可以拖拽
                 else marker.disableDragging(); //不允许拖拽
+
                 //拖拽标注图标后会触发此事件
                 marker.addEventListener('dragend', function(e){
                     var x = e.point.lng,
@@ -775,9 +821,10 @@
                 //设置标注点文字标签
                 if(labelEnable){
                     var $dataJson = {
-                        "point":point, 
-                        "title":title, 
-                        "theme":theme, 
+                        "point": point, 
+                        "title": title, 
+                        "showTitle": showTitle, // add 20220831-1
+                        "theme": theme, 
                         "style": style, 
                         "showDetails": showDetails,
                         "labelClickBack": labelClickBack
@@ -798,6 +845,13 @@
                     }
                 }
             })
+
+
+            
+            // 创建完标点后的回调函数 add 20220831-2
+            if(others.callBack){
+                others.callBack({"dom": $.MAPDOM, "map":$.MAPER, "zoom": methods.getZoom() });
+            }
 
             if($.ENABLEVIEWPORT && $.AUTOVIEWPORT){
                 map.setViewport(pointArray);
@@ -1036,11 +1090,12 @@
             var value = style[v];
             tempStr += attr + ':' + value + ';'; //eg. 'background-color:red;'
         }
-        var txtStyleStr = tempStr == '' ? '' : 'style="' + tempStr + '"';
+        var _displayStr = dataJson.showTitle === false ? ' display: none;' : ''; // 是否显示标注点文本. add 20220831-1
+        var txtStyleStr = tempStr == '' ? '' : 'style="' + tempStr + _displayStr + '"'; // edit 20220831-1
         //console.log('txtStyle:', txtStyleStr)
         //创建文本标注对象
         var label = new BMap.Label(
-            '<div class="bdLabel ' + theme + '"' + txtStyleStr + '>'+ title +'</div>', 
+            '<div class="bdLabel aaa ' + theme + '"' + txtStyleStr + '>'+ title +'</div>', 
             { //文字标签定位
                 position: point, //指定文本标注所在的地理位置
                 offset: new BMap.Size(25, -25) //设置文本偏移量x,y轴
