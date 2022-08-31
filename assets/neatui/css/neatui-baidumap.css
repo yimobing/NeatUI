@@ -5,7 +5,7 @@
  * Version：v1.0.0
  * Author: Mufeng
  * Date: 2020.12.03
- * Update: 2022.08.18
+ * Update: 2022.08.31
  */
 /*+-------------------------+*/
 html,body{width:100%; margin:0 auto; padding:0;}
@@ -186,7 +186,7 @@ section,article,figure{display: block;}
 .BMapLabel.bdMarkerLabel{ left: 25px!important; top: -50px!important; border: 0!important; background: transparent!important; }
 .bdLabel{ padding: 8px 12px!important; color: #444!important; border-color: #888!important; background-color:#d80907; border-style: solid; border-width: 1px!important; border-color:#d80907; border-radius: 3px; box-shadow: 3px 2px 2px 0px rgba(0,0,0,.35); }
 .bdLabel.no-padding{ padding: 0!important; }
-.bdLabel>span{ display: inline-block; margin-bottom: 3px; font-size: 14px; font-weight: bold; }
+.bdLabel>span{ display: inline-block; margin-bottom: 3px; /* font-size: 14px; */ font-size: inherit; font-weight: bold; }
 .bdLabel>em{ display: inline-block; margin-top: 2px; font-weight: 500; }
 .bdLabel.blue{ color: #1296db!important; border-color:#1296db!important; background-color:#1296db; }
 .bdLabel.white{ color: #fff!important; border-color:#fff!important; background-color:#fff; }
