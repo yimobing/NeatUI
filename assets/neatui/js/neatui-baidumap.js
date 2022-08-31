@@ -55,7 +55,7 @@
                 onlyBasePaint: false, //个性化地图是否使用底图模式(干净清爽),默认false add 20220823-1
 
                 //控件
-                openCityControl: true, //是否开启城市切换控件,默认true(可选)
+                openCityControl: false, //是否开启城市切换控件,默认true(可选)
                 openMapTypeControl: true, //是否开启地图类型(即地图、卫星、混合)控件,默认true(可选)
                 openCopyrightControl: true, //是否开启第3方版本信息控件(即第3方版权信息),默认true(可选)
                 openOverViewControl: true, //是否开启地图缩略图控件,默认true(可选)
