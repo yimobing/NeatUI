@@ -56,8 +56,17 @@
                 init 地图初始化
 
                 //注意：以下内置函数目前无法单独使用，只能在 init 方法的参数中进行调用，参考demo2.js
+                createOnePoint  创建一个坐标点。 options =  {
+                    longtitude: "", // 经度
+                    latitude: "", // 纬度
+                    clearFormerLays: true // 是否清除之前创建的坐标点，默认true
+                }
                 createMapPoint 创建坐标系统/创建标注点
                 createMapBoundary 创建行政区域边界
+                setMapStyle     设置地图样式. options =  
+                { 
+                    bases: isBases  //是否使用底图模式(干净清爽), 默认false
+                } 
                 getZoom 获取当前地图绽放级别
                 getCenter 获取地图当前中心点
                 clearOverlays 移除所有地图覆盖物、清空所有标注点
@@ -175,6 +184,7 @@
                     //A、B、C为任意字符(可含HTML代码). eg. title:'<div>地区名：["title"] <br>楼盘数量：["lpsl"]个</div>'}
                     coordinates: '["zuobiao"]', //经纬度坐标
                     title: '["title"]', //文字标题,标注点文字(可选)
+                    isShowTitle: true, // 是否显示文字标题(是否显示标注点文字), 默认true add 20220831-1
                     id: '["id"]', //记录主键key(可选)
                     description: '["description"]', //描述,信息窗文字(可选)
                     dragging: '["dragging"]', //标注点是否可拖拽(可选)
@@ -202,6 +212,9 @@
                 infoOpenMethod: 'mouseover', //信息窗打开方式(可选). mouseover 鼠标经过标注点时(默认)，click 点击标注点时
                 showDetails: false, //标注点是否默认就显示详细信息,默认false(可选)
                 //回调
+                callBack: function(e){ //创建完坐标点后的回调函数. e 参数：{dom:"地图父节点", map:"地图实例化对象Map", zoom:"当前地图绽放级别"} add 20220831-2
+
+                }
                 markerHoverBack: function(e){  //鼠标移动到标注点图标上面后触发此事件(可选). e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"} add 20220819-1
 
                 },
