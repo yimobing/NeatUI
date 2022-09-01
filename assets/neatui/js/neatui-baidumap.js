@@ -575,7 +575,8 @@
             var defaults = {
                 longtitude: "", // 经度
                 latitude: "", // 纬度
-                clearFormerLays: true // 是否清除之前创建的坐标点，默认true
+                clearFormerLays: true, // 是否清除之前创建的坐标点，默认true
+                clearAllOverLays: false // 是否清除所有覆盖物，默认false add 20220901-1
             }
             var settings = $.extend(true, {}, defaults, opts || {});
             // 先清除指定旧点(覆盖物)
@@ -589,6 +590,10 @@
                         break;
                     }
                 }
+            }
+            // 清除所有覆盖物 add 20220901-1
+            if(settings.clearAllOverLays){
+                map.clearOverlays();  // 一次移除所有的覆盖物
             }
             // 再创建新点
             var lng = settings.longtitude, lat = settings.latitude;
