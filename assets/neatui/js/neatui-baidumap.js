@@ -511,8 +511,8 @@
             }
             var settings = $.extend(true, {}, defaults, opts || {});
 
- 
-            var poilabelOnOff = manmadeOnOff = 'on'; // = buildingOnOff = districtlabelOnOff = 'on';
+            // 方法1：自定义地图样式
+            /* var poilabelOnOff = manmadeOnOff = 'on'; // = buildingOnOff = districtlabelOnOff = 'on';
             if(settings.bases){
                 poilabelOnOff = 'off';
                 manmadeOnOff = 'on';
@@ -520,16 +520,13 @@
                 poilabelOnOff = 'on';
                 manmadeOnOff = 'on';
             }
-
-            var styleArray =  [
-                {
+            var styleArray =  [{
                     "featureType": "poilabel",
                     "elementType": "all",
                     "stylers": {
                         "visibility": poilabelOnOff // 是否显示兴趣点(即常见地标性地点，如教育、医疗、娱乐、酒店、餐饮、大厦、小区等). on 是, off 否
                     }
-                },
-                {
+                },{
                     "featureType": "manmade",
                     "elementType": "all",
                     "stylers": {
@@ -542,8 +539,7 @@
                 //     "stylers": {
                 //         "visibility": "on" // 是否显示建筑物. on 是, off 否
                 //     }
-                // },
-                // {
+                // },{
                 //     "featureType": "districtlabel",
                 //     "elementType": "labels",
                 //     "stylers": {
@@ -551,10 +547,43 @@
                 //     }
                 // }
             ]
-            //
             map.setMapStyle({
                 styleJson: styleArray
-            })
+            }) */
+
+            // 方法2：快速设置地图样式
+
+            if(settings.bases){
+                map.setMapStyle({
+                    features: ['point', 'road', 'water', 'land', 'building'], // 设置地图上展示的元素种类(这个参数不起作用，奇怪!!!)。值：point 兴趣点, road 道路, water 河流, land 陆地, building 建筑物
+                    style: 'googlelite', // 设置地图底图样式
+                })
+            }else{
+                map.setMapStyle({
+                    features: ['point', 'road', 'water', 'land', 'building'], // 设置地图上展示的元素种类(这个参数不起作用，奇怪!!!)。值：point 兴趣点, road 道路, water 河流, land 陆地, building 建筑物
+                    style: 'normal', // 设置地图底图样式
+                })
+            }
+            // [代码解释]
+            // map.setMapStyle({
+            //     features: ['point', 'road', 'water', 'land', 'building'], // 设置地图上展示的元素种类(这个参数不起作用，奇怪!!!)。值：point 兴趣点, road 道路, water 河流, land 陆地, building 建筑物
+            //     style: 'googlelite', // 设置地图底图样式
+            // })
+            /*
+            [style值]
+            默认地图样式(normal)
+            清新蓝风格(light)
+            黑夜风格(dark)
+            清新蓝绿风格(bluish)
+            高端灰风格(grayscale)
+            强边界风格(hardedge)
+            青春绿风格(darkgreen)
+            浪漫粉风格(pink)
+            午夜蓝风格(midnight)
+            自然绿风格(grassgreen)
+            精简风格(googlelite)
+            红色警戒风格(redalert)
+            */
         },
 
 
