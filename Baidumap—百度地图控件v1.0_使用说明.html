@@ -100,6 +100,10 @@
                 icon: 'bmap_locate_blue.png', //图标文件名,仅当enable=true时有效(可选),
                 appearance: 'black' // 标注点外观. black 黑色(默认), blue 蓝色, green 绿色, red 红色, orange 橙色 add 20220818-1
             },
+            // add 20220905-1
+            labelRootNode: '.ne_bd_label', //标注点文本根节点(可选)
+            labelCustomNode: '.bdLabel', //标注点文本自定义节点(可选)
+            iconRootNode: '.ne_bd_icon', //标注点图标根节点(可选)
             infoWindowRootNode: '.bdInfoWindow', //信息窗根节点(可选). 默认 '.bdInfoWindow'。 add 20220825-1
 
             //窗口布局及显示方式
@@ -213,6 +217,7 @@
                 infoEnable: false, //是否开启信息窗,默认true(可选). 优先权大于单条数据里的isInfo字段
                 infoOpenMethod: 'mouseover', //信息窗打开方式(可选). mouseover 鼠标经过标注点时(默认)，click 点击标注点时
                 showDetails: false, //标注点是否默认就显示详细信息,默认false(可选)
+                canViewPort: 'inherit', // 是否可以自动调整视野(可选), 默认值'inherit'。值： inherit 继承初始化init()中的参数设定，即根据enableViewPort、autoViewPort参数值决定是否调整视野; true 强制调整视野，false 强制不调整视野。注意：值为true或false时优先权最高，即此时init()方法中的enableViewPort、 autoViewPort参数将失效。add 20220905-1
                 //回调
                 callBack: function(e){ //创建完坐标点后的回调函数. e 参数：{dom:"地图父节点", map:"地图实例化对象Map", zoom:"当前地图绽放级别"} add 20220831-2
 
