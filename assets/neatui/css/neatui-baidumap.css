@@ -183,7 +183,7 @@ section,article,figure{display: block;}
 }
 /*+---------标注点文本----------------+*/
 /*默认样式*/
-.BMapLabel.bdMarkerLabel{ left: 25px!important; top: -50px!important; border: 0!important; background: transparent!important; }
+.BMapLabel.ne_bd_label{ left: 25px!important; top: -50px!important; border: 0!important; background: transparent!important; }
 .bdLabel{ padding: 8px 12px!important; color: #444!important; border-color: #888!important; background-color:#d80907; border-style: solid; border-width: 1px!important; border-color:#d80907; border-radius: 3px; box-shadow: 3px 2px 2px 0px rgba(0,0,0,.35); }
 .bdLabel.no-padding{ padding: 0!important; }
 .bdLabel>span{ display: inline-block; margin-bottom: 3px; /* font-size: 14px; */ font-size: inherit; /* font-weight: bold; */ vertical-align: middle; overflow: hidden; text-overflow: ellipsis;white-space: nowrap; }
