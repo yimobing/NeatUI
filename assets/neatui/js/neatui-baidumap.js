@@ -41,9 +41,9 @@
                     appearance: 'black' // 标注点外观. black 黑色(默认), blue 蓝色, green 绿色, red 红色, orange 橙色 add 20220818-1
                 },
                 // add 20220905-1
-                labelRootNode: '.ne_bd_label', //标注点文本根节点
-                labelCustomNode: '.bdLabel', //标注点文本自定义节点
-                iconRootNode: '.ne_bd_icon', //标注点图标根节点
+                labelRootNode: '.ne_bd_label', //标注点文本根节点(可选)
+                labelCustomNode: '.bdLabel', //标注点文本自定义节点(可选)
+                iconRootNode: '.ne_bd_icon', //标注点图标根节点(可选)
 
                 infoWindowRootNode: '.bdInfoWindow', //信息窗根节点(可选). 默认 '.bdInfoWindow'。 add 20220825-1
 
