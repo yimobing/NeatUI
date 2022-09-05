@@ -40,6 +40,11 @@
                     icon: 'bmap_locate_default.png', //图标文件名,仅当enable=true时有效(可选),
                     appearance: 'black' // 标注点外观. black 黑色(默认), blue 蓝色, green 绿色, red 红色, orange 橙色 add 20220818-1
                 },
+                // add 20220905-1
+                labelRootNode: '.ne_bd_label', //标注点文本根节点
+                labelCustomNode: '.bdLabel', //标注点文本自定义节点
+                iconRootNode: '.ne_bd_icon', //标注点图标根节点
+
                 infoWindowRootNode: '.bdInfoWindow', //信息窗根节点(可选). 默认 '.bdInfoWindow'。 add 20220825-1
 
                 //窗口布局及显示方式
@@ -91,6 +96,11 @@
                 dWindow = settings.window,
                 dImage = settings.image,
                 dOnlyBasePaint = settings.onlyBasePaint, //add 20220823-1
+                // add 20220905-1
+                dLabelRootNode = settings.labelRootNode,
+                dLabelCustomNode = settings.labelCustomNode,
+                dIconRootNode = settings.iconRootNode,
+
                 dInfoWindowRootNode = settings.infoWindowRootNode, //add 20220825-1
                 dEnableEval = settings.enableEval,
                 dOpenCityControl = settings.openCityControl,
@@ -275,7 +285,10 @@
                     //=====全局对象赋值
                     $.MAPER = map;
                     $.MAPDOM = _this; //add 20220823-1
-                    $.MAPINFOWINDOWROOTNODE = dInfoWindowRootNode; //add 20220825-1
+                    $.LABELROOTNODE = dLabelRootNode;
+                    $.LABELCUSTOMNODE = dLabelCustomNode;
+                    $.ICONROOTNODE = dIconRootNode;
+                    $.INFOWINDOWROOTNODE = dInfoWindowRootNode; //add 20220825-1
                     $.ENABLEVIEWPORT = dEnableViewPort;
                     $.AUTOVIEWPORT = dAutoViewPort;
                     $.IMAGEDRAGED = dImgDraged;
@@ -684,6 +697,7 @@
                 infoEnable: true, // 是否开启信息窗,默认true(可选). 优先权大于单条数据里的isInfo字段
                 infoOpenMethod: 'mouseover', // 信息窗打开方式(可选). mouseover 鼠标经过标注点时(默认)，click 点击标注点时
                 showDetails: false, // 标注点是否默认就显示详细信息,默认false(可选)
+                canViewPort: 'inherit', // 是否可以自动调整视野(可选), 默认值'inherit'。值： inherit 继承初始化init()中的参数设定，即根据enableViewPort、autoViewPort参数值决定是否调整视野; true 强制调整视野，false 强制不调整视野。注意：值为true或false时优先权最高，即此时init()方法中的enableViewPort、 autoViewPort参数将失效。add 20220905-1
                 // 回调
                 callBack: null, // 创建完坐标点后的回调函数. e 参数：{dom:"地图父节点", map:"地图实例化对象Map", zoom:"当前地图绽放级别"} add 20220831-2
                 markerHoverBack: null, // 鼠标移动到标注点图标上面后触发此事件(可选). e参数：{point:{lng:"经度", lat:"纬度"}, id:"记录主键值"} add 20220819-1
@@ -695,11 +709,20 @@
             var others = $.extend(true, {}, defaultsOther, paramJson || {});
 
             //
+            // map.removeOverlay(overlay:  Overlay); //移除指定覆盖物
             if(others.clearOldLays){ // edit 20220830-1
                 map.clearOverlays();  //一次移除所有的覆盖物(相当于清空所有标注点)(必须!)
             }
-            //map.removeOverlay(overlay:  Overlay); //移除指定覆盖物
-            var pointArray = []; //所有坐标点组所的数组
+            // 点数组 edit 20220905-1
+            var pointArray = [ ]; //所有坐标点组所的数组
+            if(others.clearOldLays === false){
+                var oldArr = $.POINTSARRAY;
+                for(var k = 0; k < oldArr.length; k++){
+                    pointArray.push(oldArr[k]);
+                }
+            }
+
+            // 循环
             $.each(pointJson.data, function(i, item){
                 //默认
                 var defaultsData = {}
@@ -809,7 +832,7 @@
                         var _id = typeof marker.dataId == 'undefined' ? '' : marker.dataId,
                             _lng = typeof marker.dataLng == 'undefined' ? '' : marker.dataLng,
                             _lat = typeof marker.dataLat == 'undefined' ? '' : marker.dataLat;
-                        markerHoverBack({"point":{"lng":_lng, "lat":_lat}, "id": _id, "rootNode": $.MAPINFOWINDOWROOTNODE});
+                        markerHoverBack({"point":{"lng":_lng, "lat":_lat}, "id": _id, "rootNode": $.INFOWINDOWROOTNODE});
                     }
                 });
 
@@ -824,7 +847,7 @@
                             var _id = typeof marker.dataId == 'undefined' ? '' : marker.dataId,
                                 _lng = typeof marker.dataLng == 'undefined' ? '' : marker.dataLng,
                                 _lat = typeof marker.dataLat == 'undefined' ? '' : marker.dataLat;
-                            markerClickBack({"point":{"lng":_lng, "lat":_lat}, "id": _id, "rootNode": $.MAPINFOWINDOWROOTNODE});
+                            markerClickBack({"point":{"lng":_lng, "lat":_lat}, "id": _id, "rootNode": $.INFOWINDOWROOTNODE});
                         }
                     }, 300)
                 })
@@ -882,7 +905,9 @@
                         addMarkerInfoWindow(marker, $infoJson);
                     }
                 }
-            })
+            }) // END EACH
+
+            $.POINTSARRAY = pointArray; // 全局赋值 add 20220905-1
 
 
             
@@ -890,9 +915,15 @@
             if(others.callBack){
                 others.callBack({"dom": $.MAPDOM, "map":$.MAPER, "zoom": methods.getZoom() });
             }
-
-            if($.ENABLEVIEWPORT && $.AUTOVIEWPORT){
+            // 调整视野 edit 20220905-1
+            if(others.canViewPort === true){
                 map.setViewport(pointArray);
+            }else{
+                if(others.canViewPort == 'inherit'){
+                    if($.ENABLEVIEWPORT && $.AUTOVIEWPORT){
+                        map.setViewport(pointArray);
+                    }
+                }
             }
         },
 
@@ -1088,7 +1119,7 @@
     * @param {object} marker 地图实例化对象Marker
     * @param {object} dataJson 标记点文字标签信息
     */
-    function addMarkerLabel(marker, dataJson){
+     function addMarkerLabel(marker, dataJson){
         var defaultsData = {
             point: {}, //地图实例化对象Point
             title: '', //文字,标题
@@ -1132,8 +1163,9 @@
         var txtStyleStr = tempStr == '' ? '' : 'style="' + tempStr + _displayStr + '"'; // edit 20220831-1
         //console.log('txtStyle:', txtStyleStr)
         //创建文本标注对象
+        var bdLbClassName = $.LABELCUSTOMNODE.toString().replace(/\./g, '');
         var label = new BMap.Label(
-            '<div class="bdLabel aaa ' + theme + '"' + txtStyleStr + '>'+ title +'</div>', 
+            '<div class="' + bdLbClassName + ' ' + theme + '"' + txtStyleStr + '>'+ title +'</div>', // bdLabel
             { //文字标签定位
                 position: point, //指定文本标注所在的地理位置
                 offset: new BMap.Size(25, -25) //设置文本偏移量x,y轴
@@ -1142,12 +1174,14 @@
         label.setStyle(lbStyleJson);
         //map.addOverlay(label); 
         marker.setLabel(label);
+        var $bdLbNode = $($.LABELCUSTOMNODE);
+        
 
         // add 202220831-3
         // 标注点文本超过一定长度时以...代替
         var ellipsisWidth = dataJson.ellipsisTitle.toString().replace(/px/g, '');
         if(ellipsisWidth != 'auto' && ellipsisWidth != '' && !isNaN(parseFloat(ellipsisWidth))){
-            $('.bdLabel').find('span').css({
+            $bdLbNode.find('span').css({ // $('.bdLabel')
                 width: ellipsisWidth + 'px'
             })
         }
@@ -1163,15 +1197,21 @@
             }
         })
         
+
+        
+
+
         setTimeout(function(){
-            var $parent = $('.bdLabel').parent(); //$('.bdLabel').parents('.BMapLabel');
+            var $parent = $bdLbNode.parent(); // $('.bdLabel')
             var detailClassName = 'hasDetail';
-            $parent.addClass('bdMarkerLabel');
+            $parent.addClass($.LABELROOTNODE.toString().replace(/\./g, ''));  // addClass('ne_bd_label'); bdMarkerLabel
+            $parent.prev().addClass($.ICONROOTNODE.toString().replace(/\./g, '')); // addClass('ne_bd_icon');
             if(showDetails) $parent.addClass(detailClassName);
             else $parent.removeClass(detailClassName);
         }, 0)
        
     }
+
 
 
 
@@ -1201,7 +1241,7 @@
             infoOpenMethod = messages.infoOpenMethod,
             infoEventsFunc = messages.infoEventsFunc;
         //创建信息窗口对象
-        var rootClassName = $.MAPINFOWINDOWROOTNODE.replace(/\./g, '').replace(/\#/g, '');
+        var rootClassName = $.INFOWINDOWROOTNODE.replace(/\./g, '').replace(/\#/g, '');
         var infoWindow = new BMap.InfoWindow(
             '<div class="' + rootClassName + '">'+description+'</div>',
             {
@@ -1595,7 +1635,13 @@
         },      
         MAPER: null, //对图对象Map
         MAPDOM: null, //地图绑定的DOM节点
-        MAPINFOWINDOWROOTNODE: '', //信息窗根节点
+        // add 20220905-1
+        LABELROOTNODE: '', //标注点文本根节点
+        LABELCUSTOMNODE: '', //标注点文本自定义节点
+        ICONROOTNODE: '', //标注点图标根节点
+
+        INFOWINDOWROOTNODE: '', //信息窗根节点
+        POINTSARRAY: [], //所有坐标点数组 add 20220905-1
         IMAGEDRAGED: false, //自定义标注点图标是否可拖动
         IMAGEENABLE: false, //是否开启自定义标注点图标
         IMAGEPATH: '', //自定义标注点图片文件夹相对静态文件html位置
