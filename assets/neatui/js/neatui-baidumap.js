@@ -1138,17 +1138,17 @@
         // var color = '#fff',
         //     backgroundColor = style==''? 'red' : style,
         //     borderColor = style =='' ? 'red' : 'transparent';
-        //标签样式
+        //标签样式 edit 20220906-1
         var lbStyleJson =  {
             color : "inherit",
-            backgroundColor:"red",
+            backgroundColor:"transparent", // "red"
             fontSize : "12px",
             //height : "20px",
             //lineHeight : "20px",
             padding:"5px 8px",
-            borderWidth:"1px",
+            borderWidth:"0", // "1px"
             borderStyle:"solid",
-            borderColor:"red",
+            borderColor:"transparent", // "red"
             borderRadius:"3px",
             fontFamily:"微软雅黑"
         }
