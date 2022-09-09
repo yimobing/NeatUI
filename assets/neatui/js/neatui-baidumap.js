@@ -692,6 +692,7 @@
                     fontFamily: "微软雅黑"
                 },
                 clearOldLays: true, // 是否清空原有覆盖物, 默认true add 20220830-1
+                clearOneLay: true, // 是否清空 createOnePoint()方法创建的单个覆盖物(可选)，默认true. add 20220909-1
                 dbClickMarkerAutoScale: false, // 是否开启双击标注点图标后地图缩放级别自动放大一级,默认false(可选).
                 labelEnable: true, // 是否开启标注点文字,默认true(可选).
                 infoEnable: true, // 是否开启信息窗,默认true(可选). 优先权大于单条数据里的isInfo字段
@@ -710,9 +711,31 @@
 
             //
             // map.removeOverlay(overlay:  Overlay); //移除指定覆盖物
-            if(others.clearOldLays){ // edit 20220830-1
-                map.clearOverlays();  //一次移除所有的覆盖物(相当于清空所有标注点)(必须!)
+            if(others.clearOldLays){ // edit 20220909-1
+                if(others.clearOneLay){
+                    map.clearOverlays();  //一次移除所有的覆盖物(相当于清空所有标注点)(必须!)
+                }else{
+                    var allOverlay = map.getOverlays();
+                    for(var n = 0; n < allOverlay.length; n++){
+                        var overlay = allOverlay[n];
+                        var lbName = typeof overlay.mydataWrap == 'undefined' ? '' : overlay.mydataWrap;
+                        if(lbName != 'onlyTag'){
+                            map.removeOverlay(overlay);
+                        }
+                    }
+                }
+            }else{
+                var allOverlay = map.getOverlays();
+                for(var n = 0; n < allOverlay.length; n++){
+                    var overlay = allOverlay[n];
+                    var lbName = typeof overlay.mydataWrap == 'undefined' ? '' : overlay.mydataWrap;
+                    if(lbName == 'onlyTag'){
+                        map.removeOverlay(overlay);
+                        break;
+                    }
+                }
             }
+
             // 点数组 edit 20220905-1
             var pointArray = [ ]; //所有坐标点组所的数组
             if(others.clearOldLays === false){
