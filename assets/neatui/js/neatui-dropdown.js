@@ -16,6 +16,7 @@
 			json: {}, //json数据(可选)。当react=true时，本参数前台传递的值失效，json自动调用省市区三级联动的数据
 			format: ["bh","mc"], //自定义json字段格式(数组)(可选)。eg.{"bh":"1001","mc":"张三"}。当react=true时，本参数前台传递的值失效，系统将默认使用：["bh","mc"]
 			explained: true, //下拉项是否含说明性文字(可选), 默认true. 值为true时选中下拉项后将自动过滤掉这些说明性文字,即输入框不会包含说明性文字)
+			enableAdjustDirection: true, // 是否自动调整下拉方向，默认true，即当默认下拉方向朝下时,如果高度超过屏幕高,则更改下拉方向为朝上。add 20221028-1
 			areaFormat: ['province', 'city', 'county'], //地区显示值JSON格式(可选)
 			keyFormat: ['provinceId', 'cityId', 'countyId'], //地区隐藏值JSON格式(可选)
 			beautifyScrollBar: true, // 省市区同框联动时是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式 add 20220718-2
@@ -81,6 +82,7 @@
 				//gFormat = isArray(settings.format) ? (settings.format.length ==2 ? settings.format : defaults.format): defaults.format,
 				gFormat = isArray(settings.format) ? (settings.format.length ==2 ? settings.format : [defaults.format[0], settings.format[0]]): defaults.format, //edit 20200904-1
 				gExplained = typeof settings.explained == 'undefined' ? true : (settings.explained == false ? false : true),
+				gEnableAdjustDirection = settings.enableAdjustDirection === false ? false : true, // add 20221028-1
 				gReact = settings.react,
 				gRegion = settings.region,
 				gRelatedNode = settings.relatedNode
@@ -259,9 +261,11 @@
 				left = left < 0 ? 0 : left;
 				width = minW;
 			}
-			if(top + $parent.outerHeight(true) > $(window).outerHeight(true)){ //当默认下拉方向朝下时,如果高度超过屏幕高,则更改下拉方向为朝上
-				top = top - $parent.outerHeight(true) - p_h - 1; //下拉方向:朝上
-				if(top < 0) top = 5; //朝上超过高度时,top设为0
+			if(gEnableAdjustDirection){ // edit 20221028-1
+				if(top + $parent.outerHeight(true) > $(window).outerHeight(true)){ //当默认下拉方向朝下时,如果高度超过屏幕高,则更改下拉方向为朝上
+					top = top - $parent.outerHeight(true) - p_h - 1; //下拉方向:朝上
+					if(top < 0) top = 5; //朝上超过高度时,top设为0
+				}
 			}
 			var _css = {'position':'absolute', 'left':left+'px', 'top':top+'px', 'display':'block', 'width':width}
 			if(gPosition == 'fixed'){
