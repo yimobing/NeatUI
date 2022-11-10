@@ -339,6 +339,48 @@ if (!Element.prototype.closest) {
 
 
 
+//=====================================================================================================================
+//                                                  prototype 原型对象拓展
+//=====================================================================================================================
+/**
+* 日期格式化
+* [使用方法]
+    var dateStr ="1993-11-11 11:11:11";
+    var date = new Date(dateStr.replace(/-/g, '/'));  // 兼容ie浏览器
+    date.format("HH:mm:ss");
+    date.format("yyyy-MM-dd");
+    date.format("yyyy-MM-dd HH:mm:ss");
+    date.format("yyyy年MM月dd日");
+* [eg.]
+    timestampToTime(1398250549123); // 2014-06-18 10:33:24
+*/
+if (!Date.prototype.format) {
+    Date.prototype.format = function (str) {
+        var o = {
+            "M+": this.getMonth() + 1, // month
+            "d+": this.getDate(), // day
+            "H+": this.getHours(), // hour
+            "m+": this.getMinutes(), // minute
+            "s+": this.getSeconds(), // seconds
+            "q+": Math.floor((this.getMonth() + 3) / 3), // quarter
+            "S": this.getMilliseconds() // millisecond
+        }
+        if (/(y+)/.test(str)) {
+            str = str.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        }
+        for (var k in o) {
+            if (new RegExp("(" + k + ")").test(str)) {
+                str = str.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+            }
+        }
+        return str;
+    }
+};
+
+
+
+
+
 
 
 
@@ -1508,7 +1550,7 @@ var sortingAlgorithm = {
 
 
 //=====================================================================================================================
-//                                                  calendar 日历对象, 用于操作与日期相关的动作
+//                                                  calendar 日期对象，日历对象, 用于操作与日期相关的动作
 //=====================================================================================================================
 var calendar = {
 	/**
@@ -1679,9 +1721,73 @@ var calendar = {
             }
         }
         return (ps_num_arr_str instanceof Array ? resultWeekArr : resultWeekArr[0]);
+    },
+
+
+
+    /**
+     * 时间戳转化成日期
+     * @param {string} timestamp 时间戳字符串
+     * @param {object} opts 参数对象
+     * @returns {string} 返回日期字符串
+     * [日期格式化]
+        var dateStr ="1993-11-11 11:11:11";
+        var date = new Date(dateStr.replace(/-/g, '/'));  // 兼容ie浏览器
+        date.format("HH:mm:ss");
+        date.format("yyyy-MM-dd");
+        date.format("yyyy-MM-dd HH:mm:ss");
+        date.format("yyyy年MM月dd日");
+        * [eg.]
+        timestampToTime(1398250549123); // 2014-06-18 10:33:24
+    */
+    timestampToTime: function(timestamp, opts) {
+        var formatStr = typeof formats
+        var defaults = {
+            bit: 13, // 时间戳位数(可选)。默认13位。值：13 精确到毫秒, 10 精确到秒(无毫秒)
+            format: 'yyyy-MM-dd HH:mm:ss' // 日期格式化字符串(可选)。默认'年-月-日 时:分:秒'。值：'yyyy-MM-dd', 'yyyy年MM月dd日', 'yyyy-MM-dd HH:mm:ss', 'HH:mm:ss'
+        }
+        var settings = $.extend(true, {}, defaults, opts || {});
+        var bit = parseInt(settings.bit);
+        if(isNaN(bit)) bit = 13;
+        var hasMillisecond = settings.bit == 13 ? true : (settings.bit == 10 ? false : false); // 是否精确到毫秒
+        var times = hasMillisecond ? 1 : 1000; // 倍数
+        var date = new Date(timestamp * times); // 时间戳为10位(精确到秒,无毫秒)需*1000，时间戳为13位(精确到毫秒)的话不需乘1000(只需乘1)
+        var Y = date.getFullYear() + '-';
+        var M = ( date.getMonth() + 1 < 10 ? '0' + ( date.getMonth() + 1) : date.getMonth() + 1 ) + '-';
+        var D = ( date.getDate() < 10 ? '0' + date.getDate() : date.getDate() ) + ' ';
+        var h = ( date.getHours() < 10 ? '0' + date.getHours() :  date.getHours())  + ':';
+        var m = ( date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes() ) + ':';
+        var s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+        var dateStr = Y + M + D + h + m + s;
+        var date = new Date(dateStr.replace(/-/g, '/'));
+        return date.format(settings.format);
+    },
+    
+    
+
+    /**
+     * 日期转化成时间戳
+     * @param {string} time 日期字符串
+     * @param {Boolean} isMilliSecond 是否精确到毫秒，默认true。值为true时返回13位的时间戳，false 时返回10位的时间戳
+     * @returns {string} 返回时间戳字符串
+     * [eg.]
+        timeToTimestamp('2022-11-08 09:23:08', true); // 1667870588000
+        timeToTimestamp('2022-11-08 09:23:08', false); // 1667870588
+    */
+    timeToTimestamp: function(time, isMilliSecond){
+        var hasMillisecond = typeof isMilliSecond == 'undefined' ? true : (isMilliSecond === false ? false : true);
+        // 有三种方式获取
+        // var date = new Date('2014-04-23 18:55:49:123');
+        // var time1 = date.getTime(); // 精确到毫秒。1398250549123
+        // var time2 = date.valueOf(); // 精确到毫秒、1398250549123
+        // var time3 = Date.parse(date); // 只能精确到秒，毫秒用000替代。1398250549000
+        var date = new Date(time);
+        var thirteenLastZero = Date.parse(date).toString();
+        var timestamp = isMilliSecond ? date.getTime() : thirteenLastZero.substr(0, thirteenLastZero.length - 3);
+        return timestamp;
     }
 
-};  // ND CALENDAR对象
+};  // END CALENDAR对象
 
 
 
