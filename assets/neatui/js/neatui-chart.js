@@ -26,6 +26,21 @@ https://www.highcharts.com.cn/
         }
     };
 
+    // add 20221108-1 by mufeng
+    $.fn.extend({
+        /**
+         * 绘制曲线
+         * @param {object} options 参数对象
+         */
+        drawCurvedLine: function(options){
+            widgets._drawCurvedLine(options);
+        },
+
+        drawGuideLine: function(options){
+            widgets._drawGuideLine(options);
+        }
+    });
+
 
 
     //———————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -271,7 +286,8 @@ https://www.highcharts.com.cn/
 
 
     //———————————————————————————————————————————————————————————————————————————————————————————————————————————
-    //  内部对象，对象中的函数仅供内部使用，故用下划线_开头表示私有函数
+    //  内部助手对象，用于辅助开发
+    // 对象中的函数仅供内部使用，故用下划线_开头表示私有函数
     //———————————————————————————————————————————————————————————————————————————————————————————————————————————
     var helpers = {
 
@@ -581,8 +597,242 @@ https://www.highcharts.com.cn/
             }
             var chart = Highcharts.chart(bindNode, options); // 生成折线图
         }
-        
-    } // END HELPERS
+
+    }; // END HELPERS
+
+
+
+
+
+    //———————————————————————————————————————————————————————————————————————————————————————————————————————————
+    //  部件对象，用于将自己写的部分代码封装成控件供前台调用
+    // 对象中的函数仅供内部使用，故用下划线_开头表示私有函数
+    //  add 20221108-1 by mufeng
+    //———————————————————————————————————————————————————————————————————————————————————————————————————————————
+    var widgets = {
+
+        /**
+         * 两点之间创建曲线
+         * @param {object} options 对数对象
+         */
+         _drawCurvedLine: function(options){
+            var defaults = {
+                xyAxis: [ ], // xy轴坐标点数组(svg的)。要画线的所有点数组成数组，数组元素两两之间画一条线。eg. [{x: 'svg横坐标', y: 'svg纵坐标'}, {x: 'svg横坐标', y: 'svg纵坐标'}]
+                dotAmount: 0, // 有几个点要画线(可选)。默认0。至少要有2个及以上的点画线才可以画线，单个点没法画线。
+
+                lineColor: 'purple', // 线条颜色(可选)。默认紫色
+                lineWidth: 2, // 线条宽度(可选)。默认2px
+                
+                offset: 80, // 曲线弯曲度(弯曲方向)(可选)。值：大于0向上，小于0向下，等于0则为直线
+                always: false, // 是否可以一直画线(可选)。默认false。值为true时，假设要画线的点为3个，则界面上点击3次会画2条线，当击第5次时前面的线会清除掉，第4、5次点击的两个点画一条线，第5、6次点击的点画一条线
+
+                svgObject: document.getElementsByClassName('highcharts-root')[0], // SVG DOM对象(可选)。如不传递，系统会自动获取SVG根节点对象。
+                cleaned: false, // 是否清除所有曲线(可选)。默认false。如果要清空所有曲线，本参数传true即可。  
+                callBack: null // 回调函数(可选)。传递一个参数event
+            }
+            var settings = $.extend(true, {}, defaults, options || {} );
+            if(settings.svgObject == null || typeof settings.svgObject == 'undefined') return;
+            //
+            var idsClasses = 'curvature';
+            var id = idsClasses + '-' + Math.floor(Math.random() * 10000);
+            // 根据限定的条件删除之前节点
+            var nodes = document.getElementsByClassName(idsClasses);
+            var maxLineCount = parseInt(settings.dotAmount) - 1; // 最多画几条线，默认1(可选)
+            if(isNaN(maxLineCount)) maxLineCount = 1;
+            if(settings.always === true && nodes.length >= maxLineCount){
+                for(var i = nodes.length - 1; i >= 0; i--){
+                    if(nodes[i] != null) nodes[i].parentNode.removeChild(nodes[i]);
+                }
+                // $('.' + idsClasses).remove();
+            }
+            // 清除所有线
+            if(settings.cleaned){ // 清除所有线
+                for(var i = nodes.length - 1; i >= 0; i--){
+                    if(nodes[i] != null) nodes[i].parentNode.removeChild(nodes[i]);
+                }
+                $.canDraw = true; // 重置为true
+            }
+            // 指定点为0时，不画线
+            if(isNaN(parseInt(settings.dotAmount)) || parseInt(settings.dotAmount) <= 0) return;
+
+            //test1
+            // console.log('canDraw:', $.canDraw);
+            // console.log('-------------------');
+            // 限制绘制
+            if($.canDraw === false) return; // test1
+            
+            // START 开始绘制 ~~~~~~~~~~~~~~~~
+            var coordinateArr = settings.xyAxis;
+            var start = coordinateArr.length - 2,
+                end = coordinateArr.length - 1;
+            if(start < 0) return;
+            var p1x = parseFloat(coordinateArr[start].x),
+                p1y = parseFloat(coordinateArr[start].y),
+                p2x = parseFloat(coordinateArr[end].x),
+                p2y = parseFloat(coordinateArr[end].y);
+            // mid-point of line:
+            var mpx = (p2x + p1x) * 0.5;
+            var mpy = (p2y + p1y) * 0.5;
+            // angle of perpendicular to line:
+            var theta = Math.atan2(p2y - p1y, p2x - p1x) - Math.PI / 2;
+            // distance of control point from mid-point of line:
+            var offset = settings.offset; // 调整曲线的弯曲方向向上或向下，即弯曲度
+            // location of control point:
+            var c1x = mpx + offset * Math.cos(theta);
+            var c1y = mpy + offset * Math.sin(theta);
+
+            // show where the control point is:
+            // var c1 = document.getElementById("cp");
+            // c1.setAttribute("cx", c1x);
+            // c1.setAttribute("cy", c1y);
+            // construct the command to draw a quadratic curve
+            var d = "M" + p1x + " " + p1y + " Q " + c1x + " " + c1y + " " + p2x + " " + p2y;
+            var SVG_NS = "http://www.w3.org/2000/svg";
+            var svg = settings.svgObject; // document.getElementById('svgTest10');
+            // var path = document.createElement('path'); // 使用此句无法显示路径
+            var path = document.createElementNS(SVG_NS, 'path');
+            path.setAttribute('class', idsClasses);
+            path.setAttribute('id', id);
+            path.setAttribute('stroke-width', settings.lineWidth);
+            path.setAttribute('stroke', settings.lineColor);
+            path.setAttribute('stroke-linecap', 'round');
+            path.setAttribute('fill', 'transparent');
+            // path.setAttribute('d', curve);
+            svg.appendChild(path);
+            var curveElement = document.getElementById(id);
+            curveElement.setAttribute("d", d);
+            // 清除曲线
+            // curveElement.setAttribute("d", "M0 0");
+            // END 结束绘制 ~~~~~~~~~~~~~~~~
+            // 回调
+            if(settings.callBack){
+                settings.callBack({
+                    xyAxis: coordinateArr
+                });
+            }      
+            // test1
+            if(settings.always === false && coordinateArr.length == parseInt(settings.dotAmount)) $.canDraw = false;
+
+        },
+
+
+
+        /**
+         * 绘制标示线
+         * 即：绘制与x轴或y轴平行的线
+         * @param {object} options 参数对象
+         */
+        _drawGuideLine: function(options){
+            var defaults = {
+                graphicObject: null, // 图表对象(即图表初始化的实例对象)
+                event: null, // 图表点击位置的对象，即click事件里传递的参数对象
+                xyAxis: [ ], // x、y轴svg坐标点数组。要画线的所有点数组成数组，数组元素两两之间画一条线。eg. [{x: 'svg横坐标', y: 'svg纵坐标'}, {x: 'svg横坐标', y: 'svg纵坐标'}]
+                yData: [ ], // 要画的与x轴平行的直线组成数组，数组有几个元素，就代表有几条直线。eg. [{"value":"y轴数值", "description":"文本描述"}, {"value":"y轴数值", "description":"文本描述"} 
+                dotAmount: 0, // 限定取几个点(可选)。默认0。至少要有2个及以上的点画线才可以画线，单个点没法画线。
+
+                cleaned: false, // 是否清除所有线(可选)。默认false。如果要清空所有曲线，本参数传true即可
+                callBack: null // 回调函数(可选)。传递一个参数event
+            }
+            var settings = $.extend(true, {}, defaults, options || {} );
+            var chart = settings.graphicObject,
+                event = settings.event;
+            if(chart == null) return;
+           
+            // 记录要删除的Y线
+            if(typeof $.toDelYLineIdsArr == 'undefined') $.toDelYLineIdsArr = [ ];
+            // 清除所有线条
+            if(settings.cleaned){ // 清除所有线
+                for(var i = 0; i < $.toDelYLineIdsArr.length; i++){
+                    chart.yAxis[0].removePlotLine($.toDelYLineIdsArr[i]);
+                }
+                chart.xAxis[0].removePlotLine('XLINE'); // 先删除标志线
+                $.newDraw = true; // 重置为true
+            }
+            // console.log('要删除的id数组1：', $.toDelYLineIdsArr);
+            // console.log('数组：', settings.xyAxis, '\n点数：', settings.dotAmount);
+            // console.log('newDraw:', $.newDraw); 
+            // console.log('-------------------');
+            // 指定点为0时，不画线
+            if(isNaN(parseInt(settings.dotAmount)) || parseInt(settings.dotAmount) <= 0) return;
+            // 指定取N个点，只有当点了第N个点时才画线
+            if(settings.xyAxis.length < parseInt(settings.dotAmount)) return;
+
+            // START 开始绘制 ~~~~~~~~~~~~~~~~
+            // 在y轴(与x轴平行)上画一条直线(标示线)
+            var yPlotLine = {
+                id: '', // 指定线的Id,删除线时需用到
+                color: 'blue', // 线的颜色，定义为红色
+                value: event.point.close, // 9 // 定义在那个值上显示标示线，这里是在x轴上刻度为3的值处垂直化一条线
+                width: 1, // 标示线的宽度，2px
+                dashStyle: 'solid', // 线条样式。值： solid, dash, dot
+                label: {
+                    text: '水平不错',
+                    // align: 'left',
+                    // textAlign: 'center',
+                    // verticalAlign: 'middle',
+                    x: event.chartX - 5,
+                    y: event.chartY / 6,
+                    style: {
+                        'background-color': 'red',
+                        'font-size': '16px',
+                        'color': 'blue'
+                    }
+                }
+            }
+            var yData = settings.yData;
+            for(var i = 0; i < yData.length; i++){
+                var row = yData[i];
+                var yIds = 'YLINE-' + Math.floor(Math.random() * 10000);
+                // console.log('yIds:', yIds);
+                $.toDelYLineIdsArr.push(yIds);
+
+                yPlotLine.id = yIds;
+                yPlotLine.value = row["value"];
+                yPlotLine.label.text = row["description"];
+                // chart.yAxis[0].removePlotLine(yIds); // 先删除标志
+                // chart.yAxis[0].addPlotLine(yPlotLine);
+                if($.newDraw == false) return;
+                chart.yAxis[0].addPlotLine(yPlotLine);
+            }
+            // console.log('要删除的id数组2：', $.toDelYLineIdsArr);
+
+            // 在x轴上画一条与y轴平行的直线(标示线)
+            if(settings.yData.length > 0){
+                // chart.xAxis[0].removePlotLine('XLINE'); // 先删除标志线
+                chart.xAxis[0].addPlotLine({
+                    id: 'XLINE', // 线的ID，删除时要用到
+                    color: 'blue', // 线的颜色，定义为红色
+                    value: event.point.category, // 定义在那个值上显示标示线，这里是在x轴上刻度为3的值处垂直化一条线
+                    width: 1, // 标示线的宽度，2px
+                    dashStyle: 'solid', // 线条样式。值： solid, dash, dot
+                    // label: {
+                    //     text: '垂直好的',
+                    //     align: 'left',
+                    //     textAlign: 'center'
+                    // }
+                })
+            }
+            // END 结束绘制 ~~~~~~~~~~~~~~~~
+
+            // 回调
+            if(settings.callBack){
+                settings.callBack({
+                    xyAxis: settings.xyAxis
+                });
+            }
+
+            // 能否画线标记，借助于前一步画的曲线有设置id和class属性来判断
+            var lineIdsClasses = 'curvature'; // 曲线的类名className属性，只能通过这个来判断当前画了多少条线了，哎~
+            var nodes = document.getElementsByClassName(lineIdsClasses);
+            if(nodes.length >= parseInt(settings.dotAmount) - 1){
+                $.newDraw = false;
+            }
+
+        }
+
+
+
+    }; // END WIDGETS
 
 
 
@@ -770,8 +1020,23 @@ https://www.highcharts.com.cn/
 
 
 
-    
 
 
-    
+
 })(jQuery);
+
+
+
+
+
+
+//———————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  自定义函数，供前台直接调用 add 20221108-1 by mufeng
+//———————————————————————————————————————————————————————————————————————————————————————————————————————————
+var neChartDrawCurveLine = function(options){
+    $('body').drawCurvedLine(options);
+};
+
+var neChartDrawGuideLine = function(options){
+    $('body').drawGuideLine(options);
+};
