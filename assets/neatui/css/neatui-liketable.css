@@ -4,7 +4,7 @@
 * [类表格控件]样式-
 * Author：ChenMufeng
 * PubDate：2020.11.11
-* Update: 2022.07.13
+* Update: 2022.11.15
 * ----------------------
 */
 /*body{overflow-y: hidden!important;} /*禁止垂直方向出现滚动条,已在插件中用参数进行控制*/
@@ -210,7 +210,7 @@
 .like-table .column>div>span{display:inline-block; _display:inline; *display:inline; *zoom:1; }
 .like-table .column>div.left button,
 .like-table .column>div.center button,
-.like-table .column>div.right button{margin:0 auto; text-align:center!important;}
+.like-table .column>div.right button{margin:0 auto; text-align:center!important; font-size: 13px; }
 
 /*列之间没有margin值时*/
 .like-table.no-col-margin .column>div{margin:0;}
@@ -387,6 +387,13 @@
 @media screen and (max-width:800px){
 }
 @media screen and (max-width:640px){
+
+	/*按钮文字大小*/
+	.like-table .column>div.left button,
+	.like-table .column>div.center button,
+	.like-table .column>div.right button{ font-size: 12px; }
+
+	
 	/*滚动条样式*/
 	.table-content::-webkit-scrollbar{width:2px; height:5px;}/*整体样式*/
 	.table-content::-webkit-scrollbar-thumb{/*里面小方块*/
