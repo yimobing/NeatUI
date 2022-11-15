@@ -235,8 +235,8 @@
 		var barHeight = getScrollbarWidth(); //水平滚动条高度或垂直滚动条宽度. 17px\28px
 		var trackBtHeight = 5; //滚动条两端按钮高
 		var ceilPad = 5; //单元格padding值
-		var ceilW = 50; //默认列宽
-		var btnW = 35; //默认按钮宽		
+		var ceilW = 42; //默认列宽. eg. 50 edit 20221115 by mufeng
+		var btnW = 35; //默认按钮宽. eg. 30
 		var marginL = 2; //默认单元格元素之间的间距2px
 		var columnHasMargin = true; //列之间是否有margin值
 
@@ -611,7 +611,7 @@
 					var _w = eWidth * 0.8;
 					if(isNaN(_w)) _w = btnW;
 					if(_w < btnW) _w = btnW;
-					var _btnClass = field == null || field == '' ? '' : 'btn-' + field;
+					var _btnClass = field == null || field == '' ? '' : ' btn-' + field; // edit 20221115 by mufeng
 					var _altTitle = b_alt == null ? label : b_alt;
 					var _lbTextStr = b_onlyImage ? '' : label;
 					_editBoxStr = '<button type="button" class="border-zero' + _btnClass + _nameClass + '" title="' + _altTitle + '" style="width:' + _w + 'px; height:28px; line-height:28px; padding:0;' + _cellSizeStr + _cellColorStr + '">' + _bIconStr + _lbTextStr + '</button>';
