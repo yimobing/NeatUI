@@ -497,9 +497,9 @@
 							"pggs_bh": ls_pggs_bh,
 							"lock": ls_lock
 						},
-						success:function(msg){
-							if(toolTip.emptyTips(msg, this.url, this.heading, this.debug))  { isHoldOn = false; return; }
-							var json = JSON.parse(msg);
+						success: function(res){
+							if(toolTip.emptyTips(res, this.url, this.heading, this.debug))  { isHoldOn = false; return; }
+							var json = JSON.parse(res);
 							flag = json.result == 'ok' ? 1 : 0;
 							if(!flag) msg = json.result;
 						},

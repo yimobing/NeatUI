@@ -29,14 +29,14 @@
                 username: username,
                 password: password
             },
-            success: function(msg){
+            success: function(res){
               $('#text').empty();
-              //var userJson = eval("(" + msg + ")");
-              var userJson = JSON.parse(msg);
+              //var userJson = eval("(" + res + ")");
+              var userJson = JSON.parse(res);
               console.log('userJson:', userJson)
               $('#text').html("用户名：" + userJson.username + "，密码：" + userJson.password);    //在#text中输出
             },
-            error:function(msg){
+            error: function(res){
               console.log('出错啦:', msg);
             }
           });

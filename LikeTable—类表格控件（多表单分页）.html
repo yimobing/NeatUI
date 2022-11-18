@@ -675,7 +675,7 @@
                 data: {
                     "action": ""
                 },
-                success:function(res){
+                success: function(res){
                     if(toolTip.jsonEmptyTips(res,'错误：获取已回复分页总页数时读取数据为空')) { isHoldOn = false; return; }
                     var json = JSON.parse(res);
                     $g_pageCount = json.pages                
@@ -699,7 +699,7 @@
                 data: {
                     "action": ""
                 },
-                success:function(res){
+                success: function(res){
                     if(toolTip.jsonEmptyTips(res,'错误：点搜索按钮获取已回复列表时读取数据为空')) { isHoldOn = false; return; }
                     $g_tableJson_replyed = JSON.parse(res);                   
                 }
@@ -765,7 +765,7 @@
                 data: {
                     "action": ""
                 },
-                success:function(res){
+                success: function(res){
                     if(toolTip.jsonEmptyTips(res,'错误：初始加载未回复列表数据时读取数据为空')) { isHoldOn = false; return; }
                     $g_tableJson_unreply = JSON.parse(res);                   
                 }
