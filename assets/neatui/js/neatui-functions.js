@@ -1737,7 +1737,7 @@ var calendar = {
         date.format("yyyy-MM-dd");
         date.format("yyyy-MM-dd HH:mm:ss");
         date.format("yyyy年MM月dd日");
-        * [eg.]
+        * [示例] eg.
         timestampToTime(1398250549123); // 2014-06-18 10:33:24
     */
     timestampToTime: function(timestamp, opts) {
@@ -1770,7 +1770,7 @@ var calendar = {
      * @param {string} time 日期字符串
      * @param {Boolean} isMilliSecond 是否精确到毫秒，默认true。值为true时返回13位的时间戳，false 时返回10位的时间戳
      * @returns {string} 返回时间戳字符串
-     * [eg.]
+     * [示例] eg.
         timeToTimestamp('2022-11-08 09:23:08', true); // 1667870588000
         timeToTimestamp('2022-11-08 09:23:08', false); // 1667870588
     */
@@ -1785,6 +1785,111 @@ var calendar = {
         var thirteenLastZero = Date.parse(date).toString();
         var timestamp = isMilliSecond ? date.getTime() : thirteenLastZero.substr(0, thirteenLastZero.length - 3);
         return timestamp;
+    },
+
+
+
+    /**
+    * 将时间字符串转化成“天小时分钟秒”
+    * @param {string} ps_time_str 时间字符串。可能为整数，也可能是小数。
+    * @param {object} ps_opt 参数对象.
+    * [示例] eg.
+        timeStringToDayHourMinuteSecond('70.5672', {unit: '小时', accurate:'秒'}); // 2天22小时34分1.92秒
+    * [说明]
+        70.5672小时 = 2天22小时34分1.92秒
+        1572.893分钟 = 1天2小时12分53.58秒
+        70.5672分钟 = 1小时10分钟34秒
+    */
+    timeStringToDayHourMinuteSecond: function(ps_time_str, ps_opt){
+        if(ps_time_str.toString().replace(/([\s]+)/g, '') === '') return '';
+        if(isNaN(parseFloat(ps_time_str))) return '';
+        if(parseFloat(ps_time_str) < 0) return 'Time string is a negative number, please check it!'; // 时间字符串为负数
+        var defaults = {
+            unit: "小时", // 时间字符串所表示的单位，默认小时。值：小时，分钟，秒。
+            accurate: "秒", // 返回值格式，即返回值精确到哪个时间级别，默认精确到秒(回格式为：'8天8小时58分48秒')。值：天, 小时, 分钟, 秒, 毫秒。
+            zeroing: false  // 是否补零返回，即某个时间级别小于等于0时，是否也按指定的“返回值格式”进行返回，默认false。值为false时，比如 0天6小时16分16秒 将 返回 6小时16分16秒，再比如 0天0小时16分16秒 将返回 16分16秒，也就是说小于0的那个时间级别就不返回了（因为没有意义）。
+        }
+        var settings = $.extend(true, {}, defaults, ps_opt || {});
+        var unit = settings.unit,
+            accurate = settings.accurate,
+            zeroing = settings.zeroing;
+        //
+        var times = parseFloat(ps_time_str);
+        var day = '',
+            hour = '',
+            minute = '',
+            second = '',
+            millisecond = '';
+        if(unit == 'hour' || unit == '小时'){ // 时间字符串表示小时
+            day = times / 24; // 天。1天 = 24 小时
+            hour = times % 24; // 小时
+            minute = (hour - Math.floor(hour) ) * 60; // 分钟
+            second = ( minute - Math.floor(minute) ) * 60; // 秒
+            millisecond = (second - Math.floor(second) ) * 1000; // 毫秒
+            // 转
+            day = Math.floor(day);
+            hour = Math.floor(hour);
+            minute = Math.floor(minute);
+            second = Math.floor(second);
+            millisecond = Math.floor(millisecond);
+        }
+        else if(unit == 'minute' || unit == '分钟'){ // 时间字符串表示分钟
+            day = times / 1440; // 天。 1天 = 24 * 60 = 1440 分钟
+            hour = (times % 1440) / 60; // 小时
+            minute = (times % 1440) % 60; // 分钟
+            second = ( minute - Math.floor(minute) ) * 60; // 秒
+            millisecond = ( second - Math.floor(second) ) * 1000; // 毫秒
+            // 转
+            day = Math.floor(day);
+            hour = Math.floor(hour);
+            minute = Math.floor(minute);
+            second = Math.floor(second);
+            millisecond = Math.floor(millisecond);
+        }
+        else if(unit == 'second' || unit == '秒'){ // 时间字符串表示秒
+            day = times / 86400; // 天。 1天 = 24 * 60 * 60 = 86400 秒
+            hour = (times % 86400) / 3600; // 小时。1小时 = 60 * 60 = 3600秒
+            minute = ( (times % 86400) % 3600 ) / 60; // 分钟
+            second = ( minute - Math.floor(minute) ) * 60; // 秒
+            millisecond = ( second - Math.floor(second) ) * 1000; // 毫秒
+            // 转
+            day = Math.floor(day);
+            hour = Math.floor(hour);
+            minute = Math.floor(minute);
+            second = Math.floor(second);
+            millisecond = Math.floor(millisecond);
+        }
+        // if return string when time less than zero
+        var _dayStr = day + '天',
+            _hourStr = hour + '小时',
+            _minuteStr = minute + '分钟',
+            _secondStr = second + '秒',
+            _millisecondStr = millisecond + '毫秒';
+        if(zeroing === false){
+            if(day <= 0) _dayStr = '';
+            if(hour <=0) _hourStr = '';
+            if(minute <= 0) _minuteStr = '';
+            if(second <= 0) _secondStr = '';
+            if(millisecond <= 0) _millisecondStr = '';
+        }
+        // return value
+        var result = '';
+        if(accurate == 'day' || accurate == '天'){
+            result = _dayStr;
+        }
+        else if(accurate == 'hour' || accurate == '小时'){
+            result = _dayStr + _hourStr;
+        }
+        else if(accurate == 'minute' || accurate == '分钟'){
+            result = _dayStr + _hourStr + _minuteStr;
+        }
+        else if(accurate == 'second' || accurate == '秒'){
+            result = _dayStr + _hourStr + _minuteStr + _secondStr;
+        }
+        else if(accurate == 'millisecond' || accurate == '毫秒'){
+            result = _dayStr + _hourStr + _minuteStr + _secondStr + _millisecondStr;
+        }
+        return result;
     }
 
 };  // END CALENDAR对象
