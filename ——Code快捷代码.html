@@ -4,7 +4,11 @@
 //                  单页通用CSS
 //================================================
 @charset "utf-8";
-/*+--------------------------------+*/
+/*+ ----------------  ---------------- +*/
+*{margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+header, footer, main, section, menu, nav, article, aside, hgroup, summary, details, figcaption, figure{display: block;}
+a { text-decoration: none; -webkit-tap-highlight-color: rgba(0,0,0,0); }
+a img { border: 0; }
 html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color:rgba(0, 0, 0, 0); } 
 *:not(input,textarea) {-webkit-touch-callout: none; -webkit-user-select: none; }
 html{font-size: 20px;}
@@ -12,18 +16,15 @@ html{font-size: 20px;}
 @media only screen and (min-width: 414px){html{font-size: 21px!important;} }
 @media only screen and (min-width: 480px){html{font-size: 25.6px!important;} }
 body{background-color: #fff; line-height: 1.5; font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', '-apple-system-font', 'Helvetica Neue', 'sans-serif'; font-size: .7rem; color: #212121; overflow-x: hidden; overflow-y: auto; }
-*{margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-header, footer, main, section, menu, nav, article, aside, hgroup, summary, details, figcaption, figure{display: block;}
-a { text-decoration: none; -webkit-tap-highlight-color: rgba(0,0,0,0); }
-a img { border: 0 }
-/*+-------------元素外观-------------------+*/
+
+/*+ ---------------- 元素外观 ---------------- +*/
 button, input[type="text"], textarea{font-size: 14px; color: inherit; outline: 0; -moz-appearance: none; -webkit-appearance: none; -o-ppearance: none; -ms-appearance: none; appearance: none; background-color: transparent; overflow: hidden; text-overflow: ellipsis; resize: none; } 
 button{ overflow: visible; text-transform: none; }
 select{ text-transform: none; }
 ol, ul, li{ list-style: none; }
 a{ color: inherit; text-decoration: none; background-color: transparent; }
 i, em{ font-style: normal; }
-/*+-------------元素属性-------------------+*/
+/*+ ---------------- 元素属性 ---------------- +*/
 /*+readoly+*/
 input:read-only, input[readonly], span[readonly], textarea[readonly]{background-color: #fff; -webkit-text-fill-color: inherit; -webkit-text-stroke: 1px solid #d6e9c6; filter: alpha(opacity=100); -webkit-opacity: 1; opacity: 1; filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100); }
 /*+disabled+*/
@@ -35,13 +36,12 @@ input:disabled, input[disabled], textarea:disabled, textarea[disabled]{backgroun
 :-moz-placeholder{color: #afafaf; font-size: 0.6rem; } 
 :-ms-input-placeholder{color: #afafaf; font-size: 0.6rem; } 
 div:empty::before, span:empty::before{content: attr(placeholder); color: #afafaf; font-size: 0.6rem; }
-/*+--------------代码块------------------+*/
+/*+ ---------------- 代码块 ---------------- +*/
 code, kbd, pre, samp {font-family: Monaco,Menlo,Consolas,"Courier New",FontAwesome,monospace; } 
 code, pre {font-size: 14px; background-color: #f8f8f8; -webkit-touch-callout: default; /*允许系统默认菜单*/ -webkit-user-select: text; /*允许用户选择文本*/ tab-size: 2; }
 pre {display: block; padding: 16px; margin: 16px 0; line-height: 1.6; word-break: break-all; word-wrap: break-word; color: #555; border: 1px solid #dedede; border-radius: 0; } 
 pre, pre code { white-space: pre-wrap;}
-
-/*+--------------------------------+*/
+/*+ ----------------  ---------------- +*/
 body{ }
 
 
@@ -51,7 +51,7 @@ body{ }
 //                  控件开发通用CSS
 //================================================
 @charset "utf-8";
-/*+--------------------------------+*/
+/*+ ----------------  ---------------- +*/
 html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color:rgba(0, 0, 0, 0); } 
 *:not(input,textarea) {-webkit-touch-callout: none; -webkit-user-select: none; }
 html{font-size: 16px;}
@@ -66,7 +66,7 @@ ol, ul, li{ list-style: none; }
 a{ color: inherit; text-decoration: none; background-color: transparent; }
 i, em{ font-style: normal; }
 
-/*+--------------------------------+*/
+/*+ ----------------  ---------------- +*/
 
 
 
