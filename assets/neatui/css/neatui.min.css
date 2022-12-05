@@ -114,7 +114,7 @@ a{ color: inherit; /*color: #0062cc;*/ text-decoration: none; background-color: 
 i, em{ font-style: normal; }
 
 /*+ ---------------- 元素属性 ---------------- +*/
-/*+readoly+*/
+/*+readonly+*/
 input:read-only,
 input[readonly],
 span[readonly],
