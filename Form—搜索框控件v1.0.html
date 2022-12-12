@@ -45,13 +45,28 @@
             <section class="control">
                 <div class="control__module">
                     <div class="control__caption"><h4>搜索框控件</h4></div>
-                    <div class="control__operation">
-                        <button type="button" class="ne-btn has-texture" id="btn-generate-search">点击生成搜索框</button>
-                        <button type="button" class="ne-btn has-texture" id="btn-close-search">点击关闭搜索框</button>
-                    </div><!--/.control__operation-->
-                    <div class="control__content">
-                        <div class="search__form"></div>
-                    </div><!--/.control__content-->
+
+                    <div class="control__one">
+                        <div class="control__operation">
+                            <button type="button" class="ne-btn has-texture" id="btn-generate-search">点击生成搜索框</button>
+                            <button type="button" class="ne-btn has-texture" id="btn-close-search">点击关闭搜索框</button>
+                        </div><!--/.control__operation-->
+                        <div class="control__content">
+                            <div class="search__form"></div>
+                        </div><!--/.control__content-->
+                    </div><!--/.control__one-->
+
+                    <div class="control__one">
+                        <div class="control__operation">
+                            <button type="button" class="ne-btn has-texture" id="btn-generate-pc-search">点击生成电脑端搜索框</button>
+                            <button type="button" class="ne-btn has-texture" id="btn-get-pc-query">获取电脑端搜索框查询字符串</button>
+                            <button type="button" class="ne-btn has-texture" id="btn-close-pc-search">点击关闭电脑端搜索框</button>
+                        </div><!--/.control__operation-->
+                        <div class="control__content">
+                            <div class="search__pcForm"></div>
+                        </div><!--/.control__content-->
+                    </div><!--/.control__one-->
+
                 </div><!--/.control__module-->
             </section><!--/.control-->
 
@@ -150,6 +165,45 @@
                 $('.search__form').empty();
             });
 
+
+
+
+
+            //——————————————————————————————————————————
+            //=====生成电脑端搜索框按钮 
+            $('#btn-generate-pc-search').on('click', function(){
+                var source = {"return":"ok", "data":[
+                    {"字段名称":"yea", "显示名称":"年"},
+                    {"字段名称":"mon", "显示名称":"月"},
+                    {"字段名称":"day", "显示名称":"日"},
+                    {"字段名称":"grade", "显示名称":"班级"},
+                    {"字段名称":"name", "显示名称":"姓名"},
+                    {"字段名称":"sex", "显示名称":"性别"},
+                    {"字段名称":"age", "显示名称":"年龄"}
+                ]}
+
+                var _html = neuiSearchBox.getPcForm({
+                    source: source
+                });
+                $('.search__pcForm').empty().append(_html);
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====获取电脑端搜索框查询字符串
+            $('#btn-get-pc-query').on('click', function(){
+                var ls_query_str = neuiSearchBox.getPcQueryString();
+                console.log('查询字符串：', ls_query_str); 
+            });
+
+
+
+            //——————————————————————————————————————————
+            //=====关闭电脑端搜索框按钮
+            $('#btn-close-pc-search').on('click', function(){
+                $('.search__pcForm').empty();
+            });
 
 
 
