@@ -123,7 +123,7 @@
             node.className = _className;
             node.style.display = 'none';
             var o = document.getElementsByTagName('body')[0];
-            tools.insertAfter(node, o);
+            neFormTools.insertAfter(node, o);
             this.forms('.' + _className, options);
             var _html = node.innerHTML;
             node.remove();
@@ -199,7 +199,7 @@
                     }
                 } 
             }
-            var selector = elem.indexOf('#') >= 0 ? elem.replace(/([\#]+)/g, '') :  ( elem.indexOf('.') >= 0 ? tools.getClassNameString(elem) : elem.replace(/([\#\.]+)/g, '') );
+            var selector = elem.indexOf('#') >= 0 ? elem.replace(/([\#]+)/g, '') :  ( elem.indexOf('.') >= 0 ? neFormTools.getClassNameString(elem) : elem.replace(/([\#\.]+)/g, '') );
             // --------全局赋值--------
             me.$defaults = defaults;
             me.$opts = net.extend(true, {}, defaults, options || {}); // 控件参数
@@ -213,7 +213,7 @@
             me.$obj.className += me.$opts.config.layout.inputMust && me.$opts.config.layout.mustAlign == 'left' ? ' has-must-left' : ' has-must-aline';
             // ·--------校验数据格式--------
             var source = me.$opts.source;
-            if(!tools.isJsonObject(source)){
+            if(!neFormTools.isJsonObject(source)){
                 alert('source参数不是JSON对象，请检查！');
                 return;
             }
@@ -271,9 +271,9 @@
                                 // 楼盘名称清空并聚焦
                                 var el = document.querySelector('#house');
                                 el.value = ''; // 楼盘名称清空
-                                tools.setFocus(el); // 光标聚焦
+                                neFormTools.setFocus(el); // 光标聚焦
                                 // 隐藏打叉图标
-                                var nextNodes = tools.getAllSiblingElement(el.parentNode);
+                                var nextNodes = neFormTools.getAllSiblingElement(el.parentNode);
                                 for(var i = 0; i < nextNodes.length; i++){
                                     var next = nextNodes[i];
                                     var attr = next.getAttribute('data-type');
@@ -324,8 +324,8 @@
          */
          me.isFormHasData = function(o){
             var arr = [];
-            o = tools.anyToDomObject(o);
-            var child = tools.getChildElement(o);
+            o = neFormTools.anyToDomObject(o);
+            var child = neFormTools.getChildElement(o);
             Array.from(child).forEach(function(el){
                 var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
@@ -358,8 +358,8 @@
          */
         me.isFormAllCanWrite = function(o){
             var result = true; // 默认true 是
-            o = tools.anyToDomObject(o);
-            var child = tools.getChildElement(o);
+            o = neFormTools.anyToDomObject(o);
+            var child = neFormTools.getChildElement(o);
             Array.from(child).forEach(function(el){
                 var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                 Array.from(inputNode).forEach(function(txt){
@@ -394,10 +394,10 @@
             }
             var settings = $.extend(true, {}, defaults, options || {} );
             var zIndex = typeof settings.zIndex == 'undefined' ? 999 : isNaN(parseInt(settings.zIndex)) ? 999 : parseInt(settings.zIndex);
-            o = tools.anyToDomObject(o);
-            var child = tools.getChildElement(o);
+            o = neFormTools.anyToDomObject(o);
+            var child = neFormTools.getChildElement(o);
             Array.from(child).forEach(function(el){
-                if(tools.getElementStyle(el).display != 'none'){ // 若该行可见 add 20211129-1 本行
+                if(neFormTools.getElementStyle(el).display != 'none'){ // 若该行可见 add 20211129-1 本行
                     var lbNode = el.querySelector('label'),
                         mustNode = el.querySelector('[data-type="must"]'),
                         telNode= el.querySelector('.r-tel'),
@@ -421,7 +421,7 @@
                         // console.log('-------------')
                         //
                         if(el.className.indexOf('block__') >= 0){ // 分组的行 group test3
-                            label = tools.getPrevElement(txt.parentNode).querySelector('label').innerText;
+                            label = neFormTools.getPrevElement(txt.parentNode).querySelector('label').innerText;
                             // add 20211129-1
                             var eleFather = txt.parentNode.parentNode;
                             mustNode = eleFather.querySelector('[data-type="must"]');
@@ -430,14 +430,14 @@
                             isPhone = telNode == null ? false : true;
                         }
                         if(txt.parentNode.className.indexOf('item-box') >= 0){ // 合并的行 combine
-                            label += tools.getPrevElement(txt).innerText;
+                            label += neFormTools.getPrevElement(txt).innerText;
                         }
                         //
                         if(isMust && value.toString().replace(/([ ]+)/g, '') === ''){
                             tips1 += label + '、';
                             if(readonly != '' && readonly != 'readonly' && readonly != 'true') isAllRead = false;
                         }
-                        if(isMust && isPhone && !tools.isTel(value, me.$opts.config.format.phone)){
+                        if(isMust && isPhone && !neFormTools.isTel(value, me.$opts.config.format.phone)){
                             tips2 += label + '、';
                             if(readonly != '' && readonly != 'readonly' && readonly != 'true') isAllRead = false;
                         }
@@ -449,7 +449,7 @@
             if(tips1 != ''){
                 if(settings.popup){
                     var tips = '请' + chooseText + '：' + tips1.substr(0, tips1.length - 1);
-                    if(tools.isExistDialogControl()){
+                    if(neFormTools.isExistDialogControl()){
                         if(settings.method == 'dialog'){
                             neuiDialog.alert({
                                 animate: true,
@@ -476,7 +476,7 @@
             if(tips2 != ''){
                 if(settings.popup){
                     var tips = '请' + chooseText + '正确的：' + tips2.substr(0, tips2.length - 1);
-                    if(tools.isExistDialogControl()){
+                    if(neFormTools.isExistDialogControl()){
                         // neuiDialog.alert({
                         //     zIndex: zIndex,
                         //     animate: true,
@@ -506,8 +506,8 @@
          * @return {object} 返回JSON对象数组
          */
          me.getFormData = function(o){
-            o = tools.anyToDomObject(o);
-            var child = tools.getChildElement(o);
+            o = neFormTools.anyToDomObject(o);
+            var child = neFormTools.getChildElement(o);
             var json = {}
             Array.from(child).forEach(function(el){
                 var lbNode = el.querySelector('label'),
@@ -517,7 +517,7 @@
                     var isThousands = typeof txt.getAttribute('data-thousand') == 'undefined' ? false : txt.getAttribute('data-thousand') == 'true' ? true : false; // 是否千分进位
                     var value = '';
                     if(type == null || type == 'text') {
-                        value = tools.filterHtmlCode(txt.value);
+                        value = neFormTools.filterHtmlCode(txt.value);
                         if(isThousands) value = value.toString().replace(/\,/g, ''); // 去掉逗号 test1
                     }
                     else if(type == 'checkbox') {
@@ -530,10 +530,10 @@
                         hide = txt.getAttribute('data-hide') == null ? (txt.getAttribute('data-hid1') == null ? '' : txt.getAttribute('data-hid1')) : txt.getAttribute('data-hide'); // 隐藏值1(不会变)
                     //
                     if(el.className.indexOf('block__') >= 0){ // 分组的行 group test3
-                        title = tools.getPrevElement(txt.parentNode).querySelector('label').innerText;
+                        title = neFormTools.getPrevElement(txt.parentNode).querySelector('label').innerText;
                     }
                     if(txt.parentNode.className.indexOf('item-box') >= 0){ // 合并的行 combine
-                        title += tools.getPrevElement(txt).innerText;
+                        title += neFormTools.getPrevElement(txt).innerText;
                     }
                     //
                     var oneJson = { title: title, bh: bh, value: value, id: id, className: className, node: txt }
@@ -572,8 +572,8 @@
          * @param {array} 返回由数组组成的JSON对象
          */
         me.getRoomFormData = function(o){
-            o = tools.anyToDomObject(o);
-            var child = tools.getChildElement(o);
+            o = neFormTools.anyToDomObject(o);
+            var child = neFormTools.getChildElement(o);
             var json = {}, arr = [];
             Array.from(child).forEach(function(el){
                 var lbNode = el.querySelector('label'),
@@ -624,8 +624,8 @@
          * @returns {boolean} 返回布尔值。true 是住宅, false 非住宅,即“其他(如商业、工业等非住宅用途)”
          */
          me.isRoomFormPawnTypeHouse = function(o){
-            o = tools.anyToDomObject(o);
-            var child = tools.getChildElement(o);
+            o = neFormTools.anyToDomObject(o);
+            var child = neFormTools.getChildElement(o);
             var hid1Arr = [];
             Array.from(child).forEach(function(el){
                 var lbNode = el.querySelector('label'),
@@ -679,10 +679,10 @@
         me.warnRoomFormRelatedPreviousEmpty = function(o){
             var warnInfo = '';
             var isAllRead = true; // true 表示所有输入框为只读
-            o = tools.anyToDomObject(o);
+            o = neFormTools.anyToDomObject(o);
             // var index = o.parentNode.parentNode.index;
-            // var siblings = tools.getAllSiblingElement(o.parentNode.parentNode);
-            var previousNode = tools.getAllPrevElement(o.parentNode.parentNode);
+            // var siblings = neFormTools.getAllSiblingElement(o.parentNode.parentNode);
+            var previousNode = neFormTools.getAllPrevElement(o.parentNode.parentNode);
             Array.from(previousNode).forEach(function(el, i){
                 var lbNode = el.querySelector('label'),
                     inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
@@ -725,7 +725,7 @@
                     if(newValue.toString().replace(/([ ]+)/g, '') != oldValue.toString().replace(/([ ]+)/g, '')){
                         el.value = ''; // 清空下级关联元素的值
                         // 隐藏下级关联元素右侧的打叉图标 add 20220622-1
-                        var brotherNodes = tools.getAllSiblingElement(el.parentNode); // add 20220622-1
+                        var brotherNodes = neFormTools.getAllSiblingElement(el.parentNode); // add 20220622-1
                         Array.from(brotherNodes).forEach(function(brothers){
                             if(brothers.getAttribute('data-type') == 'cross'){
                                 brothers.style.display = 'none';
@@ -735,9 +735,9 @@
                     }
                 })
             }else{
-                o = tools.anyToDomObject(o);
+                o = neFormTools.anyToDomObject(o);
                 // 清空下级关联元素
-                var next = tools.getAllNextElement(o.parentNode.parentNode);
+                var next = neFormTools.getAllNextElement(o.parentNode.parentNode);
                 Array.from(next).forEach(function(el){
                     var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                     Array.from(inputNode).forEach(function(txt){
@@ -746,7 +746,7 @@
                             if(className.indexOf('clear-relation') >= 0) {
                                 txt.value = ''; // 清空下级关联元素的值
                                 // 隐藏下级关联元素右侧的打叉图标 add 20220622-1
-                                var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
+                                var brotherNodes = neFormTools.getAllSiblingElement(txt.parentNode);
                                 Array.from(brotherNodes).forEach(function(brothers){
                                     if(brothers.getAttribute('data-type') == 'cross'){
                                         brothers.style.display = 'none';
@@ -766,7 +766,7 @@
                         if(typeof value == 'undefined') value = '';
                         el.value = value; // 清空其它关联元素的值
                         // 隐藏其它关联元素右侧的打叉图标
-                        var brotherNodes = tools.getAllSiblingElement(el.parentNode);
+                        var brotherNodes = neFormTools.getAllSiblingElement(el.parentNode);
                         Array.from(brotherNodes).forEach(function(brothers){
                             if(brothers.getAttribute('data-type') == 'cross'){
                                 brothers.style.display = 'none';
@@ -863,7 +863,7 @@
                     className += ' click-num';
                     // test1
                     _dataThousandStr = !thousands ? '' : ' data-thousand="' + thousands + '"';
-                    value = !thousands ? value : tools.thousandth(value);
+                    value = !thousands ? value : neFormTools.thousandth(value);
                 }
                 if(type == '单选') {
                     types = 'checkbox';
@@ -924,7 +924,7 @@
                     _checkStr = checked == '' ? '' : (checked ? ' checked': ''),
                     _attStr = attribute == '' ? '' : ' ' + attribute.toString().replace(/\'/g, '"').replace(/([ ]+)/g, ' '),
                     _unitClass = !me.$opts.config.layout.inputCross ? '' : ' has-cell-cross';
-                    _telAClass = phone == '' ? '' : !tools.isTel(tools.pickTel(value), me.$opts.config.format.phone) ? '' : ' class="hover"';
+                    _telAClass = phone == '' ? '' : !neFormTools.isTel(neFormTools.pickTel(value), me.$opts.config.format.phone) ? '' : ' class="hover"';
                     // _crossClass = ''; // me.$opts.houses.houseRightButton && _btnStr != '' ? ' has-cell-btn' : '';
                     _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
                 var _btnStr = ''; // 右侧按钮
@@ -969,7 +969,7 @@
                 var _icoClassName = icon.indexOf('fa-') >= 0 ? 'icon fa ' + icon : 'icon icon-' + icon;
                 var _iconStr = !me.$opts.config.layout.inputIcon ? '' : (icon == '' ? '' : '<i class="' + _icoClassName + '"></i>'),
                     _unitStr = unit == '' ? '' : '<em class="r-unit' + _unitClass + '">' + unit + '</em>',
-                    _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a' + _telAClass + ' href="tel:' + tools.pickTel(value) + '"></a></em>',
+                    _phoneStr = phone == '' ? '' : '<em class="r-tel' + _unitClass + '"><a' + _telAClass + ' href="tel:' + neFormTools.pickTel(value) + '"></a></em>',
                     _chatStr = chat == '' ? '' : '<em class="r-weixin' + _unitClass + '"><a></a></em>';
                 var _crossStr = ( types == 'text' && me.$opts.config.layout.inputCross ) ? '<div class="item-cell' + _crossClass + '" data-type="cross"' + _crossStyle + '></div>' : '',
                     _mustStr = must && me.$opts.config.layout.inputMust ? '<div class="item-cell" data-type="must">*</div>' : '';
@@ -1017,8 +1017,8 @@
 
             } // END FOR
      
-            tools.removeAllChildren(me.$obj); // 先清空元素内容
-            tools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
+            neFormTools.removeAllChildren(me.$obj); // 先清空元素内容
+            neFormTools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
 
             // 分组的行 group test3
             var sortArr = groupArr.delRepeated();
@@ -1285,8 +1285,8 @@
 
             } // END FOR
 
-            tools.removeAllChildren(me.$obj); // 先清空元素内容
-            tools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
+            neFormTools.removeAllChildren(me.$obj); // 先清空元素内容
+            neFormTools.appendHTML(_outerHtml, me.$obj); // 再添加新内容
             if(me.$opts.houses.switches.hasExchangeModule) this.loadExchangeModule(me); //test2
         },
 
@@ -1305,7 +1305,7 @@
                     '<button type="button" id="btn-dropdown">取消手动输入</button>',
                 '</div>',
             ].join('\r\n');
-            var switchNode = tools.createOneNextNode(me.$obj, "switch");
+            var switchNode = neFormTools.createOneNextNode(me.$obj, "switch");
             switchNode.innerHTML = _tmpHtml; 
         },
 
@@ -1355,9 +1355,9 @@
                         var value = this.value;
                         var reg = /[^\d\.]/g; // 只允许输入数字、小数点
                         value = value.toString().replace(reg,'');
-                        value = tools.repeatedChar(value, '.'); // 只保留一个小数点
+                        value = neFormTools.repeatedChar(value, '.'); // 只保留一个小数点
                         if(isThousands){ // test1
-                            value = tools.thousandth(value);
+                            value = neFormTools.thousandth(value);
                         }
                         this.value = value;
                     })
@@ -1378,13 +1378,13 @@
                     var value = this.value;
                     var reg = /[^\d\-]/g; // 只允许输入数字、短横线
                     value = value.toString().replace(reg,'');
-                    value = tools.repeatedChar(value, '-'); // 只保留一个短横线
+                    value = neFormTools.repeatedChar(value, '-'); // 只保留一个短横线
                     this.value = value;
-                    var next = tools.getNextElement(this);
+                    var next = neFormTools.getNextElement(this);
                     if(next != null){
-                       var child = tools.getFirstChildElement(next);
+                       var child = neFormTools.getFirstChildElement(next);
                        var className = child.className;
-                        if(tools.isTel(tools.pickTel(value), me.$opts.config.format.phone)){
+                        if(neFormTools.isTel(neFormTools.pickTel(value), me.$opts.config.format.phone)){
                             child.className += className.indexOf('hover') >= 0 ? '' : 'hover';
                             child.setAttribute('href', 'tel:' + value);
                         }else{
@@ -1450,7 +1450,7 @@
                                 if(!me.$opts.houses.switches.isCrossClearValue) return;
                                 if(child[i].className.indexOf('jzmj') >= 0 || child[i].className.indexOf('ccjmj') >= 0 || child[i].className.indexOf('property') >= 0) return; // 排除建筑面积、储藏间面积、产权年限
                                 // 清空下级关联元素
-                                var next = tools.getAllNextElement(child[i].parentNode.parentNode);
+                                var next = neFormTools.getAllNextElement(child[i].parentNode.parentNode);
                                 Array.from(next).forEach(function(el){
                                     var inputNode = el.querySelectorAll('textarea, input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="checkbox"]');
                                     Array.from(inputNode).forEach(function(txt){
@@ -1458,7 +1458,7 @@
                                         if(className.indexOf('clear-relation') >= 0) {
                                             txt.value = ''; // 清空下级关联元素的值
                                             // 隐藏下级关联元素右侧的打叉图标
-                                            var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
+                                            var brotherNodes = neFormTools.getAllSiblingElement(txt.parentNode);
                                             Array.from(brotherNodes).forEach(function(brothers){
                                                 if(brothers.getAttribute('data-type') == 'cross'){
                                                     brothers.style.display = 'none';
@@ -1474,7 +1474,7 @@
                                         if(typeof value == 'undefined') value = '';
                                         txt.value = value; // 清空其它关联元素的值
                                         // 隐藏其它关联元素右侧的打叉图标
-                                        var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
+                                        var brotherNodes = neFormTools.getAllSiblingElement(txt.parentNode);
                                         Array.from(brotherNodes).forEach(function(brothers){
                                             if(brothers.getAttribute('data-type') == 'cross'){
                                                 brothers.style.display = 'none';
@@ -1489,7 +1489,7 @@
                                     Array.from(inputNode).forEach(function(txt){
                                         txt.value = ''; // 清空房号配置关联元素的值
                                         // 隐藏房号配置关联元素右侧的打叉图标
-                                        var brotherNodes = tools.getAllSiblingElement(txt.parentNode);
+                                        var brotherNodes = neFormTools.getAllSiblingElement(txt.parentNode);
                                         Array.from(brotherNodes).forEach(function(brothers){
                                             if(brothers.getAttribute('data-type') == 'cross'){
                                                 brothers.style.display = 'none';
@@ -1510,7 +1510,7 @@
             Array.from(inputNode).forEach(function(el, i){
                 el.addEventListener('input', function(){ // 输入事件
                     var value = this.value;
-                    // var cross = tools.getNextElement(this.parentNode);
+                    // var cross = neFormTools.getNextElement(this.parentNode);
                     var cross = this.parentNode.parentNode.querySelector('[data-type="cross"]');
                     if(this.parentNode.className.indexOf('item-box') >= 0){ // 合并的行 combine test3
                         cross = this.parentNode.querySelector('[data-type="cross"]');
@@ -1522,7 +1522,7 @@
                 })
                 el.addEventListener('click', function(){ // 点击事件
                     var _this = this;
-                    // var cross = tools.getNextElement(this.parentNode);
+                    // var cross = neFormTools.getNextElement(this.parentNode);
                     var cross = this.parentNode.parentNode.querySelector('[data-type="cross"]');
                     if(this.parentNode.className.indexOf('item-box') >= 0){ // 合并的行 combine test3
                         cross = this.parentNode.querySelector('[data-type="cross"]');
@@ -1609,7 +1609,7 @@
             if(pale == 'self'){ // 只切换自身
                 if(typeof o != 'undefined' && o != ''){
                     o = o instanceof jQuery ? o[0] : o;
-                    tools.setFocus(o); // 光标聚焦
+                    neFormTools.setFocus(o); // 光标聚焦
                 }
             }else{
                 // 显示“取消手动输入”，隐藏“如查无数据，请选择手动输入”
@@ -1617,7 +1617,7 @@
                 if(eleManual == null) return; // add 20220803-1
                 var parent = eleManual.parentNode;
                 parent.style.display = 'none';
-                tools.getNextElement(parent).style.display = '';
+                neFormTools.getNextElement(parent).style.display = '';
             }
         },
 
@@ -1656,7 +1656,7 @@
                 // 显示“如查无数据，请选择手动输入”，隐藏“取消手动输入”
                 var parent = document.getElementById('btn-dropdown').parentNode;
                 parent.style.display = 'none';
-                tools.getPrevElement(parent).style.display = '';
+                neFormTools.getPrevElement(parent).style.display = '';
             }
         }
 
@@ -1764,594 +1764,6 @@
 
 
     //================================================================
-    //                      工具库
-    //================================================================
-    var tools = {
-
-        /**
-         * 原生js获取元素style属性 add 20211129-1
-         * [用途]：原生js获取元素margin外边距、内边距padding
-         * [注意]：返回值中的各个属性值带单位px
-         * 兼容性：兼容IE、火狐、谷歌
-         * @param {HTML DOM} o DOM元素。
-         * @returns {object} 返回元素的各种css属性组成的数组。
-         * [示例]
-            var div = document.getElementById("user");
-            var style = getElementStyle(div);
-            alert(style.marginTop);
-        */
-        getElementStyle: function(o){
-            //  兼容IE和火狐谷歌等的写法
-            if (window.getComputedStyle) {
-                var style = getComputedStyle(o, null);
-            } else {
-                style = o.currentStyle; // 兼容IE
-            }
-            return style;
-        },
-
-
-        /**
-         * 判断是否JSON对象
-         * @param {object} ps_obj 目标对象
-         * @returns 返回布尔值. true 是, false 否
-         */
-        isJsonObject: function(ps_obj){
-            return typeof(ps_obj) == "object" && Object.prototype.toString.call(ps_obj).toLowerCase() == "[object object]" && !ps_obj.length;
-        },
-
-        /**
-         * 光标聚焦，并移动到最后
-         * 默认的调用element.focus()光标会在最前面，故需重写focus
-         * @param {HTML DOM} 要聚焦的元素
-         */
-        setFocus: function(o){
-            if (o.setSelectionRange) {
-                o.focus();
-                o.setSelectionRange(o.value.length, o.value.length);
-            } else {
-                var range = o.createTextRange(); // 创建Range对象操作文本
-                range.moveStart('character', o.value.length); // 修改文档的开始节点，向后移动长度
-                range.collapse(false);  // true 移动到开始, false 移动到最后
-                range.select();
-            }
-        },
-
-
-        /**
-         * 在当前元素后面创建一个新元素(新元素指定class类名属性)
-         * 注：该新元素的class属性命名规则和当前元素的第一个class类名一样。
-            eg. 已有节点class="pp__content a b c"，新元素指定class必须包含client，则新元素的class="pp__client"
-            eg. 已有节点class="pp-content a b c"，新元素指定class必须包含client，则新元素的class="pp-client"
-            eg. 已有节点class="pp_content a b c"，新元素指定class必须包含client，则新元素的class="pp_client"
-            eg. 已有节点class="pp a b c"，新元素指定class必须包含client，则新元素的class="client"
-         * @param {HTML DOM} o 当前元素
-         * @param {string} cname 指定新元素的class类名
-         * @returns {HTML DOM} 返回新元素对象
-         */
-        createOneNextNode: function(o, cname){
-            if(typeof o.className == 'undefined' ) return null;
-            var tmpClassName = o.className.toString().split(' ')[0];
-            var jointArr = [ '__', '_', '-' ]; // 可能的分割符组成的数组
-            var indexArr = [ ]; // 分割符在字符串的位置组成的数组
-            for(var i = 0; i < jointArr.length; i++){
-                indexArr.push(tmpClassName.indexOf(jointArr[i]));
-            }
-            var index = this.getArrayMaxValue(indexArr); // 取最大值
-            var jointChar = ''; // 新元素类名连接符
-            for(var i = 0; i < jointArr.length; i++){
-                var char = jointArr[i];
-                if(tmpClassName.indexOf(char) >= 0){
-                    jointChar = char;
-                    break;
-                }
-            }
-            // console.log('连字符：', jointChar);
-            if(jointChar == '') jointChar = '__';
-            var realClassName = tmpClassName.substr(0, index).toString().replace(/([]+)/g, '');
-            // console.log('jointArr：', jointArr, '\ntmpClassName：',tmpClassName, '\nindex：', index, '\nrealClassName：', realClassName);
-            var finalClassName = realClassName + ( realClassName === '' ? '' : jointChar ) + cname;
-            var tempNode = document.getElementsByClassName(finalClassName)[0];
-            if(tempNode == null){
-                tempNode = document.createElement('div');
-                tempNode.className = finalClassName;
-                this.insertAfter(tempNode, o);
-            }
-            tempNode.className += finalClassName == cname ? '' : ' ' + cname;
-            return tempNode;
-        },
-
-
-        /**
-         * 取数组中的最大值
-         * @param {array} arr 数组
-         * @returns {number} 返回数组中最大的值的那个元素
-         */
-        getArrayMaxValue: function(arr){
-            var max = arr[0];
-            for(var i = 0; i < arr.length; i++){
-                max = max < arr[i + 1] ? arr[i + 1] : max;
-            }
-            return max;
-        },
-
-        /**
-         * 获取字符串对应的元素节点(供jq调用)
-         * eg1. 'floor' <=> '.floor'
-         * eg2. 'floor build' <=> '.floor.build'
-         * @param {string} ps_str 字符串
-         * @returns 返回元素节点
-         */
-        getStringClassName: function(ps_str){
-            if(ps_str.replace(/([ ]+)/g, '') === '') return '';
-            var arr = ps_str.replace(/([ ]+)/g, ' ').split(' ');
-            var str = '';
-            for(var i = 0; i < arr.length; i++){
-                str += '.' + arr[i];
-            }
-            return str;
-        },
-
-        /**
-         * 获取元素节点对应的字符串(供dom调用)
-         * eg1. '.floor' <=> 'floor'
-         * eg2. '.floor.build' <=> 'floor build'
-         * @param {string} ps_str 元素节点
-         * @returns 返回字符串
-         */
-        getClassNameString: function(ps_str){
-            if(ps_str.replace(/([ ]+)/g, '') === '') return '';
-            var tmpStr = ps_str.toString().replace(/([\.]+)/g, ' ');
-            return ps_str.indexOf('.') == 0 ? (tmpStr.substr(1, tmpStr.length)) : tmpStr;
-        },
-
-
-        
-        /**
-         * 将未知的对象转化为dom对象
-         * @param {Selector String || jQuery Object || HTML DOM} o 未知的对象。几种可能的值如下：
-            选择器字符串 '.user', '#user' 
-            jq对象 '.user', '#user'
-            dom对象 document.getElementById('#user') 或 document.getElementsByClassName('user')
-         * @returns {HTML DOM} 返回dom对象(注意不是元素集合nodeList)
-         */
-        anyToDomObject: function(o){
-            // var str = o.toString().replace(/([\#\.]+)/g, ''); // 去掉井号#和点号.
-            if(o == null) return null;
-            return o instanceof jQuery ? 
-                o[0] : 
-                ( o.nodeName ?  // 判断是否dom对象
-                    o : 
-                    (
-                        o.item ? // nodeList对象
-                        o[0] : 
-                        (   document.getElementById(o.toString().replace(/([\#\.]+)/g, '')) != null ? 
-                            document.getElementById(o.toString().replace(/([\#\.]+)/g, '')) : 
-                            document.getElementsByClassName(o.toString().replace(/([\#\.]+)/g, ''))[0]
-                        )
-                    ) 
-                );
-        },
-
-
-        /**
-         * 原生js获取子节点集合(不含孙子节点) (兼容ie6+)
-         * 注：已排除文本、空格，换行符
-         * @param {HTML DOM} o 当前节点
-         * @returns {NodeList || null} 返回子节点集合或null
-         */
-        getChildElement: function(o){
-            if(o == null) return null;
-            var children = o.childNodes;
-            for (var i = 0; i < children.length; i++) {
-                var s = children[i].nodeName,
-                    r = children[i].nodeValue;
-                if (s == "#comment" || (s == "#text" && /\s/.test(r))) { // 排除注释节点或文本节点或空节点(空或换行)
-                    o.removeChild(children[i]);
-                }
-            }
-            return o.childNodes; // return o.children;
-        },
-
-        /**
-         * 原生js获取第一个子节点 (兼容ie6+)
-         * 注：已排除文本、空格，换行符
-         * @param {HTML DOM} o 当前节点
-         * @returns {HTML DOM || null} 返回元素对象或null
-         */
-         getFirstChildElement: function(o){
-            if(o == null) return null;
-            return o.children[0];
-        },
-
-        /**
-         * 原生js获取最后一个子节点 (兼容ie6+)
-         * 注：已排除文本、空格，换行符
-         * @param {HTML DOM} o 当前节点
-         * @returns {HTML DOM || null} 返回元素对象或null
-         */
-         getLastChildElement: function(o){
-            if(o == null) return null;
-            return o.children[o.children.length - 1];
-        },
-
-
-        /**
-         * 原生js获取下一个兄弟节点 (兼容ie6+)
-         * 注：已排除文本、空格，换行符
-         * @param {HTML DOM} o 当前节点
-         * @returns {HTML DOM || null} 返回元素对象或null
-         */
-        getNextElement: function(o){
-            if(o == null) return null;
-            var e = o.nextSibling;
-            if(e == null){ // 测试节点是否存在，否则返回null
-                return null;
-            }
-            if(e.nodeType == 3){ // 如果元素为文本节点
-                var two = this.getNextElement(e);
-                if(two != null && two.nodeType == 1)
-                    return two;
-            }else{
-                if(e.nodeType == 1){ // 确认节点为元素节点才返回
-                    return e;
-                }else{
-                    return null;
-                }
-            }
-        },
-
-
-        /**
-         * 原生js获取上一个兄弟节点 (兼容ie6+)
-         * 注：已排除文本、空格，换行符
-         * @param {HTML DOM} o 当前节点
-         * @returns {HTML DOM || null} 返回元素对象或null
-         */
-         getPrevElement: function(o){
-            if(o == null) return null;
-            var e = o.previousSibling;
-            if(e == null){ // 测试节点是否存在，否则返回null
-                return null;
-            }
-            if(e.nodeType == 3){ // 如果元素为文本节点
-                var two = this.getPrevElement(e);
-                if(two != null && two.nodeType == 1)
-                    return two;
-            }else{
-                if(e.nodeType == 1){ // 确认节点为元素节点才返回
-                    return e;
-                }else{
-                    return null;
-                }
-            }
-        },
-
-
-        /**
-         * 原生js获取所有兄弟节点
-         * @param {HTML DOM} o 当前节点
-         * @returns {Array} 返回兄弟节点组成的数组
-         */
-        getAllSiblingElement: function(o) {
-            var a = [];
-            var p = o.parentNode.children;
-            for(var i = 0, len = p.length; i< len; i++) {
-                if(p[i] !== o) a.push(p[i]);
-            }
-            return a;
-        },
-
-        /**
-         * 原生js获取前面所有的兄弟节点 (兼容ie6+)
-         * 注：已排除文本、空格，换行符
-         * @param {HTML DOM} o 当前元素对象节点
-         * @returns {Array} 返回数组，数组中的元素为dom对象
-         */
-        getAllPrevElement: function(o){
-            var arr = [];
-            var parent = o.parentNode;
-            if(parent == null) return [];
-            for(var i = 0; i < parent.children.length; i++){
-                var child = parent.children[i];
-                if(child == o){
-                    break;
-                }else{
-                    arr.push(child)
-                }
-            }
-            return arr;
-        },
-
-
-        /**
-         * 原生js获取后面所有的兄弟节点 (兼容ie6+)
-         * 注：已排除文本、空格，换行符
-         * @param {HTML DOM} o 当前元素对象节点
-         * @returns {Array} 返回数组，数组中的元素为dom对象
-         */
-        getAllNextElement: function(o){
-            var arr = [];
-            var parent = o.parentNode;
-            if(parent == null) return [];
-            var index = -1;
-            for(var i = 0; i < parent.children.length; i++){
-                var child = parent.children[i];
-                if(child == o){
-                    index = i;
-                }else{
-                    if(index != -1 && i > index) arr.push(child);
-                }
-            }
-            return arr;
-        },
-
-        
-
-
-
-         /**
-         * 原生js append字符串
-         * 即：向已存在的节点对象后面追加HTML字符串
-         * @param {string} str 字符串
-         * @param {HTML DOM} el 已存在的节点对象
-         */
-        appendHTML: function(str, el){
-            HTMLElement.prototype.appendStr = function(str) {
-                var divTemp = document.createElement("div"), nodes = null, 
-                    fragment = document.createDocumentFragment(); // 文档片段，一次性append，提高性能
-                divTemp.innerHTML = str;
-                nodes = divTemp.childNodes;
-                for (var i=0, length=nodes.length; i<length; i+=1) {
-                fragment.appendChild(nodes[i].cloneNode(true));
-                }
-                this.appendChild(fragment);
-                // 据说下面这样子世界会更清净
-                nodes = null;
-                fragment = null;
-            }
-            el.appendStr(str);
-        },
-
-
-        /**
-         * 原生js prepend字符串
-         * 即：向已存在的节点对象前面追加HTML字符串
-         * @param {string} str 字符串
-         * @param {HTML DOM} el 已存在的节点对象
-         */
-        prependHTML: function(str, el) {
-            var divTemp = document.createElement("div"), nodes = null
-                , fragment = document.createDocumentFragment();
-        
-            divTemp.innerHTML = str;
-            nodes = divTemp.childNodes;
-            for (var i=0, length=nodes.length; i<length; i+=1) {
-            fragment.appendChild(nodes[i].cloneNode(true));
-            }
-            // 插入到容器的前面 - 差异所在
-            el.insertBefore(fragment, el.firstChild);
-            // 内存回收？
-            nodes = null;
-            fragment = null;
-        },
-
-        /**
-         * 原生js在已存在的节点向后面插入新节点(兼容ie9-)
-         * @param {HTML DOM} newNode 新节点
-         * @param {HTML DOM} existingNode 已存在的节点
-         */
-         insertAfter: function(newNode, existingNode) {
-            var parent = existingNode.parentNode;
-            // 最后一个子节点 lastElementChild兼容其他浏览器 lastChild  兼容ie678;
-            var lastNode = parent.lastElementChild || parent.lastChild;
-            // 兄弟节点同样也是有兼容性
-            var siblingNode = existingNode.nextElementSibling || existingNode.nextSibling;
-            if (lastNode == existingNode) // 先判断目标节点是不是父级的最后一个节点，如果是的话，直接给父级加子节点就好
-            { 
-                parent.appendChild(newNode);
-            }
-            else // 不是最好后一个节点  那么插入到目标元素的下一个兄弟节点之前（就相当于目标元素的insertafter）
-            { 
-                parent.insertBefore(newNode, siblingNode);
-            }
-        },
-
-         /**
-         * 原生js移除指定节点(兼容ie11-)
-         * @param {HTML DOM} node 要移除的节点
-         */
-        removeNode: function(node){
-            // node.remove();
-            node.parentNode.removeChild(node);
-        },
-
-        /**
-         * 删除节点下所有子节点，即清空元素内容(类似jq .empty())
-         * @param {HTML DOM} o 当前节点
-         */
-        removeAllChildren: function(o){
-            while (o.hasChildNodes()) {
-                o.removeChild(o.lastChild);
-            }　
-        },
-
-
-        /**
-         * 过滤字符串中相同的字符
-         * 即字符串中相同的字符只保留第一个
-         * @param {string} ps_str 原字符中
-         * @param {string} ps_char 指定要过滤的字符(可选). 若缺省则默认替换所有相同的字符
-         * @returns {string} 返回新字符串
-         * eg.
-            repeatedChar('0.56.578.59', '.'); //0.5657859
-            repeatedChar('0.56.578.59'); //0.56789
-        */
-        repeatedChar: function(ps_str, ps_char){
-            var char = typeof ps_char == 'undefined' ? '' : ps_char;
-            var result = ps_str.replace(/./g, function(s, index){
-                return ps_str.indexOf(s) == index ? s : ( char == '' ? '' : (char == s ? '' : s) );
-            })
-            return result;
-        },
-
-
-        /**
-         * 数字千分位(不处理小数部分)，即每三位数字一个用一个逗号,分隔开
-         * @param {string | number} ps_str 原始数字
-         * @returns {string} 返回经过千分位处理后的新数字
-         * [示例]
-            eg1. 2500347 <=> 2,500,347
-            eg2. 2500347.90185 <=> 2,500,347.90185
-        */
-        thousandth: function(ps_str){
-            var arr = ps_str.toString().split('.');
-            return arr[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (arr.length <= 1 ? '':  '.' + arr[1]);
-        },
-        
-
-        /**
-         * 判断是否手机号码(正则表达式验证)
-         * @param {string} str 电话字符串
-         * @param {options} 验证类型等参数组成的对象. eg. {pattern: "mobilephone"}.
-         * @returns {boolean} 返回布尔值. true 是, false 否
-         */
-        isTel:function(str, options){
-            var defaults = {
-                mode: "standard", // 校验模式(可选)。值： standard 标准模式，即严格校验电话格式(默认), loose 宽松模式，即只校验电话位数
-                pattern: "mobilephone", // 验证类型(只在mode="standard"时有效)(可选)。值：mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
-                bit: { // 校验的电话位数(只在mode="loose"时有效)(可选)
-                    from: 6, // 校验6位(可选)。与to配合使用,可与to值相等
-                    to: 12 // 校验12位(可选)。与from配合使用,可与from值相等
-                }
-            }
-            var settings = $.extend(true, {}, defaults, options || {});
-            var mode = settings.mode,
-                pattern = settings.pattern;
-                bit = settings.bit;
-            var from = parseInt(bit.from),
-                to = parseInt(bit.to);
-
-            var bools = false;
-            if(mode == 'standard'){ //标准校验模式
-                //var reg1 = /^0?1[3|4|5|7|8|9][0-9]\d{8}$/; //手机号码：13,14,15,17,18,19开头电话号码
-                var reg1 = /^(0|86)?1\d{10}$/; //手机号码：11位数字. 最前面的 0是长途冠码, 86是中国区号
-                var reg2 = /^((0|\+)?86(\s{1})?)?(0?\d{2,3}(\-|\s{1})?)?\d{7,8}$/; //固定电话：前面086或+86是中国区号, 中间10或010或0595是区号, 后面7-8位是号码	
-                if(pattern == 'mobilephone'){ //只能移动电话
-                    bools = reg1.test($.trim(str)) ? true : false;
-                }
-                if(pattern == 'telephone'){ //只能固话(固定电话)
-                    bools = reg2.test(str) ? true : false;
-                }
-                if(pattern == 'both'){ //移动电话或固话
-                    bools = reg1.test($.trim(str)) || reg2.test(str) ? true : false;
-                }
-            }else{ //宽松校验模式
-                //if(str.trim().length == 11) return true; //只检验是否11位
-                //if(str.trim().length <= 12 && str.trim().length >= 6) return true; //只检验是否6-12位(含固话、手机号）,不兼容ie8(若节点不存在，直接str.trim()会报错）
-                if($.trim(str).length <= to && $.trim(str).length >= from) return true; //只检验是否6-12位(含固话、手机号), 兼容ie8及以下版本
-            }
-
-            return bools;
-        },
-
-
-        /**
-         * 判断是否存在对话框控件
-         * @returns {boolean} 返回布尔值. true 存在, false 不存在
-         */
-        isExistDialogControl: function(){
-            if(typeof neuiDialog == 'undefined') return false;
-            if(typeof neuiDialog.alert !== 'function') return false;
-            return true;
-        },
-
-
-        /**
-         * 过滤HTML代码
-         * @param {string} str 原字符串
-         * @param {boolean} isHTML 是否要过滤标签、css、js、换行、空格等多余内容, 默认true(可选). false时虽然不过滤但会将标签转义成字符
-         * @returns {string} 返回新字符串
-         */
-        filterHtmlCode: function(ps_str, isHTML){
-            var flag = typeof isHTML == 'undefined' ? true : (isHTML === false ? false : true);
-            if(flag){
-                if(typeof ps_str == 'undefined' || ps_str == null) return '';
-                var ps_str = ps_str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); //过滤css
-                ps_str = ps_str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g, ''); //过滤js
-                ps_str = ps_str.replace(/<[^<>]+?>/g, ''); //过滤标签
-                // ps_str = ps_str.replace(/\ +/g, ''); //去掉空格
-                ps_str = ps_str.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); //去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格
-                ps_str = ps_str.replace(/[\r\n]+?/g, ' '); //去掉换行(变成一个空格)
-            }
-            if(typeof this.encodeHtml == 'function') ps_str = this.encodeHtml(ps_str); //标签转化成字符串
-            return ps_str;
-        },
-
-
-
-         /**
-         * 将标签转换成字符串（即HTML编码）
-         * HTML与字符串互转义
-         * @param {string} ps_str 含有标签的字符串
-         * @returns {string} 返回不含标签的字符串
-         * eg1.将 < 转义成 &lt; eg2.将 > 转义成 &gt;
-         */
-        encodeHtml: function(ps_str){
-            var temp = document.createElement("div");
-            (temp.textContent != null) ? (temp.textContent = ps_str) : (temp.innerText = ps_str);
-            // 转义替换
-            var output = temp.innerHTML.toString().replace(/\'/g, '&apos;').replace(/\"/g, '&quot;') // 单双引号转义
-            // 回车换行替换成<br>
-            output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
-            output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
-            // <br>替换成<p>
-            if(output.indexOf('<br>') > -1){
-                // 让p标签成对出现
-                output = output.replace(/\<br\>/g, '</p><p>');
-                output = output.replace(/^(?!\<.*)/g, '<p>');
-                output = output.replace(/(?!\>.*)$/g, '</p>');
-                // 替换中间没有内容的空标签. eg.<p></p>
-                output = output.replace(/(\<p\>\<\/p\>)/g, '');
-            }
-            // 其它替换
-            // 注：部分ios中手写输入时即使过滤掉所有空格了还会出现一个空格，如果把空格转换成&nbsp;的话数据库中会有&nbsp;导致搜索等功能匹配不了。
-            // 故解决思路是：移动端把所有空格替换成空，在pc端把所有空格替换成一个&nbsp;
-            if(typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
-                output = output.replace(/\t/g, ''); // 制表符替换成空
-                output = output.replace(/([\s]+)/g, ' '); // 多个空格替换成一个空格
-            }else{ // pc端时
-                output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
-                output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
-            }
-            output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');  // div标签换成p
-            // 字符串化+斜杠处理
-            output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
-            output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
-            output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
-            //
-            temp = null;
-            return output;
-        },
-
-        /**
-         * 提取字符串中的电话号码，包括固话或手机号
-         * 注：只提取第一次出现的电话号码
-         * @param {string} ps_str 字符串
-         * @returns {number} 返回电话号码
-         */
-        pickTel: function(ps_str){
-            if(ps_str == null) return '';
-            var str = ps_str.toString().replace(/^(.*?)([\d\-]+)(.*)/g, '$2').toString().replace(/\-/g, '');
-            str = /^[0-9]+$/.test(str.toString()) ? str : ''; // 纯数字时是电话则返回电话，否则返回空
-            return str;
-        }
-
-    }; // END tools
-    
-
-
-    //================================================================
     //                      ie兼容
     //================================================================
     /**
@@ -2404,7 +1816,7 @@ var neuiSearchBox = {
     /**
      * 获取表单
      * @param {object} opt 参数对象 
-     * @returns {html} 返回表单HTML字符串
+     * @returns {HTML} 返回表单HTML字符串
      */
     getForm: function(opt){
         return $('body').neuiSearchBox('init', opt);
@@ -2415,8 +1827,26 @@ var neuiSearchBox = {
      */
     doneEvent: function(){
         $('body').neuiSearchBox('events');
+    },
+
+    /**
+     * 获取电脑端表单
+     * @param {object} opt 对数对象
+     * @returns {HTML} 返回HTML
+     */
+    getPcForm: function(opt){
+        return $('body').neuiSearchBox('pcInit', opt);
+    },
+
+    /**
+     * 执行电脑端表单内部系列事件
+     */
+    getPcQueryString: function(){
+        return $('body').neuiSearchBox('getPcQueStr');
     }
 };
+
+
 ;(function ($) {
     //================================================================
     //                      通用方法库
@@ -2424,7 +1854,7 @@ var neuiSearchBox = {
     var methods = {
 
         /**
-         * 初始化
+         * 表单初始化
          * @param {object} opt 参数对象
          */
         init: function(opt){
@@ -2578,6 +2008,52 @@ var neuiSearchBox = {
             return allHtml;
         },
 
+        /**
+         * 电脑端表单初始化
+         * @param {object} 参数对象
+         */
+        pcInit: function(opt){
+            var self = this;
+            var defaults = {
+                enableLocale: true, //是否启用本地演示数据源. true 是(默认), false 否
+                source: [], //自定义数据源
+            }
+            var settings = $.extend(true, {}, defaults, opt || {});
+            var enableLocale = settings.enableLocale,
+                source = settings.source;
+            if(typeof source.data == 'undefined') {
+                alert('后台返回的查询参数不含data属性，请检查！');
+                return;
+            }
+            if(source.data.length == 0){
+                alert('后台返回的查询参数data为空，即data:[]，请检查！');
+                return;
+            }
+            // HTML
+            var valueHtml = '';
+            var allHtml = '<div class="ne-search-form">';
+           
+            for(var i = 0; i < source.data.length; i++){
+                var row = source.data[i];
+                var tmp_field = row["字段名称"],
+                    tmp_desc = row["显示名称"];
+                allHtml += [
+                    '<div class="search-box">',
+                        '<div class="search-box-head search-box-head-text no-border">',
+                            '<div class="search-box-head-label">',
+                                '<label>' + tmp_desc + '</label>',
+                            '</div>',
+                        '</div>',
+                        '<div class="search-box-main">',
+                            // '<input type="text" id="s-' + tmp_field + '" placeholder="输入' + tmp_desc + '" onblur="this.placeholder=\'输入' + tmp_desc + '\'" onfocus="this.placeholder=\'\'">',
+                            '<input type="text" id="s-' + tmp_field + '" data-field="' + tmp_field + '" data-title="' + tmp_desc + '">',
+                        '</div><!--/.search-box-main-->',
+                    '</div>'
+                ].join('\r\n');    
+            }
+            allHtml += '</div><!--/.ne-search-form-->';
+            return allHtml;
+        },
 
         /**
          * 默认数据源(演示用)
@@ -2666,11 +2142,37 @@ var neuiSearchBox = {
                     $(this).hasClass('checked') ? $(this).removeClass('checked') : $(this).addClass('checked');
                 })
             }
+        },
+
+        /**
+         * 获取电脑端搜索框查询字符串
+         */
+        getPcQueStr: function(){
+            var query_str = '';
+            $('.ne-search-form .search-box').each(function(){
+                var $input = $('input', this);
+                var column = $input.attr('data-field'),
+                    title = $input.attr('data-desc'),
+                    value = neFormTools.filterHtmlCode($input.val());
+                if(value.replace(/([\s]+)/g, '') !== ''){
+                    if(query_str == ''){
+                        query_str += column + " like ''%" + value + "%''";
+                    }
+                    else{
+                        query_str += " and " + column + " like ''%" + value + "%''";
+                    }   
+                }
+            })
+            return query_str;
         }
 
 
 
-    } //END methods
+    }; //END methods
+
+
+
+
 
 
     //================================================================
@@ -2684,5 +2186,600 @@ var neuiSearchBox = {
         }else{
             $.error('Method ' + method + ' does not exist');
         }
-    }
+    };
 })(jQuery);
+
+
+
+
+
+
+
+
+/*———————————————————————————————————————————————————————————————————————————————————————————————
+ *                                    工具库
+———————————————————————————————————————————————————————————————————————————————————————————————*/
+var neFormTools = {
+
+    /**
+     * 原生js获取元素style属性 add 20211129-1
+     * [用途]：原生js获取元素margin外边距、内边距padding
+     * [注意]：返回值中的各个属性值带单位px
+     * 兼容性：兼容IE、火狐、谷歌
+     * @param {HTML DOM} o DOM元素。
+     * @returns {object} 返回元素的各种css属性组成的数组。
+     * [示例]
+        var div = document.getElementById("user");
+        var style = getElementStyle(div);
+        alert(style.marginTop);
+    */
+    getElementStyle: function(o){
+        //  兼容IE和火狐谷歌等的写法
+        if (window.getComputedStyle) {
+            var style = getComputedStyle(o, null);
+        } else {
+            style = o.currentStyle; // 兼容IE
+        }
+        return style;
+    },
+
+
+    /**
+     * 判断是否JSON对象
+     * @param {object} ps_obj 目标对象
+     * @returns 返回布尔值. true 是, false 否
+     */
+    isJsonObject: function(ps_obj){
+        return typeof(ps_obj) == "object" && Object.prototype.toString.call(ps_obj).toLowerCase() == "[object object]" && !ps_obj.length;
+    },
+
+    /**
+     * 光标聚焦，并移动到最后
+     * 默认的调用element.focus()光标会在最前面，故需重写focus
+     * @param {HTML DOM} 要聚焦的元素
+     */
+    setFocus: function(o){
+        if (o.setSelectionRange) {
+            o.focus();
+            o.setSelectionRange(o.value.length, o.value.length);
+        } else {
+            var range = o.createTextRange(); // 创建Range对象操作文本
+            range.moveStart('character', o.value.length); // 修改文档的开始节点，向后移动长度
+            range.collapse(false);  // true 移动到开始, false 移动到最后
+            range.select();
+        }
+    },
+
+
+    /**
+     * 在当前元素后面创建一个新元素(新元素指定class类名属性)
+     * 注：该新元素的class属性命名规则和当前元素的第一个class类名一样。
+        eg. 已有节点class="pp__content a b c"，新元素指定class必须包含client，则新元素的class="pp__client"
+        eg. 已有节点class="pp-content a b c"，新元素指定class必须包含client，则新元素的class="pp-client"
+        eg. 已有节点class="pp_content a b c"，新元素指定class必须包含client，则新元素的class="pp_client"
+        eg. 已有节点class="pp a b c"，新元素指定class必须包含client，则新元素的class="client"
+        * @param {HTML DOM} o 当前元素
+        * @param {string} cname 指定新元素的class类名
+        * @returns {HTML DOM} 返回新元素对象
+        */
+    createOneNextNode: function(o, cname){
+        if(typeof o.className == 'undefined' ) return null;
+        var tmpClassName = o.className.toString().split(' ')[0];
+        var jointArr = [ '__', '_', '-' ]; // 可能的分割符组成的数组
+        var indexArr = [ ]; // 分割符在字符串的位置组成的数组
+        for(var i = 0; i < jointArr.length; i++){
+            indexArr.push(tmpClassName.indexOf(jointArr[i]));
+        }
+        var index = this.getArrayMaxValue(indexArr); // 取最大值
+        var jointChar = ''; // 新元素类名连接符
+        for(var i = 0; i < jointArr.length; i++){
+            var char = jointArr[i];
+            if(tmpClassName.indexOf(char) >= 0){
+                jointChar = char;
+                break;
+            }
+        }
+        // console.log('连字符：', jointChar);
+        if(jointChar == '') jointChar = '__';
+        var realClassName = tmpClassName.substr(0, index).toString().replace(/([]+)/g, '');
+        // console.log('jointArr：', jointArr, '\ntmpClassName：',tmpClassName, '\nindex：', index, '\nrealClassName：', realClassName);
+        var finalClassName = realClassName + ( realClassName === '' ? '' : jointChar ) + cname;
+        var tempNode = document.getElementsByClassName(finalClassName)[0];
+        if(tempNode == null){
+            tempNode = document.createElement('div');
+            tempNode.className = finalClassName;
+            this.insertAfter(tempNode, o);
+        }
+        tempNode.className += finalClassName == cname ? '' : ' ' + cname;
+        return tempNode;
+    },
+
+
+    /**
+     * 取数组中的最大值
+     * @param {array} arr 数组
+     * @returns {number} 返回数组中最大的值的那个元素
+     */
+    getArrayMaxValue: function(arr){
+        var max = arr[0];
+        for(var i = 0; i < arr.length; i++){
+            max = max < arr[i + 1] ? arr[i + 1] : max;
+        }
+        return max;
+    },
+
+    /**
+     * 获取字符串对应的元素节点(供jq调用)
+     * eg1. 'floor' <=> '.floor'
+     * eg2. 'floor build' <=> '.floor.build'
+     * @param {string} ps_str 字符串
+     * @returns 返回元素节点
+     */
+    getStringClassName: function(ps_str){
+        if(ps_str.replace(/([ ]+)/g, '') === '') return '';
+        var arr = ps_str.replace(/([ ]+)/g, ' ').split(' ');
+        var str = '';
+        for(var i = 0; i < arr.length; i++){
+            str += '.' + arr[i];
+        }
+        return str;
+    },
+
+    /**
+     * 获取元素节点对应的字符串(供dom调用)
+     * eg1. '.floor' <=> 'floor'
+     * eg2. '.floor.build' <=> 'floor build'
+     * @param {string} ps_str 元素节点
+     * @returns 返回字符串
+     */
+    getClassNameString: function(ps_str){
+        if(ps_str.replace(/([ ]+)/g, '') === '') return '';
+        var tmpStr = ps_str.toString().replace(/([\.]+)/g, ' ');
+        return ps_str.indexOf('.') == 0 ? (tmpStr.substr(1, tmpStr.length)) : tmpStr;
+    },
+
+
+    
+    /**
+     * 将未知的对象转化为dom对象
+     * @param {Selector String || jQuery Object || HTML DOM} o 未知的对象。几种可能的值如下：
+        选择器字符串 '.user', '#user' 
+        jq对象 '.user', '#user'
+        dom对象 document.getElementById('#user') 或 document.getElementsByClassName('user')
+        * @returns {HTML DOM} 返回dom对象(注意不是元素集合nodeList)
+        */
+    anyToDomObject: function(o){
+        // var str = o.toString().replace(/([\#\.]+)/g, ''); // 去掉井号#和点号.
+        if(o == null) return null;
+        return o instanceof jQuery ? 
+            o[0] : 
+            ( o.nodeName ?  // 判断是否dom对象
+                o : 
+                (
+                    o.item ? // nodeList对象
+                    o[0] : 
+                    (   document.getElementById(o.toString().replace(/([\#\.]+)/g, '')) != null ? 
+                        document.getElementById(o.toString().replace(/([\#\.]+)/g, '')) : 
+                        document.getElementsByClassName(o.toString().replace(/([\#\.]+)/g, ''))[0]
+                    )
+                ) 
+            );
+    },
+
+
+    /**
+     * 原生js获取子节点集合(不含孙子节点) (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {NodeList || null} 返回子节点集合或null
+     */
+    getChildElement: function(o){
+        if(o == null) return null;
+        var children = o.childNodes;
+        for (var i = 0; i < children.length; i++) {
+            var s = children[i].nodeName,
+                r = children[i].nodeValue;
+            if (s == "#comment" || (s == "#text" && /\s/.test(r))) { // 排除注释节点或文本节点或空节点(空或换行)
+                o.removeChild(children[i]);
+            }
+        }
+        return o.childNodes; // return o.children;
+    },
+
+    /**
+     * 原生js获取第一个子节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {HTML DOM || null} 返回元素对象或null
+     */
+        getFirstChildElement: function(o){
+        if(o == null) return null;
+        return o.children[0];
+    },
+
+    /**
+     * 原生js获取最后一个子节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {HTML DOM || null} 返回元素对象或null
+     */
+        getLastChildElement: function(o){
+        if(o == null) return null;
+        return o.children[o.children.length - 1];
+    },
+
+
+    /**
+     * 原生js获取下一个兄弟节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {HTML DOM || null} 返回元素对象或null
+     */
+    getNextElement: function(o){
+        if(o == null) return null;
+        var e = o.nextSibling;
+        if(e == null){ // 测试节点是否存在，否则返回null
+            return null;
+        }
+        if(e.nodeType == 3){ // 如果元素为文本节点
+            var two = this.getNextElement(e);
+            if(two != null && two.nodeType == 1)
+                return two;
+        }else{
+            if(e.nodeType == 1){ // 确认节点为元素节点才返回
+                return e;
+            }else{
+                return null;
+            }
+        }
+    },
+
+
+    /**
+     * 原生js获取上一个兄弟节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前节点
+     * @returns {HTML DOM || null} 返回元素对象或null
+     */
+        getPrevElement: function(o){
+        if(o == null) return null;
+        var e = o.previousSibling;
+        if(e == null){ // 测试节点是否存在，否则返回null
+            return null;
+        }
+        if(e.nodeType == 3){ // 如果元素为文本节点
+            var two = this.getPrevElement(e);
+            if(two != null && two.nodeType == 1)
+                return two;
+        }else{
+            if(e.nodeType == 1){ // 确认节点为元素节点才返回
+                return e;
+            }else{
+                return null;
+            }
+        }
+    },
+
+
+    /**
+     * 原生js获取所有兄弟节点
+     * @param {HTML DOM} o 当前节点
+     * @returns {Array} 返回兄弟节点组成的数组
+     */
+    getAllSiblingElement: function(o) {
+        var a = [];
+        var p = o.parentNode.children;
+        for(var i = 0, len = p.length; i< len; i++) {
+            if(p[i] !== o) a.push(p[i]);
+        }
+        return a;
+    },
+
+    /**
+     * 原生js获取前面所有的兄弟节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前元素对象节点
+     * @returns {Array} 返回数组，数组中的元素为dom对象
+     */
+    getAllPrevElement: function(o){
+        var arr = [];
+        var parent = o.parentNode;
+        if(parent == null) return [];
+        for(var i = 0; i < parent.children.length; i++){
+            var child = parent.children[i];
+            if(child == o){
+                break;
+            }else{
+                arr.push(child)
+            }
+        }
+        return arr;
+    },
+
+
+    /**
+     * 原生js获取后面所有的兄弟节点 (兼容ie6+)
+     * 注：已排除文本、空格，换行符
+     * @param {HTML DOM} o 当前元素对象节点
+     * @returns {Array} 返回数组，数组中的元素为dom对象
+     */
+    getAllNextElement: function(o){
+        var arr = [];
+        var parent = o.parentNode;
+        if(parent == null) return [];
+        var index = -1;
+        for(var i = 0; i < parent.children.length; i++){
+            var child = parent.children[i];
+            if(child == o){
+                index = i;
+            }else{
+                if(index != -1 && i > index) arr.push(child);
+            }
+        }
+        return arr;
+    },
+
+    
+
+
+
+        /**
+     * 原生js append字符串
+     * 即：向已存在的节点对象后面追加HTML字符串
+     * @param {string} str 字符串
+     * @param {HTML DOM} el 已存在的节点对象
+     */
+    appendHTML: function(str, el){
+        HTMLElement.prototype.appendStr = function(str) {
+            var divTemp = document.createElement("div"), nodes = null, 
+                fragment = document.createDocumentFragment(); // 文档片段，一次性append，提高性能
+            divTemp.innerHTML = str;
+            nodes = divTemp.childNodes;
+            for (var i=0, length=nodes.length; i<length; i+=1) {
+            fragment.appendChild(nodes[i].cloneNode(true));
+            }
+            this.appendChild(fragment);
+            // 据说下面这样子世界会更清净
+            nodes = null;
+            fragment = null;
+        }
+        el.appendStr(str);
+    },
+
+
+    /**
+     * 原生js prepend字符串
+     * 即：向已存在的节点对象前面追加HTML字符串
+     * @param {string} str 字符串
+     * @param {HTML DOM} el 已存在的节点对象
+     */
+    prependHTML: function(str, el) {
+        var divTemp = document.createElement("div"), nodes = null
+            , fragment = document.createDocumentFragment();
+    
+        divTemp.innerHTML = str;
+        nodes = divTemp.childNodes;
+        for (var i=0, length=nodes.length; i<length; i+=1) {
+        fragment.appendChild(nodes[i].cloneNode(true));
+        }
+        // 插入到容器的前面 - 差异所在
+        el.insertBefore(fragment, el.firstChild);
+        // 内存回收？
+        nodes = null;
+        fragment = null;
+    },
+
+    /**
+     * 原生js在已存在的节点向后面插入新节点(兼容ie9-)
+     * @param {HTML DOM} newNode 新节点
+     * @param {HTML DOM} existingNode 已存在的节点
+     */
+        insertAfter: function(newNode, existingNode) {
+        var parent = existingNode.parentNode;
+        // 最后一个子节点 lastElementChild兼容其他浏览器 lastChild  兼容ie678;
+        var lastNode = parent.lastElementChild || parent.lastChild;
+        // 兄弟节点同样也是有兼容性
+        var siblingNode = existingNode.nextElementSibling || existingNode.nextSibling;
+        if (lastNode == existingNode) // 先判断目标节点是不是父级的最后一个节点，如果是的话，直接给父级加子节点就好
+        { 
+            parent.appendChild(newNode);
+        }
+        else // 不是最好后一个节点  那么插入到目标元素的下一个兄弟节点之前（就相当于目标元素的insertafter）
+        { 
+            parent.insertBefore(newNode, siblingNode);
+        }
+    },
+
+        /**
+     * 原生js移除指定节点(兼容ie11-)
+     * @param {HTML DOM} node 要移除的节点
+     */
+    removeNode: function(node){
+        // node.remove();
+        node.parentNode.removeChild(node);
+    },
+
+    /**
+     * 删除节点下所有子节点，即清空元素内容(类似jq .empty())
+     * @param {HTML DOM} o 当前节点
+     */
+    removeAllChildren: function(o){
+        while (o.hasChildNodes()) {
+            o.removeChild(o.lastChild);
+        }　
+    },
+
+
+    /**
+     * 过滤字符串中相同的字符
+     * 即字符串中相同的字符只保留第一个
+     * @param {string} ps_str 原字符中
+     * @param {string} ps_char 指定要过滤的字符(可选). 若缺省则默认替换所有相同的字符
+     * @returns {string} 返回新字符串
+     * eg.
+        repeatedChar('0.56.578.59', '.'); //0.5657859
+        repeatedChar('0.56.578.59'); //0.56789
+    */
+    repeatedChar: function(ps_str, ps_char){
+        var char = typeof ps_char == 'undefined' ? '' : ps_char;
+        var result = ps_str.replace(/./g, function(s, index){
+            return ps_str.indexOf(s) == index ? s : ( char == '' ? '' : (char == s ? '' : s) );
+        })
+        return result;
+    },
+
+
+    /**
+     * 数字千分位(不处理小数部分)，即每三位数字一个用一个逗号,分隔开
+     * @param {string | number} ps_str 原始数字
+     * @returns {string} 返回经过千分位处理后的新数字
+     * [示例]
+        eg1. 2500347 <=> 2,500,347
+        eg2. 2500347.90185 <=> 2,500,347.90185
+    */
+    thousandth: function(ps_str){
+        var arr = ps_str.toString().split('.');
+        return arr[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (arr.length <= 1 ? '':  '.' + arr[1]);
+    },
+    
+
+    /**
+     * 判断是否手机号码(正则表达式验证)
+     * @param {string} str 电话字符串
+     * @param {options} 验证类型等参数组成的对象. eg. {pattern: "mobilephone"}.
+     * @returns {boolean} 返回布尔值. true 是, false 否
+     */
+    isTel:function(str, options){
+        var defaults = {
+            mode: "standard", // 校验模式(可选)。值： standard 标准模式，即严格校验电话格式(默认), loose 宽松模式，即只校验电话位数
+            pattern: "mobilephone", // 验证类型(只在mode="standard"时有效)(可选)。值：mobilephone 只验证是否移动电话(默认), telephone 只验证是否固话, both 移动电话或固话皆可以
+            bit: { // 校验的电话位数(只在mode="loose"时有效)(可选)
+                from: 6, // 校验6位(可选)。与to配合使用,可与to值相等
+                to: 12 // 校验12位(可选)。与from配合使用,可与from值相等
+            }
+        }
+        var settings = $.extend(true, {}, defaults, options || {});
+        var mode = settings.mode,
+            pattern = settings.pattern;
+            bit = settings.bit;
+        var from = parseInt(bit.from),
+            to = parseInt(bit.to);
+
+        var bools = false;
+        if(mode == 'standard'){ //标准校验模式
+            //var reg1 = /^0?1[3|4|5|7|8|9][0-9]\d{8}$/; //手机号码：13,14,15,17,18,19开头电话号码
+            var reg1 = /^(0|86)?1\d{10}$/; //手机号码：11位数字. 最前面的 0是长途冠码, 86是中国区号
+            var reg2 = /^((0|\+)?86(\s{1})?)?(0?\d{2,3}(\-|\s{1})?)?\d{7,8}$/; //固定电话：前面086或+86是中国区号, 中间10或010或0595是区号, 后面7-8位是号码	
+            if(pattern == 'mobilephone'){ //只能移动电话
+                bools = reg1.test($.trim(str)) ? true : false;
+            }
+            if(pattern == 'telephone'){ //只能固话(固定电话)
+                bools = reg2.test(str) ? true : false;
+            }
+            if(pattern == 'both'){ //移动电话或固话
+                bools = reg1.test($.trim(str)) || reg2.test(str) ? true : false;
+            }
+        }else{ //宽松校验模式
+            //if(str.trim().length == 11) return true; //只检验是否11位
+            //if(str.trim().length <= 12 && str.trim().length >= 6) return true; //只检验是否6-12位(含固话、手机号）,不兼容ie8(若节点不存在，直接str.trim()会报错）
+            if($.trim(str).length <= to && $.trim(str).length >= from) return true; //只检验是否6-12位(含固话、手机号), 兼容ie8及以下版本
+        }
+
+        return bools;
+    },
+
+
+    /**
+     * 判断是否存在对话框控件
+     * @returns {boolean} 返回布尔值. true 存在, false 不存在
+     */
+    isExistDialogControl: function(){
+        if(typeof neuiDialog == 'undefined') return false;
+        if(typeof neuiDialog.alert !== 'function') return false;
+        return true;
+    },
+
+
+    /**
+     * 过滤HTML代码
+     * @param {string} str 原字符串
+     * @param {boolean} isHTML 是否要过滤标签、css、js、换行、空格等多余内容, 默认true(可选). false时虽然不过滤但会将标签转义成字符
+     * @returns {string} 返回新字符串
+     */
+    filterHtmlCode: function(ps_str, isHTML){
+        var flag = typeof isHTML == 'undefined' ? true : (isHTML === false ? false : true);
+        if(flag){
+            if(typeof ps_str == 'undefined' || ps_str == null) return '';
+            var ps_str = ps_str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); //过滤css
+            ps_str = ps_str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g, ''); //过滤js
+            ps_str = ps_str.replace(/<[^<>]+?>/g, ''); //过滤标签
+            // ps_str = ps_str.replace(/\ +/g, ''); //去掉空格
+            ps_str = ps_str.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); //去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格
+            ps_str = ps_str.replace(/[\r\n]+?/g, ' '); //去掉换行(变成一个空格)
+        }
+        if(typeof this.encodeHtml == 'function') ps_str = this.encodeHtml(ps_str); //标签转化成字符串
+        return ps_str;
+    },
+
+
+
+        /**
+     * 将标签转换成字符串（即HTML编码）
+     * HTML与字符串互转义
+     * @param {string} ps_str 含有标签的字符串
+     * @returns {string} 返回不含标签的字符串
+     * eg1.将 < 转义成 &lt; eg2.将 > 转义成 &gt;
+     */
+    encodeHtml: function(ps_str){
+        var temp = document.createElement("div");
+        (temp.textContent != null) ? (temp.textContent = ps_str) : (temp.innerText = ps_str);
+        // 转义替换
+        var output = temp.innerHTML.toString().replace(/\'/g, '&apos;').replace(/\"/g, '&quot;') // 单双引号转义
+        // 回车换行替换成<br>
+        output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
+        output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
+        // <br>替换成<p>
+        if(output.indexOf('<br>') > -1){
+            // 让p标签成对出现
+            output = output.replace(/\<br\>/g, '</p><p>');
+            output = output.replace(/^(?!\<.*)/g, '<p>');
+            output = output.replace(/(?!\>.*)$/g, '</p>');
+            // 替换中间没有内容的空标签. eg.<p></p>
+            output = output.replace(/(\<p\>\<\/p\>)/g, '');
+        }
+        // 其它替换
+        // 注：部分ios中手写输入时即使过滤掉所有空格了还会出现一个空格，如果把空格转换成&nbsp;的话数据库中会有&nbsp;导致搜索等功能匹配不了。
+        // 故解决思路是：移动端把所有空格替换成空，在pc端把所有空格替换成一个&nbsp;
+        if(typeof checker != 'undefined' && typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
+            output = output.replace(/\t/g, ''); // 制表符替换成空
+            output = output.replace(/([\s]+)/g, ' '); // 多个空格替换成一个空格
+        }else{ // pc端时
+            output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
+            output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
+        }
+        output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');  // div标签换成p
+        // 字符串化+斜杠处理
+        output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
+        output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
+        output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
+        //
+        temp = null;
+        return output;
+    },
+
+    /**
+     * 提取字符串中的电话号码，包括固话或手机号
+     * 注：只提取第一次出现的电话号码
+     * @param {string} ps_str 字符串
+     * @returns {number} 返回电话号码
+     */
+    pickTel: function(ps_str){
+        if(ps_str == null) return '';
+        var str = ps_str.toString().replace(/^(.*?)([\d\-]+)(.*)/g, '$2').toString().replace(/\-/g, '');
+        str = /^[0-9]+$/.test(str.toString()) ? str : ''; // 纯数字时是电话则返回电话，否则返回空
+        return str;
+    }
+
+}; // END tools
+    
+
