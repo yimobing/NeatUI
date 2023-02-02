@@ -93,6 +93,10 @@
             load: '<div class="neRoll__load"><span class="loading"></span><em>' + me.opts.labelUp.load + '</em></div>'
         }
 
+        // scrollArea 参数值为 'self'时，默认 me.$element 表示当前绑定的元素自身 add by chr 20230202
+        if(me.opts.scrollArea != win){
+            me.opts.scrollArea = me.$element;
+        }
 
         // 若是下滚，则事先在下方插入DOM
         if(me.opts.loadDownFn != ''){
@@ -185,19 +189,19 @@
 
 
         //--------START ios bug：当前页面被iframe嵌入时, $(window)对象可能会被识别为父页面的对象，导致$(window).on('scroll')不执行 edit by chr 20230202
-        if (top.location != self.location && /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase())){ // 使用iframe嵌入页面(即当前页面被嵌入到某个父页面中)，且当前设备为ios苹果手机时
-            if(me.$scrollArea == $win){
-                // window.location.host非空表示是web目录，空值表示页面直接打开(此时window.parent.document会涉及跨域报错问题)
-                var $obj = window.location.host !== '' ? $('iframe', window.parent.document) : $(window);
-                var h = $obj.height();
-                $('html, body').css({
-                    'overflow-y': 'scroll',
-                    '-webkit-overflow-scrolling': 'touch',
-                    'height': h
-                })
-                me.$scrollArea = $('body'); // 把滚动区域设为body即可
-            }
-		}
+        // if (top.location != self.location && /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase())){ // 使用iframe嵌入页面(即当前页面被嵌入到某个父页面中)，且当前设备为ios苹果手机时
+        //     if(me.$scrollArea == $win){
+        //         // window.location.host非空表示是web目录，空值表示页面直接打开(此时window.parent.document会涉及跨域报错问题)
+        //         var $obj = window.location.host !== '' ? $('iframe', window.parent.document) : $(window);
+        //         var h = $obj.height();
+        //         $('html, body').css({
+        //             'overflow-y': 'scroll',
+        //             '-webkit-overflow-scrolling': 'touch',
+        //             'height': h
+        //         })
+        //         me.$scrollArea = $('body'); // 把滚动区域设为body即可
+        //     }
+		// }
         //--------END IOS BUG
 
         // 加载下滚 
