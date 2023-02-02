@@ -3,7 +3,7 @@
  * 移动端下拉加载更多，上拉刷新控件
  * Author: ChenMufeng
  * Date: 2021.03.31
- * Pudate: 2021.04.02
+ * Pudate: 2023.02.02
  */
 ;(function($){
     // 【名词解释】移动端中,
@@ -181,7 +181,24 @@
                 }
                 fnAutoLoad(me);
             }, 150)
-        })
+        });
+
+
+        //--------START ios bug：当前页面被iframe嵌入时, $(window)对象可能会被识别为父页面的对象，导致$(window).on('scroll')不执行 edit by chr 20230202
+        if (top.location != self.location && /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase())){ // 使用iframe嵌入页面(即当前页面被嵌入到某个父页面中)，且当前设备为ios苹果手机时
+            if(me.$scrollArea == $win){
+                // window.location.host非空表示是web目录，空值表示页面直接打开(此时window.parent.document会涉及跨域报错问题)
+                var $obj = window.location.host !== '' ? $('iframe', window.parent.document) : $(window);
+                var h = $obj.height();
+                $('html, body').css({
+                    'overflow-y': 'scroll',
+                    '-webkit-overflow-scrolling': 'touch',
+                    'height': h
+                })
+                me.$scrollArea = $('body'); // 把滚动区域设为body即可
+            }
+		}
+        //--------END IOS BUG
 
         // 加载下滚 
         // Bug注意: 要先off一下,否则在多个选项卡中当每页记录数数比较大(比如20条),会出现未滚动到底部就多次加载数据导致系统卡顿
