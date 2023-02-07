@@ -189,19 +189,19 @@
 
 
         //--------START ios bug：当前页面被iframe嵌入时, $(window)对象可能会被识别为父页面的对象，导致$(window).on('scroll')不执行 edit by chr 20230202
-        // if (top.location != self.location && /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase())){ // 使用iframe嵌入页面(即当前页面被嵌入到某个父页面中)，且当前设备为ios苹果手机时
-        //     if(me.$scrollArea == $win){
-        //         // window.location.host非空表示是web目录，空值表示页面直接打开(此时window.parent.document会涉及跨域报错问题)
-        //         var $obj = window.location.host !== '' ? $('iframe', window.parent.document) : $(window);
-        //         var h = $obj.height();
-        //         $('html, body').css({
-        //             'overflow-y': 'scroll',
-        //             '-webkit-overflow-scrolling': 'touch',
-        //             'height': h
-        //         })
-        //         me.$scrollArea = $('body'); // 把滚动区域设为body即可
-        //     }
-		// }
+        /* if (top.location != self.location && /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase())){ // 使用iframe嵌入页面(即当前页面被嵌入到某个父页面中)，且当前设备为ios苹果手机时
+            if(me.$scrollArea == $win){
+                // window.location.host非空表示是web目录，空值表示页面直接打开(此时window.parent.document会涉及跨域报错问题)
+                var $obj = window.location.host !== '' ? $('iframe', window.parent.document) : $(window);
+                var h = $obj.height();
+                $('html, body').css({
+                    'overflow-y': 'scroll',
+                    '-webkit-overflow-scrolling': 'touch',
+                    'height': h
+                })
+                me.$scrollArea = $('body'); // 把滚动区域设为body即可
+            }
+		} */
         //--------END IOS BUG
 
         // 加载下滚 
@@ -215,7 +215,7 @@
                 //console.log('我要开始滚动了');
                 fnToDown(me);
             }
-        })
+        });
         
 
 
