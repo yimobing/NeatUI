@@ -93,45 +93,18 @@
             load: '<div class="neRoll__load"><span class="loading"></span><em>' + me.opts.labelUp.load + '</em></div>'
         }
 
-
-        // test1
-        var pingArr = me.opts.pingSelector;
-        var isMutipleDom = false; // 是否有多个拼接节点
-        if(pingArr != '' && pingArr instanceof Array){
-            isMutipleDom = pingArr.length > 1 ? true : false;
-        }
-        
-        // 使用iframe嵌入页面(即当前页面被嵌入到某个父页面中)，且当前设备为ios苹果手机时
-        if (top.location != self.location && /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase())){
-            if(me.opts.scrollArea == win){
-                me.opts.scrollArea = 'self';
-            }
-		}
-        
-
-        // 设定滚动区域节点，scrollArea 参数值不为 windows时 add by chr 20230202
+        // scrollArea 参数值为 'self'时，默认 me.$element 表示当前绑定的元素自身 add by chr 20230202
         if(me.opts.scrollArea != win){
-            // test1 test2
+            // test1
             // me.opts.scrollArea = me.$element;
-            if(isMutipleDom){// 多个拼接根节点时
-                if(me.opts.scrollArea == 'self'){ // 默认绑定的元素自身
-                    if($('.ne__roll_area').length == 0) me.$element.siblings().andSelf().wrapAll('<div class="ne__roll_area"></div>');
-                    me.opts.scrollArea = $('.ne__roll_area');
-                } 
-                else{ // 绑定前台指定的节点
-                    me.opts.scrollArea = $(me.opts.scrollArea); 
-                }
-            }
+            if(me.opts.scrollArea == 'self'){
+                me.$element.wrap('<div class="ne__roll_area"></div>');
+                me.opts.scrollArea = $('.ne__roll_area');
+            } 
             else{
-                if(me.opts.scrollArea == 'self'){ // 默认绑定的元素自身
-                    if($('.ne__roll_area').length == 0) me.$element.wrap('<div class="ne__roll_area"></div>');
-                    me.opts.scrollArea = $('.ne__roll_area');
-                } 
-                else{ // 绑定前台指定的节点
-                    me.opts.scrollArea = $(me.opts.scrollArea); 
-                }
-                // console.log('scrollArea：', me.opts.scrollArea);
+                me.opts.scrollArea = $(me.opts.scrollArea); 
             }
+            // console.log('scrollArea：', me.opts.scrollArea);
         }
 
         // 若是下滚，则事先在下方插入DOM
@@ -141,25 +114,25 @@
             // me.$domRoot = $('.' + me.opts.root);
             // me.$domDown = $('.' + me.opts.domDown.father);
 
-            // test1
-            // console.log('scrollArea：', me.opts.scrollArea);
+            var pingArr = me.opts.pingSelector;
+            var isMutipleDom = false; // 是否有多个拼接节点
+            if(pingArr != '' && pingArr instanceof Array){
+                isMutipleDom = pingArr.length > 1 ? true : false;
+            }
             if(isMutipleDom){ // 多个拼接根节点时
-                if(me.opts.scrollArea == win){
-                    if($('.' + me.opts.root).length == 0)
-                        me.$element.siblings().andSelf().wrapAll('<div class="' + me.opts.root + '"></div>');
-                    else
-                        me.$element.parent().next().remove();
-                    me.$element.parent().after('<div class="' + me.opts.domDown.father + '">'+ me.opts.domDown.more + '</div>');
-                }
-                else{ 
-                    // test2
-                    if($('.' + me.opts.root).length == 0)
-                        me.opts.scrollArea.wrap('<div class="' + me.opts.root + '"></div>');
-                    else
-                        me.opts.scrollArea.children(':last-child').remove();
-                    me.opts.scrollArea.append('<div class="' + me.opts.domDown.father + '">'+ me.opts.domDown.more + '</div>');
-                }
+                if($('.' + me.opts.root).length == 0)
+                    me.$element.siblings().andSelf().wrapAll('<div class="' + me.opts.root + '"></div>');
+                else
+                    me.$element.parent().next().remove();
+                me.$element.parent().after('<div class="' + me.opts.domDown.father + '">'+ me.opts.domDown.more + '</div>');
             }else{ // 单个拼接根节点
+                // test1
+                // if($('.' + me.opts.root).length == 0)
+                //     me.$element.wrap('<div class="' + me.opts.root + '"></div>');
+                // else
+                //     me.$element.next().remove();
+                // me.$element.after('<div class="' + me.opts.domDown.father + '">'+ me.opts.domDown.more + '</div>');
+
                 if(me.opts.scrollArea == win){
                     if($('.' + me.opts.root).length == 0)
                         me.$element.wrap('<div class="' + me.opts.root + '"></div>');
@@ -171,7 +144,7 @@
                     if($('.' + me.opts.root).length == 0)
                         me.opts.scrollArea.wrap('<div class="' + me.opts.root + '"></div>');
                     else
-                        me.opts.scrollArea.children(':last-child').remove();
+                        me.opts.scrollArea.children('last-child').remove();
                     me.opts.scrollArea.append('<div class="' + me.opts.domDown.father + '">'+ me.opts.domDown.more + '</div>');
                 }
             }
