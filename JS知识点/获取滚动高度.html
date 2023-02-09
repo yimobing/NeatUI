@@ -1,0 +1,29 @@
+// 判断滚动区域，设置初始文档高度、可视高度
+        if(me.opts.scrollArea == win || me.opts.scrollArea == 'window'){ // 滑动区域为WINDOWs
+            me.$scrollArea = $win;
+            me._scrollContentHeight = doc.documentElement.clientHeight || doc.body.clientHeight; // 获取win显示区高度  —— 这里有坑
+            //!!!一定不要使用下面这句,否则真实环境下会有问题
+             // me._scrollContentHeight = $doc.height(); //或doc.documentElement.scrollHeight || doc.body.scrollHeight; //文档高度
+            me._scrollWindowHeight =  $win.height(); // win.innerHeight || doc.documentElement.clientHeight || doc.body.clientHeight; //可视高度
+
+        }else{ // 滑动区域为元素自身，则必须手动设定高度
+            var SH = me.opts.scrollHeight === '' ? 0 : Math.floor(me.opts.scrollHeight.toString().replace(/px/g, ''));
+            //console.log('滑动区域高度:', SH, '\n视窗高度：', $win.height())
+            if(SH == 0 || SH > $win.height()){
+                var error = '请设置滑动区域高度，scrollHeight参数值必须大于0.\n注意：最大高度不能大于WINDOWS视窗高度：$(window).height()';
+                alert(error);
+                console.log(error);
+                return;
+            }else{
+                me.$element.css({
+                    'height': SH,
+                    'overflow-y': 'auto',
+                    '-webkit-overflow-scrolling': 'touch'
+                })
+            }
+
+            me.$scrollArea = me.opts.scrollArea instanceof jQuery ? me.opts.scrollArea : $(me.opts.scrollArea);
+            me._scrollContentHeight = me.$element[0].scrollHeight; //文档高度
+            me._scrollWindowHeight = me.$element.height(); //可视高度
+            //console.log('可视高度：', me.$element.css('height'))
+        }
