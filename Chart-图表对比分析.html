@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Chart 图表对比分析</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+<body>
+
+    <style>
+        *{margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -moz-box-sizing: border-box; }
+        .wrap{ padding: 15px 25px; }
+        .photo{ margin-bottom: 25px; border: 1px solid #555; border-radius: 4px; }
+    </style>
+
+    <div class="wrap">
+        <div class="photo" id="graph1"></div>
+        <div class="photo" id="graph2"></div>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script><!--jq库-->
+    <script type="text/javascript" src="assets/highcharts/highcharts.js"></script><!--交互图控件-->
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+        //——————————————————————————————————————————
+        // 设置画面在同一屏显示
+        var padding = parseFloat($('.wrap').css('paddingTop').replace(/px/g, '')),
+            margin = parseFloat($('.photo').css('marginBottom').replace(/px/g, '')),
+            winH = $(window).height();
+        $('.photo').css({
+            height: Math.floor( (winH - padding * 2 - margin * 2) / 2)
+        });
+
+    
+        /*+————————————————FUNCTION————————————————+*/
+    
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            // 第1张图数据源。x 表示横轴，y 表示纵轴
+            var dataSourceUpX = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+            var dataSourceUpY = [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 165.6, 134.4];
+            // 第2张图数据源
+            var dataSourceDownX = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+            var dataSourceDownY = [49.9, 88.5, 56.4, 49.2, 46.0, 66.0, 49.6, 88.5, 96.4, 77.1, 105.6, 54.4];
+
+
+            //——————————————————————————————————————————
+            // 第1张图配置
+            var upTitle = '股票走势图1'; // 标题
+            var upYDesTitle = '金额1(元)' // y轴描述
+            var upYTipTitle = '金额1'; // 数据提示框上的y轴描述
+            // 第2张图配置
+            var downTitle = '股票走势图2'; // 标题
+            var downYDesTitle = '金额2(元)' // y轴描述
+            var downYTipTitle = '金额2'; // 数据提示框上的y轴描述
+
+            
+
+            
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         系列事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            // 创建图表1
+            var chart1 = Highcharts.chart('graph1', {
+                credits: {
+                    enabled: false, // 禁用版权信息
+                },
+                title: {
+                    text: upTitle
+                },
+                exporting: false, // 是否使用导出功能
+                tooltip: {
+                    shared: true, // 是否将多个数据分享到同一个数据提示框中，也就是多个数据共用的数据提示框
+                    backgroundColor: '#FCFFC5',
+                    pointFormat: '{series.name}: <b>{point.y:.2f}元</b>' // point.y:.2f 表示保留2位小数，point.y:.0f 表示保留0位小数
+                    // 固定位置显示数据提示框
+                    // ,positioner: function() {
+                    //     return {
+                    //         x: 60,
+                    //         y: 80
+                    //     }
+                    // }   
+                },
+                colors: ['#ffa71b'],
+                // x轴配置
+                xAxis: {
+                    categories: dataSourceUpX, // 数据
+                    visible: false // 是否显示
+                },
+                // y轴配置
+                yAxis: {
+                    title: {
+                        text: upYDesTitle // y轴描述
+                    }
+                },
+                // 数据列(y轴)
+                series: [{
+                    name: upYTipTitle, // 数据提示框上显示的y轴描述
+                    data: dataSourceUpY
+                }],
+                // TEST:
+                plotOptions: {
+                    series: {
+                        // 事件
+                        events: {
+                            // INFO: 图例点击事件。不起作用！
+                            legendItemClick: function(e) {
+                                // 默认实现是显示或隐藏当前数据列，e 代表事件， this 为当前数据列
+                                // return false;
+                            },
+                            mouseOver: function(e){
+                                // console.log('移到标示线上面e：', e)
+                            },
+                            click: function(e){
+                                // console.log('点了标示线e：', e)
+                            }
+                        },
+                        // 数据列事件
+                        point: {
+                            events: {
+                                // INFO: 鼠标移动到数据列上时触发
+                                mouseOver:function(e){
+                                    // var chart =  this.series.chart;
+                                    // var x = this.x, // x轴的值
+                                    //      y = this.y; // y轴的值
+                                    // var p = this.series.points[x]; // 取当前点
+                                    // var p = this.series.points[x]; // 取当前图表活动点
+                                    // var p = chart.series[0].data[x]; // 取目标图表对应的活动点
+                                    // console.log('图表对象：', chart, '\n数据列：', this.series, '\活动点：', p);
+                                    showTooltip(this, chart1, chart2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+
+
+            //——————————————————————————————————————————
+            // 创建图表2
+            var chart2 = Highcharts.chart('graph2', {
+                credits: {
+                    enabled: false, // 禁用版权信息
+                },
+                title: {
+                    text: downTitle
+                },
+                exporting: false, // 是否使用导出功能
+                tooltip: {
+                    shared: true, // 是否将多个数据分享到同一个数据提示框中，也就是多个数据共用的数据提示框
+                    backgroundColor: '#FCFFC5',
+                    pointFormat: '{series.name}: <b>{point.y:.2f}元</b>' // point.y:.2f 表示保留2位小数，point.y:.0f 表示保留0位小数
+                    // 固定位置显示数据提示框
+                    // ,positioner: function() {
+                    //     return {
+                    //         x: 60,
+                    //         y: 80
+                    //     }
+                    // }   
+                },
+                colors: [ '#10b3ff'],
+                // x轴配置
+                xAxis: {
+                    categories: dataSourceDownX, // 数据
+                    visible: false // 是否显示
+                },
+                // y轴配置
+                yAxis: {
+                    title: {
+                        text: downYDesTitle // y轴描述
+                    }
+                },
+                // 数据列(y轴)
+                series: [{
+                    name: downYTipTitle, // 数据提示框上显示的y轴描述
+                    data: dataSourceDownY
+                }],
+                // TEST:
+                plotOptions: {
+                    series: {
+                        // 数据列事件
+                        point: {
+                            events: {
+                                // INFO: 鼠标移动到数据列上时触发
+                                mouseOver:function(e){
+                                    // var chart =  this.series.chart;
+                                    // var x = this.x, // x轴的值
+                                    //      y = this.y; // y轴的值
+                                    // var p = this.series.points[x]; // 取当前点
+                                    // var p = this.series.points[x]; // 取当前图表活动点
+                                    // var p = chart.series[0].data[x]; // 取目标图表对应的活动点
+                                    // console.log('图表对象：', chart, '\n数据列：', this.series, '\活动点：', p);
+                                    showTooltip(this, chart2, chart1);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+
+
+
+
+
+            //——————————————————————————————————————————
+            /**
+             * 显示数据提示框
+             * @param {object} ps_this 数据列对象
+             * @apram {object} ps_chart_self 当前图表对象
+             * @param {object} ps_chart_other 要显示数据提示框的图表对象(即哪张图表要显示数据提示框)
+             */
+             function showTooltip(ps_this, ps_chart_self, ps_chart_other) {
+                var x = ps_this.x,
+                    y = ps_this.y;
+                var p = ps_chart_other.series[0].data[x]; // 取目标图表对应的活动点
+                ps_chart_other.tooltip.refresh([ p ]);  // refresh([曲线1点1, 曲线2点2])
+                addPlot([ps_chart_self, ps_chart_other], x);
+            }
+
+
+
+            /**
+             * 设置标识线、标识区位置
+             * @param {object} ps_chart_arr 图表对象组成的数组
+             * @param {Number} ps_current_point 当前图表活动的数据点X轴值
+             */
+             function addPlot(ps_chart_arr, ps_current_point) {
+                for(var i = 0; i < ps_chart_arr.length; i++){
+                    var charts = ps_chart_arr[i];
+                    // 先删除标识线、标识区
+                    charts.xAxis[0].removePlotLine();
+                    charts.xAxis[0].removePlotBand();
+                    // 再动态添加标识线
+                    charts.xAxis[0].addPlotLine({
+                        value: ps_current_point,
+                        color: '#b2cada',
+                        dashStyle: 'solid', //默认值，这里定义为实线
+                        width: 2,
+                        zIndex: 1
+                    });
+                    // 再动态添加标识区
+                    charts.xAxis[0].addPlotBand({
+                        from: ps_current_point - 0.3,
+                        to: ps_current_point + 0.3,
+                        color: '#e4f2ff',
+                    });
+                }
+            }
+
+
+
+
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
