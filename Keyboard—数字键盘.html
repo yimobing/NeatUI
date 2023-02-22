@@ -303,7 +303,8 @@
 					// size: 'small', // 键盘尺寸,仅在mode='computer'时有效(可选). normal 正常(默认), small 小型, little 较小型, tiny 微型
 					theme: 'popular', // 样式风格(可选)，默认'normal'。值: normal 默认中规中矩的, popular 现代流行的。
 					title: '键盘', // 键盘抬头标题(可选), 默认空。theme='popular'时，本参数失效。
-					hasPoint: false, // 是否有小数点(可选),默认true
+					hasPoint: true, // 是否有小数点(可选),默认true
+					hasMinus: true, // 是否有负号(可选),默认false
 
 					// 最小值最大值->针对所有调用数字键盘的元素都有效
 					// minimum: 10, // 输入最小值(可选)
@@ -315,16 +316,23 @@
 
 
 					// 几个回调函数
-					keyCallBack: function () { // 点击数字键盘按键时的回调函数
+					openBack: function (e) { // 打开(点击元素)时的回调函数(可选)。常用于输入框on focus事件。返回值格式. {element: '当前元素对象', value:'当前元素值'}
+						console.log('打开e：', e)
+						rate2Decimal(this.object); // 利率转化成小数
+					},
+					numericBack: function (e) { // 点击数字键时的回调函数(可选)。常用于输入框on input事件。返回值格式. {element: '当前元素对象', value:'当前元素值', key: '当前数字键盘键对象'}
+						console.log('输入e：', e)
 						countWorthFunc(this.object);
 						keyboadCheck.checkHighlight(this.object); // 验证电话号码是否有效
 					},
-					eleCallBack: function () { // 点击元素时的回调函数（输入框聚焦focus）
-						rate2Decimal(this.object); // 利率转化成小数
-					},
-					closeCallBack: function () { // 关闭数字键盘时的回调函数（输入框失焦blur）
+					closeBack: function (e) { // 关闭时的回调函数(可选)。常用于输入框on blur事件。 {element: '当前元素对象'}
+						console.log('关闭e：', e)
 						decimal2Rate(this.object); // 小数转化成利率
+					},
+					spaceBack: function(e) { // 点击退格键(删除键)时的回调函数(可选)。 {element: '当前元素对象', value:'当前元素值', key: '当前数字键盘键对象'}
+						console.log('退格e：', e)
 					}
+
 				})
 
 			});

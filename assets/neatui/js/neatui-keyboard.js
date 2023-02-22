@@ -19,14 +19,16 @@
 				theme: 'normal', // 样式风格(可选)，默认'normal'。值: normal 默认中规中矩的, popular 现代流行的。
 				title: '', // 键盘抬头标题(可选), 默认空。theme 参数值为popular时，本参数失效。
 				hasPoint: true, // 是否有小数点(可选),默认true
+				hasMinus: false, // 是否有负号(可选),默认false
 				minimum: null, // 输入最小值(可选)
 				maximum: null, // 输入最大值(可选)
-				keyCallBack: null, // 点击数字键盘按键时的回调函数
-				eleCallBack: null, // 点击元素时的回调函数(元素指调用本控件的元素)
-				closeCallBack: null  // 关闭数字键盘时的回调函数
+				
+				openBack: null, // 打开(点击元素)时的回调函数(可选)。常用于输入框on focus事件。返回值格式. {element: '当前元素对象', value:'当前元素值'}
+				numericBack: null, // 点击数字键时的回调函数(可选)。常用于输入框on input事件。返回值格式. {element: '当前元素对象', value:'当前元素值', key: '当前数字键盘键对象'}
+				spaceBack: null, // 点击退格键(删除键)时的回调函数(可选)。 {element: '当前元素对象', value:'当前元素值', key: '当前数字键盘键对象'}
+				closeBack: null  // 关闭时的回调函数(可选)。常用于输入框on blur事件。 {element: '当前元素对象'}
 			}
 			var settings = $.extend({}, defaults, options);
-
 			this.each(function () {
 				var $this = $(this);
 				settings.object = $this; // 当前元素对象
@@ -57,11 +59,11 @@
 					var themeClass = settings.theme == 'popular' ? ' fashion-popular' : '';
 					// 生成数字键盘节点
 					var html = '<div class="ne-keyboard-layer' + topClass + themeClass + '">';
-					html += settings.theme != 'popular' ? '' : '<div class="keyboard__down"></div>';
+					html += settings.theme != 'popular' ? '' : '<div class="keyboard__down"><span>关闭</div>'; // 关闭
 					html += settings.theme == 'popular' ? '' : (settings.title == '' ? '' : '<div class="keyboard__title">' + settings.title + '</div>');
 					html += [
 						'<div class="keyboard__edit clearfix">',
-							'<div class="keyboard__num">',
+							'<div class="keyboard__keys keyboard__num">',
 								'<div class="num">1</div>',
 								'<div class="num">2</div>',
 								'<div class="num">3</div>',
@@ -72,13 +74,18 @@
 								'<div class="num">8</div>',
 								'<div class="num">9</div>',
 							'</div>',
-							'<div class="keyboard__num keyboard__operate">',
+							'<div class="keyboard__keys keyboard__operate">',
 								(
 									settings.hasPoint == true ? 
 										'<div class="num keyboard__dot">.</div>'
 										:
-										'<div class="keyboard__fill"></div>' 
-										
+										(settings.hasMinus == true ? '' : '<div class="keyboard__fill"></div>' )
+								),
+								(
+									settings.hasMinus == true ? 
+										'<div class="num keyboard__minus">-</div>'
+										:
+										'' 
 								),
 								'<div class="num keyboard__zero">0</div>',
 								'<div class="keyboard__backspace"></div>', // 删除
@@ -162,8 +169,12 @@
 								scrollH = scrollT + (numH - botH) ;
 							}
 						}else{ // ②滚动到底了
-							// console.log('ddd');
+							// console.log('docH：', docH, '\nwinH:', winH, '\nbodyH：', $('body').height())
+							// console.log('ddd'); // test1
 							padH = numH - botH + datum;
+							if($('body').height() < winH){ // 如果内容还没占满一屏
+								padH += winH - $('body').height();
+							}
 							scrollH = scrollT + padH;
 						}
 					}else{ // 2.没有被挡柱
@@ -175,7 +186,13 @@
 
 
 					event.stopPropagation(); // 阻止冒泡(必须!)
-					if (settings.eleCallBack) settings.eleCallBack(); // 点击元素时的回调函数
+					if (settings.openBack){
+						var tag = $this[0].tagName.toLocaleLowerCase();
+						settings.openBack({
+							element: $this,
+							value: tag == 'input' || tag == 'textarea' ? $this.val() : ($this.html($this.html()))
+						});
+					}
 					if (typeof (keyboardUi.showCursor) == 'function' && typeof (keyboardUi.removeCursor) == 'function') {
 						keyboardUi.removeCursor($this); // 移除所有假光标 add 20180507-1
 						keyboardUi.showCursor($this); // 添加假光标 
@@ -183,14 +200,17 @@
 
 					// ======点击数字键盘及当前点击的元素以外的区域时隐藏/删除数字键盘
 					$(document).on('click', function (e) {
-						console.log('selector;', selector)
 						if ($(e.target).closest(selector).length != 0) return; // e.target.closest(selector).length==0 说明点击的不是元素selector区域,反之则是
 						isInputLegal($this); // 检验输入是否合法 add 20181126
 						$('body').removeAttr('style'); // 移除html,body设置的style样式 add 20171220-1
 						// $('.ne-keyboard-layer').remove();
 						$('.ne-keyboard-layer').slideUp('fast', function () { // edit 20190605 把其它函数移到 slideUp里面
 							$(this).remove();
-							if (settings.closeCallBack) settings.closeCallBack(); // 关闭数字键盘时的回调函数
+							if (settings.closeBack){
+								settings.closeBack({
+									element: $this
+								});
+							}
 							if (typeof (keyboardUi.removeCursor) == 'function') keyboardUi.removeCursor($this); // 移除当前节点以外的所有假光标
 						})
 
@@ -202,41 +222,58 @@
 						e.preventDefault(); // 防止手机端输入时屏幕移动
 						var type = $this[0].tagName.toLocaleLowerCase(); // 绑定元素的类型（即标签名称):input span div select 
 						// console.log('点击数字键，当前点击的元素类型为：',type);
-						if (type != 'input') { // div,span等元素时
-							var html = $this.html();
-							html += this.innerHTML;
-							$this.html(html);
-						} else { // input元素时
-							var value = $this.val();
-							value += this.innerHTML;
+						var innerHtml = this.innerHTML;
+						var value = $this.val() + innerHtml,
+							html = $this.html() + innerHtml;
+						// test1
+						// if($(this).hasClass('keyboard__minus')){ // 负号
+						// 	value = value.toString().replace(//g, '-');
+						// }
+						if (type == 'input' || type == 'textarea') { // input textarea时
+							// var value = $this.val();
+							// value += this.innerHTML;
+							// $this.val(value);
 							$this.val(value);
+						} else { // div,span等时
+							// var html = $this.html();
+							// html += this.innerHTML;
+							// $this.html(html);
+							$this.html(html);
 						}
-
 						if (typeof (keyboardUi.removeCursor) == 'function') keyboardUi.removeCursor($this); // 移除当前节点以外的所有假光标
-
-						if (settings.keyCallBack) settings.keyCallBack(); // 点击数字键盘按键时的回调函数
-
-
+						if (settings.numericBack){
+							settings.numericBack({
+								element: $this,
+								value: type == 'input' || type == 'textarea' ? value : html,
+								key: this // 当前点了哪个键
+							});
+						}
 						e.stopPropagation(); // 阻止冒泡(让点击数字键盘以外的区域隐藏/删除数字键盘事件不生效)
-
-
 					});
 
-					// ======删除事件
+					// ======删除事件、退格事件
 					$('.keyboard__backspace').on('click', function (e) {
 						e.preventDefault(); // 防止手机端输入时屏幕移动
 						var type = $this[0].tagName.toLocaleLowerCase(); // 绑定元素的类型（即标签名称):input span div select 
-						 console.log('点击删除键，当前点击的元素类型为：',type);
-						if (type != 'input') {	// input输入框时
-							var oDivHtml = $this.html();
-							$this.html(oDivHtml.substring(0, oDivHtml.length - 1));
-						} else {	// div,span等元素时
-							var oDivValue = $this.val();
-							$this.val(oDivValue.substring(0, oDivValue.length - 1));
+						// console.log('点击删除键，当前点击的元素类型为：',type);
+						var oDivValue = $this.val(),
+							oDivHtml = $this.html();
+						var value = oDivValue.substring(0, oDivValue.length - 1),
+							html = oDivHtml.substring(0, oDivHtml.length - 1);
+						if (type == 'input' || type == 'textarea') { // input textarea时
+							$this.val(value);
+						} 
+						else { // div,span等时
+							$this.html(html);
 						}
-
 						if (typeof (keyboardUi.removeCursor) == 'function') keyboardUi.removeCursor($this); // 移除当前节点以外的所有假光标
-						if (settings.keyCallBack) settings.keyCallBack(); // 点击数字键盘按键时的回调函数
+						if (settings.spaceBack){
+							settings.spaceBack({
+								element: $this,
+								value: type == 'input' || type == 'textarea' ? value : html,
+								key: this, // 当前点了哪个键
+							});
+						}
 						e.stopPropagation();
 
 					});
@@ -256,7 +293,7 @@
 						// $('.ne-keyboard-layer').remove();
 						$('.ne-keyboard-layer').slideUp('fast', function () { // edit 20190605 把其它函数移到 slideUp里面
 							$(this).remove();
-							if (settings.closeCallBack) settings.closeCallBack(); // 关闭数字键盘时的回调函数
+							if (settings.closeBack) settings.closeBack(); // 关闭数字键盘时的回调函数
 							/*
 							if(settings.minimum!=null || settings.maximum!=null){ // 检查输入值是否合法
 								var value = parseFloat(keyboardUi.getEleValue($this));
@@ -445,6 +482,9 @@ var keyboardUi = {
 		var _radixNumc = /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase()) ? this.getEleValue(obj).length - 1 : 0;
 
 		if ($(obj).length > 0) {
+			var textAlign = typeof $(obj).css('text-align') == 'undefined' ? 'left' :$(obj).css('text-align');
+			var boxWidth = obj[0].offsetWidth; // 输入框宽
+			// console.log('输入框宽：', boxWidth);
 			_fatBot = typeof ($(obj).parent().css('paddingBottom')) == 'undefined' ? 0 : parseFloat($(obj).parent().css('paddingBottom').replace(/(px|%)/g, ''));
 			_fatLef = $(obj).position().left; // 相对父元素左侧距离
 			// _fatLef = $(obj).offset().left; // 相对body左侧距离
@@ -454,7 +494,10 @@ var keyboardUi = {
 			_padL = typeof $(obj).css('paddingLeft') == 'undefined' ? 0 : parseFloat($(obj).css('paddingLeft').replace(/(px|%)/g, ''));
 			_textW = keyboardUi.getEleValue(obj).keyboardVisualLength(_fontsize); // 通过字体大小测量文本宽
 			_width = _fatLef + _margL + _padL + _textW + _radixNumc;
-			//  console.log('fatherLeft：',_fatLef,  '\nmargin-left',_margL, '\npadding-left：',_padL, '\n_text_width：',_textW, '\n_width：', _width); // testing
+			if(textAlign == 'center'){ // 当文本居中显示时
+				_width += Math.floor(( boxWidth - _textW) / 2 - _padL);
+			}
+			// console.log('fatherLeft：',_fatLef,  '\nmargin-left',_margL, '\npadding-left：',_padL, '\n_text_width：',_textW, '\n_radixNumc:',_radixNumc, '\n_width：', _width); // test1
 			//  console.log('_fontsize：', _fontsize);
 			//  console.log('----------------------')
 		}

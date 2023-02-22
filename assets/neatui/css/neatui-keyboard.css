@@ -66,7 +66,7 @@
 .keyboard__down{
 	position: relative;
 	width: 100%;
-	height: 32px;
+	height: 36px;
 	cursor: pointer;
 }
 .keyboard__down:before{
@@ -75,7 +75,7 @@
 	width: 13px;
 	height: 13px;
 	margin: 0 auto;
-	margin-top: 8px;
+	margin-top: 12px;
 	border-style: solid;
 	border-color: #cac0c0;
 	border-width: 0 0 1px 1px;
@@ -84,6 +84,20 @@
 	-o-transform: rotate(-45deg);
 	-ms-transform: rotate(-45deg);
 	transform: rotate(-45deg);
+}
+.keyboard__down span{
+	position: absolute;
+	right: 15px;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+	-moz-transform: translateY(-50%);
+	-o-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+	margin-top: -5px;
+	color: #999;
+	font-size: 14px;
+	cursor: pointer;
 }
 .keyboard__title{
 	padding:10px 0;
@@ -98,17 +112,20 @@
 .keyboard__edit {
 	width: 100%;
 }
+
 .keyboard__num{
 	
 }
-.keyboard__num:before{
+
+.keyboard__keys{
+	
+}
+.keyboard__keys:before{
 	content: '';
 	display: block;
 	clear: both;
 }
-.keyboard__operate{
-	
-}
+
 
 .keyboard__complete{
 	width:100%;
@@ -122,7 +139,7 @@
 	cursor: pointer;
 }
 .keyboard__complete:hover{color:#1296db;}
-.keyboard__num> div {
+.keyboard__keys> div {
 	/* margin-bottom: 2px; */
 	/* margin-right: 0.5%; */
 	float: left;
@@ -143,20 +160,33 @@
 	width: 33%;
 	_width: 33%;
 }
-.keyboard__num> div:nth-child(3n) {
+
+.keyboard__operate{
+	display: -webkit-box;
+	display: -moz-box;
+	display: -o-flex;
+	display: -webkit-flex;
+	display: flex;
+	display: flex;
+	width: 100%;
+}
+.keyboard__operate> div{
+	float: none;
+	width: 100%;
+}
+.keyboard__keys> div:nth-child(3n) {
 	margin-right: 0;
 }
-.keyboard__num> div:nth-child(1),
-.keyboard__num> div:nth-child(4),
-.keyboard__num> div:nth-child(7),
-.keyboard__num> div:nth-child(10){border-left:0;}
-.keyboard__num> div:nth-child(10),
-.keyboard__num> div:nth-child(11),
-.keyboard__num> div:nth-child(12){border-bottom-width:1px;}
+.keyboard__keys> div:nth-child(1),
+.keyboard__keys> div:nth-child(4),
+.keyboard__keys> div:nth-child(7),
+.keyboard__keys> div:nth-child(10){border-left:0;}
+.keyboard__keys> div:nth-child(10),
+.keyboard__keys> div:nth-child(11),
+.keyboard__keys> div:nth-child(12){border-bottom-width:1px;}
 
-.keyboard__num> div:hover{color:#1296db;}
-.keyboard__num> div.keyboard__backspace{
-	text-indent: 99999px;
+.keyboard__keys> div:hover{color:#1296db;}
+.keyboard__keys> div.keyboard__backspace{
 	background-color: #f4f4f4;
 	background-position: 50% 50%!important;
 	background-repeat: no-repeat!important;
@@ -251,7 +281,7 @@
 	padding: 8px 0;
 	font-size: 14px;
 }
-.ne-keyboard-layer.pc.small .keyboard__num> div,
+.ne-keyboard-layer.pc.small .keyboard__keys> div,
 .ne-keyboard-layer.pc.small .keyboard__complete {
 	height: 40px;
 	line-height: 40px;
@@ -264,7 +294,7 @@
 	padding: 8px 0;
 	font-size: 14px;
 }
-.ne-keyboard-layer.pc.little .keyboard__num> div,
+.ne-keyboard-layer.pc.little .keyboard__keys> div,
 .ne-keyboard-layer.pc.little .keyboard__complete {
 	height: 35px;
 	line-height: 35px;
@@ -276,7 +306,7 @@
 	padding: 5px 0;
 	font-size: 12px;
 }
-.ne-keyboard-layer.pc.tiny .keyboard__num> div,
+.ne-keyboard-layer.pc.tiny .keyboard__keys> div,
 .ne-keyboard-layer.pc.tiny .keyboard__complete {
 	height: 30px;
 	line-height: 30px;
@@ -290,7 +320,7 @@
 }
 
 
-.ne-keyboard-layer.fashion-popular .keyboard__num> div{
+.ne-keyboard-layer.fashion-popular .keyboard__keys> div{
 	background: #ededed;
 	border-color: #e5e5e5!important;
 	color: #151515;
