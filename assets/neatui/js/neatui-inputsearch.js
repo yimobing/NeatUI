@@ -213,6 +213,7 @@
             className: "",  // 自定义控件类名(可选)，默认空。
             
             // 下拉项设置
+            itemLight: false, // 强制下拉项高亮(可选)，默认false。值为true时，所有下拉项将高亮。一般只用于下拉只有一项的情况。
             itemHeight: 36, // 每一项的高度(可选)，默认36
             explained: true, // 是否选中下拉项后自动过滤说明性文字(可选)，默认true。
             // 若想要下拉项中有说明性文字,则可在数据源非编号字段中添加em或span标签. eg {"bh":"1001", "mc":"张三<em>一个大好人</em>"}, 那么"一个大好人"就是说明性文字了.
@@ -361,7 +362,7 @@
                     ),
                 value = typeof row[fFieldValue] == 'undefined' ? (typeof row[dFieldName] == 'undefined' ? row[fFieldValue] : row[dFieldName]) : row[fFieldValue],
                 beiZhu = fFieldBz.toString().replace(/([ ]+)/g, '') === '' ? '' : ( typeof row[fFieldBz] == 'undefined' ? '' : row[fFieldBz]);
-            var _liClassName = ( value == inputValue ) ? ' class="on"' : '';
+            var _liClassName = opts.itemLight ? 'class="on"' : ( ( value == inputValue ) ? ' class="on"' : '' );
             value += beiZhu == '' ? '' : '<em>(' + beiZhu + ')</em>'
             listHtml += '<li data-bh="' + bh + '"' + _liClassName + _liStyle + '>' + value + '</li>';
         }
