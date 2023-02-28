@@ -52,9 +52,25 @@
 
 				// $this.on('click input', function(event) {
 				$this.on(mouseEvent, function (event) { // edit 20190606-1 本行 
+					// ·--------第1步，先关闭数字键盘(必须!)
+					$('.ne-keyboard-layer').remove();
+					// ·--------第2步，再调用关闭函数 add by chr 20230228-1
+					if (settings.closeBack){
+						var $currentThis = Array.isArray($.PRIVATEOBJECTARR) ? 
+							( $.PRIVATEOBJECTARR.length == 0 ? $this : $.PRIVATEOBJECTARR[$.PRIVATEOBJECTARR.length - 1] ) : 
+							$this;
+						settings.closeBack({
+							element: $currentThis
+						});
+					}
+					// 控件对象加入私有数组中
+					if(typeof $.PRIVATEOBJECTARR == 'undefined'){
+						$.PRIVATEOBJECTARR = [];
+					}
+					$.PRIVATEOBJECTARR.push($this);
 
-					$('.ne-keyboard-layer').remove(); // 关闭数字键盘(必须!)
-
+					// ·--------其它步骤
+					//
 					var topClass = settings.title == '' ? ' shadow-top' : '';
 					var themeClass = settings.theme == 'popular' ? ' fashion-popular' : '';
 					// 生成数字键盘节点
