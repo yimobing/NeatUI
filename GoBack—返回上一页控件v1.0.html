@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>返回控件</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-goback.css">
+</head>
+<body>
+    <div class="wrap">
+        <main>
+
+            <ul>
+                <li>这里是正文内容，很好的哦哦和气</li>
+                <li>这里是正文内容，很好的哦哦和气</li>
+                <li>这里是正文内容，很好的哦哦和气</li>
+                <li>这里是正文内容，很好的哦哦和气</li>
+                <li>这里是正文内容，很好的哦哦和气</li>
+            </ul>
+        </main>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-goback.js"></script>
+    <script type="text/javascript">
+
+        //——————————————————————————————————————————
+        neuiGoBack.load({
+            enable: true, // 是否启用(可选)，默认true
+            position: "fixed", // 定位方式(可选)，默认fixed
+            zIndex: 999, // 定位层级(可选)，默认999
+            direction: "top", // 定位方向(可选)。值：leftTop 左上角(默认), leftBottom 左下角, rightTop 右上角, rightBottom 右下角, top 顶部横条, bottom 底部横条。
+            top: 0, // 定位上边距离(可选)，默认0px。将根据direction参数有选择性的生效。
+            left: 0, // 定位左边距离(可选)，默认0px。将根据direction参数有选择性的生效。
+            bottom: 0, // 定位下边距离(可选)，默认0px。将根据direction参数有选择性的生效。
+            right: 0, // 定位右边距离(可选)，默认0px。将根据direction参数有选择性的生效。
+            text: "返回", // 文字(可选)，默认返回
+            showText: true, // 是否显示文字(可选)，默认true
+            fontSize: 12,  // 文字大小(可选)，默认12px
+            fontColor: "#999", // 文字颜色(可选)，默认#999。eg. #ff0000
+            backgroundColor: "#ededed", // 背景色(可选)，默认#ededed
+            opacity: "1", // 背景透明度(可选)，默认1表示不透明。值 0到1。
+            radius: "0 0 8px 0", // 四个角的圆角(可选)。
+            // 内容
+            body: {
+                padTop: 0 // 设置body区域的距离顶部的距离(可选)，默认0
+            },
+            // ios设备时
+            ios: {
+                backgroundColor: "#fff", // 背景色(可选)，默认#fff
+            },
+            // 回调函数
+            isGoTurn: true, // 是否默认执行点击时返回上一页(可选)，默认true。当不想执行返回上一页操作时，即可把本参数值设为false,然后在回调函数里自定义操作。
+            turnBack: function(e){ // 点击返回时的回调函数。返回值格式 {device: "设备类型。 ios 苹果手机, android 安卓手机"}
+                console.log('e：', e);
+                if(e.device == 'ios'){ // iphone设备时
+                    // window.location.href = '' // 自定义跳转到哪里
+                }
+            }
+        });
+        
+        // neuiGoBack.hide(); // 隐藏控件
+        // neuiGoBack.show(); // 显示控件
+       
+
+    </script>
+
+</body>
+</html>
