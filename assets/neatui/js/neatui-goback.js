@@ -1,13 +1,15 @@
 /**
  * * [GoBack]
- * * 返回控件
+ * * 返回上一页控件
+ * * [功能] 纯原生JS开发，调用一下就可以返回上一页，也支持自定义返回一页的链接地址
+ * * [适用] 适用于移动端，IOS环境下测试正常
  * * Version：1.0.0
  * * compatible：Mobile App
  * * Website: https://github.com/yimobing/neatui
  * * Author: mengZheng
  * * QQ: 1614644937
  * * Date: 2023.03.01
- * * Update: 2023.03.01
+ * * Update: 2023.03.02
  */
 
 //================================================================================================
@@ -67,19 +69,27 @@
             fontSize: 12,  // 文字大小(可选)，默认12px
             fontColor: "#999", // 文字颜色(可选)，默认#999。eg. #ff0000
             backgroundColor: "#ededed", // 背景色(可选)，默认#ededed
+            padding: "10px 12px", // 自定义padding值(可选)，默认值'10px 12px'
             opacity: "1", // 背景透明度(可选)，默认1表示不透明。值 0到1。
             radius: "0 0 8px 0", // 四个角的圆角(可选)。
-            // 内容
+            // 内容(可选)
             body: {
                 padTop: 0 // 设置body区域的距离顶部的距离(可选)，默认0
             },
-            // ios设备时
+            // ios设备时(可选)
             ios: {
                 backgroundColor: "#fff", // 背景色(可选)，默认#fff
             },
+            // 页面滚动时(可选)
+            roll: {
+                hide: false, // 是否启用自动隐藏功能(可选)，默认false。值为true时，往下滚指定高度的距离就自动隐藏，滚到顶部时又自动显示出来。
+                height: 0 // 当autoHide=true时，指定页面往下滚多少距离就自动显示或隐藏控件(可选)，默认0表示一班下滚就自动隐藏。eg. 50 表示班下滚50px就自动隐藏，滚到顶部时就自动显示出来。
+            },
             // 回调
             isGoTurn: true, // 是否默认执行点击时返回上一页(可选)，默认true。当不想执行返回上一页操作时，即可把本参数值设为false,然后在回调函数里自定义操作。
-            turnBack: null // 点击返回时的回调函数。返回值格式 {device: "设备类型。 ios 苹果手机, android 安卓手机"}
+            turnBack: null, // 点击返回时的回调函数。返回值格式 {element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象", device: "设备类型。 ios 苹果手机, android 安卓手机"}
+            openBack: null // 打开时(创建控件完成后)的回调函数。返回值格式：{element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象"}
+
         }
         me.$opts = net.extend(true, {}, defaults, options || {}); // 控件参数对象(深度合并)
         if(me.$opts.enable === false) return;
@@ -92,6 +102,8 @@
             dFontSize = me.$opts.fontSize.toString().replace(/px/g, '') + 'px',
             dFontColor = me.$opts.fontColor == '' ? '#999' : me.$opts.fontColor,
             dBackgroundColor = me.$opts.backgroundColor == '' ? '#ededed' : me.$opts.backgroundColor,
+            dPadding = me.$opts.padding == '' ? '10px 12px' : me.$opts.padding,
+            dRadius = me.$opts.radius == '' ? '0 0 8px 0' : me.$opts.radius,
             dOpacity = me.$opts.opacity == '' ? 1 : me.$opts.opacity;
         // IOS时
         if(tools.isAppIOS()){
@@ -165,12 +177,12 @@
         tools.setAttributes(me.$nodePanel, {
             style: {
                 "display": "inline-block",
-                "padding": "10px 12px",
+                "padding": dPadding,
                 "background-color": dBackgroundColor,
-                "border-radius": me.$opts.radius,
+                "border-radius": dRadius,
                 "opacity": dOpacity,
                 "filter": "alpha(opacity=" +  dOpacity * 100 + ")",
-                "color": "#999",
+                // "color": "#999",
                 "font-size": "10px",
                 "cursor": "pointer"
             }
@@ -215,6 +227,16 @@
         }
 
         // ·回调
+        // 创建完成后
+        if(me.$opts.openBack){
+            me.$opts.openBack({
+                element: me.$nodeRoot,
+                container: me.$nodePanel,
+                arrow: me.$nodeArrow,
+                text: me.$nodeText
+            });
+        }
+        // 点击返回时
         me.$nodePanel.onclick = function(){
             if(me.$opts.isGoTurn){
                 window.history.go(-1);
@@ -227,7 +249,25 @@
                 else{
                     sysType = 'android';
                 }
-                me.$opts.turnBack({device: sysType});
+                me.$opts.turnBack({
+                    element: me.$nodeRoot,
+                    container: me.$nodePanel,
+                    arrow: me.$nodeArrow,
+                    text: me.$nodeText,
+                    device: sysType
+                });
+            }
+        }
+
+        // ·自动隐藏功能
+        if(me.$opts.roll.hide){
+            var h = parseInt(me.$opts.roll.height.toString().replace(/px/g, ''));
+            window.onscroll = function(){
+                // var winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 视窗高
+                var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop || 0; // 视窗滚动距离
+                // var scrollH = document.documentElement.scrollHeight || document.body.scrollHeight; // 整个文档高
+                if(scrollTop > h) me.$nodeRoot.style.display = 'none';
+                else me.$nodeRoot.style.display = 'block';
             }
         }
 

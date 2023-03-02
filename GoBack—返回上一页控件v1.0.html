@@ -12,22 +12,52 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>返回控件</title>
+    <title>返回上一页控件</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-goback.css">
 </head>
 <body>
+    <style>
+        .news{ margin-bottom: 350px; }
+    </style>
     <div class="wrap">
         <main>
-
-            <ul>
-                <li>这里是正文内容，很好的哦哦和气</li>
-                <li>这里是正文内容，很好的哦哦和气</li>
-                <li>这里是正文内容，很好的哦哦和气</li>
-                <li>这里是正文内容，很好的哦哦和气</li>
-                <li>这里是正文内容，很好的哦哦和气</li>
-            </ul>
+            <div class="news">
+                <ul>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li> <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li> <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                    <li>这里是新闻，正在播报最新的国内、国际资讯，欢迎晚上7点收看</li>
+                </ul>
+            </div>
+            <div class="latest">
+                <div class="ul">
+                    <li>这里是最新某宝优惠活动，老少皆宜，有想羊毛的赶紧来哦~</li>
+                    <li>这里是最新某宝优惠活动，老少皆宜，有想羊毛的赶紧来哦~</li>
+                    <li>这里是最新某宝优惠活动，老少皆宜，有想羊毛的赶紧来哦~</li>
+                    <li>这里是最新某宝优惠活动，老少皆宜，有想羊毛的赶紧来哦~</li>
+                    <li>这里是最新某宝优惠活动，老少皆宜，有想羊毛的赶紧来哦~</li>
+                    <li>这里是最新某宝优惠活动，老少皆宜，有想羊毛的赶紧来哦~</li>
+                    <li>这里是最新某宝优惠活动，老少皆宜，有想羊毛的赶紧来哦~</li>
+                    <li>这里是最新某宝优惠活动，老少皆宜，有想羊毛的赶紧来哦~</li>
+                    <li>这里是最新某宝优惠活动，老少皆宜，有想羊毛的赶紧来哦~</li>
+                    <li>这里是最新某宝优惠活动，老少皆宜，有想羊毛的赶紧来哦~</li>
+                </div>
+            </div>
         </main>
     </div><!--/.wrap-->
 
@@ -39,6 +69,17 @@
     <script type="text/javascript">
 
         //——————————————————————————————————————————
+        //          次要函数
+        //——————————————————————————————————————————
+        // neuiGoBack.hide(); // 隐藏控件
+        // neuiGoBack.show(); // 显示控件
+
+
+
+        //——————————————————————————————————————————
+        //          主要函数
+        //——————————————————————————————————————————
+        // 创建控件
         neuiGoBack.load({
             enable: true, // 是否启用(可选)，默认true
             position: "fixed", // 定位方式(可选)，默认fixed
@@ -53,28 +94,36 @@
             fontSize: 12,  // 文字大小(可选)，默认12px
             fontColor: "#999", // 文字颜色(可选)，默认#999。eg. #ff0000
             backgroundColor: "#ededed", // 背景色(可选)，默认#ededed
+            padding: "10px 12px", // 自定义padding值(可选)，默认值'10px 12px'
             opacity: "1", // 背景透明度(可选)，默认1表示不透明。值 0到1。
             radius: "0 0 8px 0", // 四个角的圆角(可选)。
-            // 内容
+            // 内容(可选)
             body: {
-                padTop: 0 // 设置body区域的距离顶部的距离(可选)，默认0
+                padTop: 40 // 设置body区域的距离顶部的距离(可选)，默认0
             },
-            // ios设备时
+            // ios设备时(可选)
             ios: {
                 backgroundColor: "#fff", // 背景色(可选)，默认#fff
             },
+            // 页面滚动时(可选)
+            roll: {
+                hide: false, // 是否启用自动隐藏功能(可选)，默认false。值为true时，往下滚指定高度的距离就自动隐藏，滚到顶部时又自动显示出来。
+                height: 0 // 当autoHide=true时，指定页面往下滚多少距离就自动显示或隐藏控件(可选)，默认0表示一班下滚就自动隐藏。eg. 50 表示班下滚50px就自动隐藏，滚到顶部时就自动显示出来。
+            },
             // 回调函数
             isGoTurn: true, // 是否默认执行点击时返回上一页(可选)，默认true。当不想执行返回上一页操作时，即可把本参数值设为false,然后在回调函数里自定义操作。
-            turnBack: function(e){ // 点击返回时的回调函数。返回值格式 {device: "设备类型。 ios 苹果手机, android 安卓手机"}
-                console.log('e：', e);
+            turnBack: function(e){ // 点击返回时的回调函数。返回值格式 {element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象", device: "设备类型。 ios 苹果手机, android 安卓手机"}
+                console.log('点返回了e：', e);
                 if(e.device == 'ios'){ // iphone设备时
                     // window.location.href = '' // 自定义跳转到哪里
                 }
+            },
+            openBack: function(e){ // 打开时(创建控件完成后)的回调函数。返回值格式：{element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象"}
+                console.log('打开了e:', e);
             }
         });
         
-        // neuiGoBack.hide(); // 隐藏控件
-        // neuiGoBack.show(); // 显示控件
+       
        
 
     </script>
