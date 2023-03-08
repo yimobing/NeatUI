@@ -904,14 +904,16 @@ var utilities = {
     },
 
     /**
-     * 生成[min, max]的随机数(位数不固定,从min到max)
-     * @param {number} min 最小值
-     * @param {number} max 最大值
-     * @returns {number} 返回 min到max(含min及max)之间的随机数
+     * 返回指定范围内的随机整数
+     * 生成[n, m]的随机数(位数不固定,从n到m)
+     * @param {number} n 最小值
+     * @param {number} m 最大值
+     * @returns {number} 返回n(含)到m(含)之间的随机数
      */
-    getRandomMinMaxNumber: function(min, max){
-        //return parseInt( Math.random() * ( max - min + 1) + min, 10 );
-        return Math.floor( Math.random() * (max - min + 1) + min );
+    getRandomMinMaxNumber: function(n, m){
+        // return parseInt( Math.random() * ( m - n + 1) + n, 10 );
+        // return parseInt(Math.random() * (m - n) + n);
+        return Math.floor( Math.random() * (m - n + 1) + n );
     },
 
 
