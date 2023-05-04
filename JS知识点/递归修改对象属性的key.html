@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>递归修改对象属性的key</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="">
+</head>
+<body>
+
+
+    <script type="text/javascript">
+        const recursionFileMap = obj => {
+            let arr = [] 
+            obj.map(item => {
+                let obj1 = {
+                    name1: '',
+                    children: [],
+                }
+                obj1.name1 = item.name
+                if (item.children) {
+                    obj1.children = recursionFileMap(item.children)
+                    // item.children
+                }
+                arr.push(obj1);
+            })
+            return arr
+        }
+        
+        const info = [
+            {
+                name: 'zs',
+                children: [{name: 'zs1', children: [{name: 'zs1-1'}]}, {name: 'zs2'}],
+            },
+            {
+                name: 'ls',
+                children: [{name: 'ls1'}, {name: 'ls2'}],
+            },
+        ]
+        
+        const ret1 = recursionFileMap(info);
+        console.log(' 最后，所有原数组的name属性变为name1')
+        console.log(ret1)
+    </script>
+
+
+</body>
+</html>
