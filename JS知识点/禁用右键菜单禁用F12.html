@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>禁用右键菜单，禁用F12审查元素</title>
+</head>
+<body>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+        input[type="text"]{
+            width: 200px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+
+    <div class="wrap">
+        <p><span>用户</span><input type="text"></p>
+    </div>
+
+
+    <script>
+
+        // 禁用右键菜单
+        document.addEventListener('contextmenu', function(e){
+            var target = e.target;
+            console.log('target：', target);
+            var tagName = target.tagName.toLocaleLowerCase();
+            if(tagName != 'input' && tagName != 'textarea'){
+                e.preventDefault();
+            }
+        });
+
+        // 禁用F12
+        document.addEventListener('keydown', function(e){
+            if(window.event && window.event.keyCode == 123){
+                e.keyCode = 0;
+                e.returnValue = false;
+            }
+        })
+    </script>
+</body>
+</html>
