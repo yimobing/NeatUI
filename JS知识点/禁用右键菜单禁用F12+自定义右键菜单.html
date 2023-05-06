@@ -56,8 +56,9 @@
     </div>
     <div id="custom-context-menu">
         <ul class="hidden">
-            <li id="copy">复制 Ctrl+C</li>
-            <li id="paste">粘帖 Ctrl+V</li>
+            <li id="copy">可以使用快捷键Ctrl+C复制</li>
+            <li id="cut">可以使用快捷键Ctrl+X剪切</li>
+            <li id="paste">可以使用快捷键Ctrl+V粘贴</li>
         </ul>
     </div>
 
@@ -102,9 +103,22 @@
                         navigator.clipboard.writeText(target.value); // 复制内容到文本域 
                         // alert('复制成功！');
                     }
+                    else if(menuItem.id == 'cut'){ // 剪切 
+                        target.select();
+                        target.setSelectionRange(0, 99999);
+                        navigator.clipboard.writeText(target.value); // 复制内容到文本域 
+                        target.value = '';
+                        // alert('剪切成功！');
+                        return;
+                    }
                     else if(menuItem.id == 'paste'){ // 粘帖
                         var selectText = typeof window.getSelection == 'undefined' ? '' : window.getSelection().toString(); // 输入框选中的文字
                         // console.log('选中的文字：', selectText);
+                        // console.log('clicp：', navigator)
+                        if(typeof navigator.clipboard == 'undefined'){
+                            // alert('粘贴可以使用快捷键ctrl+v')
+                            return;
+                        }
                         navigator.clipboard.readText().then(clipText => {
                             var curPosition = target.selectionStart;
                             var value = target.value;
