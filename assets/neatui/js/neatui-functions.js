@@ -721,7 +721,7 @@ var utilities = {
         // 其它替换
         // 注：部分ios中手写输入时即使过滤掉所有空格了还会出现一个空格，如果把空格转换成&nbsp;的话数据库中会有&nbsp;导致搜索等功能匹配不了。
         // 故解决思路是：移动端把所有空格替换成空，在pc端把所有空格替换成一个&nbsp;
-        if(typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
+        if(typeof checker != 'undefined' && typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
             output = output.replace(/\t/g, ''); // 制表符替换成空
             output = output.replace(/([\s]+)/g, ' '); // 多个空格替换成成一个空格
         }else{ // pc端时
