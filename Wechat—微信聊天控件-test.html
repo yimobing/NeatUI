@@ -15,7 +15,7 @@
     <title>Wechat | 微信聊天控件</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-wechat.css"><!--聊天控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-wechat-test.css"><!--聊天控件-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-magnify.css"><!--图片放大预览控件(pc时)-->
     <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
@@ -76,8 +76,7 @@
     <!--================================================================================-->
     <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script>
     <script type="text/javascript" src="assets/libs/bluebird.min.js"></script><!--pc时让ie支持promise-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-wechat.js"></script><!--聊天控件-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-canvas.js"></script><!--图片上传(pc时)-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-wechat-test.js"></script><!--聊天控件-->
     <script type="text/javascript" src="assets/neatui/js/neatui-magnify.js"></script><!--图片放大预览控件(pc时)-->
     <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义ajax-->
     <script type="text/javascript">
@@ -133,7 +132,7 @@
             }
             // END AJAX
             */
-           return json;
+            return json;
         }
 
 
@@ -465,6 +464,7 @@
                         back: true, //是否显示返回按钮(可选),默认false
                         showBackText: false, // 是否显示返回按钮的文字(可选),默认true
                         capWrap: false, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+                        isPcImage: true, // 是否要同时在pc端使用图片上传功能(可选),默认false。 true时上传图片将使用pc方式。记得引用相应的控件。add 20230519-1
                         // zIndex: 999 // 层级,默认999(可选)
                         offset: { // add 20211105-1
                             left: isDevicePc() ? ($(window).width() - 400) / 2 : 0,

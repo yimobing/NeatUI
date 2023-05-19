@@ -1,0 +1,876 @@
+@charset "utf-8";
+
+/**
+* [neuiWechat]
+* 微信聊天控件
+* Author: ChenMufeng
+* Date: 2021.03.30
+* Update: 2021.04.09
+*/
+
+
+/*+================================================================================+*/
+/*                                    微信聊天布局
+/*+================================================================================+*/
+
+html,body{
+	width: 100%;
+	margin: 0 auto;
+	padding: 0;
+	-webkit-text-size-adjust: none;
+	-webkit-tap-highlight-color:rgba(0, 0, 0, 0); 
+	/*-webkit-touch-callout: none;*/
+	/*-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;*
+	user-select: none;*/
+	/*touch-action: none;*/
+}
+body{
+	background-color: #fff;
+	line-height: 1.5;
+	font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', 'Helvetica Neue', 'Helvetica,sans-serif';
+	font-size: .7rem;
+	color: #212121;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+*{
+	margin: 0;
+	padding: 0;
+	-moz-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+	outline: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+/*+--------------------------------+*/
+/*即非输入框区域,即input, textarea输入框以外的区域*/
+*:not(input,textarea,.cose__text) { 
+    -webkit-touch-callout: none; /*禁用系统默认菜单*/
+    -webkit-user-select: none; /*禁止用户选择文本*/
+}
+
+/*+--------------------------------+*/
+.chat{
+    /*position: fixed;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;*/
+    /* margin-top: 15px;  */
+    padding: 8px 6px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+    box-shadow: 0 1px 3px #cec4c4;
+}
+
+/*+--------聊天输入区--------+*/
+.chat__talk{
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: box;
+    display: flex;
+    align-items: center;
+}
+
+.talk__group,
+.talk__textbox{
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: box;
+    display: flex;
+}
+
+.talk__group{ 
+    align-items: center;
+    width: 28px;
+    height: 28px;
+    margin-left: 5px;
+}
+.talk__switch{ margin-left: 0; }
+.talk__expression{ margin-left: 0; }
+.talk__more{ }
+.talk__send{ width: auto; }
+.talk__send button{
+    padding: 6px 15px;
+    background-color: #08ba61;
+    color: #fff;
+    border: 0;
+    border-radius: 4px; 
+    font-size: 13px;
+}
+.talk__textbox,
+.talk__press{
+    -webkit-flex: 1;
+    -moz-flex: 1;
+    -o-flex: 1;
+    width: 100%;
+    align-items: flex-start;
+    margin: 0 6px;
+}
+.talk__textbox textarea,
+.talk__textbox div[contenteditable=true]{ 
+    line-height: 1.5; 
+    color: #666;
+    font-size: .6rem;
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch;
+ }
+
+.talk__switch-voice{ width: 100%; height: 100%; }
+.talk__switch-input{ width: 100%; height: 100%; }
+/*通用*/
+.chat__talk input,
+.chat__talk textarea,
+.chat__talk div[contenteditable=true]{
+    width: 100%;
+    height: 32px;
+    min-height: 32px;
+    padding: 4px 6px;
+    background-color: #fff;
+    border: 0;
+    border-radius: 3px;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.chat__talk div[contenteditable=true],
+.chat__talk div[contenteditable=true] *{
+    -webkit-user-select: text; /*ios可输入可换行*/
+}
+
+.chat__talk  input::-webkit-input-placeholder,
+.chat__talk  textarea::-webkit-input-placeholder,
+.chat__talk div[contenteditable=true]::-webkit-input-placeholder{  color: #333; text-align: center; }
+.chat__talk  input::-moz-placeholder,
+.chat__talk  textarea::-moz-placeholder,
+.chat__talk div[contenteditable=true]::-moz-placeholder{ line-height: 32px; color: #333; text-align: center; }
+.chat__talk  input:-moz-placeholder,
+.chat__talk  textarea:-moz-placeholder,
+.chat__talk div[contenteditable=true]:-moz-placeholder{ line-height: 32px; color: #333; }
+.chat__talk  input:-ms-input-placeholder,
+.chat__talk  textarea:-ms-input-placeholder,
+.chat__talk div[contenteditable=true]:-ms-placeholder{ line-height: 32px; color: #333; text-align: center; }
+
+.chat__talk i{
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    background-size: 100% auto;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+}
+.talk__switch-voice i{ background-image: url('../img/wechat_icon_mod_voice.png'); }
+.talk__switch-input i{ background-image: url('../img/wechat_icon_mod_keyboard.png'); }
+.talk__expression i{ background-image: url('../img/wechat_icon_mod_smile.png'); }
+.talk__more i{ background-image: url('../img/wechat_icon_mod_plus.png'); }
+
+
+
+/*+--------聊天拓展区--------+*/
+.chat__chit{
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.chit__expression{ }
+/*表情项*/
+/*功能项*/
+.chit__more{
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: box;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.chit__item{ 
+    width: 21%;
+    margin-bottom: 20px;
+    padding: 8px 4px;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 8px;
+}
+.chit__item-pcUp{
+	position: relative;
+}
+.chit__item i{
+    display: block;
+    width: 24px;
+    height: 24px;
+    margin: 0 auto;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+}
+
+.chit__item-pcUp i{ background-image: url('../img/wechat_icon_mod_upload.png'); }
+.chit__item-album i{ background-image: url('../img/wechat_icon_mod_album.png'); }
+.chit__item-album i{ background-image: url('../img/wechat_icon_mod_album.png'); }
+.chit__item-camera i{ background-image: url('../img/wechat_icon_mod_camera.png'); }
+.chit__item-video i{ background-image: url('../img/wechat_icon_mod_video.png'); }
+.chit__item-locate i{ background-image: url('../img/wechat_icon_mod_locate.png'); }
+.chit__item-sound i{ background-image: url('../img/wechat_icon_mod_sound.png'); }
+.chit__item-favourite i{ background-image: url('../img/wechat_icon_mod_favourite.png'); }
+.chit__item-card i{ background-image: url('../img/wechat_icon_mod_card.png'); }
+.chit__item-file i{ background-image: url('../img/wechat_icon_mod_file.png'); }
+.chit__item span{ margin-top: 8px; font-size: 12px; }
+
+.chit__item-pcUp input[type="file"]{
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   width: 100%;
+   height: 100%;
+   opacity: 0;
+   filter: alpha(opacity=0);
+   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+}
+
+
+
+/*+---------------聊天消息记录-----------------+*/
+.aside-layer{
+    background-color: #f4f4f4;
+}
+/*消息数量冒泡*/
+.bubbling{
+    position: absolute;
+    top: -50px;
+    right: 10px;
+    background-color: #00bfff;
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    border-radius: 100%;
+    box-shadow: 0 2px 2px 2px #fff;
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+}
+.bubbling:after{
+    content: '';
+    display: inline-block;
+    position: absolute;
+    bottom: -5px;
+    left: 5px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid #00bfff;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+}
+/*消息历史记录*/
+.cose{
+    /*
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid blue;
+    */
+    margin: 10px auto;
+    /* background: #f4f4f4; */
+    /* overflow-y: auto; */
+    /* -webkit-overflow-scrolling: touch; */
+}
+.cose__one{ 
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: box;
+    display: flex;
+
+    margin-bottom: 25px;
+    padding: 8px 10px;
+}
+.cose__one.active{
+    /* float: right; */
+}
+
+.cose__avatar{
+    width: 40px;
+    height: 40px;
+}
+
+.cose__avatar img{
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #f2f2f2;
+    border-radius: 2px;
+}
+.cose__content{
+    -webkit-flex: 1;
+    -moz-flex: 1;
+    -o-flex: 1;
+    flex: 1;
+    width: 100%;
+    position: relative;
+    margin-left: 10px;
+}
+
+.cose__content img{
+    display: block;
+    width: 30%;
+    height: auto;
+}
+
+.cose__nick{
+    display: block;
+    margin-bottom: 3px;
+    color: #777;
+    font-size: 12px;
+}
+.cose__text{
+    position: relative;
+    display: inline-block;
+    max-width: 85%;
+    padding: 6px 8px;
+    background-color: #fff;
+    border: 1px solid #fafafa;
+    border-radius: 4px;
+    line-height: 1.75;
+    color: #555;
+    font-size: 13px;
+}
+.cose__text:before{
+    content: '';
+    position: absolute;
+    top: 5px;
+}
+.cose__text-content{ 
+    -webkit-touch-callout: default; /*允许系统默认菜单*/
+    -webkit-user-select: auto; /*允许用户选择文本*/
+}
+.cose__date{
+    position: absolute;
+    top: -20px;
+    margin: 0 auto;
+    color: #cbc6c6;
+    text-align: center;
+    font-size: 10px;
+}
+
+/*聊天的人为他人*/
+.cose__one.others .cose__text:before{
+    left: -8px;
+    border-top: 8px solid #fff;
+    border-left: 10px solid transparent;
+    -webkit-transform: rotate(20deg);
+    -moz-transform: rotate(20deg);
+    -o-transform: rotate(20deg);
+    transform: rotate(20deg);
+}
+.cose__one.others .cose__date{ left: 0; }
+
+/*聊天的人为我*/
+.cose__one.active{
+
+}
+.cose__one.active .cose__content{
+    margin-left: 0;
+    margin-right: 10px;
+    text-align: right;
+}
+.cose__one.active .cose__text{
+    background-color: #a0e759;
+    border-color: #96d558;
+    text-align: left;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.cose__one.active .cose__text:before{
+    right: -8px;
+    border-top: 8px solid #a0e759;
+    border-right: 10px solid transparent;
+    -webkit-transform: rotate(-20deg);
+    -moz-transform: rotate(-20deg);
+    -o-transform: rotate(-20deg);
+    transform: rotate(-20deg);
+}
+.cose__one.active .cose__text-load{
+	position: absolute;
+	left: -25px;
+	display: inline-block;
+	height: 10px;
+	width: 10px;
+	margin: 6px;
+	border: 2px solid #666;
+	border-bottom-color: transparent;
+	border-radius: 100%;
+	vertical-align: middle;
+	-webkit-animation: rotate 0.75s linear infinite;
+	animation: rotate 0.75s linear infinite;
+}
+
+.cose__one.active .cose__text-fail{
+	position: absolute;
+	top: 0;
+	left: -45px;
+	width: 40px;
+	margin: 0 auto;
+	color: #999;
+	font-size: .6rem;
+	cursor: pointer;
+	text-align: center;
+}
+.cose__one.active .cose__text-renew{
+	width: 15px;
+	height: 15px;
+	margin: 0 auto;
+	border: 2px solid #666;
+	border-radius: 100%;
+    border-left-color: transparent;
+}
+.cose__one.active .cose__text-reset{
+	margin-top: 3px;
+	font-size: .6rem;
+}
+
+
+.cose__one.active .cose__date{ right: 0; }
+.cose__one.active .cose__text img{
+    display: inline-block;
+}
+
+/*聊天消息为图片*/
+.cose__one.isThumb{ }
+.cose__one.isThumb .cose__text{ 
+    background: none;
+    text-align: right;
+    border: 0; 
+}
+.cose__one.isThumb .cose__text:before{  content: ''; position: relative; border: 0; }
+
+
+
+
+/*+================================================================================+*/
+/*                                    兼容ie
+/*+================================================================================+*/
+/*ie9及ie9-*/
+.cose__avatar,
+.cose__content{
+    display: inline-block;
+    *display: inline;
+    _display: inline;
+    *zoom: 1;
+}
+.cose__avatar{ width: 12%\9; }
+.cose__content{ width: 85%\9; margin-left: 3%\9; }
+.talk__group,
+.talk__textbox{
+    display: inline-block;
+    *display: inline;
+    _display: inline;
+    *zoom: 1;
+    vertical-align: top\9;
+}
+.talk__textbox{ width: 78%\9; }
+.talk__send{ width: 15%\9; }
+.talk__send button{ padding: 20px 15px\9!important; }
+.chat__talk div[contenteditable=true]{
+    min-height: 60px\9!important;
+    border: 1px solid #ddd\9!important;
+}
+
+/* IE10+ CSS styles go here */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .cose__avatar,
+    .cose__content{
+        display: inline-block;
+        vertical-align: top;
+    }
+    .cose__avatar{ width: 12%; }
+    .cose__content{ width: 85%; margin-left: 3%; }
+    .talk__group,
+    .talk__textbox{
+        display: inline-block;
+        vertical-align: top;
+    }
+    .talk__textbox{ width: 78%; }
+    .talk__send{ width: 15%; margin-top: -30px; }
+    .talk__send button{ padding: 20px 15px!important; }
+    .chat__talk div[contenteditable=true]{
+        min-height: 60px!important;
+        border: 1px solid #ddd!important;
+    }
+}
+
+
+
+/*+================================================================================+*/
+/*                                    pc端时
+/*+================================================================================+*/
+@media screen and (min-width: 640px){
+    /*隐藏图片上传、语音等功能*/
+    .talk__more,
+    .talk__switch,
+    .talk__press{ 
+		/* display: none!important; */
+	}
+	.chit__item-album{
+		display: none;
+	}
+}
+
+
+
+/*+================================================================================+*/
+/*                                    HACK 兼容
+/*+================================================================================+*/
+/*ios设备时*/
+.chat.is-ios-device{ 
+    margin-bottom: 25px; 
+}
+
+
+/*+================================================================================+*/
+/*                                    侧栏窗口
+/*+================================================================================+*/
+/*+----------- -------------+*/
+.chat-aside{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    overflow: hidden;
+}
+.chat-aside .aside-mask{
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #000;
+    opacity: 0;
+    filter: alpha(opacity = 0);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -webkit-transition: opacity .25s;
+    transition: opacity .25s;
+}
+.chat-aside .aside-layer{
+    position: absolute;
+    z-index: 2;
+    /*left: 40px;*/
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #f4f4f4;
+    -webkit-transition: transform .15s;
+    transition: transform .15s;
+    -webkit-transform: translateX(100%);
+    transform: translateX(100%);
+}
+/*+----------- -------------+*/
+.chat-aside .as-lay-header{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: 10px;
+    background-color: #fff;
+    box-shadow: 0 0px 2px 2px #ece8e8;
+}
+
+
+/*返回+关闭图标*/
+.chat-aside .lay-header-top{ 
+    position: relative; 
+}
+.chat-aside .lay-header-top:after{
+    content: '';
+    display: block;
+    clear: both;
+}
+.chat-aside .header-top-back{  float: left; padding-left: 8px;}
+.chat-aside .header-top-cross{  float: right; }
+.chat-aside .header-top-back,
+.chat-aside .header-top-cross{
+	display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 30px;
+    height: 30px;
+    margin: 0 auto;
+	text-align: center;
+	cursor: pointer;
+}
+
+.chat-aside .header-top-back i{
+	background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAADOklEQVRoQ93bz2vUQBQH8Pdm3a2I4K5/hxcreFGEUrAI/kAFBdGD9qLCTpKTepEIHmop7MteVgrWgnrQikIRKVKpiPQiqBf/hb26RaRWcUaiu1CWzTommR9p7jPJJ9+XN5swi1CAw/O8mwAgoii6nfVyMesEusd7nncNEafi8yCi32g0oizndBocBIEnpaTNQCHElWazeTct2lnwIGwPKYS41Gw276dBOwn2fd8HgMYQ0Aci2rclwJzzy4yx1hDMp0qlcmh6evpr4cG6sX8aX5q7pGMM5/wiY2xOV7K9eZ0Ax1hEvIeISdeTqYw330TrYM75OUR8aAJrvaRjLGPsAQCwQaUspXw/MjIynrZBDZrTWsIq2HK5PDYzM/Mtz55hBex53mlEfDIsWR1YKyUdYwHgMSKWkspYF9Y4OAiCY0KI57awRsExVkr5DAC22UjW6DrsCtZIwp7nTSDiiyHJrpbL5cN5d+Okzq61S3exiwBQSSjj1bW1tfH5+fnveS49w+bSBuacjzHGllzCaivpGIuILxFxuyvJamtaLmNzT9j3/QNSymUXk8094S72FSLuSGgabzqdzhGTDUrby0MQBPuFECvDsNVqdSIMwx+murG2ZamLfY2IO5OSdQWb+RkuGjYTuF6v72WMvS1KspmaVowtlUorALCrCGWc6ZsW53wPY+xdEbGpSrqb7jIA7E74FbW0vr5+fHZ29qftjpzbslRkdOqXBxV0u90+urCw8MulpFODY4QCerHdbp9yCZ0JrIqu1WonwzAULiSdGayCBoCn1Wr1rAvoXMCqaCI6AwDSZtK5gRXRj4jogk10ruD/QJ+3lXLuYEX0HBFN2kBrAbuM1gZWRLeI6KrJpLWCXURrB7uGNgJWRBMRBbrL2xjYFbRRsApaSjkVRdENXUkbB6ugASAkols60FbAKmgp5fUoiu7kjbYGVkHnsT+6/4ZZBdtAWweroLNuCt+cshNgk2hnwKbQToEV0am3/8fzOwf+F1r+PSa31H8eYrTv+6Pd3QS1/qVFSvkxiqLRNGu0kwn3IAnfvT8DwEEi6mw58IDyzoR19hnuTy4ubwCgjY2NE61W60uaZHtjfgPIyulMPNxirAAAAABJRU5ErkJggg==') center/ 100% auto no-repeat scroll;
+}
+.chat-aside .header-top-cross i{
+    background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAACaklEQVRoQ+3a/zUEQQwH8FwHWlABHdAB1wEViApQga8K6AAd0AEVaEEJXrzd91iz82uTzGDnz/Nm5XPJ3u3ksqF/tjb/zEsr+K9nfM3wmuE/9g5ES5qZ74noeDBfArjq0c/MF0R0OcT2AGA7F+csmJmZiK4nG+8AnPaEZuZbIjqZxHQOAKE4Y+AnIjoIbOoGPYOVkJ8BHJaCQxker9EcHcFKjOUZll3M/EJEezMl3AydwL4C2C++hwfwDhFJaXeDTmGJ6BDAexW4N/RSrHiynrSYuXmmNbDZ4NaZ1sIWgVuhNbHFYG+0NrYK7IW2wFaDrdFW2EVgK7QldjFYG22NVQFroT2wauClaC+sKrgW7YlVB5eivbEm4Fz0cJqZdirGQ85r6tQzdxpKvZ51eEhdJPT3jAPH3GXNsGYZHiUVaFOsOTizvM3L+GspmZX0138yZPqNiORcHVrSodiNdSpqbqvQHi9wqJU6jcelR2YOTnz1uKNNwYXYEW+aaTNwxkOFAN27oSbgDOz4q4B7C1gdnIMdP40zvqfVy1sVXIIteDhRRauBa7At0CrgJVhv9GKwBtYTvQisifVCV4MtsB7oKrAl1hpdDPbAWqKLwJ5YK3Q2uAXWAp0FbonVRifBPWA10alJvFinwrzhVtkNjT57xwbTZORQRg9Dqwm2INNbAA9FPS1mlg1HgU1NsZnoRwDjjOg3QizDMqt4NgF3gc1A3wCQScIfKwaejio9y2StRyt15jYKvjw0EaQax7nQaFJyPqWlHfMOQMYQu13M/Nk2AiBto9mVBHcrrAxsBVe+cb9m25rhX5OqykA/AAHf10xMy0cgAAAAAElFTkSuQmCC') center/100% auto no-repeat scroll;
+}
+.chat-aside .header-top-back i,
+.chat-aside .header-top-cross i{
+	display: inline-block;
+	vertical-align: middle;
+	width: 14px;
+	height: 14px;
+    background-position: 50% 50%;
+	background-size: 100% auto;
+}
+.chat-aside .header-top-back span,
+.chat-aside .header-top-cross span{
+	display: inline-block;
+	vertical-align: middle;
+	color: #999;
+	font-size: 12px;
+}
+.chat-aside .header-top-back span{ margin-left: 5px; }
+.chat-aside .header-top-cross span{ margin-right: 5px; }
+
+/*顶部标题*/
+.chat-aside .lay-header-caption{
+    /* margin: 10px auto; */
+    padding: 5px 15px;
+    border-style: solid;
+    border-color: #f9f4f4;
+    border-width: 0 0 0 0;
+    font-size: 18px;
+    color: #125688;
+}
+
+.chat-aside .lay-header-custom{
+     margin-top: 20px; 
+}
+
+/*+----------- -------------+*/
+.chat-aside .as-lay-main{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 40px;
+    bottom: 80px;
+    /* background-color: #f4f4f4; */
+    /* padding: 0 10px; */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* touch-action: none; */
+}
+/*+----------- -------------+*/
+.chat-aside .as-lay-footer{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    
+}
+.chat-aside .lay-footer-button{
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    display: box;
+    justify-content: center;
+}
+.chat-aside .as-lay-footer button[type="button"]{ width: 100%; margin-left: 4px; }
+.chat-aside .as-lay-footer button[type="button"]:first-child{ margin-left: 0; }
+
+/*+-----------杂项-------------+*/
+/*底部有padding*/
+.chat-aside .as-lay-footer.has-padding{ padding: 0 5px 3px; }
+/*标题不单独一行时*/
+.chat-aside .as-lay-header.has-cap-nowrap .lay-header-caption{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 60%;
+    margin: 0 auto;
+    text-align: center;
+    color: #303b42;
+    font-size: 18px;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+.chat-aside .as-lay-header.has-cap-nowrap + .as-lay-main{ margin-top: 15px; }
+
+/*+-----------动画-------------+*/
+.chat-aside .aside-layer.cartoon-right{
+    -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
+}
+.chat-aside .aside-layer.cartoon-top{
+    -webkit-transform: translateY(100%);
+    transform: translateY(100%);
+}
+.chat-aside .aside-layer.cartoon-bottom{
+    -webkit-transform: translateY(-100%);
+    transform: translateY(-100%);
+}
+/*解冻各部分，即各部分不再冻结*/
+.chat-aside .aside-layer.unfreeze .as-lay-header,
+.chat-aside .aside-layer.unfreeze .as-lay-main,
+.chat-aside .aside-layer.unfreeze .as-lay-footer{
+    position: initial;
+}
+.chat-aside .aside-layer.unfreeze .as-lay-footer{
+    margin: 20px auto;
+    padding: 0 10px;
+}
+
+/*+-----------active-------------+*/
+.chat-aside.active > .aside-mask{
+    opacity: .6;
+    filter: alpha(opacity = 60);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+}
+.chat-aside.active > .aside-layer{
+    -webkit-transform: translate(0%, 0%);
+    transform: translate(0%, 0%);
+}
+
+
+
+
+
+/*+================================================================================+*/
+/*                                    上拉加载更多
+/*+================================================================================+*/
+.ne__pulling{
+     /* overflow: hidden; */
+     /* touch-action: none; */
+}
+.nePull__up{
+    /* position: absolute; */
+    /* top: 0; */
+    /* left: 0; */
+    /* right: 0; */
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+}
+
+.nePull__load .loading{
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+    border-radius: 100%;
+    margin: 6px;
+    border: 2px solid #666;
+    border-bottom-color: transparent;
+    vertical-align: middle;
+    -webkit-animation: rotate 0.75s linear infinite;
+    animation: rotate 0.75s linear infinite;
+}
+
+@-webkit-keyframes rotate {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    50% {
+        -webkit-transform: rotate(180deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(180deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+
+
+/*+================================================================================+*/
+/*                                   提示窗
+/*+================================================================================+*/
+.prompt{
+	position: fixed;
+	z-index: 9999999999999999;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+.prompt__mask{
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, .35);
+	background: #000\9;
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=35);
+}
+.prompt__content{
+	position: absolute;
+	z-index: 2;
+	top: 45%;
+	left: 0;
+	right: 0;
+	width: 100%;
+	margin: 0 auto;
+	text-align: center;
+}
+.prompt__content>span{
+	display: inline-block;
+	width: auto;
+	padding: 10px 15px;
+	margin: 0 auto;
+	background-color: #fff;
+	box-shadow: 0 1px 1px 2px #fafafa;
+    border-radius: 2px;
+    color: #444;
+	font-size: .85rem;
+}
+
+/*+================================================================================+*/
+/*              移动端浮层问题：阻止浮层滚动时windows窗体也随之滚动须配合JS)
+/*+================================================================================+*/
+.chat-noscroll,
+.chat-noscroll body {
+    overflow: hidden;
+}
+.chat-noscroll body {
+    position: relative;
+}

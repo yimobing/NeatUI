@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pc端利用canvas上传图片</title>
+    </title>
+</head>
+
+<body>
+
+    <div class="upload-bot">
+        <div class="img-upload">
+            <i></i>
+            <input type="file" name="files" id="file" class="img-input" accept="image/*" multiple> <!-- 这里放一个上传按钮 -->
+        </div>
+        <!--/.img-upload-->
+        <div class="img-list">
+            <ul></ul>
+        </div>
+    </div><!--/.upload-bot-->
+
+
+    <style>
+        .upload-bot {
+            margin-top: 15px;
+        }
+
+        .upload-bot:after {
+            content: '';
+            clear: both;
+            display: block;
+        }
+
+        .img-upload {
+            float: left;
+            margin-right: 15px;
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .img-upload:hover {
+            border-color: #b1abab;
+        }
+
+        .img-list {}
+
+        .img-list:after {
+            content: '';
+            clear: both;
+            display: block;
+        }
+
+        .img-upload,
+        .img-list li {
+            position: relative;
+            width: 68px;
+            height: 68px;
+            border: 1px solid #ddd;
+            border-radius: 2px;
+        }
+
+        .img-upload i {
+            display: block;
+            width: 30px;
+            height: 30px;
+            background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozRDI1NEFCMEY2OUMxMUU3Qjg5MTlENUZGMEZDRDk2OCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozRDI1NEFCMUY2OUMxMUU3Qjg5MTlENUZGMEZDRDk2OCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjNEMjU0QUFFRjY5QzExRTdCODkxOUQ1RkYwRkNEOTY4IiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjNEMjU0QUFGRjY5QzExRTdCODkxOUQ1RkYwRkNEOTY4Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+5yd3jQAAASVJREFUeNrs270OAUEUhuH1U6BXuBK1SiuRKLgB3APx022PpVeJqFVqVyKiRiWcSQjZTDEKRzL7nuRL1tfMPMGQbDYVhmGgPH1J93k9lYw0F88qYzuS4cdrc32UzLU2kFYG1y1dQ3MD2uCLpTv7DL45dt6A/z6AAQMGDBgwYMCAAQMGDBgwYMCAAX85d8fOG/DVsfvZvO48tCVVhfXKlq4i2SisvZVEBtwLlO/vxKYkqSmsY9Yomo/0IEFn1iCRp3Si3mHzHR5LToqHVinWHSR7zUPLTPTMr2cpaca6naTl6+9w3rHzBpxy7PgvDRgwYMCAAQMGDBgwYMCAAQMGDBjwn8AZS5f1GVywdDmfwWtLt9LcgPaTaTNJMXg/ijeRLDQ38BBgAN0tIpZBwtYFAAAAAElFTkSuQmCC') 50% 50% no-repeat;
+            background-size: 100% auto;
+        }
+
+        .img-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+        }
+
+
+        .img-list li {
+            float: left;
+            position: relative;
+            margin: 0 15px 15px 0;
+            background-size: 68px 68px;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .img-list li img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .img-list li a {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+        }
+
+        .img-list li .icon-del {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NEJDQzlGOTQxMjRCMTFFQTlERjRBOTUxODk2REFDNkEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NEJDQzlGOTMxMjRCMTFFQTlERjRBOTUxODk2REFDNkEiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDQzM3NTY1RjY5QzExRTc4MDQ3ODEyRjA4MTVEMDZBIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkZDQzM3NTY2RjY5QzExRTc4MDQ3ODEyRjA4MTVEMDZBIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+75Yp0AAAAUlJREFUeNqslEFugzAQRcdAOUB7iNATIFUs0gOEVApVGiq6TC/AJlwhpEfsnkVygKqRO39iB2oSFi0jfcX2n3mMTYy6UeqTiO5Y3/S3CFh7xSBNIwRAe/69/Sfn8AukWF/61GCoFLmtDvgHAgjbC1gekX5ZLvXjdIoczZvX8MQnqRMPOcgNjCfNWJBvEuu61og4jmVuQRhjDYEczP3Wb0Fd2MduJwVJksgcwhgBz4H0QaF5snS23UrhfRSJpBNes37YQvogF/a+XuumaUQYX4FcBnUP1naCiCaT3gsYBNlzStNUAEVR6DcWIp3NLp1PHxSYbT1nmRRWm815O1VVyVq2WJw6GwIh4Wk+l4KyLM9P9wwMawjk0NBbQ8ED/1fy1UoSlTlYSBnYa55LjueArl4RH+pcA3hH9o5m7l6RUS/taJ+RUT5sPwIMALmPKXe+bH1CAAAAAElFTkSuQmCC') center no-repeat;
+            background-size: cover;
+            cursor: pointer;
+        }
+
+        .panel-ebutton {
+            width: 100%;
+            margin: 35px auto 0 auto;
+            /* text-align:right; */
+        }
+
+        .panel-ebutton button[type="button"] {
+            background-color: #1296db;
+        }
+
+        .panel-ebutton button[type="button"]:first-child {
+            width: 50%;
+        }
+
+        .panel-ebutton button[type="button"]+button[type="button"] {
+            width: 36%;
+            margin-left: 13%;
+            background-color: #4a5367;
+        }
+    </style>
+
+
+    <script src="assets/libs/jquery-1.8.3.min.js"></script>
+    <script src="assets/neatui/js/neatui-canvas.js"></script>
+    <script>
+        /*+--------------------------------------------------------+*/
+        //=====上传图片/加号按钮
+        var file = document.getElementById("file");
+        neuiCanvas.uploadFile({
+            selector: file, // 上传图片节点Dom对象
+            maxWidth: 1200, // 图片最大宽度(PX). 尺寸最大可设1200px
+            maxSize: 200, // 图片最大质量(KB). 质量最大200kb
+            quality: 0.7, // 图片压缩系数, 0-1之间
+            callBack: function (arr) { // 回调
+                console.log('上传后的图片地址数组:',arr);
+                //  neui.showAnimate('上传中..');
+                setTimeout(function() {
+                    var tips = '';
+                    //  if($g_xjdh == '') tips = '询价单号为空，无法上传图片';
+                    //  if($g_dyw_xh == '') tips = '抵押物序号为空，无法上传图片';
+                    if (tips != '') {
+                        neuiDialog.alert({
+                            caption: '提示',
+                            message: tips,
+                            buttons: ['确定']
+                        })
+                        neui.destroyAnimate();
+                        return;
+                    }
+
+                    for (var i = 0; i < arr.length; i++) {
+                        var e = arr[i];
+                        var index = e.index, 
+                            base64 = e.url;
+                        var files = e.files, 
+                            oldFiles = e.oldFiles;
+                        // console.log('图片索引：', index, '\n图片地址：', base64)
+                        // console.log('图片信息(压缩前)：', oldFiles, '\n图片信息(压缩后)：', files);
+                        var ls_img_url = base64;
+                        // 后台返回单张图片
+                        var oneImgSource = {
+                            "pic_up": "1", "data": [
+                                { "pic_bh": "001", "pic_url": 'test/img/img_blue.png', "pic_url_big": "test/img/img_gray.png", "pic_del": "0" }
+                            ]
+                        }
+                        /*
+                        // START AJAX
+                        var oneImgSource = {}
+                        var isHoldOn = true;
+                        ajax({
+                            heading: "上传图片",
+                            debug: "<%=s_debug %>",
+                            type: "POST",
+                            url: "../../kp3_jk/jk_pub/jk_pic_xjd.ashx",
+                            data: {
+                                "action": "v3_uploadImage_pc",
+                                "user": "<%=s_user %>",
+                                "menu_bh": "<%=s_menu_bh%>",
+                                "serverId": ls_img_url,
+                                "xjdh": "<%=s_xjdh%>",
+                                "dyw_xh": "<%=s_dyw_xh%>"
+                            },
+                            success:function(msg){
+                                if(toolTip.emptyTips(msg, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                if(toolTip.zeroLenthTips(msg, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                oneImgSource = JSON.parse(msg);
+                            }
+                        })
+                        if(!isHoldOn) {
+                            neui.destroyAnimate();
+                            return;
+                        }
+                        // END AJAX
+                        */
+
+                        var html = getLiHtml(oneImgSource.data[0]);
+                        $('.img-list>ul').append(html);
+                    }
+                    //  neui.destroyAnimate();
+                }, 100)
+            }
+        });
+
+
+
+
+        /**
+        * 获取单张图片html
+        * @param {*} json
+        * add 20200516-1
+        */
+        function getLiHtml(json) {
+            var _delStyle = parseInt(json.pic_del) != 1 ? '' : '<i class="icon-del"></i>';
+            var bigUrl = typeof json.pic_url_big == 'undefined' ? '' : json.pic_url_big;
+            var smallUrl = json.pic_url;
+            var _html = '<li data-pic-bh="' + json.pic_bh + '" data-pic-url-big="' + bigUrl + '" style="background-image: url(' + smallUrl + ');">' +
+                '   <img src="' + smallUrl + '" alt="">' + _delStyle +
+                '</li>';
+            return _html;
+        }
+
+
+    </script>
+</body>
+
+</html>
