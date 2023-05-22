@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pc端利用canvas上传图片</title>
+    <title>pc端利用canvas上传图片并实现图片压缩</title>
     </title>
 </head>
 
@@ -145,15 +145,16 @@
 
 
     <script src="assets/libs/jquery-1.8.3.min.js"></script>
-    <script src="assets/neatui/js/neatui-canvas.js"></script>
+    <script src="assets/neatui/js/neatui-canvasUpload.js"></script>
     <script>
         /*+--------------------------------------------------------+*/
         //=====上传图片/加号按钮
         var file = document.getElementById("file");
-        neuiCanvas.uploadFile({
+        neuiCanvasUpload.uploadFile({
             selector: file, // 上传图片节点Dom对象
             maxWidth: 1200, // 图片最大宽度(PX). 尺寸最大可设1200px
             maxSize: 200, // 图片最大质量(KB). 质量最大200kb
+            minSize: 1, // 图片最小质量(KB),默认1(可选)
             quality: 0.7, // 图片压缩系数, 0-1之间
             callBack: function (arr) { // 回调
                 console.log('上传后的图片地址数组:',arr);
@@ -174,10 +175,7 @@
 
                     for (var i = 0; i < arr.length; i++) {
                         var e = arr[i];
-                        var index = e.index, 
-                            base64 = e.url;
-                        var files = e.files, 
-                            oldFiles = e.oldFiles;
+                        var index = e.index, base64 = e.url, files = e.files, oldFiles = e.oldFiles;
                         // console.log('图片索引：', index, '\n图片地址：', base64)
                         // console.log('图片信息(压缩前)：', oldFiles, '\n图片信息(压缩后)：', files);
                         var ls_img_url = base64;

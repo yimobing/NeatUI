@@ -208,7 +208,7 @@ body{
     text-align: center;
     border-radius: 8px;
 }
-.chit__item-pcUp{
+.chit__item-book{
 	position: relative;
 }
 .chit__item i{
@@ -221,7 +221,7 @@ body{
     background-size: 100% auto;
 }
 
-.chit__item-pcUp i{ background-image: url('../img/wechat_icon_mod_upload.png'); }
+.chit__item-book i{ background-image: url('../img/wechat_icon_mod_upload.png'); }
 .chit__item-album i{ background-image: url('../img/wechat_icon_mod_album.png'); }
 .chit__item-album i{ background-image: url('../img/wechat_icon_mod_album.png'); }
 .chit__item-camera i{ background-image: url('../img/wechat_icon_mod_camera.png'); }
@@ -233,7 +233,7 @@ body{
 .chit__item-file i{ background-image: url('../img/wechat_icon_mod_file.png'); }
 .chit__item span{ margin-top: 8px; font-size: 12px; }
 
-.chit__item-pcUp input[type="file"]{
+.chit__item-book input[type="file"]{
    position: absolute;
    top: 0;
    left: 0;
@@ -533,6 +533,14 @@ body{
 	}
 	.chit__item-album{
 		display: none;
+	}
+}
+
+
+@media screen and (max-width: 640px){
+    /*隐藏pc端图片上传功能*/
+	.chit__item-book{
+		display: none!important;
 	}
 }
 

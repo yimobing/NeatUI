@@ -1,6 +1,6 @@
 /**
  * [neatUiCanvas]
- * 前端图片压缩并上传
+ * pc端利用canvas上传图片、并实现图片压缩
  * 兼容性：支持火狐、谷歌、360、Microsoft Edge等现代浏览器，IE仅支持IE9+(即IE10、IE11)
  * Author: ChenMufeng
  * Date: 2020.05.07
@@ -39,15 +39,15 @@
     /*+------------------------------------------------+*/
     var uploadFile = function(options){
         var defaults = {
-            browserCompatible: false, //是否支持ie10以下的低版本浏览器,默认false
-            selector: null, //上传标签dom对象,一般为<input type="file" id="file">标签的dom对象
-            events: 'change', //触发上传的事件,默认change
-            callBack: null, //回调. callBack:function(arr), 其中 arr格式：[{index:"图片索引", url:"图片base64地址", files:"压缩后图片信息json", oldFiles:"压缩前图片信息json"}]
+            browserCompatible: false, // 是否支持ie10以下的低版本浏览器,默认false
+            selector: null, // 上传标签dom对象,一般为<input type="file" id="file">标签的dom对象
+            events: 'change', // 触发上传的事件,默认change
+            callBack: null, // 回调. callBack:function(arr), 其中 arr格式：[{index:"图片索引", url:"图片base64地址", files:"压缩后图片信息json", oldFiles:"压缩前图片信息json"}]
 
-            maxWidth: 1200, //图片最大宽度(PX),默认1200.(可缺省)
-            maxSize: 200, //图片最大质量(KB),默认200.(可缺省)
-            minSize: 5, //图片最小质量(KB),默认5.(可缺省)
-            quality: 0.7 //压缩系数,0-1之间,默认0.7.(可缺省) 
+            maxWidth: 1200, // 图片最大宽度(PX),默认1200(可选)
+            maxSize: 200, // 图片最大质量(KB),默认200(可选)
+            minSize: 1, // 图片最小质量(KB),默认1(可选)
+            quality: 0.7 // 压缩系数,0-1之间,默认0.7(可选) 
         }
         var settings = $.extend(true, {}, defaults, options || {});
         var dom = settings.selector,
@@ -181,11 +181,11 @@
             object: null, //图片对象,一般为<input type="file" id="file">标签已有的files属性,获取方式: $('#file').files[0] 或 this.files[0]
             callBack: null, //回调. callBack:function(e), 其中 e格式：{index:"图片索引", url:"图片base64地址", files:"压缩后图片信息json", oldFiles:"压缩前图片信息json"}
 
-            index:0, //当前图片索引值(用于当有多张图片需要压缩时),默认0(可缺省)
-            maxWidth: 1200, //图片最大宽度(PX),默认1200.(可缺省)
-            maxSize: 200, //图片最大质量(KB),默认200.(可缺省)
-            minSize: 5, //图片最小质量(KB),默认5.(可缺省)
-            quality: 0.7 //压缩系数,0-1之间,默认0.7.(可缺省)
+            index:0, //当前图片索引值(用于当有多张图片需要压缩时),默认0(可选)
+            maxWidth: 1200, //图片最大宽度(PX),默认1200(可选)
+            maxSize: 200, //图片最大质量(KB),默认200(可选)
+            minSize: 5, //图片最小质量(KB),默认5(可选)
+            quality: 0.7 //压缩系数,0-1之间,默认0.7(可选)
         }
         //var settings = $.extend(true, {}, defaults, options || {}); //IE9及以下浏览器不支持深度合并
         var settings = $.extend({}, defaults, options || {});
@@ -364,9 +364,9 @@
 
 
 /**--------------------------------
- * neuiCanvas对象
+ * neuiCanvasUpload 对象
  --------------------------------*/
-var neuiCanvas = {
+var neuiCanvasUpload = {
     uploadFile: $('body').uploadFile,
     compressFile: $('body').compressFile
 }
