@@ -1,6 +1,8 @@
 /**
  * [neuiWechat]
  * 微信聊天控件
+ * Date: 2021.03.30
+ * UpDate: 2023.05.23
  */
 
 ;(function($){
@@ -48,17 +50,17 @@
 			aside: { // 侧栏窗口参数
 				// 前台提供的变量
 				caption: "微信聊天", // 标题,可自定义HTML(可选)
-				toper: "", //顶部,自定义HTML(可选).
-				cross: true, //是否显示关闭图标(可选),默认false
-				back: true, //是否显示返回按钮(可选),默认false
+				toper: "", // 顶部,自定义HTML(可选).
+				cross: true, // 是否显示关闭图标(可选),默认false
+				back: true, // 是否显示返回按钮(可选),默认false
 				showBackText: true, // 是否显示返回按钮的文字(可选),默认true
-				capWrap: false, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
-
+				capWrap: false, // 标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+				isPcImage: false, // 是否要同时在pc端使用图片上传功能(可选),默认false。 true时图片上传将使用pc方式。记得引用相应的控件。add 20230523-1
 				// 内部写死的变量
 				content: "", // 内容,可自定义HTML(可选)
-				footer: me.getContent(), //底部,自定义HTML(可选).
-				adaptive: false, //窗口是否自适应内容大小(可选). true 是, false 否(默认)
-				frozen: true, //是否冻结顶部、中间及底部,即各部分是否使用绝对定位(可选). true 是(默认), false 否. false时控件大小自适应内容
+				footer: me.getContent(), // 底部,自定义HTML(可选).
+				adaptive: false, // 窗口是否自适应内容大小(可选). true 是, false 否(默认)
+				frozen: true, // 是否冻结顶部、中间及底部,即各部分是否使用绝对定位(可选). true 是(默认), false 否. false时控件大小自适应内容
 				showButton: false,
 				offset: { 
 					left: 0,
@@ -66,7 +68,7 @@
 					top: 0,
 					bottom: 0
 				},
-				zIndex: 999, //层级z-index,默认999(可选)
+				zIndex: 999, // 层级z-index,默认999(可选)
 				openCallBack: function(e){
 					// 先往内部填充一个节点作为聊天消息区域的根节点
 					e.eleMain.append('<div class="' + me.messageRoot.toString().replace(/[\.\#]/g, '') + '"></div>');
@@ -131,8 +133,11 @@
 			events: { // 系列事件. 须返回操作结果给控件. ajax({})
 				send: function(e){ }, // 发送消息按钮. e 格式 {type:"消息类型", content:"消息内容"}. type值：word 文字, voice 语音
 				getNews: function(){ }, // 获取最新消息. 注意：返回格式为Object对象或Promise对象, 即若AJAX为同步则返回消息数据Object一维对象; 若AJAX为异步,则返回消息数据写在resolve()中的Promise对象
-				album: function(){ }, // 相册图片,返回给控件单张或多张图片(小图、大图组成的对象). 注意：返回的是promise对象. 
+				album: function(){ }, // 相册图片(移动端),返回给控件单张或多张图片(小图、大图组成的对象). 注意：返回的是promise对象. 
 									 // 返回的图片数据格式：eg.{thumb: ls_pic_url, picture: ls_pic_url_big}或{data:[{thumb: ls_pic_url, picture: ls_pic_url_big}, {thumb: ls_pic_url, picture: ls_pic_url_big}]}
+				photos: function(){ // 图片上传(pc端) ,返回给控件单张或多张图片(小图、大图组成的对象). 注意：返回的是promise对象. 
+					// 返回的图片数据格式：eg.{thumb: ls_pic_url, picture: ls_pic_url_big}或{data:[{thumb: ls_pic_url, picture: ls_pic_url_big}, {thumb: ls_pic_url, picture: ls_pic_url_big}]} add 20230522-1 test6
+				}
 			}
 		}
 
@@ -216,6 +221,27 @@
 		// 根据配置显示或隐藏发送区
 		if(me.opts.alwaysShowSend){
 			$('.talk__send').show();
+		}
+		// 根据配置显示移动端上传图片区域 add 20230523-1 test6
+		if(!checkMobileDevice()){ // 移动端时才显示
+			$('.chit__item-album').hide();
+		}
+		// 根据配置显示pc端上传图片区域 add 20230523-1 test6
+		if(me.opts.aside.isPcImage){
+			if(!checkMobileDevice()){ // pc端时才显示
+				$('.chit__item-book').show();
+			}
+		}
+		// 如果加号按钮下的子节点没有内容或都隐藏了，则显示它自身 add 20230523-1 test6
+		var isChitMoreChildAllDisplayNone = true; // 子节点是否都不显示
+		$('.chit__more').children().each(function(){
+			if($(this).css('display') != 'none'){
+				isChitMoreChildAllDisplayNone = false;
+				return false;
+			}
+		});
+		if(isChitMoreChildAllDisplayNone === true && $('.chit__expression').is(':visible') == false){
+			$('.talk__more').hide(); // 隐藏加号按钮
 		}
 
 
@@ -302,14 +328,20 @@
 		$('#btn_talk_send').off('click').on('click', function(){
 			me.sendMessage(); //这个滚动条要弄到最底部，且html是拼接到最后面的即append，而非prepend
 		})
-		// 点相册, 上传图片 test5
+		// 点相册, 上传图片(移动端) test5 test6
 		$('.chit__item-album').off('click').on('click', function(){
 			if(!checkMobileDevice()){
 				me.utilities.openToast('电脑端(PC)无法上传图片，请在手机上进行操作');
 				return;
 			}
-			me.uploadImage();
+			me.uploadImageOfMobile();
 		})
+
+		// 点上传图标，上传图片(pc端) add 20230522-1 test6
+		if(me.opts.aside.isPcImage){
+			me.uploadImageOfPc();
+		}
+
 		// 点击冒泡消息
 		$('.bubbling').off('click').on('click', function(){
 			$(this).text(0).hide();
@@ -348,7 +380,7 @@
 				}
 			}else{
 				if(typeof $(this).neuiMagnify !== 'function'){
-					window.open(imgSrc, '_blank'); // 打窗口中打开
+					window.open(imgSrc, '_blank'); // 新窗口中打开
 					return;
 				}
 				$(this).neuiMagnify({
@@ -445,9 +477,9 @@
 	};
 
 	/**
-	 * 上传图片
+	 * 移动端上传图片 test61
 	 */
-	MyChat.prototype.uploadImage = function(){
+	MyChat.prototype.uploadImageOfMobile = function(){
 		var me = this;
 		if(me.opts.events){
 			if(me.opts.events.album){
@@ -488,6 +520,56 @@
 			}
 		}
 	};
+
+
+
+	/**
+	 * 移动端上传图片 test61
+	 */
+	MyChat.prototype.uploadImageOfPc = function(){
+		var me = this;
+		if(me.opts.events){
+			if(me.opts.events.photos){
+				me.opts.events.photos().then(function(res){ // 执行后台操作
+					var imageJson = res;
+					var isError = false;
+					var errors = '前台photos()函数执行完成后必须返回给控件图片数据！\n单张图片格式：{thumb:"小图地址", picture:"大图地址"}；\n多张图片格式：{data:[{thumb:"小图地址", picture:"大图地址"}]}';
+					if(!imageJson || $.isEmptyObject(imageJson)) isError = true;
+					if(typeof imageJson.data == 'undefined' && (typeof imageJson["thumb"] == 'undefined' || typeof imageJson["picture"] == 'undefined') ) isError = true;
+					// if(typeof imageJson["thumb"] == 'undefined' || typeof imageJson["picture"] == 'undefined') isError = true;
+					if(isError){
+						console.log(errors);
+						me.utilities.openToast(errors);
+						return;
+					}
+					$('.chat__chit').hide().children().hide(); // 隐藏展开区及所有子项
+					me.fnRecoverMessageAreaHeight('plus'); // 重置消息区高度
+					if(typeof imageJson.data == 'undefined') imageJson = {data:[imageJson]} // 单张图片变成多张图片的格式
+					// 插入图片
+					var dataJson = {data:[]}
+					$.each(imageJson.data, function(i, items){
+						if(typeof items["thumb"] == 'undefined' || typeof items["picture"] == 'undefined'){
+							console.log(errors);
+							me.utilities.openToast(errors);
+							return false;
+						}
+						var smallImageUrl = items["thumb"], //小图
+							bigImageUrl = items["picture"]; //大图
+						var tempJson = me.fnAtonceMessage(smallImageUrl, bigImageUrl, '0', '1', '0'); // {data:[{}]}
+						dataJson.data.push(tempJson.data[0]);
+					})
+					me.createData(dataJson, me.messageRoot, 'append');
+					me.fnScrollToBottom(); // 强制滚动条滚动到底部
+
+				}).catch(function(err){
+					me.utilities.openToast(err);
+				})
+			}
+		}
+	};
+
+
+	
 
 
 
@@ -633,6 +715,12 @@
 					'<!--[=====功能项=====]-->',
 					'<div class="chit__more" style="display: none">',
 						'<div class="chit__item chit__item-album"><i></i><span>相册</span></div><!--/.chit__item-->',
+						// add 20230523-1	
+						'<div class="chit__item chit__item-book" style="display: none">',
+							'<input type="file" name="files" id="file" class="img-input" accept="image/*" multiple>',
+							'<i></i>',
+							'<span>图片上传</span>',
+						'</div><!--/.chit__item-->',
 						// '<div class="chit__item chit__item-camera"><i></i><span>拍摄</span></div><!--/.chit__item-->',
 						// '<div class="chit__item chit__item-video"><i></i><span>视频通话</span></div><!--/.chit__item-->',
 						// '<div class="chit__item chit__item-locate"><i></i><span>位置</span></div><!--/.chit__item-->',

@@ -5,7 +5,7 @@
 * 微信聊天控件
 * Author: ChenMufeng
 * Date: 2021.03.30
-* Update: 2021.04.09
+* Update: 2023.05.23
 */
 
 
@@ -202,11 +202,15 @@ body{
 
 .chit__item{ 
     width: 21%;
+	margin-right: 3px;
     margin-bottom: 20px;
     padding: 8px 4px;
     background-color: #fff;
     text-align: center;
     border-radius: 8px;
+}
+.chit__item-book{
+	position: relative;
 }
 .chit__item i{
     display: block;
@@ -218,6 +222,8 @@ body{
     background-size: 100% auto;
 }
 
+.chit__item-book i{ background-image: url('../img/wechat_icon_mod_upload.png'); }
+.chit__item-album i{ background-image: url('../img/wechat_icon_mod_album.png'); }
 .chit__item-album i{ background-image: url('../img/wechat_icon_mod_album.png'); }
 .chit__item-camera i{ background-image: url('../img/wechat_icon_mod_camera.png'); }
 .chit__item-video i{ background-image: url('../img/wechat_icon_mod_video.png'); }
@@ -228,7 +234,17 @@ body{
 .chit__item-file i{ background-image: url('../img/wechat_icon_mod_file.png'); }
 .chit__item span{ margin-top: 8px; font-size: 12px; }
 
-
+.chit__item-book input[type="file"]{
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   width: 100%;
+   height: 100%;
+   opacity: 0;
+   filter: alpha(opacity=0);
+   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+}
 
 
 
@@ -509,11 +525,21 @@ body{
 /*+================================================================================+*/
 /*                                    pc端时
 /*+================================================================================+*/
+/* 大于640px，pc端 */
 @media screen and (min-width: 640px){
     /*隐藏图片上传、语音等功能*/
     .talk__more,
     .talk__switch,
-    .talk__press{ display: none!important; }
+    .talk__press{ 
+		/* display: none!important; */
+	}
+}
+
+/* 小于640px，移动端 */
+@media screen and (max-width: 640px){
+	button[type="button"]{
+		cursor: pointer;
+	}
 }
 
 

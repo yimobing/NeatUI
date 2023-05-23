@@ -77,20 +77,34 @@
     <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script>
     <script type="text/javascript" src="assets/libs/bluebird.min.js"></script><!--pc时让ie支持promise-->
     <script type="text/javascript" src="assets/neatui/js/neatui-wechat.js"></script><!--聊天控件-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-canvas.js"></script><!--图片上传(pc时)-->
     <script type="text/javascript" src="assets/neatui/js/neatui-magnify.js"></script><!--图片放大预览控件(pc时)-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-canvasUpload.js"></script><!--pc端图片上传控件 add 20230523-1 -->
     <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义ajax-->
     <script type="text/javascript">
         /*+----------------全局变量----------------+*/
+        //——————————————————————————————————————————
         // 全局变量 ajax({})
         var g_xjdh = '<%=s_xjdh%>';
         var g_dyw_xh = '<%=s_dyw_xh%>';
-
-        //=====在线沟通
+        // 判断环境 add 20230523-1
+        var g_check_weixin = '<%=s_weixin%>'; // 是否微信环境下。 1 是(一般为移动端), 0 不是(一般为pc端)。
+        if(g_check_weixin == '0'){ // 非微信环境下(相当于pc环境)
+            // 禁用F12
+            document.addEventListener('keydown', function(e){
+                if(window.event && window.event.keyCode == 123){
+                    e.keyCode = 0;
+                    e.returnValue = false;
+                }
+            })
+        }
+        // 在线沟通
         var g_chat_pagesize = 10; // 聊天翻页每页记录数
         var g_chat_start_date = ''; // 聊天历史消息时间(聊天开始时间), 默认空
         var g_chat_latest_date = ''; // 聊天最新消息时间, 默认为第一次调用聊天历史消息时间
         var g_chat_history_times = 0; // 聊天历史消息调用的次数,默认0次
+
+
+
 
         /*+————————————————FUNCTION————————————————+*/
         /**
@@ -133,7 +147,7 @@
             }
             // END AJAX
             */
-           return json;
+            return json;
         }
 
 
@@ -199,7 +213,7 @@
                     {"chat_bh":"C1002", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"看你们聊得很开心", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
                     {"chat_bh":"C1003", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"哪能这样说呢", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
                     {"chat_bh":"C1004", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"看你们聊得很开心", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
-                    {"chat_bh":"C1005", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"test//img/img_purple.png", "value2":"", "check_word":"0", "check_voice":"0", "check_pic":"1", "create_time":"2020-12-31 14:52:17"},
+                    {"chat_bh":"C1005", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"test/img/img_purple.png", "value2":"", "check_word":"0", "check_voice":"0", "check_pic":"1", "create_time":"2020-12-31 14:52:17"},
                     {"chat_bh":"C1006", "user_hm":"U1002", "user_tx":"assets/neatui/img/wechat_avatar_female.png", "user_xm":"小生", "value1":"您看这个可以吗，帮我掌掌眼", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"},
                     {"chat_bh":"C1007", "user_hm":"U1001", "user_tx":"assets/neatui/img/wechat_avatar_male.png", "user_xm":"张三", "value1":"这个设计不错，让设计部的同事都过来学习下", "value2":"", "check_word":"1", "check_voice":"0", "check_pic":"0", "create_time":"2020-12-31 14:52:17"}
                 ]
@@ -465,6 +479,7 @@
                         back: true, //是否显示返回按钮(可选),默认false
                         showBackText: false, // 是否显示返回按钮的文字(可选),默认true
                         capWrap: false, //标题是否单独一行(可选),默认true. 值为false时,标题将与顶部的关闭、返回按钮在同一行
+                        isPcImage: ( g_check_weixin != '1' ? true : false ), // 是否要同时在pc端使用图片上传功能(可选),默认false。 true时上传图片将使用pc方式。记得引用相应的控件。add 20230523-1
                         // zIndex: 999 // 层级,默认999(可选)
                         offset: { // add 20211105-1
                             left: isDevicePc() ? ($(window).width() - 400) / 2 : 0,
@@ -574,14 +589,19 @@
                             //alert('点我开始上传图片');
                             // 返回小图、大图组成的对象. 可1张或多张图片
                             /*  
-                                var ls_pic_url = 'test//img/img_blue.png', // 小图
-                                    ls_pic_url_big = 'test//img/img_blue.png'; // 大图
+                                var ls_pic_url = 'test/img/img_blue.png', // 小图
+                                    ls_pic_url_big = 'test/img/img_blue.png'; // 大图
                                 // ①. 返回单张图片
                                 // return {thumb: ls_pic_url, picture: ls_pic_url_big};
                                 // ②.返回多张图片
                                 return {data:[{thumb: ls_pic_url, picture: ls_pic_url_big}, {thumb: ls_pic_url, picture: ls_pic_url_big} ] }
                             */
-                            return fnChatUploadPicture(); // 因实际图片上传调用微信接口会存在延迟，故需使用promise解决异步问题
+                            return fnUploadImageForMobile(); // 因实际图片上传调用微信接口会存在延迟，故需使用promise解决异步问题
+                        },
+
+                        // pc端上传图片 add 20230523-1
+                        photos: function(){
+                            return fnUploadImageForPc();
                         }
                     }
                 })
@@ -592,9 +612,9 @@
 
             //——————————————————————————————————————————
             /**
-             * 微信聊天上传图片操作
+             * 微信聊天上传图片(移动端)
              */
-            function fnChatUploadPicture(){
+            function fnUploadImageForMobile(){
                 var allImgJson = {data:[]} // 这个要放外面,若放内部,则会出现undefined情况(把setTimeout去掉时)
                 return new Promise(function(resolve, reject){
                     // · 后台实际操作
@@ -768,14 +788,14 @@
                             if(i == 0)
                                 var oneImgJson = {
                                     data:[
-                                        {"pic_bh":"1001", "pic_url":"test//img/img_gray.png", "pic_url_big":"test//img/img_blue.png"}
+                                        {"pic_bh":"1001", "pic_url":"test/img/img_gray.png", "pic_url_big":"test/img/img_blue.png"}
                                     ]
                                 }
                             if(i == 1)
                                 var oneImgJson = {
                                     data:[
-                                        {"pic_bh":"1001", "pic_url":"test//img/img_blue.png", "pic_url_big":"test//img/img_gray.png"},
-                                        //{"pic_bh":"1001", "pic_url":"test//img/img_blue.png", "pic_url_big":""}
+                                        {"pic_bh":"1001", "pic_url":"test/img/img_blue.png", "pic_url_big":"test/img/img_gray.png"},
+                                        //{"pic_bh":"1001", "pic_url":"test/img/img_blue.png", "pic_url_big":""}
                                     ]
                                 }
                             sendOneImageToUser(JSON.stringify(oneImgJson), countPic);
@@ -819,6 +839,137 @@
                     }
 
                 }) // END PROMISE
+            }
+
+
+
+
+            //——————————————————————————————————————————
+            /**
+             * 微信聊天上传图片(pc端)
+             * add 20230523-1
+             */
+            function fnUploadImageForPc(){
+                var allImgJson = {data:[]} // 这个要放外面,若放内部,则会出现undefined情况(把setTimeout去掉时)
+                return new Promise(function(resolve, reject){
+                    var file = document.getElementById("file");
+                    neuiCanvasUpload.uploadFile({
+                        selector: file, // 上传图片节点Dom对象
+                        maxWidth: 1200, // 图片最大宽度(PX). 尺寸最大可设1200px
+                        maxSize: 200, // 图片最大质量(KB). 质量最大200kb
+                        minSize: 1, // 图片最小质量(KB),默认1(可选)
+                        quality: 0.7, // 图片压缩系数, 0-1之间
+                        callBack: function (arr) { // 回调
+                            console.log('上传后的图片地址数组:',arr);
+                            //  neui.showAnimate('上传中..');
+                            let imgLen = arr.length;
+                            for (var i = 0; i < imgLen; i++) {
+                                var e = arr[i];
+                                var index = e.index, base64 = e.url, files = e.files, oldFiles = e.oldFiles;
+                                // console.log('图片索引：', index, '\n图片地址：', base64)
+                                // console.log('图片信息(压缩前)：', oldFiles, '\n图片信息(压缩后)：', files);
+                                var ls_img_url = base64;
+                                // 后台返回
+                                /*
+                                // START AJAX
+                                var isHoldOn = true;
+                                ajax({
+                                    heading: "上传图片(pc)(非微信环境下)",
+                                    debug: false,
+                                    async: false, // 取数方式. true 异步, false 同步(默认)
+                                    type: "POST",
+                                    dataType: "html",
+                                    cache: false,
+                                    url: "../../../kppc_3v/kp3_jk/jk_pub/jk_pc_pic.ashx",
+                                    data: {
+                                        "action": "v3_uploadImage_pc",
+                                        "user": "<%=s_user%>",
+                                        "sjk": "<%=s_sjk%>",
+                                        "serverId": ls_img_url,
+                                        "xjdh": g_xjdh,
+                                        "dyw_xh": g_dyw_xh
+                                    },
+                                    success: function(res){
+                                        if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                        // if(res == '') return;
+                                        sendOneImageToUser(res, imgLen);
+                                    },
+                                    error: function(res){
+                                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    },
+                                    beforeSend: function(XMLHttpRequest){ },
+                                    complete: function(XMLHttpRequest, textStatus){ }
+                                })
+                                if(!isHoldOn){
+                                    neui.destroyAnimate();
+                                    return;
+                                }
+                                // END AJAX
+                                */
+
+                            }
+
+
+                            // · 前台模拟操作(生产环境下请注释掉本段代码)
+                            setTimeout(function(){ // 模拟异步
+                                var countPic = 2; // 总计N张图片
+                                for(var i = 0; i < countPic; i++){
+                                    if(i == 0)
+                                        var oneImgJson = {
+                                            data:[
+                                                {"pic_bh":"1001", "pic_url":"test/img/img_gray.png", "pic_url_big":"test/img/img_blue.png"}
+                                            ]
+                                        }
+                                    if(i == 1)
+                                        var oneImgJson = {
+                                            data:[
+                                                {"pic_bh":"1001", "pic_url":"test/img/img_blue.png", "pic_url_big":"test/img/img_gray.png"},
+                                                //{"pic_bh":"1001", "pic_url":"test/img/img_blue.png", "pic_url_big":""}
+                                            ]
+                                        }
+                                    sendOneImageToUser(JSON.stringify(oneImgJson), countPic);
+                                }
+                            }, 1000)
+
+
+                            // ·发送单张图片给用户
+                            // @param {string} msg 一维对象字符串
+                            // @param {number} total 图片总数
+                            function sendOneImageToUser(msg, total){
+                                var isGoOn = true;
+                                var errors = '';
+                                if(msg == ''){
+                                    errors = '图片为空1';
+                                    isGoOn = false;
+                                }
+                                var json = {}
+                                if(isGoOn) json = JSON.parse(msg);
+                                if(isGoOn && $.isEmptyObject(json)){
+                                    errors = '图片为空2';
+                                    isGoOn = false;
+                                }
+                                if(isGoOn && typeof json.data == 'undefined'){
+                                    errors = '图片不含data属性';
+                                    isGoOn = false;
+                                }
+                                if(isGoOn && json.data.length == 0){
+                                    errors = '图片data为空';
+                                }
+                                if(errors != ''){
+                                    reject('上传后返回的信息有误：' + errors); // 错误，使用reject返回错误信息
+                                }else{
+                                    var source = json.data[0];
+                                    var ls_pic_url = source["pic_url"],
+                                        ls_pic_url_big = source["pic_url_big"];
+                                    var imgJson = {thumb: ls_pic_url, picture: ls_pic_url_big}
+                                    allImgJson.data.push(imgJson);
+                                }
+                                if(allImgJson.data.length == total) resolve(allImgJson);  // 成功，使用resolve()返回所有图片数据
+                            }
+                            //  neui.destroyAnimate();
+                        }
+                    });
+                })
             }
 
             
