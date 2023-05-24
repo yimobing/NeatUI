@@ -1,0 +1,241 @@
+@charset "utf-8";
+/**
+ * [neUploadFile]
+ * jQuery文件上传控件
+ * 支持批量上传图片、PDF等文件
+ * Version：v1.0.0
+ * Author: Mufeng
+ * Date: 2023.05.24
+ * Update: 2023.05.24
+ */
+/*+-------------------------+*/
+*{margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+a { text-decoration: none; -webkit-tap-highlight-color: rgba(0,0,0,0); }
+a img { border: 0; }
+html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color:rgba(0, 0, 0, 0); } 
+
+
+/*+-------------------------+*/
+.ne__upload{
+    width: 800px;
+    margin: 5px auto;
+    border: 1px solid blue;
+    border-radius: 4px;
+    border: 0;
+}
+.neUpload__top,
+.neUpload__list{
+    border: 1px solid #cdc7c7;
+    border-radius: 4px;
+}
+.neUpload__top{
+    position: relative;
+    padding: 5px 10px;
+}
+.neUpload__choose{
+    
+}
+.neUpload__file{
+    position: relative;
+    width: 150px;
+}
+.neUpload__file button[type="button"]{
+    width: 100%;
+    padding: 10px 12px;
+    background: #19B6F8;
+    border: 0;
+    border-radius: 4px;
+    text-align: center;
+    color: #fff;
+}
+.neUpload__file input[type="file"]{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: inline-block;
+    width: auto;
+    height: 100%;
+    border: 1px solid red;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+.neUpload__choose p{
+    display: inline-block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.neUpload__operate{
+    position: absolute;
+    top: 10px;
+    right: 8px;
+}
+.neUpload__operate button[type="button"]{
+    width: auto;
+    background: #4CAF50;
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+}
+
+
+
+/*+-------------------------+*/
+.neUpload__list{
+    margin-top: 15px;
+	border: 0;
+}
+.neUpload__one{
+    display: -webkit-box;
+    display: -moz-box;
+    display: -webkit-flex;
+    display: flex;
+    display: box;
+    align-items: center;
+
+    position: relative;
+	margin-top: 5px;
+    padding: 10px 15px 10px 5px;
+	border-style: solid;
+	border-width: 1px 1px 1px 1px;
+	border-radius: 4px;
+	border-color: #cdc7c7;
+    overflow: hidden;
+}
+
+.neUpload__one:after{
+     content: '';
+     display: inline-block;
+     position: absolute;
+     z-index: 1;
+     top: -6px;
+     right: -46px;
+     width: 80px;
+     height: 35px;
+     background-color: #08ba61;
+     -webkit-transform: rotate(45deg);
+     -moz-transform: rotate(45deg);
+     -o-transform: rotate(45deg);
+     transform: rotate(45deg);
+}
+
+.neUpload__one:first-child{
+    /* border-top: 0; */
+}
+.neUpload__thumb{
+    width: 50px;
+    height: 50px;
+}
+.neUpload__thumb img{
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 3px;
+    border: 1px solid #eaeaea;
+    border-radius: 2px;
+}
+.neUpload__detail{
+    -webkit-flex: 1;
+    -moz-flex: 1;
+    -o-flex: 1;
+    flex: 1;
+    width: 100%;
+    position: relative;
+    margin-left: 10px;
+}
+.neUpload__form{
+    
+}
+.neUpload__form ::-webkit-input-placeholder{
+	/* color: #bfbfbf; */
+	color: #e2dcdc;
+	font-size: 12px;
+}
+.neUpload__form ::-moz-placeholder{
+	color: #e2dcdc;
+	font-size: 12px;
+}
+.neUpload__form  :-moz-placeholder{
+	color: #e2dcdc;
+	font-size: 12px;
+}
+
+.neUpload__form_built_in{
+    
+}
+.neUpload__form_built_in span{
+    color: #666;
+    font-size: 12px;
+}
+.neUpload__form_built_in input{
+    width: 250px;
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+.neUpload__form_built_in input:placeholder,
+.neUpload__form_built_in input[placeholder]{
+    font-size: 12px;
+}
+
+
+
+.neUpload__info{
+
+}
+.neUpload__info_size{
+    background-color: #08BA61;
+    padding: 3px;
+    border-radius: 2px;
+    color: #fff;
+    font-size: 10px;
+}
+.neUpload__info_name{
+    margin-left: 8px;
+    color: #999;
+    font-size: 12px;
+}
+
+.neUpload__progress{
+    
+}
+.neUpload__progress_success,
+.neUpload__progress_percent{
+    position: absolute;
+    bottom: 20px;
+}
+.neUpload__progress_success{
+    right: 5px;
+    color: #23b323;
+    font-size: 14px;
+}
+.neUpload__progress_percent{
+    right: 80px;
+    color: #333;
+    font-size: 13px;
+}
+.neUpload__progress progress{
+    width: 100%; 
+}
+.neUpload__remove{
+    position: absolute;
+    z-index: 2;
+    top: 0px;
+    right: 0px;
+    width: 18px;
+    height: 18px;
+    background-size: 100% auto;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAAXNSR0IArs4c6QAAAvNJREFUaEPt2s/LTkEUwPHvYa+UsqBQlI2NnfIjK0oRqXeBDcleyf+gZCtFCQs/oqQs5UdY2dgoVjZSStlzNJqn5p3ufZ65d87MO4/nfdZz753PPWfOnHufKyzYTxbMyyr4f494Z4RVdQtwSERuzOMNUNULwHMR+RrPvw98FbgIPBWRY/OEVtVnwBHgiohcTgWvA14Aux0aOCEiv1uGq+pawGEPAx+AgyLyKwnsBqnq3KA99jFwdBrWuaZW6XlAD8HOBLce6aHYJHCr6DHYZHBr6LHYQeBW0DnYweAA/QbYVXvLysWOAnv0euBlTbQFdjS4NtoKmwXuQR8XkT+WHVmE/Qjs7eqgUq+Z/XioqmF6PwKWrNAd2AMi8jMV1zUuG9wRaRN0CWx2Sod30DLSpbCmYKtIq+oa4Il/EHBrNjuNw8CYpLRVpD32PnASMMeaR3gCH5PeNbDFwEPTuxa2KDgVXRNbHByg3wI7gWVbVm1sFbBHbwBeh2i/3osWqGKNR0rno6ox2h1WrBr3zcl8W5qGj9BuaJGtZ9ocaoPDpsLN66HvvTUlSyzGVANHBeqzn/wO4B5wRkSqoKuAI+wnYJ8HTwpZNXRxcBdWRH50VO8q6KJgVXXnf+Cr8b/ITrBBGxpW7+LoYmCPvQOcAjqxK4EuAh6CrY02B4/B1kSbgnOwEfodsL3ElmUGtsAG6I2Ae9lvjjYBW2JLo7PBJbB9aBE5ndteZoFLYnvQt0TkXA56NLgGtgR6FDjCfgH2xB1UThS6jlXVsJCNjvRgcAfW/dfz3RpYCj0IvJJYq/ROBreAtUAPAd/1DwJuzVZL476lMnZNJ4FV9SZwFmgCG0X6PbAVSCpkM8GtYgP0Jt+GJqFnfYnXZGTjNFfVZHQvuPXIjkX3fT58yX1+69fsfhH5VmOfzb2Gqm4GXgHb3OfPInItPmcfeMm9OgXOzws2WNMOfR24LSLuvfey38yilXvXWzt+FdxaRKznsxph6zva2vkWLsJ/Ac6oJlskd5BZAAAAAElFTkSuQmCC');
+    cursor: pointer;
+}
+
+
+
+/*+-------------------------+*/

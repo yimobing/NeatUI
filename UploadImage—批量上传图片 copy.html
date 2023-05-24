@@ -21,6 +21,71 @@
     参考： https://blog.csdn.net/qq_36509946/article/details/95447892
     <hr>
     <div class="wrap">
+        <div class="ne__upload">
+            <div class="neUpload__top">
+                <div class="neUpload__choose">
+                    <div class="neUpload__file">
+                        <button type="button" id="btn__choose">选择文件</button>
+                        <input type="file" id="choice" accept="image/png,image/jpeg,image/gif,application/pdf" multiple="multiple">
+                    </div><!--/.neUpload__file-->
+                    <p>只能上传jpg/png文件，且不超过50kb</p>
+                </div>
+                <div class="neUpload__operate">
+                    <button type="button" id="btn_upload">批量上传</button>
+                </div>
+            </div><!--/.neUpload__top-->
+            <div class="neUpload__list">
+                <div class="neUpload__one">
+                    <div class="neUpload__thumb"><img src="test/img/1.jpg"></div>
+                    <div class="neUpload__detail">
+                        <div class="neUpload__form">
+                            <div class="neUpload__form_built_in">
+                                <span>案件编号：</span>
+                                <input type="text" placeholder="请输入案件编号" onblur="this.placeholder='请输入案件编号'" onfocus="this.placeholder=''">
+                            </div>
+                            <div class="neUpload__form_built_out">
+
+                            </div>
+                        </div><!--/.neUpload__form-->
+                        <div class="neUpload__info">
+                            <span class="neUpload__info_size">25KB</span>
+                            <span class="neUpload__info_name">天上人间此曲只应天上有.jpg</span>
+                        </div>
+                        <div class="neUpload__progress">
+                            <span class="neUpload__progress_success">上传成功</span>
+                            <progress value="30" max="100"></progress>
+                            <span class="neUpload__progress_percent">75%</span>
+                        </div>
+                    </div><!--/.neUPload__details-->
+                    <div class="neUpload__remove"></div>
+                </div><!--/.neUpload__one-->
+                <div class="neUpload__one">
+                    <div class="neUpload__thumb"><img src="test/img/1.jpg"></div>
+                    <div class="neUpload__detail">
+                        <div class="neUpload__form">
+                            <div class="neUpload__form_built_in">
+                                <span>案件编号：</span>
+                                <input type="text" placeholder="请输入案件编号" onblur="this.placeholder='请输入案件编号'" onfocus="this.placeholder=''">
+                            </div>
+                            <div class="neUpload__form_built_out">
+
+                            </div>
+                        </div><!--/.neUpload__form-->
+                        <div class="neUpload__info">
+                            <span class="neUpload__info_size">25KB</span>
+                            <span class="neUpload__info_name">天上人间此曲只应天上有.jpg</span>
+                        </div>
+                        <div class="neUpload__progress">
+                            <span class="neUpload__progress_success">上传成功</span>
+                            <progress value="50" max="100"></progress>
+                            <span class="neUpload__progress_percent">75%</span>
+                        </div>
+                    </div><!--/.neUPload__details-->
+                    <div class="neUpload__remove"></div>
+                </div><!--/.neUpload__one-->
+            </div><!--/.neUpload__list-->
+        </div><!--/.ne_upload-->
+
         <div id="app"></div>
     </div><!--/.wrap-->
 
@@ -42,13 +107,24 @@
             //+                                                          初始化                                                 
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
-    
+            //=====初始化加载
+            var fDom = document.getElementById('choice');
+            // console.log('fDom：', fDom)
+            fDom.addEventListener('change', function(e){
+                var fileList = fDom.files;
+                console.log('改动了')
+                console.log('e：', fDom.files);
+            });
+            // $('#file').on('change', function(){
+            //     console.log('改变了2');
+            // });
             
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //+                                                         系列事件                                             
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
             //=====xx点击事件
+
 
             NeUploadFile('#app', {
                 enable: true, // 是否启用上传功能(可选)，默认true
@@ -57,9 +133,9 @@
                 fileType: ['image/png', 'image/jpeg', 'application/pdf'], // 文件类型限制(可选)，默认为图片及pdf文件。数组中的每个元素为<input type="file">标签accept属性值。
                 fileSize: 100, // 文件大小限制，单位kb(可选)，默认100kb
 
-                chooseButtonLabel: '选择文件1', // 选择文件按钮的显示文字(可选)，默认'选择文件'
-                upButtonLabel: '开始上传1', // 上传按钮的显示文字(可选)，默认'开始上传'
-                suggestionLabel: '只能1上传jpg/png文件，且不超过50kb1', // 建议信息(可选)
+                chooseButtonLabel: '选择文件', // 选择文件按钮的显示文字(可选)，默认'选择文件'
+                upButtonLabel: '开始上传', // 上传按钮的显示文字(可选)，默认'开始上传'
+                suggestionLabel: '只能上传jpg/png文件，且不超过50kb', // 建议信息(可选)
                 successLabel: '上传成功', // 上传成功后显示的提示文字(可选)，默认上传成功
 
                 showThumb: true, // 是否显示缩略图(可选)，默认true
@@ -73,8 +149,8 @@
                     // 内置表单
                     enable: true, // 是否启用内置表单功能(可选)，默认true
                     valid: true, // 点上传按钮是内置表单是否必填(可选)，默认true
-                    label: '案件编号', // 内置表单的文本
-                    placeholder: '请填写案件编号', // 内置表单输入框的placeholder属性值(可选)，默认true
+                    label: '案件编号1', // 内置表单的文本
+                    placeholder: '请填写XX', // 内置表单输入框的placeholder属性值(可选)，默认true
                     // 自定义表单
                     html: '' // 自定义表单(可选)，非空时内置表单功能将不起作用
                 }
