@@ -1653,6 +1653,7 @@ var calendar = {
 
 	/**
 	 * 根据当天获取某一天、获取当天几天前或几天后的某一天的日期
+     * 注：旧版本：不再维护，统一维护到 getNDay()函数里
 	 * @param {Number} day 天数(可缺省), 默认当天
 	 * @returns {string} 返回某一天的日期. eg. 2020-05-07
 	 * eg. getDay(0) 当天,  getDay(7)) 7天后, getDay(-7) 7天前
@@ -1676,6 +1677,52 @@ var calendar = {
 		tDate = doHandleDate(tDate);
 		return tYear + "-" + tMonth + "-" + tDate;
 	},
+
+
+
+    /**
+     * 获取当前时间的N天前或者N天后
+     * @param {Number} day 正数表示N天前，负数表示N天后
+     * @returns 返回N天前或N天后的今天
+     */
+	getNDay: function(day){
+		var time = new Date();
+        time.setDate(time.getDate() + day);
+        var y = time.getFullYear();
+        var m = time.getMonth() + 1;
+        var d = time.getDate();
+        return y + "-" + m + '-' + d;
+	},
+
+
+    /**
+     * 获取当前时间的N月前或者N月后
+     * @param {Number} month 正数表示N月前，负数表示N月后
+     * @returns 返回N月前或N月后的今天
+     */
+    getNMonth: function(month) {
+        var time = new Date();
+        time.setMonth(time.getMonth() + month);
+        var y = time.getFullYear();
+        var m = time.getMonth() + 1;
+        var d = time.getDate();
+        return y + "-" + m + '-' + d;
+    },
+
+
+    /**
+     * 获取当前时间的N年前或者N年后
+     * @param {Number} year 正数表示N年前，负数表示N年后
+     * @returns 返回N年前或N年后的今天
+     */
+    getNYear: function(year) {
+        var time = new Date();
+         time.setFullYear(time.getFullYear() + year);
+         var y = time.getFullYear();
+         var m = time.getMonth() + 1;
+         var d = time.getDate();
+         return y + "-" + m + '-' + d;
+    },
 
 
     /**
