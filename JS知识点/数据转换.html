@@ -1,0 +1,40 @@
+//——————————————————————————————————————————————————
+        /**
+         * 数据转换
+         * @param {array} source 数组对象
+         * @param {array} source中每个元素的外层字段组成的数组
+         * [eg]
+            var source = [ {name:"张三", native:"福州市", data: [{age:"10", grade:"二年级"},{age:"11", grade:"三年级"}]}, {name:"李四", native:"泉州市", data: [{age:"12", grade:"四年级"},{age:"13", grade:"五年级"}]} ]
+            这个原始数组的外层字段为 ["name", "native"]
+            经过 convertData(source, ["name", "native"]) 转化，结果为
+            [ {"name":"张三", native:"福州市", age:"10", grade:"二年级"}, {"name":"张三", native:"福州市", age:"11", grade:"三年级"}, {"name":"李四", native:"泉州市", age:"12", grade:"四年级"}, {"name":"李四", native:"泉州市", age:"13", grade:"五年级"} ]
+         */
+         var convertData = function(source, outerFieldArr){
+            let newArr = [];
+            let prevLen = 0;
+            for(let i = 0; i < source.length; i++){
+                let row = source[i];
+                prevLen += newArr.length == 0 ? 0 : row.data.length;
+                for(let j = 0; j < row.data.length; j++){
+                    let one = row.data[j];
+                    // 外层
+                    // eg.
+                    // newArr.push({ // 外层
+                    //     "name": row["name"],
+                    //     "native": row["native"]
+                    // })
+                    let tmpOne = {}
+                    for(let k = 0; k < outerFieldArr.length; k++){
+                        let field = outerFieldArr[k];
+                        tmpOne[field] = row[field];
+                    }
+                    newArr.push(tmpOne);
+                    // 内层
+                    for(let v in one){
+                        let key = v, value = one[v];
+                        newArr[prevLen + j][v] = value;
+                    }
+                }
+            }
+            return newArr;
+        }

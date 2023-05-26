@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>批量上传图片</title>
+    <title>测试1</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css">
@@ -20,8 +20,7 @@
 </head>
 <body>
 
-    <h1>文件上传功能(请在WEB环境下测试，否则无法看到效果)</h1>
-    <h2>即：请建在一个web目录，如http://127.0.0.1/当前页面地址.html 进行测试</h2>
+    <h1>文件上传功能</h1>
     <h5>
         <pre>
             参考：
@@ -43,6 +42,7 @@
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
     <script src="assets/libs/jquery-1.8.3.min.js"></script>
+    <script src="assets/libs/axios.min.js"></script>
     <script src="assets/neatui/js/neatui-dialog.js"></script>
     <script src="assets/neatui/js/neatui-uploadFile.js"></script>
     <!--模拟数据 test1-->
@@ -64,7 +64,7 @@
             //     timeout: '100-1000', // 延时n-m毫秒
             // });
             // Mock.mock("../../../file/file_pdf.ashx", "post", (v) => {
-            //     // console.log('后台参数：', v);
+            //     console.log('后台参数：', v);
             //     // var source = JSON.parse(v.body);
             //     var result = {return: "ok", data: "ok"}
             //     // var result = {return: "error", data: "上传失败，原因不明"}
@@ -72,20 +72,10 @@
             // });
 
 
-            //——————————————————————————————————————————
-            // 模拟数据：校验pdf文件是否存在 test2
-            // Mock.setup({
-            //     timeout: '100-1000', // 延时n-m毫秒
-            // });
-            // Mock.mock("../../../falv_jk/jk_anjian/jk_anjian_pdf.ashx", "post", (v) => {
-            //     // console.log('后台参数：', v);
-            //     // var source = JSON.parse(v.body);
-            //     var result = {return: "ok", data: "0"}
-            //     return result;
-            // });
+            
 
 
-
+    
             
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //+                                                         系列事件                                             
@@ -115,7 +105,7 @@
         
                 form: { // 上传区域表单功能(可选)
                     // 内置表单
-                    enable: true, // 是否启用内置表单功能(可选)，默认true
+                    enable: false, // 是否启用内置表单功能(可选)，默认true
                     valid: true, // 点上传按钮是内置表单是否必填(可选)，默认true
                     label: '案件编号', // 内置表单的文本(可选)，默认'文件名'
                     placeholder: '请填写案件编号', // 内置表单输入框的placeholder属性值(可选)，默认true
@@ -124,13 +114,34 @@
                 },
                 callBack: function(e){ // 回调
                     // console.log('e：', e);
-                    if(fnRunCheck(e)){
-                        fnRunUpload(e);
+                    // if(fnRunCheck(e)){
+                    //     fnRunUpload(e);
+                    // }
+
+                    // fnRunUpload(e);
+
+                    var files = e.files; // 文件列表
+                    var asyncFun = [];
+                    for(var i = 0; i < files.length; i++){
+                        var file = files[i];
+                        var ls_pdf_mc = file.name;
+                        var result = fnLoopCheck(ls_pdf_mc);
+                        asyncFun.push(result);
                     }
+                    Promise.all(asyncFun).then(res => {
+                        console.log('res：', res);
+                        fnRunUpload(e);
+                    }).catch(errs => {
+                        neuiDialog.alert({
+                            animate: true,
+                            message: errs,
+                            buttons: ['确定']
+                        });
+                    });
                 }
             });
 
-
+            
 
             /**
              * !! 校验pdf文件是否存在
@@ -138,161 +149,70 @@
              * @returns {boolean} 返回布尔值。true 已存在, false 不存在
              */
             function fnRunCheck(e){
-                var isContinue = true;
-                var files = e.files; // 文件列表
-                for(var i = 0; i < files.length; i++){
-                    var file = files[i];
-                    var ls_pdf_mc = file.name;
-                    var isExisted = false; // 是否已存在该pdf文件，true 是, false 否
-                    /*
-                    // START AJAX
-                    $.ajax({
-                        async: false, // 请求是否异步处理，true 异步(默认), false 同步
-                        type: "POST",
-                        dataType: "html",
-                        cache: false,
-                        url: "../../../falv_jk/jk_anjian/jk_anjian_qita.ashx",
-                        data: {
-                            "action": "wh_anjian_pdf_exist",
-                            "user": "<%=s_user%>",
-                            "sjk": "<%=s_sjk%>",
-                            "menu_bh": "<%=s_menu_bh%>",
-                            "pdf_mc": ls_pdf_mc
-                        },
-                        success: function(res){
-                            // console.log('res：', res);
-                            if(res == '') return;
-                            var source = JSON.parse(res);
-                            if(source.return == 'ok'){
-                                isExisted = source.data == '1' ? true : false; // 1 已存在, 0 不存在
+                // var isContinue = true;
+                // var files = e.files; // 文件列表
+                // var data = [];
+                // for(var i = 0; i < files.length; i++){
+                //     var file = files[i];
+                //     var ls_pdf_mc = file.name;
+                //     var result = fnLoopCheck(ls_pdf_mc);
+                //     data.push(result);
+                // }
+                // Promise.all(data).then(res => {
+
+                // }).catch(errs => {
+                //     // console.log('errs:', errs)
+                // })
+            }
+
+            // 模拟数据 test2
+            Mock.setup({
+                timeout: '100-1000', // 延时n-m毫秒
+            });
+            Mock.mock("../../../falv_jk/jk_anjian/jk_anjian_pdf.ashx", "post", (v) => {
+                // console.log('后台参数：', v);
+                // var source = JSON.parse(v.body);
+                var result = {return:"ok", data:"0"}
+                return result;
+            });
+
+            var fnLoopCheck = function(ps_pdf_mc){
+                return new Promise(function(resolve, reject){
+                    axios.post("../../../falv_jk/jk_anjian/jk_anjian_pdf.ashx", {
+                        "action": "wh_anjian_pdf_exist",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk%>",
+                        "menu_bh": "<%=s_menu_bh%>",
+                        "pdf_mc": ps_pdf_mc
+                    }).then(res => {
+                        // console.log('res：', res);
+                        let source = res.data;
+                        if(source.return == 'ok'){
+                            if(source.data == '1'){ // 1 已存在PDF文件, 0 不存在PDF文件
+                                reject('系统中已存在名称为【' + ps_pdf_mc + '】的PDF文件，请勿重复上传！');
                             }
-                        },
-                        error: function(res){ },
-                        beforeSend: function(XMLHttpRequest){ },
-                        complete: function(XMLHttpRequest, textStatus){ }
+                            else{
+                                resolve('ok');
+                            }
+                        }
+                        else{
+                            reject(source.data);
+                        }
+                        
+                    }).catch(errs => {
+                        reject('判断是否存在PDF文件的接口出错了');
                     });
-                    // END AJAX
-                    */
-                    if(isExisted){
-                        neuiDialog.alert({
-                            animate: true,
-                            message: '系统中已存在名称为【' + ls_pdf_mc + '】的PDF文件，请勿重复上传！',
-                            buttons: ['确定']
-                        });
-                        isContinue = false;
-                        break;
-                    }
-                }
-                return isContinue;
+                });
             }
 
 
-
-
             //——————————————————————————————————————————
-            // 方法1：多个文件同时上传
-            // // 
-            // /**
-            //  * !! 文件上传事件
-            //  * @param {object} e 控件回调事件对象
-            //  */
-            // function fnRunUpload222(e){
-            //     var files = e.files, // 文件列表
-            //         fileData = e.fileData, // 表单数据
-            //         fileDom = e.fileDom, // 选择文件按钮DOM对象
-            //         uploadDom = e.uploadDom; // 上传文件按钮DOM对象
-            //     // 循环执行
-            //     var isAllRight = true; // 是否全部成功，默认true
-            //     var failIndex = 0; // 失败的那个文件索引值
-            //     for(let i = 0; i < files.length; i++){ // 这里要用let不用var，否则addEventListener('progress')监听事件的里传的循环i永远是最后一个循环的数
-            //         var file = files[i];
-            //         var ls_lvshi_anhao = fileData[i].value[0];
-            //         // console.log('案号：', ls_lvshi_anhao);
-            //         var formData = new FormData();
-            //         formData.append("file", file);
-            //         formData.append("lvshi_an_hao", fileData[i].value);
-            //         // START AJAX
-            //         $.ajax({
-            //             // !!! 注意：上传文件这里async一定要设置为异步即true，否则进度监听事件不起作用。
-            //             async: true, // 请求是否异步处理，true 异步(默认), false 同步
-            //             type: "POST",
-            //             url: "../../../file/file_pdf.ashx",
-            //             data: formData,
-            //             xhr: function () {
-            //                 var myXhr = $.ajaxSettings.xhr();
-            //                 if (myXhr.upload) { // 检查属性是否存在
-            //                     // 绑定事件的回调函数
-            //                     myXhr.upload.addEventListener('progress', function(e){
-            //                         progressHandlingFunction(e, i);
-            //                     }, false);
-            //                 }
-            //                 return myXhr; // xhr对象返回给jq使用
-            //             },
-            //             processData: false, // 不处理发送的数据
-            //             contentType: false, // 不设置Content-Type请求头
-            //             success: function (res) {
-            //                 // console.log('res：', res);
-            //                 // 校验返回的数据格式
-            //                 if (res == null || res == undefined || res == '') {
-            //                     neuiDialog.alert({
-            //                         animate: true,
-            //                         message: '返回值格式有误！<br>返回值为：' + res,
-            //                         buttons: ['知道了']
-            //                     });
-
-            //                     isAllRight = false;
-            //                     failIndex = i;
-            //                     return;
-            //                 }
-            //                 // 数据格式正确时
-            //                 var source = JSON.parse(res);
-            //                 if(source.return != 'ok'){
-            //                     var msg = source.data; // '上传失败，请重试！';
-            //                     neuiDialog.alert({
-            //                         animate: true,
-            //                         message: msg,
-            //                         buttons: ['确定']
-            //                     });
-            //                     isAllRight = false;
-            //                     failIndex = i;
-            //                     neUps.handleFail(failIndex); // 3.失败时，写入“上传失败”信息
-            //                 }
-            //             },
-            //             error: function(res){ },
-            //             beforeSend: function(XMLHttpRequest){ },
-            //             complete: function(XMLHttpRequest, textStatus){ }
-            //         });
-            //         // END AJAX
-
-            //         if(isAllRight == false) break; // 中断并跳出循环
-                    
-            //     } // for
-
-
-            //     // 上传结果提示
-            //     // var msg = '上传成功';
-            //     // if(isAllRight == false){
-            //     //     msg = '第' + ( failIndex + 1) + '个文件上传失败！';
-            //     //     neUps.handleFail(failIndex); // 3.失败时
-            //     // }
-            //     // neuiDialog.alert({
-            //     //     animate: true,
-            //     //     message: msg,
-            //     //     buttons: ['确定']
-            //     // });
-            // }
-
-
-
-
-            //——————————————————————————————————————————
-            // 方法2：多个文件按顺序上传，即先传完a，再b, 再c, 再d
+            // 
             /**
              * !! 文件上传事件
              * @param {object} e 控件回调事件对象
              */
-            var isContinueLoop = true; // 是否继续循环。true 是(默认), false 否
-            async function fnRunUpload(e){
+             function fnRunUpload(e){
                 var files = e.files, // 文件列表
                     fileData = e.fileData, // 表单数据
                     fileDom = e.fileDom, // 选择文件按钮DOM对象
@@ -301,48 +221,25 @@
                 var isAllRight = true; // 是否全部成功，默认true
                 var failIndex = 0; // 失败的那个文件索引值
                 for(let i = 0; i < files.length; i++){ // 这里要用let不用var，否则addEventListener('progress')监听事件的里传的循环i永远是最后一个循环的数
-                    if(isContinueLoop == false) break;
                     var file = files[i];
                     var ls_lvshi_anhao = fileData[i].value[0];
-
-                    await fnUploadOne(i, file,  ls_lvshi_anhao).then(res => {
-                        
-                    }).catch(errs => {
-                        neuiDialog.alert({
-                            animate: true,
-                            message: errs,
-                            buttons: ['知道了']
-                        })
-                    });
-                }
-            }
-
-
-
-            //——————————————————————————————————————————
-            // 上传一个文件
-            var nCount = 0; // 模拟计数
-            function fnUploadOne(i, ps_file, ps_lvshi_anhao){
-                return new Promise(function(resolve, reject){
-                    var file = ps_file;
-                    var ls_lvshi_anhao = ps_lvshi_anhao;
                     // console.log('案号：', ls_lvshi_anhao);
                     var formData = new FormData();
                     formData.append("file", file);
-                    formData.append("lvshi_an_hao", ls_lvshi_anhao);
-
-                    // 后台返回
+                    formData.append("lvshi_an_hao", fileData[i].value);
+                    // START AJAX
                     $.ajax({
-                        // !!!注意：async一定要设为异步true，否则进度监听事件无效
-                        async: true, // 是否异步，true 异步(默认), false 同步
-                        type: "POST",
                         url: "../../../file/file_pdf.ashx",
+                        type: "POST",
                         data: formData,
                         xhr: function () {
                             var myXhr = $.ajaxSettings.xhr();
                             if (myXhr.upload) { // 检查属性是否存在
+                                console.log('aaa'); // test1
                                 // 绑定事件的回调函数
+                                console.log('qqq：', myXhr.upload);
                                 myXhr.upload.addEventListener('progress', function(e){
+                                    console.log('bbb'); // test1
                                     progressHandlingFunction(e, i);
                                 }, false);
                             }
@@ -354,43 +251,50 @@
                             // console.log('res：', res);
                             // 校验返回的数据格式
                             if (res == null || res == undefined || res == '') {
-                                var msg = '返回值格式有误！<br>返回值为：' + res;
-                                reject(msg);
-                                isContinueLoop = false; // 不再继续循环
+                                neuiDialog.alert({
+                                    animate: true,
+                                    message: '返回值格式有误！<br>返回值为：' + res,
+                                    buttons: ['知道了']
+                                });
+
+                                isAllRight = false;
+                                failIndex = i;
                                 return;
                             }
                             // 数据格式正确时
                             var source = JSON.parse(res);
-                            if(source.return == 'ok'){
-                                resolve();
-                            }
-                            else{
+                            if(source.return != 'ok'){
                                 var msg = source.data; // '上传失败，请重试！';
-                                reject('第' + (i + 1) + '文件个上传失败！<br>(' + msg + ')');
-                                isContinueLoop = false; // 不再继续循环
-                                neUps.handleFail(i); // 3.失败时，写入“上传失败”信息
+                                neuiDialog.alert({
+                                    animate: true,
+                                    message: msg,
+                                    buttons: ['确定']
+                                });
+                                isAllRight = false;
+                                failIndex = i;
                             }
+                            
                         },
                         error: function(res){ },
                         beforeSend: function(XMLHttpRequest){ },
                         complete: function(XMLHttpRequest, textStatus){ }
                     });
+                    // END AJAX
 
+                    if(isAllRight == false) break; // 中断并跳出循环
+                    
+                } // for
 
-                    // 前端模拟等N秒，文件一个个上传，而不是同步上传
-                    setTimeout(() => { 
-                        // console.log('等N秒'); 
-                        if(nCount == 2){
-                            var msg = '上传失败，请重试';
-                            reject('第' + (i + 1) + '个文件上传失败！<br>(' + msg + ')');
-                            isContinueLoop = false; // 不再继续循环
-                            neUps.handleFail(i); // 3.失败时，写入“上传失败”信息
-                        }
-                        else{
-                            resolve(); 
-                        }
-                        nCount++;
-                    }, 1000); // 等N秒
+                // 上传结果提示
+                var msg = '上传成功';
+                if(isAllRight == false){
+                    msg = '第' + ( failIndex + 1) + '个文件上传失败！';
+                    neUps.handleFail(failIndex); // 3.失败时
+                }
+                neuiDialog.alert({
+                    animate: true,
+                    message: msg,
+                    buttons: ['确定']
                 });
             }
 

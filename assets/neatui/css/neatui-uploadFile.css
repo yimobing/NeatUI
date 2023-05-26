@@ -6,7 +6,7 @@
  * Version：v1.0.0
  * Author: Mufeng
  * Date: 2023.05.24
- * Update: 2023.05.24
+ * Update: 2023.05.26
  */
 /*+-------------------------+*/
 *{margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -17,8 +17,8 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
 
 /*+-------------------------+*/
 .ne__upload{
-    width: 800px;
-    margin: 5px auto;
+    width: 500px;
+	padding: 8px 15px;
     border: 1px solid blue;
     border-radius: 4px;
     border: 0;
@@ -65,7 +65,7 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
     margin-top: 5px;
     color: #666;
     font-size: 12px;
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 
 .neUpload__operate{
@@ -88,7 +88,11 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
 /*+-------------------------+*/
 .neUpload__list{
     margin-top: 15px;
-	border: 0;
+    padding: 10px 15px;
+    border-width: 0;
+}
+.neUpload__list.loaded{
+	border-width: 1px;
 }
 .neUpload__one{
     display: -webkit-box;
@@ -97,31 +101,19 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
     display: flex;
     display: box;
     align-items: center;
-
     position: relative;
-	margin-top: 5px;
+    margin-top: 5px;
     padding: 10px 15px 10px 5px;
-	border-style: solid;
-	border-width: 1px 1px 1px 1px;
-	border-radius: 4px;
-	border-color: #cdc7c7;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    border-radius: 4px;
+    border-color: #cdc7c7;
+	border-color: #eaeaea;
     overflow: hidden;
 }
 
 .neUpload__one:after{
-     content: '';
-     display: inline-block;
-     position: absolute;
-     z-index: 1;
-     top: -6px;
-     right: -46px;
-     width: 80px;
-     height: 35px;
-     background-color: #08ba61;
-     -webkit-transform: rotate(45deg);
-     -moz-transform: rotate(45deg);
-     -o-transform: rotate(45deg);
-     transform: rotate(45deg);
+    
 }
 
 .neUpload__one:first-child{
@@ -177,6 +169,8 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
     padding: 5px 8px;
     border: 1px solid #ddd;
     border-radius: 2px;
+	color: #444;
+	font-size: 13px;
 }
 .neUpload__form_built_in input:placeholder,
 .neUpload__form_built_in input[placeholder]{
@@ -204,15 +198,22 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
 .neUpload__progress{
     
 }
-.neUpload__progress_success,
+.neUpload__progress_state,
 .neUpload__progress_percent{
     position: absolute;
     bottom: 20px;
 }
-.neUpload__progress_success{
-    right: 5px;
-    color: #23b323;
-    font-size: 14px;
+.neUpload__progress_state{
+    right: 15px;
+    color: #749f74;
+    font-size: 13px;
+}
+.neUpload__progress_state.red{
+	color: #ff0000;
+}
+.neUpload__progress_state.no-speed{
+	right: 15px;
+	bottom: 0px;
 }
 .neUpload__progress_percent{
     right: 80px;
@@ -222,20 +223,79 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
 .neUpload__progress progress{
     width: 100%; 
 }
-.neUpload__remove{
+
+.neUpload__remove,
+.neUpload__tick{
+	position: relative;
+    display: inline-block;
     position: absolute;
-    z-index: 2;
-    top: 0px;
-    right: 0px;
-    width: 18px;
-    height: 18px;
-    background-size: 100% auto;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAAXNSR0IArs4c6QAAAvNJREFUaEPt2s/LTkEUwPHvYa+UsqBQlI2NnfIjK0oRqXeBDcleyf+gZCtFCQs/oqQs5UdY2dgoVjZSStlzNJqn5p3ufZ65d87MO4/nfdZz753PPWfOnHufKyzYTxbMyyr4f494Z4RVdQtwSERuzOMNUNULwHMR+RrPvw98FbgIPBWRY/OEVtVnwBHgiohcTgWvA14Aux0aOCEiv1uGq+pawGEPAx+AgyLyKwnsBqnq3KA99jFwdBrWuaZW6XlAD8HOBLce6aHYJHCr6DHYZHBr6LHYQeBW0DnYweAA/QbYVXvLysWOAnv0euBlTbQFdjS4NtoKmwXuQR8XkT+WHVmE/Qjs7eqgUq+Z/XioqmF6PwKWrNAd2AMi8jMV1zUuG9wRaRN0CWx2Sod30DLSpbCmYKtIq+oa4Il/EHBrNjuNw8CYpLRVpD32PnASMMeaR3gCH5PeNbDFwEPTuxa2KDgVXRNbHByg3wI7gWVbVm1sFbBHbwBeh2i/3osWqGKNR0rno6ox2h1WrBr3zcl8W5qGj9BuaJGtZ9ocaoPDpsLN66HvvTUlSyzGVANHBeqzn/wO4B5wRkSqoKuAI+wnYJ8HTwpZNXRxcBdWRH50VO8q6KJgVXXnf+Cr8b/ITrBBGxpW7+LoYmCPvQOcAjqxK4EuAh6CrY02B4/B1kSbgnOwEfodsL3ElmUGtsAG6I2Ae9lvjjYBW2JLo7PBJbB9aBE5ndteZoFLYnvQt0TkXA56NLgGtgR6FDjCfgH2xB1UThS6jlXVsJCNjvRgcAfW/dfz3RpYCj0IvJJYq/ROBreAtUAPAd/1DwJuzVZL476lMnZNJ4FV9SZwFmgCG0X6PbAVSCpkM8GtYgP0Jt+GJqFnfYnXZGTjNFfVZHQvuPXIjkX3fT58yX1+69fsfhH5VmOfzb2Gqm4GXgHb3OfPInItPmcfeMm9OgXOzws2WNMOfR24LSLuvfey38yilXvXWzt+FdxaRKznsxph6zva2vkWLsJ/Ac6oJlskd5BZAAAAAElFTkSuQmCC');
-    cursor: pointer;
+    z-index: 1;
+    top: -6px;
+    right: -40px;
+    width: 80px;
+    height: 35px;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.neUpload__remove{
+	background-color: #edf0ef;
+}
+.neUpload__tick{
+	background-color: #08ba61;
+	display: none;
+}
+
+.neUpload__remove:after,
+.neUpload__tick:after{
+	content: '';
+	position: absolute;
+	z-index: 2;
+	top: 15px;
+	left: 25px;
+	display: block;
+	width: 18px;
+	height: 18px;
+	background-size: 100% auto;
+	background-position: center;
+	background-repeat: no-repeat;
+   -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+.neUpload__remove:after{
+	cursor: pointer;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAAXNSR0IArs4c6QAABKtJREFUaEPtmk1sG0UUx//Pcezi2LUbCFIREtsDtEXQfLTi0APdHqEHGgGXXpKcKtxISQWqOCA14ViBiKXGpaemqhQhwSE9csokgkjhQJ2CVAWE4kqFSgQqf9WNa2cfGm/dGn/Va+/aVrNzseSdnTe/+b95M7PzCDus0A7jhQ1speKTKgIZ8vYX22DO3f5abEWttFvctqUKB9WeAYDeI0AFaABAoDoYCwYEwNfD4n7EqgGwBHhc9aoMnAdILe2404lbbjceyv8zGbhyORwsh2OhgUKXRHLBbHBTgaXLPoTvKwJG8x0lJF7a67w5OOTGkSNupa+v++VKAJub2Tvr67k/l5fS2b/u5g6BsVvWY/CCC6mxGYGYWeCmAgdV35UC7MCgW5w65Rv0eLr8RjqbTm/H5+eTNyKRzJAEl9BhkRo20katuqYBB9WeUYLjilT140967+5Tuvc/NsxYAnEEoFj+l+iJYtusgEgBWM5xOedfke9tRLPrX35xb+8j6OmwSE2ZAW0isG+DAOXECc+P77zrla67AIKg1/8wNA/5lqKAHSehOUZ/WHmQ+WY+8RaA2KxI7uko4DOqj2WHLoZfHDYKWQ2Ef1UGxsf/vSGfdyO5x4y5bJrCZ1RvhIFoWKROmqFEoY2g6p2Ry9qsSEmXb7rUBP7ouPdY0xba0MClxdRSNbNVgfW1lBbb0N+mTRL4+EWREpUaqgqsr6neudq7o6b7ZkUDMRdSo9Xmu2lz2IqeW9GmDWzFqHZSm4YUloFMA424kDxrxprY7EDIrSwD140cMgwBB1WvINCxWlGwWYh63y+sIgxeCotU2anM8LJU6QUbuF45LKhnK1znoNpzuNZAGZnD+k6tZ8SF+1dLI7p0x21QoFJ0rfWsuG8d59JB1TtFoPMMLju8F46SsyJZ5mFB1RcjwF/p2TMJXGswbGDQYsesw426tK1wlSj6zAQtW2FbYX0EbJdu99bSjtJFCtQKTHbQsoOWHbQ64xPPjgta+hdOTAE8WZqzoV+QUWBWJPVMgaIinwFQnnYp19J1eGzM//3hw85P6Y2oZckntZZVeY26upr97Nq1xPstOS2dPu1fe/PQLpl+NAVPLkT7oqblYNQE3VACSDsnpN1fbm6tXb4c7281MMAcA2gOXbkQHYxakm+VzwrQnCNgngRRPvWpfcD/l0S6+AIcENiVW2tUeZZKbjn7ocn8LsgL9rLL8E4BLvXICBgykSUK0BP1SdOnADuKEtVYAZMCyievPfW2v1OB69zSG69mA9c5Zg19iC+K0nWaMb+arXCdY2pUYblDmnj1te7liYnet+u0YUm1UOje8u+/ZWUfrlbasVUzagj4cWYPIX7hwgvk8XTlk0BbXdLp7cS5c/8wGH4NGLbsQlyCFe6Xep+n1c+n+w6AyFDyqBmDMz29+fPm39qQ0V2WtG1IYR1YJn07hLz/6XZj/cMPdsePHn1O5kNaXlZWHvz07XcJfzaD/QzEAU01mkxuGLgU2nLKCgYahW1I4YL9R4lrkwSSR7x8ym8Lym0Gz7mQmmk0qaYhhSuBSVd3QN/Ym100cMyo65oSpc0GaUd7pincjs43YnPHAf8HISD6anEfrqQAAAAASUVORK5CYII=');
+}
+.neUpload__tick:after{
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAAXNSR0IArs4c6QAAAY5JREFUaEPt2e1NxDAMBuDXGzDCbcAIwAawAUzECMAmN8KNwAYHEwRZaqXT0Uub2Plw6vzpj7ZSnrxulDSEnTXamRcOHj1xT9gTHmwEvKQHC/QfxxP2hAcbAS/pwQL1SWu4kg4hvAJ4B3AkopfriIcCT9iPCflLRHfDgq+w7Hwjos8hwVuxjDdf0ilY8+BUrGlwDtYsOBdrEizBmgNLsabAGlgzYC3sTXAI4RHAPYAvIvppuYPSxMbAZwC8Dj0BeGqF1sbGwEcAD1OyTdAlsDEwp8toLmtuVdGlsNFJK4TQBF0SuzpL10aXxq6C+YFa6BrYTeAa6FrYzeCS6JrYJHAJdG1sMlgT3QKbBdZAt8JmgyXollgROAfdGisGp6B7wKqAt6B7waqBY2gAzwDm4w9+dPFEYNqkFL+o/ohfWIZ+AzhcKJpiVROeUQvo+VZzbBHwjfLuAlsMfIHms9oTEfHPhC6a6jfchWilEw62kJKkj56wZPQsvOsJW0hJ0kdPWDJ6Ft71hC2kJOnj7hL+A2DFB0wdsY9NAAAAAElFTkSuQmCC');
 }
 
 
 
-/*+-------------------------+*/
+
+
+
+/*+----------- 进度条样式美化 --------------+*/
+progress{
+    height: 5px;
+    background: #EFEFF4;
+    border-radius: 4px;
+}
+/* 表示总长度背景色 */
+progress::-webkit-progress-bar{     
+   background-color: #f2f2f2;
+   border-radius: 4px;
+}
+/* chrome 表示已完成进度背景色 */
+progress::-webkit-progress-value{
+     background: #19b6f8;
+     border-radius: 4px;
+}
+/* firefox 表示已完成进度背景色 */
+progress::-moz-progress-bar{
+     background-color: #19b6f8;
+}
