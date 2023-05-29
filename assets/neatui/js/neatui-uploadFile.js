@@ -1,11 +1,13 @@
 /**
  * [NeUploadFile]
- * jQuery文件上传控件
- * 支持批量上传图片、PDF等文件
+ * !! 文件上传控件
+ * [功能] 支持批量上传图片、PDF、EXCEL、WORD等文件(需后端配合写接口)
+ * [开发方式] 原生JS开发，无须jq
+ * [兼容性] 支持chrome, 火狐、ie8+等浏览器
  * Version：v1.0.0
- * Author: Mufeng
+ * Author: MuFeng
  * Date: 2023.05.24
- * Update: 2023.05.26
+ * Update: 2023.05.29
  */
 //================================================================================================
 //              一、控件开始
@@ -25,17 +27,30 @@
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     var NeUploadFile = function(){
         var me = this;
-        // 1.初始化
+        /**
+         * !! 控件初始化
+         * @param {string} elem 绑定的节点，如'#app', '.app'
+         * @apram {string} options 控件参数
+         */
         this.init = function(elem, options){
             var opts = typeof (options) === "function" ? options() : options;
             methods.UpInit(me, elem, options);
         };
-        // 2.处理中
+
+        /**
+         * !! 上传处理中
+         * @param {Number} index 当前正在上传的那个文件索引值
+         * @param {Number} value 当前文件已上传的大小(已上传多少KB)
+         * @param {Number} max 当前文件的全部上传后的大小(KB)
+         */
         this.handleProgress = function(index, value, max){
             methods.UpHandle(me, index, value, max);
         };
-        // 3.失败时 
-        // index 为失败的那个文件索引值
+
+        /**
+         * !! 上传失败时
+         * @param {Number} index 失败的那个文件索引值
+         */
         this.handleFail = function(index){
             methods.UpFail(me, index);
         };
@@ -63,22 +78,29 @@
             var defaults = {
                 enable: true, // 是否启用上传功能(可选)，默认true
                 fileType: [], // ['png', 'gif', 'jpg', 'jpeg', 'pdf'], // 文件类型限制(必须)，默认为空，表示不限制文件类型
-                fileSize: 100, // 文件大小限制，单位kb(可选)，默认100kb
+                fileSize: 300, // 文件大小限制，单位KB(可选)，默认300KB。若是以MB为单位，如要限制成20MB，则写成 20*1024
                 multiple: true, // 是否允许使用批量上传功能(可选)，默认true
-                width: '800px', // 区域宽度，默认单位为px(可选)，默认800px。可传像素值500表示500px，或传百分比'50%'
+                width: 600, // 区域宽度，默认单位为px(可选)，默认600px。可传像素值600或600px表示600px，或传百分比'60%'
+                increment: true, // 文件是否使用“增量模式”进行上传(可选)，默认true。true 是表示“增量模式”， false 否表示“替换模式”
+                // [增量模式说明] 
+                // true 每次选择文件会和“已有列表中的文件”进行比较，若有新文件则把它添加到列表中，若无则不添加; 
+                // false 每次选择文件会把“已有列表中的文件”替换成当前选择的文件。
+                // 举例：“已有列表中的文件”为[1,2,3,4]，当前选择了文件[2,3,5,6]，则true时列表中的文件会变成[1,2,3,5,6]，false时列表中文件会变成[2,3,5,6]
 
                 chooseButtonLabel: '选择文件', // 选择文件按钮的显示文字(可选)，默认'选择文件'
                 upButtonLabel: '开始上传', // 上传按钮的显示文字(可选)，默认'开始上传'
-                suggestionLabel: '只能上传jpg/png文件，且不超过50kb', // 建议信息(可选)
+                suggestionLabel: '', // 建议信息(可选)，默认空。若为空系统将根据文件类型及限制的大小输出一段文字，如”只能上传png/gif/jpg/jpeg文件，且大小不超过500KB”
                 successLabel: '上传成功', // 上传成功后显示的提示文字(可选)，默认'上传成功'
-
+                failLabel: '上传失败', // 上传失败后的显示的提示文字(可选)，默认'上传失败'
                 showThumb: true, // 是否显示缩略图(可选)，默认true
                 showSize: true, // 是否显示文件大小(可选)，默认true
                 showProgress: true, // 是否显示进度条(可选)，默认true
                 showCross: true, // 是否显示打叉图标用以删除当前文件(可选)，默认true
+                showOrder: true, // 是否显示文件序号(可选)，默认true
 
                 overflow: 'auto', // 上传文件列表如果超过一屏，是否显示滚动条(可选)，默认auto。值：auto 使用浏览器的滚动条, scroll 使用区区域的滚动条(可本区域显示自己的滚动条)
-        
+                maxHeight: 0, // 自定义文件列表高度，仅当overflow='scroll'时有效(可选)，默认0。当overflow='scroll'时，系统将自会自动调整区域高度，若想自定义一个高度请设置具体的高度值，如370表示370px
+
                 form: { // 上传区域表单功能(可选)
                     // 内置表单
                     enable: true, // 是否启用内置表单功能(可选)，默认true
@@ -86,7 +108,7 @@
                     label: '文件名', // 内置表单的文本(可选)，默认'文件名'
                     placeholder: '', // 内置表单输入框的placeholder属性值(可选)，默认true
                     // 外置表单，即自定义表单
-                    customHTML: '' // 外置表单(可选)，非空时内置表单功能将不起作用
+                    customHTML: '' // 外置表单(可选)，非空时内置表单功能将不起作用。只有在enable=true且当前参数值不为空时才起作用。
                 }
             }
 
@@ -108,10 +130,13 @@
                 cMultiple = settings.multiple,
                 cFileType = settings.fileType,
                 cFileSize = settings.fileSize,
+                cIncrement = settings.increment,
+                cMaxHeight = settings.maxHeight.toString().replace(/px/g, ''),
+                cSuggestLabel = settings.suggestionLabel,
                 cShowProgress = settings.showProgress;
-                
+
             // 改造成所需的值，变量以d开头
-            var dWidth = cWidth.indexOf('px') >=0 || cWidth.indexOf('%') >= 0 ? cWidth : cWidth + 'px';
+            var dWidth = cWidth.toString().indexOf('px') >=0 || cWidth.toString().indexOf('%') >= 0 ? cWidth : cWidth + 'px';
             var dFileType = '';
             var dFileArr = [];
             if(Array.isArray(cFileType)){
@@ -160,6 +185,7 @@
             var dMultipleStr = cMultiple === false ? '' : ' multiple="multiple"'; // 上传时是选择多个文件，还是单个文件
             var dUseOutForm = settings.form.customHTML.toString().replace(/([\s]+)/g, '') === '' ? false : true; // 是否使用外置表单
             var dStatusClassName = cShowProgress ? '' : ' no-speed'; // 无进度条时的样式
+            var dSuggestLabel = cSuggestLabel.toString().replace(/(\s+)/g, '') !== '' ? cSuggestLabel : ('只能上传' + cFileType.join('、') + '文件，且大小不超过' + helpers.getFormatSize(cFileSize));
                 
 
             // 创建根节点
@@ -182,7 +208,7 @@
                             '<button type="button" id="btn__choose">' + settings.chooseButtonLabel + '</button>',
                             '<input type="file" id="' + tagFileId + '" accept="' + dFileType + '"' + dMultipleStr + '>',
                         '</div><!--/.neUpload__file-->',
-                        '<p>' + settings.suggestionLabel + '</p>',
+                        '<p>' + dSuggestLabel + '</p>',
                     '</div>',
                     '<div class="neUpload__operate">',
                         '<button type="button" id="btn_upload">' + settings.upButtonLabel + '</button>',
@@ -196,6 +222,20 @@
             // 取节点
             var fDom = document.getElementById(tagFileId); // 选择文件的节点
             var listDom = document.getElementsByClassName(tagListClassName)[0]; // 文件列表节点
+            // 设置节点
+            if(settings.overflow == 'scroll'){
+                var winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 视窗高
+                var offsetTop = helpers.getElementTop(listDom);
+                // console.log('视窗高：', winH, '\n顶部距离：', offsetTop);
+                var scrollHeight = (winH - offsetTop - 10) + 'px';
+                if(cMaxHeight != 'auto' && parseFloat(cMaxHeight) > 0){
+                    scrollHeight = cMaxHeight + 'px';
+                }
+                listDom.style.height = 'auto';
+                listDom.style.maxHeight = scrollHeight;
+                listDom.style.overflowY = 'auto';
+            }
+            
             // 全局赋值
             me.$fileDom = fDom;
             me.$listDom = listDom;
@@ -203,11 +243,37 @@
             // !!!Event：选择文件按钮发生变化事件 / 选择文件后
             var filesArr = []; // 所有要上传的文件组成数组
             fDom.addEventListener('change', function(e){
-                // 考虑到用户选择文件时有时会点“取消”按钮
                 // var fList = fDom.files;
-                var fList = fDom.files.length == 0 ? filesArr : fDom.files; // 如果第1次选了N个文件, 第2次一个也没选，这时文件默认是空的，但不能让它空
+                var fList = [];
+                if(cIncrement){ // 1.文件使用“增量模式”上传
+                    if(fDom.files.length == 0) fList = filesArr;
+                    else {
+                        fList = filesArr.map(function(item){
+                            return item;
+                        });
+                        for(var i = 0; i < fDom.files.length; i++){
+                            var item1 = fDom.files[i];
+                            var isEqual = false;
+                            for(var k = 0; k < filesArr.length; k++){
+                                var item2 = filesArr[k];
+                                if(helpers.isObjectEqual(item1, item2)){
+                                    isEqual = true;
+                                    break;
+                                }
+                            }
+                            if(!isEqual){
+                                fList.push(item1);
+                            }
+                        }
+                    }
+                }
+                else{ // 2.文件使用“替换模式”上传
+                    // 考虑到用户选择文件时有时会点“取消”按钮
+                    fList = fDom.files.length == 0 ? filesArr : fDom.files; // 如果第1次选了N个文件, 第2次一个也没选，这时文件默认是空的，但不能让它空
+                }
                 // console.log('文件列表：', fList);
                 // if(fList.length == fDom.files.length) return;
+
                 if(fList.length > 0){
                     helpers.addClass(me.$listDom, 'loaded'); //  列表有边框
                 }
@@ -222,6 +288,17 @@
                     var _nameNotSuffix = _name.substr(0, _name.lastIndexOf('.')); // 文件名无后辍。 最后一个点号出现的索引值
                     _listHtml += [
                         '<div class="neUpload__one">',
+                            (
+                                // 匿名函数马上执行
+                                (function(){
+                                    // 序号
+                                    var _tmpHtml = '';
+                                    if(settings.showOrder){
+                                        _tmpHtml += '<div class="neUpload__order">' + (i + 1) + '</div>';
+                                    }
+                                    return _tmpHtml;
+                                })()
+                            ),     
                             (
                                 
                                 // 匿名函数马上执行
@@ -278,9 +355,10 @@
                                     (
                                         // 匿名函数马上执行
                                         (function(){
+                                            var tmpSize = helpers.getFormatSize(_size);
                                             var _tmpHtml = '';
                                             if(settings.showSize){
-                                                _tmpHtml += '<span class="neUpload__info_size">' + _size + 'KB</span>';
+                                                _tmpHtml += '<span class="neUpload__info_size">' + tmpSize + '</span>';
                                             }
                                             return _tmpHtml;
                                         })()
@@ -308,12 +386,13 @@
                                 (function(){
                                     var _tmpHtml = '';
                                     if(settings.showCross){
-                                        _tmpHtml += '<div class="neUpload__remove"></div>';
+                                        _tmpHtml += '<div class="neUpload__remove"></div>'; // 打叉节点(删除)
                                     }
                                     return _tmpHtml;
                                 })()
                             ),
-                            '<div class="neUpload__tick" style="display: none"></div>',
+                            '<div class="neUpload__tick" style="display: none"></div>', // 打勾节点(成功)
+                            '<div class="neUpload__sigh" style="display: none"></div>', // 感叹节点(失败)
                         '</div><!--/.neUpload__one-->'
                     ].join('\r\n')
                 }
@@ -326,12 +405,19 @@
                 var oldArr = filesArr.map(function(item){ return item; }); // 原数组。数组直接赋值本质是引用，使用map防止对数组进行操作后会改变原数组。
                 removeDom.forEach(function(item, index){
                     item.addEventListener('click', function(){
-                        var oldElement = oldArr[index]; // 要移除的文件在原
+                        var oldElement = oldArr[index]; // 要移除的文件在原文件中的索引值
                         var newIndex = filesArr.indexOf(oldElement);
+                        // 更新列表
                         var parentNode = item.parentNode,
                             grandNode = parentNode.parentNode;
+                            nextBrotherDom = helpers.getAllNextElement(parentNode), // 后面的兄弟节点
                         // console.log('祖父节点：', grandNode, '\n父节点：', parentNode);
-                        grandNode.removeChild(parentNode); // 移除当前文件
+                        // console.log('后面的兄弟节点：', nextBrotherDom);
+                        grandNode.removeChild(parentNode); // 移除当前节点
+                        nextBrotherDom.forEach(function(v, cIndex){ // 更新序号
+                            v.getElementsByClassName('neUpload__order')[0].innerText = newIndex + cIndex + 1;
+                        });
+                        // 更新数据
                         // filesArr.splice(index, 1); // 不能这样
                         filesArr.splice(newIndex, 1); // 要这样
                         // console.log('旧索引(index)：', index);
@@ -385,7 +471,7 @@
             
 
 
-            // !!!Event：点击上传文件按钮
+            // !!!Event：点击上传文件按钮、开始上传按钮
             var btnUpDom = document.getElementById('btn_upload');
             btnUpDom.addEventListener('click', function(e){
                 var fList = filesArr; // 这里不能直接取 fDom.files，因为界面上有可能移除文件
@@ -429,8 +515,8 @@
                     }
                 }
                 if(nowIndex != null){
-                    var currentSize = (nowSize / 1024) < 1 ? (nowSize + 'KB') : (parseFloat(nowSize / 1024).toFixed(1) + 'MB');
-                    var maxSize = (cFileSize / 1024) < 1 ? (cFileSize + 'KB') : (parseFloat(cFileSize / 1024).toFixed(1) + 'MB');
+                    var currentSize = helpers.getFormatSize(nowSize),  // 当前文件大小
+                        maxSize = helpers.getFormatSize(cFileSize);  // 允许的最大大小
                     helpers.prompt('上传文件不得大于' + maxSize + '<br>第' + (nowIndex + 1) + '个文件大小为' + currentSize + '，已超过' + maxSize);
                     return;
                 }
@@ -541,6 +627,7 @@
                 var successDom = lists[i].getElementsByClassName('neUpload__progress_state')[0];
                 var removeDom = lists[i].getElementsByClassName('neUpload__remove')[0];
                 var tickDom = lists[i].getElementsByClassName('neUpload__tick')[0];
+                var sighDom = lists[i].getElementsByClassName('neUpload__sigh')[0];
                 if(index == i){
                     // 更新进度条
                     proDom.setAttribute('value', value);
@@ -554,6 +641,7 @@
                         successDom.innerText = me.$opts.successLabel;
                         // 更新状态：打勾
                         removeDom.style.display = 'none'; // 隐藏打叉节点
+                        sighDom.style.display = 'none'; // 隐藏感叹节点
                         tickDom.style = ''; // 显示打勾节点
                     }
                     else{
@@ -568,7 +656,7 @@
 
         //————————————————————————————————————————————————
         /**
-         * !!! 上传失败
+         * !!! 上传失败 testing
          * @param {object} me 控件自身对象
          * @param {Number} index 当行文件索引值
          */
@@ -576,11 +664,14 @@
             var lists = document.querySelectorAll('.neUpload__one');
             for(var i = 0; i < lists.length; i++){
                 var successDom = lists[i].getElementsByClassName('neUpload__progress_state')[0];
+                var tickDom = lists[i].getElementsByClassName('neUpload__tick')[0];
+                var sighDom = lists[i].getElementsByClassName('neUpload__sigh')[0];
                 if(index == i){
-                    console.log('终于')
+                    tickDom.style.display = 'none'; // 隐藏打勾节点
+                    sighDom.style = ''; // 显示感叹节点
                     // 更新状态：显示“上传失败”字样
                     successDom.removeAttribute('style');
-                    successDom.innerText = '上传失败';
+                    successDom.innerText = me.$opts.failLabel;
                     helpers.addClass(successDom, 'red');
                 }
             }
@@ -596,6 +687,11 @@
     //  工具库，帮助对象 helpers
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     var helpers = {
+
+        /**
+         * !! 弹出提示信息
+         * @param {string} str 提示信息字符串 
+         */
         prompt: function(str){
             if(typeof neuiDialog != 'undefined' && typeof neuiDialog.alert == 'function'){
                 neuiDialog.alert({
@@ -611,7 +707,7 @@
 
 
         /**
-         * 添加节点的class样式
+         * !! 添加节点的class样式
          * @param {HTML DOM} ele DOM元素
          * @param {string} cls class属性值
          */
@@ -620,7 +716,7 @@
         },
 
         /**
-         * 移除某个节点的class样式
+         * !! 移除某个节点的class样式
          * @param {HTML DOM} ele DOM元素
          * @param {string} cls class属性值
          */
@@ -636,7 +732,7 @@
 
         
         /**
-         * 判断某个节点是否有某个class样式
+         * !! 判断某个节点是否有某个class样式
          * @param {HTML DOM} ele DOM元素
          * @param {string} cls class属性值
          * @returns {boolean} 返回布尔值true或false
@@ -649,7 +745,143 @@
 
 
         /**
-         * 原生JS合并对象1
+         * !! 获取格式化后的文件大小
+         * @param {string} file_size 文件大小
+         * @returns {string} 返回带有单位KB或MB或GB的文件大小
+         */
+        getFormatSize: function(file_size){
+            var reg = /^[0-9]+(\.[0-9]+)?/;
+            if(!reg.test(file_size)){
+                this.prompt('传递的文件大小参数不是数字类型，请检查');
+                return;
+            }
+            var unit = (file_size / 1024) < 1 ? 'KB' : ( (file_size / (1024 * 1024)) < 1 ? 'MB' : 'GB');
+            var size = '';
+            if(unit == 'KB'){
+                size = file_size;
+            }
+            else if(unit == 'MB'){
+                size = parseFloat(file_size / 1024).toFixed(2);
+            }
+            else if(unit == 'GB'){
+                size = parseFloat( file_size / (1024 * 1024) ).toFixed(2);
+            }
+            if(size.toString().substring(size.toString().lastIndexOf('.') + 1) == '00') { // 如果最后面两个小数是00，则00不要
+                size = size.substring(0, size.lastIndexOf('.'));
+            }
+            size += unit;
+            return size;
+        },
+
+
+
+        /**
+         * !! 判断两个对象是否完全相等，判断两个对象是否相等
+         * @param {object} obj1 对象1
+         * @param {object} obj2 对象2
+         * @returns {boolean} 返回布尔值，true 是, false 否
+         */
+        isObjectEqual: function(obj1, obj2){
+            var o1 = obj1 instanceof Object;
+            var o2 = obj2 instanceof Object;
+            // 判断是不是对象
+            if(!o1 || !o2){
+                return obj1 === obj2;
+            }
+            //.keys() 返回一个对象的自身，可枚举属性kes值组成的数组
+            // 例如：数组返回下表： let arr = ['a', 'b', 'c'] Object.keys(arr); // 结果 0, 1, 2
+            if(Object.keys(obj1).length !== Object.keys(obj2).length){
+                return false;
+            }
+            for(var o in obj1){
+                var t1 = obj1[o] instanceof Object;
+                var t2 = obj2[o] instanceof Object;
+                if(t1 && t2){
+                    if(!this.isObjectEqual(obj1[o], obj2[o])){
+                        return false;
+                    }
+                }
+                else if(obj1[o] !== obj2[o]){
+                    return false;
+                }
+            }
+            return true;
+        },
+
+
+        /**
+         * !! 原生js获取后面所有的兄弟节点 (兼容ie6+)
+         * 注：已排除文本、空格，换行符
+         * @param {HTML DOM} o 当前元素对象节点
+         * @returns {Array} 返回数组，数组中的元素为dom对象
+         */
+        getAllNextElement: function(o){
+            var arr = [];
+            var parent = o.parentNode;
+            if(parent == null) return [];
+            var index = -1;
+            for(var i = 0; i < parent.children.length; i++){
+                var child = parent.children[i];
+                if(child == o){
+                    index = i;
+                }else{
+                    if(index != -1 && i > index) arr.push(child);
+                }
+            }
+            return arr;
+        },
+
+
+
+
+         /**
+         * 原生js获取元素style属性
+         * [用途]：原生js获取元素margin外边距、内边距padding
+         * [注意]：返回值中的各个属性值带单位px
+         * 兼容性：兼容IE、火狐、谷歌
+         * @param {HTML DOM} o DOM元素。
+         * @returns {object} 返回元素的各种css属性组成的数组。
+         * [示例]
+            var div = document.getElementById("user");
+            var style = getElementStyle(div);
+            alert(style.marginTop);
+        */
+        getElementStyle: function(o){
+            //  兼容IE和火狐谷歌等的写法
+            if (window.getComputedStyle) {
+                var style = getComputedStyle(o, null);
+            } else {
+                style = o.currentStyle; // 兼容IE
+            }
+            return style;
+        },
+
+
+
+        /**
+         * 原生js获取元素到浏览器顶部的距离，即offsetTop
+         * 注：不能直接使用obj.offsetTop，因为它获取的是你绑定元素上边框相对离自己最近且position属性为非static的祖先元素的偏移量
+         * @param {HTML DOM} o DOM元素。
+         * @returns {number} 返回距离值
+         */
+        getElementTop: function(o) {
+            var actualTop = o.offsetTop;
+            var current = o.offsetParent;
+            while (current !== null) {
+                actualTop += current.offsetTop;
+                current = current.offsetParent;
+            }
+            // 当HTML节点有设置margin值时
+            var docStyle = this.getElementStyle(document.documentElement), // HTML节点
+                docMarTop = Math.ceil(docStyle.marginTop.toString().replace(/([\px]+)/g, ''));
+            actualTop += docMarTop;
+            return actualTop;
+        },
+
+
+        
+        /**
+         * !! 原生JS合并对象1
          * 即用一个或多个对象来扩展一个对象，返回被拓展的对象
          * 注：本函数很好的模拟了JQ extend合并对象
          * @param {boolean} deep 是否深度合并对象(可选),默认false
