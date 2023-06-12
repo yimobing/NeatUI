@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS插件开发原理示意</title>
+</head>
+
+<body>
+    <h1>JS插件开发原理示意</h1>
+    <h5>参考：https://www.cnblogs.com/wgb1234/articles/16640397.html</h5>
+    <script>
+
+        //——————————————————————————————————————————————
+        // 第1种写法
+        var plugin2 = (function () {
+            function _callHello(str) {
+                console.log('hello World：' + str);
+            }
+            // 这个相当于给window添加了一个属性
+            this.HelloText = _callHello;
+            // 这个相当于给plugin2添加一个属性
+            return {
+                callHello: _callHello
+            }
+            // 以下写法不行!!
+            // this.callHello = _callHello;
+            // return callHello;
+           
+        })();
+
+
+        var a = plugin2.callHello('你好，世界');
+        HelloText('美中666'); // 或 window.HelloText('美中666');
+
+
+
+        //——————————————————————————————————————————————
+        // 第2种写法 更为内敛 本质上是一样的
+        ;(function(){
+            var _plugin_api = {
+                oneFunc: function(str){
+                    console.log('用户名：', str);
+                    // return this;
+                }
+            }
+            // 方法1
+            // this.MyPlugin = _plugin_api;
+            // 方法2
+            return MyPlugin = _plugin_api;
+        })();
+        var b = window.MyPlugin.oneFunc('李四x');
+
+
+
+
+        //——————————————————————————————————————————————
+        // 第3种写法，常见的封装方式
+        ; (function (root, factory) {
+            if (typeof define === 'function' && define.amd) { // amd
+                define(factory);
+            } else if (typeof exports === 'object') { // umd
+                module.exports = factory();
+            } else {
+                window.NeDate = factory();
+            }
+        })(this, function () {
+            var NeDate = function () {
+                var me = this;
+                this.init = function (elem, opts) {
+                    console.log('init方法：elem1：', elem, '\noptions1：', opts);
+                };
+                this.load = function (elem, opts) {
+                    console.log('house方法：elem2：', elem, '\noptions2：', opts);
+                };
+            }
+           
+            // 方法1
+            this.NeuiDate = NeDate;
+            // 方法2
+            // return NeuiDate = NeDate;
+        });
+
+        var date = new NeuiDate();
+        // var date = new NeDate();
+        date.init('#aaa', {
+            username: '赵六'
+        })
+
+
+    </script>
+</body>
+
+</html>

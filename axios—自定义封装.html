@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>axios自定义封装</title>
+</head>
+<body>
+    <div id="app">
+        <pre>
+        绑定节点
+
+
+        //
+        封装方法：
+
+        1. 
+            debug=true
+            接口有通，返回值格式有误=> 返回自定义的提示信息
+            接口有通，且 {return:"error", data:""} => 返回自定义的错误信息 + data里的信息
+            接口不通，=> 返回错误状态码+具体的错误信息
+        2.
+            debug=false
+            接口有通，返回值格式有误 => 返回“数据有误”
+            接口有通，且 {return:"error", data:""} =>
+            接口不通，=> 返回“网络错误”
+
+        参考：
+        https://developer.aliyun.com/article/1143881
+        https://blog.csdn.net/XSL_HR/article/details/130178296
+        http://www.ay1.cc/article/1681044889717323413.html
+        https://new-developer.aliyun.com/article/1143882
+        https://blog.csdn.net/weixin_49668076/article/details/120986055
+        https://www.uoften.com/article/188656.html
+        </pre>
+    </div>
+
+    <script src="assets/neatui/js/neatui-axios.js"></script>
+    <script>
+        $axios({
+            method: "GET",
+            data: {
+                name: "小明",
+                grade: "三年级",
+                sex: "男",
+                age: 10
+            }
+        });
+
+        $axios.post('https://www.xx.com/book', {
+            name: "小王",
+            grade: "五年级",
+            sex: "女",
+            age: 12
+        });
+
+        // testing
+        $axios.post("../../../falv_jk/jk_pub/jk_department_user.ashx?params=2", {
+            debug: true,
+            vue: this,
+       
+                "action": "wh_pub_department_ins",
+                "user": "<%=s_user%>",
+                "sjk": "<%=s_sjk%>",
+                "menu_bh": "<%=s_menu_bh%>",
+                "department_mc": "",
+                "tree_sj_bh": ""
+            
+        });
+    </script>
+</body>
+</html>
