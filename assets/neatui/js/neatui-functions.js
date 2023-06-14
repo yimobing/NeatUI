@@ -1972,15 +1972,6 @@ var checker = {
             ps_obj && typeof ps_obj === 'object' && ps_obj.nodeType === 1 && typeof ps_obj.nodeName === 'string';
     },
 
-    
-    /**
-     * 判断是否JSON对象
-     * @param {object} ps_obj 目标对象
-     * @returns 返回布尔值. true 是, false 否
-     */
-    checkIsJsonObject: function(ps_obj){
-        return typeof(ps_obj) == "object" && Object.prototype.toString.call(ps_obj).toLowerCase() == "[object object]" && !ps_obj.length;
-    },
 
 
     /**
@@ -2001,10 +1992,22 @@ var checker = {
     },
 
 
+
     /**
-	 * 判断字符串是否为JSON对象
+     * 判断是否json对象
+     * @param {object} ps_obj 目标对象
+     * @returns 返回布尔值. true 是, false 否
+     */
+    checkIsJsonObject: function(ps_obj){
+        return typeof(ps_obj) == "object" && Object.prototype.toString.call(ps_obj).toLowerCase() == "[object object]" && !ps_obj.length;
+    },
+
+
+
+    /**
+     * 判断是否json字符串
      * @param {string} str 字符串
-	 * return {boolean} 返回值: true 是json,  false 是空、null、数组等非json
+	 * return {boolean} 返回值: true 是json格式的字符串,  false 是空、null、数组等非json格式的字符串
 	 */
 	checkIsJsonString: function(str){
 		if(typeof str === 'string'){
