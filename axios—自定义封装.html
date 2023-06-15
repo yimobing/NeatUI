@@ -4,70 +4,646 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>axios自定义封装</title>
+    <title>Axios自定义封装控件</title>
+    <link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
+    <link type="text/css" rel="stylesheet" href="assets/lib/element-ui@2.15.13/index.css">
 </head>
 <body>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body{ width: 80%; margin: 0 auto; padding: 10px; }
+        .caption{ margin-bottom: 10px; text-align: center; color: #1296db; font-size: 36px; font-weight: bold; }
+        .instruction{ }
+        .info{ margin-top: 80px; }
+        .info__group{ margin-bottom: 50px; border: 3px solid #1296db; border-radius: 4px; }
+        .info__title{ padding: 25px 15px; background-color: #1296db; color: #fff; font-size: 24px; font-weight: bold; }
+        .info__content{ margin-top: 15px; padding: 10px; }
+        .info__content>div{ margin-bottom: 10px; }
+        .info__code{ padding: 15px 20px; }
+        .info__code pre{ border-radius: 4px; }
+
+        li{ list-style-type: circle; list-style-position: inside; padding-right: 10px; border-bottom: 1px dotted #ddd; padding: 8px 12px; }
+        li span{ margin-left: 10px; font-weight: bold; }
+        li em{ margin-left: 10px; font-style: normal; color: #666; }
+    </style>
+
     <div id="app">
-        <pre>
-        绑定节点
+       
+        <div class="instruction">
+            <div class="instruction__caption caption">控件使用说明</div>
+            <pre></pre>
+        </div><!--/.instruction-->
+        <div class="info">
+            <div class="info__caption caption">控件使用实例</div>
+            <div class="info__group">
+                <div class="info__title"> GET 请求 (校长) </div>
+                <div class="info__content">
+                    <ul>
+                        <li>
+                            <span>{{leaderData.name}}</span><em>职务：{{leaderData.duty}}</em>
+                        </li>
+                    </ul>
+                </div><!--/.info__content-->
+                <div class="info__code">
+<pre>
+    // 方法1，通过 method 指定请求方式
+    $axios({
+        debug: true,
+        // headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        method: "get",
+        url: "../leader.ashx?action=wh_pub_get_xiaozhang&user=1&sjk=xiaozhang", // 这里是为了和mock模拟地址一致才这样写
+        params: {
+            "action": "wh_pub_get_xiaozhang",
+            "user": "1",
+            "sjk": "xiaozhang"
+        }
+    }).then(res => {
+        console.log('res1：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        this.leaderData = res.data;
+    }).catch(errs => {
+        console.log('errs1：', errs);
+    });
 
+    // 方法2，直接调用指定的请求方法
+    $axios.get("../leader.ashx", {
+        params: {
+            "action": "wh_pub_get_xiaozhang",
+            "user": "1",
+            "sjk": "xiaozhang"
+        }
+    }, {
+        debug: true,
+        // headers: {'Content-Type': 'application/json'} 
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).then(res => {
+        console.log('res1：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        this.leaderData = res.data;
+    }).catch(errs => {
+        console.log('errs1：', errs);
+    });
+</pre>
+                </div><!--/.info__code-->
+            </div><!--/.info__group-->
 
-        //
-        封装方法：
+            <div class="info__group">
+                <div class="info__title"> POST 请求 (老师) </div>
+                <div class="info__content">
+                    <ul>
+                        <li>
+                            <span>{{teacherData.name}}</span><em>职务：{{teacherData.duty}}</em>
+                        </li>
+                    </ul>
+                </div><!--/.info__content-->
+                <div class="info__code">
+<pre>
+     // 方法1，通过 method 指定请求方式
+    $axios({
+        debug: true,
+        headers: {'Content-Type': 'application/json'},
+        // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        method: "post",
+        url: "../teacher.ashx",
+        data: {
+            "action": "wh_pub_get_xuexiao",
+            "user": "1",
+            "sjk": "laoshi"
+        },
+        
+    }).then(res => {
+        console.log('res2：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        this.teacherData = res.data;
+    }).catch(errs => {
+        console.log('errs2：', errs);
+    });
 
-        1. 
-            debug=true
-            接口有通，返回值格式有误=> 返回自定义的提示信息
-            接口有通，且 {return:"error", data:""} => 返回自定义的错误信息 + data里的信息
-            接口不通，=> 返回错误状态码+具体的错误信息
-        2.
-            debug=false
-            接口有通，返回值格式有误 => 返回“数据有误”
-            接口有通，且 {return:"error", data:""} =>
-            接口不通，=> 返回“网络错误”
+    // 方法2，直接调用指定的请求方法
+    $axios.post("../teacher.ashx", {
+        "action": "wh_pub_get_laoshi",
+        "user": "1",
+        "sjk": "laoshi"
+    }, {
+        debug: true,
+        // headers: {'Content-Type': 'application/json'} 
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).then(res => {
+        console.log('res2：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        this.teacherData = res.data;
+    }).catch(errs => {
+        console.log('errs2：', errs);
+    });
+</pre>
+                </div><!--/.info__code-->
+            </div><!--/.info__group-->
 
-        参考：
-        https://developer.aliyun.com/article/1143881
-        https://blog.csdn.net/XSL_HR/article/details/130178296
-        http://www.ay1.cc/article/1681044889717323413.html
-        https://new-developer.aliyun.com/article/1143882
-        https://blog.csdn.net/weixin_49668076/article/details/120986055
-        https://www.uoften.com/article/188656.html
-        </pre>
-    </div>
+            <div class="info__group">
+                <div class="info__title"> 并发 POST 请求 (学校 + 学生) </div>
+                <div class="info__content">
+                    <div class="info__school">
+                        <ul>
+                            <li>
+                                <span>学校名称：</span><em>{{schoolData.name}}</em>
+                                <span>学校地址：</span><em>{{schoolData.address}}</em>
+                            </li>
+                        </ul>
+                    </div><!--/.info__school-->
+                    <div class="info__student">
+                        <ul>
+                            <template v-for="item in studentData">
+                                <li>
+                                    <span><em>{{item.name}}</em></span>
+                                    <span><em>{{item.age}}岁</em></span>
+                                    <span><em>{{item.sex}}</em></span>
+                                    <span><em>{{item.grade}} {{item.classes}}</em></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div><!--/.info__student-->
+                </div><!--/.info__content-->
+                <div class="info__code">
+<pre>
+    var p = [getDataSchool(this), getDataStudent(this)];
+    $axios.all(p).then(values => {
+        console.log('values：', values); // 这里取到的是N个接口返回值组成的数组。eg. [{return:"ok", data: []}, {return:"ok", data: []}]
+        this.schoolData = values[0];
+        this.studentData = values[1].data;
+    }).catch(errs => {
+        console.log('errs3：', errs);
+    });
 
-    <script src="assets/neatui/js/neatui-axios.js"></script>
-    <script>
-        $axios({
-            method: "GET",
+    /**
+    * !!! 获取学校信息
+    * @returns {promise} 返回promise对象
+    */
+    function getDataSchool(_this){
+        return $axios({
+            debug: true,
+            url: "../school.ashx",
+            method: "post",
             data: {
-                name: "小明",
-                grade: "三年级",
-                sex: "男",
-                age: 10
+                "action": "wh_pub_get_xuexiao",
+                "user": "张三",
+                "sjk": "lvshi"
+            },
+            headers: {'Content-Type': 'application/json'} 
+            // headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+    }
+
+
+    /**
+    * !!! 获取学生信息
+    * @returns {promise} 返回promise对象
+    */
+    function getDataStudent(_this){
+        return $axios({
+            debug: true,
+            url: "../student.ashx",
+            method: "post",
+            data: {
+                "action": "wh_pub_get_xuesheng",
+                "user": "李四",
+                "sjk": "houtai"
+            }
+        });
+    }
+</pre>
+                </div><!--/.info__code-->
+            </div><!--/.info__group-->
+        </div><!--/.info-->
+    </div><!--/#app-->
+
+
+    <script src="assets/lib/vue@2.6.14/vue.min.js"></script><!--Vue2库-->
+    <script src="assets/lib/axios/axios.min.js"></script><!--原生Axios库-->
+    <script src="assets/lib/element-ui@2.15.13/index.js"></script><!--ELmentUI库-->
+    <script src="assets/lib/mock/mock-min.js"></script><!--Mock模拟数据-->
+    <script src="assets/neatui/js/neatui-axios.js"></script><!--Axios自定义封装控件-->
+    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
+	<!--<script type="text/javascript" href="highlight/highlight.min.js"></script>--><!--代码高亮-->
+    <script type="statement">
+
+        //========================================================================================================
+        // 一、控件使用说明
+        //========================================================================================================
+        /*————————————————————————————————————————————————————————————————————————————————————————————————
+        /**
+         * --------------------------------
+         * [1、控件调用方法]
+         * --------------------------------
+         【方法】
+           ① $axios(options).then().catch(); // 自定义请求方式，即通过配置options配置项的参数method='post'或'get'来设置请求方式
+           ② $axios.get(url, params, config).then().catch(); // GET 请求
+           ③ $axios.post(url, data, config).then().catch(); // POST 请求
+           ④ $axios.all([promise1, promise1, ...]).then().catch(); // 并发请求。 promise1, promise2等实例是一个 POST 或 GET 请求
+        【说明】
+            ①中指定 method='get' 时相当于②
+            ①中指定 method='post' 时相当于③
+
+        * --------------------------------
+        *  [2、配置项参数说明]
+        * --------------------------------
+            options 和 config 配置项除了新增几个自定义的参数，其余和原生配置项完全一样
+            具体参考
+            Axios 官网：http://www.axios-js.com/zh-cn/docs/
+            Vue2 Axios 教程：https://www.runoob.com/vue2/vuejs-ajax-axios.html
+
+            2-1. options 配置参数如下
+            var options = {
+                // · 自定义参数
+                debug: false, // 是否启用调试功能(可选)，默认false。false时接口有问题将显示“友好提示信息”，true时接口有问题将显示“直接提示信息”
+                vue: null, // vue实例化对象，用于弹窗(可选)。如不传则为null，表示默认使用alert弹窗。
+
+                // · 原生参数，即 Axios API 里的“请求配置项”，控件里默认只写出部分，您可根据需要进行添加
+                // 即将被发送的自定义请求头。即发送给后台的数据格式，不同的数据格式后台接收方法也不同。
+                // GET 请求时，默认使用的是“查询格式的字符串”，前端即使指定“JSON格式的字符串”也不起作用，请知悉！
+                // headers: { "Content-Type": "application/x-www-form-urlencoded" },// 查询格式的字符串格。eg. "?a=3&b=5"
+                headers: { "Content-Type": "application/json" }, // JSON格式字符串。eg. "{a:3, b:5}"
+                method: "get",  // 请求方法(可选)，默认 get
+                baseURL: "", // 自动加在url前面，除非url是一个绝对 URL(可选)。它可以通过设置一个 `baseURL` 便于为实例的方法传递相对 URL
+                url: "", // 用于请求的服务器地址
+                params: { // 请求方法为 "GET" 时与请求一起发送的 URL 参数
+
+                },
+                data: { // 请求方法为 "POST", "PUT" 和 "PATCH" 时请求主体被发送的数据
+                    
+                },
+                timeout: 5000 // 指定请求超时的毫秒数(可选)，超时的话请求将被中断，默认设置为5秒。0 表示无超时时间。
+                // 其它参数见Axios官网
+                //..
+            };
+
+            2-2. config 配置项没有 url 和 method 两个参数(即使设置也不起作用)，其余参数和options完全一样。
+      
+
+        * --------------------------------
+            [3、控件使用示例]
+        * --------------------------------
+            例1.
+            $axios(options).then(res => {
+                // 1.接口响应正常且执行成功时
+                // 只有以下情况才会跑到 then 里
+                // 如：接口执行成功，即eg. {return:"ok", data: "成功时数据"} 
+                console.log('res：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+                this.leaderData = res.data;
+            }).catch(errs => {
+                // 2.接口响应错误或执行失败时
+                // 以下情况都会跑到 catch 里
+                // 如：网络断开、超时、服务器错误、接口地址错误等，或者接口执行失败 eg.{return:"error", data: "失败信息"}
+                console.log('errs：', errs);
+            });
+
+            例2.
+            $axios.post(url, data, config).then(res => {
+                //..
+            }).catch(errs => {
+                //..
+            });
+
+            例3.
+            $axios.get(url, params, config).then(res => {
+                //..
+            }).catch(errs => {
+                //..
+            });
+            
+            例4.
+            var p1 = $axios(options);
+            var p2 = $axios(options);
+            var p = [p1, p2];
+            $axios.all(p).then(values => {
+                // 这里取到的是N个接口返回值组成的数组。eg. [{return:"ok", data: []}, {return:"ok", data: []}]
+            }).catch(errs => {
+                // 只要有一个promise实例出现错误，就会跳到这里
+            });
+
+        ————————————————————————————————————————————————————————————————————————————————————————————————
+        */
+     </script>
+
+     
+
+     <script>
+        
+        //========================================================================================================
+        // 二、 代码配置
+        //========================================================================================================
+        //————————————————————————————————————————————————
+        //=====代码块高亮
+        hljs.initHighlightingOnLoad()
+        hljs.configure({
+            languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
+        });
+        document.querySelectorAll('pre').forEach((block) => {
+            hljs.highlightBlock(block);
+        });
+
+
+        //————————————————————————————————————————————————
+        // 将“控件使用说明”的代码复制到某个DOM节点里，展示给用户看
+        var domList = document.getElementsByTagName("script");
+        // console.log('domList：', domList);
+        var domStatement;
+        for(var k = 0; k < domList.length; k++){
+            var item = domList[k];
+            var type = item.getAttribute('type');
+            if(type == 'statement'){
+                domStatement = item;
+                break;
+            }
+        }
+        var html = domStatement.innerHTML;
+        var child = document.getElementsByClassName('instruction')[0].childNodes;
+        // console.log('child：', child);
+        child[3].innerHTML = html;
+
+      
+
+
+
+        //========================================================================================================
+        // 三、控件调用实例
+        //========================================================================================================
+        //————————————————————————————————————————————————
+        // Vue中使用实例
+        //————————————————————————————————————————————————
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    leaderData: { }, // 校长数据
+                    teacherData: { }, // 老师数据
+                    schoolData: { }, // 学校数据
+                    studentData: [ ] // 学生数据
+                }
+            },
+
+            // 创建时
+            created() {
+
+                //————————————————————————————————————————————————
+                //         1. GET 请求
+                //————————————————————————————————————————————————
+                Mock.setup({
+                    timeout: "100-2000" // todo:延时m到n毫秒返回
+                });
+                // 校长数据
+                var mDaLeader = Mock.mock({
+                    "array|+1": [{
+                        name: "钟云芳",
+                        duty: "副校长，负责学校纪律"
+                    }]
+                });
+                // mock 没办法模拟 get 请求url后面那串参数，故把那串参数也作为整体地址
+                Mock.mock("../leader.ashx?action=wh_pub_get_xiaozhang&user=1&sjk=xiaozhang", "get", (v) => {
+                    // console.log('v1：', v);
+                    var result = { return: "ok", data: mDaLeader.array }  // 成功时
+                    // var result = { return: "error", data: '获取数据时失败1'}  // 失败时
+                    return result;
+                });
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 获取校长数据： GET 请求
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 方法1，通过 method 指定请求方式
+                $axios({
+                    debug: true,
+                    vue: this,
+                    // headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    method: "get",
+                    url: "../leader.ashx?action=wh_pub_get_xiaozhang&user=1&sjk=xiaozhang", // 这里是为了和mock模拟地址一致才这样写
+                    params: {
+                        "action": "wh_pub_get_xiaozhang",
+                        "user": "1",
+                        "sjk": "xiaozhang"
+                    }
+                }).then(res => {
+                    // console.log('res1：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+                    this.leaderData = res.data;
+                }).catch(errs => {
+                    // console.log('errs1：', errs);
+                });
+
+                // // 方法2，直接调用指定的请求方法
+                // $axios.get("../leader.ashx", {
+                //     params: {
+                //         "action": "wh_pub_get_xiaozhang",
+                //         "user": "1",
+                //         "sjk": "xiaozhang"
+                //     }
+                // }, {
+                //     debug: true,
+                //     vue: this,
+                //     // headers: {'Content-Type': 'application/json'} 
+                //     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                // }).then(res => {
+                //     console.log('res1：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+                //     this.leaderData = res.data;
+                // }).catch(errs => {
+                //     console.log('errs1：', errs);
+                // });
+
+
+
+
+
+                //————————————————————————————————————————————————
+                //          2. POST 请求
+                //————————————————————————————————————————————————
+                Mock.setup({
+                    timeout: "100-2000" // todo:延时m到n毫秒返回
+                });
+                // 老师数据
+                var mDaTeacher = Mock.mock({
+                    "array|+1": [{
+                        name: "李均全",
+                        duty: "高中数据老师"
+                    }]
+                });
+                Mock.mock("../teacher.ashx", "post", (v) => {
+                    // console.log('v2：', v);
+                    var result = { return: "ok", data: mDaTeacher.array } // 成功时
+                    // var result = { return: "error", data: '获取数据时失败2'} // 失败时
+                    return result;
+                });
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 获取老师数据： POST 请求
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 方法1，通过 method 指定请求方式
+                $axios({
+                    debug: true,
+                    vue: this,
+                    headers: {'Content-Type': 'application/json'},
+                    // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    method: "post",
+                    url: "../teacher.ashx",
+                    data: {
+                        "action": "wh_pub_get_xuexiao",
+                        "user": "1",
+                        "sjk": "laoshi"
+                    },
+                   
+                }).then(res => {
+                    // console.log('res2：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+                    this.teacherData = res.data;
+                }).catch(errs => {
+                    // console.log('errs2：', errs);
+                });
+
+                // // 方法2，直接调用指定的请求方法
+                // $axios.post("../teacher.ashx", {
+                //     "action": "wh_pub_get_laoshi",
+                //     "user": "1",
+                //     "sjk": "laoshi"
+                // }, {
+                //     debug: true,
+                //     vue: this,
+                //     // headers: {'Content-Type': 'application/json'} 
+                //     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                // }).then(res => {
+                //     console.log('res2：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+                //     this.teacherData = res.data;
+                // }).catch(errs => {
+                //     console.log('errs2：', errs);
+                // });
+
+
+
+
+
+
+                //————————————————————————————————————————————————
+                //          3. 并发请求 
+                // (支持多个POST或GET请求，或者POST、GET混合的请求)
+                //———————————————————————————————————————————————— 
+                Mock.setup({
+                    timeout: "100-2000" // todo:延时m到n毫秒返回
+                });
+                // 学校数据
+                var mDaSchool = Mock.mock({
+                    "array|+1": [{
+                        name: "泉州五中",
+                        address: "泉州市丰泽区云路小区"
+                    }]
+                });
+                Mock.mock("../school.ashx", "post", (v) => {
+                    // console.log('v3：', v);
+                    var result = { return: "ok", name: mDaSchool.array.name, address: mDaSchool.array.address } // 成功时
+                    // var result = { return1: "error", data: '获取数据时失败3'} // 失败时
+                    return result;
+                });
+
+                // 学生数据
+                var mDaStudent = Mock.mock({
+                    "array|5": [{
+                        "name": "@cname",
+                        "age|+1": [10, 11, 12, 13, 14, 15],
+                        "sex|+1": ["男", "女"],
+                        "grade|+1": ["一年", "二年", "三年", "四年", "五年"],
+                        "classes|+1": ["一班", "二班", "三班"]
+                    }]
+                });
+                Mock.mock("../student.ashx", "post", (v) => {
+                    // console.log('v4：', v);
+                    var result = { return: "ok", data: mDaStudent.array } // 成功时
+                    // var result = { return: "error", data: '获取数据时失败4'} // 失败时
+                    return result;
+                });
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 获取学校 + 学生数据： 并发请求
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                var p = [getDataSchool(this), getDataStudent(this)];
+                $axios.all(p).then(values => {
+                    // console.log('values：', values); // 这里取到的是N个接口返回值组成的数组。eg. [{return:"ok", data: []}, {return:"ok", data: []}]
+                    this.schoolData = values[0];
+                    this.studentData = values[1].data;
+                }).catch(errs => {
+                    console.log('errs3：', errs);
+                });
+
+                /**
+                 * !!! 获取学校信息
+                 * @param {vue} _this vue实例化对象
+                 * @returns {promise} 返回promise对象
+                 */
+                function getDataSchool(_this){
+                    return $axios({
+                        debug: true,
+                        vue: _this,
+                        url: "../school.ashx",
+                        method: "post",
+                        data: {
+                            "action": "wh_pub_get_xuexiao",
+                            "user": "张三",
+                            "sjk": "lvshi"
+                        },
+                        headers: {'Content-Type': 'application/json'} 
+                        // headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                    });
+
+                    // 如果要在单个promise里操作then,则要这里写
+                    // var mypromise = $axios({
+                    //     debug: true,
+                    //     vue: _this,
+                    //     url: "../school.ashx",
+                    //     method: "post",
+                    //     data: {
+                    //         "action": "wh_pub_get_xuexiao",
+                    //         "user": "张三",
+                    //         "sjk": "lvshi"
+                    //     },
+                    //     headers: {'Content-Type': 'application/json'} 
+                    //     // headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                    // })
+                    
+                    // mypromise.then(res => {
+                    //     // console.log('学生数据正常：', res);
+                    //     // var result = response.data;
+                    //     _this.schoolData = res;
+                    // }).catch(errs => {
+                    //     console.log('学校数据异常：', errs);
+                    // });
+                    // return mypromise
+                }
+
+
+                /**
+                 * !!! 获取学生信息
+                 * @param {vue} _this vue实例化对象
+                 * @returns {promise} 返回promise对象
+                 */
+                function getDataStudent(_this){
+                    return $axios({
+                        debug: true,
+                        vue: _this,
+                        url: "../student.ashx",
+                        method: "post",
+                        data: {
+                            "action": "wh_pub_get_xuesheng",
+                            "user": "李四",
+                            "sjk": "houtai"
+                        }
+                    });
+                }
+
+
+
+
+
+                
+                
+            },
+            // 挂载时
+            mounted() {
+
             }
         });
 
-        $axios.post('https://www.xx.com/book', {
-            name: "小王",
-            grade: "五年级",
-            sex: "女",
-            age: 12
-        });
 
-        // testing
-        $axios.post("../../../falv_jk/jk_pub/jk_department_user.ashx?params=2", {
-            debug: true,
-            vue: this,
-       
-                "action": "wh_pub_department_ins",
-                "user": "<%=s_user%>",
-                "sjk": "<%=s_sjk%>",
-                "menu_bh": "<%=s_menu_bh%>",
-                "department_mc": "",
-                "tree_sj_bh": ""
-            
-        });
+
     </script>
 </body>
 </html>
