@@ -34,6 +34,46 @@
          */
         this.init = function(elem, options){
             var opts = typeof (options) === "function" ? options() : options;
+            methods.UpInit(me, elem, options);
+        };
+
+        /**
+         * !! 上传处理中
+         * @param {Number} index 当前正在上传的那个文件索引值
+         * @param {Number} value 当前文件已上传的大小(已上传多少KB)
+         * @param {Number} max 当前文件的全部上传后的大小(KB)
+         */
+        this.handleProgress = function(index, value, max){
+            methods.UpHandle(me, index, value, max);
+        };
+
+        /**
+         * !! 上传失败时
+         * @param {Number} index 失败的那个文件索引值
+         */
+        this.handleFail = function(index){
+            methods.UpFail(me, index);
+        };
+        // var opts = typeof (options) === "function" ? options() : options;
+        // return new UpInit(elem, opts);
+    };
+
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //  内置函数库 methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    var methods = {
+
+        //————————————————————————————————————————————————
+        /**
+         * 控件初始化
+         * @param {object} me 控件自身对象
+         * @param {string} elem 控件绑定的根节点。如 '.app', '#app'
+         * @param {object} options 控件传递过来的参数
+         * @returns 
+         */
+        UpInit: function(me, elem, options){
             // 默认参数
             var defaults = {
                 enable: true, // 是否启用上传功能(可选)，默认true
@@ -46,18 +86,12 @@
                 // true 每次选择文件会和“已有列表中的文件”进行比较，若有新文件则把它添加到列表中，若无则不添加; 
                 // false 每次选择文件会把“已有列表中的文件”替换成当前选择的文件。
                 // 举例：“已有列表中的文件”为[1,2,3,4]，当前选择了文件[2,3,5,6]，则true时列表中的文件会变成[1,2,3,5,6]，false时列表中文件会变成[2,3,5,6]
-                
-                // 文件重复自动跳过 add 20230616-1
-                skipRepeatFile: true, // 是否启用文件重复自动跳过功能(可选)，默认true。主要用于后端文件检查，如果检查到文件重复，则界面上手动移除重复的
-                skipMessage: '文件重复，自动跳过', // 文件重复自动跳过功能提示文字(可选)。仅当 skipRepeatFile=true时有效。
 
-                //
-                chooseButtonLabel: '选择文件', // 选择文件按钮的显示文字(可选)
-                upButtonLabel: '开始上传', // 上传按钮的显示文字(可选)
+                chooseButtonLabel: '选择文件', // 选择文件按钮的显示文字(可选)，默认'选择文件'
+                upButtonLabel: '开始上传', // 上传按钮的显示文字(可选)，默认'开始上传'
                 suggestionLabel: '', // 建议信息(可选)，默认空。若为空系统将根据文件类型及限制的大小输出一段文字，如”只能上传png/gif/jpg/jpeg文件，且大小不超过500KB”
-                successLabel: '上传成功', // 上传成功后显示的提示文字(可选)
-                repeatLabel: '文件重复', // 文件有重复时显示的提示文字(可选)，仅当skipRepeatFile=true时有效。
-                failLabel: '上传失败', // 上传失败后的显示的提示文字(可选)
+                successLabel: '上传成功', // 上传成功后显示的提示文字(可选)，默认'上传成功'
+                failLabel: '上传失败', // 上传失败后的显示的提示文字(可选)，默认'上传失败'
                 showThumb: true, // 是否显示缩略图(可选)，默认true
                 showSize: true, // 是否显示文件大小(可选)，默认true
                 showProgress: true, // 是否显示进度条(可选)，默认true
@@ -75,9 +109,6 @@
                     placeholder: '', // 内置表单输入框的placeholder属性值(可选)，默认true
                     // 外置表单，即自定义表单
                     customHTML: '' // 外置表单(可选)，非空时内置表单功能将不起作用。只有在enable=true且当前参数值不为空时才起作用。
-                },
-                callBack: function (e) { // 开始上传按钮回调事件
-                    
                 }
             }
 
@@ -86,85 +117,31 @@
                 return;
             }
             me.$opts = settings; // 全局赋值
-            methods.doneInit(me, elem);
-        };
-        // var opts = typeof (options) === "function" ? options() : options;
-        // return new doneInit(elem, opts);
 
-
-
-        /**
-         * !! 上传处理，处理上传进度条
-         * @param {Number} index 当前正在上传的那个文件索引值
-         * @param {Number} value 当前文件已上传的大小(已上传多少KB)
-         * @param {Number} max 当前文件的全部上传后的大小(KB)
-         */
-        this.handleProgress = function(index, value, max){
-            methods.doneProgress(me, index, value, max);
-        };
-
-
-
-        /**
-         * !! 处理重复文件
-         * !!! 后端检查到上传的文件有重复时，自动跳过
-         * add 20230616-1
-         * @param {array} 重复的文件索引值组成的数组
-         */
-        this.handleRepeate = function (indexArr) {
-            methods.doneRepeate(me, indexArr);
-        };
-
-
-
-        /**
-         * !! 处理上传失败
-         * @param {Number} index 失败的那个文件索引值
-         */
-        this.handleFail = function(index){
-            methods.doneFail(me, index);
-        };
-    };
-
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //  内置函数库 methods
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    var methods = {
-
-        //————————————————————————————————————————————————
-        /**
-         * 控件初始化
-         * @param {object} me 控件自身对象
-         * @param {string} elem 控件绑定的根节点。如 '.app', '#app'
-         * @returns 
-         */
-        doneInit: function (me, elem) {
-            var _this = this;
-            //~~~~~~~~ 1. 创建外层节点 ~~~~~~~~
             // 全局属性
             var tagFileId = 'choice'; // input type file 节点的id属性
                 tagListClassName = 'neUpload__list', // 文件列表节点的className
                 tagThumbClassName = 'thumb', // 缩略图节点className
                 tagFormInClassName = 'neUpload__form_built_in', // 内置表单节点的className
                 tagFormOutClassName = 'neUpload__form_built_out'; // 自定义表单节点的className
+
             // 取值，变量以c开头
-            var cWidth = me.$opts.width,
-                cMultiple = me.$opts.multiple,
-                cIncrement = me.$opts.increment,
-                cMaxHeight = me.$opts.maxHeight.toString().replace(/px/g, ''),
-                cSuggestLabel = me.$opts.suggestionLabel,
-                cShowProgress = me.$opts.showProgress,
-                cSkipMessage = me.$opts.skipMessage;
+            var cWidth = settings.width,
+                cMultiple = settings.multiple,
+                cFileType = settings.fileType,
+                cFileSize = settings.fileSize,
+                cIncrement = settings.increment,
+                cMaxHeight = settings.maxHeight.toString().replace(/px/g, ''),
+                cSuggestLabel = settings.suggestionLabel,
+                cShowProgress = settings.showProgress;
 
             // 改造成所需的值，变量以d开头
             var dWidth = cWidth.toString().indexOf('px') >=0 || cWidth.toString().indexOf('%') >= 0 ? cWidth : cWidth + 'px';
             var dFileType = '';
             var dFileArr = [];
-            if(Array.isArray(me.$opts.fileType)){
-                for(var i = 0; i < me.$opts.fileType.length; i++){
-                    var _type = me.$opts.fileType[i].toString().toLocaleLowerCase().replace(/\./g, ''); // 转成小写并去掉点号
+            if(Array.isArray(cFileType)){
+                for(var i = 0; i < cFileType.length; i++){
+                    var _type = cFileType[i].toString().toLocaleLowerCase().replace(/\./g, ''); // 转成小写并去掉点号
                     // 转成 input type file accept属性值
                     var _format = '';
                     if(_type == 'jpg' || _type == 'jpeg'){ // 图片
@@ -206,9 +183,9 @@
                 return;
             }
             var dMultipleStr = cMultiple === false ? '' : ' multiple="multiple"'; // 上传时是选择多个文件，还是单个文件
-            var dUseOutForm = me.$opts.form.customHTML.toString().replace(/([\s]+)/g, '') === '' ? false : true; // 是否使用外置表单
+            var dUseOutForm = settings.form.customHTML.toString().replace(/([\s]+)/g, '') === '' ? false : true; // 是否使用外置表单
             var dStatusClassName = cShowProgress ? '' : ' no-speed'; // 无进度条时的样式
-            var dSuggestLabel = cSuggestLabel.toString().replace(/(\s+)/g, '') !== '' ? cSuggestLabel : ('只能上传' + me.$opts.fileType.join('、') + '文件，且大小不超过' + helpers.getFormatSize(me.$opts.fileSize));
+            var dSuggestLabel = cSuggestLabel.toString().replace(/(\s+)/g, '') !== '' ? cSuggestLabel : ('只能上传' + cFileType.join('、') + '文件，且大小不超过' + helpers.getFormatSize(cFileSize));
                 
 
             // 创建根节点
@@ -226,87 +203,59 @@
             // 创建顶部节点
             var _topHtml = [
                 '<div class="neUpload__top">',
-                    '<div class="neUpload__operation">',
-                        '<div class="neUpload__choose">',
-                            '<div class="neUpload__file">',
-                                '<button type="button" id="btn__choose">' + me.$opts.chooseButtonLabel + '</button>',
-                                '<input type="file" id="' + tagFileId + '" accept="' + dFileType + '"' + dMultipleStr + '>',
-                            '</div><!--/.neUpload__file-->',
-                            // '<p>' + dSuggestLabel + '</p>',
-                        '</div><!--/.neUpload__choose-->',
-                        // add 20230616-1
-                        (
-                            (function () {
-                                var _tmpHtml = '';
-                                if (me.$opts.skipRepeatFile) {
-                                    _tmpHtml += [
-                                        '<div class="neUpload__repeate">',
-                                            '<input type="checkbox" id="jumperCheck" checked>',
-                                            '<span>' + cSkipMessage + '</span>',
-                                        '</div><!--/.neUpload__repeate-->'
-                                    ].join('\r\n')
-                                }
-                                return _tmpHtml;
-                            })()
-                        ),
-                        
-                        '<div class="neUpload__operate">',
-                            '<button type="button" id="btn_upload">' + me.$opts.upButtonLabel + '</button>',
-                        '</div><!--/.neUpload__operate-->',
-                    '</div><!--/.neUpload__operation-->',
-                    '<div class="neUpload__tips">',
-                        dSuggestLabel,
-                    '</div><!--/.neUpload__tips-->',
+                    '<div class="neUpload__choose">',
+                        '<div class="neUpload__file">',
+                            '<button type="button" id="btn__choose">' + settings.chooseButtonLabel + '</button>',
+                            '<input type="file" id="' + tagFileId + '" accept="' + dFileType + '"' + dMultipleStr + '>',
+                        '</div><!--/.neUpload__file-->',
+                        '<p>' + dSuggestLabel + '</p>',
+                    '</div>',
+                    '<div class="neUpload__operate">',
+                        '<button type="button" id="btn_upload">' + settings.upButtonLabel + '</button>',
+                    '</div>',
                 '</div><!--/.neUpload__top-->',
-                '<div class="' + tagListClassName + '"></div>'
+                ' <div class="' + tagListClassName + '">',
+                '</div>'
             ].join('\r\n');
             rootNode.innerHTML = _topHtml;
 
-            //~~~~~~~~ 2. 取节点，全局赋值 ~~~~~~~~
             // 取节点
             var fDom = document.getElementById(tagFileId); // 选择文件的节点
-            var lDom = document.getElementsByClassName(tagListClassName)[0]; // 文件列表节点
-            // 全局赋值
-            me.$UseOutForm = dUseOutForm; // 是否使用外置表单
-            me.$FileDom = fDom; // 选择文件节点
-            me.$ListDom = lDom; // 文件列表节点
-            me.$UploadDom = document.getElementById('btn_upload'); // 开始上传按钮节点
-            me.$SkipDom = document.getElementById('jumperCheck'); // 文件重复自动跳过节点
-            me.$FilesArr = [];  // 所有要上传的文件组成的数组
-
-
-            //~~~~~~~~ 3. 设置外观 ~~~~~~~~
-            // 是否有滚动条
-            if(me.$opts.overflow == 'scroll'){
+            var listDom = document.getElementsByClassName(tagListClassName)[0]; // 文件列表节点
+            // 设置节点
+            if(settings.overflow == 'scroll'){
                 var winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 视窗高
-                var offsetTop = helpers.getElementTop(me.$ListDom);
+                var offsetTop = helpers.getElementTop(listDom);
                 // console.log('视窗高：', winH, '\n顶部距离：', offsetTop);
                 var scrollHeight = (winH - offsetTop - 10) + 'px';
                 if(cMaxHeight != 'auto' && parseFloat(cMaxHeight) > 0){
                     scrollHeight = cMaxHeight + 'px';
                 }
-                me.$ListDom.style.height = 'auto';
-                me.$ListDom.style.maxHeight = scrollHeight;
-                me.$ListDom.style.overflowY = 'auto';
+                listDom.style.height = 'auto';
+                listDom.style.maxHeight = scrollHeight;
+                listDom.style.overflowY = 'auto';
             }
             
+            // 全局赋值
+            me.$fileDom = fDom;
+            me.$listDom = listDom;
 
-            //~~~~~~~~ 4. 创建文件列表节点 ~~~~~~~~
-            // [事件] 选择文件事件、选择文件按钮
-            me.$FileDom.addEventListener('change', function(e){
-                // var fList = me.$FileDom.files;
+            // !!!Event：选择文件按钮发生变化事件 / 选择文件后
+            var filesArr = []; // 所有要上传的文件组成数组
+            fDom.addEventListener('change', function(e){
+                // var fList = fDom.files;
                 var fList = [];
                 if(cIncrement){ // 1.文件使用“增量模式”上传
-                    if(me.$FileDom.files.length == 0) fList = me.$FilesArr;
+                    if(fDom.files.length == 0) fList = filesArr;
                     else {
-                        fList = me.$FilesArr.map(function(item){
+                        fList = filesArr.map(function(item){
                             return item;
                         });
-                        for(var i = 0; i < me.$FileDom.files.length; i++){
-                            var item1 = me.$FileDom.files[i];
+                        for(var i = 0; i < fDom.files.length; i++){
+                            var item1 = fDom.files[i];
                             var isEqual = false;
-                            for(var k = 0; k < me.$FilesArr.length; k++){
-                                var item2 = me.$FilesArr[k];
+                            for(var k = 0; k < filesArr.length; k++){
+                                var item2 = filesArr[k];
                                 if(helpers.isObjectEqual(item1, item2)){
                                     isEqual = true;
                                     break;
@@ -320,19 +269,19 @@
                 }
                 else{ // 2.文件使用“替换模式”上传
                     // 考虑到用户选择文件时有时会点“取消”按钮
-                    fList = me.$FileDom.files.length == 0 ? me.$FilesArr : me.$FileDom.files; // 如果第1次选了N个文件, 第2次一个也没选，这时文件默认是空的，但不能让它空
+                    fList = fDom.files.length == 0 ? filesArr : fDom.files; // 如果第1次选了N个文件, 第2次一个也没选，这时文件默认是空的，但不能让它空
                 }
                 // console.log('文件列表：', fList);
-                // if(fList.length == me.$FileDom.files.length) return;
+                // if(fList.length == fDom.files.length) return;
 
                 if(fList.length > 0){
-                    helpers.addClass(me.$ListDom, 'loaded'); //  列表有边框
+                    helpers.addClass(me.$listDom, 'loaded'); //  列表有边框
                 }
-                me.$FilesArr = []; // 先重置为空(必须)
+                filesArr = []; // 先重置为空(必须)
                 var _listHtml = '';
                 for(var i = 0; i < fList.length; i++){
                     var item = fList[i];
-                    me.$FilesArr.push(item);
+                    filesArr.push(item);
                     var _name = item.name,
                         _size = Math.ceil(item.size / 1024), // bite变kb
                         _type = item.type;
@@ -344,7 +293,7 @@
                                 (function(){
                                     // 序号
                                     var _tmpHtml = '';
-                                    if(me.$opts.showOrder){
+                                    if(settings.showOrder){
                                         _tmpHtml += '<div class="neUpload__order">' + (i + 1) + '</div>';
                                     }
                                     return _tmpHtml;
@@ -356,7 +305,7 @@
                                 (function(){
                                     // 缩略图
                                     var _tmpHtml = '';
-                                    if(me.$opts.showThumb){
+                                    if(settings.showThumb){
                                         _tmpHtml = [
                                             '<div class="neUpload__thumb">',
                                                 '<img class="' + tagThumbClassName + '" src="">',
@@ -373,11 +322,11 @@
                                         (function(){
                                             // 内置表单
                                             var _tmpHtml = '';
-                                            if(me.$opts.form.enable){ 
+                                            if(settings.form.enable){ 
                                                 _tmpHtml = [
                                                     '<div class="' + tagFormInClassName + '">',
-                                                        '<span>' + me.$opts.form.label + '：</span>',
-                                                        '<input type="text" placeholder="' + me.$opts.form.placeholder + '" onblur="this.placeholder=\'' + me.$opts.form.placeholder + '\'" onfocus="this.placeholder=\'\'" value="' + _nameNotSuffix + '">',
+                                                        '<span>' + settings.form.label + '：</span>',
+                                                        '<input type="text" placeholder="' + settings.form.placeholder + '" onblur="this.placeholder=\'' + settings.form.placeholder + '\'" onfocus="this.placeholder=\'\'" value="' + _nameNotSuffix + '">',
                                                     '</div>'
                                                 ].join('\r\n')
                                             }
@@ -389,11 +338,11 @@
                                         (function(){
                                             // 自定义表单
                                             var _tmpHtml = '';
-                                            if(me.$opts.form.enable){
-                                                if(me.$UseOutForm){
+                                            if(settings.form.enable){
+                                                if(dUseOutForm){
                                                     _tmpHtml = [
                                                         '<div class="' + tagFormOutClassName + '">',
-                                                        me.$opts.form.customHTML,
+                                                        settings.form.customHTML,
                                                         '</div>'
                                                     ].join('\r\n')
                                                 }
@@ -408,7 +357,7 @@
                                         (function(){
                                             var tmpSize = helpers.getFormatSize(_size);
                                             var _tmpHtml = '';
-                                            if(me.$opts.showSize){
+                                            if(settings.showSize){
                                                 _tmpHtml += '<span class="neUpload__info_size">' + tmpSize + '</span>';
                                             }
                                             return _tmpHtml;
@@ -436,8 +385,8 @@
                                 // 匿名函数马上执行
                                 (function(){
                                     var _tmpHtml = '';
-                                    if(me.$opts.showCross){
-                                        _tmpHtml += '<div class="neUpload__remove" title="删除"></div>'; // 打叉节点(删除)
+                                    if(settings.showCross){
+                                        _tmpHtml += '<div class="neUpload__remove"></div>'; // 打叉节点(删除)
                                     }
                                     return _tmpHtml;
                                 })()
@@ -448,118 +397,86 @@
                     ].join('\r\n')
                 }
 
-                me.$ListDom.innerHTML = _listHtml;
-                //~~~~~~~~ 5. 执行系列事件1 ~~~~~~~~
-                _this.fnOnRemoveFile(me); // 删除文件事件
-                
-            }); // END on change
+                listDom.innerHTML = _listHtml;
 
-
-            //~~~~~~~~ 6. 执行系列事件2 ~~~~~~~~
-            _this.fnOnPreviewThumb(me); // 缩略图预览事件
-            _this.fnOnUpload(me); // 上传文件事件
-
-        }, // END doneInit()
-
-
-
-        //————————————————————————————————————————————————
-        /**
-         * !! 事件：删除按钮、删除文件、界面上移除某个文件
-         * @param {object} me 控件自身对象
-         */
-        fnOnRemoveFile: function (me) {
-            var removeDom = document.querySelectorAll('.neUpload__remove');
-            var delCount = 0; // 统计删的个数
-            var oldArr = me.$FilesArr.map(function(item){ return item; }); // 原数组。数组直接赋值本质是引用，使用map防止对数组进行操作后会改变原数组。
-            removeDom.forEach(function (item, index) {
-                item.addEventListener('click', function () {
-                    var oldElement = oldArr[index]; // 要移除的文件在原文件中的索引值
-                    var newIndex = me.$FilesArr.indexOf(oldElement);
-                    // 更新列表
-                    var parentNode = item.parentNode,
-                        grandNode = parentNode.parentNode;
-                        nextBrotherDom = helpers.getAllNextElement(parentNode), // 后面的兄弟节点
-                    // console.log('祖父节点：', grandNode, '\n父节点：', parentNode);
-                    // console.log('后面的兄弟节点：', nextBrotherDom);
-                    grandNode.removeChild(parentNode); // 移除当前节点
-                    nextBrotherDom.forEach(function(v, cIndex){ // 更新序号
-                        v.getElementsByClassName('neUpload__order')[0].innerText = newIndex + cIndex + 1;
-                    });
-                    // 更新数据
-                    // me.$FilesArr.splice(index, 1); // 不能这样
-                    me.$FilesArr.splice(newIndex, 1); // 要这样
-                    // console.log('旧索引(index)：', index);
-                    // console.log('新索引：', newIndex);
-                    // console.log('旧文件：', oldArr);
-                    // console.log('新文件：', me.$FilesArr);
-                    if(me.$FilesArr.length == 0){
-                        helpers.removeClass(me.$ListDom, 'loaded'); // 列表无边框
-                    }
-                    delCount++;
-                });
-            });   
-             
-        }, // END fnOnRemoveFile()
-
-
-
-        //————————————————————————————————————————————————
-        /**
-         * !! 事件：缩略图预览
-         * @param {object} me 控件自身对象
-         */
-        fnOnPreviewThumb: function (me) {
-            // 只有图片才有缩略图,其它文件无缩略图哦~~
-            var thumbList = document.querySelectorAll('.' + tagThumbClassName);
-            if(thumbList.length > 0){
-                for(var i = 0; i < thumbList.length; i++){
-                    var $img = thumbList[i],
-                        file = fList[i];
-                    // console.log('图片节点：', $img, '\n文件：', file);
-                    // 1.这样不行，只能有一张缩略图
-                    // var reader = new FileReader();
-                    // reader.onload = function(){
-                    //     console.log('result：', reader.result)
-                    //     $img.src = reader.result;
-                    // }
-                    // if (file) {
-                    //     reader.readAsDataURL(file);
-                    // } else {
-                    //     $img.src = "";
-                    // }
-                    // 2.像这样才可以有多张缩略图
-                    var reader = new FileReader();
-                    reader.onload = (
-                        function(aImg) { 
-                            return function(e) { 
-                                aImg.src = e.target.result; 
-                            };
+                // 删除按钮、删除某个文件、界面上移除某个文件
+                var removeDom = document.querySelectorAll('.neUpload__remove');
+                var delCount = 0; // 统计删的个数
+                var oldArr = filesArr.map(function(item){ return item; }); // 原数组。数组直接赋值本质是引用，使用map防止对数组进行操作后会改变原数组。
+                removeDom.forEach(function(item, index){
+                    item.addEventListener('click', function(){
+                        var oldElement = oldArr[index]; // 要移除的文件在原文件中的索引值
+                        var newIndex = filesArr.indexOf(oldElement);
+                        // 更新列表
+                        var parentNode = item.parentNode,
+                            grandNode = parentNode.parentNode;
+                            nextBrotherDom = helpers.getAllNextElement(parentNode), // 后面的兄弟节点
+                        // console.log('祖父节点：', grandNode, '\n父节点：', parentNode);
+                        // console.log('后面的兄弟节点：', nextBrotherDom);
+                        grandNode.removeChild(parentNode); // 移除当前节点
+                        nextBrotherDom.forEach(function(v, cIndex){ // 更新序号
+                            v.getElementsByClassName('neUpload__order')[0].innerText = newIndex + cIndex + 1;
+                        });
+                        // 更新数据
+                        // filesArr.splice(index, 1); // 不能这样
+                        filesArr.splice(newIndex, 1); // 要这样
+                        // console.log('旧索引(index)：', index);
+                        // console.log('新索引：', newIndex);
+                        // console.log('旧文件：', oldArr);
+                        // console.log('新文件：', filesArr);
+                        if(filesArr.length == 0){
+                            helpers.removeClass(me.$listDom, 'loaded'); // 列表无边框
                         }
-                    )($img);
-                    if(file){
-                        reader.readAsDataURL(file);
-                    }
-                    else{
-                        $img.src = '';
+                        delCount++;
+                    });
+                });
+                
+
+                // 缩略图预览(只有图片才有缩略图,其它文件无缩略图哦~~)
+                var thumbList = document.querySelectorAll('.' + tagThumbClassName);
+                if(thumbList.length > 0){
+                    for(var i = 0; i < thumbList.length; i++){
+                        var $img = thumbList[i],
+                            file = fList[i];
+                        // console.log('图片节点：', $img, '\n文件：', file);
+                        // 1.这样不行，只能有一张缩略图
+                        // var reader = new FileReader();
+                        // reader.onload = function(){
+                        //     console.log('result：', reader.result)
+                        //     $img.src = reader.result;
+                        // }
+                        // if (file) {
+                        //     reader.readAsDataURL(file);
+                        // } else {
+                        //     $img.src = "";
+                        // }
+                        // 2.像这样才可以有多张缩略图
+                        var reader = new FileReader();
+                        reader.onload = (
+                            function(aImg) { 
+                                return function(e) { 
+                                    aImg.src = e.target.result; 
+                                };
+                            }
+                        )($img);
+                        if(file){
+                            reader.readAsDataURL(file);
+                        }
+                        else{
+                            $img.src = '';
+                        }
                     }
                 }
-            }
-        }, // END fnOnPreviewThumb()
+            });
+            
 
 
-
-        //————————————————————————————————————————————————
-        /**
-         * !! 事件：上传文件、上传文件按钮、开始上传按钮
-         * @param {object} me 控件自身对象
-         */
-        fnOnUpload: function (me) {
-             me.$UploadDom.addEventListener('click', function (e) {
-                // edit 20230616-1
-                var fList = me.$FilesArr; // 这里不能直接取 me.$FileDom.files，因为界面上有可能移除文件
-                // console.log('文件列表1：', me.$FilesArr);
-                // console.log('文件列表2:', me.$FileDom.files);
+            // !!!Event：点击上传文件按钮、开始上传按钮
+            var btnUpDom = document.getElementById('btn_upload');
+            btnUpDom.addEventListener('click', function(e){
+                var fList = filesArr; // 这里不能直接取 fDom.files，因为界面上有可能移除文件
+                // console.log('文件列表1：', filesArr);
+                // console.log('文件列表2:', fDom.files);
                 // ·------各种判断------
                 // 必须要选择文件才能上传
                 if(fList.length == 0){
@@ -591,7 +508,7 @@
                 var nowIndex = null, nowSize = null;
                 for(var i = 0; i < fSizes.length; i++){
                     var _file = fSizes[i]
-                    if(_file > me.$opts.fileSize){
+                    if(_file > cFileSize){
                         nowIndex = i;
                         nowSize = _file;
                         break;
@@ -599,7 +516,7 @@
                 }
                 if(nowIndex != null){
                     var currentSize = helpers.getFormatSize(nowSize),  // 当前文件大小
-                        maxSize = helpers.getFormatSize(me.$opts.fileSize);  // 允许的最大大小
+                        maxSize = helpers.getFormatSize(cFileSize);  // 允许的最大大小
                     helpers.prompt('上传文件不得大于' + maxSize + '<br>第' + (nowIndex + 1) + '个文件大小为' + currentSize + '，已超过' + maxSize);
                     return;
                 }
@@ -610,14 +527,14 @@
                 var nowIndex = null, nowType = '';
                 for(var i = 0; i < newArr.length; i++){
                     var _type = newArr[i];
-                    if(me.$opts.fileType.indexOf(_type) < 0){
+                    if(cFileType.indexOf(_type) < 0){
                         nowIndex = i;
                         nowType = _type;
                         break;
                     }
                 }
                 if(nowIndex != null){
-                    helpers.prompt('您上传的文件不是' + me.$opts.fileType.join(',') + '文件<br>(第' + (nowIndex + 1) + '个文件为' + nowType + '文件)');
+                    helpers.prompt('您上传的文件不是' + cFileType.join(',') + '文件<br>(第' + (nowIndex + 1) + '个文件为' + nowType + '文件)');
                     return;
                 }
                 
@@ -666,7 +583,7 @@
                         value: [fNotSufNames[i]]
                     })
                 }
-                var fileData = me.$opts.form.enable ? ( me.$UseOutForm ? outFormData : inFormData) : singleNameData;
+                var fileData = settings.form.enable ? ( dUseOutForm ? outFormData : inFormData) : singleNameData;
 
 
                 // ·------开始执行上传操作------
@@ -676,21 +593,19 @@
                     item.style.display = 'none';
                 });
                 // 回调
-                 if (me.$opts.callBack) {
-                    var params = {
+                if(settings.callBack){
+                    settings.callBack({
                         "files": fList, // 文件列表
                         "fileNames": fNames, // 文件名数据
                         "fileSizes": fSizes,
                         "fileTypes": fTypes,
                         "fileData": fileData, // 表单数据
-                        "fileDom": me.$FileDom, // 选择文件按钮DOM对象
-                        "uploadDom": me.$UploadDom, // 开始上传文件按钮DOM对象
-                        "skipDom": me.$SkipDom // 文件重复自动跳过节点
-                    }
-                    me.$opts.callBack(params);
+                        "fileDom": fDom, // 选择文件按钮DOM对象
+                        "uploadDom": btnUpDom // 上传文件按钮DOM对象
+                    })
                 }
             });
-        }, // END fnOnUpload()
+        }, // END UpInit()
 
 
 
@@ -702,8 +617,8 @@
          * @param {Number} value 当前文件已上传的大小
          * @param {Number} max 当前文件总大小
          */
-        doneProgress: function(me, index, value, max){
-            // var dom = me.$ListDom;
+        UpHandle: function(me, index, value, max){
+            // var dom = me.$listDom;
             // console.log('dom：', dom);
             var lists = document.querySelectorAll('.neUpload__one');
             for(var i = 0; i < lists.length; i++){
@@ -735,81 +650,24 @@
                     
                 }
             }
-        }, // END doneProgress()
+        }, // END UpHandle()
 
 
 
         //————————————————————————————————————————————————
         /**
-         * !! 文件重复自动跳过 add 20230616-1
-         * !! 文件重复时，写入“文件重复”信息，并根据配置作移除或不移除处理
-         * @param {object} me 控件自身对象
-         * @param {array} indexArr 重复的文件索引值组成的数组
-         */
-        doneRepeate: function (me, indexArr) {
-            // console.log('indexArr：', indexArr);
-            var delCount = 0; // 统计删的个数
-            var oldArr = me.$FilesArr.map(function(item){ return item; }); // 原数组。数组直接赋值本质是引用，使用map防止对数组进行操作后会改变原数组。
-            for (var k = 0; k < indexArr.length; k++){
-                var index = indexArr[k];
-                var forRemoveIndex = me.$SkipDom.checked ? ( k == 0 ? index : index - delCount ) : index; // 每删一个索引要减1
-                //-------- 打上标记
-                var oneDom = document.querySelectorAll('.neUpload__one')[forRemoveIndex];
-                var successDom = oneDom.getElementsByClassName('neUpload__progress_state')[0],
-                    removeDom = oneDom.getElementsByClassName('neUpload__remove')[0],
-                    tickDom = oneDom.getElementsByClassName('neUpload__tick')[0],
-                    sighDom = oneDom.getElementsByClassName('neUpload__sigh')[0];
-                tickDom.style.display = 'none'; // 隐藏打勾节点
-                removeDom.style = ''; // 显示删除节点
-                // sighDom.style = ''; // 显示感叹节点
-                // 更新状态：显示“文件重复”字样
-                successDom.removeAttribute('style');
-                successDom.innerText = me.$opts.repeatLabel;
-                helpers.addClass(successDom, 'red');
-                
-                //-------- 重复处理，从界面上移除
-                if (me.$SkipDom.checked) {
-                    var oldElement = oldArr[index]; // 要移除的文件在原文件中的索引值
-                    var newIndex = me.$FilesArr.indexOf(oldElement);
-                    // 更新列表
-                    var parentNode = document.querySelectorAll('.neUpload__one')[forRemoveIndex];
-                    var grandNode = parentNode.parentNode;
-                    nextBrotherDom = helpers.getAllNextElement(parentNode), // 后面的兄弟节点
-                        // console.log('祖父节点：', grandNode, '\n父节点：', parentNode);
-                        // console.log('后面的兄弟节点：', nextBrotherDom);
-                        grandNode.removeChild(parentNode); // 移除当前节点
-                    nextBrotherDom.forEach(function (v, cIndex) { // 更新序号
-                        v.getElementsByClassName('neUpload__order')[0].innerText = newIndex + cIndex + 1;
-                    });
-                    // 更新数据
-                    me.$FilesArr.splice(newIndex, 1); // 要这样
-               
-                    if (me.$FilesArr.length == 0) {
-                        helpers.removeClass(me.$ListDom, 'loaded'); // 列表无边框
-                    }
-                    delCount++;
-                }
-            }
-        },
-
-
-        //————————————————————————————————————————————————
-        /**
-         * !!! 上传失败
+         * !!! 上传失败 testing
          * @param {object} me 控件自身对象
          * @param {Number} index 当行文件索引值
          */
-        doneFail: function(me, index){
+        UpFail: function(me, index){
             var lists = document.querySelectorAll('.neUpload__one');
-            for (var i = 0; i < lists.length; i++){
-                var oneDom = lists[i];
-                var successDom = oneDom.getElementsByClassName('neUpload__progress_state')[0],
-                    removeDom = oneDom.getElementsByClassName('neUpload__remove')[0],
-                    tickDom = oneDom.getElementsByClassName('neUpload__tick')[0],
-                    sighDom = oneDom.getElementsByClassName('neUpload__sigh')[0];
+            for(var i = 0; i < lists.length; i++){
+                var successDom = lists[i].getElementsByClassName('neUpload__progress_state')[0];
+                var tickDom = lists[i].getElementsByClassName('neUpload__tick')[0];
+                var sighDom = lists[i].getElementsByClassName('neUpload__sigh')[0];
                 if(index == i){
                     tickDom.style.display = 'none'; // 隐藏打勾节点
-                    removeDom.style.display = 'none'; // 隐藏删除节点
                     sighDom.style = ''; // 显示感叹节点
                     // 更新状态：显示“上传失败”字样
                     successDom.removeAttribute('style');
@@ -817,7 +675,7 @@
                     helpers.addClass(successDom, 'red');
                 }
             }
-        }, // END doneFail
+        }, // END UpFail
 
     }; // END methods
 

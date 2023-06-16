@@ -20,18 +20,54 @@
 </head>
 <body>
 
-    <h1>文件上传功能</h1>
-    <h4>请在WEB环境下测试，否则无法看到效果</h2>
-    <h4>即：请建一个web目录，如http://127.0.0.1/当前页面地址.html 进行测试</h4>
-    <h5>
-        <pre>
-            参考：
-            1. jQuery ajax xhr文件上传进度条监听 
-            https://blog.csdn.net/qq_36509946/article/details/95447892
-            2.批量上传时xhr.upload.addEventListener进度的坑：
-            https://www.cnblogs.com/ray-h/p/12360419.html
-        </pre>
-    </h5>
+    <style>
+        .control{ float: left; }
+        .wrap{ float: left; margin-left: 25px; }
+    </style>
+
+    <div class="control">
+        <h1>文件上传功能</h1>
+        <h4>请在WEB环境下测试，否则无法看到效果</h2>
+        <h4>即：请建一个web目录，如http://127.0.0.1/当前页面地址.html 进行测试</h4>
+        <h5>
+            <pre>
+                参考：
+                1. jQuery ajax xhr文件上传进度条监听 
+                https://blog.csdn.net/qq_36509946/article/details/95447892
+                2.批量上传时xhr.upload.addEventListener进度的坑：
+                https://www.cnblogs.com/ray-h/p/12360419.html
+            </pre>
+        </h5>
+        <div class="statement">
+            <pre>
+                [控件调用方法]
+                var neUps = new NeUploadFile(); // 实例化
+                neUps.init(options);  // 控件初始化
+
+                /**
+                * !! 上传处理，处理上传进度条
+                * @param {Number} index 当前正在上传的那个文件索引值
+                * @param {Number} value 当前文件已上传的大小(已上传多少KB)
+                * @param {Number} max 当前文件的全部上传后的大小(KB)
+                */
+                neUps.handleProgress(index, value, max);
+
+                /**
+                * !! 处理重复文件
+                * !!! 后端检查到上传的文件有重复时，自动跳过
+                * add 20230616-1
+                * @param {array} 重复的文件索引值组成的数组
+                */
+                neUps.handleRepeat(indexArr);
+
+                /**
+                * !! 处理上传失败时
+                * @param {Number} index 失败的那个文件索引值
+                */
+                neUps.handleFail(index);
+            </pre>
+        </div><!--/.statement-->
+    </div><!--/.control-->
     
 
     <hr>
@@ -107,11 +143,16 @@
                 // false 每次选择文件会把“已有列表中的文件”替换成当前选择的文件。
                 // 举例：“已有列表中的文件”为[1,2,3,4]，当前选择了文件[2,3,5,6]，则true时列表中的文件会变成[1,2,3,5,6]，false时列表中文件会变成[2,3,5,6]
 
-                chooseButtonLabel: '选择文件', // 选择文件按钮的显示文字(可选)，默认'选择文件'
-                upButtonLabel: '开始上传', // 上传按钮的显示文字(可选)，默认'开始上传'
+                // 文件重复自动跳过 add 20230616-1
+                skipRepeatFile: true, // 是否启用文件重复自动跳过功能(可选)，默认true。主要用于后端文件检查，如果检查到文件重复，则界面上手动移除重复的
+                skipMessage: '文件重复，自动跳过', // 文件重复自动跳过功能提示文字(可选)。仅当 skipRepeatFile=true时有效。
+
+                chooseButtonLabel: '选择文件', // 选择文件按钮的显示文字(可选)
+                upButtonLabel: '开始上传', // 上传按钮的显示文字(可选)
                 suggestionLabel: '', // 建议信息(可选)，默认空。若为空系统将根据文件类型及限制的大小输出一段文字，如”只能上传png/gif/jpg/jpeg文件，且大小不超过500KB”
-                successLabel: '上传成功', // 上传成功后显示的提示文字(可选)，默认'上传成功'
-                failLabel: '上传失败', // 上传失败后的显示的提示文字(可选)，默认'上传失败'
+                successLabel: '上传成功', // 上传成功后显示的提示文字(可选)
+                repeatLabel: '文件重复', // 文件有重复时显示的提示文字(可选)，仅当skipRepeatFile=true时有效。
+                failLabel: '上传失败', // 上传失败后的显示的提示文字(可选)
                 showThumb: false, // 是否显示缩略图(可选)，默认true
                 showSize: true, // 是否显示文件大小(可选)，默认true
                 showProgress: true, // 是否显示进度条(可选)，默认true
@@ -132,8 +173,13 @@
                 },
                 callBack: function(e){ // 回调
                     // console.log('e：', e);
-                    if(fnRunCheck(e)){
-                        fnRunUpload(e);
+                    // if(fnRunCheck(e)){
+                    //     fnRunUpload(e);
+                    // }
+                    var {isContinue, filesArr} = fnRunCheck(e);
+                    // console.log('真正等待上传的文件：', filesArr);
+                    if(isContinue){
+                        fnRunUpload(filesArr);
                     }
                 }
             });
@@ -144,15 +190,23 @@
              * !! 校验pdf文件是否存在
              * @param {object} e 控件回调事件对象 
              * @returns {boolean} 返回布尔值。true 已存在, false 不存在
+             * edit 20230616-1
              */
+            var nCount = 0; // 模拟第x1, x2个文件是重复的
             function fnRunCheck(e){
+                nCount++;
                 var isContinue = true;
                 var files = e.files; // 文件列表
+                var repeatIndexArr = []; // 重复的文件索引值组成的数组
+                var isSkip = e.skipDom.checked; // 文件重复时是否自动跳过，true 是, false 否
                 for(var i = 0; i < files.length; i++){
                     var file = files[i];
                     var ls_pdf_mc = file.name;
-                    var isExisted = false; // 是否已存在该pdf文件，true 是, false 否
+                    // 后台返回
+                    var isExisted = nCount == 1 ? ( (i == 1 || i == 3) ? true : false ) : false; // 模拟第2、4个文件重复
+                    // var isExisted = false; // 是否已存在该pdf文件，true 是, false 否
                     /*
+                    var isExisted = false; // 是否已存在该pdf文件，true 是, false 否
                     // START AJAX
                     $.ajax({
                         async: false, // 请求是否异步处理，true 异步(默认), false 同步
@@ -182,23 +236,67 @@
                     // END AJAX
                     */
                     if(isExisted){
-                        neuiDialog.alert({
-                            animate: true,
-                            message: '系统中已存在名称为【' + ls_pdf_mc + '】的PDF文件，请勿重复上传！',
-                            buttons: ['确定']
-                        });
-                        isContinue = false;
-                        break;
+                        // 改前
+                        // isContinue = false;
+                        // neuiDialog.alert({
+                        //     animate: true,
+                        //     message: '系统中已存在名称为【' + ls_pdf_mc + '】的PDF文件，请勿重复上传！',
+                        //     buttons: ['确定']
+                        // });
+                        // break;
+                        // 改后1
+                        repeatIndexArr.push(i);
                     }
                 }
-                return isContinue;
+
+                // 改后2
+                var filesArr = []; // 待上传的文件，即去掉重复文件后所有文件信息组成的数组
+                if(repeatIndexArr.length > 0){
+                    // · 判断跳过逻辑
+                    if(isSkip){ // 自动跳过
+                        isContinue = true; // 继续
+                    }
+                    else{ // 不自动跳过
+                        isContinue = false; // 中断
+                        neuiDialog.alert({
+                            animate: true,
+                            message: '您有' + repeatIndexArr.length + '个PDF文件在系统中已存在，请勿重复上传',
+                            buttons: ['确定']
+                        });
+                    }
+                    neUps.handleRepeate(repeatIndexArr);  // 4.重复时，写入“文件重复”信息，并根据配置作移除或不移除处理
+                    // · 去掉重复的文件
+                    var fDataArr = e.fileData; // 老文件
+                    fDataArr.map(function(item, i){ 
+                        for(var k = 0; k < repeatIndexArr.length; k++){
+                            var index = repeatIndexArr[k];
+                            var removeIndex = k == 0 ? index : index - 1;
+                            if(i == removeIndex){
+                                fDataArr.splice(removeIndex, 1);
+                            }
+                        }
+                    });
+                    for(var v in e){
+                        if(v != "fileData") filesArr[v] = e[v];
+                    }
+                    filesArr["fileData"] = fDataArr;
+                }
+                else{
+                    filesArr = e;
+                }
+            
+                // 返回值
+                return {
+                    isContinue: isContinue,
+                    filesArr: filesArr
+                };
             }
 
 
 
 
             //——————————————————————————————————————————
-            // 方法1：多个文件同时上传
+            // 方法1：多个文件同时上传(不建议，废弃)
             // // 
             // /**
             //  * !! 文件上传事件

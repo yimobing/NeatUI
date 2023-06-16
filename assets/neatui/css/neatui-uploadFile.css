@@ -32,8 +32,12 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
     position: relative;
     padding: 5px 10px;
 }
+.neUpload__operation{
+	
+}
 .neUpload__choose{
-    
+	display: inline-block;
+	width: auto;
 }
 .neUpload__file{
     position: relative;
@@ -60,16 +64,9 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
     opacity: 0;
     filter: alpha(opacity=0);
 }
-.neUpload__choose p{
-    display: inline-block;
-    margin-top: 5px;
-    color: #666;
-    font-size: 12px;
-    /* font-weight: bold; */
-}
-
 .neUpload__operate{
     position: absolute;
+	z-index: 1;
     top: 6px;
     right: 8px;
 }
@@ -81,6 +78,77 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
     border-radius: 4px;
     color: #fff;
     cursor: pointer;
+}
+.neUpload__tips {
+	margin-top: 10px;
+    color: #666;
+    font-size: 12px;
+    /* font-weight: bold; */
+}
+
+.neUpload__repeate{
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0 10px;
+	font-size: 14px;
+}
+.neUpload__repeate input[type="checkbox"]{
+	display: inline-block;
+	vertical-align: middle;
+    /*去掉默认样式*/
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance:none;
+	-ms-appearance:none;
+    /*定义自己的样式*/
+    background: #fff;
+    border:1px solid #FF0000;
+    height: 21px;
+    width: 51px;
+    border-radius: 20px;
+    outline: none;
+    transition: all ease-in-out 300ms;
+    -webkit-transition: all ease-in-out 300ms;
+    -moz-transition: all ease-in-out 300ms;
+    position: relative;
+}
+
+.neUpload__repeate input[type="checkbox"]::after{
+    content: 'off';
+    display: block;
+    height: 15px;
+    line-height:15px;
+    width: 15px;
+    padding:2px;
+    border: 1px solid #fff;
+    background: #FF0000;
+	color:#fff;
+	font-size: 12px;
+    border-radius: 50%;
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    -webkit-transition: all ease-in-out 300ms;
+    -moz-transition: all ease-in-out 300ms;
+    transition: all ease-in-out 300ms;
+}
+.neUpload__repeate input[type="checkbox"]:checked{ 
+	background: #FF0000;
+}
+.neUpload__repeate input[type="checkbox"]:checked::after{
+    content: 'on';
+    left: 29px;
+    background: #fff;
+    color: #FF0000;
+}
+
+
+.neUpload__repeate span{
+	display: inline-block;
+	vertical-align: middle;
+	color: #888;
+	font-size: 13px;
 }
 
 
