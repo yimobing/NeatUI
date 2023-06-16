@@ -124,6 +124,15 @@
         this.handleFail = function(index){
             methods.doneFail(me, index);
         };
+
+
+        /**
+         * 获取所有要上传的文件
+         * @returns {array} 返回要上传的文件组成的数组
+         */
+        // this.getFileList = function () {
+        //     return methods.doneGetFileList(me);
+        // };
     };
 
 
@@ -790,7 +799,7 @@
                     delCount++;
                 }
             }
-        },
+        }, // END doneRepeate()
 
 
         //————————————————————————————————————————————————
@@ -817,7 +826,22 @@
                     helpers.addClass(successDom, 'red');
                 }
             }
-        }, // END doneFail
+        }, // END doneFail()
+
+
+
+        //————————————————————————————————————————————————
+        /**
+         * !!! 返回要上传的所有文件
+         * @param {object} me 控件自身对象
+         * @returns {array} 返回要上传的文件组成的数组
+         */
+        // doneGetFileList: function (me) {
+        //     return me.$FilesArr;
+        // } // END doneGetFileList()
+
+
+
 
     }; // END methods
 
