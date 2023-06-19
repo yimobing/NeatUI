@@ -69,7 +69,7 @@
             method = options.method.toLocaleLowerCase();
         // console.log('data：', data);
         if (method == 'get') {
-            return this.get(url, options);
+            return this.get(url, options.params, options);
         }
         else if (method == 'post') {
             return this.post(url, options.data, options);
@@ -97,12 +97,12 @@
      * @param {object} params 请求主体被发送的数据
      * @param {object} config 请求配置项
      */
-    AJAX.prototype.get = function (url, config) {
+    AJAX.prototype.get = function (url, params, config) {
         // 调用原生 GET
         var $http = fnIntercept(this);
         return new Promise((resolve, reject) => {
-            $http.get(url, config).then(res => {
-                resolve(res);
+            $http.get(url, params, config).then(res => {
+                resolve(res.data);
             }).catch(errs => {
                 reject(errs);
             });
@@ -124,7 +124,7 @@
         var $http = fnIntercept(this);
         return new Promise((resolve, reject) => {
             $http.post(url, data, config).then(res => {
-                resolve(res);
+                resolve(res.data);
             }).catch(errs => {
                 reject(errs);
             });
@@ -155,7 +155,7 @@
         instance.interceptors.request.use(
             // 在发送请求之前做些什么
             (config) => {
-                // console.log('config1:', config);
+                // console.log('config:', config);
                 // get请求映射参数
                 if (config.method === 'get' && config.params) {
                     // let url = config.url + '?' + config.params;
@@ -170,6 +170,7 @@
                     // // config.url = url;
                     // config.data = utils.convertUrl2Object(url);
                 }
+
                 // post、put请求映射参数
                 // if (config.method === 'post' || config.method === 'put') {
                 //     const requestObj = {
@@ -179,6 +180,7 @@
                 //     }
                 //     console.log('requestObj：',requestObj);
                 // }
+
                 return config; // 这里一定要返回
             },
             // 对请求错误做些什么
@@ -222,12 +224,7 @@
                     // 接口操作失败时
                     else if (result["return"] != 'ok') {
                         var failMsg = typeof result["data"] == 'undefined' || result["data"] == '' ? '未知错误，请稍后再试' : result["data"];
-                        var isLoginOverTime = failMsg.indexOf('登录超时') >= 0 ? true : false; // 是否登录超时，未实现
-                        utils.toast(config.vue, failMsg, {
-                            logout: isLoginOverTime,
-                            type: 'warning',
-                            title: '操作失败'
-                        });
+                        utils.toast(config.vue, failMsg, {type: 'warning', title: '操作失败'});
                         return Promise.reject({ message: failMsg, response: result });
                     }
                 }
@@ -361,20 +358,18 @@
             // alert(msg);
             var defaults = {
                 title: '', // 标题名称(可选)，默认空
-                logout: false, // 是否登录超时(可选)，默认false
                 type: 'error' // 弹窗类型(可选)。info 消息提示(默认), warning 警告提示, error 错误提示，success 成功提示
             }
             var settings = this.extend(true, {}, defaults, opts || {});
             var title = settings.title,
-                logout = settings.logout,
                 type = settings.type;
-            if (_this != null && typeof _this.$alert == 'function') {
+            if(_this != null && typeof _this.$alert == 'function'){
                 _this.$alert(str, title, {
                     type: type,
                     dangerouslyUseHTMLString: true
                 });
             }
-            else {
+            else{
                 alert(str.toString().replace(/(\<br([\s]+)?(\/?)([\s]+)?>)/g, '\n'));
             }
         },

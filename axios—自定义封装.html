@@ -49,36 +49,33 @@
     // 方法1，通过 method 指定请求方式
     $axios({
         debug: true,
-        // headers: {'Content-Type': 'application/json'},
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         method: "get",
-        url: "../leader.ashx?action=wh_pub_get_xiaozhang&user=1&sjk=xiaozhang", // 这里是为了和mock模拟地址一致才这样写
+        url: "../leader.ashx",
         params: {
             "action": "wh_pub_get_xiaozhang",
             "user": "1",
             "sjk": "xiaozhang"
         }
     }).then(res => {
-        console.log('res1：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-        this.leaderData = res.data;
+        // console.log('res1：', res);
+        var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        this.leaderData = result.data;
     }).catch(errs => {
         console.log('errs1：', errs);
     });
 
     // 方法2，直接调用指定的请求方法
     $axios.get("../leader.ashx", {
+        debug: true,
         params: {
             "action": "wh_pub_get_xiaozhang",
             "user": "1",
             "sjk": "xiaozhang"
         }
-    }, {
-        debug: true,
-        // headers: {'Content-Type': 'application/json'} 
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     }).then(res => {
-        console.log('res1：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-        this.leaderData = res.data;
+        // console.log('res1：', res);
+        var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        this.leaderData = result.data;
     }).catch(errs => {
         console.log('errs1：', errs);
     });
@@ -111,8 +108,9 @@
         },
         
     }).then(res => {
-        console.log('res2：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-        this.teacherData = res.data;
+        // console.log('res2：', res); 
+        var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        this.teacherData = result.data;
     }).catch(errs => {
         console.log('errs2：', errs);
     });
@@ -127,8 +125,9 @@
         // headers: {'Content-Type': 'application/json'} 
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     }).then(res => {
-        console.log('res2：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-        this.teacherData = res.data;
+        // console.log('res2：', res);
+        var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        this.teacherData = result.data;
     }).catch(errs => {
         console.log('errs2：', errs);
     });
@@ -165,8 +164,10 @@
     var p = [getDataSchool(this), getDataStudent(this)];
     $axios.all(p).then(values => {
         console.log('values：', values); // 这里取到的是N个接口返回值组成的数组。eg. [{return:"ok", data: []}, {return:"ok", data: []}]
-        this.schoolData = values[0];
-        this.studentData = values[1].data;
+        var result1 = values[0].data;
+        var result2 = value2[1].data;
+        this.schoolData = result1;
+        this.studentData = result2.data;
     }).catch(errs => {
         console.log('errs3：', errs);
     });
@@ -233,7 +234,7 @@
          * --------------------------------
          【方法】
            ① $axios(options).then().catch(); // 自定义请求方式，即通过配置options配置项的参数method='post'或'get'来设置请求方式
-           ② $axios.get(url, params, config).then().catch(); // GET 请求
+           ② $axios.get(url, config).then().catch(); // GET 请求
            ③ $axios.post(url, data, config).then().catch(); // POST 请求
            ④ $axios.all([promise1, promise1, ...]).then().catch(); // 并发请求。 promise1, promise2等实例是一个 POST 或 GET 请求
         【说明】
@@ -295,13 +296,17 @@
 
             例2.
             $axios.post(url, data, config).then(res => {
+                console.log('res：', res);
+                var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
                 //..
             }).catch(errs => {
                 //..
             });
 
             例3.
-            $axios.get(url, params, config).then(res => {
+            $axios.get(url, config).then(res => {
+                console.log('res：', res);
+                var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
                 //..
             }).catch(errs => {
                 //..
@@ -321,24 +326,14 @@
         */
      </script>
 
-     
+
+
 
      <script>
-        
+
         //========================================================================================================
         // 二、 代码配置
         //========================================================================================================
-        //————————————————————————————————————————————————
-        //=====代码块高亮
-        hljs.initHighlightingOnLoad()
-        hljs.configure({
-            languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
-        });
-        document.querySelectorAll('pre').forEach((block) => {
-            hljs.highlightBlock(block);
-        });
-
-
         //————————————————————————————————————————————————
         // 将“控件使用说明”的代码复制到某个DOM节点里，展示给用户看
         var domList = document.getElementsByTagName("script");
@@ -356,6 +351,21 @@
         var child = document.getElementsByClassName('instruction')[0].childNodes;
         // console.log('child：', child);
         child[3].innerHTML = html;
+
+
+
+
+
+        //————————————————————————————————————————————————
+        //=====代码块高亮
+        hljs.initHighlightingOnLoad()
+        hljs.configure({
+            languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
+        });
+        document.querySelectorAll('pre').forEach((block) => {
+            hljs.highlightBlock(block);
+        });
+        
 
       
 
@@ -409,39 +419,40 @@
                 $axios({
                     debug: true,
                     vue: this,
-                    // headers: {'Content-Type': 'application/json'},
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    // // headers: {'Content-Type': 'application/json'},
+                    // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     method: "get",
-                    url: "../leader.ashx?action=wh_pub_get_xiaozhang&user=1&sjk=xiaozhang", // 这里是为了和mock模拟地址一致才这样写
+                    url: "../leader.ashx",
                     params: {
                         "action": "wh_pub_get_xiaozhang",
                         "user": "1",
                         "sjk": "xiaozhang"
                     }
                 }).then(res => {
-                    // console.log('res1：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-                    this.leaderData = res.data;
+                    // console.log('res1：', res);
+                    var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+                    this.leaderData = result.data;
                 }).catch(errs => {
                     // console.log('errs1：', errs);
                 });
 
-                // // 方法2，直接调用指定的请求方法
+                // 方法2，直接调用指定的请求方法
                 // $axios.get("../leader.ashx", {
+                //     debug: true,
+                //     vue: this,
+                //     // // headers: {'Content-Type': 'application/json'} 
+                //     // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 //     params: {
                 //         "action": "wh_pub_get_xiaozhang",
                 //         "user": "1",
                 //         "sjk": "xiaozhang"
                 //     }
-                // }, {
-                //     debug: true,
-                //     vue: this,
-                //     // headers: {'Content-Type': 'application/json'} 
-                //     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                 // }).then(res => {
-                //     console.log('res1：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-                //     this.leaderData = res.data;
+                //     // console.log('res1：', res);
+                //     var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+                //     this.leaderData = result.data;
                 // }).catch(errs => {
-                //     console.log('errs1：', errs);
+                //     // console.log('errs1：', errs);
                 // });
 
 
@@ -475,8 +486,8 @@
                 $axios({
                     debug: true,
                     vue: this,
-                    headers: {'Content-Type': 'application/json'},
-                    // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    // headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     method: "post",
                     url: "../teacher.ashx",
                     data: {
@@ -486,8 +497,9 @@
                     },
                    
                 }).then(res => {
-                    // console.log('res2：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-                    this.teacherData = res.data;
+                    // console.log('res2：', res);
+                    var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+                    this.teacherData = result.data;
                 }).catch(errs => {
                     // console.log('errs2：', errs);
                 });
@@ -503,10 +515,11 @@
                 //     // headers: {'Content-Type': 'application/json'} 
                 //     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                 // }).then(res => {
-                //     console.log('res2：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-                //     this.teacherData = res.data;
+                //     // console.log('res2：', res);
+                //     var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+                //     this.teacherData = result.data;
                 // }).catch(errs => {
-                //     console.log('errs2：', errs);
+                //     // console.log('errs2：', errs);
                 // });
 
 
@@ -558,8 +571,10 @@
                 var p = [getDataSchool(this), getDataStudent(this)];
                 $axios.all(p).then(values => {
                     // console.log('values：', values); // 这里取到的是N个接口返回值组成的数组。eg. [{return:"ok", data: []}, {return:"ok", data: []}]
-                    this.schoolData = values[0];
-                    this.studentData = values[1].data;
+                    var result1 = values[0].data;
+                    var result2 = values[1].data;
+                    this.schoolData = result1;
+                    this.studentData = result2.data;
                 }).catch(errs => {
                     console.log('errs3：', errs);
                 });
