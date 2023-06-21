@@ -173,13 +173,10 @@
                 },
                 callBack: function(e){ // 回调
                     // console.log('e：', e);
-                    // if(fnRunCheck(e)){
-                    //     fnRunUpload(e);
-                    // }
-                    var {isContinue, filesArr} = fnRunCheck(e);
-                    // console.log('真正等待上传的文件：', filesArr);
+                    var isContinue= fnRunCheck(e);
+                    // console.log('真正等待上传的文件：', e);
                     if(isContinue){
-                        fnRunUpload(filesArr);
+                        fnRunUpload(e);
                     }
                 }
             });
@@ -252,7 +249,6 @@
                 // 改后2
                 var filesArr = []; // 待上传的文件，即去掉重复文件后所有文件信息组成的数组
                 if(repeatIndexArr.length > 0){
-                    // · 判断跳过逻辑
                     if(isSkip){ // 自动跳过
                         isContinue = true; // 继续
                     }
@@ -265,31 +261,9 @@
                         });
                     }
                     neUps.handleRepeate(repeatIndexArr);  // 4.重复时，写入“文件重复”信息，并根据配置作移除或不移除处理
-                    // · 去掉重复的文件
-                    var fDataArr = e.fileData; // 老文件
-                    fDataArr.map(function(item, i){ 
-                        for(var k = 0; k < repeatIndexArr.length; k++){
-                            var index = repeatIndexArr[k];
-                            var removeIndex = k == 0 ? index : index - 1;
-                            if(i == removeIndex){
-                                fDataArr.splice(removeIndex, 1);
-                            }
-                        }
-                    });
-                    for(var v in e){
-                        if(v != "fileData") filesArr[v] = e[v];
-                    }
-                    filesArr["fileData"] = fDataArr;
                 }
-                else{
-                    filesArr = e;
-                }
-            
-                // 返回值
-                return {
-                    isContinue: isContinue,
-                    filesArr: filesArr
-                };
+                
+                return isContinue;
             }
 
 
@@ -410,7 +384,6 @@
                     if(isContinueLoop == false) break;
                     var file = files[i];
                     var ls_lvshi_anhao = fileData[i].value[0];
-
                     await fnUploadOne(i, file,  ls_lvshi_anhao).then(res => {
                         
                     }).catch(errs => {
@@ -439,7 +412,6 @@
                 return new Promise(function(resolve, reject){
                     var file = ps_file;
                     var ls_lvshi_anhao = ps_lvshi_anhao;
-                    // console.log('案号：', ls_lvshi_anhao);
                     var formData = new FormData();
                     formData.append("file", file);
                     formData.append("lvshi_an_hao", ls_lvshi_anhao);

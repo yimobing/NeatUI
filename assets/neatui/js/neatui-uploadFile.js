@@ -7,7 +7,7 @@
  * Version：v1.0.0
  * Author: MuFeng
  * Date: 2023.05.24
- * Update: 2023.05.29
+ * Update: 2023.06.21
  */
 //================================================================================================
 //              一、控件开始
@@ -282,6 +282,11 @@
             me.$UploadDom = document.getElementById('btn_upload'); // 开始上传按钮节点
             me.$SkipDom = document.getElementById('jumperCheck'); // 文件重复自动跳过节点
             me.$FilesArr = [];  // 所有要上传的文件组成的数组
+            // 方便前端调用 handleRepeate()时， callBack 回调数据也跟着更新 add 20230621-1 test1
+            me.$FilesNames = []; // 文件名数组(含后辍)，如['aaa.jpg', 'bbb.png']
+            me.$FilesSizes = []; // 文件大小(单位：KB)数组，如[50, 30, 80]
+            me.$FilesTypes = [];  // 文件类型数组，即文件名后辍数组，如['.pdf', '.jpg', '.png']
+            me.$FilesData = []; // 表单数据
 
 
             //~~~~~~~~ 3. 设置外观 ~~~~~~~~
@@ -675,9 +680,15 @@
                         value: [fNotSufNames[i]]
                     })
                 }
-                var fileData = me.$opts.form.enable ? ( me.$UseOutForm ? outFormData : inFormData) : singleNameData;
-
-
+                var fData = me.$opts.form.enable ? (me.$UseOutForm ? outFormData : inFormData) : singleNameData;
+                 
+                // 全局赋值
+                // 方便前端调用 handleRepeate()时， callBack 回调数据也跟着更新 add 20230621-1 test1
+                me.$FilesNames = fNames; // 文件名数组(含后辍)，如['aaa.jpg', 'bbb.png']
+                me.$FilesSizes = fSizes; // 文件大小(单位：KB)数组，如[50, 30, 80]
+                me.$FilesTypes = fTypes;  // 文件类型数组，即文件名后辍数组，如['.pdf', '.jpg', '.png']
+                me.$FilesData = fData; // 表单数据
+                 
                 // ·------开始执行上传操作------
                 // 隐藏某些文本信息
                 var successDom = document.querySelectorAll('.neUpload__progress_state');
@@ -685,13 +696,13 @@
                     item.style.display = 'none';
                 });
                 // 回调
-                 if (me.$opts.callBack) {
+                if (me.$opts.callBack) {
                     var params = {
                         "files": fList, // 文件列表
                         "fileNames": fNames, // 文件名数据
                         "fileSizes": fSizes,
                         "fileTypes": fTypes,
-                        "fileData": fileData, // 表单数据
+                        "fileData": fData, // 表单数据
                         "fileDom": me.$FileDom, // 选择文件按钮DOM对象
                         "uploadDom": me.$UploadDom, // 开始上传文件按钮DOM对象
                         "skipDom": me.$SkipDom // 文件重复自动跳过节点
@@ -790,8 +801,13 @@
                     nextBrotherDom.forEach(function (v, cIndex) { // 更新序号
                         v.getElementsByClassName('neUpload__order')[0].innerText = newIndex + cIndex + 1;
                     });
-                    // 更新数据
+                    // 更新数据 (全局赋值)
                     me.$FilesArr.splice(newIndex, 1); // 要这样
+                    // 这里因为是全局对象，所以数据更新时 callBack 回调数据也会跟着更新 edit 20230621-1 test1
+                    me.$FilesNames.splice(newIndex, 1);
+                    me.$FilesSizes.splice(newIndex, 1);
+                    me.$FilesTypes.splice(newIndex, 1);
+                    me.$FilesData.splice(newIndex, 1);
                
                     if (me.$FilesArr.length == 0) {
                         helpers.removeClass(me.$ListDom, 'loaded'); // 列表无边框
