@@ -23,6 +23,14 @@ var color = {
 var school1 = '泉州六中';
 
 
+var notice = ({
+    message = '',
+    duration = 1.5
+}) => {
+    console.log('消息：', message);
+    console.log('延时：', duration);
+}
+
 
 
 export const school = school1;  // '泉州五中';
@@ -41,6 +49,7 @@ export default color;
 // };
 
 
-// export default function formats() {
-//     return 'green';
+// 导出一个函数
+// export default function info() {
+//     return notice(options);
 // }
