@@ -1,9 +1,6 @@
-
-
- //————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
- //                                                   JS插件开发的几种方式
- //                                  注：           //... 表示省一堆代码
- //————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+// JS插件开发的几种方式
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 /**
 *  参考文档：
     JavaScript中new一个函数和直接调用函数的区别：https://www.cnblogs.com/vicky-li/p/8669549.html
@@ -13,9 +10,9 @@
 *
 */
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//========================================================================================================================
 //                    jQuery extend 封装控件1
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//========================================================================================================================
 // jQuery 插件开发
 ;(function ($) {
 
@@ -89,9 +86,9 @@ $('#id').jeDate('event2', userName, userSex, userAge); // 调用控件内部even
 
 
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//========================================================================================================================
 //                    jQuery extend 封装控件2
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//========================================================================================================================
 // jQuery 插件开发
 ;(function ($) {
 
@@ -148,78 +145,179 @@ $('#id').NeDate(opts); // opts是一个对象
 
 
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//========================================================================================================================
 //                    原生JS封装控件
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+// [参考]
+// https://www.cnblogs.com/linyuxuan/p/14708647.html
+// https://www.cnblogs.com/netWild/p/15685653.html
+//========================================================================================================================
 
 //————————————————————————————————————————————————————————————————————————————————————
-//            只调用单一方法
+//            封装方法：通用
 //————————————————————————————————————————————————————————————————————————————————————
-;(function(root, factory){
-    if (typeof define === 'function' && define.amd) { // amd
-        define(factory);
-    } else if (typeof exports === 'object') { // umd
-        module.exports = factory();
-    } else {
-        window.NeDate = factory();
+; (function (root, factory) {
+    if (typeof define === 'function' && define.amd) {        // AMD
+        define(['jquery', 'underscore'], factory);
+    } else if (typeof exports === 'object') {        // Node, CommonJS之类的
+        module.exports = factory(require('jquery'), require('underscore'));
+    } else { // 浏览器全局变量(root 即 window)
+        root.returnExports = factory(root.jQuery, root._); // returnExports 是函数名称
     }
-})(this, function(){
-    var NeDate = function(elem,options){
+})(this, function ($, _) { // 方法
+    function a() { };   // 私有方法，因为它没被返回 (见下面)
+    function b() { };  // 公共方法，因为被返回了
+    function c() { };  // 公共方法，因为被返回了
+
+    //  暴露公共方法
+    return { b: b, c: c }
+});
+//========注：匿名函数马上执行有两种格式：
+// 格式1
+(function () { }());
+// 格式2
+(function () { })();
+
+
+
+
+
+//————————————————————————————————————————————————————————————————————————————————————
+//            封装实例1：控件对象只能当函数使用
+//————————————————————————————————————————————————————————————————————————————————————
+; (function (root, factory) { 
+    if (typeof define === 'function' && define.amd) { // AMD规范
+        define(factory);
+    }
+    else if (typeof exports === 'object') { // CommonJS规范
+        module.exports = factory();
+    }
+    else { // 浏览器全局变量(root 即 window)
+        root.NeDate = factory();
+    }
+})(this, function () {
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //  一、开始调用
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // [注] 实例属性(因为是独立的, 不共享)建议使用“构造函数模式”进行定义; 实例方法(因为要共享)建议使用“原型模式”进行定义
+    /**
+     * !! 构造函数
+     * @param {HTML DOM Node} elem 绑定的元素。eg. '#ID节点', '.类名节点'
+     * @param {Ojbect} options 参数配置项
+     */
+    function NDate(elem, options) {
+        // “构造函数模式”定义实例属性，这些属性是独立的，即改变某个实例的属性并不影响其它实例的属性
+        // this.a = '';
+        // this.b = '';
+        // this.c = '';
         var opts = typeof (options) === "function" ? options() : options;
-        return new DatePick(elem, opts);
+        if (typeof elem != 'undefined' && typeof options != 'undefined') { // 构造函数当成普通函数使用时
+            return new DateInitialize(this, elem, opts);
+        }
     };
-    //...
-    function DatePick(elem, options){
+
+
+
+    /**
+     * !!! 控件对象初始化
+     * @param {Object} me 构造函数对象，一般为 this 
+     * @param {HTML DOM} elem 绑定的元素。eg. '#ID节点', '.类名节点'
+     * @param {Ojbect} options 参数配置项
+     */
+    function DateInitialize(me, elem, options) {
+        console.log('初始化');
         var defaults = {
+            name: "穆桂英",
+            sex: 18,
+            age: "女"
+        }
+        var settings = helpers.extend(true, {}, defaults, options || {}); // 合并对象
+        me.$defaults = defaults;
+        me.$opts = settings; // 方便其它地方直接调用
+        //...
+    };
+
+
+    
+    // “原型模式”定义实例方法，这些方法是共享的
+    /**
+     * !! 初始化
+     * @param {HTML DOM Node} o 绑定的元素。eg. '#ID节点', '.类名节点'
+     * @param {Object} opts 参数配置项
+     */
+    NDate.prototype.init = function (o, opts) {
+        new DateInitialize(this, o, opts);
+    };
+
+
+
+    /**
+     * !! 加载中
+     * @param {string} value1 参数1
+     * @param {string} value2 参数2
+     * @param {string} value3 参数3
+     */
+    NDate.prototype.load = function (value1, value2, value3) {
+        console.log('城市', value1, value2, value3);
+        console.log('默认参数：', this.$defaults);
+        console.log('配置参数：', this.$opts);
+        methods._getCity();
+    };
+
+    //...
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //  二、内置函数库 methods
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    var methods = {
+        _getCity: function () {
             
         }
-    }
-    //...  
-    return NeDate; // 返回对象
+    }; // END methods
+
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //  三、工具库，帮助对象 helpers
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    var helpers = {
+        /**
+        * 原生JS合并对象
+        */
+        extend: function () {
+            // eg.
+            return {}
+        }
+    }; // END helpers
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //  四、返回对象
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    return NDate;
 });
 
-//=====前台调用示例
-NeDate(elem, options);
+
+
+//========前台调用示例
+var options = {
+    name: '张三',
+    sex: '男',
+    age: 18
+}
+// 方法1：构造函数当成普通函数使用
+NeDate('#dom1', options);
+// 方法2：构造函数使用 new 实例化
+var date = new NeDate();
+date.init('#dom1', options); // 初始化
+date.load('泉州市', '福建省份GDP第一的城市', '362600'); // 调用控件里提供的某些方法
 
 
 
 
 //————————————————————————————————————————————————————————————————————————————————————
-//                  可调用多个方法
-//————————————————————————————————————————————————————————————————————————————————————
-;(function(root, factory){
-    if (typeof define === 'function' && define.amd) { // amd
-        define(factory);
-    } else if (typeof exports === 'object') { // umd
-        module.exports = factory();
-    } else {
-        window.NeDate = factory();
-    }
-})(this, function(){
-    var NeDate = function(){
-        var me = this;
-        this.init = function(elem, opts){
-            console.log('init方法：elem1：', elem, '\noptions1：', opts);
-        };
-        this.load = function(elem, opts){
-            console.log('house方法：elem2：', elem, '\noptions2：', opts);
-        };
-    }
-    //... 
-    return NeDate; // 返回对象
-});
-
-//=====前台调用示例
-var date = new NeDate(); // 实例化一个对象
-date.init('.house', {user:"林冲", sex: "男", grade: "梁山泊"}); 
-date.load('.tax',  {source: "数据源"});
-
-
-
-
-//————————————————————————————————————————————————————————————————————————————————————
-//                  可调用多个方法2
-// 控件对象既可当函数使用，又可当对象使用。
+// 封装实例2：控件对象既可当函数使用，又可当对象使用。
 //————————————————————————————————————————————————————————————————————————————————————
 ;(function(root, factory){
     if (typeof define === 'function' && define.amd) { // amd
@@ -234,7 +332,7 @@ date.load('.tax',  {source: "数据源"});
     //================================================================
     // 构造函数
     //================================================================
-    function NeDate(elem, options){
+    function NDate(elem, options){
         this.defaults = {
             method: "GET",
             data: {
@@ -246,12 +344,12 @@ date.load('.tax',  {source: "数据源"});
 
 
     //================================================================
-    // 原型添加相关的方法
+    // 原型模式定义实例方法
     //================================================================
-    NeDate.prototype.init = function(elem, options){
+    NDate.prototype.init = function(elem, options){
         this.settings = utils.extend(true, {}, this.defaults, options || {});
     };
-    NeDate.prototype.load = function(elem, options){
+    NDate.prototype.load = function(elem, options){
         this.settings = utils.extend(true, {}, this.defaults, options || {});
     };
 
@@ -274,7 +372,7 @@ date.load('.tax',  {source: "数据源"});
     //================================================================
     // 返回对象
     //================================================================
-    return NeDate;
+    return NDate;
 });
 
 //================================================================
