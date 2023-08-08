@@ -1691,6 +1691,8 @@ var calendar = {
         var y = time.getFullYear();
         var m = time.getMonth() + 1;
         var d = time.getDate();
+        if (m < 10) m = '0' + m;
+        if (d < 10) d = '0' + d;
         return y + "-" + m + '-' + d;
 	},
 
@@ -1706,6 +1708,8 @@ var calendar = {
         var y = time.getFullYear();
         var m = time.getMonth() + 1;
         var d = time.getDate();
+        if (m < 10) m = '0' + m;
+        if (d < 10) d = '0' + d;
         return y + "-" + m + '-' + d;
     },
 
@@ -1717,10 +1721,12 @@ var calendar = {
      */
     getNYear: function(year) {
         var time = new Date();
-         time.setFullYear(time.getFullYear() + year);
-         var y = time.getFullYear();
-         var m = time.getMonth() + 1;
-         var d = time.getDate();
+        time.setFullYear(time.getFullYear() + year);
+        var y = time.getFullYear();
+        var m = time.getMonth() + 1;
+        var d = time.getDate();
+        if (m < 10) m = '0' + m;
+        if (d < 10) d = '0' + d;
          return y + "-" + m + '-' + d;
     },
 
