@@ -54,10 +54,11 @@ html,body{
 	user-select: none;*/
 	/*touch-action: none;*/
 }
-/*即非输入框区域,即input, textarea输入框以外的区域*/
+/* 即非输入框区域,即input, textarea输入框以外的区域 */
+/* 以下两个属性值为 none 时, 将禁止用户复制内容，即鼠标无法选中文本更无法复制文本 */
 *:not(input,textarea) { 
-    -webkit-touch-callout: none; /*禁用系统默认菜单*/
-    -webkit-user-select: none; /*禁止用户选择文本*/
+    /* -webkit-touch-callout: none; */ /*禁用系统默认菜单*/
+    /* -webkit-user-select: none; */ /*禁止用户选择文本*/
 }
 
 html{font-size: 20px;}
