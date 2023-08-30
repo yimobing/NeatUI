@@ -198,7 +198,7 @@
                 var isSkip = e.skipDom.checked; // 文件重复时是否自动跳过，true 是, false 否
                 for(var i = 0; i < files.length; i++){
                     var file = files[i];
-                    var ls_pdf_mc = file.name;
+                    var ls_pdf_mc = file.name.toString().replace(/([\s]+)/g, ''); // 去掉文件名所有空格
                     // 后台返回
                     var isExisted = nCount == 1 ? ( (i == 1 || i == 3) ? true : false ) : false; // 模拟第2、4个文件重复
                     // var isExisted = false; // 是否已存在该pdf文件，true 是, false 否
