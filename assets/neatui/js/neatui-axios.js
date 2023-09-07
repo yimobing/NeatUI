@@ -368,6 +368,14 @@
             var title = settings.title,
                 logout = settings.logout,
                 type = settings.type;
+            // 销毁转圈
+            if (typeof elementUi != 'undefined' && typeof elementUi.destroyAnimate == 'function') {
+                elementUi.destroyAnimate();
+            }
+            // if (_this != null && typeof _this.loading != 'undefined') {
+            //     _this.loading = false;
+            // }
+            // 弹出提示信息窗口
             if (_this != null && typeof _this.$alert == 'function') {
                 _this.$alert(str, title, {
                     type: type,
