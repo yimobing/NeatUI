@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Canvas添加去除水印1</title>
+	
+</head>
+<body>
+	<div class="testing" id="water">
+		<p id="ele"><img src="0.png"></p>
+
+	</div>
+
+
+	<script src="canvas.js"></script>
+	<script>
+		let dom = document.getElementById("ele");
+		Watermark.set('water', dom, '你好');
+
+		// Watermark.remove('ele', document.getElementById("water"));
+
+	</script>
+</body>
+</html>
