@@ -150,6 +150,20 @@
 					mode: "span",
 					width: 140
 				},{
+					title: "市场价值单价",
+					subtitle:"(元/m²)",
+					field: "xjhf_scjz_dj",
+					mode: "span",
+					width: 120,
+					type: "float"
+				},{
+					title: "市场价值总价",
+					subtitle:"(万元)",
+					field: "xjhf_scjz_zj",
+					mode: "span",
+					width: 120,
+					type: "float"
+				},{
 					title: "抵押净值单价",
 					subtitle:"(元/m²)",
 					field: "xjhf_dyjz_dj",
@@ -302,12 +316,12 @@
 			var json = {
 				"return": "ok",
 				"data":[
-					{"xjdh":"20231023-001", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/一栋/1505/135平方米", "pic_num":"15", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"15000", "xjhf_dyjz_zj":"130", "time_xjhf":"2023-08-15 14:21:37"},
-					{"xjdh":"20231023-001", "dyw_xh":"2", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/一栋/1505/135平方米", "pic_num":"16", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"15500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
-					{"xjdh":"20231023-002", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/二栋/1505/135平方米", "pic_num":"17", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"13500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
-					{"xjdh":"20231023-003", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/三栋/1505/135平方米", "pic_num":"18", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"14500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
-					{"xjdh":"20231023-004", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/四栋/1505/135平方米", "pic_num":"19", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"15500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
-					{"xjdh":"20231023-005", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/五栋/1505/135平方米", "pic_num":"20", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"18500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"}
+					{"xjdh":"20231023-001", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/一栋/1505/135平方米", "pic_num":"15", "user_xjhf":"林新疆1", "xjhf_scjz_dj":"13000", "xjhf_scjz_zj":"120", "xjhf_dyjz_dj":"15000", "xjhf_dyjz_zj":"130", "time_xjhf":"2023-08-15 14:21:37"},
+					{"xjdh":"20231023-001", "dyw_xh":"2", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/一栋/1505/135平方米", "pic_num":"16", "user_xjhf":"林新疆1", "xjhf_scjz_dj":"13000", "xjhf_scjz_zj":"120", "xjhf_dyjz_dj":"15500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
+					{"xjdh":"20231023-002", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/二栋/1505/135平方米", "pic_num":"17", "user_xjhf":"林新疆1", "xjhf_scjz_dj":"13000", "xjhf_scjz_zj":"120", "xjhf_dyjz_dj":"13500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
+					{"xjdh":"20231023-003", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/三栋/1505/135平方米", "pic_num":"18", "user_xjhf":"林新疆1", "xjhf_scjz_dj":"13000", "xjhf_scjz_zj":"120", "xjhf_dyjz_dj":"14500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
+					{"xjdh":"20231023-004", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/四栋/1505/135平方米", "pic_num":"19", "user_xjhf":"林新疆1", "xjhf_scjz_dj":"13000", "xjhf_scjz_zj":"120", "xjhf_dyjz_dj":"15500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
+					{"xjdh":"20231023-005", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/五栋/1505/135平方米", "pic_num":"20", "user_xjhf":"林新疆1", "xjhf_scjz_dj":"13000", "xjhf_scjz_zj":"120", "xjhf_dyjz_dj":"18500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"}
 				]
 			}
 
