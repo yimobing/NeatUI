@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="application-name" content="快评">
+	<meta name="applicable-device" content="pc,mobile">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Cache-Control" content="no-transform">
+	<meta http-equiv="Cache-Control" content="no-siteapp">
+	<title>查看快评历史询价回复</title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-liketable.css" /><!--类表格控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css" /><!--日历控件-->
+	<!--[if lt IE 9]>
+		<script type="text/javascript" src="assets/libs/html5shiv.min.js"></script>
+		<script type="text/javascript" src="assets/libs/respond.min.js"></script>
+		<script type="text/javascript" src="assets/libs/rem.min.js"></script>
+		<script type="text/javascript" src="assets/libs/json2.js"></script>
+	<![endif]-->
+	<!--json2.js支持IE8-以下版本json与字符串互转h函数:JSON.Stringify()、 JSON.Parse()-->
+</head>
+<body>
+	<style>
+		body{ overflow-y: hidden; } 
+		.wrap{ padding: 10px 15px; }
+		/*+搜索区域+*/
+		.search{ position: relative; width: 80%; margin-bottom: 10px; }
+		.erow-column{ display: inline-block; width: auto; }
+		.erow-column-normal{ width: 300px; }
+		.erow-column-long{ width: 400px; }
+		.erow-column-btn{ margin-left: 15px; }
+		.erow-column .item-l, .item-r{ display: inline-block; }
+		.erow-column .item-l{ width: 80px; }
+		.erow-column .item-r{ width: 200px!important; }
+		.erow-column-long .item-r{width: 300px!important; }
+		.erow-column input{ width: 100%!important; }
+		.like-table .list-content .column > div > span{ margin-top: 15px\9;}
+	</style>
+
+	<div class="wrap">
+		<div class="search ne-form">
+			<div class="eform-row">
+				<div class="erow-column erow-column-normal">
+					<div class="item-l"><label>开始日期</label></div>
+					<div class="item-r"><input type="text" class="date" id="s-startDate" readonly></div>
+				</div><!--/.erow-column-->
+				<div class="erow-column erow-column-normal">
+					<div class="item-l"><label>结束日期</label></div>
+					<div class="item-r"><input type="text" class="date" id="s-endDate" readonly></div>
+				</div><!--/.erow-column-->
+				<div class="erow-column erow-column-long">
+					<div class="item-l"><label>评估对象</label></div>
+					<div class="item-r"><input type="text" id="s-pawnObj" placeholder="请输入评估对象(抵押物)，如泉州浦西万达广场"></div>
+				</div><!--/.erow-column-->
+				<div class="erow-column erow-column-btn">
+					<button type="button" class="ne-btn has-3d blue" id="btn-query">查询</button>
+				</div><!--/.erow-column-->
+			</div><!--/.eform-row-->
+		</div><!--/.search-->
+		<div class="history"></div><!--/.history-->
+	</div><!--/.wrap-->
+
+	<script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-liketable.js"></script><!--类表格控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义封装AJAX-->
+	<script type="text/javascript">
+		/*+————————————————全局变量————————————————+*/
+		//——————————————————————————————————————————
+		// 默认值
+		var STARTDATE = neuiCalendar.getMonthFirstDay(); // 开始日期. 默认本月1号
+		var ENDDATE = neuiCalendar.getNowtime(); // 结束日期. 默认当天
+		// 查询条件
+		var g_ksrq = STARTDATE; // 开始日期
+		var g_jsrq = ENDDATE; // 结束日期
+		var g_dyw = ''; // 评估对象(抵押物)
+
+
+
+		
+		//——————————————————————————————————————————
+		//=====列表及分页
+		var PAGESIZE = 30; //每页几条记录
+		var g_setJson = { //配置表格列字段
+			headHeight:50, //表头高度. auto 自动(默认). 其它大于0的数字如：50 表示高50px. (可缺省)
+			headHasBgColor:true, //表头是否有背景色(可缺省),默认true
+			tbodyHeight:"auto", //自定义表格内容高度. auto 自动(默认). 其它大于0的数字如：300 表示高300px. (可缺省)
+			topHeight: "auto", //表格以外上面部分高度(如header部分(可选). auto 自动(默认)，系统会自动计算表格距离顶部的距离; 其它大于0的数字如：150 表示高150px.
+			botHeight:"auto", //表格以外下面部分高度（不含分页部分）(如footer部分).  auto 自动,即高度为0 (默认), 其它大于0的数字如：100 表示高100px. (可缺省)
+			isSerialCol:true, //是否显示序号列. 默认true(可缺省)
+			isSorted:true, //是否启用列排序. 默认true.(可缺省)
+			isCeilLine:true, //单元格是否有边线(可缺省),默认false
+			emptyDataTips:'抱歉，没有找到相应数据..', //无数据时的提示文(可选)
+			primaryKey:{ //主键列 (可缺省)
+				field:["xjdh"],  //可多个字段. eg. [":lsh_id1","lsh_id2"]
+				show:false //是否显示,默认false. (可缺省)
+			},
+			customize:{ //自定义属性(可缺省)
+				serialColumnWidth:45, //序号列宽(可缺省),默认50
+				discoloration:true, //是否隔行变色(可缺省),默认false
+				retainIllegalChar:false //单元格内容是否保留非法字符(防止向数据库写入非法字符)(可缺省). true 是, false 否(默认). false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
+			},
+			columns:[{
+					title: "询价单号",
+					field: "xjdh",
+					mode: "span",
+					width: 130
+				},{
+					title: "抵押物序号",
+					field: "dyw_xh",
+					mode: "span",
+					width: 60
+				},{
+					title: "行政区域",
+					field: "area",
+					mode: "span",
+					width: 150
+				},{
+					title: "评估对象(抵押物)",
+					field: "dyw_add",
+					mode: "span",
+					width: 200
+				},{
+					title: "上传图片数量",
+					subtitle:"(张)",
+					field: "pic_num",
+					mode: "span",
+					width: 110,
+					type: "int"
+				},{
+					title: "回复人",
+					field: "user_xjhf",
+					mode: "span",
+					width: 80
+				},{
+					title: "回复时间",
+					field: "time_xjhf",
+					mode: "span",
+					width: 140
+				},{
+					title: "抵押净值单价",
+					subtitle:"(元/m²)",
+					field: "xjhf_dyjz_dj",
+					mode: "span",
+					width: 120,
+					type: "float"
+				},{
+					title: "抵押净值总价",
+					subtitle:"(万元)",
+					field: "xjhf_dyjz_zj",
+					mode: "span",
+					width: 120,
+					type: "float"
+				}
+			]
+		}
+
+	
+		
+
+		/*+————————————————FUNCTION————————————————+*/
+		/**
+		 * 函数：加载数据
+		 * @param {object} options 参数
+		 */
+		 function load_data(options){
+			var defaults = {
+				resetOrder: false // 是否重置序号,默认false
+			}
+			var settings = $.extend(true, {}, defaults, options || {});
+			if(settings.resetOrder){ // 重置序号
+				$.privateProperty.pageCurpage['history'] = 1;
+			}
+			neui.showAnimate();
+			setTimeout(function(){
+				var listJson = getListData(1); 
+				var pages = getListPage();
+				createTableList(listJson, pages);
+				neui.destroyAnimate();
+			}, 100)
+		}
+
+
+
+		/**
+		* 函数：创建列表及分页
+		* @param {object} dataJson 列表数据源
+		* @param {number} pageCount 分页总页数
+		*/
+		function createTableList(dataJson, pageCount){
+			$('.history').neuiLikeTable({
+				setJson: g_setJson, //列字段配置json
+				dataJson: dataJson, //表格数据json
+				pagination: {
+					enable: true, //是否启用分页
+					pageMode: 'select', //分页方式（可缺省）。list 数字列表形式（默认），select 选择形式
+					pageSize: PAGESIZE, //每页几条记录，默认25（可缺省）
+					pageCount: pageCount, //总页数
+					recordCount: '', //总记录数(可选), 默认空(此时界面不显示总记录数)
+					pageSelect:{ //pageMode='select'时(可缺省)
+						allPage: false, //全部按钮（即：通过此按钮可一次性加载全部数据）(可缺省)
+						homePage: true, //首页按钮(可缺省)
+						prevPage: true, //上一页按钮(可缺省)
+						nextPage: true, //下一页按钮(可缺省)
+						lastPage: true, //最后一页（尾页）按钮(可缺省)
+						dropPage: true //下拉页码（一页页显示）按钮(可缺省)
+					},
+					callback:function(e){ //回调函数（必须）.参数e格式: {curpage:1, pagesize:20, pageCount:3}
+						//console.log('回调信息，e：',e);
+						//var curpage = e.curpage;  //当前页码
+						PAGESIZE = e.pagesize; //全局赋值
+						var json = getListData(e.curpage);
+						return json;
+					}
+				},
+				exportExcel: { //导出EXCEL
+					enable: false, //是否启用
+					filename: '查询快评历史询价', //文件名
+					fileAutoTime: true, //导出的文件自动添加时间(hh:mm:ss)作为文件名的一部分
+					extension: '.xls' //拓展名。 .xls(excel 2003)(默认), .xlsx (excel 2007,2010)
+				}
+			})
+		}
+
+
+
+
+
+		//========================================
+		/**
+		 * 函数：获取分页总页数
+		 * @returns {Number} 返回页数
+		 */
+		 function getListPage(){
+			var ls_every_page_count = PAGESIZE;
+			// 后台返回
+			var json = {
+				"return": "ok",
+				"data": 10
+			}
+			/*
+			// START AJAX
+			var json = {}
+			var isHoldOn = true;
+			ajax({
+				heading: "获取分页总页数",
+				debug: false,
+				url: "../kp_sj/fwh_pub/jk_xjsl.ashx",
+				data: {
+					"action": "sel_v3_pc_xjhf_lssj_page_count",
+                    "user": "<%=s_user%>",
+					"sjk": "<%=s_sjk%>",
+					"every_page_count": ls_every_page_count, // 每页记录数
+					"ksrq": g_ksrq,
+					"jsrq": g_jsrq,
+					"dyw": g_dyw
+				},
+				success: function(res){
+					if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+					json = JSON.parse(res);
+				},
+				error: function(res){
+					if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+				},
+				beforeSend: function(XMLHttpRequest) { },
+				complete: function(XMLHttpRequest, textStatus) { }
+			})
+			if(!isHoldOn) {
+				neui.destroyAnimate();
+				return;
+			}
+			// END AJAX
+			*/
+
+			var pages = json.data;
+			return utilities.isNaN(parseInt(pages)) ? 1 : parseInt(pages);
+		}
+
+
+
+		/**
+		 * 函数：获取列表数据
+		 * @param {string} ps_curpage 当前页码
+		 * @returns {object} 返回json数组
+		 */
+		 function getListData(ps_curpage){
+			var ls_open_page_num = typeof ps_curpage == 'undefined' ? 1 : ps_curpage;
+			var ls_every_page_count = PAGESIZE;
+			// 后台返回
+			var json = {
+				"return": "ok",
+				"data":[
+					{"xjdh":"20231023-001", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/一栋/1505/135平方米", "pic_num":"15", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"15000", "xjhf_dyjz_zj":"130", "time_xjhf":"2023-08-15 14:21:37"},
+					{"xjdh":"20231023-001", "dyw_xh":"2", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/一栋/1505/135平方米", "pic_num":"16", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"15500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
+					{"xjdh":"20231023-002", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/二栋/1505/135平方米", "pic_num":"17", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"13500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
+					{"xjdh":"20231023-003", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/三栋/1505/135平方米", "pic_num":"18", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"14500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
+					{"xjdh":"20231023-004", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/四栋/1505/135平方米", "pic_num":"19", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"15500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"},
+					{"xjdh":"20231023-005", "dyw_xh":"1", "area":"福建省-泉州市-丰泽区", "dyw_add":"泉州浦西万达广场/五栋/1505/135平方米", "pic_num":"20", "user_xjhf":"林新疆1", "xjhf_dyjz_dj":"18500","xjhf_dyjz_zj":"135", "time_xjhf":"2023-08-16 20:05:37"}
+				]
+			}
+
+			/*
+			// START AJAX
+			var json = {}
+			var isHoldOn = true;
+			ajax({
+				heading: "获取列表数据",
+				debug: false,
+				url: "../kp_sj/fwh_pub/jk_xjsl.ashx",
+				data: {
+					"action": "sel_v3_pc_xjhf_lssj",
+					"user": "<%=s_user%>",
+					"sjk": "<%=s_sjk%>",
+					"open_page_num": ls_open_page_num, // 当前页码
+					"every_page_count": ls_every_page_count, // 每页记录数
+					"ksrq": g_ksrq,
+					"jsrq": g_jsrq,
+					"dyw": g_dyw
+				},
+				success: function(res){
+					if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+					json = JSON.parse(res);
+				},
+				error: function(res){
+					if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+				},
+				beforeSend: function(XMLHttpRequest) { },
+				complete: function(XMLHttpRequest, textStatus) { }
+			})
+			if(!isHoldOn) {
+				neui.destroyAnimate();
+				return;
+			}
+			// END AJAX
+			*/
+
+			return json;
+		}
+
+		
+		
+
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$(function(){
+			//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                      +初始化系列事件+
+			//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+			//——————————————————————————————————————————
+			//=====加载日历控件
+			$('.date').each(function(){
+				neuiCalendar.neDate($(this));
+				$('#s-startDate').val(STARTDATE);
+				$('#s-endDate').val(ENDDATE);
+			});
+
+
+
+			//——————————————————————————————————————————
+			//=====加载列表
+			// load_data();
+			
+			
+
+
+			//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                      +系列事件+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+			//——————————————————————————————————————————
+			//=====查询按钮
+			$('#btn-query').on('click', function(){
+				//全局赋值
+				g_ksrq = filter.html($('#s-startDate').val());
+				g_jsrq = filter.html($('#s-endDate').val());
+				g_dyw = filter.html($('#s-pawnObj').val());
+				var arr = [ g_ksrq, g_jsrq, g_dyw ]
+				// console.log('数组：', arr);
+
+				// 校验数据是否为空
+				var tips = '';
+				if(g_ksrq == '') tips += '开始日期、';
+				if(g_jsrq == '') tips += '结束日期、';
+				// if(g_dyw == '') tips += '评估对象、';
+				if(tips != ''){
+					neuiDialog.alert({
+						animate: true,
+						message: '请填写：' + tips.substr(0, tips.length - 1),
+						buttons: ['确定']
+					})
+					return;
+				}
+				load_data({ resetOrder: true }); // 刷新数据，并重置序号
+			});
+
+
+		
+
+		}); // $(function(){})
+	</script>
+</body>
+</html>
