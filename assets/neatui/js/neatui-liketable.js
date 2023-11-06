@@ -1945,7 +1945,6 @@
 		var bindTNode = _this.selector; //eg. .panel1, eg. #panel2
 		var rootNode = $.privateProperty.tableRootNode;
 		var pageNode = $.privateProperty.pageRootElement;
-		var nowpage = parseInt($.privateProperty.pageCurpage[_this.selector.replace(/[\.\#]/g,'')]);
 		var pageId = '#' + getNodePureString(pageNode) + '-' + generateRandChar();
 		//是否有导出excel按钮
 		var excelEnable = typeof settings.exportExcel == 'undefined' ? true : (settings.exportExcel.enable === false ? false : true); //默认true
@@ -1967,11 +1966,14 @@
 		}
 
 		var isRebuild = typeof ps_params == 'undefined' ? true : ps_params["rebuild"] === false ? false : true;
-		if(isRebuild) {
+		if (isRebuild) { // 重建页码
 			$.privateProperty.pageTotal[_this.selector.replace(/[\.\#]/g, '')] = page.pageCount; //全局赋值
 			$.privateProperty.recordTotal[_this.selector.replace(/[\.\#]/g, '')] = typeof page.recordCount == 'undefined' ? '' : page.recordCount;
 			$.privateProperty.pagePerpage[_this.selector.replace(/[\.\#]/g, '')] = page.pageSize;
+			// 当前页码重置为1 add 20231106-1
+			$.privateProperty.pageCurpage[_this.selector.replace(/[\.\#]/g, '')] = 1;
 		}
+		var nowpage = parseInt($.privateProperty.pageCurpage[_this.selector.replace(/[\.\#]/g,'')]);
 		var page_count = $.privateProperty.pageTotal[_this.selector.replace(/[\.\#]/g, '')];
 		var record_count = $.privateProperty.recordTotal[_this.selector.replace(/[\.\#]/g, '')];
 		var page_perpage = $.privateProperty.pagePerpage[_this.selector.replace(/[\.\#]/g, '')];
