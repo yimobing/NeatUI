@@ -980,6 +980,19 @@ var utilities = {
 
 
     /**
+     * !! 生成随机颜色
+     * @returns 返回颜色值
+     */
+    getRandomColor: function(){
+        return (function(m,s,c){
+        return (c ? arguments.callee(m,s,c-1) : '#') +
+            s[m.floor(m.random() * 16)]
+        })(Math,'0123456789abcdef',5)
+    },
+
+
+
+    /**
      * 提取电话号码，包括固话或手机号
      * 注：只提取第一次出现的电话号码
      * @param {string} ps_str 字符串
