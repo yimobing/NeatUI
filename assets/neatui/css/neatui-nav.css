@@ -6,7 +6,7 @@
 * 导航菜单控件
 * Author: ChenMufeng
 * Date: 2021.05.26
-* Update: 2021.05.28
+* Update: 2023.12.15
 */
 
 /*+----------------------------------------+*/
@@ -30,7 +30,7 @@ body{
 }
 
 
-/*+--------------------菜单公共--------------------+*/
+/*+--------------------+ 菜单公共 +--------------------+*/
 /*+菜单通用+*/
 .nav{ width: 97%; margin: 0 auto; }
 .nav__link{
@@ -50,7 +50,7 @@ body{
 }
 
 
-/*+----------------横排菜单----------------+*/
+/*+----------------+ 横排菜单 +----------------+*/
 .nav-across{
     display: -webkit-box;
     display: -moz-box;
@@ -127,7 +127,7 @@ body{
 }
 
 
-/*+----------------紧排菜单----------------+*/
+/*+----------------+ 紧排菜单 +----------------+*/
 .nav-down{
     margin-top: 15px;
     margin-bottom: 10px;
@@ -295,7 +295,23 @@ body{
 }
 
 
-/*+----------------媒体查询----------------+*/
+/*+----------------+ 两端对齐菜单 +----------------+*/
+.nav-justy{ }
+.nav-justy .nav__group{ display: -webkit-box; display: -moz-box; display: -webkit-flex; display: flex; display: box; align-items: stretch; margin-top: 10px ;}
+.nav-justy .nav__group:first-child{ margin-top: 0; }
+.nav-justy .nav__group_caption{ position: relative; width: 85px; padding: 10px 8px; background-color: #fff; border-radius: 4px 2px 2px 4px; color: #444; font-size: 18px; font-weight: 510; box-shadow: 0 1px 2px 0px #e9dbdb; }
+.nav-justy .nav__group_caption span{ position: absolute; top: 50%; transform: translateY(-50%); }
+.nav-justy .nav__group_caption:after{ content: ''; position: absolute; right: -10px; top: 50%; transform: translateY(-50%) rotate(90deg); display: block; width: 0; height: 0; border-style: solid; border-width: 0 8px 8px 8px; border-color: transparent transparent #fff transparent; }
+.nav-justy .nav__group_content{ -webkit-flex: 1; -moz-flex: 1; -o-flex: 1; flex: 1; width: 100%; margin-left: 10px;  }
+.nav-justy .nav__item{ position: relative; margin-top: 1px; padding: 15px 15px; background-color: #fff; border-radius: 0; }
+.nav-justy .nav__item:first-child{ margin-top: 0; border-radius: 2px 4px 0 0; }
+.nav-justy .nav__item:last-child{ border-radius: 0 0 4px 2px; }
+.nav-justy .nav__item:after{ content: ''; position: absolute; right: 10px; top: 42%; -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%); -o-transform: translateY(-50%); transform: translateY(-50%); display: block; width: 6px; height: 6px; border-style: solid; border-color: #b2aeae; border-width: 1px 1px 0 0; transform: rotate(45deg); }
+.nav-justy .nav__item span{ color: #585858; font-size: 16px; font-weight: 510;  }
+.nav-justy .nav__item a{ position: absolute; z-index: 1; top: 0; left: 0; right: 0; display: block; width: 100%; height: 100%; margin: 0 auto; cursor: pointer;}
+
+
+/*+----------------+ 媒体查询 +----------------+*/
 @media screen and (max-width: 374px){
     .nav-across.column-3 .nav__item{ min-width: 20%; }
     .nav-across.column-4 .nav__item{ min-width: 15%; }
