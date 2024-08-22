@@ -697,45 +697,76 @@ var utilities = {
     /**
      * 将标签转换成字符串（即HTML编码）
      * HTML与字符串互转义
+	 * edit 20240822-1
      * @param {string} ps_str 含有标签的字符串
      * @returns {string} 返回不含标签的字符串
      * eg1.将 < 转义成 &lt; eg2.将 > 转义成 &gt;
      */
     htmlEncode: function(ps_str){
-        var temp = document.createElement("div");
-        (temp.textContent != null) ? (temp.textContent = ps_str) : (temp.innerText = ps_str);
-        // 转义替换
-        var output = temp.innerHTML.toString().replace(/\'/g, '&apos;').replace(/\"/g, '&quot;') // 单双引号转义
-        // 回车换行替换成<br>
-        output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
-        output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
-        // <br>替换成<p>
-        if(output.indexOf('<br>') > -1){
-            // 让p标签成对出现
-            output = output.replace(/\<br\>/g, '</p><p>');
-            output = output.replace(/^(?!\<.*)/g, '<p>');
-            output = output.replace(/(?!\>.*)$/g, '</p>');
-            // 替换中间没有内容的空标签. eg.<p></p>
-            output = output.replace(/(\<p\>\<\/p\>)/g, '');
-        }
-        // 其它替换
-        // 注：部分ios中手写输入时即使过滤掉所有空格了还会出现一个空格，如果把空格转换成&nbsp;的话数据库中会有&nbsp;导致搜索等功能匹配不了。
-        // 故解决思路是：移动端把所有空格替换成空，在pc端把所有空格替换成一个&nbsp;
-        if(typeof checker != 'undefined' && typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
-            output = output.replace(/\t/g, ''); // 制表符替换成空
-            output = output.replace(/([\s]+)/g, ' '); // 多个空格替换成成一个空格
-        }else{ // pc端时
-            output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
-            output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
-        }
-		output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');  // div标签换成p
-        // 字符串化+斜杠处理
-        output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
-        output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
-        output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
-        //
-        temp = null;
-        return output;
+		if(typeof document != 'undefined'){ // document 对象存在时
+			var temp = document.createElement("div");
+			(temp.textContent != null) ? (temp.textContent = ps_str) : (temp.innerText = ps_str);
+			// 转义替换
+			var output = temp.innerHTML.toString().replace(/\'/g, '&apos;').replace(/\"/g, '&quot;') // 单双引号转义
+			// 回车换行替换成<br>
+			output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
+			output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
+			// <br>替换成<p>
+			if(output.indexOf('<br>') > -1){
+				// 让p标签成对出现
+				output = output.replace(/\<br\>/g, '</p><p>');
+				output = output.replace(/^(?!\<.*)/g, '<p>');
+				output = output.replace(/(?!\>.*)$/g, '</p>');
+				output = output.replace(/(\<p\>\<\/p\>)/g, ''); // 替换中间没有内容的空标签. eg.<p></p>
+			}
+			// 其它替换
+			// 注：部分ios中手写输入时即使过滤掉所有空格了还会出现一个空格，如果把空格转换成&nbsp;的话数据库中会有&nbsp;导致搜索等功能匹配不了。
+			// 故解决思路是：移动端把所有空格替换成空，在pc端把所有空格替换成一个&nbsp;
+			if(typeof checker != 'undefined' && typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
+				output = output.replace(/\t/g, ''); // 制表符替换成空
+				output = output.replace(/([\s]+)/g, ' '); // 多个空格替换成成一个空格
+			}else{ // pc端时
+				output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
+				output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
+			}
+			output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');  // div标签换成p
+			// 字符串化+斜杠处理
+			output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
+			output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
+			output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
+			//
+			temp = null;
+			return output;
+		}
+		
+		else{ // document 对象不存在时
+			var output = ps_str;
+			// 字符串化+斜杠处理
+			// output = output.replace(/<[^<>]+?>/g, ''); // 过滤标签。不行，这里是要转义而非过滤
+			
+			// output = output.replace(/\r/g, ''); // 去掉换行
+			// output = output.replace(/\n/g, ''); // 去掉回车
+			// output = output.replace(/[\r\n]+?/g, ''); // 去掉换行
+			
+			output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
+			output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
+			// <br>替换成<p>
+			if(output.indexOf('<br>') > -1){
+				// 让p标签成对出现
+				output = output.replace(/\<br\>/g, '</p><p>');
+				output = output.replace(/^(?!\<.*)/g, '<p>');
+				output = output.replace(/(?!\>.*)$/g, '</p>');
+				output = output.replace(/(\<p\>\<\/p\>)/g, ''); // 替换中间没有内容的空标签. eg.<p></p>
+			}
+			output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
+			output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
+			output = output.replace(/\'/g, '&apos;'); // 单引号替换成 &apos;
+			output = output.replace(/\"/g, '&quot;'); // 双引号替换成 &quot;
+			output = output.replace(/\&/g, '&amp;'); // 连字符替换成 &amp;
+			output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
+			output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
+			output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
+		}
     },
 
 
@@ -2361,34 +2392,48 @@ var filter = {
 
     /**
      * 过滤指定字符或代码
-     * @param {string} ps_str 原字符串
-     * @param {object}} ps_opts 过滤条件组成的对象
-     * @returns {string} 返回新字符串
+	 * edit 20240822-1
+     * @param {String} ps_str 原字符串
+     * @param {Object}} ps_opts 过滤条件组成的对象
+     * @returns {String} 返回新字符串
      */
     charCode: function(ps_str, ps_opts){
         if(typeof ps_str == 'undefined' || ps_str == null) return ps_str;
         var defaults = {
-            javascript: true, //是否过滤js
-            css: true, //是否过滤css
-            space: true, //是否过滤空格
-            html: true, //是否过滤html
-            lineFeed: true, //是否过滤换行
-            tab: true, //是否过滤制表符
-            transferred: true //标签是否转义成字符. eg. < 转义成 &lt; > 转义成 &gt;
+            javascript: true, // 是否过滤js
+            css: true, // 是否过滤css
+            space: true, // 是否过滤空格
+            html: true, // 是否过滤html
+            lineFeed: true, // 是否过滤换行
+            tab: true, // 是否过滤制表符
+            transferred: true // 标签是否转义成字符. eg. < 转义成 &lt; > 转义成 &gt;
         }
-        var settings = $.extend(true, {}, defaults, ps_opts || {});
-        var result = str = ps_str.toString();
-        if(settings.javascript) result = str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g, ''); //过滤js
-        if(settings.css) result = result.replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); //过滤css
+        // var settings = $.extend(true, {}, defaults, ps_opts || {});
+		var settings = merge.combine(false, defaults, ps_opts || {});
+        var result = ps_str.toString(),
+			str = ps_str.toString();
+        if(settings.javascript) result = str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g, ''); // 过滤js
+        if(settings.css) result = result.replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); // 过滤css
         if(settings.space){
-            result = result.replace(/\ +/g, ''); //去掉空格
-            result = result.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); //去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格
+            result = result.replace(/\ +/g, ''); // 去掉空格
+            result = result.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); // 去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格
         }
-        if(settings.html) result = result.replace(/<[^<>]+?>/g, ''); //过滤标签
-        if(settings.lineFeed) result = result.replace(/[\r\n]+?/g, ''); //去掉换行
-        if(settings.tab) result = result.replace(/\t/g, ''); //去掉制表符
-        if(settings.transferred){
-            if(typeof utilities.htmlEncode == 'function') result = utilities.htmlEncode(result); //标签转化成字符串
+        if(settings.html) result = result.replace(/<[^<>]+?>/g, ''); // 过滤标签
+        if(settings.lineFeed) result = result.replace(/[\r\n]+?/g, ''); // 去掉换行
+        if(settings.tab) result = result.replace(/\t/g, ''); // 去掉制表符
+        if(settings.transferred){ // 标签转化成字符串
+            if(typeof utilities != 'undefined' && typeof utilities.htmlEncode == 'function') {
+				result = utilities.htmlEncode(result);
+			}
+			else {
+				result = result.replace(/\'/g, '&apos;'); // 单引号替换成 &apos;
+				result = result.replace(/\"/g, '&quot;'); // 双引号替换成 &quot;
+				result = result.replace(/\&/g, '&amp;'); // 连字符替换成 &amp;
+				result = result.replace(/\</g, '&lt;'); // // 左尖括号替换成&lt;
+				result = result.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
+				result = result.replace(/\\/g, '/'); // 反斜杠替换成斜杠
+				result = result.replace(/(\s+)/g, '&nbsp;');
+			}
         }
         return result;
     },
