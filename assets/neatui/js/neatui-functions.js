@@ -2194,10 +2194,10 @@ var checker = {
      * 判断字符串是否数值类型
      * @param {string} ps_str 字符串
      * @returns {boolean} 返回布尔值. true 是小数, false 不是小数
-     * eg. 11.5, 11.53, -11.5, -11.53 是数值类型, 11., 11.53.5 不是数值类型
+     * eg. 1.5, 11.5, 11.53, -1.5, -11.5, -11.53 是数值类型, 11. , 11.53.5 不是数值类型
      */
     checkIsNumerType: function(ps_str){
-        var reg = /^\-?[0-9]+\.?[0-9]+$/;
+		var reg = /^[0-9]+(\.[0-9]+)?$/;
         return reg.test(ps_str.toString()) ? true : false;
     },
     
