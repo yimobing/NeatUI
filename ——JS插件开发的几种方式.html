@@ -384,8 +384,8 @@ function createNewInstace(dom, config){
     var context = new NeDate(dom, config); // context 是一个实例化的对象，只能当对象使用，不能当函数使用。
     // 创建请求函数
     var instance = NeDate.prototype.init.bind(context); // instance 是一个函数，由 bind 返回的一个新函数，可以调用 instance()。
-    // 将 Axios.prototype 对象中的方法添加到 instance 函数对象中
-    // 为了实现能够将 instance 函数作为对象使用，我们就要将 NeDate.prototype 对象中的方法添加给 instance 。毕竟函数也一个对象，也能够添加方法。
+    // 将 对象原型链 prototype 对象中的方法添加到 instance 函数对象中
+    // 为了实现能够将 instance 函数作为对象使用，我们就要将 对象原型链 prototype 对象中的方法添加给 instance 。毕竟函数也一个对象，也能够添加方法。
     Object.keys(NeDate.prototype).forEach(function(item){
         instance[item] = NeDate.prototype[item].bind(context);
     });
