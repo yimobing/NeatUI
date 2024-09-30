@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>导入导出EXCEL(未封装成控件)</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+</head>
+<body>
+    <style>
+        .exportImport{ padding: 30px 50px; }
+
+        .output__preview table {
+            border-collapse: collapse;
+        }
+        .output__preview th, 
+        .output__preview td {
+            border: solid 1px #6D6D6D;
+            padding: 5px 10px;
+        }
+    </style>
+
+    <div class="wrap">
+        <main>
+            <div class="web">
+                <pre>
+                    文档：https://blog.csdn.net/lgd1917/article/details/122449774
+                    http://t.zoukankan.com/javalinux-p-15631834.html
+                    官网：https://sheetjs.com/
+                    GitHub：https://github.com/SheetJS/sheetjs/blob/master/dist/xlsx.full.min.js
+                </pre>
+            </div>
+            <!-- 导入导出操作区 -->
+            <div class="exportImport">
+                <input type="file" id="file" style="display:none;" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+                <button type="button" id="btn-import" class="ne-btn has-texutre blue">导入EXCEL(2007+)</button>
+                <button type="button" id="btn-export" class="ne-btn has-texutre green">导出EXCEL(2007+)</button>
+            </div><!--/.exportImport-->
+            <!-- 导入的表格展示区 -->
+            <div class="output">
+                <div class="output__caption">导入数据预览</div>
+                <div class="output__preview" id="TBCVS" contenteditable></div>
+            </div><!--/.output-->
+        </main>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script><!--jQ库-->
+    <script type="text/javascript" src="assets/libs/xlsx.core.min.js"></script><!--导入导出EXCEL控件-->
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义AJAX-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+    
+        /*+————————————————FUNCTION————————————————+*/
+    
+        // 读取本地excel文件
+        function readingWorkbookFromLocalFile(file, callback) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var data = e.target.result;
+                var workbook = XLSX.read(data, {type: 'binary'});
+                if(callback) callback(workbook);
+            };
+            reader.readAsBinaryString(file);
+        }
+
+        /**
+         * 读取excel表格 edit 20220725-1 test1
+         */
+        function readWorkbook(workbook) {
+            var sheetNames = workbook.SheetNames; // 工作表名称集合
+            var worksheet = workbook.Sheets[sheetNames[0]]; // 这里我们只读取第一张sheet
+            var opts = {
+                /*'A'|number|string[]*/
+                header: 'A', // 把表头当作表身数据
+                /** Default value for null/undefined values */
+                defval: ''// 给空的单元格赋值为空字符串，避免单元格被跳过(JSON解析出来后缺少相应的key)
+            }
+            // 将导入数据以表格的形式展示在界面上
+            var csv = XLSX.utils.sheet_to_csv(worksheet, opts);
+	        document.getElementById('TBCVS').innerHTML = csv2table(csv);
+            // 返回导入数据供调用
+            var source = XLSX.utils.sheet_to_json(worksheet, opts);
+            return source;
+        }
+
+        // 
+        /**
+         * 将csv转换成简单的表格，会忽略单元格合并，在第一行和第一列追加类似excel的索引
+         * @param {Object} csv csv对象
+         */
+        function csv2table(csv){
+            var html = '<table>';
+            var rows = csv.split('\n');
+            // rows.shift(); // 删除第一行
+            rows.pop(); // 删除最后一行没用的
+            rows.forEach(function(row, idx) {
+                var columns = row.split(',');
+                columns.unshift(idx+1); // 添加行索引
+                if(idx == 0) { // 添加列索引，即表头A、B、C、D、E、F .. 这行
+                    html += '<tr>';
+                    for(var i=0; i<columns.length; i++) {
+                        html += '<th>' + (i == 0 ? '': String.fromCharCode(65 + i - 1)) + '</th>';
+                    }
+                    html += '</tr>';
+                }
+                html += '<tr>';
+                columns.forEach(function(column) {
+                    html += '<td>' + column + '</td>';
+                });
+                html += '</tr>';
+            });
+            html += '</table>';
+            return html;
+        }
+
+
+
+        /**
+         * 通用的打开下载对话框方法，没有测试过具体兼容性
+         * @param url 下载地址，也可以是一个blob对象，必选
+         * @param saveName 保存文件名，可选
+         */
+        function openDownloadDialog(url, saveName){
+            if(typeof url == 'object' && url instanceof Blob)
+            {
+                url = URL.createObjectURL(url); // 创建blob地址
+            }
+            var aLink = document.createElement('a');
+            aLink.href = url;
+            aLink.download = saveName || ''; // HTML5新增的属性，指定保存文件名，可以不要后缀，注意，file:///模式下不会生效
+            var event;
+            if(window.MouseEvent) event = new MouseEvent('click');
+            else
+            {
+                event = document.createEvent('MouseEvents');
+                event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            }
+            aLink.dispatchEvent(event);
+        }
+
+
+        // 将一个sheet转成最终的excel文件的blob对象，然后利用URL.createObjectURL下载
+        function sheet2blob(sheet, sheetName) {
+            sheetName = sheetName || 'sheet1';
+            var workbook = {
+                SheetNames: [sheetName],
+                Sheets: {}
+            };
+            workbook.Sheets[sheetName] = sheet;
+            // 生成excel的配置项
+            var wopts = {
+                bookType: 'xlsx', // 要生成的文件类型
+                bookSST: false, // 是否生成Shared String Table，官方解释是，如果开启生成速度会下降，但在低版本IOS设备上有更好的兼容性
+                type: 'binary'
+            };
+            var wbout = XLSX.write(workbook, wopts);
+            var blob = new Blob([s2ab(wbout)], {type:"application/octet-stream"});
+            // 字符串转ArrayBuffer
+            function s2ab(s) {
+                var buf = new ArrayBuffer(s.length);
+                var view = new Uint8Array(buf);
+                for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            }
+            return blob;
+        }
+            
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====初始化加载
+            
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                         系列事件                                             
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====导入按钮、导入EXCEL
+            $('#btn-import').on('click', function(){
+                document.getElementById('file').click();
+            });
+            //
+            document.getElementById('file').addEventListener('change', function(e) {
+                var files = e.target.files;
+                if(files.length == 0) return;
+                var f = files[0];
+                if(!/\.xlsx$/g.test(f.name)) {
+                    alert('仅支持读取xlsx格式！');
+                    return;
+                }
+                readingWorkbookFromLocalFile(f, function(workbook) {
+                    var sourceArr = readWorkbook(workbook);
+                    console.log('数据源：', sourceArr);
+                    // 转换成10个字段
+                    var tableJson = {data:[]}
+                    for(var i = 0; i < sourceArr.length; i++){
+                        var row = sourceArr[i];
+                        var count = 0;
+                        var ls_value1 = ls_value2 = ls_value3 = ls_value4 = ls_value5 = '';
+                        var ls_value6 = ls_value7 = ls_value8 = ls_value9 = ls_value10 = '';
+                        for(var v in row){
+                            count++;
+                            var value = filter.html(row[v]); // 过滤非法字符
+                            // console.log('v：',v, '-value：', value);
+                            if(count == 1) ls_value1 = value;
+                            if(count == 2) ls_value2 = value;
+                            if(count == 3) ls_value3 = value;
+                            if(count == 4) ls_value4 = value;
+                            if(count == 5) ls_value5 = value;
+                            if(count == 6) ls_value6 = value;
+                            if(count == 7) ls_value7 = value;
+                            if(count == 8) ls_value8 = value;
+                            if(count == 9) ls_value9 = value;
+                            if(count == 10) ls_value10 = value;
+                        }
+                        tableJson.data.push({
+                            "value1": ls_value1,
+                            "value2": ls_value2,
+                            "value3": ls_value3,
+                            "value4": ls_value4,
+                            "value5": ls_value5,
+                            "value6": ls_value6,
+                            "value7": ls_value7,
+                            "value8": ls_value8,
+                            "value9": ls_value9,
+                            "value10": ls_value10,
+                        })
+                    }
+                    console.log('tableJson：', tableJson); //test1
+               
+                    // 开始执行
+                    neui.showAnimate('正在导入，请稍侯');
+                    setTimeout(function(){
+
+                        var flag = '', msg = '导入成功';
+                        for(var i = 0; i < tableJson.data.length; i++){
+                            var row = tableJson.data[i];
+                            var ls_value1 = row["value1"],
+                                ls_value2 = row["value2"],
+                                ls_value3 = row["value3"],
+                                ls_value4 = row["value4"],
+                                ls_value5 = row["value5"],
+                                ls_value6 = row["value6"],
+                                ls_value7 = row["value7"],
+                                ls_value8 = row["value8"],
+                                ls_value9 = row["value9"],
+                                ls_value10 = row["value10"];
+                            var arr = [ ls_value1, ls_value2, ls_value3, ls_value4, ls_value5, ls_value6, ls_value7, ls_value8, ls_value9, ls_value10 ]
+                            // console.log('数组：', arr);
+                            
+                            // 后台返回
+                            /*
+                            // START AJAX
+                            var isHoldOn = true;
+                            ajax({
+                                heading: "导入数据",
+                                debug: false,
+                                async: false, // 取数方式. true 异步, false 同步(默认)
+                                type: "GET",
+                                dataType: "html",
+                                cache: false,
+                                url: "../plpg_jk/jk_daoru/jk_daoru.ashx",
+                                data: {
+                                    "action": "ins_linshi_daoru_cunfang",
+                                    "user": "<%=s_user%>",
+                                    "ziduan1": ls_value1,
+                                    "ziduan2": ls_value2,
+                                    "ziduan3": ls_value3,
+                                    "ziduan4": ls_value4,
+                                    "ziduan5": ls_value5,
+                                    "ziduan6": ls_value6,
+                                    "ziduan7": ls_value7,
+                                    "ziduan8": ls_value8,
+                                    "ziduan9": ls_value9,
+                                    "ziduan10": ls_value10
+                                },
+                                success: function(res){
+                                    if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    // if(res == '') return;
+                                    var json = JSON.parse(res);
+                                    flag = json.return == 'ok' ? 1 : 0;
+                                    if(!flag) msg = json.data;
+                                },
+                                error: function(res){
+                                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                },
+                                beforeSend: function(XMLHttpRequest){ },
+                                complete: function(XMLHttpRequest, textStatus){ }
+                            })
+                            if(!isHoldOn){
+                                neui.destroyAnimate();
+                                return;
+                            }
+                            // END AJAX
+                            */
+                            flag = parseInt(1); // 1 成功, 0 失败
+                            if(!flag) msg = '导入失败';
+
+                            if(!flag) break;
+                        }
+
+                        neuiDialog.alert({
+                            message: msg,
+                            buttons: ['确定'],
+                            callBack: function(){
+                                if(flag){ // 成功
+                                    //..
+                                }
+                            }
+                        })
+
+                        neui.destroyAnimate();
+                    }, 100)
+                })
+            });
+
+
+
+
+
+
+
+            
+            //——————————————————————————————————————————
+            //=====导出按钮、导出EXCEL
+            $('#btn-export').on('click', function(){
+                // 示例eg.
+                // var aoa = [
+			    //     // ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
+                //     ['姓名', '性别', '年龄', '注册时间'],
+                //     ['张三', '男', 18, new Date()],
+                //     ['李四', '女', 22, new Date()]
+                // ];
+                // var sheet = XLSX.utils.aoa_to_sheet(aoa);
+                // // sheet['!merges'] = [
+                // //     // 设置A1-C1的单元格合并
+                // //     {s: {r: 0, c: 0}, e: {r: 0, c: 2}}
+                // // ];
+                // // 需要注意的地方就是被合并的单元格要用null预留出位置，否则后面的内容（本例中是第四列其它信息）会被覆盖。
+                // openDownloadDialog(sheet2blob(sheet), '文件名.xlsx');
+                // return;
+
+                neui.showAnimate('导出中，请稍侯');
+                setTimeout(function(){
+                    // 后台返回
+                    var exportJson = { 
+                        "return":"ok", 
+                        "data":[
+                            {"ziduan1":"张三", "ziduan2":"泉州市", "ziduan3":"丰泽区", "ziduan4":"秀秀路", "ziduan5":"司机", "ziduan6":"55", "ziduan7":"15000", "ziduan8":"入职两年", "ziduan9":"55kg", "ziduan10":"168cm" },
+                            {"ziduan1":"李四", "ziduan2":"泉州市", "ziduan3":"丰泽区", "ziduan4":"秀秀路", "ziduan5":"司机", "ziduan6":"55", "ziduan7":"15000", "ziduan8":"入职两年", "ziduan9":"55kg", "ziduan10":"168cm" },
+                            {"ziduan1":"王五", "ziduan2":"泉州市", "ziduan3":"丰泽区", "ziduan4":"秀秀路", "ziduan5":"司机", "ziduan6":"55", "ziduan7":"15000", "ziduan8":"入职两年", "ziduan9":"55kg", "ziduan10":"168cm" }
+                        ]
+                    }
+                    /*
+                    // START AJAX
+                    var exportJson = {}
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "获取导出数据",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "GET",
+                        dataType: "html",
+                        cache: false,
+                        url: "../plpg_jk/jk_daoru/jk_daoru.ashx",
+                        data: {
+                            "action": "sel_linshi_daoru_cunfang",
+                            "user": "<%=s_user%>"
+                        },
+                        success: function(res){
+                            if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            // if(res == '') return;
+                            exportJson = JSON.parse(res);
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // END AJAX
+                    */
+
+                    // 数据转换
+                    var arr = [];
+                    for(var i = 0; i < exportJson.data.length; i++){
+                        var row = exportJson.data[i];
+                        var ls_ziduan1 = row["ziduan1"],
+                            ls_ziduan2 = row["ziduan2"],
+                            ls_ziduan3 = row["ziduan3"],
+                            ls_ziduan4 = row["ziduan4"],
+                            ls_ziduan5 = row["ziduan5"],
+                            ls_ziduan6 = row["ziduan6"],
+                            ls_ziduan7 = row["ziduan7"],
+                            ls_ziduan8 = row["ziduan8"],
+                            ls_ziduan9 = row["ziduan9"],
+                            ls_ziduan10 = row["ziduan10"];
+
+                        arr.push(
+                            [ls_ziduan1, ls_ziduan2, ls_ziduan3, ls_ziduan4, ls_ziduan5, ls_ziduan6, ls_ziduan7, ls_ziduan8, ls_ziduan9, ls_ziduan10]
+                        )
+                    }
+                    // console.log('数组：', arr);
+                    // 执行导出操作
+                    var mydate = new Date(),
+                        year = mydate.getFullYear(),
+                        month = mydate.getMonth()+1;
+                        day = mydate.getDate(),
+                        hour = mydate.getHours(),
+                        minute = mydate.getMinutes(),
+                        seconds = mydate.getSeconds();
+                    if(month < 10) month = '0'+month;
+                    if(day < 10) day = '0'+day;
+                    if(hour < 10) hour = '0'+hour;
+                    if(minute < 10) minute = '0'+minute;
+                    if(seconds < 10) seconds = '0'+seconds;
+                    var today = year+''+month+''+day+''+hour+''+minute+''+seconds;
+                    var sheet = XLSX.utils.aoa_to_sheet(arr);
+                    openDownloadDialog(sheet2blob(sheet), '导出Excel-' + today + '.xlsx');
+
+
+                    neui.destroyAnimate();
+                }, 100)
+            })
+
+
+            
+            //----------------------------------------------------------------------------------------------------------------
+            //                                                大型区块                                                         
+            //----------------------------------------------------------------------------------------------------------------
+            //:----------------------------------------
+            //=====xx点击事件
+            
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            //                               中等区块                                  
+            //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+            //::::::::::::::::::::::::::::::::::::::::
+            //=====xx点击事件
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            //                 小区块                                 
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            //=====xx点击事件
+            
+    
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
