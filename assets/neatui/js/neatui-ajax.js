@@ -55,6 +55,7 @@
                 success: function(res){ },
                 error: function(res){
                     var debug = typeof this.debug == 'undefined' ? false : (this.debug.toString().toLocaleLowerCase() == 'true' ? true : false);
+                    var action = utilities.getStringParams('action', this.url);
                     utilities.toast(action, this.heading, res, "errors", debug ? false : true);
                 },
                 beforeSend: function(XMLHttpRequest){ },
