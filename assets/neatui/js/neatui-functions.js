@@ -1382,6 +1382,27 @@ var utilities = {
     },
 
 
+    
+    /**
+     * 原生js向父节点中添加子节点，并将子节点插入到父节点内部的最前面
+     * @param {HTML DOM} newNode newNode 子节点
+     * @param {HTML DOM} existingNode  已存在的节点
+     * add 20240929-1
+     */
+     prependChild: function (childNode, fatherNode) {
+        var childrenNode = fatherNode.children; // 获取父节点的直接子元素
+        // 将子节点插入到内部的最前面，但不包括style和script元素
+        for (var i = 0; i < childrenNode.length; i++) {
+            if (childrenNode[i].tagName === "STYLE" || childrenNode[i].tagName === "SCRIPT") {
+                continue; // 跳过style和script元素
+            }
+            fatherNode.insertBefore(childNode, childrenNode[i]);
+            break; // 只插入一次，因为新节点会被插入到第一个非style/script元素之前
+        }
+    },
+
+     
+     
     /**
      * 原生js在已存在的节点向后面插入新节点(兼容ie9-)
      * @param {HTML DOM} newNode 新节点
