@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>neFrame IFRAME嵌入页面控件 </title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+</head>
+<body>
+    <style>
+        *{ margin: 0; padding: 0; box-sizing: border-box; }
+        body{ padding: 10px 15px; }
+        .caption{ text-align: center; color: #555; font-size: 36px; font-weight: bold; }
+        .describe{ text-align: center; color: #1296db; font-size: 24px; font-weight: 500; }
+        .grid{ margin-top: 10px; padding: 10px 15px;  border: 1px solid #999; border-radius: 4px; }
+        .grid__caption{ font-size: 18px; font-weight: bold; }
+        .grid__title{ font-size: 16px; font-weight: 500; }
+        .grid__subtitle{ color: #08ba61; font-size: 12px; }
+        .grid__subtitle strong{ color: #ff0000; font-weight: bold; font-size: 1.5em; }
+        .grid__list{ margin-top: 15px; display: flex; align-items: center; }
+        .grid__list_one{  margin-right: 10px; padding: 6px 12px;  background-color: #d1d0d0; color: #5e5252; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        .grid__list_one.on{ background-color: #1296db; color: #fff; font-weight: bold; }
+        .grid__result{ margin-top: 10px;  }
+    </style>
+    <div class="wrap">
+        <div class="caption"> IFRAME嵌入页面控件 </div>
+        <div class="describe"> 以下 iframe 简称“框架” </div>
+        <div class="content">
+            <pre>
+                [ 控件使用说明 ]
+                调用方式：
+                    neuiFrame(elem, options);
+                参数说明：
+                    elem 为用户要嵌入iframe绑定的节点。eg. '#节点ID属性名', '.节点属性名'
+                    options 为选项参数，类型为是一个Object对象，参数如下：
+                    {
+                        src: '', // 框架链接地址(必须)
+                        refresh: false, // 是否刷新绑定的节点中的页面，默认false(可选)。值为true 时将重建页面，false 时不会重建页面。注：当点击不同按钮时要在同一个绑定的节点下面显示不同的页面，请将本参数设为true。
+                        // 指定框架宽高
+                        width: 'auto', // 框架宽度，默认auto表示系统自动计算(可选)。接受百分比如50%、带或不带单位的数值型如100px。
+                        height: 'auto', // 框架高度，默认auto表示系统自动计算(可选)。接受百分比如50%、带或不带单位的数值型如100px。
+                        // 自定义框架左侧、右侧距离。仅当 width != 'auto' 时有效
+                        left: 'auto', // 框架以外左侧距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                        right: 'auto', // 框架以外右侧距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                        // 自定义框架顶部、底部距离。仅当 height != 'auto' 时有效
+                        top: 'auto', // 框架以外顶部距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                        bottom: 'auto', // 框架以外底部距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                        // 框架误差纠正
+                        corrected: true, // 是否启用框架宽高值误差纠正功能，默认true(可选)
+                        inaccuracy: 0, // 框架宽高误差值，默认0(可选)。建议值14，仅当corrected = true 时有效。注：1.系统将在已确定的框架宽高基础上再减去该值。2.参数值为0时，自动将把浏览器滚动条宽度作为误差值。
+                    }
+            </pre>
+        </div>
+
+        <div class="grid">
+            <div class="grid__caption"> 分组1 </div>
+            <div class="grid__title"> 不同页面绑定到同一个节点下，即N个页面绑定1个节点 </div>
+            <div class="grid__subtitle"> 
+                这些页面都绑定到<strong>同一个</strong>节点，每次点击不同按钮时，将重新加载对应页面，即刷新重载!
+            </div>
+            <div class="grid__list grid__group_1">
+                <div class="grid__list_one">按钮1</div>
+                <div class="grid__list_one">按钮2</div>
+                <div class="grid__list_one">按钮3</div>
+            </div><!--/.grid__list-->
+            <div class="grid__result">
+                <div class="page_0"></div>
+            </div><!--/.grid__result-->
+        </div><!--/.grid-->
+
+        <div class="grid">
+            <div class="grid__caption"> 分组2 </div>
+            <div class="grid__title"> 不同页面绑定到不同节点下，即N个页面绑定N个节点 </div>
+            <div class="grid__subtitle"> 
+                这些页面绑定到<strong>不同</strong>节点，第1次点击按钮时将加载对应页面，第2,3,4, ... M 次点击按钮时<strong>不会</strong>再刷新或重载页面
+            </div>
+            <div class="grid__list grid__group_2">
+                <div class="grid__list_one">嵌入页面1</div>
+                <div class="grid__list_one">嵌入页面2</div>
+            </div><!--/.grid__list-->
+            <div class="grid__result">
+                <div class="page_1"></div>
+                <div class="page_2" style="display: none"></div>
+            </div><!--/.grid__collect-->
+        </div><!--/.grid-->
+
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script><!--Jq库-->
+    <script src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script src="assets/neatui/js/neatui-iframe.js"></script><!-- IFRAME嵌入页面控件-->
+    <script>
+        /*+————————————————全局变量————————————————+*/
+        
+        /*+————————————————FUNCTION————————————————+*/
+        //——————————————————————————————————————————
+        /**
+         * 创建iframe框架页面
+         * @param {HTMLDOM} ps_node iframe绑定的节点，格式 #id, .class
+         * @param {String} ps_url iframe链接地址
+         * @param {Boolean} ps_shua_xin 是否刷新绑定的节点中的页面(可选)，默认false。
+         */
+        function createFramePage(ps_node, ps_url, ps_shua_xin){
+            var isShuaxin = typeof ps_shua_xin == 'undefined' ? false : ps_shua_xin === true ? true : false;
+            neuiFrame(ps_node, {
+                src: ps_url, // 框架链接地址(必须)
+                refresh: isShuaxin, // 是否刷新绑定的节点中的页面，默认false(可选)。值为true 时将重建页面，false 时不会重建页面。注：当点击不同按钮时要在同一个绑定的节点下面显示不同的页面，请将本参数设为true。
+                // 指定框架宽高
+                width: $(window).width() - 60, // 框架宽度，默认auto表示系统自动计算(可选)。接受百分比如50%、带或不带单位的数值型如100px。
+                height: $(window).height(), // 框架高度，默认auto表示系统自动计算(可选)。接受百分比如50%、带或不带单位的数值型如100px。
+                // 自定义框架左侧、右侧距离。仅当 width != 'auto' 时有效
+                left: 'auto', // 框架以外左侧距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                right: 'auto', // 框架以外右侧距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                // 自定义框架顶部、底部距离。仅当 height != 'auto' 时有效
+                top: 'auto', // 框架以外顶部距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                bottom: 'auto', // 框架以外底部距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                // 框架误差纠正
+                corrected: true, // 是否启用框架宽高值误差纠正功能，默认true(可选)
+                inaccuracy: 0, // 框架宽高误差值，默认0(可选)。建议值14，仅当corrected = true 时有效。注：1.系统将在已确定的框架宽高基础上再减去该值。2.参数值为0时，自动将把浏览器滚动条宽度作为误差值。
+                    
+            });
+        }
+
+
+
+        //——————————————————————————————————————————
+        /**
+         * 加载同一个框架节点下的不同页面
+         * @param {Number} ps_index 按钮索引值，从0开始
+         * 
+         */
+        function loadTheSameNodePage(ps_index){
+            var url = '';
+            var elem = '.page_0';
+            if(ps_index == 0) url = 'http://www.jemui.com/';
+            else if(ps_index == 1) url = 'https://fontawesome.com/v4/icons/';
+            else if(ps_index == 2) url = 'https://www.bootcss.com/';
+            createFramePage(elem, url, true);
+        }
+
+
+
+        /**
+         * 加载不同框架节点下的不同页面
+         * @param {Number} ps_index 按钮索引值，从0开始
+         * 
+         */
+        function loadTheDifferrentNodePage(ps_index){
+            var url = '';
+            var elem = '';
+            console.log('index：', ps_index);
+            if(ps_index == 0) {
+                url = 'https://www.runoob.com';
+                elem = '.page_1';
+            }
+            else if(ps_index == 1) {
+                url = 'https://www.w3school.com.cn';
+                elem = '.page_2';
+            }
+            createFramePage(elem, url, false);
+        }
+
+
+
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                                   系列事件
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        // 分组1
+        $('.grid__group_1 .grid__list_one').on('click', function(){
+            var index = $(this).index();
+            $(this).addClass('on').siblings().removeClass('on');
+            loadTheSameNodePage(index);
+        });
+        
+        
+        // 分组2
+        $('.grid__group_2 .grid__list_one').on('click', function(){
+            var index = $(this).index();
+            $(this).addClass('on').siblings().removeClass('on');
+            $(this).parent().siblings('.grid__result').children().eq(index).show().siblings().hide();
+            loadTheDifferrentNodePage(index);
+        });
+
+
+    </script>
+</body>
+</html>
