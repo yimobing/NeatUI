@@ -14,6 +14,7 @@
     2. http://t.zoukankan.com/javalinux-p-15631834.html
  * Author: Mufeng
  * Date: 2024.09.29
+ * Update: 2024.10.08
 */
 
 //———————————————————————————————————————————————————————————————————
@@ -194,7 +195,7 @@
     /**
      * 执行导出EXCEL数据
      * @param {Array} arr 二维数组
-     * @param {Object} opts 导出其它选项参数
+     * @param {Object} opts 导出其它选项参数(可选)
      */
     EXCELS.prototype.exportExcel = function (arr, opts) {
         // arr 示例数据
@@ -214,8 +215,10 @@
         // 开始执行
         // 选项参数 opts 
         var defaults = {
-            merged: false, // 是否合并某些单元格
-            mergeMethod: {s: {r: 0, c: 0}, e: {r: 0, c: 2}} // 比如，这里设置A1-C1的单元格合并
+            merged: false, // 是否合并某些单元格，默认false
+            mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
+            ]
         }
         var settings = utils.extend(true, {}, defaults, opts || {});
         // 导出的文件名
@@ -228,9 +231,7 @@
         // 执行导出操作
         var sheet = XLSX.utils.aoa_to_sheet(arr);
         if (settings.merged) { // 合并单元格
-            sheet['!merges'] = [
-                settings.mergeMethod
-            ];
+            sheet['!merges'] = settings.mergeMethod;
         }
         this.openDownloadDialog(this.sheet2blob(sheet), file_name + '.xlsx');
     }

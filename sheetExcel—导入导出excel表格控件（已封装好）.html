@@ -89,8 +89,10 @@
                             ];
                             var opts = {
                                 merged: false, // 是否合并某些单元格
-                                mergeMethod: {s: {r: 0, c: 0}, e: {r: 0, c: 2}} // 比如，这里设置A1-C1的单元格合并
-                            }
+                                mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
+                                    { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
+                                ]
+                            }   
                             neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
                         }
                     },
@@ -163,31 +165,27 @@
                     appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的样式名，默认空(可选)
                     btnClassName: 'btn-daochu', // 按钮样式名(可选)
                     btnText: '导出EXCEL(2007+)', // 按钮文本名(可选)
-                    filename: '导出Excelxx', // 导出的文件名(可选)
+                    filename: '导出Excel', // 导出的文件名(可选)
                     withNowTime: true, // 导出的文件名后面是否加上当前时间，默认true(可选)。值：true 时后面加上当前时间，false 时后面加上随机字符
                     callback: function(e){
-
-                        // 
-                        var arr = [
-                            // ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
-                            ['姓名', '性别', '年龄', '注册时间'],
-                            ['张三', '男', 18, new Date()],
-                            ['李四', '女', 22, new Date()]
-                        ];
-                        var sheet = XLSX.utils.aoa_to_sheet(arr);
-                        // sheet['!merges'] = [
-                        //     // 设置A1-C1的单元格合并
-                        //     {s: {r: 0, c: 0}, e: {r: 0, c: 2}}
-                        // ];
-                        // 需要注意的地方就是被合并的单元格要用null预留出位置，否则后面的内容（本例中是第四列其它信息）会被覆盖。
-
-                        var arr = [
-                            // ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
-                            ['姓名2', '性别2', '年龄2', '注册时间2'],
-                            ['张三', '男', 18, new Date()],
-                            ['李四', '女', 22, new Date()]
-                        ];
-                        neuiSheetExcel.exportExcel(arr); // 调用控件内部的函数进行导出
+                        neui.showAnimate('努力导出中...');
+                        setTimeout(() => {
+                            var arr = [
+                                ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
+                                ['姓名', '性别', '年龄', '注册时间'],
+                                ['张三', '男', 18, new Date()],
+                                ['李四', '女', 22, new Date()]
+                            ];
+                            var opts = {
+                                merged: true, // 是否合并某些单元格，默认false
+                                mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
+                                    { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
+                                ]
+                            }
+                            neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
+                            neui.destroyAnimate();
+                        }, 100);
+                        
                     }
                 },
                 // 预览功能模块
