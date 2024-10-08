@@ -1441,8 +1441,10 @@ var utilities = {
      * [适用性] 适用于指定区域内容溢出时出现了滚动条，此时就可以用本方法获取滚动条宽度
      * [兼容性] 兼容IE5+
      * @returns {number} 返回滚动条宽度值。一般各大浏览器滚动条的值均在17-21之间
+     * edit 20241008
      */
     getScrollbarWidth: function(){
+        // 方法1
         var w = 0;
         if(/msie/.test(navigator.userAgent.toLocaleLowerCase())){
             var $textarea1 = $('<textarea cols="10" rows="2"></textarea>').css({ position: 'absolute', top: -1000, left: -1000 }).appendTo('body'),
@@ -1465,6 +1467,22 @@ var utilities = {
             $div.parent().remove();
         }
         return w;
+        // 方法2：
+        // var oP = document.createElement('p'), styles = {
+        //     width: '100px',
+        //     height: '100px',
+        //     overflowY: 'scroll',
+        // }, i, widthOfBar;
+        // for (i in styles){
+        //     oP.style[i] = styles[i];
+        // }
+        // document.body.appendChild(oP);
+		// widthOfBar = oP.offsetWidth - oP.clientWidth;
+        // var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串 
+        // var isIE = window.ActiveXObject || "ActiveXObject" in window ? true : false;
+		// if(isIE) oP.removeNode(true);
+		// else oP.remove();
+        // return widthOfBar;
     },
 
     /**
