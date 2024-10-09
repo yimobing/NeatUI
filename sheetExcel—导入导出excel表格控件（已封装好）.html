@@ -53,12 +53,13 @@
         <div class="controls__demo">
             <pre>
                 neuiSheetExcel({
+                    // 这两个参数一般没用
                     idClass: 'sheet', // 根节点样式名(可选)
                     operationClassName: 'sheet__operate', // 导入导出操作节点样式名(可选)
                     // 导入功能模块
                     import: {
                         enable: true, // 是否启用，默认true(可选)
-                        appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的样式名，默认空(可选)
+                        appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                         btnClassName: 'btn-daoru', // 按钮样式名(可选)
                         btnText: '导入EXCEL(2007+)', // 按钮文本名(可选)
                         format: { // 数据输出方式(可选)
@@ -74,7 +75,7 @@
                     // 导出功能模块
                     export: {
                         enable: true, // 是否启用，默认true
-                        appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的样式名，默认空(可选)
+                        appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                         btnClassName: 'btn-daochu', // 按钮样式名(可选)
                         btnText: '导出EXCEL(2007+)', // 按钮文本名(可选)
                         filename: '导出Excel', // 导出的文件名(可选)
@@ -101,7 +102,7 @@
                     // 预览功能模块
                     preview: {
                         enable: true,  // 是否启用，默认true(可选)
-                        appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的样式名，默认空(可选)
+                        appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                         nodeId: 'output', // 预览数据绑定的节点ID(可选)
                         title: '导入数据预览', // 标题内容，空时表示没有标题(可选)
                         hasTitleRow: true, // 预览时是否添加列索引，即添加表头A、B、C、D、E、F .. 这行，默认true(可选)
@@ -143,12 +144,13 @@
             //——————————————————————————————————————————
             // 导入导出功能初始化
             neuiSheetExcel({
+                // 这两个参数一般没用
                 idClass: 'sheet', // 根节点样式名(可选)
                 operationClassName: 'sheet__operate', // 导入导出操作节点样式名(可选)
                 // 导入功能模块
                 import: {
                     enable: true, // 是否启用，默认true(可选)
-                    appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的样式名，默认空(可选)
+                    appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                     btnClassName: 'btn-daoru', // 按钮样式名(可选)
                     btnText: '导入EXCEL(2007+)', // 按钮文本名(可选)
                     format: { // 数据输出方式(可选)
@@ -164,7 +166,7 @@
                 // 导出功能模块
                 export: {
                     enable: true, // 是否启用，默认true
-                    appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的样式名，默认空(可选)
+                    appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                     btnClassName: 'btn-daochu', // 按钮样式名(可选)
                     btnText: '导出EXCEL(2007+)', // 按钮文本名(可选)
                     filename: '导出Excel', // 导出的文件名(可选)
@@ -194,7 +196,7 @@
                 // 预览功能模块
                 preview: {
                     enable: true,  // 是否启用，默认true(可选)
-                    appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的样式名，默认空(可选)
+                    appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                     nodeId: 'output', // 预览数据绑定的节点ID(可选)
                     title: '导入数据预览', // 标题内容，空时表示没有标题(可选)
                     hasTitleRow: true, // 预览时是否添加列索引，即添加表头A、B、C、D、E、F .. 这行，默认true(可选)

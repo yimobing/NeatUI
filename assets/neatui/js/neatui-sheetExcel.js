@@ -35,13 +35,13 @@
     //================================================================
     function EXCELS(options) {
         this.defaults = {
+            // 这两个参数一般没用
             idClass: 'sheet', // 根节点样式名(可选)
             operationClassName: 'sheet__operate', // 操作区域节点样式名(可选)
-
             // 导入功能模块
             import: {
                 enable: true, // 是否启用，默认true(可选)
-                appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的样式名，默认空(可选)
+                appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                 btnClassName: 'btn-daoru', // 按钮样式名(可选)
                 btnText: '导入EXCEL(2007+)', // 按钮文本名(可选)
                 format: { // 数据输出方式(可选)
@@ -52,20 +52,20 @@
                 },
                 callback: null // 回调函数。 e 参数为数组，数组中每个元素为一个object对象，表示表格中的一行数据。
             },
-            // 导出功能模块
+            // 导出功能模块(可选)
             export: {
-                enable: true, // 是否启用，默认true
-                appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的样式名，默认空(可选)
+                enable: true, // 是否启用，默认true。注：当前端不传递 export 参数时，默认不启用，即相当于 export.enable = false
+                appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                 btnClassName: 'btn-daochu', // 按钮样式名(可选)
                 btnText: '导出EXCEL(2007+)', // 按钮文本名(可选)
                 filename: '导出Excel', // 导出的文件名(可选)
                 withNowTime: true, // 导出的文件名后面是否加上当前时间，默认true(可选)。值：true 时后面加上当前时间，false 时后面加上随机字符
                 callback: null // 回调函数。 e 参数为空对象，不传递任何数据。
             },
-            // 预览功能模块
+            // 预览功能模块(可选)
             preview: {
-                enable: true,  // 是否启用，默认true(可选)
-                appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的样式名，默认空(可选)
+                enable: true,  // 是否启用，默认true(可选)。注：当前端不传递 preview 参数时，默认不启用，即相当于 preview.enable = false
+                appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                 nodeId: 'output', // 预览数据绑定的节点ID(可选)
                 title: '导入数据预览', // 标题内容，空时表示没有标题(可选)
                 hasTitleRow: true, // 预览时是否添加列索引，即添加表头A、B、C、D、E、F .. 这行，默认true(可选)
@@ -97,21 +97,26 @@
             '<button type="button" class="btn-dao btn-dao-ru ' + this.settings.import.btnClassName + '">' + this.settings.import.btnText + '</button>'
         ].join('\r\n');
         // 导出节点HTML
-        var expDiv = document.createElement('div');
-        expDiv.className = 'sheet__operate_daochu';
-        expDiv.innerHTML = [
-            '<button type="button" class="btn-dao btn-dao-chu ' + this.settings.export.btnClassName + '">' + this.settings.export.btnText + '</button>'
-        ].join('\r\n');
+        var expDiv = null;
+        if (typeof options.export != 'undefined' && this.settings.export.enable) {
+            expDiv = document.createElement('div');
+            expDiv.className = 'sheet__operate_daochu';
+            expDiv.innerHTML = [
+                '<button type="button" class="btn-dao btn-dao-chu ' + this.settings.export.btnClassName + '">' + this.settings.export.btnText + '</button>'
+            ].join('\r\n');
+        }
         // 预览节点HTML
-        var prewDiv = document.createElement('div');
-        prewDiv.className = 'sheet__output';
-        prewDiv.style = "display: none";
-        var _titleStr = this.settings.preview.title == '' ? '' : '<div class="sheet__output_caption">' + this.settings.preview.title + '</div>';
-        prewDiv.innerHTML = [
-            _titleStr,
-            '<div class="sheet__output_table" id="' + this.settings.preview.nodeId + '" contenteditable></div>'
-        ].join('\r\n');
-
+        var prewDiv = null;
+        if (typeof options.preview != 'undefined' && this.settings.preview.enable) {
+            prewDiv = document.createElement('div');
+            prewDiv.className = 'sheet__output';
+            prewDiv.style = "display: none";
+            var _titleStr = this.settings.preview.title == '' ? '' : '<div class="sheet__output_caption">' + this.settings.preview.title + '</div>';
+            prewDiv.innerHTML = [
+                _titleStr,
+                '<div class="sheet__output_table" id="' + this.settings.preview.nodeId + '" contenteditable></div>'
+            ].join('\r\n');
+        }
         // 创建控件根节点
         var rootDiv = null;
         if (document.getElementsByClassName(this.settings.idClass).length == 0) { // 不存在，才创建
@@ -131,10 +136,12 @@
                 else document.getElementsByClassName(impFatherClassName)[0].appendChild(impDiv);
             }
             // 将导出节点作为子节点插入到指定节点中
-            if (this.settings.export.enable) {
-                var expFatherClassName = this.settings.export.appendToParentNode;
-                if (expFatherClassName == '') opertDiv.appendChild(expDiv);
-                else document.getElementsByClassName(expFatherClassName)[0].appendChild(expDiv);
+            if (typeof options.export != 'undefined' && this.settings.export.enable) {
+                if (expDiv != null) {
+                    var expFatherClassName = this.settings.export.appendToParentNode;
+                    if (expFatherClassName == '') opertDiv.appendChild(expDiv);
+                    else document.getElementsByClassName(expFatherClassName)[0].appendChild(expDiv);
+                }
             }
             // 判断操作区域子节点是否空，若空则删除该节点
             if (opertDiv.childNodes.length == 0) {
@@ -142,10 +149,12 @@
             }
         }
         // 创建预览节点
-        if (this.settings.preview.enable) {
-            var prewFatherClassName = this.settings.preview.appendToParentNode;
-            if (prewFatherClassName == '') rootDiv.appendChild(prewDiv);
-            else document.getElementsByClassName(prewFatherClassName)[0].appendChild(prewDiv);
+        if (typeof options.preview != 'undefined' && this.settings.preview.enable) {
+            if (prewDiv != null) {
+                var prewFatherClassName = this.settings.preview.appendToParentNode;
+                if (prewFatherClassName == '') rootDiv.appendChild(prewDiv);
+                else document.getElementsByClassName(prewFatherClassName)[0].appendChild(prewDiv);
+            }
         }
 
         // 判断根节点内容是否为空，若空则删除根节点
