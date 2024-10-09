@@ -218,16 +218,19 @@
             merged: false, // 是否合并某些单元格，默认false
             mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
                 { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
-            ]
+            ],
+            filename: '' // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
         }
         var settings = utils.extend(true, {}, defaults, opts || {});
         // 导出的文件名
         var today = utils.getCurrentTime();
         var randStr = utils.getRandomWord(8, 12, true);
-        var file_name = this.settings.export.filename + '-' +
-        (
-            this.settings.export.withNowTime ? today : randStr
-        );
+        var file_name = settings.filename.toString().replace(/\s+/g, '') !== '' ?
+            settings.filename
+            :
+            (
+                this.settings.export.filename + '-' + ( this.settings.export.withNowTime ? today : randStr )
+            );
         // 执行导出操作
         var sheet = XLSX.utils.aoa_to_sheet(arr);
         if (settings.merged) { // 合并单元格
