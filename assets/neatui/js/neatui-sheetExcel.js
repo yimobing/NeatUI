@@ -164,35 +164,41 @@
 
         // 执行导入操作
         if (this.settings.import.enable) {
-            document.getElementsByClassName(this.settings.import.btnClassName)[0].onclick = function () {
-                // console.log('aaa');
-                var uploadDom = document.getElementById('sheet-upload');
-                uploadDom.click();
-                uploadDom.addEventListener('change', function (e) {
-                    // console.log('我要开始导入数据了');
-                    var files = e.target.files;
-                    if(files.length == 0) return;
-                    var f = files[0];
-                    if(!/\.xlsx$/g.test(f.name)) {
-                        utils.dialogs('仅支持读取xlsx格式！');
-                        return;
-                    }
-                    _this.readingWorkbookFromLocalFile(f, function(workbook) {
-                        var sourceArr = _this.readWorkbook(workbook);
-                        // console.log('数据源：', sourceArr);
-                        if (_this.settings.import.callback) {
-                            _this.settings.import.callback(sourceArr);  // 导入回调函数
+            var _impNode = document.getElementsByClassName(this.settings.import.btnClassName);
+            if (_impNode.length != 0) {
+                _impNode[0].onclick = function () {
+                    // console.log('aaa');
+                    var uploadDom = document.getElementById('sheet-upload');
+                    uploadDom.click();
+                    uploadDom.addEventListener('change', function (e) {
+                        // console.log('我要开始导入数据了');
+                        var files = e.target.files;
+                        if (files.length == 0) return;
+                        var f = files[0];
+                        if (!/\.xlsx$/g.test(f.name)) {
+                            utils.dialogs('仅支持读取xlsx格式！');
+                            return;
                         }
+                        _this.readingWorkbookFromLocalFile(f, function (workbook) {
+                            var sourceArr = _this.readWorkbook(workbook);
+                            // console.log('数据源：', sourceArr);
+                            if (_this.settings.import.callback) {
+                                _this.settings.import.callback(sourceArr);  // 导入回调函数
+                            }
+                        });
                     });
-                });
+                }
             }
         }
 
         // 执行导出操作
         if (this.settings.export.enable) {
-            document.getElementsByClassName(this.settings.export.btnClassName)[0].onclick = function () {
-                if (_this.settings.export.callback) {
-                    _this.settings.export.callback({});  // 导出回调函数
+            var _expNode = document.getElementsByClassName(this.settings.export.btnClassName);
+            if (_expNode.length != 0) {
+                _expNode[0].onclick = function () {
+                    if (_this.settings.export.callback) {
+                        _this.settings.export.callback({});  // 导出回调函数
+                    }
                 }
             }
         }
