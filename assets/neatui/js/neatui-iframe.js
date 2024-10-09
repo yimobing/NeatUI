@@ -66,7 +66,9 @@
                 enable: false, // 是否启用，默认false(可选)
                 horizontal: 0, // 水平方向宽度误差值，默认0(可选)。注：系统将在框架宽度基础上再减去该参数的值。
                 vertical: 0 // 垂直方向高度误差值，默认0(可选)。注：系统将在框架高度基础上再减去该参数的值。
-            }
+            },
+            // 回调函数
+            resize: null // 浏览器窗口大小变化时的回调函数，默认null(可选)
         }
         var settings = helpers.extend(true, {}, defaults, options || {}); // 合并对象
         me.$defaults = defaults;
@@ -102,14 +104,18 @@
         if (me.$opts.refresh == false) {
             if (userNode.childNodes.length == 0) { // 绑定的节点下面只能创建一个框架
                 helpers.appendHTML(allHtml, userNode);
-                methods.setControlStyle(me, userNode, rootClassName, skeletonClassName);
+                methods._setControlStyle(me, userNode, rootClassName, skeletonClassName);
             }
         }
         else {
             userNode.innerHTML = ''; // 清空内容
             // 重建内容
             helpers.appendHTML(allHtml, userNode);
-            methods.setControlStyle(me, userNode, rootClassName, skeletonClassName);
+            methods._setControlStyle(me, userNode, rootClassName, skeletonClassName);
+        }
+        // 回调
+        if (me.$opts.resize) {
+            window.addEventListener('resize', methods._handleWindowChange(me));
         }
     };
 
@@ -136,10 +142,6 @@
     //  二、内置函数库 methods
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     var methods = {
-        // _getCity: function () {
-            
-        // }
-
         /**
          * 设置控件样式
          * @param {Object} me 控件自身对象
@@ -147,7 +149,7 @@
          * @param {String} root_class_name 根节点样式名
          * @param {String} skeleton_class_name 框架节点样式名
          */
-        setControlStyle: function (me, user_node, root_class_name, skeleton_class_name) {
+        _setControlStyle: function (me, user_node, root_class_name, skeleton_class_name) {
             var rootNode = document.getElementsByClassName(root_class_name)[0],
                 skeletonNode = document.getElementsByClassName(skeleton_class_name)[0];
             // 设置样式
@@ -193,7 +195,20 @@
             // console.log('框架真实宽度：', realW, ', 真实高度：', realH);
             rootNode.style = 'width: ' + realW + '; height: ' + realH + ';'; // 'width: 100%; height: 100%;';
             skeletonNode.style = 'width: 100%; height: 100%;  overflow: auto; -webkit-overflow-scrolling: touch;';
-        }
+        },
+
+
+
+        /**
+         * 浏览器窗口大小发生变化时
+         * @param {Object} me 控件自身对象
+         */
+        _handleWindowChange: function (me) {
+            // console.log('浏览器窗口大小发生变化了');
+            me.$opts.resize({});
+        },
+
+
     }; // END methods
 
 
