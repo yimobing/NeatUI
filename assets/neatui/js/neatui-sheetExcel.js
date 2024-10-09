@@ -88,6 +88,7 @@
             return;
         }
         var _this = this;
+        this.opts = options;
         this.settings = utils.extend(true, {}, this.defaults, options || {});
         // 导入节点HTML
         var impDiv = document.createElement('div');
@@ -301,7 +302,7 @@
         // }
         var opts = this.settings.import.format;
         // 将导入数据以表格的形式展示在界面上
-        if (this.settings.preview.enable) {
+        if (typeof this.opts.preview != 'undefined' && this.settings.preview.enable) {
             document.getElementsByClassName('sheet__output')[0].style = ''; // 显示预览区域
             var csv = XLSX.utils.sheet_to_csv(worksheet, opts); // 生成CSV格式
             document.getElementById(this.settings.preview.nodeId).innerHTML = this.csv2table(csv);
