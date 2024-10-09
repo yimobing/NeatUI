@@ -4,7 +4,7 @@
  * 调用控件即可直接嵌入一个iframe页面，浏览器窗口调整时，iframe子页面大小也会自动调整
  * Author：Mufeng
  * Date: 2024.10.08
- * Update: 2024.10.08
+ * Update: 2024.10.09
  */
 ; (function (root, factory) {
     if (typeof define === 'function' && define.amd) { // AMD规范
@@ -50,7 +50,7 @@
         var defaults = {
             src: '', // 框架链接地址(必须)
             refresh: false, // 是否刷新绑定的节点中的页面，默认false(可选)。值为true 时将重建页面，false 时不会重建页面。注：当点击不同按钮时要在同一个绑定的节点下面显示不同的页面，请将本参数设为true。
-            // 指定框架宽高
+            // 指定框架宽高。注：当框架实际宽高<=0时，系统将自动把浏览器视窗高度作为框架宽高。
             width: 'auto', // 框架宽度，默认auto表示系统自动计算(可选)。接受百分比如50%、带或不带单位的数值型如100px。
             height: 'auto', // 框架高度，默认auto表示系统自动计算(可选)。接受百分比如50%、带或不带单位的数值型如100px。
             // 自定义框架左侧、右侧距离。仅当 width != 'auto' 时有效
@@ -59,9 +59,14 @@
             // 自定义框架顶部、底部距离。仅当 height != 'auto' 时有效
             top: 'auto', // 框架以外顶部距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
             bottom: 'auto', // 框架以外底部距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
-            // 框架误差纠正
+            // 框架误差纠正，若不想启用误差纠正功能，请设置参数 width, height 为具体数值即可。注：以下参数当 width = 'auto' 时宽度纠正参数失效，height = 'auto' 时高度纠正参数失效。
             corrected: true, // 是否启用框架宽高值误差纠正功能，默认true(可选)
-            inaccuracy: 0, // 框架宽高误差值，默认0(可选)。建议值14，仅当corrected = true 时有效。注：1.系统将在已确定的框架宽高基础上再减去该值。2.参数值为0时，自动将把浏览器滚动条宽度作为误差值。
+            inaccuracy: 0, // 统一设置框架宽高误差值，默认0(可选)。建议值14，仅当 corrected = true 且 deviation.enable = false 时有效。注：1.系统将在框架宽高基础上再减去该参数的值。2.参数值为0时，自动将把浏览器滚动条宽度作为误差值。
+            deviation: { // 分开设置框架宽高误差值(可选)。仅当 corrected 且 deviation.enable = true 时 有效。生效后参数 inaccuracy 失效。
+                enable: false, // 是否启用，默认false(可选)
+                horizontal: 0, // 水平方向宽度误差值，默认0(可选)。注：系统将在框架宽度基础上再减去该参数的值。
+                vertical: 0 // 垂直方向高度误差值，默认0(可选)。注：系统将在框架高度基础上再减去该参数的值。
+            }
         }
         var settings = helpers.extend(true, {}, defaults, options || {}); // 合并对象
         me.$defaults = defaults;
@@ -164,13 +169,28 @@
                 topH = reg.test(t) ? offsetTop : t,
                 botH = reg.test(b) ? 0 : b;
             var incorrectVal = parseFloat(me.$opts.inaccuracy.toString().replace(/(px|rem|vw|vh)/g, ''));
-            var numc = me.$opts.corrected === false ?
-                0 :
-                incorrectVal == 0 ? helpers.getScrollbarWidth() : incorrectVal;
-            // console.log('框架宽高误差值：', numc);
-            var realW = (w == 'auto' || w == '') ? (winW - leftW - rightW - numc) + 'px' : (me.$opts.width.toString().indexOf('%') > 0 ? w : w + 'px');
-            realH = (h == 'auto' || h == '') ? (winH - topH - botH - numc) + 'px' : (me.$opts.height.toString().indexOf('%') > 0 ? h : h + 'px');
-            // console.log('框架真实宽度：', realW, '\n真实高度：', realH);
+            var numcW = 0, numcH = 0;
+            if (me.$opts.corrected && me.$opts.deviation.enable) {
+                numcW = parseFloat(me.$opts.deviation.horizontal.toString().replace(/(px|rem|vw|vh)/g, ''));
+                numcH = parseFloat(me.$opts.deviation.vertical.toString().replace(/(px|rem|vw|vh)/g, ''));
+            }
+            else if (me.$opts.corrected && me.$opts.deviation.enable === false) {
+                var value = (incorrectVal == 0 ? helpers.getScrollbarWidth() : incorrectVal);
+                numcW = value;
+                numcH = value;
+            }
+            // console.log('框架宽度误差值：', numcW, ', 高度误差值：', numcH);
+            var realW = (w == 'auto' || w == '') ? (winW - leftW - rightW - numcW) : w,
+                realH = (h == 'auto' || h == '') ? (winH - topH - botH - numcH) : h;
+            if (realW.toString().indexOf('%') < 0) { // 宽度不是百分比时
+                if (realW <= 0) realW = winW;
+                realW += 'px';
+            }
+            if (realH.toString().indexOf('%') < 0) { // 高度不是百分比时
+                if (realH <= 0) realH = winH;
+                realH += 'px';
+            }
+            // console.log('框架真实宽度：', realW, ', 真实高度：', realH);
             rootNode.style = 'width: ' + realW + '; height: ' + realH + ';'; // 'width: 100%; height: 100%;';
             skeletonNode.style = 'width: 100%; height: 100%;  overflow: auto; -webkit-overflow-scrolling: touch;';
         }
