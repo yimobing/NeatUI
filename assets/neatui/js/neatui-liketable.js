@@ -1876,8 +1876,8 @@
 		for(var k = 0; k < ps_en_arr.length; k++){
 			var field1 = ps_en_arr[k];
 			for(var i = 0; i < arr.length; i++){
-				var _row = ps_obj.find('.list-content').children().eq(i);
-				ps_obj.find('.list-content').children().eq(i).children().each(function(j){
+				var _row = ps_obj.find('.list-content').children().eq(arr[i]); // edit 20241010-1
+				_row.children().each(function(j){
 					var field2 = ps_obj.find('.list-title').children().eq(j).attr('data-field');
 					if(field1 == field2){
 						var $input = $(this).find('input:text, textarea, input:radio, input:checkbox');

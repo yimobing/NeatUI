@@ -74,8 +74,8 @@
         · neuiLikeTable.addOneRow($tableDom); // 新建一空行
         · neuiLikeTable.insertOneRow(source, $tableDom); // 新建一空行或非空行. source为数据源. source为空时(即''或{})则新建空行,非空时(如{name:"张三"})则新建非空行
         · neuiLikeTable.deleteOneRow(5, $tableDom); // 删除某一行. 5代表该行索引值
-        · neuiLikeTable.setSomeColumnReadonly(["yhjcnf", "dizhi"], 0); // 指定第N行(索引值)中某些列(英文字段)为只读状态
-        · neuiLikeTable.setSomeColumnCanWrite(["yhjcnf", "dizhi"], 0); // 指定第N行(索引值)中某些列(英文字段)为可写状态
+        · neuiLikeTable.setSomeColumnReadonly(["yhjcnf", "dizhi"], 0); // 指定第N行(索引值)中某些列(英文字段)为只读状态 (仅限参数 columns.mode = 'input|textarea' && colmns.disabled=false 时有效)
+        · neuiLikeTable.setSomeColumnCanWrite(["yhjcnf", "dizhi"], 0); // 指定第N行(索引值)中某些列(英文字段)为可写状态 (仅限参数 columns.mode = 'input|textarea' && colmns.disabled=true 时有效)
         · neuiLikeTable.changeRowStatus(0, status, $tableDom); // 更改第1行(索引值0)的“状态列”文本为“已保存”. 所有行时，0 改成 'all'。status参数为自定义状态(可选),值：saved 已保存(默认), unsave 未保存。$tableDom参数为表格根对象(可选)
         · neuiLikeTable.selectAllRow($tableDom); // 全选
         · neuiLikeTable.selectNoneRow($tableDom); // 全不选
