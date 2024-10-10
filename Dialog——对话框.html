@@ -21,6 +21,7 @@
 	<title>Dialog | 对话框插件</title>
 	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
 	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
 	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-keyboard.css"><!--数字键盘控件-->
 	<link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
 	<link type="text/css" rel="stylesheet" href="test//css/demo-dialog.css"><!--本页demo样式-->
@@ -126,7 +127,8 @@
 		<section class="grid-demo-feedback">
 			<button type="button" class="ne-btn blue l-2x" id="btn_feedback1">单行输入框</button>
 			<button type="button" class="ne-btn lightblue l-2x" id="btn_feedback2">多行输入框</button>
-			<button type="button" class="ne-btn purple l-2x" id="btn_feedback3">自定义输入框内容</button>
+			<button type="button" class="ne-btn purple l-2x" id="btn_feedback3">自定义输入框内容1</button>
+			<button type="button" class="ne-btn purple l-2x" id="btn_feedback4">自定义输入框内容2</button>
 		</section>
 		<!--/grid-demo-feedback-->
 
@@ -956,8 +958,11 @@
 
 		});
 
+
+
+
 		/*+------------------------+*/
-		//=====自定义输入框内容
+		//=====自定义输入框内容1
 		$('#btn_feedback3').on('click', function () {
 			var $this = $(this);
 
@@ -998,6 +1003,58 @@
 					var _this = this;
 					_this.closeFeed(); //_this.closeWindow = true //关闭当前输入框窗口
 					//neuiDialog.closeFeedWindow(); //关闭所有输入框窗口
+					alert('请注意：我什么都没执行\n若要点我之后马上关闭提示窗口');
+				}
+			})
+		});
+
+
+
+		/*+------------------------+*/
+		//=====自定义输入框内容2
+		$('#btn_feedback4').on('click', function () {
+			var _html = [
+				'<div class="ne-form" style="width: 93%">',
+					'<div class="eform-row">',
+						'<div class="item-l"><label>联系人</label></div>',
+						'<div class="item-r">',
+							'<input type="text" id="s-user" placeholder="联系人姓名" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'联系人姓名\'"/>',
+						'</div>',
+						'<div class="item-cell" data-type="must">*</div>',
+					'</div>',
+					'<div class="eform-row">',
+						'<div class="item-l"><label>联系电话</label></div>',
+						'<div class="item-r">',
+							'<input type="text" id="tel" placeholder="联系人电话" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'联系人电话\'"/>',
+						'</div>',
+						'<div class="item-cell" data-type="must">*</div>',
+					'</div>',
+					'<div class="eform-row">',
+						'<div class="item-l"><label>备注</label></div>',
+						'<div class="item-r">',
+							'<textarea id="s-notes"></textarea>',
+						'</div>',
+					'</div>',
+				'</div>',
+			].join('\r\n');
+
+			neuiDialog.feedback({
+				// animate:true,
+				caption: '客户经理信息',
+				// textAlign:'center', // 标题位置
+				html: _html,
+				// conMargin:'5px auto',
+				// conPadding:'5px',
+				buttons: ['确定'],
+				// btnWidth:['100%'], // 按钮大小100%
+				showCross: true, // 是否显示右上角打叉图标(关闭按钮)
+				// minWidth:310, // 最小宽度
+				// maxWidth:500, // 最大宽度
+				openBack: function () { }, // 窗口加载完成的回调函数
+				callBack: function () {
+					var _this = this;
+					// _this.closeFeed(); //_this.closeWindow = true // 关闭当前输入框窗口
+					//neuiDialog.closeFeedWindow(); // 关闭所有输入框窗口
 					alert('请注意：我什么都没执行\n若要点我之后马上关闭提示窗口');
 				}
 			})
