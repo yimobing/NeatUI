@@ -202,10 +202,12 @@
             //——————————————————————————————————————————
             //=====导入按钮、导入EXCEL
             $('#btn-import').on('click', function(){
+                console.log('aaa，开始导入');
                 document.getElementById('file').click();
             });
             //
             document.getElementById('file').addEventListener('change', function(e) {
+                console.log('bbb，开始导入');
                 var files = e.target.files;
                 if(files.length == 0) return;
                 var f = files[0];

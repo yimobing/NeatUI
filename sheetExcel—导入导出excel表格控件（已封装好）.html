@@ -68,7 +68,8 @@
                             /** Default value for null/undefined values */
                             defval: '' // 给空的单元格赋值为空字符串，避免单元格被跳过(JSON解析出来后缺少相应的key)
                         },
-                        callback: function(e){ // 回调函数。 e 参数为数组，数组中每个元素为一个object对象，表示表格中的一行数据。
+                        canSecondChooseSameFile: true, // 是否能再次选择同名文件进行导入，默认true(可选)。值为false时，页面没刷新的情况下，同名文件不能第2次选择导入
+                        callback: function(e){ // 回调函数(可选)。 e 参数为数组，数组中每个元素为一个object对象，表示表格中的一行数据。
                             console.log('返回来的数据源为：', e);
                         }
                     },
@@ -80,7 +81,7 @@
                         btnText: '导出EXCEL(2007+)', // 按钮文本名(可选)
                         filename: '导出Excel', // 导出的文件名(可选)
                         withNowTime: true, // 导出的文件名后面是否加上当前时间，默认true(可选)。值：true 时后面加上当前时间，false 时后面加上随机字符
-                        callback: function(e){ // 回调函数。 e 参数为空对象，不传递任何数据。
+                        callback: function(e){ // 回调函数(可选)。 e 参数为空对象，不传递任何数据。
                             // 要导出的数据为二维数组，格式如下
                             var arr = [
                                 // ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
@@ -159,6 +160,7 @@
                         /** Default value for null/undefined values */
                         defval: '' // 给空的单元格赋值为空字符串，避免单元格被跳过(JSON解析出来后缺少相应的key)
                     },
+                    canSecondChooseSameFile: false, // 是否能再次选择同名文件进行导入，默认true(可选)。值为false时，页面没刷新的情况下，同名文件不能第2次选择导入
                     callback: function(e){
                         console.log('返回来的数据源为：', e);
                     }

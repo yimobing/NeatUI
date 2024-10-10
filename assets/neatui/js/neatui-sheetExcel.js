@@ -50,7 +50,8 @@
                     /** Default value for null/undefined values */
                     defval: '' // 给空的单元格赋值为空字符串，避免单元格被跳过(JSON解析出来后缺少相应的key)
                 },
-                callback: null // 回调函数。 e 参数为数组，数组中每个元素为一个object对象，表示表格中的一行数据。
+                canSecondChooseSameFile: true, // 是否能再次选择同名文件进行导入，默认true(可选)。值为false时，页面没刷新的情况下，同名文件不能第2次选择导入
+                callback: null // 回调函数(可选)。 e 参数为数组，数组中每个元素为一个object对象，表示表格中的一行数据。
             },
             // 导出功能模块(可选)
             export: {
@@ -60,7 +61,7 @@
                 btnText: '导出EXCEL(2007+)', // 按钮文本名(可选)
                 filename: '导出Excel', // 导出的文件名(可选)
                 withNowTime: true, // 导出的文件名后面是否加上当前时间，默认true(可选)。值：true 时后面加上当前时间，false 时后面加上随机字符
-                callback: null // 回调函数。 e 参数为空对象，不传递任何数据。
+                callback: null // 回调函数(可选)。 e 参数为空对象，不传递任何数据。
             },
             // 预览功能模块(可选)
             preview: {
@@ -167,28 +168,31 @@
         if (this.settings.import.enable) {
             var _impNode = document.getElementsByClassName(this.settings.import.btnClassName);
             if (_impNode.length != 0) {
+                var uploadDom = document.getElementById('sheet-upload');
                 _impNode[0].onclick = function () {
-                    // console.log('aaa');
-                    var uploadDom = document.getElementById('sheet-upload');
+                    // console.log('aaa,我要开始导入数据了');
                     uploadDom.click();
-                    uploadDom.addEventListener('change', function (e) {
-                        // console.log('我要开始导入数据了');
-                        var files = e.target.files;
-                        if (files.length == 0) return;
-                        var f = files[0];
-                        if (!/\.xlsx$/g.test(f.name)) {
-                            utils.dialogs('仅支持读取xlsx格式！');
-                            return;
-                        }
-                        _this.readingWorkbookFromLocalFile(f, function (workbook) {
-                            var sourceArr = _this.readWorkbook(workbook);
-                            // console.log('数据源：', sourceArr);
-                            if (_this.settings.import.callback) {
-                                _this.settings.import.callback(sourceArr);  // 导入回调函数
-                            }
-                        });
-                    });
                 }
+                uploadDom.addEventListener('change', function (e) {
+                    // console.log('bbb,我要开始导入数据了');
+                    var files = e.target.files;
+                    if (files.length == 0) return;
+                    var f = files[0];
+                    if (!/\.xlsx$/g.test(f.name)) {
+                        utils.dialogs('仅支持读取xlsx格式！');
+                        return;
+                    }
+                    _this.readingWorkbookFromLocalFile(f, function (workbook) {
+                        var sourceArr = _this.readWorkbook(workbook);
+                        // console.log('数据源：', sourceArr);
+                        if (_this.settings.import.callback) {
+                            _this.settings.import.callback(sourceArr);  // 导入回调函数
+                            if (_this.settings.import.canSecondChooseSameFile) {
+                                uploadDom.value = ''; // 清空 input file 中的文件，如此同名文件便能第2次选择，否则同名文件只能选择一次
+                            }
+                        }
+                    });
+                });
             }
         }
 
