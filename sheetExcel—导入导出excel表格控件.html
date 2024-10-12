@@ -49,18 +49,37 @@
         <div class="controls__caption">控件说明</div>
         <div class="controls__content">
             <pre>
-                [neuiSheetExcel]
+                * ------------------------------------------------------
+                * [neuiSheetExcel]
                 * 导入导出EXCEL控件
                 * 利用JS实现纯前端导入和导出excel文件 (基于SheetJS出品的js-xlsx库进行二次封装)
                 * [局限说明] 本控件只支持xlsx格式即excel 2007+。对于xls格式即excel 2003及以下产品不支持！
                 * [原生库说明]
                     由SheetJS出品的js-xlsx是一款非常方便的只需要纯JS即可读取和导出excel的工具库，功能强大，支持格式众多，支持xls、xlsx、ods(一种OpenOffice专有表格文件格式)等十几种格式。本控件全部都是以xlsx格式为例。
-                * [参考]
-                    官网：https://sheetjs.com/
-                    GitHub：https://github.com/SheetJS/sheetjs/blob/master/dist/xlsx.full.min.js
-                    文档：
+                * [缺点说明]
+                    sheetJS库基础版(免费的)无法实现带样式导出(如字体大小、单元格居中等)，但可以使用基于其扩展的开源项目xlsx-js-style来实现，即xlsx-js-style用于实现基本表格样式。
+                * [库文件参考]
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    【sheetJS js-xlsx 基础库】
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    说明：有分基础版和完整版2个版本, 基础版免费，完整版加入了更多功能故是收费的
+                    官网： https://sheetjs.com/
+                    GitHub： https://github.com/SheetJS/sheetjs/blob/master/dist/
+                    其中： xlsx.core.min.js 是基础版(免费的), xlsx.full.min.js 是完整版(有些功能要收费的)。一般下载基础版(免费的)即可。
+                    参考：
                     1. https://blog.csdn.net/lgd1917/article/details/122449774
                     2. http://t.zoukankan.com/javalinux-p-15631834.html
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    【xlsx-js-style 表格样式库】
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    说明：开源免费，核心API就是SheetJS的
+                    NPM:  https://www.npmjs.com/package/xlsx-js-style
+                    GitHub： https://github.com/gitbrent/xlsx-js-style/blob/master/dist/
+                    其中：下载 xlsx.bundle.js 即可
+                    参考：
+                    1. https://www.jianshu.com/p/72f668099403
+                    2. https://www.jianshu.com/p/80091cf3201a
+                * ------------------------------------------------------
             </pre>
         </div>
         <div class="controls__caption">控件调用方式</div>
