@@ -66,29 +66,53 @@
         <div class="controls__caption">控件调用方式</div>
         <div class="controls__demo">
             <pre>
-                控件内置了两个函数。
-                neuiSheetExcel.exportExcel(arr, opts) 和 neuiSheetExcel(options) 
+                控件内置了以下函数。
+                neuiSheetExcel.exportExcel(arr, opts); // 仅导出表格数据
+                neuiSheetExcel(options); // 控件初始化+导入导出表格数据
                 
                 1、如果仅使用导出功能，则：
                 neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
-                // 使用示例eg.
-                // 要导出的数据为二维数组，格式如下
-                var arr = [
-                    // ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
-                    ['姓名2', '性别2', '年龄2', '注册时间2'],
-                    ['张三', '男', 18, new Date()],
-                    ['李四', '女', 22, new Date()]
-                ];
-                // 选项参数(可选)
+                其中：
+                (1) arr 是要导出的表格数据，为一个二维数组对象
+                var arr = [ 
+                    [第1行第1-3列合并后的表头, null, null, 其它信息], // 合并表头时，特别注意合并的地方后面预留2个null
+                    [第2行第1列数据, 第2行第2列数据, 第2行第3列数据, 第2行第4列数据], 
+                    [第3行第1列数据, 第3行第2列数据, 第3行第3列数据, 第3行第4列数据], 
+                    [第4行第1列数据, 第4行第2列数据, 第4行第3列数据, 第4行第4列数据], 
+                    //...
+                ]
+                (2) opts 是导出选项参数(可选)，为一个Object对象
                 var opts = {
-                    merged: false, // 是否合并某些单元格
-                    mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
-                        { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
-                    ],
-                    filename: '' // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
-                }   
-                neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
+                    sheetName: 'sheet1', // 工作表名，默认 sheet1(可选)
+                    filename: '', // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
+                    merged: { // 表格单元格合并(可选)
+                        enable: false, // 是否启用功能，默认false(可选)
+                        pattern: [ // 单元格合并方式，是一个数组，默认空数组(可选)。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。r从0开始,0表示第1行,1第2行,以此类推; c也从0开始,0表示第1列,1表示第2列,以此类推。
+                            // { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // 比如，这里设置第1行A1-C1的单元格合并
+                            // { s: { r: 1, c: 1 }, e: { r: 1, c: 4 } } // 比如，这里设置第2行B2-E2的单元格合并
+                        ]
+                    },
+                    columnWidth: { // 表格单元格列宽(可选)
+                        enable: false, // 是否启用功能，默认false(可选)
+                        pattern: [ // 单元格列宽方式，是一个数组，默认空数组(可选)。每个数组由包含wch或wpx构成的对象组成，wpx 字段表示以像素为单位，wch 字段表示以字符为单位(1个汉字等于2个字符)。
+                            // 注：数组中第N个元素代表表格第N列。若表格共有M列,则数组元素个数<=M,即数组元素个数可以小于M个
+                            // { wch: 30 }, // 比如，这里设置第1列的宽。30表示30/2=15个字
+                            // { wch: 40 }, // 比如，这里设置第2列的宽。40表示40/2=20个字
+                        ]
+                    },
+                    styled: { // 表格单元格样式(可选)
+                        enable: false, // 是否启用功能，默认false(可选)
+                        allowEveryCell: false, // 所有单元格样式，是否给所有单元格设置一个默认的样式，默认false(可选)。仅当 enable = true 时有效。
+                        pattern: [ // 个别单元格样式，默认空数组(可选)。注：个别单元格的样式将覆盖所有单元格设置的样式。
+                            // cell 某个单元格如 A1, B1, C1; format 单元格样式, 是一个Object对象, 格式参考变量 cellFormatStyle, 默认null表示不配置样式
+                            // { cell: "A1", format: null },
+                            // { cell: "B1", format: null }, 
+                            // { cell: "C1", style: cellFormatStyle },
+                        ]
+                    }
+                }
 
+                (3) 使用示例：参数本页示例部分。
 
                 2、如果要使用导入和导出功能，则：
                 neuiSheetExcel(options);
@@ -120,25 +144,11 @@
                         appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                         btnClassName: 'btn-daochu', // 按钮样式名(可选)
                         btnText: '导出EXCEL(2007+)', // 按钮文本名(可选)
-                        filename: '导出Excel', // 导出的文件名(可选)
+                        filename: '导出文件', // 导出的文件名(可选)
                         withNowTime: true, // 导出的文件名后面是否加上当前时间，默认true(可选)。值：true 时后面加上当前时间，false 时后面加上随机字符
                         callback: function(e){ // 回调函数(可选)。 e 参数为空对象，不传递任何数据。
-                            // 要导出的数据为二维数组，格式如下
-                            var arr = [
-                                // ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
-                                ['姓名2', '性别2', '年龄2', '注册时间2'],
-                                ['张三', '男', 18, new Date()],
-                                ['李四', '女', 22, new Date()]
-                            ];
-                            // 选项参数(可选)
-                            var opts = {
-                                merged: false, // 是否合并某些单元格
-                                mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
-                                    { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
-                                ],
-                                filename: '' // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
-                            }   
-                            neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
+                            // 这里调用导出函数 neuiSheetExcel.exportExcel(arr, opts); 将数据导致成excel
+                            // 使用方法参考本页示例部分
                         }
                     },
                     // 预览功能模块(可选)
@@ -159,7 +169,8 @@
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
     <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script><!--jQ库-->
-    <script type="text/javascript" src="assets/libs/xlsx.core.min.js"></script><!--SheetJS工具库-->
+    <script type="text/javascript" src="assets/libs/xlsx.core.min.js"></script><!--SheetJS的js-xlsx基础库-->
+    <script type="text/javascript" src="assets/libs/xlsx.bundle.js"></script><!--xlsx-js-style表格样式库,基于SheetJS-->
     <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
     <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
     <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义AJAX-->
@@ -216,7 +227,7 @@
                     appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                     btnClassName: 'btn-daochu', // 按钮样式名(可选)
                     btnText: '导出EXCEL(2007+)', // 按钮文本名(可选)
-                    filename: '导出Excel', // 导出的文件名(可选)
+                    filename: '导出文件', // 导出的文件名(可选)
                     withNowTime: true, // 导出的文件名后面是否加上当前时间，默认true(可选)。值：true 时后面加上当前时间，false 时后面加上随机字符
                     callback: function(e){
                         fnExportData(); // 导出数据
@@ -243,25 +254,80 @@
                 neui.showAnimate('努力导出中...');
                 setTimeout(() => {
                     var arr = [
-                        ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
-                        ['姓名', '性别', '年龄', '注册时间'],
-                        ['张三', '男', 18, new Date()],
-                        ['李四', '女', 22, new Date()]
+                        ['主要信息', null, null, '其它信息', null], // 特别注意合并的地方后面预留2个null
+                        ['姓名', '性别', '年龄', '籍贯', '注册时间'],
+                        ['张文远', '男', 18, '福建省-泉州市-鼓楼区', new Date()],
+                        ['李桂英', '女', 22, '福建省-泉州市-丰泽区', new Date()],
+                        ['赵胜才', '男', 45, '福建省-泉州市-晋江市', new Date()]
                     ];
+
+                    // 单元格样式 格式 eg.
+                    var cellFormatStyle = {
+                        alignment: {
+                            horizontal: 'center'
+                        },
+                        font: { // 字体设置
+                            sz: 12,
+                            bold: true,
+                            color: {
+                                rgb: '000000'// 十六进制，不带#
+                            }
+                        },
+                        alignment: { // 文字居中
+                            horizontal: 'center',
+                            vertical: 'center',
+                            wrapText: true
+                        },
+                        border: {
+                            top: { style: 'thin' },
+                            right: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            left: { style: 'thin' }
+                        }
+                    }
+
                     // 选项参数
                     var opts = {
-                        merged: true, // 是否合并某些单元格，默认false
-                        mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
-                            { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
-                        ],
-                        filename: '' // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
+                        sheetName: 'sheet1', // 工作表名，默认 sheet1(可选)
+                        filename: '', // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
+                        merged: { // 表格单元格合并(可选)
+                            enable: true, // 是否启用功能，默认false(可选)
+                            pattern: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。r从0开始,0表示第1行,1第2行,以此类推; c也从0开始,0表示第1列,1表示第2列,以此类推。
+                                { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // 比如，这里设置第1行A1-C1的单元格合并
+                                { s: { r: 0, c: 3 }, e: { r: 0, c: 4 } } // 比如，这里设置第2行D1-E1的单元格合并
+                            ]
+                        },
+                        columnWidth: { // 表格单元格列宽(可选)
+                            enable: true, // 是否启用功能，默认false(可选)
+                            pattern: [ // 单元格列宽方式，是一个数组，默认空数组(可选)。每个数组由包含wch或wpx构成的对象组成，wpx 字段表示以像素为单位，wch 字段表示以字符为单位。
+                                // 注：数组中第N个元素代表表格第N列。若表格共有M列,则数组元素个数<=M,即数组元素个数可以小于M个
+                                { wch: 10 }, // 比如，这里设置第1列的宽
+                                { wch: 10 }, // 比如，这里设置第2列的宽
+                                { wch: 6 },
+                                { wch: 30 },
+                                { wch: 50 }
+                            ]
+                        },
+                        styled: { // 表格单元格样式(可选)
+                            enable: true, // 是否启用功能，默认false(可选)
+                            allowEveryCell: true, // 所有单元格样式，是否给所有单元格设置一个默认的样式，默认false(可选)。仅当 enable = true 时有效。
+                            pattern: [ // 个别单元格样式，默认空数组(可选)。注：个别单元格的样式将覆盖所有单元格设置的样式。
+                                // cell 某个单元格如 A1, B1, C1; format 单元格样式, 是一个Object对象, 格式参考变量 cellFormatStyle, 默认null表示不配置样式
+                                { cell: "A1", format: cellFormatStyle },
+                                { cell: "D1", format: cellFormatStyle },
+                                { cell: "A2", format: cellFormatStyle },
+                                { cell: "B2", format: cellFormatStyle },
+                                { cell: "C2", format: cellFormatStyle },
+                                { cell: "D2", format: cellFormatStyle },
+                                { cell: "E2", format: cellFormatStyle }
+                            ]
+                        }
                     }
                     neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
                     neui.destroyAnimate();
                 }, 100);
             }
 
-    
     
         }); //$(function(){});
     </script>

@@ -1,20 +1,39 @@
 
 /**
+ * --------------------------------------------------------------------------------
  * [neuiSheetExcel]
  * 导入导出EXCEL控件
  * 利用JS实现纯前端导入和导出excel文件 (基于SheetJS出品的js-xlsx库进行二次封装)
  * [局限说明] 本控件只支持xlsx格式即excel 2007+。对于xls格式即excel 2003及以下产品不支持！
  * [原生库说明]
     由SheetJS出品的js-xlsx是一款非常方便的只需要纯JS即可读取和导出excel的工具库，功能强大，支持格式众多，支持xls、xlsx、ods(一种OpenOffice专有表格文件格式)等十几种格式。本控件全部都是以xlsx格式为例。
- * [参考]
-    官网：https://sheetjs.com/
-    GitHub：https://github.com/SheetJS/sheetjs/blob/master/dist/xlsx.full.min.js
-    文档：
-    1. https://blog.csdn.net/lgd1917/article/details/122449774
-    2. http://t.zoukankan.com/javalinux-p-15631834.html
+ * [缺点说明]
+    sheetJS库基础版(免费的)无法实现带样式导出(如字体大小、单元格居中等)，但可以使用基于其扩展的开源项目xlsx-js-style来实现，即xlsx-js-style用于实现基本表格样式。
+ * [库文件参考]
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    【sheetJS js-xlsx 基础库】
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    说明：有分基础版和完整版2个版本, 基础版免费，完整版加入了更多功能故是收费的
+    官网： https://sheetjs.com/
+    GitHub： https://github.com/SheetJS/sheetjs/blob/master/dist/
+    其中： xlsx.core.min.js 是基础版(免费的), xlsx.full.min.js 是完整版(有些功能要收费的)。一般下载基础版(免费的)即可。
+    参考：
+     1. https://blog.csdn.net/lgd1917/article/details/122449774
+     2. http://t.zoukankan.com/javalinux-p-15631834.html
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    【xlsx-js-style 表格样式库】
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    说明：开源免费，核心API就是SheetJS的
+    NPM:  https://www.npmjs.com/package/xlsx-js-style
+    GitHub： https://github.com/gitbrent/xlsx-js-style/blob/master/dist/
+    其中：下载 xlsx.bundle.js 即可
+    参考：
+    1. https://www.jianshu.com/p/72f668099403
+    2. https://www.jianshu.com/p/80091cf3201a
+ * --------------------------------------------------------------------------------
  * Author: Mufeng
  * Date: 2024.09.29
- * Update: 2024.10.08
+ * Update: 2024.10.12
 */
 
 //———————————————————————————————————————————————————————————————————
@@ -59,7 +78,7 @@
                 appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                 btnClassName: 'btn-daochu', // 按钮样式名(可选)
                 btnText: '导出EXCEL(2007+)', // 按钮文本名(可选)
-                filename: '导出Excel', // 导出的文件名(可选)
+                filename: '导出文件', // 导出的文件名(可选)
                 withNowTime: true, // 导出的文件名后面是否加上当前时间，默认true(可选)。值：true 时后面加上当前时间，false 时后面加上随机字符
                 callback: null // 回调函数(可选)。 e 参数为空对象，不传递任何数据。
             },
@@ -86,13 +105,14 @@
      */
     EXCELS.prototype.intitialize = function (options) {
         if (typeof XLSX == 'undefined') {
-            var message = '导出导出EXCEL控件需SheetJS工具库(xlsx.core.min.js)支持。<br>请先引入此JS文件。<br>如无，请先下载<br>https://github.com/SheetJS/sheetjs/blob/master/dist/xlsx.full.min.js<br>官网：https://sheetjs.com';
-            console.log(message.toString().replace(/<br>/g, '\n'));
-            utils.dialogs(message);
+            var tips = '错误警告1：导入导出EXCEL控件需SheetJS js-xlsx工具库(xlsx.core.min.js)支持。<br>请先引入此JS文件。<br>如无，请先下载xlsx基础版(免费的)<br>https://github.com/SheetJS/sheetjs/blob/master/dist/xlsx.core.min.js<br>官网：https://sheetjs.com';
+            console.error(tips.toString().replace(/<br>/g, '\n'));
+            utils.dialogs('当前控件基于js-xlsx<br>请引入: xlsx.core.min.js<br>具体信息F12查看控制台');
             return;
         }
         this.opts = options;
-        this.settings = utils.extend(true, {}, this.defaults, this.opts || {});
+        // this.settings = utils.extend(true, {}, this.defaults, this.opts || {});
+        this.settings = utils.combine(true, this.defaults, this.opts || {});
     };
 
 
@@ -237,12 +257,13 @@
         if (typeof this.settings == 'undefined') {
             this.intitialize({});
         }
-        // arr 示例数据
+        // arr 示例数据 eg.
         // var arr = [
-        //     // ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
-        //     ['姓名', '性别', '年龄', '注册时间'],
-        //     ['张三', '男', 18, new Date()],
-        //     ['李四', '女', 22, new Date()]
+        //     // ['主要信息', null, null, '其它信息', null], // 特别注意合并的地方后面预留2个null
+        //     ['姓名', '性别', '年龄', '籍贯', '注册时间'],
+        //     ['张文远', '男', 18, '福建省-泉州市-鼓楼区', new Date()],
+        //     ['李桂英', '女', 22, '福建省-泉州市-丰泽区', new Date()],
+        //     ['赵胜才', '男', "45", '福建省-泉州市-晋江市', new Date()]
         // ];
         // var sheet = XLSX.utils.aoa_to_sheet(arr);
         // sheet['!merges'] = [
@@ -251,31 +272,146 @@
         // ];
         // 需要注意的地方就是被合并的单元格要用null预留出位置，否则后面的内容（本例中是第四列其它信息）会被覆盖。
 
-        // 开始执行
+        // 单元格样式 格式 eg.
+        var cellFormatStyle = {
+            font: { // 字体设置
+                sz: 9, // 大小
+                bold: false // 是否加粗
+                // ,color: { // 颜色
+                //     rgb: '000000' // 十六进制，不带#
+                // },
+                // name: 'Arial', // 字体名称，如 宋体, 仿宋, 微软雅黑, Microsoft YaHei, Arial, Calibri
+                // italic: false, // 是否斜体
+                // strike: false, // 是否中划线,中间删除线
+                // underline: false // 是否下划线
+            },
+            alignment: { // 对齐方式
+                horizontal: "left", // 水平对齐. "left" or "center" or "right"
+                vertical: "center", // 垂直对齐. "top" or "center" or "bottom"
+                wrapText: true // 是否允许文本换行
+            },
+            border: { // 单元格边框
+              // eg. { style: 'thin', color: { rgb: 'dddddd' } } 
+              // 其中 style 的值: dashDotDot, dashDot, dashed, dotted, hair, mediumDashDotDot, mediumDashDot, mediumDashed, medium, slantDashDot, thick, thin
+              top: { style: 'thin' },
+              right: { style: 'thin' },
+              bottom: { style: 'thin' },
+              left: { style: 'thin' }
+            }
+            // ,fill: { // 单元格填充
+            //     bgColor: { // 背景色
+            //         rgb: '1296db' // 十六进制，不带#
+            //     },
+            //     fgColor: { // 前景色
+            //         rgb: 'ffffff'
+            //     },
+            //     patternType: 'solid' // 值： solid 或 none
+            // },
+            // numFmt: "",  // 对数字类型的单元格进行格式化，类型为数字或字符串。可能的值. "0",  "0.0%", "0.00%", "0.00%;\\(0.00%\\);\\-;@",  "m/dd/yy" 
+        };
+
         // 选项参数 opts 
         var origions = {
-            merged: false, // 是否合并某些单元格，默认false
-            mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
-            ],
-            filename: '' // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
+            sheetName: 'sheet1', // 工作表名，默认 sheet1(可选)
+            filename: '', // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
+            merged: { // 表格单元格合并(可选)
+                enable: false, // 是否启用功能，默认false(可选)
+                pattern: [ // 单元格合并方式，是一个数组，默认空数组(可选)。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。r从0开始,0表示第1行,1第2行,以此类推; c也从0开始,0表示第1列,1表示第2列,以此类推。
+                    // { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // 比如，这里设置第1行A1-C1的单元格合并
+                    // { s: { r: 1, c: 1 }, e: { r: 1, c: 4 } } // 比如，这里设置第2行B2-E2的单元格合并
+                ]
+            },
+            columnWidth: { // 表格单元格列宽(可选)
+                enable: false, // 是否启用功能，默认false(可选)
+                pattern: [ // 单元格列宽方式，是一个数组，默认空数组(可选)。每个数组由包含wch或wpx构成的对象组成，wpx 字段表示以像素为单位，wch 字段表示以字符为单位(1个汉字等于2个字符)。
+                    // 注：数组中第N个元素代表表格第N列。若表格共有M列,则数组元素个数<=M,即数组元素个数可以小于M个
+                    // { wch: 30 }, // 比如，这里设置第1列的宽。30表示30/2=15个字
+                    // { wch: 40 }, // 比如，这里设置第2列的宽。40表示40/2=20个字
+                ]
+            },
+            styled: { // 表格单元格样式(可选)
+                enable: false, // 是否启用功能，默认false(可选)
+                allowEveryCell: false, // 所有单元格样式，是否给所有单元格设置一个默认的样式，默认false(可选)。仅当 enable = true 时有效。
+                pattern: [ // 个别单元格样式，默认空数组(可选)。注：个别单元格的样式将覆盖所有单元格设置的样式。
+                    // cell 某个单元格如 A1, B1, C1; format 单元格样式, 是一个Object对象, 格式参考变量 cellFormatStyle, 默认null表示不配置样式
+                    // { cell: "A1", format: null },
+                    // { cell: "B1", format: null }, 
+                    // { cell: "C1", style: cellFormatStyle },
+                ]
+            }
         }
-        var config = utils.extend(true, {}, origions, opts || {});
+        var config = utils.combine(true, origions, opts || {});
         // 导出的文件名
         var today = utils.getCurrentTime();
         var randStr = utils.getRandomWord(8, 12, true);
+        var sheet_name = config.sheetName.toString();
         var file_name = config.filename.toString().replace(/\s+/g, '') !== '' ?
             config.filename
             :
             (
                 this.settings.export.filename + '-' + ( this.settings.export.withNowTime ? today : randStr )
             );
-        // 执行导出操作
-        var sheet = XLSX.utils.aoa_to_sheet(arr);
-        if (config.merged) { // 合并单元格
-            sheet['!merges'] = config.mergeMethod;
+        // 数据变成工作表
+        var work_sheet = XLSX.utils.aoa_to_sheet(arr);
+        // 合并单元格
+        if (config.merged.enable) { 
+            work_sheet['!merges'] = config.merged.pattern;
         }
-        this.openDownloadDialog(this.sheet2blob(sheet), file_name + '.xlsx');
+        // 设置单元格列宽
+        if (config.columnWidth.enable) {
+            work_sheet['!cols'] = config.columnWidth.pattern;
+        }
+        // 设置单元格样式. 以下是样式设置，样式设置放在组织完数据之后
+        if (config.styled.enable) {
+            if (!utils.isJsFileLoaded('xlsx.bundle.js')) {
+                var tips = '错误警告2：设置导出数据的单元格样式需xlsx-js-style工具库(xlsx.bundle.js)支持，请引入此JS文件<br>该库文件用于设置导出EXCEL数据时单元格的样式！<br>如不加载该库文件，则您所设置的样式将不起作用！<br>下载地址：https://github.com/gitbrent/xlsx-js-style/blob/master/dist/xlsx.bundle.js';
+                console.error(tips.toString().replace(/<br>/g, '\n'));
+                utils.dialogs('请引入: xlsx.bundle.js <br>该库文件用于设置单元格样式<br>具体信息查看F12控制台');
+            }
+            else {
+                // 设置所有单元格样式
+                if (config.styled.allowEveryCell) {
+                    Object.keys(work_sheet).forEach(key => {
+                        // 非!开头的属性都是单元格
+                        if (!key.startsWith("!")) {
+                            // 注意：now_styes 只能定义在 forEach 循环内，否则单元格的数据要是为数值型的话，部分会显示为 1900/1/22
+                            var now_styes = {
+                                font: {
+                                    sz: 9
+                                },
+                                alignment: {
+                                    horizontal: "left",
+                                    vertical: "center",
+                                    wrapText: true
+                                },
+                                border: {
+                                    top: { style: 'thin' },
+                                    right: { style: 'thin' },
+                                    bottom: { style: 'thin' },
+                                    left: { style: 'thin' }
+                                }
+                            };
+                            work_sheet[key].s = now_styes;
+                        }
+                    });
+                }
+                
+                // 设置个别单元格样式
+                for (var i = 0; i < config.styled.pattern.length; i++) {
+                    var one = config.styled.pattern[i];
+                    var _cell = one.cell, _format = one.format;
+                    // console.log('typeof：', typeof work_sheet[_cell].s);
+                    if (_format != null) {
+                        if (typeof (work_sheet[_cell]) == 'undefined')
+                            console.error('无法设置单元格' + _cell + '的样式，因为它可能是合并后的单元格或者根本不存在此单元格，请检查！')
+                        else
+                            work_sheet[_cell].s = _format;
+                    }
+                }
+            }
+        }
+        // 数据格式化并导出
+        this.openDownloadDialog(this.sheet2blob(work_sheet, sheet_name), file_name + '.xlsx');
     };
         
     
@@ -317,6 +453,7 @@
     EXCELS.prototype.readWorkbook = function (wb) {
         var sheetNames = wb.SheetNames; // 工作表名称集合
         var worksheet = wb.Sheets[sheetNames[0]]; // 这里我们只读取第一张sheet
+        // opts 格式 eg.
         // var opts = {
         //     /*'A'|number|string[]*/
         //     header: 'A', // 值：'A' 把表头当作表身数据，number 或 string[] 表头单独出来即表头还是表头数据
@@ -398,8 +535,8 @@
 
     /**
      * 将一个sheet转成最终的excel文件的blob对象，然后利用URL.createObjectURL下载
-     * @param {} sheet 
-     * @param {*} sheetName 
+     * @param {Object} sheet 工作表实例化对象
+     * @param {String} sheetName 工作表名(可选)。默认sheet1
      * @returns {Object} 返回一个blob对象
      */
     EXCELS.prototype.sheet2blob = function(sheet, sheetName) {
@@ -456,6 +593,20 @@
             }
         },
 
+        /**
+         * 判断是否加载了某个JS文件
+         * @param {String} jsFilePath js文件名称或文件路径. eg. aaa.js
+         * @returns {Boolean} 返回布尔值true或false
+         */
+        isJsFileLoaded: function(jsFilePath) {
+            var scripts = document.getElementsByTagName('script');
+            for (var i = 0; i < scripts.length; i++) {
+                if (scripts[i].src && scripts[i].src.includes(jsFilePath)) {
+                    return true;
+                }
+            }
+            return false;
+        },
 
 
         /**
@@ -553,6 +704,134 @@
             function fnIsArray(o) {
                 return Object.prototype.toString.call(o) == '[object Array]';
             }
+        },
+
+
+
+        /**
+         * 原生JS合并对象2
+         * 即用两个对象来拓展，返回拓展后的新对象
+         * @param {boolean} deep 是否深度合并，默认false
+         * @param {object} defs 第1个被合并的对象(可选)。
+         * @param {object} opts 第2个被合并的对象(可选)。
+         * @param {object} method 其它操作方式(可选). 
+            可传值1：选择是否要遍历对象的原型链(默认true) { includePrototype: false } 。 
+            可传值2：foreach 对每个合并项进行自定义处理. {
+                    forEach: function(target, name, sourceItem) {
+                        target[name] = sourceItem + 'hello， 自定义每个合并项';
+                        return target;
+                    }
+                }
+        * @returns {object} 返回合并后的目标对象
+        */
+        combine: function(deep, defs, opts, method){
+            var options = {};
+            if(typeof deep === 'boolean') options = { isDeep: deep === false ? false : true };
+            else options =  { isDeep: false }
+            if(typeof method === 'object') options = method;
+            /**
+             * 子函数：合并对象
+             * @param {object} options 选项
+             * @returns {object} 返回合并后的对象
+             * [参考]：https://segmentfault.com/a/1190000011492291
+             * [示例]
+                // eg1.普通合并(浅合并)
+                var target = EXT().merge(data1, data2);
+                // eg2. isDeep 选择是否进行深合并。true 深度合并, false 浅合并，默认true
+                var target = EXT({ isDeep: false }).merge(data1, data2);
+                // eg3. includePrototype：选择是否要遍历对象的原型链，默认为 true
+                var target = EXT({ includePrototype: false }).merge(data1, data2);
+                // eg4. forEach：对每个合并项进行自定义处理
+                var target = EXT({
+                    forEach: function(target, name, sourceItem) {
+                        target[name] = sourceItem + 'hello， 自定义每个合并项';
+                        return target;
+                    }
+                }).merge(data1, data2);
+            */
+            function EXT(options) {
+                return new EXT.prototype.init(options);
+            };
+            EXT.fn = EXT.prototype = {
+                type: function(o) {
+                    return Object.prototype.toString.call(o).slice(8, -1).toLowerCase();
+                },
+                typeMap: {
+                    object: function() {
+                        return {};
+                    },
+                    array: function() {
+                        return [];
+                    }
+                },
+                // 默认配置项
+                defaults: {
+                    // 是否深合并
+                    isDeep: true,
+                    // 是否遍历合并源对象原型链上的属性
+                    includePrototype: true,
+                    // 用于对每个合并项进行自定义修正
+                    forEach: function(target, name, sourceItem) {
+                        target[name] = sourceItem;
+                        return target;
+                    }
+                },
+                // 将配置项合并到默认配置项
+                init: function(options) {
+                    for (var name in options) {
+                        this.defaults[name] = options[name];
+                    }
+                    return this;
+                },
+                merge: function() {
+                    var self = this,
+                        _default = self.defaults,
+                        i = 1,
+                        length = arguments.length,
+                        target = arguments[0] || {},
+                        source,
+                        targetItem,
+                        sourceItem,
+                        tiType,
+                        siType,
+                        clone,
+                        name;
+                    for (; i < length; i++) {
+                        // 判断源对象是否为空
+                        if ((source = arguments[i]) != null) {
+                            for (name in source) {
+                                var hasPro = source.hasOwnProperty(name);
+                                // 是否遍历源对象的原型链
+                                if (hasPro || _default.includePrototype) {
+                                    targetItem = target[name];
+                                    sourceItem = source[name];
+                                    tiType = self.type(targetItem);
+                                    siType = self.type(sourceItem);
+                                    // 防止出现回环
+                                    if (target === sourceItem) {
+                                        continue;
+                                    }
+                                    // 如果复制的是对象或者数组
+                                    if (_default.isDeep && sourceItem != null && self.typeMap[siType]) {
+                                        clone = targetItem != null && tiType === siType ? targetItem : self.typeMap[siType]();
+                                        // 递归
+                                        target[name] = self.merge(clone, sourceItem);
+                                    } else {
+                                        clone = hasPro ? target : target.__proto__;
+                                        // 处理每一个合并项
+                                        clone = _default.forEach.call(self, clone, name, sourceItem);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return target;
+                }
+            };
+            EXT.fn.init.prototype = EXT.fn;
+
+            // 调用并返回结果
+            return EXT(options).merge(defs, opts);
         },
 
 
