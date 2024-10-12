@@ -80,17 +80,33 @@
     // 原型添加相关的方法
     //================================================================
     //———————————————————————————————————————————————————
-    // !!! 初始化
-    EXCELS.prototype.init = function (options) {
+    /**
+     * !!! 参数配置初始化
+     * @param {Object} options 控件参数
+     */
+    EXCELS.prototype.intitialize = function (options) {
         if (typeof XLSX == 'undefined') {
             var message = '导出导出EXCEL控件需SheetJS工具库(xlsx.core.min.js)支持。<br>请先引入此JS文件。<br>如无，请先下载<br>https://github.com/SheetJS/sheetjs/blob/master/dist/xlsx.full.min.js<br>官网：https://sheetjs.com';
             console.log(message.toString().replace(/<br>/g, '\n'));
             utils.dialogs(message);
             return;
         }
-        var _this = this;
         this.opts = options;
-        this.settings = utils.extend(true, {}, this.defaults, options || {});
+        this.settings = utils.extend(true, {}, this.defaults, this.opts || {});
+    };
+
+
+    
+
+    //———————————————————————————————————————————————————
+    /**
+     * !!! 创建控件
+     * @param {Object} options 控件参数
+     */
+    EXCELS.prototype.createSheetsExcels = function (options) {
+        var _this = this;
+        this.intitialize(options);
+        if (typeof this.settings == 'undefined') return;
         // 导入节点HTML
         var impDiv = document.createElement('div');
         impDiv.className = 'sheet__operate_daoru';
@@ -100,7 +116,7 @@
         ].join('\r\n');
         // 导出节点HTML
         var expDiv = null;
-        if (typeof options.export != 'undefined' && this.settings.export.enable) {
+        if (typeof this.opts.export != 'undefined' && this.settings.export.enable) {
             expDiv = document.createElement('div');
             expDiv.className = 'sheet__operate_daochu';
             expDiv.innerHTML = [
@@ -109,7 +125,7 @@
         }
         // 预览节点HTML
         var prewDiv = null;
-        if (typeof options.preview != 'undefined' && this.settings.preview.enable) {
+        if (typeof this.opts.preview != 'undefined' && this.settings.preview.enable) {
             prewDiv = document.createElement('div');
             prewDiv.className = 'sheet__output';
             prewDiv.style = "display: none";
@@ -138,7 +154,7 @@
                 else document.getElementsByClassName(impFatherClassName)[0].appendChild(impDiv);
             }
             // 将导出节点作为子节点插入到指定节点中
-            if (typeof options.export != 'undefined' && this.settings.export.enable) {
+            if (typeof this.opts.export != 'undefined' && this.settings.export.enable) {
                 if (expDiv != null) {
                     var expFatherClassName = this.settings.export.appendToParentNode;
                     if (expFatherClassName == '') opertDiv.appendChild(expDiv);
@@ -151,7 +167,7 @@
             }
         }
         // 创建预览节点
-        if (typeof options.preview != 'undefined' && this.settings.preview.enable) {
+        if (typeof this.opts.preview != 'undefined' && this.settings.preview.enable) {
             if (prewDiv != null) {
                 var prewFatherClassName = this.settings.preview.appendToParentNode;
                 if (prewFatherClassName == '') rootDiv.appendChild(prewDiv);
@@ -207,7 +223,7 @@
                 }
             }
         }
-    },
+    };
     
         
     
@@ -218,6 +234,9 @@
      * @param {Object} opts 导出其它选项参数(可选)
      */
     EXCELS.prototype.exportExcel = function (arr, opts) {
+        if (typeof this.settings == 'undefined') {
+            this.intitialize({});
+        }
         // arr 示例数据
         // var arr = [
         //     // ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
@@ -234,30 +253,30 @@
 
         // 开始执行
         // 选项参数 opts 
-        var defaults = {
+        var origions = {
             merged: false, // 是否合并某些单元格，默认false
             mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
                 { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
             ],
             filename: '' // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
         }
-        var settings = utils.extend(true, {}, defaults, opts || {});
+        var config = utils.extend(true, {}, origions, opts || {});
         // 导出的文件名
         var today = utils.getCurrentTime();
         var randStr = utils.getRandomWord(8, 12, true);
-        var file_name = settings.filename.toString().replace(/\s+/g, '') !== '' ?
-            settings.filename
+        var file_name = config.filename.toString().replace(/\s+/g, '') !== '' ?
+            config.filename
             :
             (
                 this.settings.export.filename + '-' + ( this.settings.export.withNowTime ? today : randStr )
             );
         // 执行导出操作
         var sheet = XLSX.utils.aoa_to_sheet(arr);
-        if (settings.merged) { // 合并单元格
-            sheet['!merges'] = settings.mergeMethod;
+        if (config.merged) { // 合并单元格
+            sheet['!merges'] = config.mergeMethod;
         }
         this.openDownloadDialog(this.sheet2blob(sheet), file_name + '.xlsx');
-    }
+    };
         
     
 
@@ -631,7 +650,7 @@ function createNewInstace(config){
     // 实例化一个对像
     var context = new EXCELS(config); // context 是一个实例化的对象，只能当对象使用，不能当函数使用。
     // 创建请求函数
-    var instance = EXCELS.prototype.init.bind(context); // instance 是一个函数，由 bind 返回的一个新函数，可以调用 instance()。
+    var instance = EXCELS.prototype.createSheetsExcels.bind(context); // instance 是一个函数，由 bind 返回的一个新函数，可以调用 instance()。
     // 将 对象原型链 prototype 对象中的方法添加到 instance 函数对象中
     // 为了实现能够将 instance 函数作为对象使用，我们就要将 对象原型链 prototype 对象中的方法添加给 instance 。毕竟函数也一个对象，也能够添加方法。
     Object.keys(EXCELS.prototype).forEach(function (item) {

@@ -30,7 +30,21 @@
             font-size: 36px;
             font-weight: 550;
         }
+        .operate{ padding: 10px 15px; display: flex; }
+        .btn{ display: inline-block; min-width: 100px; padding: 6px 12px; background-color: orange; border-radius: 4px; color: #fff; font-size: 14px; cursor: pointer; }
     </style>
+
+    <div class="custom">
+        <!-- 自定义导入的操作区域 -->
+        <div class="toper"></div>
+        <!-- 自定义导入的表格展示区域 -->
+        <div class="tabler"></div>
+    </div><!--/.custom-->
+
+    <div class="operate">
+        <div class="btn" id="btn-daodaochuchu">仅使用导出功能</div>
+    </div><!--/.operate-->
+
     <div class="controls">
         <div class="controls__caption">控件说明</div>
         <div class="controls__content">
@@ -49,10 +63,37 @@
                     2. http://t.zoukankan.com/javalinux-p-15631834.html
             </pre>
         </div>
-        <div class="controls__caption">控件参数</div>
+        <div class="controls__caption">控件调用方式</div>
         <div class="controls__demo">
             <pre>
-                neuiSheetExcel({
+                控件内置了两个函数。
+                neuiSheetExcel.exportExcel(arr, opts) 和 neuiSheetExcel(options) 
+                
+                1、如果仅使用导出功能，则：
+                neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
+                // 使用示例eg.
+                // 要导出的数据为二维数组，格式如下
+                var arr = [
+                    // ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
+                    ['姓名2', '性别2', '年龄2', '注册时间2'],
+                    ['张三', '男', 18, new Date()],
+                    ['李四', '女', 22, new Date()]
+                ];
+                // 选项参数(可选)
+                var opts = {
+                    merged: false, // 是否合并某些单元格
+                    mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
+                        { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
+                    ],
+                    filename: '' // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
+                }   
+                neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
+
+
+                2、如果要使用导入和导出功能，则：
+                neuiSheetExcel(options);
+                其中 options 是一个Object对象，格式如下
+                var options = {
                     // 这两个参数一般没用
                     idClass: 'sheet', // 根节点样式名(可选)
                     operationClassName: 'sheet__operate', // 导入导出操作节点样式名(可选)
@@ -108,15 +149,11 @@
                         title: '导入数据预览', // 标题内容，空时表示没有标题(可选)
                         hasTitleRow: true, // 预览时是否添加列索引，即添加表头A、B、C、D、E、F .. 这行，默认true(可选)
                     }
-                });
+                };
             </pre>
         </div>
-    </div><!--/-->
+    </div><!--/.controls__demo-->
 
-    <!-- 自定义导入的操作区域 -->
-    <div class="toper"></div>
-    <!-- 自定义导入的表格展示区域 -->
-    <div class="tabler"></div>
 
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
@@ -140,9 +177,17 @@
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         $(function(){
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //+                                                          初始化                                                 
+            //+                                                         系列事件                                             
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
+            // 仅使用导出功能
+            $('#btn-daodaochuchu').on('click', function(){
+                fnExportData();  // 导出数据
+            });
+
+
+
+            // ——————————————————————————————————————————
             // 导入导出功能初始化
             neuiSheetExcel({
                 // 这两个参数一般没用
@@ -174,26 +219,7 @@
                     filename: '导出Excel', // 导出的文件名(可选)
                     withNowTime: true, // 导出的文件名后面是否加上当前时间，默认true(可选)。值：true 时后面加上当前时间，false 时后面加上随机字符
                     callback: function(e){
-                        neui.showAnimate('努力导出中...');
-                        setTimeout(() => {
-                            var arr = [
-                                ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
-                                ['姓名', '性别', '年龄', '注册时间'],
-                                ['张三', '男', 18, new Date()],
-                                ['李四', '女', 22, new Date()]
-                            ];
-                            // 选项参数
-                            var opts = {
-                                merged: true, // 是否合并某些单元格，默认false
-                                mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
-                                    { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
-                                ],
-                                filename: '' // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
-                            }
-                            neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
-                            neui.destroyAnimate();
-                        }, 100);
-                        
+                        fnExportData(); // 导出数据
                     }
                 },
                 // 预览功能模块(可选)
@@ -207,11 +233,33 @@
             });
 
 
-            
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //+                                                         系列事件                                             
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //——————————————————————————————————————————
+
+
+            // ——————————————————————————————————————————
+            /**
+             * 函数：导出数据
+             */
+            function fnExportData(){
+                neui.showAnimate('努力导出中...');
+                setTimeout(() => {
+                    var arr = [
+                        ['主要信息', null, null, '其它信息'], // 特别注意合并的地方后面预留2个null
+                        ['姓名', '性别', '年龄', '注册时间'],
+                        ['张三', '男', 18, new Date()],
+                        ['李四', '女', 22, new Date()]
+                    ];
+                    // 选项参数
+                    var opts = {
+                        merged: true, // 是否合并某些单元格，默认false
+                        mergeMethod: [ // 单元格合并方式，是一个数组。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。
+                            { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } } // 比如，这里设置A1-C1的单元格合并
+                        ],
+                        filename: '' // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
+                    }
+                    neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
+                    neui.destroyAnimate();
+                }, 100);
+            }
 
     
     
