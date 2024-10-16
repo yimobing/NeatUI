@@ -45,7 +45,8 @@
 						extension: '.xls' //拓展名。 .xls(excel 2003)(默认), .xlsx (excel 2007,2010)
 					},
 					pagination:{ //表格分页参数json
-						enable:true, //是否启用分页（可选）。true 是（默认），false 否. 当参数 loadMore=true时, 本参数不起作用(此时默认false)
+						enable: true, //是否启用分页（可选）。true 是（默认），false 否. 当参数 loadMore=true时, 本参数不起作用(此时默认false)
+						className: '', // 自定义分页节点样式名，默认空(可选)。eg. 'fenye-dibu-1' // add 20241016-1
 						loadMore: false, //分页是否使用“下拉加载更多”方式,默认false(只支持单表格,多表格尚不支持). 当值为true时, 参数enable不起作用(此时默认为false)
 						pageSize:25, //每页几条记录，默认25（可选）
 						pageCount:null, //总页数（必须）
@@ -2073,10 +2074,12 @@
 		//$(pageNode).remove(); //删除旧节点
 		//$(rootNode).after(_html); //拼接节点
 
-		//将分页信息添加到底部节点中
+		//将分页信息添加到底部节点中 edit 20241016-1
 		var footNode = $.privateProperty.footerNode;
-		if($(footNode).length==0) 
-			$('body').append('<div id="' + getNodePureString(footNode) + '"></div>');
+		if ($(footNode).length == 0) {
+			var _footClassStr = settings.pagination.className.toString().replace(/\s+/g, '') === '' ? '' : ' class="' + settings.pagination.className.toString().replace(/(\#|\.)/g, '') + '"';
+			$('body').append('<div id="' + getNodePureString(footNode) + '"' + _footClassStr + '></div>');
+		}
 		$(footNode).append(_html).css({'height': $(footNode).children().outerHeight(true)});
 		
 

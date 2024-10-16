@@ -429,6 +429,7 @@
     //=====[表格分页参数json]
     $g_pageJson = {
         enable:$g_pagination, //是否启用分页（可缺省）。true 是（默认），false 否
+        className: '', // 自定义分页节点样式名，默认空(可选)。eg. 'fenye-dibu-1'
         pageSize:$pagesize, //每页几条记录，默认25（可缺省）
         pageCount:$g_pageCount, //总页数（必须）
         pageMode:'select', //分页方式（可缺省）。list 列表形式（默认），select下拉形式
