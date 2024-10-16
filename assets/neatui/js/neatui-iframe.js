@@ -4,7 +4,7 @@
  * 调用控件即可直接嵌入一个iframe页面，浏览器窗口调整时，iframe子页面大小也会自动调整
  * Author：Mufeng
  * Date: 2024.10.08
- * Update: 2024.10.09
+ * Update: 2024.10.16
  */
 ; (function (root, factory) {
     if (typeof define === 'function' && define.amd) { // AMD规范
@@ -193,8 +193,29 @@
                 realH += 'px';
             }
             // console.log('框架真实宽度：', realW, ', 真实高度：', realH);
-            rootNode.style = 'width: ' + realW + '; height: ' + realH + ';'; // 'width: 100%; height: 100%;';
-            skeletonNode.style = 'width: 100%; height: 100%;  overflow: auto; -webkit-overflow-scrolling: touch;';
+            // 设置节点样式 edit 20241016-1
+            var _rootStyStr = 'width: ' + realW + '; height: ' + realH + ';'; // 'width: 100%; height: 100%;';
+            var _skeStyStr = 'width: 100%; height: 100%;  overflow: auto; -webkit-overflow-scrolling: touch;';
+            // 写法1：这种写法ie不支持
+            // rootNode.style = _rootStyStr;
+            // skeletonNode.style = _skeStyStr;
+            // 写法2：兼容ie的写法
+            rootNode.setAttribute('style', _rootStyStr);
+            skeletonNode.setAttribute('style', _skeStyStr);
+            /* 
+            // 【说明】
+            // 注： 设置 DOM 节点的样式时，某些写法ie是不支持的
+            // ie 不支持的写法
+            dom.style = 'width: 100px; height: 100px';
+            // ie 支持的写法1
+            dom.setAttribute('style', 'width: 100px; height: 100px');
+            // ie 支持的写法2
+            dom.style.width = '100px';
+            dom.style.height = '100px';
+            // ie 支持的写法3
+            dom.style.setProperty('width', '100px');
+            dom.style.setProperty('height', '100px');
+            */
         },
 
 
