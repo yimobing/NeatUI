@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author:ChenMufeng
 * Date: 2020.03.26
-* Update:2020.11.11
+* Update:2024.10.16
 
 */
 (function($){
@@ -775,8 +775,20 @@
 					width += w;
 					//console.log('text:',text,' w:',w);
 				}
-			})
+			});
+
+			// 解决某种特殊情况下 ie 浏览器引发的bug add 20241016-1
+			// 当表格的父节点显示、隐藏、再显示时，比如两个切片A、B下各有一个表格。默认显示切片A下的表格，当点击切片B时，隐藏切片A，再点击切片A时，此时在ie浏览器中切片A里的表格宽度就会变成0
+			// 也就是说，ie浏览器切片节点的显示隐藏会触发resize函数
+			// 这时表格宽度为0，就必须记录一下上一次的表格的宽度值
+			if (checkIsIE()) { // ie 浏览器时
+				if (width != 0) $.recordLastInnerWidth = width;
+				else if (width == 0) {
+					width = $.recordLastInnerWidth;
+				}
+			}
 			
+
 			var offsetTop = $parent.offset().top, //距离屏幕顶部距离
 				offsetLeft = $parent.offset().left; //距离屏幕左侧距离
 			var isOverScreen = width < winW ? false : true; //表格宽是否超过屏幕宽			
