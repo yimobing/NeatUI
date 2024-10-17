@@ -46,6 +46,10 @@
                 heading: "", //接口描述(中文)
                 debug: false, //是否启用调试模式,默认false. 调试模式下会把具体错误信息提示给用户看,非调试模式下只会给用户友好提示信息
                 async: false,
+                // add 20241017-1
+                clean: false, // 是否去掉请求地址中的某些后辍参数,默认false(可选)。注：目前正则还没写好,只能去掉链接地址中只有一个参数，多个参数无法只去掉某一个。
+                matches: [], // 请求地址中的后辍参数组成的数组,默认空数组(可选). 仅当 clean=true时有效.eg. matches['param'], 则url为'aabb.com?param=1&add=2' 将变成 'aabb.com?add=2'
+
                 type: "GET",
                 dataType: "html",
                 cache: false,
@@ -62,6 +66,21 @@
                 complete: function(XMLHttpRequest, textStatus){ }
             }
             var settings = $.extend(true, {}, defaults, options || {});
+            // add 20241017-1
+            if (settings.clean) {
+                var arr = settings.matches;
+                var links = settings.url.toString();
+                for (var i = 0; i < arr.length; i++){
+                    var value = arr[i];
+                    if (value.toString().replace(/\s+/g, '') !== '') {
+                        var pattern = '([\\?])' + value + '=(.*)'; // 正则还没完全写好
+                        links = links.replace(new RegExp(pattern, ''), '');
+                    }
+                }
+                settings.url = links;
+                // console.log('新URL：', settings.url);
+            }
+
             $.ajax(settings);
        },
 
