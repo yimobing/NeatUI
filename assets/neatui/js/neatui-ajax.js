@@ -262,7 +262,7 @@
             var message = ps_str;
             if(typeof neuiDialog != 'undefined'){
                 neuiDialog.alert({
-                    caption: '提示',
+                    // caption: '提示',
                     message: message,
                     buttons: ['确定']
                 })
