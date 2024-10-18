@@ -3,7 +3,7 @@
 * 对话框插件
 * Author: ChenMufeng
 * Date: 2018.8.30
-* Update:2021.08.09
+* Update: 2024.10.18
 */
 //(function($){
 //	$.fn.extend({
@@ -141,6 +141,7 @@
 				loadDelay:100, //转圈延迟时间(animate=true时有效).默认100（单位：毫秒）
 				popup:true, //是否允许弹出窗口. 是|true,否|false,默认true
 				bubbleRet:1, //popup=false时,指定默认执行第几个按钮事件(默认值1). eg. popup=false,bubbleRet=2,表示不弹出窗口,但默认执行第2个按钮里的事件
+				multiple: false, // 是否允许一次性弹出多个窗口,默认false(可选)。值为true 时同时调用控件N次时会导致弹出N个窗口,有点烦人 add 20241018-1
 				caption:'', //标题.默认空。"提示"
 				message:'欢迎使用对话框插件！', //提示信息.默认"欢迎使用对话框插件！"
 				buttons:['确定','取消'], //按钮名称.默认['确定','取消']
@@ -262,7 +263,11 @@
 			
 			
 			/*函数：打开对话框*/
-			function openAlert(ps_mask_zindex, ps_mask_opacity){
+			function openAlert(ps_mask_zindex, ps_mask_opacity) {
+				// add 20241018-1
+				if (settings.multiple == false && $(weuiParent).length != 0) {
+					return;
+				}
 				$('body').append(_html); //创建HTML
 				self.openMask(shade, ps_mask_zindex, ps_mask_opacity); //打开遮罩
 				

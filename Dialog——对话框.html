@@ -251,6 +251,7 @@
 			//loadDelay:2000, //转圈延迟时间(animate=true时有效).默认100(单位：毫秒)
 			//popup:true, //是否允许弹出窗口. 是|true,否|false,默认true
 			//bubbleRet:2, //popup=false时,指定默认执行第几个按钮事件(默认值1). eg. popup=false,bubbleRet=2,表示不弹出窗口,但默认执行第2个按钮里的事件
+			multiple: false, // 是否允许一次性弹出多个窗口,默认false(可选)。值为true 时同时调用控件N次时会导致弹出N个窗口,有点烦人 add 20241018-1
 			caption:'温馨提醒', //标题.默认"提示"
 			message:msg, //提示信息.默认"欢迎使用neui对话框插件！"
 			buttons:['确认','取消'], //按钮名称.默认['确定','取消']
