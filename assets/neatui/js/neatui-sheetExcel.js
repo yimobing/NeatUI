@@ -33,7 +33,7 @@
  * --------------------------------------------------------------------------------
  * Author: Mufeng
  * Date: 2024.09.29
- * Update: 2024.10.12
+ * Update: 2024.10.22
 */
 
 //———————————————————————————————————————————————————————————————————
@@ -45,14 +45,14 @@
     } else if (typeof exports === 'object') { // umd
         module.exports = factory();
     } else {
-        window.EXCELS = factory();
+        window.NXcls = factory();
     }
 })(this, function(){
 
     //================================================================
     // 构造函数
     //================================================================
-    function EXCELS(options) {
+    function Widget() {
         this.defaults = {
             // 这两个参数一般没用
             idClass: 'sheet', // 根节点样式名(可选)
@@ -103,7 +103,7 @@
      * !!! 参数配置初始化
      * @param {Object} options 控件参数
      */
-    EXCELS.prototype.intitialize = function (options) {
+    Widget.prototype.intitialize = function (options) {
         if (typeof XLSX == 'undefined') {
             var tips = '错误警告1：导入导出EXCEL控件需SheetJS js-xlsx工具库(xlsx.core.min.js)支持。<br>请先引入此JS文件。<br>如无，请先下载xlsx基础版(免费的)<br>https://github.com/SheetJS/sheetjs/blob/master/dist/xlsx.core.min.js<br>官网：https://sheetjs.com';
             console.error(tips.toString().replace(/<br>/g, '\n'));
@@ -123,7 +123,7 @@
      * !!! 创建控件
      * @param {Object} options 控件参数
      */
-    EXCELS.prototype.createSheetsExcels = function (options) {
+    Widget.prototype.createSheetsExcels = function (options) {
         var _this = this;
         this.intitialize(options);
         if (typeof this.settings == 'undefined') return;
@@ -253,7 +253,7 @@
      * @param {Array} arr 二维数组
      * @param {Object} opts 导出其它选项参数(可选)
      */
-    EXCELS.prototype.exportExcel = function (arr, opts) {
+    Widget.prototype.exportExcel = function (arr, opts) {
         if (typeof this.settings == 'undefined') {
             this.intitialize({});
         }
@@ -426,7 +426,7 @@
      * @param {Function} callback 回调函数
      * @returns {} 返回一个叫WorkBook的对象
      */
-    EXCELS.prototype.readingWorkbookFromLocalFile = function (file, callback) {
+    Widget.prototype.readingWorkbookFromLocalFile = function (file, callback) {
         var reader = new FileReader();
         reader.onload = function (e) {
             var data = e.target.result;
@@ -450,7 +450,7 @@
      * 读取excel表格、读取workbook对象
      * @param {workbook} wb workbook对象
      */
-    EXCELS.prototype.readWorkbook = function (wb) {
+    Widget.prototype.readWorkbook = function (wb) {
         var sheetNames = wb.SheetNames; // 工作表名称集合
         var worksheet = wb.Sheets[sheetNames[0]]; // 这里我们只读取第一张sheet
         // opts 格式 eg.
@@ -480,7 +480,7 @@
      * @param {csv} csv csv对象
      * @returns {HTML} 返回表格table的HTML代表
      */
-    EXCELS.prototype.csv2table = function (csv) {
+    Widget.prototype.csv2table = function (csv) {
         var _this = this;
         var html = '<table>';
         var rows = csv.split('\n');
@@ -515,7 +515,7 @@
      * @param url 下载地址，也可以是一个blob对象，必选
      * @param saveName 保存文件名，可选
      */
-    EXCELS.prototype.openDownloadDialog = function(url, saveName) {
+    Widget.prototype.openDownloadDialog = function(url, saveName) {
         if (typeof url == 'object' && url instanceof Blob) {
             url = URL.createObjectURL(url); // 创建blob地址
         }
@@ -539,7 +539,7 @@
      * @param {String} sheetName 工作表名(可选)。默认sheet1
      * @returns {Object} 返回一个blob对象
      */
-    EXCELS.prototype.sheet2blob = function(sheet, sheetName) {
+    Widget.prototype.sheet2blob = function(sheet, sheetName) {
         sheetName = sheetName || 'sheet1';
         var workbook = {
             SheetNames: [sheetName],
@@ -917,7 +917,7 @@
     //================================================================
     // 返回对象
     //================================================================
-    return EXCELS;
+    return Widget;
 });
 
 
@@ -927,13 +927,13 @@
 function createNewInstace(config){
     // 说明：bind()就是将函数绑定到某个对象上。 例如：f.bind(obj)，实际上可以理解为 obj.f()
     // 实例化一个对像
-    var context = new EXCELS(config); // context 是一个实例化的对象，只能当对象使用，不能当函数使用。
+    var context = new NXcls(config); // context 是一个实例化的对象，只能当对象使用，不能当函数使用。
     // 创建请求函数
-    var instance = EXCELS.prototype.createSheetsExcels.bind(context); // instance 是一个函数，由 bind 返回的一个新函数，可以调用 instance()。
+    var instance = NXcls.prototype.createSheetsExcels.bind(context); // instance 是一个函数，由 bind 返回的一个新函数，可以调用 instance()。
     // 将 对象原型链 prototype 对象中的方法添加到 instance 函数对象中
     // 为了实现能够将 instance 函数作为对象使用，我们就要将 对象原型链 prototype 对象中的方法添加给 instance 。毕竟函数也一个对象，也能够添加方法。
-    Object.keys(EXCELS.prototype).forEach(function (item) {
-        instance[item] = EXCELS.prototype[item].bind(context);
+    Object.keys(NXcls.prototype).forEach(function (item) {
+        instance[item] = NXcls.prototype[item].bind(context);
     });
     // 为 instance 函数对象添加属性
     Object.keys(context).forEach(function (item) {
