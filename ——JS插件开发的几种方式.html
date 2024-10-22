@@ -325,14 +325,14 @@ date.load('泉州市', '福建省份GDP第一的城市', '362600'); // 调用控
     } else if (typeof exports === 'object') { // umd
         module.exports = factory();
     } else {
-        window.NeDate = factory();
+        window.NDate = factory();
     }
 })(this, function(){
 
     //================================================================
     // 构造函数
     //================================================================
-    function NDate(elem, options){
+    function Widget(elem, options){
         this.defaults = {
             method: "GET",
             data: {
@@ -346,13 +346,14 @@ date.load('泉州市', '福建省份GDP第一的城市', '362600'); // 调用控
     //================================================================
     // 原型模式定义实例方法
     //================================================================
-    NDate.prototype.init = function(elem, options){
-        this.settings = utils.extend(true, {}, this.defaults, options || {});
-    };
-    NDate.prototype.load = function(elem, options){
-        this.settings = utils.extend(true, {}, this.defaults, options || {});
-    };
-
+    Widget.prototype = {
+        init: function(elem, options){
+            this.settings = utils.extend(true, {}, this.defaults, options || {});
+        },
+        load: function(elem, options){
+            this.settings = utils.extend(true, {}, this.defaults, options || {});
+        }
+    }
 
 
     //================================================================
@@ -372,22 +373,22 @@ date.load('泉州市', '福建省份GDP第一的城市', '362600'); // 调用控
     //================================================================
     // 返回对象
     //================================================================
-    return NDate;
+    return Widget;
 });
 
 //================================================================
 //  创建“既是函数又是对象”的实例
 //================================================================
-function createNewInstace(dom, config){
+function createNewInstace(element, config){
     // 说明：bind()就是将函数绑定到某个对象上。 例如：f.bind(obj)，实际上可以理解为 obj.f()
     // 实例化一个对像
-    var context = new NeDate(dom, config); // context 是一个实例化的对象，只能当对象使用，不能当函数使用。
+    var context = new NDate(element, config); // context 是一个实例化的对象，只能当对象使用，不能当函数使用。
     // 创建请求函数
-    var instance = NeDate.prototype.init.bind(context); // instance 是一个函数，由 bind 返回的一个新函数，可以调用 instance()。
+    var instance = NDate.prototype.init.bind(context); // instance 是一个函数，由 bind 返回的一个新函数，可以调用 instance()。
     // 将 对象原型链 prototype 对象中的方法添加到 instance 函数对象中
     // 为了实现能够将 instance 函数作为对象使用，我们就要将 对象原型链 prototype 对象中的方法添加给 instance 。毕竟函数也一个对象，也能够添加方法。
-    Object.keys(NeDate.prototype).forEach(function(item){
-        instance[item] = NeDate.prototype[item].bind(context);
+    Object.keys(NDate.prototype).forEach(function(item){
+        instance[item] = NDate.prototype[item].bind(context);
     });
     // 为 instance 函数对象添加属性
     Object.keys(context).forEach(function(item){
