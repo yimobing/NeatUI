@@ -1360,6 +1360,28 @@ var utilities = {
 
 
     /**
+     * 重定义并优化原生的 Node.appendChild 方法
+     * 向父节点中添加子节点，并将子节点插入到父节点内部的最后面，但在script/style节点前面
+     * add 20241022-1
+     * @param {HTML DOM} newNode childNode 子节点
+     * @param {HTML DOM} fatherNode  父节点
+     * add 20240929-1
+     */
+    appendChild: function (childNode, fatherNode) {
+        var childrenNode = fatherNode.children; // 获取父节点的直接子元素
+        // 将子节点插入到内部的最后面，但不包括style和script元素
+        for (var i = childrenNode.length - 1; i >= 0; i--) { // 循环倒装一下
+            if (childrenNode[i].tagName === "STYLE" || childrenNode[i].tagName === "SCRIPT" || childrenNode[i].className === 'controls') {
+                continue; // 跳过style和script元素
+            }
+            this.insertAfter(childNode, childrenNode[i]);
+            break; // 只插入一次，因为新节点会被插入到最后一个style/script元素之前
+        }
+    },
+
+
+      
+    /**
      * 原生js prepend字符串
      * 即：向已存在的节点对象前面追加HTML字符串
      * @param {string} str 字符串
@@ -1385,8 +1407,8 @@ var utilities = {
     
     /**
      * 原生js向父节点中添加子节点，并将子节点插入到父节点内部的最前面
-     * @param {HTML DOM} newNode newNode 子节点
-     * @param {HTML DOM} existingNode  已存在的节点
+     * @param {HTML DOM} childNode 子节点
+     * @param {HTML DOM} fatherNode 父节点
      * add 20240929-1
      */
      prependChild: function (childNode, fatherNode) {
