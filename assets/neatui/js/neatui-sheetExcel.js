@@ -111,7 +111,6 @@
             return;
         }
         this.opts = options;
-        // this.settings = utils.extend(true, {}, this.defaults, this.opts || {});
         this.settings = utils.combine(true, this.defaults, this.opts || {});
     };
 
@@ -608,127 +607,29 @@
             return false;
         },
 
-
-        /**
-         * !!! 原生JS合并对象1
-         * 即用一个或多个对象来扩展一个对象，返回被拓展的对象
-         * 注：本函数很好的模拟了JQ extend合并对象
-         * @param {boolean} deep 是否深度合并对象(可选),默认false
-         * @param {object} target 目标对象，其他对象的成员属性将被附加到该对象上。
-         * @param {object} object1 第1个被合并的对象(可选)。
-         * @param {object} objectN 第N个被合并的对象(可选)。
-         *  [调用示例] 
-            格式：extend(deep, target, defs, opts);
-            eg. extend(defs, opts); // 浅合并
-            eg. extend(false, defs, opts); // 浅合并
-            eg. extend({}, defs, opts); // 浅合并
-            eg. extend(false, {}, defs, opts); //浅合并
-            eg. extend(true, defs, opts); // 深合并
-            eg. extend(true, {}, defs, opts); //深合并
-        * [jq合并对象的方法]
-            $.extend(deep, target, obj1, obj2, ..., objN);
-        */
-        extend: function(){
-            var options, name, src, copy, deep = false, target = arguments[0], i = 1, length = arguments.length;
-            if (typeof (target) === "boolean") deep = target, target = arguments[1] || {}, i = 2; // eg. extend(true, {}, defs, opts || {});
-            if (typeof (target) !== "object" && typeof (target) !== "function") target = {}; // eg.
-            if (length === i) target = this, --i;
-            if(deep){ 
-                // 深度合并
-                for (; i < length; i++) {
-                    if ((options = arguments[i]) != null) {
-                        target = fnExtendObject(target, options);
-                    }
-                }
-            }else{ 
-                // 浅合并
-                for (; i < length; i++) {
-                    if ((options = arguments[i]) != null) {
-                        for (name in options) {
-                            src = target[name], copy = options[name];
-                            if (target === copy) continue;
-                            if (copy !== undefined) target[name] = copy;
-                        }
-                    }
-                }
-            }
-            // console.log('target：', target)
-            return target;
-
-
-            /**
-             * 子函数：递归深度合并JSON对象
-             * 注：遇到相同元素级属性，以defs为准。
-             * 参考：https://www.cnblogs.com/catgatp/p/9189228.html
-             * @param {object} defs 第1个被合并的对象
-             * @param {object} opts 第2个被合并的对象
-             * @returns {object} 返回合并后的目标对象，所有被合并的对象的成员属性将被附加到该对象上。
-             */
-            function fnExtendObject(defs, opts){
-                if(!fnIsJson(defs)  || !fnIsJson(opts)){
-                    utils.dialogs('参数不是JSON对象，请检查！');
-                    return {};
-                }
-                var target = JSON.parse(JSON.stringify(defs)); // 赋值而不改变原对象(注意：对象直接赋值是引用赋值，会改变原对象)
-                // 遇到相同元素级属性，以 minor 为准
-                // 不返还新Object，而是 main 改变
-                var mergeObj = function(minor, main) {
-                    for(var key in minor) {
-                        if(main[key] === undefined) { // 不冲突的，直接赋值 
-                            main[key] = minor[key];
-                            continue;
-                        }
-                        // 冲突了，如果是Object，看看有么有不冲突的属性; 不是Object 则以 minor 为准为主
-                        // console.log(key)
-                        if(fnIsJson(minor[key]) || fnIsArray(minor[key])) { // arguments.callee 递归调用，并且与函数名解耦 
-                            // console.log("is json")
-                            //arguments.callee(minor[key], main[key]);
-                            mergeObj(minor[key], main[key]);
-                        }else{
-                            main[key] = minor[key];
-                        }
-                    }
-                }
-                mergeObj(opts, target);
-                return target;
-            }
-            /**
-             * 子函数：判断是否JSON对象
-             */
-            function fnIsJson(o) {
-                return typeof o == "object" && (o != null && o.constructor == Object);
-            }
-            /**
-             * 子函数：判断是否数组
-             */
-            function fnIsArray(o) {
-                return Object.prototype.toString.call(o) == '[object Array]';
-            }
-        },
-
-
-
         /**
          * 原生JS合并对象2
          * 即用两个对象来拓展，返回拓展后的新对象
-         * @param {boolean} deep 是否深度合并，默认false
-         * @param {object} defs 第1个被合并的对象(可选)。
-         * @param {object} opts 第2个被合并的对象(可选)。
-         * @param {object} method 其它操作方式(可选). 
-            可传值1：选择是否要遍历对象的原型链(默认true) { includePrototype: false } 。 
-            可传值2：foreach 对每个合并项进行自定义处理. {
-                    forEach: function(target, name, sourceItem) {
-                        target[name] = sourceItem + 'hello， 自定义每个合并项';
-                        return target;
-                    }
+         * @param {Boolean} deep 是否深度合并，默认false
+         * @param {Bbject} defs 第1个被合并的对象(可选)
+         * @param {Object} opts 第2个被合并的对象(可选)
+         * @param {Object} method 其它操作方式(可选)
+            参数 method = {
+                isToEmptyObject: true, // 是否合并到空对象上
+                includePrototype: true, // 是否遍历合并源对象原型链上的属性，默认true
+                forEach: function(target, name, sourceItem) {
+                    target[name] = sourceItem + 'hello， 自定义每个合并项';
+                    return target;
                 }
-        * @returns {object} 返回合并后的目标对象
+            }
+        * @returns {Object} 返回合并后的目标对象
         */
         combine: function(deep, defs, opts, method){
             var options = {};
             if(typeof deep === 'boolean') options = { isDeep: deep === false ? false : true };
             else options =  { isDeep: false }
-            if(typeof method === 'object') options = method;
+            if (typeof method === 'object') options = method;
+
             /**
              * 子函数：合并对象
              * @param {object} options 选项
@@ -765,13 +666,11 @@
                     }
                 },
                 // 默认配置项
-                defaults: {
-                    // 是否深合并
-                    isDeep: true,
-                    // 是否遍历合并源对象原型链上的属性
-                    includePrototype: true,
-                    // 用于对每个合并项进行自定义修正
-                    forEach: function(target, name, sourceItem) {
+                defaults: {  
+                    isDeep: true, // 是否深合并，默认true
+                    isToEmptyObject: true, // 是否合并到空对象上
+                    includePrototype: true, // 是否遍历合并源对象原型链上的属性，默认true
+                    forEach: function(target, name, sourceItem) { // 用于对每个合并项进行自定义修正
                         target[name] = sourceItem;
                         return target;
                     }
@@ -788,7 +687,7 @@
                         _default = self.defaults,
                         i = 1,
                         length = arguments.length,
-                        target = arguments[0] || {},
+                        target = _default.isToEmptyObject ? {} : arguments[0] || {},
                         source,
                         targetItem,
                         sourceItem,
