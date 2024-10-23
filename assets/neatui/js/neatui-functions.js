@@ -3026,6 +3026,7 @@ var merge = {
      * 原生JS合并对象1
      * 即用一个或多个对象来扩展一个对象，返回被拓展的对象
      * 注：本函数很好的模拟了JQ extend合并对象
+     * BUG说明：某些情况下很多层次的深合并时本函数有存在一些BUG
      * @param {boolean} deep 是否深度合并对象(可选),默认false
      * @param {object} target 目标对象，其他对象的成员属性将被附加到该对象上。
      * @param {object} object1 第1个被合并的对象(可选)。
@@ -3050,7 +3051,7 @@ var merge = {
             // 深度合并
             for (; i < length; i++) {
                 if ((options = arguments[i]) != null) {
-                    target = fnExtendObject(target, options);
+                    target = fnExtObj(target, options);
                 }
             }
         }else{ 
@@ -3077,7 +3078,7 @@ var merge = {
          * @param {object} opts 第2个被合并的对象
          * @returns {object} 返回合并后的目标对象，所有被合并的对象的成员属性将被附加到该对象上。
          */
-         function fnExtendObject(defs, opts){
+         function fnExtObj(defs, opts){
             if(!fnIsJson(defs)  || !fnIsJson(opts)){
                 alert('参数不是JSON对象，请检查！');
                 return {};
@@ -3125,24 +3126,31 @@ var merge = {
     /**
      * 原生JS合并对象2
      * 即用两个对象来拓展，返回拓展后的新对象
-     * @param {boolean} deep 是否深度合并，默认false
-     * @param {object} defs 第1个被合并的对象(可选)。
-     * @param {object} opts 第2个被合并的对象(可选)。
-     * @param {object} method 其它操作方式(可选). 
-        可传值1：选择是否要遍历对象的原型链(默认true) { includePrototype: false } 。 
-        可传值2：foreach 对每个合并项进行自定义处理. {
-                forEach: function(target, name, sourceItem) {
-                    target[name] = sourceItem + 'hello， 自定义每个合并项';
-                    return target;
-                }
+     * @param {Boolean} deep 是否深度合并，默认false
+     * @param {Bbject} defs 第1个被合并的对象(可选)
+     * @param {Object} opts 第2个被合并的对象(可选)
+     * @param {Object} method 其它操作方式(可选)
+        参数 method = {
+            isToEmptyObject: true, // 是否合并到空对象上
+            includePrototype: true, // 是否遍历合并源对象原型链上的属性，默认true
+            forEach: function(target, name, sourceItem) {
+                target[name] = sourceItem + 'hello， 自定义每个合并项';
+                return target;
             }
-     * @returns {object} 返回合并后的目标对象
-     */
+        }
+    * @returns {Object} 返回合并后的目标对象
+    * [调用示例]
+        combine(true, defaults, options); // 深合并
+        combine(false, defaults, options); // 浅合并
+        combine(true, defaults, options, { isToEmptyObject: false }); // 深合并defaults和options两个对象到defaults对象上, defaults会发生变化
+        combine(true, defaults, options); 或 combine(true, defaults, options, { isToEmptyObject: true }); // 深合并defaults和options两个对象到空对象{} 上, defaults不会发生变化
+    */
     combine: function(deep, defs, opts, method){
         var options = {};
         if(typeof deep === 'boolean') options = { isDeep: deep === false ? false : true };
         else options =  { isDeep: false }
-        if(typeof method === 'object') options = method;
+        if (typeof method === 'object') options = method;
+
         /**
          * 子函数：合并对象
          * @param {object} options 选项
@@ -3179,13 +3187,11 @@ var merge = {
                 }
             },
             // 默认配置项
-            defaults: {
-                // 是否深合并
-                isDeep: true,
-                // 是否遍历合并源对象原型链上的属性
-                includePrototype: true,
-                // 用于对每个合并项进行自定义修正
-                forEach: function(target, name, sourceItem) {
+            defaults: {  
+                isDeep: true, // 是否深合并，默认true
+                isToEmptyObject: true, // 是否合并到空对象上
+                includePrototype: true, // 是否遍历合并源对象原型链上的属性，默认true
+                forEach: function(target, name, sourceItem) { // 用于对每个合并项进行自定义修正
                     target[name] = sourceItem;
                     return target;
                 }
@@ -3202,7 +3208,7 @@ var merge = {
                     _default = self.defaults,
                     i = 1,
                     length = arguments.length,
-                    target = arguments[0] || {},
+                    target = _default.isToEmptyObject ? {} : arguments[0] || {},
                     source,
                     targetItem,
                     sourceItem,
@@ -3246,7 +3252,8 @@ var merge = {
 
         // 调用并返回结果
         return EXT(options).merge(defs, opts);
-    }
+    },
+
 
 
 }; // END MERGE 对象
