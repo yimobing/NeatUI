@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="pan_junbiao的博客">
+    <title>使用progress标签的进度条</title>
+ 
+    <script type="text/javascript">
+        function button_onclick() {
+            for (var i = 0; i <= 90; i++){
+                updateProgress(i);
+            }   
+        }
+        function updateProgress(newValue) {
+            var progressBar = document.getElementById('p');
+            progressBar.value = newValue;
+            document.getElementsByTagName('span')[0].textContent = newValue;
+        }
+    </script>
+</head>
+ 
+<body>
+    <section>
+        <h2>progress元素的使用实例</h2>
+        <p>完成百分比: <progress id="p" max=100></progress><span>0</span>%</p>
+        <input type="button" onClick="button_onclick()" value="请点击" />
+    </section>
+</body>
+ 
+</html>

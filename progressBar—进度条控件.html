@@ -19,45 +19,19 @@
 </head>
 
 <body>
+
     <style>
-        .wrap{ width: 50%; padding: 50px; background-color: #fff; }
-        .progress{ margin-bottom: 15px; }
+        html, body{ padding: 25px; background-color: #f4f4f4; }
+        .wrap{ width: 70%; margin: 0 auto; padding: 50px; background-color: #fff;  border: 3px solid blue; border-radius: 4px; }
+        h1{ margin-bottom: 35px; font-size: 24rpx; text-align: center; }
     </style>
 
     <div class="wrap">
-        <div class="progress">
-            <span style="width: 80%;">
-                <em>80%</em>
-            </span>
+        <div class="controls">
+            <h1>进度条演示</h1>
+            <div class="new_div_wrap"></div>
         </div>
-
-        <div class="progress red">
-            <span style="width: 60%;">
-                <em>20%</em>
-            </span>
-        </div>
-        <div class="progress blue">
-            <span style="width: 40%;">
-                <em>40%</em>
-            </span>
-        </div>
-
-        <div class="progress orange">
-            <span class="orange" style="width: 60%;">
-                <em>60%</em>
-            </span>
-        </div>
-
-        <div class="progress green">
-            <span class="green" style="width: 100%;">
-                <em>100%</em>
-            </span>
-        </div>
-    </div>
-    <!--/.wrap-->
-
-    <div>后面是我新生成的</div>
-    <div class="new_div"></div>
+    </div><!--/.wrap-->
 
 
     <!--================================================================================-->
@@ -77,23 +51,27 @@
             //+                                                          初始化                                                 
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //——————————————————————————————————————————
-            // 进度条初始化
-            neuiProgressBar({
+            // 进度条配置项
+            var options = {
                // 主题样式
-                theme: 'blue', // 主题，默认空(可选)。值： red 红色, blue 蓝色, green 绿色, orange 橙色
+                theme: 'green', // 主题，默认空(可选)。值： red 红色, blue 蓝色, green 绿色, orange 橙色
                 extClass: '', // 自定义节点样式名，默认空(可选)。支持多个样式名.eg. 'aaa'. eg. 'aaa bbb'
                 // 大小与位置
-                parentNode: '.new_div', // 绑定控件到到某个父节点下(可选)。eg. '.div1'. eg. '#div2'
-                position: 'fixed', // 定位方式，默认空表示相对定位(可选)。值： relative 相对定位, absolute 绝对定位, fixed 固定定位
+                parentNode: '.new_div_wrap', // 绑定控件到到某个父节点下，默认空绑定到body最后面script/style标签前(可选)。eg. '.div1'. eg. '#div2'
+                position: '', // 定位方式，默认空表示相对定位(可选)。值： relative 相对定位, absolute 绝对定位, fixed 固定定位
                 zIndex: 99, // 定位层级，默认99(可选)
                 width: 300, // 自定义区域宽度，默认300(可选)
                 height: 100, // 自定义区域高度，默认100(可选)
                 hasBorder: true, // 区域是否显示边框，默认true(可选)
                 hasRadius: true, // 区域是否有圆角，默认true(可选)
                 hasShadow: true, // 区域是否有阴影，默认true(可选)
+                bar: { // 进度条外观(可选)
+                    shape: 'rectangle', // 形状，默认长方形(可选)，值： rectangle 长方形, annulus 环形(圆形)
+                    height: 20, // 高度，默认20px(可选)。仅当 shape = 'rectangle'时有效。
+                    borderRadius: 10, // 圆角值，默认10px(可选)。仅当 shape = 'rectangle'时有效。
+                },
                 mask: { // 遮罩(可选)
-                    enable: true, // 是否显示遮罩，默认true(可选)。仅当 position = 'absolute' 或 fixed 时才有效。
-                    zIndex: 98,  // 遮罩层级，默认98(可选)
+                    enable: true, // 是否显示遮罩，默认true(可选)。仅当 position = 'absolute' 或 fixed 时才有效。注：遮罩层级系统会自动计算,永远比控件小1。
                     opacity: .5, // 遮罩透明度，默认0.5(可选)。当值大于 1 将自动转化成除以100的小数，比如 80 表示 0.8
                     closeOnceClick: true, // 点击遮罩时是否自动关闭控件，默认true(可选)
                 },
@@ -103,25 +81,104 @@
                 },
                 // 常用属性
                 showSpeed: true, // 是否显示百分比进度，默认true(可选)
+                showTitle: true, // 是否显示标题，默认true(可选)
+                titleText: '正在处理中，请稍侯', // 标题文本，有默认值(可选)
                 showOver: true, // 是否显示进度完成，默认true(可选)
                 overText: '加载完成', // 进度完成的文字，默认'加载完成'，仅当showOver=true时有效。(可选)
                 min: 0, // 进度条最小值，默认0表示0%(可选)
                 max: 500, // 进度条最大值，默认100表示100%完成(可选)
-                current: 200, // 进度条当前位置，默认100表示100%(可选)
-                duration: 0, // 动画时长，默认0，单位毫秒(可选)
+                current: 0, // 进度条初始位置，默认0表示0%(可选)。注意：值不为0时控件创建完成后系统将自动执行进度条动画。请注意，值不为0时，若duration 设置过小可能会影响覆盖后续自定义的进度条动画，导致设置的进度条不显示。
+                duration: 5, // 动画时长，默认5，单位毫秒(可选)。注意：建议值设为5-100，若值太小比如为0可能会导致动画太快看不到效果，值太大比如1000可能导致动画太慢超过实际后端执行速度。
                 // 回调
-                callback: function(){ // 控件创建完后的回调函数，默认null(可选)
-                    neuiProgressBar.setProgress(this.current); // 初始化后创建进度条动画，并设置进度条当前位置
+                callback: function(){ // 回调函数，默认null(可选)。如需在控件创建完后执行其它事件，请写在回调函数中
+                    // 这里执行其它事件
+                    //...
                 }
-            });
+            }
+
+            neuiProgressBar(options); // 创建进度条并初始化
+
+
+           
+
+            //——————————————————————————————————————————
+            // 在循环内创建进度条动画，并设置进度条当前位置
+            for(var i = 0; i <= 300; i++){
+                neuiProgressBar.updateProgress(i); // 设置当前进度条“增量值”(一般在for/forEach循环内使用)。参数值为“增量值”。“增量值”含义说明：比如进度条总长为 500，当前“增量值”为10，则系统会自动计算进度条“进度位置”占比为10/500 * 100% = 2%，即“百分比值”为2
+            }
+
 
 
             //——————————————————————————————————————————
-            // 在循环中创建进度条动画，并设置进度条当前位置
-            // for(var i = 0; i <= 100; i++){
-            //     var percent = i;
-            //     neuiProgressBar.setProgress(percent);
+            // 在循环外创建进度条动画，并设置进度条当前位置
+            // neuiProgressBar.updatePosition(50); //  设置当前进度条“进度位置”(一般在for/forEach循环外使用)。参数值带百分号%时为“百分比值”，否则为“增量值”。“增量值”含义表示：比如进度条总长为 500，当前“增量值”为10，则系统会自动计算进度条“进度位置”占比为10/500 * 100% = 2%，即“百分比值”为2
+            // neuiProgressBar.destroy(1000); // 延迟N毫秒销毁进度条控件
+            
+
+
+            //——————————————————————————————————————————
+            // // 在循环中创建进度条动画，并设置进度条当前位置
+            // var flag = ''; // 
+            // var start = 0;
+            // for(var i = 0; i <= 500; i++){
+            //     start = i;
+            //     if(i <= 400){
+            //         neuiProgressBar.updateProgress(i);
+            //     }
+            //     else {
+            //         flag = 0;
+            //         break;
+            //     }
             // }
+            // console.log('flag：', flag);
+            // console.log('start：', start);
+            // if(flag == 0){
+            //     console.log('执行失败了');
+            // }
+
+
+           
+
+
+
+
+
+
+            //——————————————————————————————————————————————————————————
+            //          以下为 js 延时功能测试代码，请忽略
+            //——————————————————————————————————————————————————————————
+            //——————————————————————————————————————————————————————————
+            // //for循环延迟执行
+            // for (var i = 0; i < 10; i++) {
+            //     (function (i) {
+            //         setTimeout(function () {
+            //             console.log('i：', i);
+            //         }, 5000 * i); //循环延迟5秒
+            //     })(i);
+            // }
+            // console.log('好')
+            
+            //——————————————————————————————————————————————————————————
+            // function someFunction() {
+            //     console.log('这段代码会立即执行');
+            
+            //     setTimeout(function() {
+            //         console.log('这段代码将在2000毫秒后执行');
+            
+            //         // 在这里可以添加更多的代码，它们也会在延时后执行
+            //         // 要阻止后续代码执行，可以使用 return 或 throw
+            //         // return; // 这会导致后续代码停止执行
+            
+            //         // 或者你可以抛出一个异常
+            //         throw new Error('停止执行后续代码');
+            //     }, 2000);
+            
+            //     // 这里的代码会在setTimeout之后立即执行
+            //     // 如果你想阻止它执行，你可以在setTimeout的回调函数中使用return或throw
+            //     console.log('这段代码是在函数后')
+            // }
+            
+            // someFunction();
 
 
 

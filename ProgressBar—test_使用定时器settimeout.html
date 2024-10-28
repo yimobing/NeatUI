@@ -1,0 +1,83 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+	<title>使用settimeout定时器的进度条</title>
+	<style>
+		#center {
+			margin: 50px auto;
+			width: 400px;
+		}
+
+		#loading {
+			width: 397px;
+			height: 49px;
+			background: url('test/img/jindutiao_bak.png') no-repeat;
+		}
+
+		#loading div {
+			width: 0px;
+			height: 48px;
+			background: url('test/img/jindutiao_pro.png') no-repeat;
+			color: #fff;
+			text-align: center;
+			font-family: Tahoma;
+			font-size: 18px;
+			line-height: 48px;
+		}
+
+		#message {
+			width: 200px;
+			height: 35px;
+			font-family: Tahoma;
+			font-size: 12px;
+			background-color: #d8e7f0;
+			border: 1px solid #187CBE;
+			display: none;
+			line-height: 35px;
+			text-align: center;
+			margin-bottom: 10px;
+			margin-left: 50px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="center">
+		<div id="message"></div>
+		<div id="loading">
+			<div></div>
+		</div>
+	</div>
+	<script src="assets/libs/jquery-1.8.3.min.js"></script>
+	<script>
+		var progress_id = "loading";
+		function SetProgress(progress) {
+			if (progress) {
+				$("#" + progress_id + " > div").css("width", String(progress) + "%"); //控制#loading div宽度 
+				$("#" + progress_id + " > div").html(String(progress) + "%"); //显示百分比 
+			}
+		}
+		var i = 0;
+		function doProgress() {
+			if (i > 100) {
+				$("#message").html("加载完毕！").fadeIn("slow");//加载完毕提示 
+				return;
+			}
+			if (i <= 100) {
+				setTimeout("doProgress()", 100);
+				SetProgress(i);
+				i++;
+			}
+		}
+
+
+		
+			doProgress();
+		
+	</script>
+</body>
+
+</html>
