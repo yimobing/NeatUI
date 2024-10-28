@@ -607,6 +607,8 @@
             return false;
         },
 
+
+        
         /**
          * 原生JS合并对象2
          * 即用两个对象来拓展，返回拓展后的新对象
@@ -687,14 +689,17 @@
                         _default = self.defaults,
                         i = 1,
                         length = arguments.length,
-                        target = _default.isToEmptyObject ? {} : arguments[0] || {},
+                        // 根据是否全并到空对象{}中，决定对象采取”引用”还是“只赋值不引用”的方式
+                        // config = arguments[0] || {},
+                        config = _default.isToEmptyObject ? JSON.parse(JSON.stringify(arguments[0] || {})) : arguments[0] || {}, // 默认配置项
                         source,
-                        targetItem,
+                        configItem,
                         sourceItem,
                         tiType,
                         siType,
                         clone,
                         name;
+                    // console.log('默认配置项defs：', defs, '\n默认配置项config：', config, '\n第1个参数：', arguments[0]);
                     for (; i < length; i++) {
                         // 判断源对象是否为空
                         if ((source = arguments[i]) != null) {
@@ -702,21 +707,21 @@
                                 var hasPro = source.hasOwnProperty(name);
                                 // 是否遍历源对象的原型链
                                 if (hasPro || _default.includePrototype) {
-                                    targetItem = target[name];
+                                    configItem = config[name];
                                     sourceItem = source[name];
-                                    tiType = self.type(targetItem);
+                                    tiType = self.type(configItem);
                                     siType = self.type(sourceItem);
                                     // 防止出现回环
-                                    if (target === sourceItem) {
+                                    if (config === sourceItem) {
                                         continue;
                                     }
                                     // 如果复制的是对象或者数组
                                     if (_default.isDeep && sourceItem != null && self.typeMap[siType]) {
-                                        clone = targetItem != null && tiType === siType ? targetItem : self.typeMap[siType]();
+                                        clone = configItem != null && tiType === siType ? configItem : self.typeMap[siType]();
                                         // 递归
-                                        target[name] = self.merge(clone, sourceItem);
+                                        config[name] = self.merge(clone, sourceItem);
                                     } else {
-                                        clone = hasPro ? target : target.__proto__;
+                                        clone = hasPro ? config : config.__proto__;
                                         // 处理每一个合并项
                                         clone = _default.forEach.call(self, clone, name, sourceItem);
                                     }
@@ -724,7 +729,7 @@
                             }
                         }
                     }
-                    return target;
+                    return config;
                 }
             };
             EXT.fn.init.prototype = EXT.fn;
