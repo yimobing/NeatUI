@@ -811,7 +811,8 @@
                     ( typeof items["thousandth"] == 'undefined' ? true : (items["thousandth"] === true ? true : false) )
                     :
                     ( typeof items["thousandth"] == 'undefined' ? false : (items["thousandth"] === true ? true : false) ),
-                    placeholder = items["placeholder"] == 'undefined' ? null : items["placeholder"],
+                    placeholder = typeof items["placeholder"] == 'undefined' ? null : items["placeholder"],
+                    enablePlaceholder = typeof items["enablePlaceholder"] == 'undefined' ? true : items["enablePlaceholder"],
                     unit = typeof items["unit"] == 'undefined' ? '' : items["unit"],
                     phone = typeof items["phone"] == 'undefined' ? false : items["phone"] === true ? true : false,
                     chat = typeof items["chat"] == 'undefined' ? false : items["chat"] === true ? true : false,
@@ -903,7 +904,10 @@
                 
                 //
                 var chooseText = placeholder != null && placeholder.toString().replace(/([ ]+)/g, '') != '' ? placeholder :  (!readonly ? '请填写' : '请选择'); //+title 
-                    _looseFocusStr = !readonly ?  '' : ';this.blur()';
+                    _looseFocusStr = !readonly ? '' : ';this.blur()';
+                if (enablePlaceholder !== true) {
+                    chooseText = '';
+                }
                 var _classStr = className,
                     _styleStr = '',
                     _placeholderStr = !must ? '' : ' placeholder="' + chooseText + '"',

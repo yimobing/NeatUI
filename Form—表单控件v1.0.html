@@ -178,7 +178,8 @@
     chat        是否微信类型(可选)。值：true, false 否(默认)
     must        是否必填项(可选)。值：true 是, false 否(默认)
     multiple    是否多行(可选)。值: true 是, false 否(默认)
-    placeholder 空占位符(可选), 默认空。仅在must=true时有效。
+    placeholder 空占位符(可选), 默认空。仅在must=true && enablePlaceholder=true 时有效。
+    enablePlaceholder 是否使用占位符(可选)，默认true。某些情况下比如IE10或IE11占位符看起来像正常的值，不想使用占位符时，就可设置此属性为false。
     readonly    是否强制为只读(可选), 默认false
     disabled    是否强制为禁用(可选), 默认false。true时 readonly参数值也将被强制置为true。
     rowRead     是否整行只读(可选), 默认false。true 时整行将以比较灰的背景色和灰的文字颜色显示，以和可写入的行区分开来。true时 readonly参数值也将被强制置为true。
@@ -349,7 +350,7 @@
                     {title:"电话+微信", field:"moWx", type:"文本", value:"18350605829", phone: true, chat: true },
 
                     {title:"千分进位", field:"money", type:"数字", value:"15000", thousandth:true },
-                    {title:"占位符", field:"hasPlace", type:"数字", value:"", placeholder:"请先输入总价", must:true },
+                    {title:"占位符", field:"hasPlace", type:"数字", value:"", placeholder:"请先输入总价", must:true, enablePlaceholder: true },
                     {title:"有隐藏值的", field:"hasHid", type:"数字", value:"15000", hid:"Z1001" },
                     {title:"自定义属性", field:"customAttr", type:"文本", value:"vip2", attribute:"data-toggle='1' data-vip='5'" },
                     {title:"有右侧单位", field:"hasUnit", type:"数字", value:"15000", unit:"元/m²" },
