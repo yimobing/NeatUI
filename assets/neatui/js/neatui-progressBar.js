@@ -78,8 +78,8 @@
             var me = this;
             me.settings = utils.combine(true, me.defaults, options || {});
             me.$opts = me.settings; // 全局赋值1
-            console.log('defaults：', me.defaults);
-            console.log('settings：', me.settings); // test1
+            // console.log('defaults：', me.defaults);
+            // console.log('settings：', me.settings);
             var _themeClass = me.settings.theme == '' ? '' : ' ' + me.settings.theme.toString().replace(/(\.|\#)/g, ''),
                 _extClass = me.settings.extClass == '' ? '' : ' ' + me.settings.extClass.toString().replace(/(\.|\#)/g, ''),
                 _current = parseFloat(me.settings.current.toString().replace(/(%|px)/g, '')),
@@ -129,7 +129,6 @@
                         // 匿名函数马上执行
                         (function () {
                             var _titleHtml = '<div class="ne__progress_title">' + me.settings.titleText + '</div>';
-                            // console.log('titlehtml：', _titleHtml); // test1
                             return (
                                 !me.settings.showTitle ? '' : _titleHtml
                             )
@@ -284,7 +283,12 @@
                 if (node1 != null && typeof node1 != 'undefined') node1.remove();
                 if (node2 != null && typeof node2 != 'undefined') node2.remove();
             }, intervals)
-          
+        },
+
+        // testing
+        finish: function () {
+            var me = this;
+            return me.$opts.$complete === true ? true : false;
         }
     };
 
@@ -318,6 +322,7 @@
                 }   
                 else{
                     me.$opts.$nodeBarOver.style.setProperty('display', 'block');
+                    me.$opts.$complete = true; // 全局赋值 testing
                 }  
                 _this._setBarWidthAndText(me, percentage);
             }, intervals);

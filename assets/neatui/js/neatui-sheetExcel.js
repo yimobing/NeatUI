@@ -70,6 +70,8 @@
                     defval: '' // 给空的单元格赋值为空字符串，避免单元格被跳过(JSON解析出来后缺少相应的key)
                 },
                 canSecondChooseSameFile: true, // 是否能再次选择同名文件进行导入，默认true(可选)。值为false时，页面没刷新的情况下，同名文件不能第2次选择导入
+                loading: false, // 导入时使用转圈特效，默认false(可选)。注：需先引入 neatui.min.js
+                loadText: '导入中，请稍候..', // 转圈特效文本，有默认值(可选)
                 callback: null // 回调函数(可选)。 e 参数为数组，数组中每个元素为一个object对象，表示表格中的一行数据。
             },
             // 导出功能模块(可选)
@@ -89,6 +91,9 @@
                 nodeId: 'output', // 预览数据绑定的节点ID(可选)
                 title: '导入数据预览', // 标题内容，空时表示没有标题(可选)
                 hasTitleRow: true, // 预览时是否添加列索引，即添加表头A、B、C、D、E、F .. 这行，默认true(可选)
+                hasRowOrder: true, // 预览时是否添加行序号，默认true(可选)
+                firstRowIsHead: false, // 第1行数据是否作为表头，默认false(可选)
+                editable: false, // 展示区域内容是否可编辑，默认false(可选)
             }
         }
     };
@@ -110,8 +115,9 @@
             utils.dialogs('当前控件基于js-xlsx<br>请引入: xlsx.core.min.js<br>具体信息F12查看控制台');
             return;
         }
-        this.opts = options;
-        this.settings = utils.combine(true, this.defaults, this.opts || {});
+        this.opts = options; // 用户配置参数
+        this.settings = utils.combine(true, this.defaults, this.opts || {}); // 合并后的参数
+        this.datasource = []; // 用户导入的数据源，默认空
     };
 
 
@@ -149,9 +155,10 @@
             prewDiv.className = 'sheet__output';
             prewDiv.style = "display: none";
             var _titleStr = this.settings.preview.title == '' ? '' : '<div class="sheet__output_caption">' + this.settings.preview.title + '</div>';
+            var _editStr = this.settings.preview.editable === true ? ' contenteditable' : '';
             prewDiv.innerHTML = [
                 _titleStr,
-                '<div class="sheet__output_table" id="' + this.settings.preview.nodeId + '" contenteditable></div>'
+                '<div class="sheet__output_table" id="' + this.settings.preview.nodeId + '"' + _editStr + '></div>'
             ].join('\r\n');
         }
         // 创建控件根节点
@@ -218,14 +225,34 @@
                         return;
                     }
                     _this.readingWorkbookFromLocalFile(f, function (workbook) {
-                        var sourceArr = _this.readWorkbook(workbook);
-                        // console.log('数据源：', sourceArr);
-                        if (_this.settings.import.callback) {
-                            _this.settings.import.callback(sourceArr);  // 导入回调函数
-                            if (_this.settings.import.canSecondChooseSameFile) {
-                                uploadDom.value = ''; // 清空 input file 中的文件，如此同名文件便能第2次选择，否则同名文件只能选择一次
+                        // test1
+                        if (_this.settings.import.loading) {
+                            if (typeof neui == 'undefined' || typeof neui.showAnimate != 'function') {
+                                console.error('您已开始导入时转圈特效，该特效需先引入 neatui.min.js 文件');
+                                return;
+                            }
+                            neui.showAnimate(_this.settings.import.loadText);
+                            setTimeout(function () {
+                                fnDaoDaoDao();
+                                neui.destroyAnimate();
+                            }, 100);
+                        }
+                        else {
+                            fnDaoDaoDao();
+                        }
+
+                        function fnDaoDaoDao() {
+                            var sourceArr = _this.readWorkbook(workbook);
+                            // console.log('数据源：', sourceArr);
+                            if (_this.settings.import.callback) {
+                                _this.settings.import.callback(sourceArr);  // 导入回调函数
+                                _this.datasource = sourceArr; // 全局赋值
+                                if (_this.settings.import.canSecondChooseSameFile) {
+                                    uploadDom.value = ''; // 清空 input file 中的文件，如此同名文件便能第2次选择，否则同名文件只能选择一次
+                                }
                             }
                         }
+
                     });
                 });
             }
@@ -412,7 +439,97 @@
         // 数据格式化并导出
         this.openDownloadDialog(this.sheet2blob(work_sheet, sheet_name), file_name + '.xlsx');
     };
-        
+    
+
+
+    /**
+     * 校验数据完整性，即某列某一行数据是否为空 test1
+     * @param {Array} ps_column_arr 要校验的列名组成的数组
+     * @param {Array} ps_data_arr 导入的数据源(可选)。默认使用控件实例化后导入的数据源
+     * @param {String} 返回一个提示信息对象。格式： { message: '提示信息，第3行不能为空', current: '空行的行序号'}
+     */
+    Widget.prototype.examineEmpty = function(ps_column_arr, ps_data_arr){
+        var datas = Array.isArray(ps_data_arr) && ps_data_arr.length != 0 ? ps_data_arr : this.datasource;
+        if(datas.length == 0){
+            console.error('数据源参数ps_data_arr为空数组，需要您先导入excel数据，或者不导入但需直接传递数据源数组作为参数值');
+            return;
+        }
+        var tips = '';
+        var row = -1;
+        for (var j = 0; j < ps_column_arr.length; j++){
+            var col = ps_column_arr[j];
+            var isContinue = true;
+            for (var i = 0; i < datas.length; i++){
+                var item = datas[i];
+                // console.log('列：', col);
+                // console.log('行：', i + 1);
+                // console.log('列值：', item[col]);
+                // console.log('----------');
+                if (item[col].toString().replace(/\s+/g, '') === '') {
+                    isContinue = false;
+                    row = i + 1;
+                    break;
+                }   
+            }
+            if (!isContinue) {
+                tips = col + '：第' + row + '行为空';
+                break;
+            }
+        };
+        return {
+            message: tips,
+            current: row
+        };
+    },
+
+
+
+    /**
+     * 校验重复行，即某列某几行数据是否相同 test1
+     * 比如：A 列所有行数据都不能相同, B 列所有行数据都不能相同
+     * @param {Array} ps_column_arr 要校验的列名组成的数组
+     * @param {Array} ps_data_arr 导入的数据源(可选)。默认认使用控件实例化后导入的数据源
+     * @param {String} 返回一个提示信息对象。格式： { message: '提示信息，如姓名：第2行与第3行相同', prev: '数据相同的行1', next: '数据相同的行2' }
+     */
+    Widget.prototype.examineUnique = function (ps_column_arr, ps_data_arr) {
+        var datas = Array.isArray(ps_data_arr) && ps_data_arr.length != 0 ? ps_data_arr : this.datasource;
+        if(datas.length == 0){
+            console.error('数据源参数ps_data_arr为空数组，需要您先导入excel数据，或者不导入但需直接传递数据源数组作为参数值');
+            return;
+        }
+        var tips = '';
+        var row1 = -1, row2 = -1;
+        for (var j = 0; j < ps_column_arr.length; j++){
+            var col = ps_column_arr[j];
+            var isContinue = true;
+            for (var i = 0; i < datas.length; i++){
+                var item = datas[i];
+                for (var k = i + 1; k < datas.length; k++){
+                    var next = datas[k];
+                    // console.log('列：', col);
+                    // console.log('行：', i + 1);
+                    // console.log('行2：', k + 1);
+                    // console.log('item[col]：', item[col], '\nnext[col]：', next[col]);
+                    // console.log('-----------------');
+                    if (item[col] == next[col]) {
+                        isContinue = false;
+                        row1 = i + 1;
+                        row2 = k + 1;
+                        break;
+                    }
+                }   
+            }
+            if (!isContinue) {
+                tips = col + '：第' + row2 + '行与第' + row1 + '行相同';
+                break;
+            }
+        };
+        return {
+            message: tips,
+            prev: row1,
+            next: row2
+        };
+    },
     
 
 
@@ -474,7 +591,7 @@
 
 
     /**
-     * 将csv转换成简单的表格
+     * 将csv转换成简单的表格 test1
      * 注意：会忽略单元格合并，在第一行和第一列追加类似excel的索引
      * @param {csv} csv csv对象
      * @returns {HTML} 返回表格table的HTML代表
@@ -483,13 +600,25 @@
         var _this = this;
         var html = '<table>';
         var rows = csv.split('\n');
+        // console.log('row：', rows);
         // rows.shift(); // 删除第一行
-        rows.pop(); // 删除最后一行没用的
+        // rows.pop(); // 删除最后一行没用的
         rows.forEach(function (row, idx) {
             var columns = row.split(',');
-            columns.unshift(idx + 1); // 添加行索引
+            if (_this.settings.preview.hasRowOrder) {
+                // columns.unshift(idx + 1); // 添加行索引
+                if (_this.settings.preview.firstRowIsHead) {
+                    if (idx == 0)
+                        columns.unshift("");
+                    else
+                        columns.unshift(idx);
+                }
+                else {
+                    columns.unshift(idx + 1); // 添加行索引
+                }
+            }
             if (_this.settings.preview.hasTitleRow) {
-                if (idx == 0) { // 添加列索引，即表头A、B、C、D、E、F .. 这行
+                if (idx == 0) { // 添加列索引行，即表头A、B、C、D、E、F .. 这行
                     html += '<tr>';
                     for (var i = 0; i < columns.length; i++) {
                         html += '<th>' + (i == 0 ? '' : String.fromCharCode(65 + i - 1)) + '</th>';
@@ -498,8 +627,21 @@
                 }
             }
             html += '<tr>';
-            columns.forEach(function (column) {
-                html += '<td>' + column + '</td>';
+            columns.forEach(function (column, j) {
+                // html += '<td>' + column + '</td>';
+                if (_this.settings.preview.firstRowIsHead) {
+                    if (idx == 0) {
+                        if(_this.settings.preview.hasRowOrder && j == 0)
+                            html += '<td>' + column + '</td>';
+                        else
+                            html += '<th>' + column + '</th>';
+                    }
+                    else 
+                        html += '<td>' + column + '</td>';
+                }
+                else {
+                    html += '<td>' + column + '</td>';
+                }
             });
             html += '</tr>';
         });

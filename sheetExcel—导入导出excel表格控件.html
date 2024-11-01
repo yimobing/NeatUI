@@ -31,8 +31,11 @@
             font-weight: 550;
         }
         .operate{ padding: 10px 15px; display: flex; }
-        .btn{ display: inline-block; min-width: 100px; padding: 6px 12px; background-color: orange; border-radius: 4px; color: #fff; font-size: 14px; cursor: pointer; }
+        .btn{ display: inline-block; min-width: 100px; margin-right: 15px; padding: 6px 12px; background-color: orange; border-radius: 4px; color: #fff; font-size: 14px; cursor: pointer; }
+        .btn:nth-child(2){ background-color: purple; }
+        .btn:nth-child(3){ background-color: lightgreen; }
     </style>
+
 
     <div class="custom">
         <!-- 自定义导入的操作区域 -->
@@ -43,6 +46,8 @@
 
     <div class="operate">
         <div class="btn" id="btn-daodaochuchu">仅使用导出功能</div>
+        <div class="btn" id="btn-empty">校验导入数据完整性(单元格是否有空值)</div>
+        <div class="btn" id="btn-repeat">校验导入数据重复行(某一列是否有两行相同的值)</div>
     </div><!--/.operate-->
 
     <div class="controls">
@@ -88,6 +93,11 @@
                 控件内置了以下函数。
                 neuiSheetExcel.exportExcel(arr, opts); // 仅导出表格数据
                 neuiSheetExcel(options); // 控件初始化+导入导出表格数据
+
+                // 以下两个函数，如不传递第2个参数，则需先导入数据否则会报错
+                neuiSheetExcel.examineEmpty(["列名1", "列名2"], "导入的数据源数组(可选)"); // 校验导入的数据完整性(单元格是否有空值)
+                neuiSheetExcel.examineUnique(["列名1", "列名2"], "导入的数据源数组(可选)"); // 校验导入的数据重复行(某些列是否有重复行)
+
                 
                 1、如果仅使用导出功能，则：
                 neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
@@ -153,6 +163,8 @@
                             defval: '' // 给空的单元格赋值为空字符串，避免单元格被跳过(JSON解析出来后缺少相应的key)
                         },
                         canSecondChooseSameFile: true, // 是否能再次选择同名文件进行导入，默认true(可选)。值为false时，页面没刷新的情况下，同名文件不能第2次选择导入
+                        loading: false, // 导入时使用转圈特效，默认false(可选)。注：需先引入 neatui.min.js
+                        loadText: '导入中，请稍候..', // 转圈特效文本，有默认值(可选)
                         callback: function(e){ // 回调函数(可选)。 e 参数为数组，数组中每个元素为一个object对象，表示表格中的一行数据。
                             console.log('返回来的数据源为：', e);
                         }
@@ -177,6 +189,9 @@
                         nodeId: 'output', // 预览数据绑定的节点ID(可选)
                         title: '导入数据预览', // 标题内容，空时表示没有标题(可选)
                         hasTitleRow: true, // 预览时是否添加列索引，即添加表头A、B、C、D、E、F .. 这行，默认true(可选)
+                        hasRowOrder: true, // 预览时是否添加行序号，默认true(可选)
+                        firstRowIsHead: false, // 第1行数据是否作为表头，默认false(可选)
+                        editable: false, // 展示区域内容是否可编辑，默认false(可选)
                     }
                 };
             </pre>
@@ -235,7 +250,9 @@
                         /** Default value for null/undefined values */
                         defval: '' // 给空的单元格赋值为空字符串，避免单元格被跳过(JSON解析出来后缺少相应的key)
                     },
-                    canSecondChooseSameFile: false, // 是否能再次选择同名文件进行导入，默认true(可选)。值为false时，页面没刷新的情况下，同名文件不能第2次选择导入
+                    canSecondChooseSameFile: true, // 是否能再次选择同名文件进行导入，默认true(可选)。值为false时，页面没刷新的情况下，同名文件不能第2次选择导入
+                    loading: true, // 导入时使用转圈特效，默认false(可选)。注：需先引入 neatui.min.js
+                    loadText: '导入中，请稍候..', // 转圈特效文本，有默认值(可选)
                     callback: function(e){
                         console.log('返回来的数据源为：', e);
                     }
@@ -259,6 +276,9 @@
                     nodeId: 'output', // 预览数据绑定的节点ID(可选)
                     title: '导入数据预览', // 标题内容，空时表示没有标题(可选)
                     hasTitleRow: true, // 预览时是否添加列索引，即添加表头A、B、C、D、E、F .. 这行，默认true(可选)
+                    hasRowOrder: true, // 预览时是否添加行序号，默认true(可选)
+                    firstRowIsHead: true, // 第1行数据是否作为表头，默认false(可选)
+                    editable: true, // 展示区域内容是否可编辑，默认false(可选)
                 }
             });
 
@@ -347,6 +367,41 @@
                 }, 100);
             }
 
+
+
+             // ——————————————————————————————————————————
+             // 校验数据完整性
+             $('#btn-empty').on('click', function(){
+                var msgData = neuiSheetExcel.examineEmpty(["押品序号", "押品编号"]);
+                var tips = msgData.message,
+                    prevRow = msgData.prev,
+                    nextRow = msgData.next;
+                console.log('msgData：', msgData);
+                console.log('tips：', tips);
+                if(tips != ''){
+                    alert(tips);
+                    return;
+                }
+             });
+
+
+
+
+            // ——————————————————————————————————————————
+            // 校验重复行
+            $('#btn-repeat').on('click', function(){
+                var msgData = neuiSheetExcel.examineUnique(["押品序号", "押品编号"]);
+                var tips = msgData.message,
+                    prevRow = msgData.prev,
+                    nextRow = msgData.next;
+                console.log('msgData：', msgData);
+                console.log('tips：', tips);
+                if(tips != ''){
+                    alert(tips);
+                    return;
+                } 
+
+            });
     
         }); //$(function(){});
     </script>

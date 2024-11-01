@@ -92,15 +92,17 @@ i, em{ font-style: normal; }
 }
 .sheet__output_table th, 
 .sheet__output_table td {
-	padding: 5px 10px;
+	padding: 3px 6px;
 	border: solid 1px #9e9d9d;
-	color: #555;
+	
 }
 .sheet__output_table th{
 	text-align: center;
+	color: #555;
 	font-size: 16px;
 	font-weight: 550;
 }
 .sheet__output_table td{
-	font-size: 14px;
+	color: #888;
+	font-size: 12px;
 }
