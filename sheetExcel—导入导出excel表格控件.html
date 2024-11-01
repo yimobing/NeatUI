@@ -374,8 +374,7 @@
              $('#btn-empty').on('click', function(){
                 var msgData = neuiSheetExcel.examineEmpty(["押品序号", "押品编号"]);
                 var tips = msgData.message,
-                    prevRow = msgData.prev,
-                    nextRow = msgData.next;
+                    current = msgData.current;
                 console.log('msgData：', msgData);
                 console.log('tips：', tips);
                 if(tips != ''){
