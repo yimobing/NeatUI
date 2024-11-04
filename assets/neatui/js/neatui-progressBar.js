@@ -4,6 +4,7 @@
 /**
  * [neuiProgressBar]
  * 进度条控件
+ * 说明：使用原生JS开发，无需引用户Jq等其它js文件
  * Author：Mufeng
  * Date: 2024.10.22
  * Update: 2024.11.04
@@ -30,7 +31,7 @@
             parentNode: '', // 绑定控件到到某个父节点下，默认空绑定到body最后面script/style标签前(可选)。eg. '.div1'. eg. '#div2'
             position: 'relative', // 定位方式，默认空表示相对定位(可选)。值： relative 相对定位, absolute 绝对定位, fixed 固定定位
             zIndex: 99, // 定位层级，默认99(可选)
-            width: 300, // 自定义区域宽度，默认300(可选)
+            width: 400, // 自定义区域宽度，默认400(可选)
             height: 100, // 自定义区域高度，默认100(可选)
             hasBorder: true, // 区域是否显示边框，默认true(可选)
             hasRadius: true, // 区域是否有圆角，默认true(可选)
@@ -54,12 +55,18 @@
             showSpeed: true, // 是否显示百分比进度，默认true(可选)
             showTitle: true, // 是否显示标题，默认true(可选)
             titleText: '正在处理中，请稍侯', // 标题文本，有默认值(可选)
+            showSubtitle: true, // 是否显示副标题，默认true(可选)
+            subtitleFormat: '当前/总数', // 副标题格式，默认'当前/总数'(可选)。系统会自动将其转化成'当前50/总数100' 的格式。注：参数值中的反斜杠要与参数 subtitleSeparator 保持一致。
+            subtitleSeparator: '/', // 副标题分割符，默认反斜杠/(可选)。
             showOver: true, // 是否显示进度完成，默认true(可选)
             overText: '加载完成', // 进度完成的文字，默认'加载完成'(可选)。仅当showOver=true时有效。
+            showFail: true, // 是否显示进度失败，默认true(可选)。注：需手动调用控件“显示失败信息”的函数，才会显示出来。
+            failText: '加载失败', // 进度失败的文字，默认'加载失败'(可选)。仅当 showFail=true时有效。
             min: 0, // 进度条最小值，默认0表示(0/max)%(可选)
             max: 100, // 进度条最大值，默认100(可选)
             current: 0, // 进度条初始位置。默认0表示(0/max)%(可选)。注意：值不为0时控件创建完成后系统将自动执行进度条动画。请注意，值不为0时，若 duration 设置过小可能会影响覆盖后续自定义的进度条动画，导致设置的进度条不显示。
             duration: 5, // 动画时长，默认5(可选)。单位毫秒。注意：建议值设为5-100，若值太小比如为0可能会导致动画太快看不到效果，值太大比如1000可能导致动画太慢超过实际后端执行速度。
+            cycleBegin: 0, // 循环起始值，默认0(可选)。注：用于解决 for(var m = 0; m < 100; m++) 和 for(m = 1; i <= 100; m++) 这两种情况，前者请设置参数值为0，后者请设置参数值为 1。
             // 回调
             callback: null // 回调函数，默认null(可选)。如需在控件创建完后执行其它事件，请写在回调函数中
         }
@@ -147,18 +154,37 @@
                     var _innerHtml = [
                         // 匿名函数马上执行
                         (function () {
-                            var _titleHtml = !me.settings.showTitle ? '' : '<div class="ne__progress_title">' + me.settings.titleText + '</div>';
+                            // 标题和副标题
+                            var _titleHtml = !me.settings.showTitle && !me.settings.showSubtitle ? '' :
+                                [
+                                    '<div class="ne__progress_caption">',
+                                        (function () {
+                                                return !me.settings.showTitle ? '' : '<div class="ne__progress_title">' + me.settings.titleText + '</div>';
+                                        })(),
+                                        (function () {
+                                            return !me.settings.showSubtitle ? '' : '<div class="ne__progress_subtitle"></div>';
+                                        })(),
+                                    '</div>'
+                                ].join('\r\n');
                             return _titleHtml;
                         })(),
                         // 匿名函数马上执行
                         (function () {
+                            // 进度完成
                             var _overHtml = !me.settings.showOver ? '' : '<div class="ne__progress_message">' + me.settings.overText + '</div>';
                             return _overHtml;
+                        })(),
+                        // 匿名函数马上执行
+                        (function () {
+                            // 进度完成
+                            var _failHtml = !me.settings.showFail ? '' : '<div class="ne__progress_fail">' + me.settings.failText + '</div>';
+                            return _failHtml;
                         })(),
                         '<div class="ne__progress_bar' + _barShapeClass + _themeClass + '"' + _barStyle + '>',
                         '<span class="ne__progress_bar_cartoon" style="width: ' + _percent + '">',
                         // 匿名函数马上执行
                         (function () {
+                            // 百分比值
                             var _pHtml = !me.settings.showSpeed ? '' : '<em class="ne__progress_bar_text">' + _percent + '</em>';
                             return _pHtml;
                         })(),
@@ -173,8 +199,11 @@
             // 全局赋值1
             me.$opts.$nodeRoot = rootNode; // 根节点
             me.$opts.$nodeBarCartoon = document.getElementsByClassName('ne__progress_bar_cartoon')[0]; // 位置动画节点
+            me.$opts.$nodeBarTitle = document.getElementsByClassName('ne__progress_title')[0]; // 标题节点
+            me.$opts.$nodeBarSubtitle = document.getElementsByClassName('ne__progress_subtitle')[0]; // 标题节点
             me.$opts.$nodeBarText = document.getElementsByClassName('ne__progress_bar_text')[0]; // 位置文本节点
             me.$opts.$nodeBarOver = document.getElementsByClassName('ne__progress_message')[0]; // 完成文本节点
+            me.$opts.$nodeBarFail = document.getElementsByClassName('ne__progress_fail')[0]; // 失败文本节点
             // 全局赋值2 (标记作用)
             me.$opts.$startPosition = parseFloat(me.settings.min); // 进度条初始位置
             me.$opts.$startProportion = 0; // 进度条初始进度，即初始占比，默认0表示0%
@@ -225,11 +254,26 @@
                 console.error(tips);
                 return;
             }
-            if (increment > me.settings.max) increment = me.settings.max;
 
-            var nowRate = utils.getRatio(increment, me.settings.max);
+            var realIncresing = me.settings.cycleBegin <= 0 ? (increment + 1) : increment;
+            if (realIncresing > me.settings.max) realIncresing = me.settings.max;
+            var nowRate = utils.getRatio(realIncresing, me.settings.max);
             var duration = me.settings.duration < 0 ? 0 : me.settings.duration;
-            
+            // 副标题文本动态赋值
+            if (typeof me.$opts.$nodeBarSubtitle != 'undefined') {
+                var subHtml = '';
+                var subArr = me.settings.subtitleFormat.split(me.settings.subtitleSeparator);
+                if (Array.isArray(subArr)) {
+                    var preStr = subArr[0],
+                        nextStr = subArr[1];
+                    subHtml = preStr + realIncresing + me.settings.subtitleSeparator + nextStr + me.settings.max; // eg. '当前50/总数100'
+                }
+                else {
+                    subHtml = realIncresing + me.settings.subtitleSeparator + me.settings.max; // eg. '50/100'
+                }
+                me.$opts.$nodeBarSubtitle.innerHTML = '(' + subHtml + ')';
+            }
+            //
             me.$opts.$loopTimes++; // 全局赋值2
             if (me.$opts.$loopTimes == 1) {
                 me.$opts.$startProportion = nowRate;
@@ -322,6 +366,16 @@
 
 
         /**
+         * 手动显示进度失败信息
+         */
+        showFailInfo: function () {
+            var me = this;
+            me.$opts.$nodeBarFail.style.setProperty('display', 'block');
+        },
+
+
+
+        /**
          * 销毁控件
          * @param {Object} 包含延时等参数在内的对象
          * @paam {Function} callback 回调函数
@@ -330,7 +384,7 @@
             var me = this;
             var settings = {
                 duration: 0, // 延时销毁的时长，默认0。单位毫秒
-                success: null,   // 成功时执行的函数
+                success: null,  // 成功时执行的函数
                 fail: null // 失败时执行的函数
             }
             var config = utils.combine(true, settings, opts || {});
@@ -381,10 +435,12 @@
                 var percentage = n + '%';
                 // 进度100%时才显示完成
                 if (n < 100) {
+                   
                     me.$opts.$nodeBarOver.style.setProperty('display', 'none');
                 }   
                 else{
                     me.$opts.$nodeBarOver.style.setProperty('display', 'block');
+                    me.$opts.$nodeBarFail.style.setProperty('display', 'none');
                 }  
                 _this._setBarWidthAndText(me, percentage);
                 if(typeof resolve == 'function') resolve(); // 异步操作成功，调用resolve
@@ -413,6 +469,7 @@
                     } 
                     else {
                         me.$opts.$nodeBarOver.style.setProperty('display', 'block');
+                        me.$opts.$nodeBarFail.style.setProperty('display', 'none');
                     }
                     clearInterval(timer);
                     timer = null;
@@ -432,8 +489,8 @@
           * @param {Object} me 当前控件对象
           */
         _setBarWidthAndText(me, percentage) {
-            me.$opts.$nodeBarCartoon.style.setProperty('width', percentage); // 进度条占比形状
-            me.$opts.$nodeBarText.innerText = percentage; // 进度条占比文本. eg. 48%
+            if(typeof me.$opts.$nodeBarCartoon != 'undefined') me.$opts.$nodeBarCartoon.style.setProperty('width', percentage); // 进度条占比形状
+            if(typeof me.$opts.$nodeBarText != 'undefined') me.$opts.$nodeBarText.innerText = percentage; // 进度条占比文本. eg. 48%
         },
 
 
