@@ -44,7 +44,7 @@
             mask: { // 遮罩(可选)
                 enable: true, // 是否显示遮罩，默认true(可选)。仅当 position = 'absolute' 或 fixed 时才有效。注：遮罩层级系统会自动计算,永远比控件小1。
                 opacity: 0.5, // 遮罩透明度，默认0.5(可选)。当值大于 1 将自动转化成除以100的小数，比如 80 表示 0.8
-                closeOnceClick: true, // 点击遮罩时是否自动关闭控件，默认true(可选)
+                closeOnceClick: false // 点击遮罩时是否自动关闭控件，默认false(可选)
             },
             buttons: { // 按钮
                 enable: false, // 是否显示关闭按钮，默认true(可选)
