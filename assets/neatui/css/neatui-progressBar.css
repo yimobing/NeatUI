@@ -4,7 +4,7 @@
 * 进度条控件
 * Author: Mufeng
 * Date: 2024.10.22
-* Pubdate: 2024.10.22
+* Pubdate: 2024.11.04
 */
 
 /*+ ----------------  ---------------- +*/
@@ -58,7 +58,7 @@ body {
 	text-align: center;
 	color: #187CBE;
 	font-size: 12px;
-	/* display: none; */
+	display: none;
 }
 
 .ne__progress_bar {

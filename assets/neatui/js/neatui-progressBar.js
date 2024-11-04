@@ -6,7 +6,7 @@
  * 进度条控件
  * Author：Mufeng
  * Date: 2024.10.22
- * Update: 2024.10.22
+ * Update: 2024.11.04
  */
 ; (function (root, factory) {
     if (typeof define === 'function' && define.amd) { // amd
@@ -55,11 +55,11 @@
             showTitle: true, // 是否显示标题，默认true(可选)
             titleText: '正在处理中，请稍侯', // 标题文本，有默认值(可选)
             showOver: true, // 是否显示进度完成，默认true(可选)
-            overText: '加载完成', // 进度完成的文字，默认'加载完成'，仅当showOver=true时有效。(可选)
-            min: 0, // 进度条最小值，默认0表示0%(可选)
-            max: 100, // 进度条最大值，默认100表示100%完成(可选)
-            current: 0, // 进度条初始位置，默认0表示0%(可选)。注意：值不为0时控件创建完成后系统将自动执行进度条动画。请注意，值不为0时，若duration 设置过小可能会影响覆盖后续自定义的进度条动画，导致设置的进度条不显示。
-            duration: 5, // 动画时长，默认5，单位毫秒(可选)。注意：建议值设为5-100，若值太小比如为0可能会导致动画太快看不到效果，值太大比如1000可能导致动画太慢超过实际后端执行速度。
+            overText: '加载完成', // 进度完成的文字，默认'加载完成'(可选)。仅当showOver=true时有效。
+            min: 0, // 进度条最小值，默认0表示(0/max)%(可选)
+            max: 100, // 进度条最大值，默认100(可选)
+            current: 0, // 进度条初始位置。默认0表示(0/max)%(可选)。注意：值不为0时控件创建完成后系统将自动执行进度条动画。请注意，值不为0时，若 duration 设置过小可能会影响覆盖后续自定义的进度条动画，导致设置的进度条不显示。
+            duration: 5, // 动画时长，默认5(可选)。单位毫秒。注意：建议值设为5-100，若值太小比如为0可能会导致动画太快看不到效果，值太大比如1000可能导致动画太慢超过实际后端执行速度。
             // 回调
             callback: null // 回调函数，默认null(可选)。如需在控件创建完后执行其它事件，请写在回调函数中
         }
@@ -86,8 +86,13 @@
                 _parentNode = me.settings.parentNode,
                 _width = me.settings.width.toString().replace(/(px|rem|em|vem|vh|%)/g, '') + 'px',
                 _height = me.settings.height.toString().replace(/(px|rem|em|vem|vh|%)/g, '') + 'px';
-            // 创建节点
-            var rootClassId = 'ne-progress-bar'; // 根节点样式名或ID名
+            // 定义样式名
+            var rootClassId = 'ne-progress-bar', // 根节点样式名或ID名
+                maskClassId = 'ne-progress-mask'; // 遮罩节点样式名
+            // 全局赋值1
+            me.$opts.$classNameRoot = rootClassId; // 根节点样式名
+            me.$opts.$classNameMask = maskClassId; // 遮罩节点样式名
+            // 创建根节点
             var rootNode = document.createElement('div');
             rootNode.className = rootClassId;
             rootNode.className += _extClass;
@@ -96,6 +101,20 @@
             rootNode.className += !me.settings.hasShadow ? '' : ' has-shadow';
             rootNode.style.setProperty('width', _width);
             rootNode.style.setProperty('height', _height);
+
+            // 节点存在时，移除节点(防止重复)
+            if (document.getElementsByClassName(rootClassId).length != 0 || document.getElementsByClassName(maskClassId).length != 0) {
+                // 移除进度条节点
+                Array.from(document.getElementsByClassName(rootClassId)).forEach(function (item) {
+                    item.remove();
+                });
+                // 移除遮罩节点
+                Array.from(document.getElementsByClassName(maskClassId)).forEach(function (item) {
+                    item.remove();
+                });
+            }
+
+            // 节点不存在时，创建根节点内容
             if (document.getElementsByClassName(rootClassId).length == 0) {
                 // 创建根节点
                 if (_parentNode != '') {
@@ -120,7 +139,7 @@
                 if (me.settings.bar.shape == 'rectangle') {
                     var _barShapeClass = ' fashion-' + (me.settings.bar.shape == '' ? 'rectangle' : me.settings.bar.shape),
                         _barH = me.settings.bar.height.toString().replace(/(px|rem|em|vem|vh|%)/g, '')
-                        _barRadius = me.settings.bar.borderRadius.toString().replace(/(px|rem|em|vem|vh|%)/g, '');
+                    _barRadius = me.settings.bar.borderRadius.toString().replace(/(px|rem|em|vem|vh|%)/g, '');
                     var _heightStr = _barH == me.defaults.bar.height.toString() ? '' : 'height: ' + (_barH + 'px'),
                         _radiusStr = _barRadius == me.defaults.bar.borderRadius.toString() ? '' : ';border-radius: ' + (_barRadius + 'px');
                     var _barStyle = ' style="' + _heightStr + _radiusStr + '"';
@@ -128,40 +147,31 @@
                     var _innerHtml = [
                         // 匿名函数马上执行
                         (function () {
-                            var _titleHtml = '<div class="ne__progress_title">' + me.settings.titleText + '</div>';
-                            return (
-                                !me.settings.showTitle ? '' : _titleHtml
-                            )
+                            var _titleHtml = !me.settings.showTitle ? '' : '<div class="ne__progress_title">' + me.settings.titleText + '</div>';
+                            return _titleHtml;
                         })(),
                         // 匿名函数马上执行
                         (function () {
-                            var _overHtml = '<div class="ne__progress_message">' + me.settings.overText + '</div>';
-                            return (
-                                !me.settings.showOver ? '' : _overHtml
-                            )
+                            var _overHtml = !me.settings.showOver ? '' : '<div class="ne__progress_message">' + me.settings.overText + '</div>';
+                            return _overHtml;
                         })(),
                         '<div class="ne__progress_bar' + _barShapeClass + _themeClass + '"' + _barStyle + '>',
                         '<span class="ne__progress_bar_cartoon" style="width: ' + _percent + '">',
                         // 匿名函数马上执行
                         (function () {
-                            var _pHtml = '<em class="ne__progress_bar_text">' + _percent + '</em>';
-                            return (
-                                !me.settings.showSpeed ? '' : _pHtml
-                            )
+                            var _pHtml = !me.settings.showSpeed ? '' : '<em class="ne__progress_bar_text">' + _percent + '</em>';
+                            return _pHtml;
                         })(),
                         '</span>',
                         '</div>'
                     ].join('\r\n');
                 }
-
                 // 拼接内容
                 utils.appendHTML(_innerHtml, rootNode);
             }
 
             // 全局赋值1
             me.$opts.$nodeRoot = rootNode; // 根节点
-            me.$opts.$classNameRoot = rootClassId; // 根节点样式名
-            me.$opts.$classNameMask = 'ne-progress-mask'; // 遮罩节点样式名
             me.$opts.$nodeBarCartoon = document.getElementsByClassName('ne__progress_bar_cartoon')[0]; // 位置动画节点
             me.$opts.$nodeBarText = document.getElementsByClassName('ne__progress_bar_text')[0]; // 位置文本节点
             me.$opts.$nodeBarOver = document.getElementsByClassName('ne__progress_message')[0]; // 完成文本节点
@@ -169,7 +179,7 @@
             me.$opts.$startPosition = parseFloat(me.settings.min); // 进度条初始位置
             me.$opts.$startProportion = 0; // 进度条初始进度，即初始占比，默认0表示0%
             me.$opts.$loopTimes = 0;  // 在循环内进度条循环的次数，默认0
-
+            
             // 定位方式不是相对定位时
             if (me.settings.position != '' && me.settings.position != 'relative') {
                 rootNode.className += ' ' + me.settings.position;
@@ -197,14 +207,21 @@
 
 
         /** 
-         * 设置当前进度条“增量值”(一般在for/forEach循环内使用)
+         * 同步或异步设置当前进度条“增量值”(一般在for/forEach循环内使用)
          * 即：渐进性地更新当前进度占整个进度条的“百分比值”
          * @param {Number} increment 当前进度条“增量值”。“增量值”含义说明：比如进度条总长为 500，当前“增量值”为10，则系统会自动计算进度条“进度位置”占比为10/500 * 100% = 2%，即“百分比值”为2
+         * @param {Object} opts 其它参数(可选)。用于设置同步或异步，默认同步。格式: { async: true或false }  true 异步, false 同步
          */
-        updateProgress: function (increment) {
+        updateProgress: function (increment, opts) {
             var me = this;
+            if (typeof me.settings == 'undefined') {
+                var tips = '进度条控件尚未初始化，请先调用 neuiProgressBar(options) 进行初始化';
+                console.error(tips);
+                // alert(tips);
+                return;
+            }
             if (typeof increment == 'undefined' || isNaN(parseFloat(increment))) {
-                var tips = 'updateProgress()函数参数错误，请检查！';
+                var tips = arguments.callee.name + '函数参数错误，请检查！';
                 console.error(tips);
                 return;
             }
@@ -220,37 +237,72 @@
             // console.log('循环次数：', me.$opts.$loopTimes);
             // console.log('当前进度：', nowRate + '%');
             // console.log('-------------------');
-            (function (i) {
-                // 起始进度默认延时一定要设为0，否则会等待N毫秒后才开始执行
-                var timer = null, // 延迟函数ID
-                    intervals = 0;  // 执行间隔时间，单位毫秒
-                if (i == me.$opts.$startProportion) { // 初始进度
-                    intervals = 0;
-                }
-                else {
-                    // 清除延迟操作
-                    if (timer != null) {
-                        clearTimeout(timer);
-                        timer = null;
+            var isAsync = typeof opts == 'undefined' ?
+                false :
+                (
+                    typeof opts != 'object' ?
+                        false :
+                        (
+                            typeof opts.async == 'undefined' ?
+                                false :
+                                (opts.async === true ? true : false)
+                        )
+                );
+            // console.log('isAsync：', isAsync);
+            // 同步版本
+            if (isAsync == false) {
+                (function (i) {
+                    // 起始进度默认延时一定要设为0，否则会等待N毫秒后才开始执行
+                    var timer = null, // 延迟函数ID
+                        intervals = 0;  // 执行间隔时间，单位毫秒
+                    if (i == me.$opts.$startProportion) { // 初始进度
+                        intervals = 0;
                     }
-                    intervals = duration * (i - me.$opts.$startProportion);
-                }
-                timer = helpers._setProgressAnimate(me, intervals, i);
-            })(nowRate);
+                    else {
+                        // 清除延迟操作
+                        if (timer != null) {
+                            clearTimeout(timer);
+                            timer = null;
+                        }
+                        intervals = duration * (i - me.$opts.$startProportion);
+                    }
+                    timer = helpers._setProgressAnimate(me, intervals, i);
+                })(nowRate);
+            }
+            // 异步版本
+            else {
+                return new Promise(function (resolve, reject) {
+                    var i = nowRate;
+                    // 起始进度默认延时一定要设为0，否则会等待N毫秒后才开始执行
+                    var timer = null, // 延迟函数ID
+                        intervals = 0;  // 执行间隔时间，单位毫秒
+                    if (i == me.$opts.$startProportion) { // 初始进度
+                        intervals = 0;
+                    }
+                    else {
+                        // 清除延迟操作
+                        if (timer != null) {
+                            clearTimeout(timer);
+                            timer = null;
+                        }
+                        intervals = duration;
+                    }
+                    timer = helpers._setProgressAnimate(me, intervals, i, resolve);
+                });
+            }
         },
 
 
 
-        
         /**
-         * 设置当前进度条“进度位置”(一般在for/forEach循环外使用)
+         * 同步设置当前进度条“进度位置”(一般在for/forEach循环外使用)
          * 即：一次性地更新当前进度占整个进度条的“百分比值”
          * @param {Number|String} incrementOrPercent 当前进度条“增量值”或“百分比值”，值带百分号%时为“百分比值”，否则为“增量值”。“增量值”含义说明：比如进度条总长为 500，当前“增量值”为10，则系统会自动计算进度条“进度位置”占比为10/500 * 100% = 2%，即“百分比值”为2
          */
         updatePosition: function (incrementOrPercent) {
             var me = this;
             if (typeof incrementOrPercent == 'undefined') {
-                var tips = 'updatePosition()函数参数错误，请检查！';
+                var tips = arguments.callee.name + '函数参数错误，请检查！';
                 console.error(tips);
                 return;
             }
@@ -271,25 +323,37 @@
 
         /**
          * 销毁控件
-         * @param {Number} ps_duration 延时的时长，即延时多少时间后才执行操作，默认1000(可选)。单位毫秒。
+         * @param {Object} 包含延时等参数在内的对象
+         * @paam {Function} callback 回调函数
          */
-        destroy: function (ps_duration) {
+        destroy: function (opts, callback) {
             var me = this;
-            var defTime = 1000; // 默认延时时长，单位毫秒
-            var intervals = typeof ps_duration == 'undefined' ? defTime : (isNaN(parseFloat(ps_duration)) ? defTime : parseFloat(ps_duration)); // 执行间隔时间，单位毫秒
-            setTimeout(function () {
+            var settings = {
+                duration: 0, // 延时销毁的时长，默认0。单位毫秒
+                success: null,   // 成功时执行的函数
+                fail: null // 失败时执行的函数
+            }
+            var config = utils.combine(true, settings, opts || {});
+            var intervals = config.duration;
+            // var defTime = 0; // 默认延时时长，单位毫秒
+            // var intervals = typeof ps_duration == 'undefined' ? defTime : (isNaN(parseFloat(ps_duration)) ? defTime : parseFloat(ps_duration)); // 执行间隔时间，单位毫秒
+            var timer = setTimeout(function () {
+                if (me.$opts == null || typeof me.$opts == 'undefined') {
+                    if (config.fail) {
+                        config.fail('进度条节点不存在(可能是还没有初始化)，故不用销毁');
+                    }
+                    return;
+                }
                 var node1 = me.$opts.$nodeRoot,
                     node2 = me.$opts.$nodeMask;
                 if (node1 != null && typeof node1 != 'undefined') node1.remove();
                 if (node2 != null && typeof node2 != 'undefined') node2.remove();
-            }, intervals)
+                if (config.success) {
+                    config.success();
+                }
+                clearTimeout(timer);
+            }, intervals);
         },
-
-        // testing
-        finish: function () {
-            var me = this;
-            return me.$opts.$complete === true ? true : false;
-        }
     };
 
 
@@ -306,25 +370,24 @@
          * @param {Object} me 当前控件对象
          * @param {Number} intervals 延迟间隔时长，单位毫秒
          * @param {Number} n 闭包参数
+         * @param {Function} resolve Promise的resolve函数(可选)
          * @returns 返回延迟函数的ID
          */
-         _setProgressAnimate: function (me, intervals, n) {
+         _setProgressAnimate: function (me, intervals, n, resolve) {
             var _this = this;
-            return setTimeout(function(){
+            return setTimeout(function () {
                 // console.log('当前进度i值：', n);
                 // console.log('---------------');
                 var percentage = n + '%';
-                // me.$opts.$nodeBarCartoon.style.setProperty('width', percentage);
-                // me.$opts.$nodeBarText.innerText = percentage;
                 // 进度100%时才显示完成
                 if (n < 100) {
                     me.$opts.$nodeBarOver.style.setProperty('display', 'none');
                 }   
                 else{
                     me.$opts.$nodeBarOver.style.setProperty('display', 'block');
-                    me.$opts.$complete = true; // 全局赋值 testing
                 }  
                 _this._setBarWidthAndText(me, percentage);
+                if(typeof resolve == 'function') resolve(); // 异步操作成功，调用resolve
             }, intervals);
         },
 
@@ -341,8 +404,7 @@
             var timer = setInterval(fnAnimates(), me.settings.duration);
             function fnAnimates() {
                 if (start > pos) {
-                    // console.log('start：', start);
-                    // console.log('value：', value);
+                    // console.log('开始start：', start);
                     // console.log('进度pos：', pos);
                     // console.log('---------');
                     // 进度100%时才显示完成
@@ -351,20 +413,17 @@
                     } 
                     else {
                         me.$opts.$nodeBarOver.style.setProperty('display', 'block');
-                    }  
+                    }
                     clearInterval(timer);
                     timer = null;
                 }
                 else {
                     var percentage = start + '%';
-                    // me.$opts.$nodeBarCartoon.style.setProperty('width', percentage); // 进度条占比形状
-                    // me.$opts.$nodeBarText.innerText = percentage; // 进度条占比文本. eg. 48%
                     _this._setBarWidthAndText(me, percentage);
                     start++;
-                }
-                
+                }    
                 return fnAnimates;
-            } 
+            }
         },
          
          
@@ -598,7 +657,15 @@
          * @param {HTML DOM} existingNode 已存在的节点
          */
         insertAfter: function(newNode, existingNode) {
+            if (typeof existingNode == 'undefined' || existingNode == null) {
+                console.error('节点不存在');
+                return;
+            }
             var parent = existingNode.parentNode;
+            if (parent == null) {
+                console.error('父节点不存在');
+                return;
+            }
             // 最后一个子节点 lastElementChild兼容其他浏览器 lastChild  兼容ie678;
             var lastNode = parent.lastElementChild || parent.lastChild;
             // 兄弟节点同样也是有兼容性
