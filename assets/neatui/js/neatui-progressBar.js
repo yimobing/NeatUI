@@ -46,11 +46,6 @@
                 opacity: 0.5, // 遮罩透明度，默认0.5(可选)。当值大于 1 将自动转化成除以100的小数，比如 80 表示 0.8
                 closeOnceClick: false // 点击遮罩时是否自动关闭控件，默认false(可选)
             },
-            buttons: { // 按钮
-                enable: false, // 是否显示关闭按钮，默认true(可选)
-                btnText: '关闭' // 关闭按钮文本，默认'关闭'(可选)
-            },
-
             // 常用属性
             showSpeed: true, // 是否显示百分比进度，默认true(可选)
             showTitle: true, // 是否显示标题，默认true(可选)
@@ -58,10 +53,11 @@
             showSubtitle: true, // 是否显示副标题，默认true(可选)
             subtitleFormat: '当前/总数', // 副标题格式，默认'当前/总数'(可选)。系统会自动将其转化成'当前50/总数100' 的格式。注：参数值中的反斜杠要与参数 subtitleSeparator 保持一致。
             subtitleSeparator: '/', // 副标题分割符，默认反斜杠/(可选)。
-            showOver: true, // 是否显示进度完成，默认true(可选)
+            showOver: true, // 是否在进度加载100%时显示完成，默认true(可选)
             overText: '加载完成', // 进度完成的文字，默认'加载完成'(可选)。仅当showOver=true时有效。
-            showFail: true, // 是否显示进度失败，默认true(可选)。注：需手动调用控件“显示失败信息”的函数，才会显示出来。
+            showFail: true, // 是否在进度加载失败时显示失败，默认true(可选)。注：需手动调用函数 neuiProgressBar.showFailureInfo() 才会显示出来。
             failText: '加载失败', // 进度失败的文字，默认'加载失败'(可选)。仅当 showFail=true时有效。
+            showClose: false, // 是否显示关闭按钮，默认false(可选)。注：可手动调用函数 neuiProgressBar.showCloseDownButton() 强制显示出来。
             min: 0, // 进度条最小值，默认0表示(0/max)%(可选)
             max: 100, // 进度条最大值，默认100(可选)
             current: 0, // 进度条初始位置。默认0表示(0/max)%(可选)。注意：值不为0时控件创建完成后系统将自动执行进度条动画。请注意，值不为0时，若 duration 设置过小可能会影响覆盖后续自定义的进度条动画，导致设置的进度条不显示。
@@ -93,15 +89,26 @@
                 _parentNode = me.settings.parentNode,
                 _width = me.settings.width.toString().replace(/(px|rem|em|vem|vh|%)/g, '') + 'px',
                 _height = me.settings.height.toString().replace(/(px|rem|em|vem|vh|%)/g, '') + 'px';
-            // 定义样式名
-            var rootClassId = 'ne-progress-bar', // 根节点样式名或ID名
-                maskClassId = 'ne-progress-mask'; // 遮罩节点样式名
-            // 全局赋值1
-            me.$opts.$classNameRoot = rootClassId; // 根节点样式名
-            me.$opts.$classNameMask = maskClassId; // 遮罩节点样式名
+            // 定义样式名或ID名
+            var classIdRoot = 'ne-progress-bar', // 根节点样式名或ID名
+                classIdMask = 'ne-progress-mask', // 遮罩节点样式名或ID名
+                classIdOver = 'ne__progress_over', // 进度完成节点样式名或ID名
+                classIdFail = 'ne__progress_fail', // 进度失败节点样式名或ID名
+                classIdClose = 'ne__progress_close'; // 关闭按钮节点样式名或ID名
+            // 全局赋值2
+            me.$opts.$classNameRoot = classIdRoot; // 根节点样式名
+            me.$opts.$classNameMask = classIdMask; // 遮罩节点样式名
+            me.$opts.$classNameOver = classIdOver; // 进度完成节点样式名
+            me.$opts.$classNameFail = classIdFail; // 进度失败节点样式名
+            me.$opts.$classNameClose = classIdClose; // 关闭按钮节点样式名
+            me.$opts.$codeHtmlOver = '<div class="' + classIdOver + '">' + me.settings.overText + '</div>'; // 进度完成HTML字符串
+            me.$opts.$codeHtmlFail = '<div class="' + classIdFail + '">' + me.settings.failText + '</div>'; // 进度失败HTML字符串
+            me.$opts.$codeHtmlClose = '<div class="' + classIdClose + '"></div>';; // 关闭按钮HTML字符串
+           
+
             // 创建根节点
             var rootNode = document.createElement('div');
-            rootNode.className = rootClassId;
+            rootNode.className = classIdRoot;
             rootNode.className += _extClass;
             rootNode.className += !me.settings.hasBorder ? '' : ' has-border';
             rootNode.className += !me.settings.hasRadius ? '' : ' has-radius';
@@ -110,19 +117,19 @@
             rootNode.style.setProperty('height', _height);
 
             // 节点存在时，移除节点(防止重复)
-            if (document.getElementsByClassName(rootClassId).length != 0 || document.getElementsByClassName(maskClassId).length != 0) {
+            if (document.getElementsByClassName(classIdRoot).length != 0 || document.getElementsByClassName(classIdMask).length != 0) {
                 // 移除进度条节点
-                Array.from(document.getElementsByClassName(rootClassId)).forEach(function (item) {
+                Array.from(document.getElementsByClassName(classIdRoot)).forEach(function (item) {
                     item.remove();
                 });
                 // 移除遮罩节点
-                Array.from(document.getElementsByClassName(maskClassId)).forEach(function (item) {
+                Array.from(document.getElementsByClassName(classIdMask)).forEach(function (item) {
                     item.remove();
                 });
             }
 
             // 节点不存在时，创建根节点内容
-            if (document.getElementsByClassName(rootClassId).length == 0) {
+            if (document.getElementsByClassName(classIdRoot).length == 0) {
                 // 创建根节点
                 if (_parentNode != '') {
                     var parentClassId = _parentNode.toString().replace(/(\.|\#)/g, '');
@@ -152,59 +159,71 @@
                     var _barStyle = ' style="' + _heightStr + _radiusStr + '"';
                     var _percent = utils.getRatio(_current, parseFloat(me.settings.max)) + '%';
                     var _innerHtml = [
-                        // 匿名函数马上执行
-                        (function () {
-                            // 标题和副标题
-                            var _titleHtml = !me.settings.showTitle && !me.settings.showSubtitle ? '' :
-                                [
-                                    '<div class="ne__progress_caption">',
-                                        (function () {
+                        '<div class="ne__progress_content">',
+                            // 标题和副标题 (匿名函数马上执行)
+                            (function () {
+                                var _tmpHtml = !me.settings.showTitle && !me.settings.showSubtitle ? '' :
+                                    [
+                                        '<div class="ne__progress_caption">',
+                                            (function () {
                                                 return !me.settings.showTitle ? '' : '<div class="ne__progress_title">' + me.settings.titleText + '</div>';
-                                        })(),
-                                        (function () {
-                                            return !me.settings.showSubtitle ? '' : '<div class="ne__progress_subtitle"></div>';
-                                        })(),
-                                    '</div>'
-                                ].join('\r\n');
-                            return _titleHtml;
-                        })(),
-                        // 匿名函数马上执行
-                        (function () {
-                            // 进度完成
-                            var _overHtml = !me.settings.showOver ? '' : '<div class="ne__progress_message">' + me.settings.overText + '</div>';
-                            return _overHtml;
-                        })(),
-                        // 匿名函数马上执行
-                        (function () {
-                            // 进度完成
-                            var _failHtml = !me.settings.showFail ? '' : '<div class="ne__progress_fail">' + me.settings.failText + '</div>';
-                            return _failHtml;
-                        })(),
-                        '<div class="ne__progress_bar' + _barShapeClass + _themeClass + '"' + _barStyle + '>',
-                        '<span class="ne__progress_bar_cartoon" style="width: ' + _percent + '">',
-                        // 匿名函数马上执行
-                        (function () {
-                            // 百分比值
-                            var _pHtml = !me.settings.showSpeed ? '' : '<em class="ne__progress_bar_text">' + _percent + '</em>';
-                            return _pHtml;
-                        })(),
-                        '</span>',
-                        '</div>'
+                                            })(),
+                                            (function () {
+                                                return !me.settings.showSubtitle ? '' : '<div class="ne__progress_subtitle"></div>';
+                                            })(),
+                                        '</div>'
+                                    ].join('\r\n');
+                                return _tmpHtml;
+                            })(),
+                            // 进度完成节点 (匿名函数马上执行)
+                            (function () {
+                                // var _tmpStyle = !me.settings.showOver ? ' style="display: none"' : '';
+                                // var _tmpHtml = '<div class="ne__progress_over"' + _tmpStyle + '>' + me.settings.overText + '</div>';
+                                var _tmpHtml = !me.settings.showOver ? '' : me.$opts.$codeHtmlOver;
+                                return _tmpHtml;
+                            })(),
+                            // 进度失败节点 (匿名函数马上执行)
+                            (function () {
+                                // var _tmpStyle = !me.settings.showFail ? ' style="display: none"' : '';
+                                // var _tmpHtml = '<div class="ne__progress_fail"' + _tmpStyle + '>' + me.settings.failText + '</div>';
+                                var _tmpHtml = !me.settings.showFail ? '' : me.$opts.$codeHtmlFail;
+                                return _tmpHtml;
+                            })(),
+                            // 关闭按钮节点 (匿名函数马上执行)
+                            (function () {
+                                // var _tmpStyle = !me.settings.showClose ? ' style="display: none"' : '';
+                                // var _tmpHtml = '<div class="ne__progress_close"' + _tmpStyle + '></div>';
+                                var _tmpHtml = !me.settings.showClose ? '' : me.$opts.$codeHtmlClose;
+                                return _tmpHtml;
+                            })(),
+                            '<div class="ne__progress_strip' + _barShapeClass + _themeClass + '"' + _barStyle + '>',
+                                '<span class="ne__progress_strip_cartoon" style="width: ' + _percent + '">',
+                                // 百分比值节点 (匿名函数马上执行)
+                                (function () {
+                                    var _tmpHtml = !me.settings.showSpeed ? '' : '<em class="ne__progress_strip_text">' + _percent + '</em>';
+                                    return _tmpHtml;
+                                })(),
+                                '</span>',
+                            '</div>',
+                        '</div><!--/.ne__progress_content-->'
                     ].join('\r\n');
                 }
                 // 拼接内容
                 utils.appendHTML(_innerHtml, rootNode);
             }
 
-            // 全局赋值1
+            // 全局赋值3
             me.$opts.$nodeRoot = rootNode; // 根节点
-            me.$opts.$nodeBarCartoon = document.getElementsByClassName('ne__progress_bar_cartoon')[0]; // 位置动画节点
+            me.$opts.$nodeBarContent = document.getElementsByClassName('ne__progress_content')[0]; // 内容节点
+            me.$opts.$nodeBarStrip = document.getElementsByClassName('ne__progress_strip')[0]; // 进度条节点
+            me.$opts.$nodeBarCartoon = document.getElementsByClassName('ne__progress_strip_cartoon')[0]; // 位置动画节点
+            me.$opts.$nodeBarText = document.getElementsByClassName('ne__progress_strip_text')[0]; // 位置文本节点
             me.$opts.$nodeBarTitle = document.getElementsByClassName('ne__progress_title')[0]; // 标题节点
-            me.$opts.$nodeBarSubtitle = document.getElementsByClassName('ne__progress_subtitle')[0]; // 标题节点
-            me.$opts.$nodeBarText = document.getElementsByClassName('ne__progress_bar_text')[0]; // 位置文本节点
-            me.$opts.$nodeBarOver = document.getElementsByClassName('ne__progress_message')[0]; // 完成文本节点
-            me.$opts.$nodeBarFail = document.getElementsByClassName('ne__progress_fail')[0]; // 失败文本节点
-            // 全局赋值2 (标记作用)
+            me.$opts.$nodeBarSubtitle = document.getElementsByClassName('ne__progress_subtitle')[0]; // 副标题节点
+            me.$opts.$nodeBarOver = document.getElementsByClassName(classIdOver)[0]; // 进度完成节点
+            me.$opts.$nodeBarFail = document.getElementsByClassName(classIdFail)[0]; // 进度失败节点
+            me.$opts.$nodeBarClose = document.getElementsByClassName(classIdClose)[0]; // 关闭按钮节点
+            // 全局赋值4 (标记作用)
             me.$opts.$startPosition = parseFloat(me.settings.min); // 进度条初始位置
             me.$opts.$startProportion = 0; // 进度条初始进度，即初始占比，默认0表示0%
             me.$opts.$loopTimes = 0;  // 在循环内进度条循环的次数，默认0
@@ -214,16 +233,17 @@
                 rootNode.className += ' ' + me.settings.position;
                 rootNode.style.setProperty('z-index', me.settings.zIndex);
                 var maskNode = helpers._createMask(me); // 创建遮罩
-                if (me.settings.mask.closeOnceClick) { // 点击遮罩层时
+                if (me.settings.mask.closeOnceClick) { // 点击遮罩层时关闭控件
                     // var maskNode = document.getElementsByClassName(me.$opts.$classNameMask)[0];
                     maskNode.addEventListener('click', function () {
                         rootNode.remove();
                         maskNode.remove();
                     });
                 }
-                // 全局赋值1
+                // 全局赋值3
                 me.$opts.$nodeMask = maskNode;
             }
+            helpers._onClickCloseBtn(me); // 点击关闭按钮时关闭控件
             // 回调
             if (me.settings.callback) {
                 me.settings.callback();
@@ -274,7 +294,7 @@
                 me.$opts.$nodeBarSubtitle.innerHTML = '(' + subHtml + ')';
             }
             //
-            me.$opts.$loopTimes++; // 全局赋值2
+            me.$opts.$loopTimes++; // 全局赋值4
             if (me.$opts.$loopTimes == 1) {
                 me.$opts.$startProportion = nowRate;
             }
@@ -368,9 +388,30 @@
         /**
          * 手动显示进度失败信息
          */
-        showFailInfo: function () {
+        showFailureInfo: function () {
             var me = this;
-            me.$opts.$nodeBarFail.style.setProperty('display', 'block');
+            if (typeof me.$opts.$nodeBarFail != 'undefined') me.$opts.$nodeBarFail.style.setProperty('display', 'block');
+            else {
+                utils.prependHTML(me.$opts.$codeHtmlFail, me.$opts.$nodeBarContent);
+                me.$opts.$nodeBarFail = document.getElementsByClassName(me.$opts.$classNameFail)[0]; // 全局赋值3
+                me.$opts.$nodeBarFail.style.setProperty('display', 'block');
+            }
+        },
+
+
+
+        /**
+         * 手动显示关闭按钮
+         */
+        showCloseDownButton: function () {
+            var me = this;
+            if (typeof me.$opts.$nodeBarClose != 'undefined') me.$opts.$nodeBarClose.style.setProperty('display', 'block');
+            else {
+                utils.prependHTML(me.$opts.$codeHtmlClose, me.$opts.$nodeBarContent);
+                me.$opts.$nodeBarClose = document.getElementsByClassName(me.$opts.$classNameClose)[0]; // 全局赋值3
+                me.$opts.$nodeBarClose.style.setProperty('display', 'block');
+                helpers._onClickCloseBtn(me); // 点击关闭按钮时关闭控件
+            }
         },
 
 
@@ -435,12 +476,11 @@
                 var percentage = n + '%';
                 // 进度100%时才显示完成
                 if (n < 100) {
-                   
-                    me.$opts.$nodeBarOver.style.setProperty('display', 'none');
+                    if(typeof me.$opts.$nodeBarOver != 'undefined') me.$opts.$nodeBarOver.style.setProperty('display', 'none');
                 }   
                 else{
-                    me.$opts.$nodeBarOver.style.setProperty('display', 'block');
-                    me.$opts.$nodeBarFail.style.setProperty('display', 'none');
+                    if(typeof me.$opts.$nodeBarOver != 'undefined') me.$opts.$nodeBarOver.style.setProperty('display', 'block');
+                    if(typeof me.$opts.$nodeBarFail != 'undefined') me.$opts.$nodeBarFail.style.setProperty('display', 'none');
                 }  
                 _this._setBarWidthAndText(me, percentage);
                 if(typeof resolve == 'function') resolve(); // 异步操作成功，调用resolve
@@ -465,11 +505,11 @@
                     // console.log('---------');
                     // 进度100%时才显示完成
                     if (pos < 100) {
-                        me.$opts.$nodeBarOver.style.setProperty('display', 'none');
+                        if(typeof me.$opts.$nodeBarOver != 'undefined') me.$opts.$nodeBarOver.style.setProperty('display', 'none');
                     } 
                     else {
-                        me.$opts.$nodeBarOver.style.setProperty('display', 'block');
-                        me.$opts.$nodeBarFail.style.setProperty('display', 'none');
+                        if(typeof me.$opts.$nodeBarOver != 'undefined') me.$opts.$nodeBarOver.style.setProperty('display', 'block');
+                        if(typeof me.$opts.$nodeBarFail != 'undefined') me.$opts.$nodeBarFail.style.setProperty('display', 'none');
                     }
                     clearInterval(timer);
                     timer = null;
@@ -513,6 +553,20 @@
             maskNode.setAttribute('style', 'position: fixed; z-index: ' + zIndex + '; top: 0; right: 0; width: 100%; height: 100%; margin: 0 auto; background: #000; opacity: '+ opacity + '; filter: alpha(opacity = ' + alphOpacity + ')');
             utils.insertAfter(maskNode, me.$opts.$nodeRoot);
             return maskNode;
+        },
+
+        /**
+         * 点击关闭按钮时关闭控件
+         * @param {Object} me 当前控件对象
+         */
+        _onClickCloseBtn: function (me) {
+             // 关闭按钮点击事件
+             if (typeof me.$opts.$nodeBarClose != 'undefined') {
+                me.$opts.$nodeBarClose.addEventListener('click', function () {
+                    me.$opts.$nodeRoot.remove();
+                    me.$opts.$nodeMask.remove();
+                });
+            }
         }
     };
 
@@ -665,11 +719,35 @@
         },
 
 
+           
+        /**
+         * 原生js prepend字符串
+         * 即：向父节点中添加子节点HTML字符串，将把该HTML插入到父节点内部的最前面
+         * @param {String} str 子节点字符串
+         * @param {HTML DOM} el 父节点
+         */
+        prependHTML: function(str, el) {
+            var divTemp = document.createElement("div"),
+                nodes = null,
+                fragment = document.createDocumentFragment();
+            divTemp.innerHTML = str;
+            nodes = divTemp.childNodes;
+            for (var i = 0, length = nodes.length; i < length; i += 1) {
+                fragment.appendChild(nodes[i].cloneNode(true));
+            }
+            // 插入到容器的前面 - 差异所在
+            el.insertBefore(fragment, el.firstChild);
+            // 内存回收？
+            nodes = null;
+            fragment = null;
+        },
+    
+    
         /**
          * 原生js append字符串
-         * 即：向已存在的节点对象后面追加HTML字符串
-         * @param {string} str 字符串
-         * @param {HTML DOM} el 已存在的节点对象
+         * 即：向父节点中添加子节点HTML字符串，将把该HTML插入到父节点内部的最后面
+         * @param {String} str 子节点字符串
+         * @param {HTML DOM} el 父节点
          */
          appendHTML: function(str, el){
             HTMLElement.prototype.appendStr = function(str) {

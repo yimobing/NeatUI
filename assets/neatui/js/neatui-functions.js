@@ -1337,9 +1337,9 @@ var utilities = {
 
     /**
      * 原生js append字符串
-     * 即：向已存在的节点对象后面追加HTML字符串
-     * @param {string} str 字符串
-     * @param {HTML DOM} el 已存在的节点对象
+     * 即：向父节点中添加子节点HTML字符串，将把该HTML插入到父节点内部的最后面
+     * @param {String} str 子节点字符串
+     * @param {HTML DOM} el 父节点
      */
     appendHTML: function(str, el){
         HTMLElement.prototype.appendStr = function(str) {
@@ -1364,7 +1364,7 @@ var utilities = {
      * 向父节点中添加子节点，并将子节点插入到父节点内部的最后面，但在script/style节点前面
      * add 20241022-1
      * @param {HTML DOM} newNode childNode 子节点
-     * @param {HTML DOM} fatherNode  父节点
+     * @param {HTML DOM} fatherNode 父节点
      * add 20240929-1
      */
     appendChild: function (childNode, fatherNode) {
@@ -1383,18 +1383,18 @@ var utilities = {
       
     /**
      * 原生js prepend字符串
-     * 即：向已存在的节点对象前面追加HTML字符串
-     * @param {string} str 字符串
-     * @param {HTML DOM} el 已存在的节点对象
+     * 即：向父节点中添加子节点HTML字符串，将把该HTML插入到父节点内部的最前面
+     * @param {String} str 子节点字符串
+     * @param {HTML DOM} el 父节点
      */
     prependHTML: function(str, el) {
-        var divTemp = document.createElement("div"), nodes = null
-            , fragment = document.createDocumentFragment();
-    
+        var divTemp = document.createElement("div"),
+            nodes = null,
+            fragment = document.createDocumentFragment();
         divTemp.innerHTML = str;
         nodes = divTemp.childNodes;
-        for (var i=0, length=nodes.length; i<length; i+=1) {
-        fragment.appendChild(nodes[i].cloneNode(true));
+        for (var i = 0, length = nodes.length; i < length; i += 1) {
+            fragment.appendChild(nodes[i].cloneNode(true));
         }
         // 插入到容器的前面 - 差异所在
         el.insertBefore(fragment, el.firstChild);
@@ -1426,7 +1426,7 @@ var utilities = {
      
      
     /**
-     * 原生js在已存在的节点向后面插入新节点(兼容ie9-)
+     * 原生js在已存在的节点后面插入新节点(兼容ie9-)
      * @param {HTML DOM} newNode 新节点
      * @param {HTML DOM} existingNode 已存在的节点
      */
