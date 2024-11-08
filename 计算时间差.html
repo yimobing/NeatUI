@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计算时间差</title>
+</head>
+<body>
+    <script>
+
+         /**
+         * 将秒数转化成用户看得懂的具体时间字符串
+         * @param {Number} ps_seconds 秒数(数值类型)。eg. 80 表示 80秒
+         * @param {String} 返回具体的时间字符串。eg. 800秒相当于'10分20秒',  5200秒相当于'1小时26分钟40秒'
+         */
+        var getTimeToString = function(ps_seconds){
+            if(ps_seconds <= 0) return '0秒';
+            return getTimeStringByMiliseconds(ps_seconds * 1000); // 时间差。单位毫秒 
+        }
+
+
+        /**
+         * 获取两个时间之间的时间差
+         * @param {Object} options 参数对象。格式参见函数内 defaults 参数
+         * @returns {String} 返回时间差字符串。eg. '2年1天13小时55分钟53秒'
+         */
+        var getTimeDiffrence = function(options){
+            var defaults = {
+                method: 'dateString', // 时间参数格式，默认dateString。值： dateString 表示日期的字符串值, milliseconds 一个Unix 时间戳整数值，表示自 1970 年 1 月 1 日 00:00:00 UTC（the Unix epoch）以来的毫秒数。
+                // 时间参数格式：可以是1970年1月1日以来至某个时间的毫秒数(如63208553000)，也可以是时间戳，或某个时间字符串(比如' 2024-11-07 09:15:38')。
+                earlierTime: new Date().getMilliseconds(), // 较早的时间，默认1970年的毫秒数。eg. '2024-11-07 10:03:12', 
+                laterTime: new Date().getTime() // 较晚的时间，默认1970年至今的毫秒数。eg. '2026-11-08 23:59:05'
+            }
+            var earlierTime = options.earlierTime || defaults.earlierTime,
+                laterTime = options.laterTime || defaults.laterTime,
+                method = options.method || defaults.method;
+           
+            var d1 = 0,  // 将时间转化成时间戳。自1970年1月1日以来的毫秒数
+                d2 = 0;
+            if(method == 'dateString'){
+                d1 = new Date(earlierTime).getTime(),
+                d2 = new Date(laterTime).getTime();
+            }
+            else if(method == 'milliseconds'){
+                d1 = new Date(parseInt(earlierTime)).getTime(),
+                d2 = new Date(parseInt(laterTime)).getTime();
+            }
+            else {
+                console.error(arguments.callee.name + '参数传递错误，method 不是有效的参数值');
+                return '';
+            }
+            var jiangeshijian = d2 - d1; // 时间差。单位毫秒
+            return getTimeStringByMiliseconds(jiangeshijian);
+        }
+
+
+
+
+         /**
+         * 通过毫秒数返回一个用户看得懂的具体时间字符串
+         * @param {Number} ps_milliseconds 毫秒时间(数值类型)。eg. 2500 表示 2500 毫秒
+         * @returns {String} 返回时间字符串。eg. 9328000 毫秒 相当于'2小时35分钟28秒' eg. 31672410000 毫秒 相当于 '1年1天13小时53分钟30秒'
+         */
+         var getTimeStringByMiliseconds = function(ps_milliseconds){
+            var nD = 365; // 一年几天，默认365天
+            var dMilliseconds = ps_milliseconds; // 时间差。单位毫秒
+            // console.log('ps_milliseconds：', ps_milliseconds);
+            var dSeconds = Math.floor(dMilliseconds / 1000), // 时间差。单位秒
+                dMinutes = dSeconds >= 60 ? Math.floor(dSeconds / 60) : 0, // 分钟
+                dHours = dMinutes >= 60 ? Math.floor(dMinutes / 60) : 0, // 小时
+                dDays = dHours >= 24 ? Math.floor(dHours / 24) : 0, // 天
+                dYears = dDays > nD ? Math.floor(dDays / nD) : 0; // 年
+            // console.log('-------- 时间信息 ----------');
+            // console.log('开始时间：', earlierTime);
+            // console.log('结束时间：', laterTime);
+            // console.log('总毫秒数：', dMilliseconds);
+            // console.log('总秒数：', dSeconds);
+            // console.log('总分钟数：', dMinutes);
+            // console.log('总小时数：', dHours);
+            // console.log('总天数：', dDays);
+            // console.log('总年数：', dYears);
+            
+            var year = 0, day = 0, hour = 0, minute = 0, second = 0, millisecond = 0;
+            // if(dYears >= 1){ //... }
+            year = dYears; // 年
+            day = dDays - ( year * nD ); // 天
+            hour = dHours - ( (year * nD + day) * 24 ); // 小时
+            minute = dMinutes - ( ( (year * nD + day) * 24 + hour ) * 60 ); // 分钟
+            second = dSeconds - ((((year * nD + day) * 24 + hour) * 60 + minute) * 60); // 秒
+            if (dMilliseconds < 1000) millisecond = dMilliseconds; // 毫秒 (只有小于1秒时才使用毫秒)
+            // console.log('-------- 时间相差 ----------');
+            // console.log('年：', year);
+            // console.log('天：', day);
+            // console.log('小时：', hour);
+            // console.log('分钟：', minute);
+            // console.log('秒：', second);
+            var str = ''; // 用时字符串。eg. '2年10天12小时45分钟15秒';
+            str += year <= 0 ? '' : year + '年';
+            str += day <= 0 ? '' : day + '天';
+            str += hour <= 0 ? '' : hour + '小时';
+            str += minute <= 0 ? '' : minute + '分钟';
+            str += second <= 0 ? '' : second + '秒';
+            str += millisecond <= 0 ? '' : (millisecond / 1000).toFixed(1) + '秒';
+            // console.log('用时：', str);
+            return str;
+        }
+
+
+        
+        //————————————————————————————————————————————————
+        var result1 = getTimeToString(5200);
+        console.log('耗时：', result1);
+
+
+        var result2 = getTimeDiffrence({
+            // 格式1
+            // method: 'milliseconds',
+            // earlierTime: '63208553000', // '2024-11-07 10:03:12', 
+            // laterTime: '83208553000' // '2026-11-08 23:59:05'
+            // 格式2
+            method: 'dateString',
+            earlierTime: '2024-11-07 10:03:12', 
+            laterTime: '2025-11-08 23:56:42'
+        });
+
+        console.log('用时：', result2);
+
+        
+    </script>
+</body>
+</html>
