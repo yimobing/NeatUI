@@ -17,7 +17,7 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-progressBar.css"><!--进度条控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-progressBar.css"><!--进度条样式-->
 </head>
 
 <body>
@@ -52,6 +52,11 @@
             <h1>进度条调用及参数说明</h1>
             <div class="code__content">
                 <pre>
+                    【使用说明】
+                    本控件使用原生JS开发，无需引入jQ等库文件，只需引入控件对应样式及脚本文件，如下：
+                    &lt;link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-progressBar.css"&gt;&lt;!--进度条样式--&gt;
+                    &lt;script src="assets/neatui/js/neatui-progressBar.js"&gt;&lt;/script>&lt;!--进度条控件--&gt;
+
                     【调用方法】
                     进度条控件提供以下方法供前端调用：
                     ********************************
@@ -94,6 +99,7 @@
                         showFail: true, //是否在进度加载失败时显示失败，默认true(可选)。注：需手动调用函数 neuiProgressBar.showFailureInfo() 才会显示出来。
                         failText: '加载失败', // 进度失败的文字，默认'加载失败'(可选)。仅当 showFail=true时有效。
                         showClose: false, // 是否显示关闭按钮，默认false(可选)。注：可手动调用函数 neuiProgressBar.showCloseDownButton() 强制显示出来。
+                        showConsume: true, // 是否显示耗时时间，默认true(可选)。注：可手动调用函数 neuiProgressBar.showTimeConsuming() 强制显示出来。
                         min: 0, // 进度条最小值，默认0表示(0/max)%(可选)
                         max: 100, // 进度条最大值，默认100(可选)
                         current: 0, // 进度条初始位置。默认0表示(0/max)%(可选)。注意：值不为0时控件创建完成后系统将自动执行进度条动画。请注意，值不为0时，若 duration 设置过小可能会影响覆盖后续自定义的进度条动画，导致设置的进度条不显示。
@@ -132,6 +138,12 @@
                     ********************************
                     // 手动显示进度条失败信息
                     · neuiProgressBar.showFailureInfo();
+                    ********************************
+
+
+                    ********************************
+                    // 手动显示耗时时间信息
+                    · neuiProgressBar.showTimeConsuming();
                     ********************************
 
 
@@ -256,6 +268,7 @@
                 showFail: true,
                 failText: '加载失败',
                 showClose: false,
+                showConsume: true,
                 min: min,
                 max: max,
                 current: 0, 
@@ -446,9 +459,12 @@
                     message: msg,
                     buttons: ['确定'],
                     callBack: function(ret){
-                        if(flag){
+                        if(flag){ // 成功
+                            neuiProgressBar.showTimeConsuming(); // 显示耗时时间信息
+
+                            // 销毁进度条控件
                             neuiProgressBar.destroy({
-                                duration: 1000, // 延时销毁的时长，默认0。单位毫秒
+                                duration: 2000, // 延时销毁的时长，默认0。单位毫秒
                                 success: function(){
                                     console.log('成功销毁了进度条控件');
                                     console.log('------------------------');
@@ -459,7 +475,7 @@
                                 }
                             })
                         }
-                        else{
+                        else{ // 失败
                             neuiProgressBar.showFailureInfo(); // 手动显示进度条失败信息
                             neuiProgressBar.showCloseDownButton(); // 手动显示进度条关闭按钮
                         }
@@ -488,7 +504,7 @@
             // axios 请求方式：post时它是对象, get时它是字符串
             // ajax 请求方式：无论是get或post，它都是字符串
             var failRecord = parseInt($('#c-wrong').val()); // 20; // 999999999; // 第几条时失败，比如 max = 100, 这里填写 <= 100 的值即可
-            console.log('failRecord：', failRecord);
+            // console.log('failRecord：', failRecord);
             if(nCount <= failRecord){ // 第N条时失败
                 return Mock.mock({
                     "return": "ok",

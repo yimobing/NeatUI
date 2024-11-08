@@ -4,7 +4,7 @@
 * 进度条控件
 * Author: Mufeng
 * Date: 2024.10.22
-* Pubdate: 2024.11.04
+* Pubdate: 2024.11.08
 */
 
 /*+ ----------------  ---------------- +*/
@@ -33,7 +33,7 @@
 	flex-wrap: wrap;
 	align-items: center;
 	margin: 0 auto;
-	padding: 8px 15px;
+	padding: 20px 20px 10px;
 	background-color: #fff;
 }
 .ne__progress_content{
@@ -62,9 +62,13 @@
 	z-index: 2;
 	left: 0;
 	top: 0;
-	width: 24px;
-	height: 24px;
+	width: 20px;
+	height: 20px;
 	cursor: pointer;
+	border-style: solid;
+	border-color: #eae7e7;
+	border-width: 0 1px 1px 0;
+	border-radius: 4px 0 4px 0;
 	background-color: transparent;
 	background-repeat: no-repeat;
 	background-position: center;
@@ -72,6 +76,7 @@
 	background-image: url('data:image/svg+xml;base64,PHN2ZyB0PSIxNzMwNzcyNzQ3NTUwIiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjEyODY3IiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCI+PHBhdGggZD0iTTEwMTcuNiA5NzZMNTUwLjQgNTEyIDEwMTcuNiA0OGM5LjYtOS42IDkuNi0yOC44IDAtMzguNC05LjYtOS42LTI4LjgtOS42LTM4LjQgMEw1MTIgNDczLjYgNDggNi40QzM4LjQtMy4yIDE5LjItMy4yIDkuNiA2LjRjLTkuNiA5LjYtOS42IDI4LjggMCAzOC40TDQ3My42IDUxMiA2LjQgOTc2Yy05LjYgOS42LTkuNiAyOC44IDAgMzguNCA5LjYgOS42IDI4LjggOS42IDM4LjQgMEw1MTIgNTUwLjRsNDY0IDQ2NGM5LjYgOS42IDI4LjggOS42IDM4LjQgMCAxMi44LTkuNiAxMi44LTI1LjYgMy4yLTM4LjR6IiBmaWxsPSIjNzA3MDcwIiBwLWlkPSIxMjg2OCI+PC9wYXRoPjwvc3ZnPg==');
 }
 .ne__progress_close:hover{
+	border-color: #abd5e4;
 	opacity: .8;
 	filter: alpha(opacity = 80);
 	background-size: 16px 16px;
@@ -100,6 +105,12 @@
 	background-color: #e9dddc;
 	border-color: #F25E54;
 	color: #F25E54;
+}
+.ne__progress_consume{
+	margin-top: 10px;
+	text-align: right;
+	color: #999;
+	font-size: 12px;
 }
 
 .ne__progress_strip {

@@ -1,13 +1,10 @@
-//————————————————————————————————————————————————————————————————————————————————————
-// 封装实例2：控件对象既可当函数使用，又可当对象使用。
-//————————————————————————————————————————————————————————————————————————————————————
 /**
  * [neuiProgressBar]
  * 进度条控件
  * 说明：使用原生JS开发，无需引用户Jq等其它js文件
  * Author：Mufeng
  * Date: 2024.10.22
- * Update: 2024.11.04
+ * Update: 2024.11.08
  */
 ; (function (root, factory) {
     if (typeof define === 'function' && define.amd) { // amd
@@ -58,6 +55,7 @@
             showFail: true, // 是否在进度加载失败时显示失败，默认true(可选)。注：需手动调用函数 neuiProgressBar.showFailureInfo() 才会显示出来。
             failText: '加载失败', // 进度失败的文字，默认'加载失败'(可选)。仅当 showFail=true时有效。
             showClose: false, // 是否显示关闭按钮，默认false(可选)。注：可手动调用函数 neuiProgressBar.showCloseDownButton() 强制显示出来。
+            showConsume: true, // 是否显示耗时时间，默认true(可选)。注：可手动调用函数 neuiProgressBar.showTimeConsuming() 强制显示出来。
             min: 0, // 进度条最小值，默认0表示(0/max)%(可选)
             max: 100, // 进度条最大值，默认100(可选)
             current: 0, // 进度条初始位置。默认0表示(0/max)%(可选)。注意：值不为0时控件创建完成后系统将自动执行进度条动画。请注意，值不为0时，若 duration 设置过小可能会影响覆盖后续自定义的进度条动画，导致设置的进度条不显示。
@@ -94,16 +92,19 @@
                 classIdMask = 'ne-progress-mask', // 遮罩节点样式名或ID名
                 classIdOver = 'ne__progress_over', // 进度完成节点样式名或ID名
                 classIdFail = 'ne__progress_fail', // 进度失败节点样式名或ID名
-                classIdClose = 'ne__progress_close'; // 关闭按钮节点样式名或ID名
+                classIdClose = 'ne__progress_close', // 关闭按钮节点样式名或ID名
+                classIdConsume = 'ne__progress_consume'; // 耗时时间节点样式名或ID名
             // 全局赋值2
             me.$opts.$classNameRoot = classIdRoot; // 根节点样式名
             me.$opts.$classNameMask = classIdMask; // 遮罩节点样式名
             me.$opts.$classNameOver = classIdOver; // 进度完成节点样式名
             me.$opts.$classNameFail = classIdFail; // 进度失败节点样式名
             me.$opts.$classNameClose = classIdClose; // 关闭按钮节点样式名
+            me.$opts.$classNameConsume = classIdConsume; // 耗时时间节点样式名
             me.$opts.$codeHtmlOver = '<div class="' + classIdOver + '">' + me.settings.overText + '</div>'; // 进度完成HTML字符串
             me.$opts.$codeHtmlFail = '<div class="' + classIdFail + '">' + me.settings.failText + '</div>'; // 进度失败HTML字符串
-            me.$opts.$codeHtmlClose = '<div class="' + classIdClose + '"></div>';; // 关闭按钮HTML字符串
+            me.$opts.$codeHtmlClose = '<div class="' + classIdClose + '" title="关闭进度条"></div>';; // 关闭按钮HTML字符串
+            me.$opts.$codeHtmlConsume = '<div class="' + classIdConsume + '"></div>';; // 耗时时间HTML字符串
            
 
             // 创建根节点
@@ -205,6 +206,13 @@
                                 })(),
                                 '</span>',
                             '</div>',
+                            // 耗时时间节点 (匿名函数马上执行)
+                            (function () {
+                                // var _tmpStyle = !me.settings.showConsume ? ' style="display: none"' : '';
+                                // var _tmpHtml = '<div class="ne__progress_consume"' + _tmpStyle + '></div>';
+                                var _tmpHtml = !me.settings.showConsume ? '' : me.$opts.$codeHtmlConsume;
+                                return _tmpHtml;
+                            })(),
                         '</div><!--/.ne__progress_content-->'
                     ].join('\r\n');
                 }
@@ -223,10 +231,15 @@
             me.$opts.$nodeBarOver = document.getElementsByClassName(classIdOver)[0]; // 进度完成节点
             me.$opts.$nodeBarFail = document.getElementsByClassName(classIdFail)[0]; // 进度失败节点
             me.$opts.$nodeBarClose = document.getElementsByClassName(classIdClose)[0]; // 关闭按钮节点
+            me.$opts.$nodeBarConsume = document.getElementsByClassName(classIdConsume)[0]; // 耗时时间按钮节点
             // 全局赋值4 (标记作用)
             me.$opts.$startPosition = parseFloat(me.settings.min); // 进度条初始位置
             me.$opts.$startProportion = 0; // 进度条初始进度，即初始占比，默认0表示0%
-            me.$opts.$loopTimes = 0;  // 在循环内进度条循环的次数，默认0
+            me.$opts.$loopCount = 0;  // 在循环内进度条循环的次数，默认0
+            me.$opts.$loopBeginValue = 0; // 耗时计时器定时起始值，默认0
+            me.$opts.$loopTimers = null; // 耗时计时器定时对象，默认null test1
+            me.$opts.$loopStartTime = new Date().getTime(); // 耗时计时器开始时间，默认1970年至今的毫秒数
+            me.$opts.$loopEndTime = null // 耗时计时器结束时间，默认null
             
             // 定位方式不是相对定位时
             if (me.settings.position != '' && me.settings.position != 'relative') {
@@ -294,13 +307,15 @@
                 me.$opts.$nodeBarSubtitle.innerHTML = '(' + subHtml + ')';
             }
             //
-            me.$opts.$loopTimes++; // 全局赋值4
-            if (me.$opts.$loopTimes == 1) {
+            me.$opts.$loopCount++; // 全局赋值4
+            if (me.$opts.$loopCount == 1) { // 第1次循环时
                 me.$opts.$startProportion = nowRate;
+                helpers._setConsumingTimer(me); // 开启耗时计时器定时 test1 
             }
-            // console.log('循环次数：', me.$opts.$loopTimes);
+            // console.log('循环次数：', me.$opts.$loopCount);
             // console.log('当前进度：', nowRate + '%');
             // console.log('-------------------');
+            // 同步或异步操作
             var isAsync = typeof opts == 'undefined' ?
                 false :
                 (
@@ -317,20 +332,20 @@
             if (isAsync == false) {
                 (function (i) {
                     // 起始进度默认延时一定要设为0，否则会等待N毫秒后才开始执行
-                    var timer = null, // 延迟函数ID
+                    var timers = null, // 延迟函数ID
                         intervals = 0;  // 执行间隔时间，单位毫秒
                     if (i == me.$opts.$startProportion) { // 初始进度
                         intervals = 0;
                     }
                     else {
                         // 清除延迟操作
-                        if (timer != null) {
-                            clearTimeout(timer);
-                            timer = null;
+                        if (timers != null) {
+                            clearTimeout(timers);
+                            timers = null;
                         }
                         intervals = duration * (i - me.$opts.$startProportion);
                     }
-                    timer = helpers._setProgressAnimate(me, intervals, i);
+                    timers = helpers._setProgressAnimate(me, intervals, i);
                 })(nowRate);
             }
             // 异步版本
@@ -338,20 +353,20 @@
                 return new Promise(function (resolve, reject) {
                     var i = nowRate;
                     // 起始进度默认延时一定要设为0，否则会等待N毫秒后才开始执行
-                    var timer = null, // 延迟函数ID
+                    var timers = null, // 延迟函数ID
                         intervals = 0;  // 执行间隔时间，单位毫秒
                     if (i == me.$opts.$startProportion) { // 初始进度
                         intervals = 0;
                     }
                     else {
                         // 清除延迟操作
-                        if (timer != null) {
-                            clearTimeout(timer);
-                            timer = null;
+                        if (timers != null) {
+                            clearTimeout(timers);
+                            timers = null;
                         }
                         intervals = duration;
                     }
-                    timer = helpers._setProgressAnimate(me, intervals, i, resolve);
+                    timers = helpers._setProgressAnimate(me, intervals, i, resolve);
                 });
             }
         },
@@ -379,8 +394,10 @@
                 var start = me.$opts.$startPosition; // 当前进度条“进度位置”
                 progress = start + nowRate;
             }
+            
             if (parseFloat(progress) > 100) progress = 100;
             helpers._setPositionAnimate(me, progress);
+            helpers._setConsumingTimer(me); // 开启耗时计时器定时 test1 
         },
 
 
@@ -396,10 +413,33 @@
                 me.$opts.$nodeBarFail = document.getElementsByClassName(me.$opts.$classNameFail)[0]; // 全局赋值3
                 me.$opts.$nodeBarFail.style.setProperty('display', 'block');
             }
+            helpers._clearConsumingTimer(me); // 清空耗时计时器定时
         },
 
 
-
+        /**
+         * 手动显示耗时时间信息
+         */
+         showTimeConsuming: function () {
+            var me = this;
+            if (typeof me.$opts.$nodeBarConsume != 'undefined') me.$opts.$nodeBarConsume.style.setProperty('display', 'block');
+            else {
+                utils.appendHTML(me.$opts.$codeHtmlConsume, me.$opts.$nodeBarContent);
+                me.$opts.$nodeBarConsume = document.getElementsByClassName(me.$opts.$classNameConsume)[0]; // 全局赋值3
+                me.$opts.$nodeBarConsume.style.setProperty('display', 'block');
+                if (me.$opts.$loopStartTime != null && me.$opts.$loopEndTime != null) {
+                    var timeStr = utils.getTimeDiffrence({
+                        method: 'milliseconds',
+                        earlierTime: me.$opts.$loopStartTime,
+                        laterTime: me.$opts.$loopEndTime
+                    });
+                    // console.log('timeStr：', timeStr);
+                    me.$opts.$nodeBarConsume.innerHTML = '耗时 ' + timeStr;
+                }
+            }
+        },
+         
+         
         /**
          * 手动显示关闭按钮
          */
@@ -413,6 +453,9 @@
                 helpers._onClickCloseBtn(me); // 点击关闭按钮时关闭控件
             }
         },
+
+
+        
 
 
 
@@ -432,7 +475,7 @@
             var intervals = config.duration;
             // var defTime = 0; // 默认延时时长，单位毫秒
             // var intervals = typeof ps_duration == 'undefined' ? defTime : (isNaN(parseFloat(ps_duration)) ? defTime : parseFloat(ps_duration)); // 执行间隔时间，单位毫秒
-            var timer = setTimeout(function () {
+            var timers = setTimeout(function () {
                 if (me.$opts == null || typeof me.$opts == 'undefined') {
                     if (config.fail) {
                         config.fail('进度条节点不存在(可能是还没有初始化)，故不用销毁');
@@ -446,7 +489,8 @@
                 if (config.success) {
                     config.success();
                 }
-                clearTimeout(timer);
+                clearTimeout(timers);
+                helpers._clearConsumingTimer(me); // 清空耗时计时器定时
             }, intervals);
         },
     };
@@ -475,13 +519,15 @@
                 // console.log('---------------');
                 var percentage = n + '%';
                 // 进度100%时才显示完成
-                if (n < 100) {
+                if (n < 100) { // 进度 < 100%
                     if(typeof me.$opts.$nodeBarOver != 'undefined') me.$opts.$nodeBarOver.style.setProperty('display', 'none');
                 }   
-                else{
+                else{ // 进度 = 100%
                     if(typeof me.$opts.$nodeBarOver != 'undefined') me.$opts.$nodeBarOver.style.setProperty('display', 'block');
-                    if(typeof me.$opts.$nodeBarFail != 'undefined') me.$opts.$nodeBarFail.style.setProperty('display', 'none');
-                }  
+                    if (typeof me.$opts.$nodeBarFail != 'undefined') me.$opts.$nodeBarFail.style.setProperty('display', 'none');
+                    me.$opts.$loopEndTime = new Date().getTime();  // 全局赋值4
+                    _this._clearConsumingTimer(me); // 清空耗时计时器定时
+                }
                 _this._setBarWidthAndText(me, percentage);
                 if(typeof resolve == 'function') resolve(); // 异步操作成功，调用resolve
             }, intervals);
@@ -497,22 +543,23 @@
          _setPositionAnimate: function (me, pos) {
             var _this = this;
             var start = 0;
-            var timer = setInterval(fnAnimates(), me.settings.duration);
+            var timers = setInterval(fnAnimates(), me.settings.duration);
             function fnAnimates() {
                 if (start > pos) {
                     // console.log('开始start：', start);
                     // console.log('进度pos：', pos);
                     // console.log('---------');
                     // 进度100%时才显示完成
-                    if (pos < 100) {
+                    if (pos < 100) { // 进度 < 100%
                         if(typeof me.$opts.$nodeBarOver != 'undefined') me.$opts.$nodeBarOver.style.setProperty('display', 'none');
                     } 
-                    else {
+                    else { // 进度 = 100%
                         if(typeof me.$opts.$nodeBarOver != 'undefined') me.$opts.$nodeBarOver.style.setProperty('display', 'block');
                         if(typeof me.$opts.$nodeBarFail != 'undefined') me.$opts.$nodeBarFail.style.setProperty('display', 'none');
                     }
-                    clearInterval(timer);
-                    timer = null;
+                    clearInterval(timers);
+                    timers = null;
+                    _this._clearConsumingTimer(me); // 清空耗时计时器定时
                 }
                 else {
                     var percentage = start + '%';
@@ -567,6 +614,39 @@
                     me.$opts.$nodeMask.remove();
                 });
             }
+        },
+        
+
+        /**
+         * 开启耗时计时器定时 test1
+         * @param {Object} me 当前控件对象
+         */
+        _setConsumingTimer(me) {
+            if (me.settings.showConsume) {
+                function fn() {
+                    var intervals = 100; // 耗时时间, 单位毫秒
+                    me.$opts.$loopTimers = setTimeout(fn, intervals); // 这里填写1000，表示每1秒执行一次
+                    var milliseconds = intervals * me.$opts.$loopBeginValue;
+                    var seconds = Math.floor(milliseconds / 1000);
+                    var tmpStr = milliseconds == 0 ? '' : '耗时' + (seconds == 0 ? (milliseconds / 1000).toFixed(1) + '秒' : utils.getTimeToString(seconds)); // eg. '耗时5秒'; 
+                    me.$opts.$nodeBarConsume.innerHTML = tmpStr;
+                    me.$opts.$loopBeginValue++;
+                }
+                fn();
+            }
+        },
+
+
+        /**
+         * 清空耗时计时器定时 test1
+         * @param {Object} me 当前控件对象
+         */
+        _clearConsumingTimer: function (me) {
+            if (me.$opts.$loopTimers != null) { // 清空定时器
+                me.$opts.$loopBeginValue = 0; // 重置0 // 全局赋值4 
+                clearTimeout(me.$opts.$loopTimers);
+                me.$opts.$loopTimers = null;
+            }
         }
     };
 
@@ -587,6 +667,104 @@
             return Math.floor( (parseFloat(ps_now_value) / parseFloat(ps_max_value)) * 100 )
         },
 
+
+              
+        /**
+         * 将秒数转化成用户看得懂的具体时间字符串
+         * @param {Number} ps_seconds 秒数(数值类型)。eg. 80 表示 80秒
+         * @param {String} 返回具体的时间字符串。eg. 800秒相当于'10分20秒',  5200秒相当于'1小时26分钟40秒'
+         */
+         getTimeToString: function(ps_seconds){
+            if(ps_seconds <= 0) return '0秒';
+            return this.getTimeStringByMiliseconds(ps_seconds * 1000); // 时间差。单位毫秒 
+        },
+         
+         
+         
+        /**
+         * 获取两个时间之间的时间差
+         * @param {Object} options 参数对象。格式参见函数内 defaults 参数
+         * @returns {String} 返回时间差字符串。eg. '2年1天13小时55分钟53秒'
+         */
+         getTimeDiffrence: function (options){
+             var defaults = {
+                method: 'dateString', // 时间参数格式，默认dateString。值： dateString 表示日期的字符串值, milliseconds 一个Unix 时间戳整数值，表示自 1970 年 1 月 1 日 00:00:00 UTC（the Unix epoch）以来的毫秒数。
+                // 时间参数格式：可以是1970年1月1日以来至某个时间的毫秒数(如63208553000)，也可以是时间戳，或某个时间字符串(比如' 2024-11-07 09:15:38')。
+                earlierTime: new Date().getMilliseconds(), // 较早的时间，默认1970年的毫秒数。eg. '2024-11-07 10:03:12', 
+                laterTime: new Date().getTime() // 较晚的时间，默认1970年至今的毫秒数。eg. '2026-11-08 23:59:05'
+            }
+            var earlierTime = options.earlierTime || defaults.earlierTime,
+                laterTime = options.laterTime || defaults.laterTime,
+                method = options.method || defaults.method;
+            var nD = 365; // 一年几天，默认365天
+            var d1 = 0,  // 将时间转化成时间戳。自1970年1月1日以来的毫秒数
+                d2 = 0;
+            if(method == 'dateString'){
+                d1 = new Date(earlierTime).getTime(),
+                d2 = new Date(laterTime).getTime();
+            }
+            else if(method == 'milliseconds'){
+                d1 = new Date(parseInt(earlierTime)).getTime(),
+                d2 = new Date(parseInt(laterTime)).getTime();
+            }
+            else {
+                console.error(arguments.callee.name + '参数传递错误，method 不是有效的参数值');
+                return '';
+            }
+            var jiangeshijian = d2 - d1; // 时间差。单位毫秒
+            return this.getTimeStringByMiliseconds(jiangeshijian);
+        },
+
+         
+         
+        /**
+         * 通过毫秒数返回一个用户看得懂的具体时间字符串
+         * @param {Number} ps_milliseconds 毫秒时间(数值类型)。eg. 2500 表示 2500 毫秒
+         * @returns {String} 返回时间字符串。eg. 9328000 毫秒 相当于'2小时35分钟28秒' eg. 31672410000 毫秒 相当于 '1年1天13小时53分钟30秒'
+         */
+        getTimeStringByMiliseconds: function(ps_milliseconds){
+            var nD = 365; // 一年几天，默认365天
+            var dMilliseconds = ps_milliseconds; // 时间差。单位毫秒
+            // console.log('ps_milliseconds：', ps_milliseconds);
+            var dSeconds = Math.floor(dMilliseconds / 1000), // 时间差。单位秒
+                dMinutes = dSeconds >= 60 ? Math.floor(dSeconds / 60) : 0, // 分钟
+                dHours = dMinutes >= 60 ? Math.floor(dMinutes / 60) : 0, // 小时
+                dDays = dHours >= 24 ? Math.floor(dHours / 24) : 0, // 天
+                dYears = dDays > nD ? Math.floor(dDays / nD) : 0; // 年
+            // console.log('-------- 时间信息 ----------');
+            // console.log('开始时间：', earlierTime);
+            // console.log('结束时间：', laterTime);
+            // console.log('总毫秒数：', dMilliseconds);
+            // console.log('总秒数：', dSeconds);
+            // console.log('总分钟数：', dMinutes);
+            // console.log('总小时数：', dHours);
+            // console.log('总天数：', dDays);
+            // console.log('总年数：', dYears);
+            
+            var year = 0, day = 0, hour = 0, minute = 0, second = 0, millisecond = 0;
+            // if(dYears >= 1){ //... }
+            year = dYears; // 年
+            day = dDays - ( year * nD ); // 天
+            hour = dHours - ( (year * nD + day) * 24 ); // 小时
+            minute = dMinutes - ( ( (year * nD + day) * 24 + hour ) * 60 ); // 分钟
+            second = dSeconds - ((((year * nD + day) * 24 + hour) * 60 + minute) * 60); // 秒
+            if (dMilliseconds < 1000) millisecond = dMilliseconds; // 毫秒 (只有小于1秒时才使用毫秒)
+            // console.log('-------- 时间相差 ----------');
+            // console.log('年：', year);
+            // console.log('天：', day);
+            // console.log('小时：', hour);
+            // console.log('分钟：', minute);
+            // console.log('秒：', second);
+            var str = ''; // 用时字符串。eg. '2年10天12小时45分钟15秒';
+            str += year <= 0 ? '' : year + '年';
+            str += day <= 0 ? '' : day + '天';
+            str += hour <= 0 ? '' : hour + '小时';
+            str += minute <= 0 ? '' : minute + '分钟';
+            str += second <= 0 ? '' : second + '秒';
+            str += millisecond <= 0 ? '' : (millisecond / 1000).toFixed(1) + '秒';
+            // console.log('用时：', str);
+            return str;
+        },
 
 
         /**
