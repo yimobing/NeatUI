@@ -145,8 +145,10 @@
         function calculate(){
             i++;
             // console.log('i：', i);
-            timer = setTimeout("calculate()", 500);
-            document.getElementById('result').innerText = i;
+            timer = setTimeout("calculate()", 500);  // 这种写法必须是全局作用域下执行，不然就会报defined错误，即 Uncaught ReferenceError: xxx is not defined
+            // timer = setTimeout(calculate, 500); // 如果报undefined错就要这样写
+            // document.getElementById('result').innerText = i;
+            document.getElementById('result').innerText = '耗时 ' + i + '秒';
         }
         // 开始计数
         function beginCount(){
