@@ -23,7 +23,7 @@
         /**
          * 获取两个时间之间的时间差
          * @param {Object} options 参数对象。格式参见函数内 defaults 参数
-         * @returns {String} 返回时间差字符串。eg. '2年1天13小时55分钟53秒'
+         * @returns {Object} 返回一个对象，包含字段：毫秒数 和 时间差字符串。eg. { millisecond: 90000, strtime: '2年1天13小时55分钟53秒'}
          */
         var getTimeDiffrence = function(options){
             var defaults = {
@@ -51,7 +51,10 @@
                 return '';
             }
             var jiangeshijian = d2 - d1; // 时间差。单位毫秒
-            return getTimeStringByMiliseconds(jiangeshijian);
+            return {
+                millisecond: jiangeshijian, // 毫秒数
+                strtime: this.getTimeStringByMiliseconds(jiangeshijian) // 时间差字符串
+            }
         }
 
 
@@ -113,7 +116,7 @@
         console.log('耗时：', result1);
 
 
-        var result2 = getTimeDiffrence({
+        var value = getTimeDiffrence({
             // 格式1
             // method: 'milliseconds',
             // earlierTime: '63208553000', // '2024-11-07 10:03:12', 
@@ -123,8 +126,10 @@
             earlierTime: '2024-11-07 10:03:12', 
             laterTime: '2025-11-08 23:56:42'
         });
+        var result2 = value.strtime,
+            result3 = value.millisecond;
 
-        console.log('用时：', result2);
+        console.log('用时：', result2, '\n多少毫秒：', result3);
 
         
     </script>

@@ -52,10 +52,11 @@
             subtitleSeparator: '/', // 副标题分割符，默认反斜杠/(可选)。
             showOver: true, // 是否在进度加载100%时显示完成，默认true(可选)
             overText: '加载完成', // 进度完成的文字，默认'加载完成'(可选)。仅当showOver=true时有效。
-            showFail: true, // 是否在进度加载失败时显示失败，默认true(可选)。注：需手动调用函数 neuiProgressBar.showFailureInfo() 才会显示出来。
+            showFail: true, // 是否在进度加载失败时显示失败，默认true(可选)。注：需手动调用函数 neuiProgressBar.showInfoFail() 才会显示出来。
             failText: '加载失败', // 进度失败的文字，默认'加载失败'(可选)。仅当 showFail=true时有效。
-            showClose: false, // 是否显示关闭按钮，默认false(可选)。注：可手动调用函数 neuiProgressBar.showCloseDownButton() 强制显示出来。
-            showConsume: true, // 是否显示耗时时间，默认true(可选)。注：可手动调用函数 neuiProgressBar.showTimeConsuming() 强制显示出来。
+            showClose: false, // 是否显示关闭按钮，默认false(可选)。注：可手动调用函数 neuiProgressBar.showBtnClose() 强制显示出来。
+            showTimeTake: true, // 是否显示消耗时间，默认true(可选)。注：可手动调用函数 neuiProgressBar.showInfoTimeTake() 强制显示出来。
+            failClearTimeTakeTimer: true, // 进度失败时是否自动关闭消耗时间的定时器，默认true(可选)
             min: 0, // 进度条最小值，默认0表示(0/max)%(可选)
             max: 100, // 进度条最大值，默认100(可选)
             current: 0, // 进度条初始位置。默认0表示(0/max)%(可选)。注意：值不为0时控件创建完成后系统将自动执行进度条动画。请注意，值不为0时，若 duration 设置过小可能会影响覆盖后续自定义的进度条动画，导致设置的进度条不显示。
@@ -93,18 +94,18 @@
                 classIdOver = 'ne__progress_over', // 进度完成节点样式名或ID名
                 classIdFail = 'ne__progress_fail', // 进度失败节点样式名或ID名
                 classIdClose = 'ne__progress_close', // 关闭按钮节点样式名或ID名
-                classIdConsume = 'ne__progress_consume'; // 耗时时间节点样式名或ID名
+                classIdConsume = 'ne__progress_consume'; // 消耗时间节点样式名或ID名
             // 全局赋值2
             me.$opts.$classNameRoot = classIdRoot; // 根节点样式名
             me.$opts.$classNameMask = classIdMask; // 遮罩节点样式名
             me.$opts.$classNameOver = classIdOver; // 进度完成节点样式名
             me.$opts.$classNameFail = classIdFail; // 进度失败节点样式名
             me.$opts.$classNameClose = classIdClose; // 关闭按钮节点样式名
-            me.$opts.$classNameConsume = classIdConsume; // 耗时时间节点样式名
+            me.$opts.$classNameConsume = classIdConsume; // 消耗时间节点样式名
             me.$opts.$codeHtmlOver = '<div class="' + classIdOver + '">' + me.settings.overText + '</div>'; // 进度完成HTML字符串
             me.$opts.$codeHtmlFail = '<div class="' + classIdFail + '">' + me.settings.failText + '</div>'; // 进度失败HTML字符串
             me.$opts.$codeHtmlClose = '<div class="' + classIdClose + '" title="关闭进度条"></div>';; // 关闭按钮HTML字符串
-            me.$opts.$codeHtmlConsume = '<div class="' + classIdConsume + '"></div>';; // 耗时时间HTML字符串
+            me.$opts.$codeHtmlConsume = '<div class="' + classIdConsume + '"></div>';; // 消耗时间HTML字符串
            
 
             // 创建根节点
@@ -170,7 +171,7 @@
                                                 return !me.settings.showTitle ? '' : '<div class="ne__progress_title">' + me.settings.titleText + '</div>';
                                             })(),
                                             (function () {
-                                                return !me.settings.showSubtitle ? '' : '<div class="ne__progress_subtitle"></div>';
+                                                return !me.settings.showSubtitle ? '' : '<div class="ne__progress_subtitle">(0/' + me.settings.max + ')</div>';
                                             })(),
                                         '</div>'
                                     ].join('\r\n');
@@ -206,11 +207,11 @@
                                 })(),
                                 '</span>',
                             '</div>',
-                            // 耗时时间节点 (匿名函数马上执行)
+                            // 消耗时间节点 (匿名函数马上执行)
                             (function () {
-                                // var _tmpStyle = !me.settings.showConsume ? ' style="display: none"' : '';
+                                // var _tmpStyle = !me.settings.showTimeTake ? ' style="display: none"' : '';
                                 // var _tmpHtml = '<div class="ne__progress_consume"' + _tmpStyle + '></div>';
-                                var _tmpHtml = !me.settings.showConsume ? '' : me.$opts.$codeHtmlConsume;
+                                var _tmpHtml = !me.settings.showTimeTake ? '' : me.$opts.$codeHtmlConsume;
                                 return _tmpHtml;
                             })(),
                         '</div><!--/.ne__progress_content-->'
@@ -231,7 +232,7 @@
             me.$opts.$nodeBarOver = document.getElementsByClassName(classIdOver)[0]; // 进度完成节点
             me.$opts.$nodeBarFail = document.getElementsByClassName(classIdFail)[0]; // 进度失败节点
             me.$opts.$nodeBarClose = document.getElementsByClassName(classIdClose)[0]; // 关闭按钮节点
-            me.$opts.$nodeBarConsume = document.getElementsByClassName(classIdConsume)[0]; // 耗时时间按钮节点
+            me.$opts.$nodeBarConsume = document.getElementsByClassName(classIdConsume)[0]; // 消耗时间按钮节点
             // 全局赋值4 (标记作用)
             me.$opts.$startPosition = parseFloat(me.settings.min); // 进度条初始位置
             me.$opts.$startProportion = 0; // 进度条初始进度，即初始占比，默认0表示0%
@@ -292,25 +293,11 @@
             if (realIncresing > me.settings.max) realIncresing = me.settings.max;
             var nowRate = utils.getRatio(realIncresing, me.settings.max);
             var duration = me.settings.duration < 0 ? 0 : me.settings.duration;
-            // 副标题文本动态赋值
-            if (typeof me.$opts.$nodeBarSubtitle != 'undefined') {
-                var subHtml = '';
-                var subArr = me.settings.subtitleFormat.split(me.settings.subtitleSeparator);
-                if (Array.isArray(subArr)) {
-                    var preStr = subArr[0],
-                        nextStr = subArr[1];
-                    subHtml = preStr + realIncresing + me.settings.subtitleSeparator + nextStr + me.settings.max; // eg. '当前50/总数100'
-                }
-                else {
-                    subHtml = realIncresing + me.settings.subtitleSeparator + me.settings.max; // eg. '50/100'
-                }
-                me.$opts.$nodeBarSubtitle.innerHTML = '(' + subHtml + ')';
-            }
             //
             me.$opts.$loopCount++; // 全局赋值4
             if (me.$opts.$loopCount == 1) { // 第1次循环时
                 me.$opts.$startProportion = nowRate;
-                helpers._setConsumingTimer(me); // 开启耗时计时器定时 test1 
+                helpers._setTakeTimer(me); // 开启耗时计时器定时 test1 
             }
             // console.log('循环次数：', me.$opts.$loopCount);
             // console.log('当前进度：', nowRate + '%');
@@ -345,7 +332,7 @@
                         }
                         intervals = duration * (i - me.$opts.$startProportion);
                     }
-                    timers = helpers._setProgressAnimate(me, intervals, i);
+                    timers = helpers._setProgressAnimate(me, intervals, i, realIncresing);
                 })(nowRate);
             }
             // 异步版本
@@ -366,7 +353,7 @@
                         }
                         intervals = duration;
                     }
-                    timers = helpers._setProgressAnimate(me, intervals, i, resolve);
+                    timers = helpers._setProgressAnimate(me, intervals, i, realIncresing, resolve);
                 });
             }
         },
@@ -397,7 +384,7 @@
             
             if (parseFloat(progress) > 100) progress = 100;
             helpers._setPositionAnimate(me, progress);
-            helpers._setConsumingTimer(me); // 开启耗时计时器定时 test1 
+            helpers._setTakeTimer(me); // 开启耗时计时器定时 test1 
         },
 
 
@@ -405,7 +392,7 @@
         /**
          * 手动显示进度失败信息
          */
-        showFailureInfo: function () {
+        showInfoFail: function () {
             var me = this;
             if (typeof me.$opts.$nodeBarFail != 'undefined') me.$opts.$nodeBarFail.style.setProperty('display', 'block');
             else {
@@ -413,14 +400,16 @@
                 me.$opts.$nodeBarFail = document.getElementsByClassName(me.$opts.$classNameFail)[0]; // 全局赋值3
                 me.$opts.$nodeBarFail.style.setProperty('display', 'block');
             }
-            helpers._clearConsumingTimer(me); // 清空耗时计时器定时
+            if (me.settings.failClearTimeTakeTimer) {
+                helpers._clearTakeTimer(me); // 清空耗时计时器定时
+            }
         },
 
 
         /**
-         * 手动显示耗时时间信息
+         * 手动显示消耗时间信息
          */
-         showTimeConsuming: function () {
+         showInfoTimeTake: function () {
             var me = this;
             if (typeof me.$opts.$nodeBarConsume != 'undefined') me.$opts.$nodeBarConsume.style.setProperty('display', 'block');
             else {
@@ -428,22 +417,46 @@
                 me.$opts.$nodeBarConsume = document.getElementsByClassName(me.$opts.$classNameConsume)[0]; // 全局赋值3
                 me.$opts.$nodeBarConsume.style.setProperty('display', 'block');
                 if (me.$opts.$loopStartTime != null && me.$opts.$loopEndTime != null) {
-                    var timeStr = utils.getTimeDiffrence({
+                    var result = utils.getTimeDiffrence({
                         method: 'milliseconds',
                         earlierTime: me.$opts.$loopStartTime,
                         laterTime: me.$opts.$loopEndTime
                     });
+                    var timeStr = result.strtime;
                     // console.log('timeStr：', timeStr);
                     me.$opts.$nodeBarConsume.innerHTML = '耗时 ' + timeStr;
                 }
             }
         },
+
          
-         
+        /**
+         * 获取消耗时间信息
+         * @returns {Object} 返回时间消耗信息对象，包含字段：毫秒数 和 时间差字符串。eg. { millisecond: 90000, strtime: '2年1天13小时55分钟53秒'}
+         */
+        getTimeTake: function () {
+            var me = this;
+            var millisecond = null, strtime = '';
+            if (me.$opts.$loopStartTime != null && me.$opts.$loopEndTime != null) {
+                var result = utils.getTimeDiffrence({
+                    method: 'milliseconds',
+                    earlierTime: me.$opts.$loopStartTime,
+                    laterTime: me.$opts.$loopEndTime
+                });
+                millisecond = result.millisecond;
+                strtime = result.strtime;
+            }
+            return {
+                millisecond: result.millisecond,
+                strtime: result.strtime
+            }
+        },
+
+        
         /**
          * 手动显示关闭按钮
          */
-        showCloseDownButton: function () {
+        showBtnClose: function () {
             var me = this;
             if (typeof me.$opts.$nodeBarClose != 'undefined') me.$opts.$nodeBarClose.style.setProperty('display', 'block');
             else {
@@ -490,7 +503,7 @@
                     config.success();
                 }
                 clearTimeout(timers);
-                helpers._clearConsumingTimer(me); // 清空耗时计时器定时
+                helpers._clearTakeTimer(me); // 清空耗时计时器定时
             }, intervals);
         },
     };
@@ -509,10 +522,11 @@
          * @param {Object} me 当前控件对象
          * @param {Number} intervals 延迟间隔时长，单位毫秒
          * @param {Number} n 闭包参数
+         * @param {Number} progressValue 当前进度条进度值
          * @param {Function} resolve Promise的resolve函数(可选)
          * @returns 返回延迟函数的ID
          */
-         _setProgressAnimate: function (me, intervals, n, resolve) {
+         _setProgressAnimate: function (me, intervals, n, progressValue, resolve) {
             var _this = this;
             return setTimeout(function () {
                 // console.log('当前进度i值：', n);
@@ -526,9 +540,10 @@
                     if(typeof me.$opts.$nodeBarOver != 'undefined') me.$opts.$nodeBarOver.style.setProperty('display', 'block');
                     if (typeof me.$opts.$nodeBarFail != 'undefined') me.$opts.$nodeBarFail.style.setProperty('display', 'none');
                     me.$opts.$loopEndTime = new Date().getTime();  // 全局赋值4
-                    _this._clearConsumingTimer(me); // 清空耗时计时器定时
+                    _this._clearTakeTimer(me); // 清空耗时计时器定时
                 }
-                _this._setBarWidthAndText(me, percentage);
+                _this._setBarLengthAndText(me, percentage);
+                _this._setBarSubtitle(me, progressValue); // 设置副标题栏
                 if(typeof resolve == 'function') resolve(); // 异步操作成功，调用resolve
             }, intervals);
         },
@@ -559,11 +574,12 @@
                     }
                     clearInterval(timers);
                     timers = null;
-                    _this._clearConsumingTimer(me); // 清空耗时计时器定时
+                    _this._clearTakeTimer(me); // 清空耗时计时器定时
                 }
                 else {
                     var percentage = start + '%';
-                    _this._setBarWidthAndText(me, percentage);
+                    _this._setBarLengthAndText(me, percentage);
+                    _this._setBarSubtitle(me, start); // 设置副标题栏
                     start++;
                 }    
                 return fnAnimates;
@@ -572,12 +588,36 @@
          
          
          /**
-          * 设置进度条当前占比占比宽度和显示文本
+          * 设置进度条当前占比占比长度和显示文本
           * @param {Object} me 当前控件对象
           */
-        _setBarWidthAndText(me, percentage) {
+        _setBarLengthAndText(me, percentage) {
             if(typeof me.$opts.$nodeBarCartoon != 'undefined') me.$opts.$nodeBarCartoon.style.setProperty('width', percentage); // 进度条占比形状
             if(typeof me.$opts.$nodeBarText != 'undefined') me.$opts.$nodeBarText.innerText = percentage; // 进度条占比文本. eg. 48%
+        },
+
+
+        /**
+         * 设置进度条副标题栏 test2
+         * 副标题文本动态赋值
+         * @param {Object} me 当前控件对象
+         * @returns {Number} jindu 当前进度值
+         */
+        _setBarSubtitle(me, jindu) {
+            // 副标题文本动态赋值
+            if (typeof me.$opts.$nodeBarSubtitle != 'undefined') {
+                var subHtml = '';
+                var subArr = me.settings.subtitleFormat.split(me.settings.subtitleSeparator);
+                if (Array.isArray(subArr)) {
+                    var preStr = subArr[0],
+                        nextStr = subArr[1];
+                    subHtml = preStr + jindu + me.settings.subtitleSeparator + nextStr + me.settings.max; // eg. '当前50/总数100'
+                }
+                else {
+                    subHtml = jindu + me.settings.subtitleSeparator + me.settings.max; // eg. '50/100'
+                }
+                me.$opts.$nodeBarSubtitle.innerHTML = '(' + subHtml + ')';
+            }  
         },
 
 
@@ -621,10 +661,10 @@
          * 开启耗时计时器定时 test1
          * @param {Object} me 当前控件对象
          */
-        _setConsumingTimer(me) {
-            if (me.settings.showConsume) {
+        _setTakeTimer(me) {
+            if (me.settings.showTimeTake) {
                 function fn() {
-                    var intervals = 100; // 耗时时间, 单位毫秒
+                    var intervals = 100; // 消耗时间, 单位毫秒
                     me.$opts.$loopTimers = setTimeout(fn, intervals); // 这里填写1000，表示每1秒执行一次
                     var milliseconds = intervals * me.$opts.$loopBeginValue;
                     var seconds = Math.floor(milliseconds / 1000);
@@ -641,7 +681,7 @@
          * 清空耗时计时器定时 test1
          * @param {Object} me 当前控件对象
          */
-        _clearConsumingTimer: function (me) {
+        _clearTakeTimer: function (me) {
             if (me.$opts.$loopTimers != null) { // 清空定时器
                 me.$opts.$loopBeginValue = 0; // 重置0 // 全局赋值4 
                 clearTimeout(me.$opts.$loopTimers);
@@ -684,7 +724,7 @@
         /**
          * 获取两个时间之间的时间差
          * @param {Object} options 参数对象。格式参见函数内 defaults 参数
-         * @returns {String} 返回时间差字符串。eg. '2年1天13小时55分钟53秒'
+         * @returns {Object} 返回一个对象，包含字段：毫秒数 和 时间差字符串。eg. { millisecond: 90000, strtime: '2年1天13小时55分钟53秒'}
          */
          getTimeDiffrence: function (options){
              var defaults = {
@@ -712,7 +752,10 @@
                 return '';
             }
             var jiangeshijian = d2 - d1; // 时间差。单位毫秒
-            return this.getTimeStringByMiliseconds(jiangeshijian);
+            return {
+                millisecond: jiangeshijian, // 毫秒数 
+                strtime: this.getTimeStringByMiliseconds(jiangeshijian) // 时间差字符串
+            }
         },
 
          
