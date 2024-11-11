@@ -1001,7 +1001,7 @@
                 divTemp.innerHTML = str;
                 nodes = divTemp.childNodes;
                 for (var i=0, length=nodes.length; i<length; i+=1) {
-                fragment.appendChild(nodes[i].cloneNode(true));
+                    fragment.appendChild(nodes[i].cloneNode(true));
                 }
                 this.appendChild(fragment);
                 // 据说下面这样子世界会更清净
