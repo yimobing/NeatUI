@@ -56,7 +56,7 @@
             failText: '加载失败', // 进度失败的文字，默认'加载失败'(可选)。仅当 showFail=true时有效。
             showClose: false, // 是否显示关闭按钮，默认false(可选)。注：可手动调用函数 neuiProgressBar.showBtnClose() 强制显示出来。
             showTimeTake: true, // 是否显示消耗时间，默认true(可选)。注：可手动调用函数 neuiProgressBar.showInfoTimeTake() 强制显示出来。
-            failClearTimeTakeTimer: true, // 进度失败时是否自动关闭消耗时间的定时器，默认true(可选)
+            failClearTimeTakeTimer: true, // 进度失败时是否自动关闭消耗时间计时器，默认true(可选)。值为false时需在失败时手动调用函数 neuiProgressBar.clearTimerTimeTake() 来清空消耗时间计时器
             min: 0, // 进度条最小值，默认0表示(0/max)%(可选)
             max: 100, // 进度条最大值，默认100(可选)
             current: 0, // 进度条初始位置。默认0表示(0/max)%(可选)。注意：值不为0时控件创建完成后系统将自动执行进度条动画。请注意，值不为0时，若 duration 设置过小可能会影响覆盖后续自定义的进度条动画，导致设置的进度条不显示。
@@ -237,10 +237,10 @@
             me.$opts.$startPosition = parseFloat(me.settings.min); // 进度条初始位置
             me.$opts.$startProportion = 0; // 进度条初始进度，即初始占比，默认0表示0%
             me.$opts.$loopCount = 0;  // 在循环内进度条循环的次数，默认0
-            me.$opts.$loopBeginValue = 0; // 耗时计时器定时起始值，默认0
-            me.$opts.$loopTimers = null; // 耗时计时器定时对象，默认null test1
-            me.$opts.$loopStartTime = new Date().getTime(); // 耗时计时器开始时间，默认1970年至今的毫秒数
-            me.$opts.$loopEndTime = null // 耗时计时器结束时间，默认null
+            me.$opts.$loopBeginValue = 0; // 消耗时间计时器起始值，默认0
+            me.$opts.$loopTimers = null; // 消耗时间计时器对象，默认null test1
+            me.$opts.$loopStartTime = new Date().getTime(); // 消耗时间计时器开始时间，默认1970年至今的毫秒数
+            me.$opts.$loopEndTime = null // 消耗时间计时器结束时间，默认null
             
             // 定位方式不是相对定位时
             if (me.settings.position != '' && me.settings.position != 'relative') {
@@ -297,7 +297,7 @@
             me.$opts.$loopCount++; // 全局赋值4
             if (me.$opts.$loopCount == 1) { // 第1次循环时
                 me.$opts.$startProportion = nowRate;
-                helpers._setTakeTimer(me); // 开启耗时计时器定时 test1 
+                helpers._setTakeTimer(me); // 开启消耗时间计时器 test1 
             }
             // console.log('循环次数：', me.$opts.$loopCount);
             // console.log('当前进度：', nowRate + '%');
@@ -384,24 +384,38 @@
             
             if (parseFloat(progress) > 100) progress = 100;
             helpers._setPositionAnimate(me, progress);
-            helpers._setTakeTimer(me); // 开启耗时计时器定时 test1 
+            helpers._setTakeTimer(me); // 开启消耗时间计时器 test1 
         },
 
 
 
         /**
          * 手动显示进度失败信息
+         * @param {Object} opts 其它参数(可选)。格式: { text: '自定义失败的文本信息,默认空', closed: '是不显示关闭按钮,默认false' }
          */
-        showInfoFail: function () {
+        showInfoFail: function (opts) {
             var me = this;
+            var origons = {
+                text: '', // 失败的文本信息，默认空表示使用控件初始时配置的(可选)
+                closed: false // 是否显示关闭按钮，默认false表示使用控件初始时配置的(可选)
+            }
+            var config = utils.combine(true, origons, opts || {});
             if (typeof me.$opts.$nodeBarFail != 'undefined') me.$opts.$nodeBarFail.style.setProperty('display', 'block');
             else {
                 utils.prependHTML(me.$opts.$codeHtmlFail, me.$opts.$nodeBarContent);
                 me.$opts.$nodeBarFail = document.getElementsByClassName(me.$opts.$classNameFail)[0]; // 全局赋值3
                 me.$opts.$nodeBarFail.style.setProperty('display', 'block');
             }
+            // 显示自定义的失败信息
+            if (config.text.toString().replace(/\s+/g, '') !== ''){
+                me.$opts.$nodeBarFail.innerHTML = config.text;
+            }
+            // 显示关闭按钮
+            if (config.closed) {
+                me.showBtnClose();
+            }
             if (me.settings.failClearTimeTakeTimer) {
-                helpers._clearTakeTimer(me); // 清空耗时计时器定时
+                helpers._clearTakeTimer(me); // 清空消耗时间计时器
             }
         },
 
@@ -452,7 +466,17 @@
             }
         },
 
-        
+
+        /**
+         * 手动清空消耗时间计时器
+         * 注：当 failClearTimeTakeTimer = false 时，需要您手动调用本函数进行清空
+         */
+        clearTimerTimeTake: function () {
+            var me = this;
+            helpers._clearTakeTimer(me); // 清空消耗时间计时器
+        },
+
+
         /**
          * 手动显示关闭按钮
          */
@@ -503,7 +527,7 @@
                     config.success();
                 }
                 clearTimeout(timers);
-                helpers._clearTakeTimer(me); // 清空耗时计时器定时
+                helpers._clearTakeTimer(me); // 清空消耗时间计时器
             }, intervals);
         },
     };
@@ -540,7 +564,7 @@
                     if(typeof me.$opts.$nodeBarOver != 'undefined') me.$opts.$nodeBarOver.style.setProperty('display', 'block');
                     if (typeof me.$opts.$nodeBarFail != 'undefined') me.$opts.$nodeBarFail.style.setProperty('display', 'none');
                     me.$opts.$loopEndTime = new Date().getTime();  // 全局赋值4
-                    _this._clearTakeTimer(me); // 清空耗时计时器定时
+                    _this._clearTakeTimer(me); // 清空消耗时间计时器
                 }
                 _this._setBarLengthAndText(me, percentage);
                 _this._setBarSubtitle(me, progressValue); // 设置副标题栏
@@ -574,7 +598,7 @@
                     }
                     clearInterval(timers);
                     timers = null;
-                    _this._clearTakeTimer(me); // 清空耗时计时器定时
+                    _this._clearTakeTimer(me); // 清空消耗时间计时器
                 }
                 else {
                     var percentage = start + '%';
@@ -658,7 +682,7 @@
         
 
         /**
-         * 开启耗时计时器定时 test1
+         * 开启消耗时间计时器 test1
          * @param {Object} me 当前控件对象
          */
         _setTakeTimer(me) {
@@ -678,11 +702,11 @@
 
 
         /**
-         * 清空耗时计时器定时 test1
+         * 清空消耗时间计时器 test1
          * @param {Object} me 当前控件对象
          */
         _clearTakeTimer: function (me) {
-            if (me.$opts.$loopTimers != null) { // 清空定时器
+            if (me.$opts.$loopTimers != null) {
                 me.$opts.$loopBeginValue = 0; // 重置0 // 全局赋值4 
                 clearTimeout(me.$opts.$loopTimers);
                 me.$opts.$loopTimers = null;

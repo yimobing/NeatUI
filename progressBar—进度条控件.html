@@ -100,7 +100,7 @@
                         failText: '加载失败', // 进度失败的文字，默认'加载失败'(可选)。仅当 showFail=true时有效。
                         showClose: false, // 是否显示关闭按钮，默认false(可选)。注：可手动调用函数 neuiProgressBar.showBtnClose() 强制显示出来。
                         showTimeTake: true, // 是否显示消耗时间，默认true(可选)。注：可手动调用函数 neuiProgressBar.showInfoTimeTake() 强制显示出来。
-                        failClearTimeTakeTimer: true, // 进度失败时是否自动关闭消耗时间的定时器，默认true(可选)
+                        failClearTimeTakeTimer: true, // 进度失败时是否自动关闭消耗时间，默认true(可选)。值为false时需在失败时手动调用函数 neuiProgressBar.clearTimerTimeTake() 来清空消耗时间计时器
                         min: 0, // 进度条最小值，默认0表示(0/max)%(可选)
                         max: 100, // 进度条最大值，默认100(可选)
                         current: 0, // 进度条初始位置。默认0表示(0/max)%(可选)。注意：值不为0时控件创建完成后系统将自动执行进度条动画。请注意，值不为0时，若 duration 设置过小可能会影响覆盖后续自定义的进度条动画，导致设置的进度条不显示。
@@ -138,7 +138,8 @@
                     
                     ********************************
                     // 手动显示进度条失败信息
-                    · neuiProgressBar.showInfoFail();
+                    · neuiProgressBar.showInfoFail(opts);
+                    opts 参数为可选，格式： { text: '失败的文本信息，默认空表示使用控件初始时配置的(可选)', closed: '是否显示关闭按钮，默认false表示使用控件初始时配置的(可选)' }
                     ********************************
 
 
@@ -147,6 +148,12 @@
                     · neuiProgressBar.showInfoTimeTake();
                     ********************************
 
+
+                    ********************************
+                    //  手动清空消耗时间计时器
+                        注：当 failClearTimeTakeTimer = false 时，需要您手动调用本函数进行清空
+                    · neuiProgressBar.clearTimerTimeTake();
+                    ********************************
 
 
 
@@ -278,8 +285,8 @@
                 showFail: true,
                 failText: '加载失败',
                 showClose: false,
-                showTimeTake: false, // test1
-                failClearTimeTakeTimer: true,
+                showTimeTake: true, // test1
+                failClearTimeTakeTimer: false, // test1
                 min: min,
                 max: max,
                 current: 0, 
@@ -362,7 +369,10 @@
             console.log('flag：', flag);
             if(flag == 0){ // 失败
                 console.log('执行失败了');
-                neuiProgressBar.showInfoFail(); // 手动显示进度条失败信息
+                neuiProgressBar.showInfoFail({
+                    text: '',
+                    closed: false
+                }); // 手动显示进度条失败信息
                 neuiProgressBar.showBtnClose(); // 手动显示进度条关闭按钮
             }
             else{ // 成功
@@ -491,8 +501,12 @@
                             })
                         }
                         else{ // 失败
-                            neuiProgressBar.showInfoFail(); // 手动显示进度条失败信息
-                            neuiProgressBar.showBtnClose(); // 手动显示进度条关闭按钮
+                            neuiProgressBar.showInfoFail({
+                                text: '',
+                                closed: false
+                            }); // 手动显示进度条失败信息
+                            // neuiProgressBar.showBtnClose(); // 手动显示进度条关闭按钮
+                            neuiProgressBar.clearTimerTimeTake(); // 手动清空消耗时间计时器 test1
                         }
 					}
                 });
