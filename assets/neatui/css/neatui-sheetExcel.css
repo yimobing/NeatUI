@@ -4,7 +4,7 @@
  * 导入导出excel文件
  * Author: Mufeng
  * Date: 2024.09.29
- * Pubdate: 2024.09.30
+ * Pubdate: 2024.11.11
 */
 
 
@@ -84,10 +84,26 @@ i, em{ font-style: normal; }
 	font-size: 18px;
 	font-weight: 550;
 }
-.sheet__output_table{
-	
+.sheet__output_download{
+	margin-bottom: 5px;	
+	text-align: right;
 }
-.sheet__output_table table {
+.sheet__output_download button{
+	display: inline-block;
+	padding: 4px 8px;
+	line-height: 1;
+	border: 1px solid #4caf50;
+	border-radius: 2px;
+	text-align: right;
+	color: #4caf50;
+	font-size: 12px;
+	cursor: pointer;
+}
+.sheet__output_download button:hover{
+	opacity: .7;
+	filter: alpha(opacity = 70);
+}
+.sheet__output_table {
 	border-collapse: collapse;
 }
 .sheet__output_table th, 

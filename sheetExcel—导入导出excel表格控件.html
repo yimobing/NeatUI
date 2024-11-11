@@ -24,31 +24,24 @@
     <style>
         body{
             margin-bottom: 100px;
+            padding: 25px;
         }
         .controls__caption{ 
             text-align: center;
             font-size: 36px;
             font-weight: 550;
         }
-        .operate{ padding: 10px 15px; display: flex; }
-        .btn{ display: inline-block; min-width: 100px; margin-right: 15px; padding: 6px 12px; background-color: orange; border-radius: 4px; color: #fff; font-size: 14px; cursor: pointer; }
-        .btn:nth-child(2){ background-color: purple; }
-        .btn:nth-child(3){ background-color: lightgreen; }
+        .custom{ margin-top: 10px; }
+        .talber1, .tabler2{ margin: 10px; }
+        .operate{ margin-top: 25px; padding: 10px 15px; border: 1px solid purple; border-radius: 4px; }
+        .operate__row{ display: flex; margin-top: 20px; }
+        .operate__row:first-child{ margin-top: 0; }
+        .btn{ display: inline-block; min-width: 100px; margin-right: 15px; padding: 6px 12px; background-color: blue; border-radius: 4px; color: #fff; font-size: 14px; cursor: pointer; }
+        .btn:nth-child(2){ background-color: lightsalmon; }
+        .btn:nth-child(3){ background-color: lightseagreen; }
     </style>
 
 
-    <div class="custom">
-        <!-- 自定义导入的操作区域 -->
-        <div class="toper"></div>
-        <!-- 自定义导入的表格展示区域 -->
-        <div class="tabler"></div>
-    </div><!--/.custom-->
-
-    <div class="operate">
-        <div class="btn" id="btn-daodaochuchu">仅使用导出功能</div>
-        <div class="btn" id="btn-empty">校验导入数据完整性(单元格是否有空值)</div>
-        <div class="btn" id="btn-repeat">校验导入数据重复行(某一列是否有两行相同的值)</div>
-    </div><!--/.operate-->
 
     <div class="controls">
         <div class="controls__caption">控件说明</div>
@@ -91,60 +84,19 @@
         <div class="controls__demo">
             <pre>
                 控件内置了以下函数。
-                neuiSheetExcel.exportExcel(arr, opts); // 仅导出表格数据
-                neuiSheetExcel(options); // 控件初始化+导入导出表格数据
+                neuiSheetExcel(options); // 初始化控件，支持导入、导出表格数据
+                neuiSheetExcel.exportExcel(arr, opts); // 仅导出表格数据，不需要先初始化控件
+                neuiSheetExcel.presentation(rows, opts); // 展示自定义的预览表格数据。注意：需先初始化控件 test2
+                neuiSheetExcel.getTableElement(); // 获取预览表格的节点，即table标签节点的样式名 test2
 
                 // 以下两个函数，如不传递第2个参数，则需先导入数据否则会报错
                 neuiSheetExcel.examineEmpty(["列名1", "列名2"], "导入的数据源数组(可选)"); // 校验导入的数据完整性(单元格是否有空值)
                 neuiSheetExcel.examineUnique(["列名1", "列名2"], "导入的数据源数组(可选)"); // 校验导入的数据重复行(某些列是否有重复行)
 
-                
-                1、如果仅使用导出功能，则：
-                neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
-                其中：
-                (1) arr 是要导出的表格数据，为一个二维数组对象
-                var arr = [ 
-                    [第1行第1-3列合并后的表头, null, null, 其它信息], // 合并表头时，特别注意合并的地方后面预留2个null
-                    [第2行第1列数据, 第2行第2列数据, 第2行第3列数据, 第2行第4列数据], 
-                    [第3行第1列数据, 第3行第2列数据, 第3行第3列数据, 第3行第4列数据], 
-                    [第4行第1列数据, 第4行第2列数据, 第4行第3列数据, 第4行第4列数据], 
-                    //...
-                ]
-                (2) opts 是导出选项参数(可选)，为一个Object对象
-                var opts = {
-                    sheetName: 'sheet1', // 工作表名，默认 sheet1(可选)
-                    filename: '', // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
-                    merged: { // 表格单元格合并(可选)
-                        enable: false, // 是否启用功能，默认false(可选)
-                        pattern: [ // 单元格合并方式，是一个数组，默认空数组(可选)。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。r从0开始,0表示第1行,1第2行,以此类推; c也从0开始,0表示第1列,1表示第2列,以此类推。
-                            // { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // 比如，这里设置第1行A1-C1的单元格合并
-                            // { s: { r: 1, c: 1 }, e: { r: 1, c: 4 } } // 比如，这里设置第2行B2-E2的单元格合并
-                        ]
-                    },
-                    columnWidth: { // 表格单元格列宽(可选)
-                        enable: false, // 是否启用功能，默认false(可选)
-                        pattern: [ // 单元格列宽方式，是一个数组，默认空数组(可选)。每个数组由包含wch或wpx构成的对象组成，wpx 字段表示以像素为单位，wch 字段表示以字符为单位(1个汉字等于2个字符)。
-                            // 注：数组中第N个元素代表表格第N列。若表格共有M列,则数组元素个数<=M,即数组元素个数可以小于M个
-                            // { wch: 30 }, // 比如，这里设置第1列的宽。30表示30/2=15个字
-                            // { wch: 40 }, // 比如，这里设置第2列的宽。40表示40/2=20个字
-                        ]
-                    },
-                    styled: { // 表格单元格样式(可选)
-                        enable: false, // 是否启用功能，默认false(可选)
-                        allowEveryCell: false, // 所有单元格样式，是否给所有单元格设置一个默认的样式，默认false(可选)。仅当 enable = true 时有效。
-                        pattern: [ // 个别单元格样式，默认空数组(可选)。注：个别单元格的样式将覆盖所有单元格设置的样式。
-                            // cell 某个单元格如 A1, B1, C1; format 单元格样式, 是一个Object对象, 格式参考变量 cellFormatStyle, 默认null表示不配置样式
-                            // { cell: "A1", format: null },
-                            // { cell: "B1", format: null }, 
-                            // { cell: "C1", style: cellFormatStyle },
-                        ]
-                    }
-                }
-
-                (3) 使用示例：参数本页示例部分。
-
-                2、如果要使用导入和导出功能，则：
-                neuiSheetExcel(options);
+                ----------------------------------------
+                    · 如果要使用导入和导出功能，则：
+                    neuiSheetExcel(options);
+                ----------------------------------------
                 其中 options 是一个Object对象，格式如下
                 var options = {
                     // 这两个参数一般没用
@@ -191,12 +143,104 @@
                         hasTitleRow: true, // 预览时是否添加列索引，即添加表头A、B、C、D、E、F .. 这行，默认true(可选)
                         hasRowOrder: true, // 预览时是否添加行序号，默认true(可选)
                         firstRowIsHead: false, // 第1行数据是否作为表头，默认false(可选)
+                        customColumns: [], // 自定义新增的预览表格列，默认空数组(可选)。格式： [{ name: '列名1', value: '列值1' }, { name: '列名2', value: '列值2' }]。其中 name 为列名，默认空(可选)。 value 为列值，默认空(可选)
                         editable: false, // 展示区域内容是否可编辑，默认false(可选)
                     }
                 };
+
+
+
+                ----------------------------------------
+                    · 如果仅使用导出功能，则：
+                    neuiSheetExcel.exportExcel(arr, opts); // 调用控件内部的函数进行导出
+                    注意：这个函数控件不需要先初始化即可使用
+                ----------------------------------------
+                其中：
+                (1) arr 是要导出的表格数据，为一个二维数组对象
+                var arr = [ 
+                    [第1行第1-3列合并后的表头, null, null, 其它信息], // 合并表头时，特别注意合并的地方后面预留2个null
+                    [第2行第1列数据, 第2行第2列数据, 第2行第3列数据, 第2行第4列数据], 
+                    [第3行第1列数据, 第3行第2列数据, 第3行第3列数据, 第3行第4列数据], 
+                    [第4行第1列数据, 第4行第2列数据, 第4行第3列数据, 第4行第4列数据], 
+                    //...
+                ]
+                (2) opts 是导出选项参数(可选)，为一个Object对象
+                var opts = {
+                    sheetName: 'sheet1', // 工作表名，默认 sheet1(可选)
+                    filename: '', // 自定义导出的文件名，默认空(可选)。本参数方便单独调用本函数时使用。当本参数值不为空时，优先权高于参数 export.filename
+                    merged: { // 表格单元格合并(可选)
+                        enable: false, // 是否启用功能，默认false(可选)
+                        pattern: [ // 单元格合并方式，是一个数组，默认空数组(可选)。每个数组由包含s和e构成的对象组成，s表示开始，e表示结束，r表示行，c表示列。r从0开始,0表示第1行,1第2行,以此类推; c也从0开始,0表示第1列,1表示第2列,以此类推。
+                            // { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // 比如，这里设置第1行A1-C1的单元格合并
+                            // { s: { r: 1, c: 1 }, e: { r: 1, c: 4 } } // 比如，这里设置第2行B2-E2的单元格合并
+                        ]
+                    },
+                    columnWidth: { // 表格单元格列宽(可选)
+                        enable: false, // 是否启用功能，默认false(可选)
+                        pattern: [ // 单元格列宽方式，是一个数组，默认空数组(可选)。每个数组由包含wch或wpx构成的对象组成，wpx 字段表示以像素为单位，wch 字段表示以字符为单位(1个汉字等于2个字符)。
+                            // 注：数组中第N个元素代表表格第N列。若表格共有M列,则数组元素个数<=M,即数组元素个数可以小于M个
+                            // { wch: 30 }, // 比如，这里设置第1列的宽。30表示30/2=15个字
+                            // { wch: 40 }, // 比如，这里设置第2列的宽。40表示40/2=20个字
+                        ]
+                    },
+                    styled: { // 表格单元格样式(可选)
+                        enable: false, // 是否启用功能，默认false(可选)
+                        allowEveryCell: false, // 所有单元格样式，是否给所有单元格设置一个默认的样式，默认false(可选)。仅当 enable = true 时有效。
+                        pattern: [ // 个别单元格样式，默认空数组(可选)。注：个别单元格的样式将覆盖所有单元格设置的样式。
+                            // cell 某个单元格如 A1, B1, C1; format 单元格样式, 是一个Object对象, 格式参考变量 cellFormatStyle, 默认null表示不配置样式
+                            // { cell: "A1", format: null },
+                            // { cell: "B1", format: null }, 
+                            // { cell: "C1", style: cellFormatStyle },
+                        ]
+                    }
+                }
+
+                (3) 使用示例：参数本页示例部分。
+
+
+
+
+                ----------------------------------------
+                test2
+                 · 如果要展示自定义的预览表格数据，则
+                    neuiSheetExcel.presentation(rows, options);
+                   注意：需先初始化控件
+                ----------------------------------------
+                rows 表格数据组成的数组，由表+行数据组成。假设一共有2行2列数据，则格式为: ['列名1, 列名2', '行1列1, 行1列2', '行2列1, 行2列2']
+                opts 其它参数(可选)。格式如下
+                    var options = {
+                        selector: '', // 绑定展示数据的节点样式名或ID，默认空(可选)。空时自动拼接到参数 preview 指定的节点下。
+                        enableDownload: true, // 是否允许下载预览的数据，默认true(可选)
+                        filename: '导出记录', // 自定义下载的文件名后半段名称，默认'导出记录'(可选)。默认以"导入的文件名 + __当前参数名 + _当前时间"。eg. '北京师大附属中学学生__导出记录_20241028145713'。如果导入的文件不存在，则以当前参数名为文件名。
+                        sheetName: 'sheet1' // 下载的文件工作表名，默认 sheet1(可选)
+                    }
+                
             </pre>
         </div>
-    </div><!--/.controls__demo-->
+    </div><!--/.controls-->
+
+
+
+    
+    <div class="custom">
+        <!-- 自定义导入的操作区域 -->
+        <div class="toper"></div>
+        <!-- 自定义导入的表格展示区域 -->
+        <div class="tabler1"></div>
+        <!-- 展示自定义的预览表格数据 -->
+        <div class="tabler2"></div>
+    </div><!--/.custom-->
+
+    <div class="operate">
+        <div class="operate__row">
+            <div class="btn" id="btn-daodaochuchu">仅使用导出功能</div>
+            <div class="btn" id="btn-custom-display">展示自定义的预览表格数据</div>
+        </div>
+        <div class="operate__row">
+            <div class="btn" id="btn-empty">校验导入数据完整性(单元格是否有空值)</div>
+            <div class="btn" id="btn-repeat">校验导入数据重复行(某一列是否有两行相同的值)</div>
+        </div>
+    </div><!--/.operate-->
 
 
     <!--================================================================================-->
@@ -234,7 +278,7 @@
 
             // ——————————————————————————————————————————
             // 导入导出功能初始化
-            neuiSheetExcel({
+            var options = {
                 // 这两个参数一般没用
                 idClass: 'sheet', // 根节点样式名(可选)
                 operationClassName: 'sheet__operate', // 导入导出操作节点样式名(可选)
@@ -272,15 +316,24 @@
                 // 预览功能模块(可选)
                 preview: {
                     enable: true,  // 是否启用，默认true(可选)。注：当前端不传递 preview 参数时，默认不启用，即相当于 preview.enable = false
-                    appendToParentNode: '', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
+                    appendToParentNode: 'tabler1', // 指定绑定到某个父节点下，这里填写父节点的class样式名，默认空(可选)
                     nodeId: 'output', // 预览数据绑定的节点ID(可选)
                     title: '导入数据预览', // 标题内容，空时表示没有标题(可选)
                     hasTitleRow: true, // 预览时是否添加列索引，即添加表头A、B、C、D、E、F .. 这行，默认true(可选)
                     hasRowOrder: true, // 预览时是否添加行序号，默认true(可选)
                     firstRowIsHead: true, // 第1行数据是否作为表头，默认false(可选)
+                    customColumns: [{ // 自定义新增的预览表格列，默认空数组(可选) test2
+                        name: '导入结果1', // 列名，默认空(可选)
+                        value: '' // 值，默认空(可选)
+                    },{ // 自定义列，默认空数组(可选)
+                        name: '导入结果2', // 列名，默认空(可选)
+                        value: '' // 值，默认空(可选)
+                    }],
                     editable: true, // 展示区域内容是否可编辑，默认false(可选)
                 }
-            });
+            }
+
+            neuiSheetExcel(options);
 
 
 
@@ -369,9 +422,28 @@
 
 
 
-             // ——————————————————————————————————————————
-             // 校验数据完整性
-             $('#btn-empty').on('click', function(){
+
+            // ——————————————————————————————————————————
+            // 展示自定义的预览表格数据 test2
+            $('#btn-custom-display').on('click', function(){
+                neuiSheetExcel.presentation([
+                    '用户名, 性别, 年龄, 年级, 数学老师, 英语老师',
+                    '小明, 男, 10, 二年级, 成功, 失败',
+                    '小吕, 女, 11, 三年级, 成功, 失败',
+                    '小孙, 男, 12, 四年级, 失败, 成功'
+                ], {
+                    selector: 'tabler2', // 绑定展示数据的节点样式名或ID，默认空(可选)。空时自动拼接到参数 preview 指定的节点下。
+                    enableDownload: true, // 是否允许下载预览的数据，默认true(可选)
+                    filename: '导出记录', // 自定义下载的文件名后半段名称，默认'导出记录'(可选)。默认以"导入的文件名 + __当前参数名 + _当前时间"。eg. '北京师大附属中学学生__导出记录_20241028145713'。如果导入的文件不存在，则以当前参数名为文件名。
+                    sheetName: 'sheet1' // 下载的文件工作表名，默认 sheet1(可选)
+                })
+            });
+
+
+
+            // ——————————————————————————————————————————
+            // 校验数据完整性
+            $('#btn-empty').on('click', function(){
                 var msgData = neuiSheetExcel.examineEmpty(["押品序号", "押品编号"]);
                 var tips = msgData.message,
                     current = msgData.current;
@@ -381,7 +453,7 @@
                     alert(tips);
                     return;
                 }
-             });
+            });
 
 
 

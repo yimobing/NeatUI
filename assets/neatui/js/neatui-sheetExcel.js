@@ -33,7 +33,7 @@
  * --------------------------------------------------------------------------------
  * Author: Mufeng
  * Date: 2024.09.29
- * Update: 2024.10.22
+ * Update: 2024.11.11
 */
 
 //———————————————————————————————————————————————————————————————————
@@ -93,6 +93,7 @@
                 hasTitleRow: true, // 预览时是否添加列索引，即添加表头A、B、C、D、E、F .. 这行，默认true(可选)
                 hasRowOrder: true, // 预览时是否添加行序号，默认true(可选)
                 firstRowIsHead: false, // 第1行数据是否作为表头，默认false(可选)
+                customColumns: [], // 自定义新增的预览表格列，默认空数组(可选)。格式： [{ name: '列名1', value: '列值1' }, { name: '列名2', value: '列值2' }]。其中 name 为列名，默认空(可选)。 value 为列值，默认空(可选) test2
                 editable: false, // 展示区域内容是否可编辑，默认false(可选)
             }
         }
@@ -117,6 +118,7 @@
         }
         this.opts = options; // 用户配置参数
         this.settings = utils.combine(true, this.defaults, this.opts || {}); // 合并后的参数
+        this.$opts = this.settings;
         this.datasource = []; // 用户导入的数据源，默认空
     };
 
@@ -158,7 +160,7 @@
             var _editStr = this.settings.preview.editable === true ? ' contenteditable' : '';
             prewDiv.innerHTML = [
                 _titleStr,
-                '<div class="sheet__output_table" id="' + this.settings.preview.nodeId + '"' + _editStr + '></div>'
+                '<div class="sheet__output_result" id="' + this.settings.preview.nodeId + '"' + _editStr + '></div>'
             ].join('\r\n');
         }
         // 创建控件根节点
@@ -224,6 +226,7 @@
                         utils.dialogs('仅支持读取xlsx格式！');
                         return;
                     }
+                    _this.$opts.filename = f.name; // 文件名 // 全局赋值1
                     _this.readingWorkbookFromLocalFile(f, function (workbook) {
                         // test1
                         if (_this.settings.import.loading) {
@@ -246,7 +249,7 @@
                             // console.log('数据源：', sourceArr);
                             if (_this.settings.import.callback) {
                                 _this.settings.import.callback(sourceArr);  // 导入回调函数
-                                _this.datasource = sourceArr; // 全局赋值
+                                _this.datasource = sourceArr; // 全局赋值2
                                 if (_this.settings.import.canSecondChooseSameFile) {
                                     uploadDom.value = ''; // 清空 input file 中的文件，如此同名文件便能第2次选择，否则同名文件只能选择一次
                                 }
@@ -443,6 +446,92 @@
 
 
     /**
+     * 展示自定义的预览表格数据。注意：需先初始化控件 test2
+     * @param {Array} rows 表格数据组成的数组，由表+行数据组成。假设一共有2行2列数据，则格式为: ['列名1, 列名2', '行1列1, 行1列2', '行2列1, 行2列2']
+     * @param {Object} options 其它参数(可选)。格式参考函数内的config变量
+     */
+    Widget.prototype.presentation = function (rows, options) {
+        var _this = this;
+        var settings = {
+            selector: '', // 绑定展示数据的节点样式名或ID，默认空(可选)。空时自动拼接到参数 preview 指定的节点下。
+            enableDownload: true, // 是否允许下载预览的数据，默认true(可选)
+            filename: '导出记录', // 自定义下载的文件名后半段名称，默认'导出记录'(可选)。默认以"导入的文件名 + __当前参数名 + _当前时间"。eg. '北京师大附属中学学生__导出记录_20241028145713'。如果导入的文件不存在，则以当前参数名为文件名。
+            sheetName: 'sheet1' // 下载的文件工作表名，默认 sheet1(可选)
+        }
+        var config = utils.combine(true, settings, options || {});
+        var bindNodesClassId = config.selector.toString().replace(/(\.|\#)/g, '') || this.settings.preview.nodeId;
+        // 将导入数据以表格的形式展示在界面上
+        if (typeof this.opts.preview != 'undefined' && this.settings.preview.enable) {
+            document.getElementsByClassName('sheet__output')[0].style = ''; // 显示预览区域
+            var o = document.getElementById(bindNodesClassId) != null ?  document.getElementById(bindNodesClassId) : document.getElementsByClassName(bindNodesClassId)[0];
+            if (o == null) {
+                var tips = '绑定的节点' + config.selector + '不存在'
+                console.error(tips);
+                utils.dialogs(tips);
+                return;
+            }
+            if (bindNodesClassId != this.settings.preview.nodeId) {
+                document.getElementById(this.settings.preview.nodeId).appendChild(o);
+            }
+            var tableRootClassName = 'sheet__output_present_table',
+                tableDownBtnId = 'outPutDownload';
+            o.innerHTML = this.getTableHtml(rows, tableRootClassName);
+            // 下载预览的数据、下载按钮
+            if (config.enableDownload) {
+                // 创建下载按钮节点
+                var _tmpHtml = '<div class="sheet__output_download"><button type="button" id="' + tableDownBtnId + '">下载</button></div>'
+                utils.prependHTML(_tmpHtml, o);
+                // 循环节点，取出数据变成二维数组
+                document.getElementById(tableDownBtnId).addEventListener('click', function () {
+                    var arr = [];
+                    document.querySelectorAll('.' + tableRootClassName + ' tr').forEach(function (element) {
+                        var childs = element.childNodes;
+                        var one = [];
+                        for (var i = 0; i < childs.length; i++){ // 遍历 tr
+                            var childrens = childs[i].childNodes;
+                            // console.log('childrens：', childrens);
+                            if (childrens.length == 0) {
+                                one.push('');
+                            }
+                            for (var j = 0; j < childrens.length; j++){ // 遍历 td 
+                                if (childrens[j].nodeType == 3) {
+                                    one.push(childrens[j].nodeValue);
+                                }
+                            }
+                        }
+                        arr.push(one);
+                    });
+                    // console.log('allArr：', arr);
+                    // arr 格式eg.
+                    // var arr = [
+                    //     ['姓名', '性别', '年龄', '籍贯', '注册时间'],
+                    //     ['张文远', '男', 18, '福建省-泉州市-鼓楼区', new Date()],
+                    //     ['李桂英', '女', 22, '福建省-泉州市-丰泽区', new Date()]
+                    // ];
+                    var filename = (
+                        typeof _this.$opts.filename == 'undefined' || _this.$opts.filename == '' ? '' : _this.$opts.filename.toString().replace(/(.xlsx)/g, '') + '__'
+                    ) + config.filename + '_' + utils.getCurrentTime();
+                    var sheetName = config.sheetName == '' ? 'sheet1' : config.sheetName;
+                    _this.exportExcel(arr, {
+                        sheetName,
+                        filename
+                    })
+                });
+            }
+        }  
+    };
+
+
+    /**
+     * 获取预览表格的节点，即table标签节点的样式名 test2
+     * @returns {String} 返回表格标签节点的样式名
+     */
+    Widget.prototype.getTableElement = function () {
+        return 'sheet__output_table';
+    };
+
+
+    /**
      * 校验数据完整性，即某列某一行数据是否为空 test1
      * @param {Array} ps_column_arr 要校验的列名组成的数组
      * @param {Array} ps_data_arr 导入的数据源(可选)。默认使用控件实例化后导入的数据源
@@ -581,7 +670,9 @@
         if (typeof this.opts.preview != 'undefined' && this.settings.preview.enable) {
             document.getElementsByClassName('sheet__output')[0].style = ''; // 显示预览区域
             var csv = XLSX.utils.sheet_to_csv(worksheet, opts); // 生成CSV格式
-            document.getElementById(this.settings.preview.nodeId).innerHTML = this.csv2table(csv);
+            //  test2
+            // document.getElementById(this.settings.preview.nodeId).innerHTML = this.csv2table(csv);
+            utils.appendHTML(this.csv2table(csv), document.getElementById(this.settings.preview.nodeId));
         }
         // 返回导入数据供调用
         var source = XLSX.utils.sheet_to_json(worksheet, opts); // 生成JSON格式
@@ -598,11 +689,45 @@
      */
     Widget.prototype.csv2table = function (csv) {
         var _this = this;
-        var html = '<table>';
         var rows = csv.split('\n');
-        // console.log('row：', rows);
+        // console.log('csv：', csv);
+        // console.log('csv typeof：', typeof csv);
+        // console.log('rows：', rows);
+        return this.getTableHtml(rows);
+    };
+
+
+
+    /**
+     * 获取预览区域表格HTML字符串
+     * @param {Array} rows 表格数据组成的数组，由表+行数据组成。假设一共有2行2列数据，则格式为: ['列名1, 列名2', '行1列1', '行1列2', '行2列1', '行2列2']
+     * @param {String} ps_table_clasname 自定义表格节点样式名，默认空(可选)
+     */
+    Widget.prototype.getTableHtml = function (rows, ps_table_clasname) {
+        var _this = this;
+        var tbClassNameStr = typeof ps_table_clasname != 'undefined' && ps_table_clasname.toString().replace(/\s+/g, '') !== '' ? ' ' + ps_table_clasname : '';
+        // console.log('rows：', rows);
+        // 自定义新增预览列 test2
+        if (Array.isArray(this.settings.preview.customColumns) && this.settings.preview.customColumns.length != 0) {
+            var columnHeadStr = '', columnRowStr = '';
+            this.settings.preview.customColumns.forEach(function (item) {
+                if (item.name.toString().replace(/\s+/g, '') !== '') {
+                    columnHeadStr += ',' + item.name;
+                    columnRowStr += ',' + item.value;
+                }
+            });
+            if (columnHeadStr != '' && columnRowStr != '') {
+                rows.forEach(function (row, idx) {
+                    // idx == 0 为表头
+                    rows[idx] += idx == 0 ? columnHeadStr : columnRowStr;
+                })
+            }
+        }
+        // console.log('rows2：', rows);
         // rows.shift(); // 删除第一行
         // rows.pop(); // 删除最后一行没用的
+        //
+        var html = '<table class="sheet__output_table' + tbClassNameStr + '">';
         rows.forEach(function (row, idx) {
             var columns = row.split(',');
             if (_this.settings.preview.hasRowOrder) {
@@ -631,10 +756,11 @@
                 // html += '<td>' + column + '</td>';
                 if (_this.settings.preview.firstRowIsHead) {
                     if (idx == 0) {
-                        if(_this.settings.preview.hasRowOrder && j == 0)
-                            html += '<td>' + column + '</td>';
-                        else
-                            html += '<th>' + column + '</th>';
+                        // if(_this.settings.preview.hasRowOrder && j == 0)
+                        //     html += '<td>' + column + '</td>';
+                        // else
+                        //     html += '<th>' + column + '</th>';
+                        html += '<th>' + column + '</th>';
                     }
                     else 
                         html += '<td>' + column + '</td>';
@@ -881,7 +1007,30 @@
         },
 
 
-
+        /**
+         * 原生js prepend字符串
+         * 即：向父节点中添加子节点HTML字符串，将把该HTML插入到父节点内部的最前面
+         * @param {String} str 子节点字符串
+         * @param {HTML DOM} el 父节点
+         */
+         prependHTML: function(str, el) {
+            var divTemp = document.createElement("div"),
+                nodes = null,
+                fragment = document.createDocumentFragment();
+            divTemp.innerHTML = str;
+            nodes = divTemp.childNodes;
+            for (var i = 0, length = nodes.length; i < length; i += 1) {
+                fragment.appendChild(nodes[i].cloneNode(true));
+            }
+            // 插入到容器的前面 - 差异所在
+            el.insertBefore(fragment, el.firstChild);
+            // 内存回收？
+            nodes = null;
+            fragment = null;
+        },
+         
+         
+         
         /**
          * 原生js向父节点中添加子节点，并将子节点插入到父节点内部的最前面
          * @param {HTML DOM} newNode newNode 子节点
@@ -897,6 +1046,50 @@
                 }
                 fatherNode.insertBefore(childNode, childrenNode[i]);
                 break; // 只插入一次，因为新节点会被插入到第一个非style/script元素之前
+            }
+        },
+
+
+        /**
+         * 原生js append字符串
+         * 即：向父节点中添加子节点HTML字符串，将把该HTML插入到父节点内部的最后面
+         * @param {String} str 子节点字符串
+         * @param {HTML DOM} el 父节点
+         */
+         appendHTML: function(str, el){
+            HTMLElement.prototype.appendStr = function(str) {
+                var divTemp = document.createElement("div"), nodes = null, 
+                    fragment = document.createDocumentFragment(); // 文档片段，一次性append，提高性能
+                divTemp.innerHTML = str;
+                nodes = divTemp.childNodes;
+                for (var i=0, length=nodes.length; i<length; i+=1) {
+                    fragment.appendChild(nodes[i].cloneNode(true));
+                }
+                this.appendChild(fragment);
+                // 据说下面这样子世界会更清净
+                nodes = null;
+                fragment = null;
+            }
+            el.appendStr(str);
+        },
+
+         
+        /**
+         * 重定义并优化原生的 Node.appendChild 方法
+         * 向父节点中添加子节点，并将子节点插入到父节点内部的最后面，但在script/style节点前面
+         * @param {HTML DOM} newNode childNode 子节点
+         * @param {HTML DOM} fatherNode  父节点
+         * add 20240929-1
+         */
+        appendChild: function (childNode, fatherNode) {
+            var childrenNode = fatherNode.children; // 获取父节点的直接子元素
+            // 将子节点插入到内部的最后面，但不包括style和script元素
+            for (var i = childrenNode.length - 1; i >= 0; i--) { // 循环倒装一下
+                if (childrenNode[i].tagName === "STYLE" || childrenNode[i].tagName === "SCRIPT" || childrenNode[i].className === 'controls') {
+                    continue; // 跳过style和script元素
+                }
+                this.insertAfter(childNode, childrenNode[i]);
+                break; // 只插入一次，因为新节点会被插入到最后一个style/script元素之前
             }
         },
         
