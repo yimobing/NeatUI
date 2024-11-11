@@ -86,10 +86,21 @@ i, em{ font-style: normal; }
 }
 .sheet__output_download{
 	margin-bottom: 5px;	
-	text-align: right;
+	text-align: center;
+}
+.sheet__output_download:after{
+	content: '';
+	display: block;
+	clear: both;
+}
+.sheet__output_download_title{
+	display: inline-block;
+	color: #555;
+	font-size: 16px;
+	font-weight: 545;
 }
 .sheet__output_download button{
-	display: inline-block;
+	float: right;
 	padding: 4px 8px;
 	line-height: 1;
 	border: 1px solid #4caf50;

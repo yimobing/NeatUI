@@ -454,7 +454,9 @@
         var _this = this;
         var settings = {
             selector: '', // 绑定展示数据的节点样式名或ID，默认空(可选)。空时自动拼接到参数 preview 指定的节点下。
+            title: '', // 标题信息，默认空(可选)
             enableDownload: true, // 是否允许下载预览的数据，默认true(可选)
+            alt: '下载表格数据', // 下载按钮的提示文字,有默认值(可选)
             filename: '导出记录', // 自定义下载的文件名后半段名称，默认'导出记录'(可选)。默认以"导入的文件名 + __当前参数名 + _当前时间"。eg. '北京师大附属中学学生__导出记录_20241028145713'。如果导入的文件不存在，则以当前参数名为文件名。
             sheetName: 'sheet1' // 下载的文件工作表名，默认 sheet1(可选)
         }
@@ -479,7 +481,16 @@
             // 下载预览的数据、下载按钮
             if (config.enableDownload) {
                 // 创建下载按钮节点
-                var _tmpHtml = '<div class="sheet__output_download"><button type="button" id="' + tableDownBtnId + '">下载</button></div>'
+                var _tmpHtml = [
+                    '<div class="sheet__output_download">',
+                        // 标题信息 (匿名函数马上执行)
+                        (function () {
+                            return config.title.toString().replace(/\s+/g, '') === '' ? '' : '<div class="sheet__output_download_title">' + config.title + '</div>'; 
+                        })(),
+                        '<button type="button" id="' + tableDownBtnId + '" title="' + config.alt + '">下载</button>',
+                    '</div > '
+                ].join('\r\n')
+                    
                 utils.prependHTML(_tmpHtml, o);
                 // 循环节点，取出数据变成二维数组
                 document.getElementById(tableDownBtnId).addEventListener('click', function () {
