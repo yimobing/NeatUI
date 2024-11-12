@@ -453,7 +453,7 @@
     Widget.prototype.presentation = function (rows, options) {
         var _this = this;
         var settings = {
-            selector: '', // 绑定展示数据的节点样式名或ID，默认空(可选)。空时自动拼接到参数 preview 指定的节点下。
+            selector: '', // 绑定展示数据的节点样式名或ID，默认空(可选)。空时自动拼接到参数 preview 指定的节点下
             title: '', // 标题信息，默认空(可选)
             enableDownload: true, // 是否允许下载预览的数据，默认true(可选)
             alt: '下载表格数据', // 下载按钮的提示文字,有默认值(可选)
@@ -472,17 +472,19 @@
                 utils.dialogs(tips);
                 return;
             }
-            if (bindNodesClassId != this.settings.preview.nodeId) {
-                document.getElementById(this.settings.preview.nodeId).appendChild(o);
-            }
+            // if (bindNodesClassId != this.settings.preview.nodeId) {
+            //     document.getElementById(this.settings.preview.nodeId).appendChild(o);
+            // }
             var tableRootClassName = 'sheet__output_present_table',
                 tableDownBtnId = 'outPutDownload';
             o.innerHTML = this.getTableHtml(rows, tableRootClassName);
             // 下载预览的数据、下载按钮
             if (config.enableDownload) {
+                var width = utils.getElementWidth(document.getElementsByClassName(tableRootClassName)[0]), // 获取表格宽度
+                    btnStyleStr = config.selector.toString().replace(/(\.|\#)/g, '') === '' ? '' : 'style="width: ' + width + 'px"';
                 // 创建下载按钮节点
                 var _tmpHtml = [
-                    '<div class="sheet__output_download">',
+                    '<div class="sheet__output_download"' + btnStyleStr + '>',
                         // 标题信息 (匿名函数马上执行)
                         (function () {
                             return config.title.toString().replace(/\s+/g, '') === '' ? '' : '<div class="sheet__output_download_title">' + config.title + '</div>'; 
@@ -682,8 +684,7 @@
             document.getElementsByClassName('sheet__output')[0].style = ''; // 显示预览区域
             var csv = XLSX.utils.sheet_to_csv(worksheet, opts); // 生成CSV格式
             //  test2
-            // document.getElementById(this.settings.preview.nodeId).innerHTML = this.csv2table(csv);
-            utils.appendHTML(this.csv2table(csv), document.getElementById(this.settings.preview.nodeId));
+            document.getElementById(this.settings.preview.nodeId).innerHTML = this.csv2table(csv);
         }
         // 返回导入数据供调用
         var source = XLSX.utils.sheet_to_json(worksheet, opts); // 生成JSON格式
@@ -1113,6 +1114,32 @@
         removeNode: function(node){
             // node.remove();
             node.parentNode.removeChild(node);
+        },
+
+
+        /**
+         * 获取元素宽度
+         * @param {HTML DOM} o 某个元素
+         * @returns 返回该元素的宽度值
+         */
+        getElementWidth: function(o) {
+            if (!o) return 0;
+            // 获取元素的宽度，考虑元素可能被隐藏
+            var styles = window.getComputedStyle(o);
+            var w = o.offsetWidth;
+            var paddingLeft = parseFloat(styles.paddingLeft);
+            var paddingRight = parseFloat(styles.paddingRight);
+            var borderLeft = parseFloat(styles.borderLeftWidth);
+            var borderRight = parseFloat(styles.borderRightWidth);
+            // 如果元素被隐藏，宽度可能为0，此时使用内部尺寸作为参考
+            if (w === 0 && !isNaN(paddingLeft) && !isNaN(paddingRight) && !isNaN(borderLeft) && !isNaN(borderRight)) {
+                w = o.clientWidth;
+                w += isNaN(paddingLeft) ? 0 : paddingLeft;
+                w += isNaN(paddingRight) ? 0 : paddingRight;
+                w += isNaN(borderLeft) ? 0 : borderLeft;
+                w += isNaN(borderRight) ? 0 : borderRight;
+            }
+            return w;
         },
 
 
