@@ -1459,6 +1459,34 @@ var utilities = {
 
 
     /**
+     * 原生js获取元素宽度
+     * add 20241112-1
+     * @param {HTML DOM} o 某个元素
+     * @returns 返回该元素的宽度值
+     */
+     getElementWidth: function(o) {
+        if (!o) return 0;
+        // 获取元素的宽度，考虑元素可能被隐藏
+        var styles = window.getComputedStyle(o);
+        var w = o.offsetWidth;
+        var paddingLeft = parseFloat(styles.paddingLeft);
+        var paddingRight = parseFloat(styles.paddingRight);
+        var borderLeft = parseFloat(styles.borderLeftWidth);
+        var borderRight = parseFloat(styles.borderRightWidth);
+        // 如果元素被隐藏，宽度可能为0，此时使用内部尺寸作为参考
+        if (w === 0 && !isNaN(paddingLeft) && !isNaN(paddingRight) && !isNaN(borderLeft) && !isNaN(borderRight)) {
+            w = o.clientWidth;
+            w += isNaN(paddingLeft) ? 0 : paddingLeft;
+            w += isNaN(paddingRight) ? 0 : paddingRight;
+            w += isNaN(borderLeft) ? 0 : borderLeft;
+            w += isNaN(borderRight) ? 0 : borderRight;
+        }
+        return w;
+    },
+
+     
+
+    /**
      * 获取浏览器滚动条宽度
      * [适用性] 适用于指定区域内容溢出时出现了滚动条，此时就可以用本方法获取滚动条宽度
      * [兼容性] 兼容IE5+
