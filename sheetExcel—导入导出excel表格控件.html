@@ -88,6 +88,8 @@
                 neuiSheetExcel.exportExcel(arr, opts); // 仅导出表格数据，不需要先初始化控件
                 neuiSheetExcel.presentation(rows, opts); // 展示自定义的预览表格数据。注意：需先初始化控件 test2
                 neuiSheetExcel.getTableElement(); // 获取预览表格的节点，即table标签节点的样式名 test2
+                neuiSheetExcel.getImportButtonElement(); // 获取导入按钮节点
+                neuiSheetExcel.setImportButtonAttribute(options); // 设置导入按钮样式等属性
 
                 // 以下两个函数，如不传递第2个参数，则需先导入数据否则会报错
                 neuiSheetExcel.examineEmpty(["列名1", "列名2"], "导入的数据源数组(可选)"); // 校验导入的数据完整性(单元格是否有空值)
@@ -207,7 +209,7 @@
                    注意：需先初始化控件
                 ----------------------------------------
                 rows 表格数据组成的数组，由表+行数据组成。假设一共有2行2列数据，则格式为: ['列名1, 列名2', '行1列1, 行1列2', '行2列1, 行2列2']
-                opts 其它参数(可选)。格式如下
+                options 其它参数(可选)。格式如下
                     var options = {
                         selector: '', // 绑定展示数据的节点样式名或ID，默认空(可选)。空时自动拼接到参数 preview 指定的节点下。
                         title: '', // 标题信息，默认空(可选)
@@ -215,6 +217,21 @@
                         alt: '下载表格数据', // 下载按钮的提示文字,有默认值(可选)
                         filename: '导出记录', // 自定义下载的文件名后半段名称，默认'导出记录'(可选)。默认以"导入的文件名 + __当前参数名 + _当前时间"。eg. '北京师大附属中学学生__导出记录_20241028145713'。如果导入的文件不存在，则以当前参数名为文件名。
                         sheetName: 'sheet1' // 下载的文件工作表名，默认 sheet1(可选)
+                    }
+
+
+
+                ----------------------------------------
+                 · 设置导入按钮样式等属性
+                    neuiSheetExcel.setImportButtonAttribute(options);
+                   注意：需先初始化控件
+                ----------------------------------------
+                options 其它参数(可选)。格式如下
+                    var options = {
+                        disabled: false, // 是否禁用，默认false(可选)
+                        text: '', // 按钮文本值，默认空表示不作更改(可选)
+                        alt: '', // 按钮提示文字，默认空表示不作更改(可选)
+                        style: '' // 具体的样式，默认空表示不作更改(可选). eg. 'border: 1px solid red; font-size: 16px'
                     }
                 
             </pre>
@@ -300,6 +317,12 @@
                     loading: true, // 导入时使用转圈特效，默认false(可选)。注：需先引入 neatui.min.js
                     loadText: '导入中，请稍候..', // 转圈特效文本，有默认值(可选)
                     callback: function(e){
+                        // neuiSheetExcel.setImportButtonAttribute({
+                        //     disabled: true,
+                        //     text: '不允许第2次导入',
+                        //     alt: '禁止操作了，您无法再次导入',
+                        //     style: '1px solid red; font-size: 18px;'
+                        // })
                         console.log('返回来的数据源为：', e);
                     }
                 },

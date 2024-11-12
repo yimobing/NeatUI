@@ -248,7 +248,7 @@
                             var sourceArr = _this.readWorkbook(workbook);
                             // console.log('数据源：', sourceArr);
                             if (_this.settings.import.callback) {
-                                _this.settings.import.callback(sourceArr);  // 导入回调函数
+                                _this.settings.import.callback(sourceArr);  // 导入按钮的回调函数
                                 _this.datasource = sourceArr; // 全局赋值2
                                 if (_this.settings.import.canSecondChooseSameFile) {
                                     uploadDom.value = ''; // 清空 input file 中的文件，如此同名文件便能第2次选择，否则同名文件只能选择一次
@@ -267,7 +267,7 @@
             if (_expNode.length != 0) {
                 _expNode[0].onclick = function () {
                     if (_this.settings.export.callback) {
-                        _this.settings.export.callback({});  // 导出回调函数
+                        _this.settings.export.callback({});  // 导出按钮的回调函数
                     }
                 }
             }
@@ -542,6 +542,36 @@
     Widget.prototype.getTableElement = function () {
         return 'sheet__output_table';
     };
+
+
+    /**
+     * 获取导入按钮节点  add 20241112-1
+     * @returns {String} 返回导入按钮的样式名
+     */
+    Widget.prototype.getImportButtonElement = function () {
+        return 'btn-dao-ru';
+    };
+
+
+    /**
+     * 设置导入按钮样式等属性 add 20241112-1
+     * @param {Object} options 参数对象(可选)。格式参考函数内的参数
+     */
+    Widget.prototype.setImportButtonAttribute = function (options) {
+        var settings = {
+            disabled: false, // 是否禁用，默认false(可选)
+            text: '', // 按钮文本值，默认空表示不作更改(可选)
+            alt: '', // 按钮提示文字，默认空表示不作更改(可选)
+            style: '' // 具体的样式，默认空表示不作更改(可选). eg. 'border: 1px solid red; font-size: 16px'
+        }
+        var config = utils.combine(true, settings, options || {});
+        var $btn = document.getElementsByClassName(this.getImportButtonElement())[0];
+        $btn.setAttribute('disabled', config.disabled);
+        if (config.text.toString().replace(/\s+/g, '') !== '') $btn.innerText = config.text;
+        if (config.alt.toString().replace(/\s+/g, '') !== '') $btn.setAttribute('title', config.alt);
+        if (config.style.toString().replace(/\s+/g, '') !== '') $btn.setAttribute('style', config.style);
+    },
+    
 
 
     /**
@@ -1118,7 +1148,7 @@
 
 
         /**
-         * 获取元素宽度
+         * 原生js获取元素宽度
          * @param {HTML DOM} o 某个元素
          * @returns 返回该元素的宽度值
          */
