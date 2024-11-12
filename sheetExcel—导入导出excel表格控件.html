@@ -229,9 +229,9 @@
                 options 其它参数(可选)。格式如下
                     var options = {
                         disabled: false, // 是否禁用，默认false(可选)
-                        text: '', // 按钮文本值，默认空表示不作更改(可选)
-                        alt: '', // 按钮提示文字，默认空表示不作更改(可选)
-                        style: '' // 具体的样式，默认空表示不作更改(可选). eg. 'border: 1px solid red; font-size: 16px'
+                        text: '', // 按钮文本值，默认空表示使用初始化时的按钮文本(可选)
+                        alt: '', // 按钮提示文字，默认空表示不作更改，即移除属性(可选)
+                        style: '' // 具体的样式，默认空表示不作更改，即移除属性(可选). eg. 'border: 1px solid red; font-size: 16px'
                     }
                 
             </pre>
@@ -322,7 +322,7 @@
                         //     text: '不允许第2次导入',
                         //     alt: '禁止操作了，您无法再次导入',
                         //     style: '1px solid red; font-size: 18px;'
-                        // })
+                        // });
                         console.log('返回来的数据源为：', e);
                     }
                 },

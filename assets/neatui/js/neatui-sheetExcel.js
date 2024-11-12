@@ -560,16 +560,24 @@
     Widget.prototype.setImportButtonAttribute = function (options) {
         var settings = {
             disabled: false, // 是否禁用，默认false(可选)
-            text: '', // 按钮文本值，默认空表示不作更改(可选)
-            alt: '', // 按钮提示文字，默认空表示不作更改(可选)
-            style: '' // 具体的样式，默认空表示不作更改(可选). eg. 'border: 1px solid red; font-size: 16px'
+            text: '', // 按钮文本值，默认空表示使用初始化时的按钮文本(可选)
+            alt: '', // 按钮提示文字，默认空表示不作更改，即移除属性(可选)
+            style: '' // 具体的样式，默认空表示不作更改，即移除属性(可选). eg. 'border: 1px solid red; font-size: 16px'
         }
         var config = utils.combine(true, settings, options || {});
         var $btn = document.getElementsByClassName(this.getImportButtonElement())[0];
-        $btn.setAttribute('disabled', config.disabled);
+        // 设置文本
         if (config.text.toString().replace(/\s+/g, '') !== '') $btn.innerText = config.text;
+        else $btn.innerText = this.defaults.import.btnText;
+        // 设置禁用属性
+        if (config.disabled) $btn.setAttribute('disabled', config.disabled);
+        else $btn.removeAttribute('disabled');
+        // 设置titlen属性
         if (config.alt.toString().replace(/\s+/g, '') !== '') $btn.setAttribute('title', config.alt);
+        else $btn.removeAttribute('title');
+        // 设置样式 
         if (config.style.toString().replace(/\s+/g, '') !== '') $btn.setAttribute('style', config.style);
+        else $btn.removeAttribute('style');
     },
     
 
