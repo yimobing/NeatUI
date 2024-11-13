@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>按楼盘查看学校详情（展示某一个地点边界范围）</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css"><!--百度地图-->
+</head>
+<body>
+    <style>
+        html, body{ height: 100%; }
+        body{ max-width: 640px; width: 100%; margin: 0 auto; padding: 10px 2px; background-color: #f4f4f4; overflow-y: auto!important; }
+        .wrap{  }
+        /*+-------------------------------+*/
+        body{ padding: 2px 2px; }
+        .web{ margin-bottom: 10px; background-color: #fff; padding: 10px 15px; border-radius: 4px; text-align: center; font-size: 16px; }
+        /*+----------------tab---------------+*/
+        .tab{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex;  } 
+        .tab>div{display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: box; display: flex; align-items: center; justify-content: center; position: relative; width: 100%; height: 40px; background-color: #daf0fd; color: #4c626f; text-align: center; font-size: 15px; }
+        .tab>div:first-child{border-radius: 8px 0 0 0; } 
+        .tab>div:nth-child(2){border-radius: 0 8px 0 0; } 
+        .tab>div.on{background-color: #fff; border-radius: 0; font-weight: bold; } 
+        .tab>div.on:before{position: absolute; top: -5px; left: 0; content: ''; display: inline-block; width: 100%; height: 10px; background-color: #fff; } 
+        .tab>div.on:after{content: ''; position: absolute; z-index: 1; top: 0; width: 0; height: 0; } 
+        .tab>div:first-child.on:before{border-radius: 8px 20px 0 0; } 
+        .tab>div:first-child.on:after{right: -40px; border-bottom: 40px solid #fff; border-right: 40px solid  transparent; } 
+        .tab>div:nth-child(2).on:before{border-radius: 20px 8px 0 0; } 
+        .tab>div:nth-child(2).on:after{left: -40px; border-bottom: 40px solid #fff; border-left: 40px solid transparent; }
+        /*+-------------------------------+*/
+        .switch{ padding: 20px 15px; background-color: #fff; border-radius: 0 0 4px 4px;}
+        .switch__bdmap{ width: 100%; padding: 0; }
+        .switch__ditu{ margin-top: 12px;}
+        .bdmap{ background-color: #fff; box-shadow: none; border: 0; border-radius: 4px;}
+    </style>
+    <div class="wrap">
+        <section class="web" style="display: none;">学校名称</section>
+        <section class="tab">
+            <div class="on">学校概况</div>
+            <div>学区范围</div>
+        </section>
+        <section class="switch">
+            <div class="switch__school ne-form"></div>
+            <div class="switch__bdmap bdmap" style="display: none;">
+                <div class="switch__ditu bdmap__map">
+                    <div id="map"></div>
+                </div><!--/.switch__ditu-->
+            </div><!--/.switch__bdmap-->
+        </section>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script><!--百度地图api文件 (这里要屏蔽)-->
+    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script><!--JQ库-->
+    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义封装AJAX-->
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+        //
+        var g_area = '<%=s_area%>'; // 地区(省市区县). ajax({})
+        var g_xuexiao_bh = '<%=s_xuexiao_bh%>'; // 学校编号. ajax({})
+        //
+        var g_xuexiao_mc = ''; // 学校名称
+        var g_zhongxin_zb = ''; // 地图中心点坐标
+        
+    
+        /*+————————————————FUNCTION————————————————+*/
+        /**
+         * 创建学校详情 edit 20210726-1
+         * @param {object} ps_source 数据源
+         */
+        function createSchoolDetails(ps_source){
+            if(!ps_source || $.isEmptyObject(ps_source)) return;
+            if(typeof ps_source.data == 'undefined') return;
+            var node = '.switch__school';
+            var items = ps_source.data[0];
+            var _html = [
+                '<div class="eform-row flex-start" style="display: none;">',
+                    '<div class="item-l"><label>学校名称：</label></div>',
+                    '<div class="item-r">' + items["xuexiao_mc"] + '</div>',
+                '</div><!--/.eform-row-->',
+                '<div class="eform-row flex-start">',
+                    '<div class="item-l"><label>学校类别：</label></div>',
+                    '<div class="item-r">' + items["xuexiao_lb_mc"] + '</div>',
+                '</div><!--/.eform-row-->',
+                '<div class="eform-row flex-start">',
+                    '<div class="item-l"><label>学校地址：</label></div>',
+                    '<div class="item-r">' + items["xuexiao_add"] + '</div>',
+                '</div><!--/.eform-row-->',
+                '<div class="eform-row flex-start">',
+                    '<div class="item-l"><label>学校描述：</label></div>',
+                    '<div class="item-r">' + items["xuexiao_ms"] + '</div>',
+                '</div><!--/.eform-row-->',
+                // '<div class="eform-row flex-start">',
+                //     '<div class="item-l"><label>学校备注：</label></div>',
+                //     '<div class="item-r">' + items["xuexiao_bz"] + '</div>',
+                // '</div><!--/.eform-row-->',
+                '<div class="eform-row flex-start" style="display: none;">',
+                    '<div class="item-l"><label>学校坐标：</label></div>',
+                    '<div class="item-r">' + items["zuobiao"] + '</div>',
+                '</div><!--/.eform-row-->',
+            ].join('\r\n');
+
+            if($(node).length > 0) $(node).empty().append(_html);
+        }
+
+
+        /**
+         * 函数：设置地图宽高 edit 20210726-1
+         * (高度一定要在设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
+         */
+        function setDituSize(){
+            var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
+                winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
+            // 整个区域
+            var eleAll = $('.bdmap'),
+                allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
+                allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
+                allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
+                allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
+                allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
+                allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
+                allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
+                allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
+            //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
+            // 顶部区域
+            var eleTop = $('.tab'),
+                topHeight = eleTop.outerHeight(true);
+            // 地图区域
+            var eleTu = $('.switch'),
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
+                tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
+                tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
+                tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
+                tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
+                tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
+            // 计算宽高
+            var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
+                allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
+                tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
+                tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
+            // console.log('bodyWidth：', $('body').width(), '\nallMargLeft:',allMargLeft, '\nallMargRight:',allMargRight, '\nallPadLeft:',allPadLeft, '\nallPadRight:', allPadRight);
+            // console.log('tuMargLeft:',tuMargLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadRight:',tuPadRight);
+            // console.log('--------------------------------');
+            // console.log('tuHeight：', tuHeight, '\nmapHeight：', eleTu.height());
+            // 设置地图宽高
+            $('.bdmap__map').css({
+                width: tuWidth,
+                height: tuHeight - $('.web').outerHeight(true)
+            })
+            $('#map').css({
+                width: eleTu.width(),
+                height: eleTu.height()
+            })
+        }
+
+
+
+        /**
+         * 百度地图类对象
+         * 参考：http://mobai.blog.51cto.com/
+         */
+        var bdChinaMap = {
+            status: false,
+            map: '', // 地图根节点
+            center: '118.611836,24.918225', // 中心点坐标. eg.'经度,纬度'
+            caption: '泉州市', // 中心点说明文字
+            zoom: 11, // 缩放级别(3-19)
+            point: '', // 地图中心点信息. eg. new BMap.Point(经度,纬度)
+            clickCreateNewCenter: false, // 是否启用点击地图时在点击位置新建中心点坐标(可选), 默认false
+            marker: '', // 点标记覆盖物
+            label: '', // 信息窗覆盖物
+            overlays: [], // 全部覆盖物 
+            default: { // 地图默认配置项,即MapOptions及其它参数(可选)
+                enableMapClick: true // 是否启用底图景点可点功能(可选), 默认启用
+            },
+            image: { // 自定义点标记图标及其它属性(可选)
+                enable: false, // 是否启用(可选)，默认false
+                path: 'assets/neatui/img/', // 图片路径(可选)
+                icon: 'bmap_locate_blue.png', // 图片名称(可选)
+                size: 50 // 图片大小(可选)
+            },
+            infos: { // 自定义信息窗口(可选)
+                enable: false, // 是否启用(可选), 默认false
+                title : '' , // 标题(可选)。默认为中心点说明文字，支持HTML内容
+                message: '', // 短信内容(可选)(这个貌似没用)。完整的短信内容包括：自定义部分+位置链接，不设置时，显示默认短信内容。短信内容最长为140个字
+                content: '', // 内容或描述，比如点标记的地址(可选)。默认空，支持HTML内容
+                width: 0, // 宽。单位像素，取值范围：0, 220 - 730, 其中0表示自动调整宽
+                height: 0, // 高。单位像素，取值范围：0, 60 - 650，其中0表示自动调整高
+                method: 'mouseover' // 打开方式(可选). mouseover 鼠标经过点标记时(默认)，click 鼠标点击点标记时
+            }, 
+            
+            overlaysCache: [],
+            myPoints: [], // 所有坐标点数组
+            myPolygon: '',
+            myOverlay: [],
+            drawManager: '',
+            drawMode: '', // 当前绘制模式(可选), 默认空. 值：空 无任何绘制操作, hander 拖动地图(鼠标为一只手), marker 画点, circle 画圆, polyline 画线,  polygon 画多边形, rectangle 画矩形。
+            clickTimes: 0, // 记录地图被点击的次数(可选), 默认0
+
+            styleOptions: {
+                strokeColor: 'red', // 边线颜色。
+                fillColor: 'red', // 填充颜色。当参数为空时，圆形将没有填充效果。
+                strokeWeight: 1, // 边线的宽度，以像素为单位。
+                strokeOpacity: 0.8, // 边线透明度，取值范围0 - 1。
+                fillOpacity: 0.3,  // 填充的透明度，取值范围0 - 1。
+                strokeStyle: 'solid' // 边线的样式，solid或dashed。
+            },
+
+            /**
+             * 实例化
+             */
+            init: function () {
+                var _this = this;
+                if (this.status) {
+                    return;
+                }
+                this.center = this.center == '' ? '118.611836,24.918225' : this.center; // 当中心点坐标为空时,设定一个默认坐标
+                this.status = true;
+                var options = {
+                    enableMapClick: this.default.enableMapClick
+                }
+                this.map = new BMap.Map('map', options);
+                this.point = new BMap.Point(this.center.split(',')[0], this.center.split(',')[1]);
+                var map = this.map;
+                var styleOptions = this.styleOptions;
+                map.centerAndZoom(this.point, 16);
+                map.enableScrollWheelZoom();
+                // 添加点标记
+                this.addMarker();
+                // 添加信息窗口
+                this.addInfoWindow();
+                // 加载多边形
+                if(this.myPoints.length != 0){ // 加载多个已有的多边形
+                    for(var i = 0; i < this.myPoints.length; i++){
+                        this.myOverlay = this.myPoints[i];
+                        if (this.myOverlay) {
+                            this.loadMyOverlay();
+                        }
+                    }
+                }else{  // 加载一个已有的多边形
+                    if (this.myOverlay) this.loadMyOverlay();
+                }
+            },
+
+            /**
+             * 加载已有的覆盖物
+             */
+            loadMyOverlay: function () {
+                var _this = this;
+                var map = this.map;
+                map.centerAndZoom(this.point, this.zoom); // 设置地图中心点
+                // 创建多边形覆盖物
+                var ply = new BMap.Polygon(this.myOverlay, this.styleOptions);
+                this.myPolygon = ply;
+                try { 
+                    //ply.enableEditing(); 
+                    ply.name = 'duobianxing'; // 标记覆盖物类型,方便清除指定覆盖物时用
+                } 
+                catch (e) { };
+                map.addOverlay(ply);
+            },
+
+            
+            /**
+             * 添加点标记
+             * @param {BMap Point} ps_point 地理坐标点
+             */
+            addMarker: function(ps_point){
+                var map = this.map;
+                var markPoint = typeof ps_point == 'undefined' ? this.point : ps_point;
+                // 添加点标记
+                var iconUrl = this.image.path + this.image.icon,
+                    iconSize = new BMap.Size(this.image.size, this.image.size),
+                    iconOptions = {
+                        // offset: new BMap.Size(0, 0),
+                        // imageOffset: new BMap.Size(0, 0),
+                        anchor: new BMap.Size(5, 10) // 图标的定位锚点。此点用来决定图标与地理位置的关系，是相对于图标左上角的偏移值，默认等于图标宽度和高度的中间值
+                    };
+                var markerOptions = { }
+                if(this.image.enable){
+                    markerOptions.icon = new BMap.Icon(iconUrl, iconSize, iconOptions);
+                }
+                var marker = new BMap.Marker(markPoint, markerOptions);
+                marker.name = 'dianbiaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+                map.addOverlay(marker);
+                this.marker = marker;
+
+                // 添加信息窗
+                var lbText =  '<div class="bdLabel">' + this.caption + '</div>',
+                    lbOptions = {
+                        position: markPoint, // 指定文本标注所在的地理位置
+                        // offset: new BMap.Size(30, -30) // 设置文本偏移量
+                        width: 0,     // 宽度(220-730) 0 自动调整
+                        maxWidth:500,  // 最大宽度(220-730)
+                        height: 0,     // 高度(60-650) 0 自动调整
+                        offset: { // 位置偏移
+                            width: -40, 
+                            height: -75
+                        }
+                    }
+                var label = new BMap.Label(lbText, lbOptions);
+                label.setStyle({
+                    color: 'blue',
+                    borderRadius: '5px',
+                    borderColor: '#ccc',
+                    padding: '10px',
+                    fontSize: '16px',
+                    height: '30px',
+                    lineHeight: '30px',
+                    fontFamily: '微软雅黑'
+                })
+                label.name = 'wenbenbiaozhu'; // 标记覆盖物类型,方便清除指定覆盖物时用
+                marker.setLabel(label); // 绑定文本标注到点标记上
+                map.addOverlay(label);
+                setTimeout(function(){ // 更改文本标注样式
+                    $('.bdLabel').parent().addClass('bdMarkerLabel');
+                }, 0)
+                this.label = label;
+
+                // 坐标拾取器赋值
+                if($('#c-locate').length != 0) $('#c-locate').val(this.center);
+            },
+
+
+            /**
+             * 添加信息窗口
+             */
+            addInfoWindow: function(){
+                if(!this.infos.enable) return;
+                var map = this.map;
+                var marker = this.marker;
+                var infoOptions = {
+                    width : this.infos.width, // 宽。单位像素，取值范围：0, 220 - 730
+                    height: this.infos.height, // 高。单位像素，取值范围：0, 60 - 650
+                    title : '<div class="bdInfoTitle">' + (this.infos.title == '' ? this.caption : this.infos.title) + '</div>', // 标题。支持HTML内容
+	                message: this.infos.message // 短信内容(可选)。完整的短信内容包括：自定义部分+位置链接，不设置时，显示默认短信内容。短信内容最长为140个字
+                }
+                var infoContent = '<div class="bdInfoDescribe">' + this.infos.content + '</div>';
+                var infoDow = new BMap.InfoWindow(infoContent, infoOptions);  // 创建信息窗口对象 
+                marker.addEventListener(this.infos.method, function(){       
+                    map.openInfoWindow(infoDow, this.point);
+                })
+
+                if(this.infos.method == 'mouseover'){
+                    marker.addEventListener('mouseout', function(){       
+                        map.closeInfoWindow()
+                    })
+                }
+            }
+        };
+
+
+       
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //+                                                          初始化                                                 
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====检测窗口变化事件
+            $(window).on('resize', function(){
+                setDituSize();
+            });
+
+            
+            //——————————————————————————————————————————
+            //=====加载学校详细数据
+            // 后台返回
+            var schoolJson = {
+                "return":"ok", 
+                "data":[
+                    {"xuexiao_mc":"丰泽区崇德实验小学", "xuexiao_lb_mc":"小学", "xuexiao_add":"泉州市丰泽区津淮街中段", "xuexiao_ms":"这是一所好学校", "xuexiao_bz":"2016开始创校，师资雄厚，目前全鹇有36个班，从一年级到六年级，教师队伍200人。", "zuobiao":"118.611836,24.918225"}
+                ]
+            }
+            /*
+            //START AJAX
+            var schoolJson = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取学校详细数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "GET",
+                dataType: "html",
+                cache: false,
+                url: "../../fwh_pub/jk_xuexiao_loupan.ashx",
+                data: {
+                    "action": "sel_xuexiao_loupan_xuexiao_one",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "area": g_area,
+                    "xuexiao_bh": g_xuexiao_bh
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    schoolJson = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return;
+            }
+            //END AJAX
+            */
+
+            createSchoolDetails(schoolJson); // 创建学校详情
+
+
+            // 全局赋值
+            if(typeof schoolJson.data != 'undefined'){
+                var firstRowData = schoolJson.data[0];
+                g_xuexiao_mc = firstRowData["xuexiao_mc"];
+                g_zhongxin_zb = firstRowData["zuobiao"];
+                $('.web').text(g_xuexiao_mc);
+            }
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====选项卡切换事件 add 20210726-1
+            $('.tab>div').on('click', function(){
+                var index = $(this).index();
+                $(this).addClass('on').siblings().removeClass('on');
+                $('.switch').children().eq(index).show().siblings().hide();
+
+                //——————————————————————————————————————————
+                //======设置地图宽高
+                setDituSize(); 
+
+                //——————————————————————————————————————————
+                //======后台返回学区坐标数据
+                var coordinateJson = { // 泉州市点坐标数组
+                    "return":"ok",
+                    "data":[
+                        { "weizhi":"1001", "data":[
+                            {"zuobiao":"118.599547, 24.9246154"},
+                            {"zuobiao":"118.607812, 24.9197654"},
+                            {"zuobiao":"118.594948, 24.91308"}
+                        ]},
+                        { "weizhi":"1002", "data":[
+                            {"zuobiao":"118.602206, 24.914588"},
+                            {"zuobiao":"118.612986, 24.912294"},
+                            {"zuobiao":"118.606302, 24.906198"},
+                            {"zuobiao":"118.601991, 24.904035"},
+                            {"zuobiao":"118.598829, 24.908361"},
+                            {"zuobiao":"118.598829, 24.908361"}
+                        ]}
+                    ]
+                }
+                /*
+                //START AJAX
+                var coordinateJson = {}
+                var isHoldOn = true;
+                ajax({
+                    heading: "获取学区坐标",
+                    debug: false,
+                    async: false, // 取数方式. true 异步, false 同步(默认)
+                    type: "GET",
+                    dataType: "html",
+                    cache: false,
+                    url: "../../fwh_pub/jk_xuexiao_loupan.ashx",
+                    data: {
+                        "action": "sel_xuexiao_loupan_xq_zuobiao",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk%>",
+                        "area": g_area,
+                        "xuexiao_bh": g_xuexiao_bh
+                    },
+                    success: function(res){
+                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        // if(res == '') return;
+                        coordinateJson = JSON.parse(res);
+                    },
+                    error: function(res){
+                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    },
+                    beforeSend: function(XMLHttpRequest){ },
+                    complete: function(XMLHttpRequest, textStatus){ }
+                })
+                if(!isHoldOn){
+                    return;
+                }
+                //END AJAX
+                */
+
+
+                // 将坐标数据转化经纬度坐标数组
+                var coordinateArray = [ ];
+                if(typeof coordinateJson.data != 'undefined'){
+                    for(var i1 = 0; i1 < coordinateJson.data.length; i1++){
+                        var item1 = coordinateJson.data[i1];
+                        var arr = [ ];
+                        if(typeof item1.data != 'undefined'){
+                            for(var i2 = 0; i2 < item1.data.length; i2++){
+                                var item2 = item1.data[i2];
+                                var zb = item2.zuobiao;
+                                var tmpArr = item2.zuobiao.split(','),
+                                    lng= tmpArr[0], lat = tmpArr[1];
+                                arr.push(new BMap.Point(lng, lat));
+                            }
+                        }
+                        coordinateArray.push(arr);
+                    }
+                }
+
+
+                
+                //——————————————————————————————————————————
+                //=====地图初始化
+                // console.log('overlayArrray:', coordinateArray)
+                bdChinaMap.center = g_zhongxin_zb == '' ? '118.611836,24.918225' : g_zhongxin_zb; // '118.611836,24.918225'; // 中心点坐标
+                bdChinaMap.caption = g_xuexiao_mc == '' ? '泉州市' : g_xuexiao_mc; // '泉州市'; // 中心点说明文字
+                bdChinaMap.zoom = 15; // 缩放级别
+                bdChinaMap.image.enable = true;
+                bdChinaMap.image.icon = 'bmap_school.png';
+                bdChinaMap.default.enableMapClick = false; // 是否启用底图景点可点功能
+                // 加载多个已有的多边形
+                bdChinaMap.myPoints = coordinateArray;     
+                bdChinaMap.init();
+            });
+
+    
+        }); //$(function(){});
+    </script>
+
+
+</body>
+</html>
