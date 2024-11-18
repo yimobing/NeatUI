@@ -152,6 +152,8 @@
     <script type="text/javascript">
 
         /*+————————————————全局变量————————————————+*/
+        var maxAreaNum = -1; // 最多可画的学区范围数量，-1 表示不限。
+        //
         var g_xuexiao_bh = ''; // '<%=s_xuexiao_bh%>'; // 学校编号 ajax({})
         var g_xuexiao_mc = ''; // 学校名称
         var g_zhongxin_zb = ''; // 地图中心点坐标
@@ -202,6 +204,7 @@
                 var map = bdChinaMap.map;
                 var allOverlay = map.getOverlays();
                 allOverlay.map(function(item, index){
+                    // console.log('item：', item);
                     if(item.name === 'duobianxing'){
                         // console.log('item：', item);
                         // console.log('path：', item.getPath());
@@ -209,8 +212,6 @@
                         arr.push(item.getPath());
                     }
                 })
-
-
                 // console.log('tempArr:', arr)
                 // 将经纬度坐标转化成字符串型数组
                 var coordArr = [ ];
@@ -232,6 +233,7 @@
         }
         
 
+        //————————————————————————————————————————————————
         /**
          * 百度地图类对象 edit 20210723-1
          * 参考：http://mobai.blog.51cto.com/
@@ -465,9 +467,9 @@
                     ply.identifier = layUid; // 添加覆盖物唯一标识符
                     //
                     ply.addEventListener("lineupdate", function (event) { // 拖动边线进行编辑时监听事件
-                    // console.log('覆盖物属性发生变化event:', event);
-                    if(_this.clickTimes != 0) _this.drawMode = 'polygon'; // 全局赋值
-                        _this.showLatLon(event.currentTarget.ha);
+                        // console.log('覆盖物属性发生变化event:', event);
+                        if(_this.clickTimes != 0) _this.drawMode = 'polygon'; // 全局赋值
+                            _this.showLatLon(event.currentTarget.ha);
                     })
                     ply.addEventListener("mouseover", function(event){ // 鼠标进入时的监听事件
                         // console.log('鼠标进入了event：', event)
@@ -840,6 +842,7 @@
 
 
 
+        //————————————————————————————————————————————————
         /**
          * 删除一个学区范围、删除一个多边形区域 add 20210719-1
          * @param {string} ps_weizhi 学区编号
