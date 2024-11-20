@@ -3,53 +3,43 @@
  * [neui百度地图插件v2.0.0] 测试中
  * Author: Mufeng
  * Date: 2021.06.18
- * Update: 2021.06.19
+ * Update: 2024.11.20
  */
 
-/*+-------------------------+*/
-html, body{ width:100%; margin:0 auto; padding:0; -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent; }
-*:not(input,textarea) { -webkit-touch-callout: none; -webkit-user-select: none; }
-html{font-size: 20px;}
-@media only screen and (min-width:400px){html{font-size:21.33333333px!important}}
-@media only screen and (min-width:414px){html{font-size:21px!important}}
-@media only screen and (min-width:480px){html{font-size:25.6px!important}}
-body{background-color:#fff;line-height:1.5;font-family:'Hiragino Sans GB W3','Hiragino Sans GB','microsoft yahei','Sim sun','-apple-system-font','Helvetica Neue','sans-serif';font-size:.7rem;color:#212121;overflow-x:hidden;overflow-y:auto}
-body.mobile{ max-width: 640px; margin: 0 auto; }
-body.transparent{ background-color: #f4f4f4; }
-*{margin:0;padding:0;-moz-box-sizing:border-box;-o-box-sizing:border-box;-webkit-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;outline:0;-webkit-tap-highlight-color:transparent}
-header, footer, main, section, menu, nav, article, aside, hgroup, summary, details, figcaption, figure{display: block;}
+
 
 
 
 
 /*===============================================================================================*/
-/*                                    1、自定义百度地图样式
+/*                                    1、页面布局
 /*===============================================================================================*/
-/*+-----------通用样式--------------+*/
-html,body{width: 98%;margin: 1% auto;height: 98%;overflow: hidden;}  /*一定要 设置height高度 不然地图不显示*/
-#allmap {
-	margin-right: 300px; 
-	margin-right: 15px;
-	height: 100%;
+/*+------------------------ 主体区域 --------+*/
+html,
+body {
+	width: 98%;
+	margin: 0.25% auto;
+	height: 99.5%;
 	overflow: hidden;
 }
-#result {display: none; border-left: 1px dotted #999; height: 100%; width: 295px; position: absolute; top: 0px; right: 0px; font-size: 12px; }
-dl, dt, dd, ul, li {margin: 0; padding: 0; list-style: none; }
-p {font-size: 12px; }
-dt {font-size: 14px; font-family: "微软雅黑"; font-weight: bold; border-bottom: 1px dotted #000; padding: 5px 0 5px 5px; margin: 5px 0; }
-dd {padding: 5px 0 0 5px; }
-li {line-height: 28px; } 
-.red {color: red; } 
-#showPanelBtn{ display: none; position: absolute; font-size: 14px; top: 50%; margin-top: -95px; right: 0px; width: 40px; padding: 10px 10px; color: #999; cursor: pointer; text-align: center; height: 170px; background:  rgba(255,255,255,0.9); -webkit-transition:   all 0.5s ease-in-out; transition:  all 0.5s ease-in-out; font-family: '微软雅黑'; font-weight: bold;  }
-#panelWrap{ width: 0px; position: absolute; top: 0px; right: 0px; height: 100%; overflow: auto; -webkit-transition:  all 0.5s ease-in-out; transition:  all 0.5s ease-in-out;  }
-#panelWrap ul{ padding: 10px 15px; }
-#panelWrap ul>li{ font-size: 13px; border-bottom: 1px solid #eaeaea; }
-#panelWrap ul>li>span{ margin-left: 8px; cursor: pointer; }
-#showOverlayInfo{ width: 20px; height: 200px; margin: -100px 0 0 -10px; color: #999; position: absolute; opacity: 0.5; top: 50%; left: 50%;  }
-#panel{ position: absolute;  }
+.bdmap * {
+	margin: 0;
+	padding: 0;
+	-moz-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+	outline: none;
+	-webkit-tap-highlight-color: transparent;
+}
+dl, dt, dd, ul, li { margin: 0; padding: 0; list-style: none; }
+.red {
+	color: red;
+}
 
-/**/
-.bdmap{
+/*一定要 设置height高度 不然地图不显示*/
+.bdmap {
 	position: relative;
 	margin: 0 auto;
 	overflow: hidden;
@@ -58,32 +48,39 @@ li {line-height: 28px; }
 	border: 1px solid #cac9c9;
 	border-radius: 20px;
 	box-shadow: 0 2px 4px 2px #dfdada;
+	height: 100%;
+	/* overflow: hidden; */
 }
 
-.bdmap__editor{ }
-.bdmap__map{ 
-    position: relative; 
-    width: 100%; 
-    height: 88%; 
-    margin: 15px 0 0 0; /*这里不能使用auto,要写具体数值,不然js中窗口resize时margin、padding值会踊着变化*/
-    padding: 3px; 
-    border: 1px solid #eaeaea; 
-    border-radius: 2px;
-    overflow: hidden;
-}
+.bdmap__editor {
 
-#map{ 
-   height: 100%; 
-   -webkit-transition:  all 0.5s ease-in-out; 
-   transition:  all 0.5s ease-in-out;  
+}
+.bdmap__map {
+	position: relative;
+	width: 100%;
+	margin: 15px 0 0 0;
+	/*这里不能使用auto,要写具体数值,不然js中窗口resize时margin、padding值会踊着变化*/
+	padding: 3px;
+	border: 1px solid #eaeaea;
+	border-radius: 2px;
+	overflow: hidden;
 }
 
 
-/*+----------元素样式---------------+*/
-.bdmap__editor{   }
-.bdmap__editor>div{ margin-top: 15px; }
-.bdmap__editor>div:first-child{ margin-top: 0; }
-.bdmap__editor *{ font-size: 14px; }
+.bdmap__editor {}
+
+.bdmap__editor>div {
+	margin-top: 15px;
+}
+
+.bdmap__editor>div:first-child {
+	margin-top: 0;
+}
+
+.bdmap__editor * {
+	font-size: 14px;
+}
+
 .bdmap__editor input[type="text"] {
 	min-width: 150px;
 	height: 28px;
@@ -91,83 +88,104 @@ li {line-height: 28px; }
 	margin-left: 10px;
 	padding: 0 5px;
 	background-color: #fcfcfc;
-	border: 1px solid #a59b9b!important;
+	border: 1px solid #a59b9b !important;
 	border-radius: 2px;
 }
-.bdmap__editor button[type="button"]{
-	height: 28px!important;
+
+.bdmap__editor button[type="button"] {
+	height: 28px !important;
 	line-height: 28px;
 	margin-left: 8px;
 	padding: 0 8px;
-	position:relative;
-    *display: inline;
-    zoom: 1; 
+	position: relative;
+	*display: inline;
+	zoom: 1;
 	outline: none;
 	text-align: center;
-	justify-content:center;/*if flex*/
+	justify-content: center;
+	/*if flex*/
 	vertical-align: baseline;
 	border: solid 1px #b7b7b7;
 	border-radius: 3px;
 	text-decoration: none;
-	text-shadow: 0 .25px .25px rgba(0,0,0,.3);
-    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+	text-shadow: 0 .25px .25px rgba(0, 0, 0, .3);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
 	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed));
-	background: -moz-linear-gradient(top,  #fff,  #ededed);
+	background: -moz-linear-gradient(top, #fff, #ededed);
 	background: linear-gradient(to right bottom, #fff, #ededed);
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ededed');
-	color: #606060!important;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ededed');
+	color: #606060 !important;
 	cursor: pointer;
 
 }
 
-button[type="button"][data-type="copy"]{ background-color: #8bbb2e; }
-button[type="button"][data-type="new"]{ 
-    background-color: #0c88e8; 
-    color: #e8f0de!important;
-    border: solid 1px #538312;
-    background: #64991e;
-    background: -webkit-gradient(linear, left top, left bottom, from(#7db72f), to(#4e7d0e));
-    background: -moz-linear-gradient(top,  #7db72f,  #4e7d0e);
-    background: linear-gradient(to left bottom, #7db72f, #4e7d0e);
-    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#7db72f', endColorstr='#4e7d0e');
-}
-button[type="button"][data-type="del"]{ 
-    background-color: #F25E54; 
-    color: #fae7e9!important;
-    border: solid 1px #b73948;
-    background: #da5867;
-    background: -webkit-gradient(linear, left top, left bottom, from(#f16c7c), to(#bf404f));
-    background: -moz-linear-gradient(top,  #f16c7c,  #bf404f);
-    background: linear-gradient(to left bottom, #f16c7c, #bf404f);
-    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f16c7c', endColorstr='#bf404f');
-}
-button[type="button"][data-type="save"]{
-    background-color: #08ba61; 
-    color: #fff!important;
-    border: solid 1px #1b9af7;
-    background: #1b9af7;
-    background: -webkit-gradient(linear, left top, left bottom, from(#42a8f3), to(#98d3e7));
-    background: -moz-linear-gradient(top,  #42a8f3,  #98d3e7);
-    background: linear-gradient(to left bottom, #98d3e7, #42a8f3);
-    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#42a8f3', endColorstr='#98d3e7');
+button[type="button"][data-type="copy"] {
+	background-color: #8bbb2e;
 }
 
-button[type="button"][data-type="copy"]:hover{ background-color: #8bbb2e; }
-button[type="button"][data-type="new"]:hover{ background-color: #0c88e8; }
-button[type="button"][data-type="del"]:hover{ background-color: #F25E54; }
-button[type="button"][data-type="save"]:hover{background-color: #08ba61; }
-button[type="button"]:hover{
-    opacity: .8;
-    filter: alpha(opacity=80);
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+button[type="button"][data-type="new"] {
+	background-color: #0c88e8;
+	color: #e8f0de !important;
+	border: solid 1px #538312;
+	background: #64991e;
+	background: -webkit-gradient(linear, left top, left bottom, from(#7db72f), to(#4e7d0e));
+	background: -moz-linear-gradient(top, #7db72f, #4e7d0e);
+	background: linear-gradient(to left bottom, #7db72f, #4e7d0e);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#7db72f', endColorstr='#4e7d0e');
 }
+
+button[type="button"][data-type="del"] {
+	background-color: #F25E54;
+	color: #fae7e9 !important;
+	border: solid 1px #b73948;
+	background: #da5867;
+	background: -webkit-gradient(linear, left top, left bottom, from(#f16c7c), to(#bf404f));
+	background: -moz-linear-gradient(top, #f16c7c, #bf404f);
+	background: linear-gradient(to left bottom, #f16c7c, #bf404f);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f16c7c', endColorstr='#bf404f');
+}
+
+button[type="button"][data-type="save"] {
+	background-color: #08ba61;
+	color: #fff !important;
+	border: solid 1px #1b9af7;
+	background: #1b9af7;
+	background: -webkit-gradient(linear, left top, left bottom, from(#42a8f3), to(#98d3e7));
+	background: -moz-linear-gradient(top, #42a8f3, #98d3e7);
+	background: linear-gradient(to left bottom, #98d3e7, #42a8f3);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#42a8f3', endColorstr='#98d3e7');
+}
+
+button[type="button"][data-type="copy"]:hover {
+	background-color: #8bbb2e;
+}
+
+button[type="button"][data-type="new"]:hover {
+	background-color: #0c88e8;
+}
+
+button[type="button"][data-type="del"]:hover {
+	background-color: #F25E54;
+}
+
+button[type="button"][data-type="save"]:hover {
+	background-color: #08ba61;
+}
+
+button[type="button"]:hover {
+	opacity: .8;
+	filter: alpha(opacity=80);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+}
+
 /*坐标拾取器*/
-.bdmap__picker{ }
+.bdmap__picker {}
+
 /*图形绘制*/
-.bdmap__draw{ }
+.bdmap__draw {}
 
 /*鼠标绘制区*/
-.bdmap__mouse{
+.bdmap__mouse {
 	position: absolute;
 	top: 50px;
 	right: 25px;
@@ -175,9 +193,10 @@ button[type="button"]:hover{
 	filter: alpha(opacity=90);
 	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
-.bdmap__mouse-title{
+
+.bdmap__mouse-title {
 	background-color: #ff0000;
-    padding: 8px 20px;
+	padding: 8px 20px;
 	border-radius: 4px;
 	color: #fff;
 	text-align: center;
@@ -185,7 +204,7 @@ button[type="button"]:hover{
 	cursor: pointer;
 }
 
-.bdmap__mouse-title:after{
+.bdmap__mouse-title:after {
 	content: '';
 	display: inline-block;
 	vertical-align: middle;
@@ -196,12 +215,15 @@ button[type="button"]:hover{
 	border-right: 6px solid transparent;
 	border-bottom: 12px solid #fff;
 }
-.bdmap__mouse-title.angle-down{ }
-.bdmap__mouse-title.angle-down:after{
+
+.bdmap__mouse-title.angle-down {
+
+}
+.bdmap__mouse-title.angle-down:after {
 	border-bottom: 0;
 	border-top: 12px solid #fff;
 }
-.bdmap__mouse-step{
+.bdmap__mouse-step {
 	margin-top: 5px;
 	background-color: #fff;
 	padding: 5px 20px;
@@ -209,39 +231,155 @@ button[type="button"]:hover{
 	color: #888;
 	font-size: 12px;
 }
-.bdmap__mouse-step p{ margin-top: 2px; }
-.bdmap__mouse-step p:first-child{ margin-top: 0; }
-.bdmap__mouse-step p.bold{ font-size: 1.1em; font-weight: bold; }
+.bdmap__mouse-step p {
+	margin-top: 2px;
+	font-size: 12px;
+}
+.bdmap__mouse-step p:first-child {
+	margin-top: 0;
+}
+.bdmap__mouse-step p.bold {
+	font-size: 1.1em;
+	font-weight: bold;
+}
 
-/*+------------地图样式-------------+*/
-/*文本标*/
-.BMapLabel.bdMarkerLabel{
-	border: 0!important;
-	background: transparent!important;
+
+
+/*+------------------------ 测试区域 --------+*/
+#result {
+	position: absolute;
+	z-index: 1;
+	top: 0px;
+	right: 0px;
+	border-left: 1px dotted #999;
+	height: 100%;
+	width: 295px;
+	background-color: #fff;
+	font-size: 12px;
+	display: none;
 }
-.bdLabel{
+#result dt {
+	font-size: 14px;
+	font-family: "微软雅黑";
+	font-weight: bold;
+	border-bottom: 1px dotted #000;
+	padding: 5px 0 5px 5px;
+	margin: 5px 0;
+}
+#result  dd {
+	padding: 5px 0 0 5px;
+}
+
+
+#showPanelBtn {
+	display: none;
+	position: absolute;
+	font-size: 14px;
+	top: 50%;
+	margin-top: -95px;
+	right: 0px;
+	width: 40px;
+	padding: 10px 10px;
+	color: #999;
+	cursor: pointer;
+	text-align: center;
+	height: 170px;
+	background: rgba(255, 255, 255, 0.9);
+	-webkit-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
+	font-family: '微软雅黑';
+	font-weight: bold;
+}
+#panelWrap {
+	width: 0px;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	height: 100%;
+	overflow: auto;
+	-webkit-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
+}
+
+#panelWrap ul {
+	padding: 10px 15px;
+}
+#panelWrap ul>li {
+	line-height: 28px;
+	font-size: 13px;
+	border-bottom: 1px solid #eaeaea;
+}
+
+#panelWrap ul>li>span {
+	margin-left: 8px;
+	cursor: pointer;
+}
+
+#showOverlayInfo {
+	width: 20px;
+	height: 200px;
+	margin: -100px 0 0 -10px;
+	color: #999;
+	position: absolute;
+	opacity: 0.5;
+	top: 50%;
+	left: 50%;
+}
+
+#panel {
+	position: absolute;
+}
+
+
+
+
+
+
+/*===============================================================================================*/
+/*                                    2、自定义百度地图样式
+/*===============================================================================================*/
+/*+------------------------ 地图根节点 ------------------------+*/
+.ne-bd-map-root {
+	width: 100%;
+	/* height: 100%; */
+	border-radius: 8px;
+	-webkit-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
+	overflow: hidden;
+}
+
+/*+------------------------ 地图样式 ------------------------+*/
+/*+ 文本标 +*/
+.BMapLabel.bdMarkerLabel {
+	border: 0 !important;
+	background: transparent !important;
+}
+
+.bdLabel {
 	position: relative;
-    background-color: #fff;
-    padding: 12px 25px;
-    border-width: 1px;
-    border-style: solid;
-    border-color: #19b6f8;
-    border-radius: 3px;
-    box-shadow: 0 1px 3px 0px #3291b9;
-    color: #0c88e8;
-    font-size: 15px;
-    font-weight: bold; 
+	background-color: #fff;
+	padding: 12px 25px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #19b6f8;
+	border-radius: 3px;
+	box-shadow: 0 1px 3px 0px #3291b9;
+	color: #0c88e8;
+	font-size: 15px;
+	font-weight: bold;
 }
-.bdLabel.blue{
-    border-color: #1296db;
-    color: #1296db;
+
+.bdLabel.blue {
+	border-color: #1296db;
+	color: #1296db;
 }
-.bdLabel:before{
+
+.bdLabel:before {
 	content: '';
 	position: absolute;
-    bottom: -8px;
-    left: 30px;
-    margin: 0 auto;
+	bottom: -8px;
+	left: 30px;
+	margin: 0 auto;
 	display: block;
 	width: 0;
 	height: 0;
@@ -249,82 +387,105 @@ button[type="button"]:hover{
 	border-right: 20px solid transparent;
 	border-top: 15px solid #fff;
 }
+
 .bdLabel p,
-.bdLabel br{ line-height: 1.75; }
+.bdLabel br {
+	line-height: 1.75;
+}
 
+/*+ 标注点信息窗 +*/
+.bdInfoTitle {
+	font-size: 16px;
+}
 
-/*+------------标注点信息窗-------------+*/
-.bdInfoTitle{ font-size: 16px; }
-.bdInfoDescribe{ padding: 5px 8px; font-size: 14px; }
+.bdInfoDescribe {
+	padding: 5px 8px;
+	font-size: 14px;
+}
+
 .bdInfoDescribe p,
-.bdInfoDescribe br{ line-height: 1.75; }
+.bdInfoDescribe br {
+	line-height: 1.75;
+}
 
 
 
 /*===============================================================================================*/
-/*                                    2、百度地图原始样式
+/*                                    3、百度地图原生样式
 /*===============================================================================================*/
 /*
 * [百度地图样式在线资源]
 * 鼠标绘制工具：http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css
 * 检索信息窗口：http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.css
 */
-
-/*+------------鼠标绘制工具-------------+*/
+/*+------------------------ 鼠标绘制工具 ------------------------+*/
 .BMapLib_Drawing_panel {
-	height:47px;
-	border:1px solid #666;
-	border-radius:5px;
-	overflow:hidden;
-	box-shadow:1px 1px 3px rgba(0,0,0,0.3);
-	float:left
-}
-.BMapLib_Drawing .BMapLib_box {
-	border-right:1px solid #d2d2d2;
-	float:left;
-	height:100%;
-	width:64px;
-	height:100%;
-	background-image:url('../img/bmap_drawing_tool_bg.png');
-	cursor:pointer
-}
-.BMapLib_Drawing .BMapLib_last {
-	border-right:0
-}
-.BMapLib_Drawing .BMapLib_hander {
-	background-position:0 0
-}
-.BMapLib_Drawing .BMapLib_hander_hover {
-	background-position:0 -52px
-}
-.BMapLib_Drawing .BMapLib_marker {
-	background-position:-65px 0
-}
-.BMapLib_Drawing .BMapLib_marker_hover {
-	background-position:-65px -52px
-}
-.BMapLib_Drawing .BMapLib_circle {
-	background-position:-130px 0
-}
-.BMapLib_Drawing .BMapLib_circle_hover {
-	background-position:-130px -52px
-}
-.BMapLib_Drawing .BMapLib_polyline {
-	background-position:-195px 0
-}
-.BMapLib_Drawing .BMapLib_polyline_hover {
-	background-position:-195px -52px
-}
-.BMapLib_Drawing .BMapLib_polygon {
-	background-position:-260px 0
-}
-.BMapLib_Drawing .BMapLib_polygon_hover {
-	background-position:-260px -52px
-}
-.BMapLib_Drawing .BMapLib_rectangle {
-	background-position:-325px 0
-}
-.BMapLib_Drawing .BMapLib_rectangle_hover {
-	background-position:-325px -52px
+	height: 47px;
+	border: 1px solid #666;
+	border-radius: 5px;
+	overflow: hidden;
+	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+	float: left
 }
 
+.BMapLib_Drawing .BMapLib_box {
+	border-right: 1px solid #d2d2d2;
+	float: left;
+	height: 100%;
+	width: 64px;
+	height: 100%;
+	background-image: url('../img/bmap_drawing_tool_bg.png');
+	cursor: pointer
+}
+
+.BMapLib_Drawing .BMapLib_last {
+	border-right: 0
+}
+
+.BMapLib_Drawing .BMapLib_hander {
+	background-position: 0 0
+}
+
+.BMapLib_Drawing .BMapLib_hander_hover {
+	background-position: 0 -52px
+}
+
+.BMapLib_Drawing .BMapLib_marker {
+	background-position: -65px 0
+}
+
+.BMapLib_Drawing .BMapLib_marker_hover {
+	background-position: -65px -52px
+}
+
+.BMapLib_Drawing .BMapLib_circle {
+	background-position: -130px 0
+}
+
+.BMapLib_Drawing .BMapLib_circle_hover {
+	background-position: -130px -52px
+}
+
+.BMapLib_Drawing .BMapLib_polyline {
+	background-position: -195px 0
+}
+
+.BMapLib_Drawing .BMapLib_polyline_hover {
+	background-position: -195px -52px
+}
+
+.BMapLib_Drawing .BMapLib_polygon {
+	background-position: -260px 0
+}
+
+.BMapLib_Drawing .BMapLib_polygon_hover {
+	background-position: -260px -52px
+}
+
+.BMapLib_Drawing .BMapLib_rectangle {
+	background-position: -325px 0
+}
+
+.BMapLib_Drawing .BMapLib_rectangle_hover {
+	background-position: -325px -52px
+}
