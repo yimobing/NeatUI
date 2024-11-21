@@ -2,11 +2,11 @@
  * [neuiBdmap]
  * 百度地图控件 纯JS原生版
  * Version：v1.0.1
- * 还差的功能：地图初始化时设置宽、高，参数整合
+ * 还差的功能：参数整合
  * Author: Mufeng
  * QQ: 1614644937
  * Date: 2021.06.18
- * Update: 2024.11.19
+ * Update: 2024.11.21
  */
 
 
@@ -65,7 +65,7 @@
             // 功能与配置项(可选)
             draft: { // 地图底图功能(可选)
                 platOptions: { // 地图默认配置项(可选)。
-                    enableMapClick: true, // 是否启用底图景点可点功能(可选)，默认true。
+                    enableMapClick: false, // 是否启用底图景点可点功能(可选)，默认false。
                     minZoom: 3, // 地图允许展示的最小级别
                     maxZoom: 19, // 地图允许展示的最大级别
                     // mapType: BMAP_NORMAL_MAP, // 地图类型，默认为BMAP_NORMAL_MAP (启用此会报错,原因未知)
@@ -433,8 +433,8 @@
                 // html节点 test2
                 // $('.bdLabel').parent().addClass('bdMarkerLabel');
                 var node = document.getElementsByClassName('bdLabel');
-                if (typeof node != 'undefined' && node.length > 0) {
-                    node[0].parentNode.className += 'bdMarkerLabel';
+                if (node != null && node.length > 0) {
+                    node[0].parentNode.classList.add('bdMarkerLabel');
                 }
             }, 100);
 
@@ -1267,7 +1267,10 @@
             }
             me.settings.overlaysCache = arr;
              // html节点 test2
-            $("#panelWrap")[0].innerHTML = '<ul>' + s + '</ul>';
+            var node = document.getElementById('panelWrap');
+            if (node != null && node.length > 0) {
+                node[0].innerHTML = '<ul>' + s + '</ul>';
+            }
         },
 
 
@@ -1577,6 +1580,7 @@
          * 注：不能直接使用obj.offsetTop，因为它获取的是你绑定元素上边框相对离自己最近且position属性为非static的祖先元素的偏移量
          * @param {HTML DOM} o DOM元素。
          * @returns {number} 返回距离值
+
          */
         getElementTop: function(o) {
             var actualTop = o.offsetTop;
