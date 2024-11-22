@@ -3,7 +3,7 @@
  * NeatUI 函数库
  * Author: ChenMufeng
  * Date: 2021.02.05
- * Update: 2021.07.20
+ * Update: 2024.11.22
  */
 
 
@@ -1467,7 +1467,7 @@ var utilities = {
      getElementWidth: function(o) {
         if (!o) return 0;
         // 获取元素的宽度，考虑元素可能被隐藏
-        var styles = window.getComputedStyle(o);
+        var styles = this.getElementStyle(o);
         var w = o.offsetWidth;
         var paddingLeft = parseFloat(styles.paddingLeft);
         var paddingRight = parseFloat(styles.paddingRight);
@@ -1482,6 +1482,34 @@ var utilities = {
             w += isNaN(borderRight) ? 0 : borderRight;
         }
         return w;
+    },
+
+     
+     
+    /**
+     * 原生js获取元素高度
+     * add 20241122-1
+     * @param {HTML DOM} o 某个元素
+     * @returns 返回该元素的宽度值
+     */
+    getElementHeight: function(o) {
+        if (!o) return 0;
+        // 获取元素的宽度，考虑元素可能被隐藏
+        var styles = this.getElementStyle(o);
+        var h = o.offsetHeight;
+        var paddingTop = parseFloat(styles.paddingTop);
+        var paddingBottom = parseFloat(styles.paddingBottom);
+        var borderTop = parseFloat(styles.borderTopWidth);
+        var borderBottom = parseFloat(styles.borderBottomWidth);
+        // 如果元素被隐藏，宽度可能为0，此时使用内部尺寸作为参考
+        if (h === 0 && !isNaN(paddingTop) && !isNaN(paddingBottom) && !isNaN(borderTop) && !isNaN(borderBottom)) {
+            h = o.clientHeight;
+            h += isNaN(paddingTop) ? 0 : paddingTop;
+            h += isNaN(paddingBottom) ? 0 : paddingBottom;
+            h += isNaN(borderTop) ? 0 : borderTop;
+            h += isNaN(borderBottom) ? 0 : borderBottom;
+        }
+        return h;
     },
 
      
