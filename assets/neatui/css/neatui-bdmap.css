@@ -3,7 +3,7 @@
  * [neui百度地图插件v2.0.0] 测试中
  * Author: Mufeng
  * Date: 2021.06.18
- * Update: 2024.11.21
+ * Update: 2024.11.22
  */
 
 /*===============================================================================================*/
@@ -21,7 +21,7 @@
 
 /*+------------------------ 地图样式 ------------------------+*/
 /*+ 文本标 +*/
-.BMapLabel.bdMarkerLabel {
+.BMapLabel.ne_bd_label {
 	border: 0 !important;
 	background: transparent !important;
 }
@@ -49,7 +49,8 @@
 	content: '';
 	position: absolute;
 	bottom: -8px;
-	left: 30px;
+	left: 0;
+	right: 0;
 	margin: 0 auto;
 	display: block;
 	width: 0;

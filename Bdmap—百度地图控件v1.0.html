@@ -17,8 +17,8 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241121-5"><!--百度地图控件-->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_fanwei.css?v=20241121-5"><!--当前页面样式-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241122-7"><!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_fanwei.css?v=20241122-7"><!--当前页面样式-->
 </head>
 
 <body>
@@ -128,7 +128,7 @@
     <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
     <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
     <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义ajax-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-bdmap.js?v=20241119-11"></script><!--自定义ajax-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-bdmap.js?v=20241122-7"></script><!--自定义ajax-->
     <script type="text/javascript">
         /*+————————————————全局变量————————————————+*/
         var g_xuexiao_bh = ''; // '<%=s_xuexiao_bh%>'; // 学校编号 ajax({})
@@ -411,18 +411,18 @@
             center: {
                 city: "", // 城市(可选)，默认空。值：空时根据坐标定位, 非空时根据城市定位。eg.'泉州市', eg.'泉州市惠安县'。
                 coordinate: g_zhongxin_zb,  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
-                caption: g_xuexiao_mc, // 标题文字(可选)，默认空。
-                describe: "", // 描述文字(可选)，默认空。
-                enableDrag: true, // 是否允许拖拽(可选)，默认false
+                caption: g_xuexiao_mc, // 标题文字(可选)，默认'北京市'。支持HTML
+                describe: "", // 描述文字(可选)，默认空。支持HTML
+                // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                complete: function(e){
+                    $('#c-locate').val(e.lng + ',' + e.lat);
+                },
                 enableClickCreateNew: true, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
                 // 用点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 clickCallback: function(e){
                     $('#c-locate').val(e.lng + ',' + e.lat); // 输入框赋值
                 },
-                // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
-                complete: function(e){
-                    $('#c-locate').val(e.lng + ',' + e.lat);
-                },
+                enableDrag: true, // 是否允许拖拽(可选)，默认false
                 // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 dragEnd: function(e){
                     $('#c-locate').val(e.lng + ',' + e.lat);
@@ -440,7 +440,12 @@
                     enableHighResolution: true, // 是否启用使用高分辨率地图。在iPhone4及其后续设备上，可以通过开启此选项获取更高分辨率的底图，v1.2,v1.3版本默认不开启，v1.4默认为开启状态
                     enableAutoResize: true // 是否自动适应地图容器变化，默认启用
                 },
-                enableWheelZoom: true // 是否开启鼠标滚轮缩放功能，仅对PC上有效(可选)，默认true。
+                enableWheelZoom: true, // 是否开启鼠标滚轮缩放功能，仅对PC上有效(可选)，默认true。
+                personalize: { // 个性化地图(可选)
+                    enable: false, // 是否启用(可选)，默认false
+                    basePaint: false, // 是否使用个性化的底图模式(干净清爽)(可选)，默认false。
+                    baseStyle: '', // 地图风格，默认空表示使用默认设置。仅当basePaint为false时有效。值： normal 普通风格, light 清新蓝风格, dark 黑夜风格, bluish 清新蓝绿风格, grayscale 高端灰风格, hardedge 强边界风格, darkgreen 青春绿风格, pink 浪漫粉风格, midnight 午夜蓝风格, grassgreen 自然绿风格, googlelite 精简风格(底图模式,干净清爽), redalert 红色警戒风格
+                }
             },
 
             // 点标记功能(可选)
@@ -482,7 +487,7 @@
             hideValues: identifyArray, // 多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
             buttons: { // 按钮(可选)
                 enable: true,  // 是否添加操作按钮(可选)，默认false
-                text: '删除', // 操作按钮的文本，默认'删除'
+                text: '删除多边形', // 操作按钮的文本，默认'删除'
                 callback: function(e){  // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
                     console.log('e：', e);
                     var ls_data_bh = e.id,
@@ -526,12 +531,12 @@
             },
             operateButton: { // 操作按钮(可选)
                 buttoned: true, // 是否添加操作按钮(可选)，默认false
-                btnText: '删除本学区' // 操作按钮的文本(可选)，默认'删除'
+                btnText: '删除多边形' // 操作按钮的文本(可选)，默认'删除'
             },
             stepDescription: { // 绘制步骤说明(可选)
                 enable: true, // 是否启用功能(可选)，默认true
-                title: '绘制学区步骤说明', // 标题(可选)，有默认值
-                content: '', // 自定义详细的绘制步骤说明(可选)，默认空。支持HTML
+                title: '绘制多边形步骤说明', // 标题(可选)，有默认值
+                content: '' // 自定义详细的绘制步骤说明(可选)，默认空。支持HTML
             }
         });
 

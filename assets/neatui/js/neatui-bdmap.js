@@ -6,7 +6,7 @@
  * Author: Mufeng
  * QQ: 1614644937
  * Date: 2021.06.18
- * Update: 2024.11.21
+ * Update: 2024.11.22
  */
 
 
@@ -17,6 +17,31 @@
  * GeoUtils类库：http://api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils_min.js
  * 加载检索信息窗口：http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.js
  */
+
+
+/**
+ * 【关于对覆盖物的标记】
+    说明：
+    百度地图API中对覆盖物标记的方法有两种
+    一种用 overlay.name='同一个字符串' 来标记同一个覆盖物(如多边形覆盖物)，即同一种覆盖物的 name 属性相同
+    另一种是用 overlay.identifier='一直变化的字符串' 来标记每一个覆盖物，即每一个覆盖物哪怕是同一种覆盖物，它们的 identifier 都不相同
+    // eg.
+    overlay.name = 'anniu_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+    overlay.identifier = layUid; // 添加覆盖物唯一标识符
+
+    1. 本控件中使用 name 属性来标记相同的覆盖物，name 的值及含义如下：
+    // 标记覆盖物类型,方便清除指定覆盖物时用
+    duobianxing_biaoji // 多边形覆盖物 polygon
+    dian_biaoji // 图像标注覆盖物(点标记覆盖物) Marker
+    wenben_biaoji // 文本标注覆盖物 Label
+    anniu_biaoji // 按钮覆盖物。一般是显示在多边形时面的按钮
+
+    2. 本控件中使用 identifier 属性来标记每一个覆盖，identifier 的值及含义如下
+    // 添加覆盖物唯一标识符
+    identity_duobianxing_1 // 每个多边形唯一标识符，后面的数字 1 表示 第1个多边形
+    identity_duobianxing_1_btn // 每个多边形内部按钮唯一标识符，后面的 1_btn 表示第1个多边形内部的按钮
+ */
+
 
 //————————————————————————————————————————————————————————————————————————————————————
 // 
@@ -53,13 +78,13 @@
             center: {
                 city: "", // 城市(可选)，默认空。值：空时根据坐标定位, 非空时根据城市定位。eg.'泉州市', eg.'泉州市惠安县'。
                 coordinate: "116.404177,39.909652",  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
-                caption: "北京市", // 标题文字(可选)，默认空。
-                describe: "", // 描述文字(可选)，默认空。
-                enableDrag: false, // 是否允许拖拽(可选)，默认false
-                enableClickCreateNew: false, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
-                clickCallback: null, // 用点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                caption: "北京市", // 标题文字(可选)，默认'北京市'。支持HTML
+                describe: "", // 描述文字(可选)，默认空。支持HTML
                 complete: null, // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
-                dragEnd: null, // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                enableClickCreateNew: false, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
+                clickCallback: null, // 点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                enableDrag: false, // 是否允许拖拽(可选)，默认false
+                dragEnd: null // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
             },
 
             // 功能与配置项(可选)
@@ -72,7 +97,12 @@
                     enableHighResolution: true, // 是否启用使用高分辨率地图。在iPhone4及其后续设备上，可以通过开启此选项获取更高分辨率的底图，v1.2,v1.3版本默认不开启，v1.4默认为开启状态
                     enableAutoResize: true // 是否自动适应地图容器变化，默认启用
                 },
-                enableWheelZoom: true // 是否开启鼠标滚轮缩放功能，仅对PC上有效(可选)，默认true。
+                enableWheelZoom: true, // 是否开启鼠标滚轮缩放功能，仅对PC上有效(可选)，默认true。
+                personalize: { // 个性化地图(可选)
+                    enable: false, // 是否启用(可选)，默认false
+                    basePaint: false, // 是否使用个性化的底图模式(干净清爽)(可选)，默认false。
+                    baseStyle: '', // 地图风格，默认空表示使用默认设置。仅当basePaint为false时有效。值： normal 普通风格, light 清新蓝风格, dark 黑夜风格, bluish 清新蓝绿风格, grayscale 高端灰风格, hardedge 强边界风格, darkgreen 青春绿风格, pink 浪漫粉风格, midnight 午夜蓝风格, grassgreen 自然绿风格, googlelite 精简风格(底图模式,干净清爽), redalert 红色警戒风格
+                }
             },
 
             // 点标记功能(可选)
@@ -96,42 +126,38 @@
 
         // 2. 内部参数
         this.config = {
-            map: null, // 地图对象(可选)，默认null。
-            centerPoint: null, // 地图中心点信息(可选)，默认null. eg. new BMap.Point(经度,纬度)
             status: false, // 地图状态(可选)，默认false。值：true 已加载, false 未加载
+            clickTimes: 0, // 记录地图被点击的次数(可选)，默认0。
+            loadTimes: 0, // 记录地图重载的次数(可选)，默认0。
             // 覆盖物集合
             overlays: [], // 所有覆盖物集合
             markerLays: [], // 点标记覆盖物集合
             labelLays: [], // 信息窗覆盖物集合
             polyLays: [], // 多边形覆盖物集合
-
-            // 多边形覆盖物(多个) 以下参数待重新整合 test1
-            myPolyIdentifiers: [], // 覆盖物标识符数组(即一个标识符对应一个覆盖物)(可选)。
-            myPolyGroupNames: [], // 覆盖物分类数组(可选)。eg.["学校", "便利店", "旅游景点"] 分别表示学校、便利店、旅游景点三种不同类型的覆盖物
-            myPolyAllPoints: [], // 所有覆盖物的点坐标数组(可选)。
-            myPolyOnePoints: [], // 一个覆盖物的点坐标数组(可选)。
-            myPolyOnePointCache: [], // 一个覆盖物的点坐标数组(临时变量，用于记录这些点一个个删除后的剩余的点)(可选)。
-            // 多边形覆盖物(单个) 以下参数待重新整合 test1
-            myPolygon: "", // 当前覆盖物对象(可选)。
-            myPolyHidValue: "", // 当前覆盖物隐藏值(可选)。当前端删除某个覆盖物时，如删除接口需传递某个参数，则可使用本参数。
-
-            //
-            myLayIdentifier: [], // 覆盖物标识符数组(即让一个标识符对应一个覆盖物)
-            myLayNumber: '', // 覆盖物编号
-            myGroupName: [], // 覆盖物分组名称数组.
-
-            // 前台前过来的点坐标 (可删除)
+            // 前台前过来的点坐标 test 1
             overlaysCache: [],
-            myPoints: [], // 所有坐标点数组
-            myOverlay: [], // 所有覆盖物数组
+            // myPoints: [], // 所有坐标点数组
+            // myOverlay: [], // 所有覆盖物数组
              
             // 鼠标绘制管理类 BMapLib.DrawingManager
-            drawManager: "", // 鼠标绘制管理类实例化对象(可选)，默认空。
             drawMode: "", // 当前绘制模式(可选)，默认空。值：空 无任何绘制操作, hander 拖动地图(鼠标为一只手), marker 画点, circle 画圆, polyline 画线,  polygon 画多边形, rectangle 画矩形。
-            
-            // 次数记录
-            clickTimes: 0, // 记录地图被点击的次数(可选)，默认0。
-            loadTimes: 0, // 记录地图重载的次数(可选)，默认0。
+
+            // 以下参数是没用到的, 后期完善后可删除
+            // 多边形覆盖物(多个) 以下参数待重新整合 test1
+            // myPolyIdentifiers: [], // 覆盖物标识符数组(即一个标识符对应一个覆盖物)(可选)。
+            // myPolyGroupNames: [], // 覆盖物分类数组(可选)。eg.["学校", "便利店", "旅游景点"] 分别表示学校、便利店、旅游景点三种不同类型的覆盖物
+            // myPolyAllPoints: [], // 所有覆盖物的点坐标数组(可选)。
+            // myPolyOnePoints: [], // 一个覆盖物的点坐标数组(可选)。
+            // myPolyOnePointCache: [], // 一个覆盖物的点坐标数组(临时变量，用于记录这些点一个个删除后的剩余的点)(可选)。
+
+            // 多边形覆盖物(单个) 以下参数待重新整合 test1
+            // myPolygon: "", // 当前覆盖物对象(可选)。
+            // myPolyHidValue: "", // 当前覆盖物隐藏值(可选)。当前端删除某个覆盖物时，如删除接口需传递某个参数，则可使用本参数。
+
+            // test1
+            // myLayIdentifier: [], // 覆盖物标识符数组(即让一个标识符对应一个覆盖物)
+            // myLayNumber: '', // 覆盖物编号
+            // myGroupName: [], // 覆盖物分组名称数组.
         }
 
     };
@@ -154,17 +180,25 @@
             var settings = utils.combine(true, me.defaults, me.config);
             me.settings = utils.combine(true, settings, options || {}); // 全局赋值1
             me.$opts = { // 全局赋值2
+                $maper: null, // 地图实例化对象
                 $container: null, // 地图根节点容器ID
                 $nodeRoot: null, // 地图根节点DOM
-                $maper: null, // 地图实例化对象
-                $centerPoint: null, // 地图中心点坐标
                 $zoom: null, // 地图缩放级别
+                $centerPoint: null, // 地图中心点地理坐标
+                $centerMarker: null, // 中心点图像标注实例
+                $centerLabelNode: null, // 中心点文本标注节点
                 $polygon: null // 多边形覆盖物。是一个Object对象
             }
             me.createMap(elem);
         },
 
 
+
+
+
+        //————————————————————————————————————————————————
+        //  create开头的函数，用于：创建控件效果
+        //————————————————————————————————————————————————
         //————————————————————————————————————————————————
         /**
          * 创建地图并初始化
@@ -180,7 +214,7 @@
             var container = elem.toString().replace(/(\#|\.)/g, '');
             var nodeRoot = document.getElementById(container);
             nodeRoot.classList.add('ne-bd-map-root');
-            // · 设置地图宽高
+            // · 设置地图大小
             var w = me.settings.width.toString().toLocaleLowerCase().replace(/\s+/g, ''),
                 h = me.settings.height.toString().toLocaleLowerCase().replace(/\s+/g, ''),
                 width = parseFloat(w.replace(/(px|%|vw|vh)/g, '')),
@@ -258,22 +292,30 @@
             }
 
             // 全局赋值2
+            me.$opts.$maper = maper; // 地图实例化对象
             me.$opts.$container = elem; // 地图容器ID
             me.$opts.$nodeRoot = nodeRoot; // 地图根节点DOM
-            me.$opts.$maper = maper; // 地图实例化对象
-            me.$opts.$centerPoint = centerPoint; // 中心点坐标对象
             me.$opts.$zoom = zoom; // 地图缩放级别
+            me.$opts.$centerPoint = centerPoint; // 中心点地理坐标
 
             // 第4步，开始与地图进行交互操作
             // 允许使用鼠标滚轮控制缩放
             if (me.settings.draft.enableWheelZoom) {
                 maper.enableScrollWheelZoom();
             }
+            // 个性化地图
+            if (me.settings.draft.personalize.enable) {
+                me.setMapFashion({
+                    bases: me.settings.draft.personalize.basePaint,  // 是否使用底图模式(干净清爽)
+                    styles: me.settings.draft.personalize.baseStyle // 地图风格
+                });
+            }
 
             // 先清空所有覆盖物
             me.clearAllOverlay();
-            // 添加点标记
-            me.addMarker({
+            // 添加中心点标记
+            me.createMarker({
+                type: 'zhongxin',
                 coordinate: centerCoordinate,
                 title: centerCaption, 
                 describe: centerDescribe,
@@ -283,7 +325,7 @@
                 dragEndCallback: centerDragEnd 
             });
 
-            // 添加HTML节点
+            // 添加自定义的HTML节点
             var environment = me.settings.environment;
             var language = environment.language.toString().toLocaleLowerCase();
             if (language != '') {
@@ -319,7 +361,8 @@
                     if (me.settings.drawMode != '' && me.settings.drawMode != 'hander') return;
                     var lng = e.point.lng, lat = e.point.lat;
                     me.clearAllMarkOverlay(); // 清空点标记覆盖物
-                    me.addMarker({ // 重建点标记
+                    me.createMarker({ // 重建点标记
+                        type: 'zhongxin',
                         coordinate: lng + ',' + lat,
                         title: centerCaption, 
                         describe: centerDescribe,
@@ -342,10 +385,11 @@
 
         //————————————————————————————————————————————————
         /**
-         * 创建、添加一个点标记覆盖物
+         * 创建或添加一个图像标注覆盖物(点标记覆盖物)
          * @param {Object} options 参数对象。格式参见函数内部代码
+         * @returns {Marker} 返回当前图像标注实例
          */
-        addMarker: function(options){
+        createMarker: function(options){
             var me = this;
             if (typeof me.$opts == 'undefined') {
                 console.error('地图尚未初始化，无法使用函数' + arguments.callee.name);
@@ -357,6 +401,7 @@
                 return;
             }
             var originals = {
+                type: '', // 坐标类型(可选)，默认空。值： zhongxin 中心点坐标, 空 表示其它类型。
                 coordinate: '', // 坐标经纬度字符串. eg. '经度,纬度'
                 title: '', // 标题(可选)，默认空。支持HTML
                 describe: '', // 描述信息(可选)，默认空。支持HTML
@@ -366,7 +411,8 @@
                 dragEndCallback: null // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
             }
             var finals = utils.combine(true, originals, options || {});
-            var coordinate = finals.coordinate,
+            var type= finals.type,
+                coordinate = finals.coordinate,
                 title = finals.title,
                 describe = finals.describe,
                 message = finals.message,
@@ -389,18 +435,22 @@
                 markerOptions.icon = new BMap.Icon(iconUrl, iconSize, iconOptions);
             }
             var oneMark = new BMap.Marker(markPoint, markerOptions);
-            oneMark.name = 'dianbiaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+            oneMark.name = 'dian_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
             maper.addOverlay(oneMark);
             me.settings.overlays.push(oneMark); // 全局赋值
             me.settings.markerLays.push(oneMark);
 
             // 添加信息窗
-            var lbText =  '<div class="bdLabel">' + title + '</div>',
+            var lbClassName = 'bdLabel';
+            if (type == 'zhongxin') {
+                lbClassName += ' bdCentralLabel';
+            }
+            var lbText =  '<div class="' + lbClassName + '">' + title + '</div>',
                 lbOptions = {
                     position: markPoint, // 指定文本标注所在的地理位置
                     // offset: new BMap.Size(30, -30) // 设置文本偏移量
                     width: 0,     // 宽度(220-730) 0 自动调整
-                    maxWidth:500,  // 最大宽度(220-730)
+                    maxWidth: 500,  // 最大宽度(220-730)
                     height: 0,     // 高度(60-650) 0 自动调整
                     offset: { // 位置偏移
                         width: -40, 
@@ -418,9 +468,22 @@
                 lineHeight: '30px',
                 fontFamily: '微软雅黑'
             })
-            label.name = 'wenbenbiaozhu'; // 标记覆盖物类型,方便清除指定覆盖物时用
+            label.name = 'wenben_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
             oneMark.setLabel(label); // 绑定文本标注到点标记上
             maper.addOverlay(label);
+            // 更改文本标注节点样式及位置
+            setTimeout(function () {
+                var lbNode = document.getElementsByClassName(lbClassName); // 延时一下才能取非空节点
+                if (lbNode != null && lbNode.length > 0) {
+                    lbNode[0].parentNode.classList.add('ne_bd_label'); // 给父节点添加一个样式名
+                    if (type == 'zhongxin') {
+                        // 全局赋值2
+                        me.$opts.$centerLabelNode = lbNode[0]; // 中心点文本标注节点
+                    }
+                }
+                dotHelper.setLabelPositionAndSize(me, lbNode); // 调整文本标注的大小和位置
+            }, 100);
+            
             // 添加信息窗口
             dotHelper._addInfoWindow(me, oneMark, markPoint, {
                 title,
@@ -428,22 +491,17 @@
                 message
             });
 
-            // 更改文本标注样式
-            setTimeout(function () {
-                // html节点 test2
-                // $('.bdLabel').parent().addClass('bdMarkerLabel');
-                var node = document.getElementsByClassName('bdLabel');
-                if (node != null && node.length > 0) {
-                    node[0].parentNode.classList.add('bdMarkerLabel');
-                }
-            }, 100);
-
             // 全局赋值1
             me.settings.overlays.push(label);
             me.settings.labelLays.push(label);
            
-            // 创建完成时会触发此事件
+            // 创建完成事件
             if (finals.finishCallback) {
+                if (type == 'zhongxin') {
+                    // 全局赋值2
+                    me.$opts.$centerMarker = oneMark; // 中心点图像标注实例
+                }
+                // 创建完成时会触发此事件
                 finals.finishCallback({
                     lng: longitude,
                     lat: latitude
@@ -460,8 +518,12 @@
                             lat: e.point.lat
                         });
                     }
+                    var lbNode = document.getElementsByClassName(lbClassName); // 这里取到的可能是空节点
+                    dotHelper.setLabelPositionAndSize(me, lbNode); // 调整文本标注的大小和位置
                 });
             }
+
+            return oneMark;
         },
 
 
@@ -547,17 +609,17 @@
                 var ply = new BMap.Polygon(onePoint, skinOptions);
                 try {
                     ply.enableEditing();
-                    ply.name = 'duobianxing'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
+                    ply.name = 'duobianxing_biaoji'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
                     // 统计多边形个数, 给覆盖物添加唯一标识符
-                    var count = 1; // 统计多边形覆盖物个数
+                    var total = 1; // 统计多边形覆盖物个数
                     var polyOverlay = maper.getOverlays();
                     polyOverlay.map(function (item) {
-                        if (item.name === 'duobianxing') {
-                            count++;
+                        if (item.name === 'duobianxing_biaoji') {
+                            total++;
                         }
                     })
-                    var layUid = 'duobianxing-' + count;
-                    ply.identifier = layUid; // 添加覆盖物唯一标识符
+                    var plyUid = 'identity_duobianxing_' + total;
+                    ply.identifier = plyUid; // 添加多边形唯一标识符
                     maper.addOverlay(ply);
                     // 全局赋值1
                     // me.settings.myPolygon = ply; 
@@ -581,14 +643,13 @@
                     
                     // 给覆盖物添加操作按钮
                     if (buttoned) {
-                        // var point = me.settings.myOverlay[0];
                         var coord = polygonHelper._getPolyCenter(ply),  // 获取多边形中心点
-                            layNo = ids;
+                            plyNo = ids;
                         polygonHelper._addOverlayButton(me, {
                             longitude: coord.lng,
                             latitude: coord.lat,
-                            layUid, // 覆盖物唯一标识符，默认空
-                            layNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
+                            plyUid, // 覆盖物唯一标识符，默认空
+                            plyNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
                             btnText, // 按钮文本，默认'删除'(可选)
                             btnCallback // 按钮回调函数，默认null(可选)
                         });
@@ -600,41 +661,154 @@
 
 
 
+
+
+
+
+
+        //————————————————————————————————————————————————
+        //  remove和clear开头的函数，用于：清除或清空覆盖物
+        //————————————————————————————————————————————————
         //————————————————————————————————————————————————
         /**
-         * 删除一个多边形覆盖物
-         * @param {String} ps_lay_uid 多边形覆盖物唯一标识符
-         * @param {String} ps_btn_uid 多边形覆盖物上面的按钮唯一标识符
+         * 清除全部覆盖物
          */
-        removePolygonOverlay: function(ps_lay_uid, ps_btn_uid){
+         clearAllOverlay: function(){
+            var me = this;
+            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            // var r = confirm('确认清除所有覆盖物？');
+            // if(r !== true) return;
+            var overlays = me.settings.overlays;
+            for (var i = 0; i < overlays.length; i++) {
+                maper.removeOverlay(overlays[i]);
+            }
+            me.settings.overlays = []; // 全局赋值1
+            // maper.removeOverlay(me.settings.myPolygon);
+            // me.settings.myPolygon = '';
+        },
+
+         
+         
+        //————————————————————————————————————————————————
+        /**
+         * 清除全部点标记覆盖物
+         */
+        clearAllMarkOverlay: function () {
             var me = this;
             if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             var allOverlay = maper.getOverlays();
-             allOverlay.map(function (item) {
-                 if (item.identifier === ps_lay_uid) {
-                     maper.removeOverlay(item);
-                 }
-                 if (item.identifier === ps_btn_uid) {
-                     maper.removeOverlay(item);
-                 }
-             });
+            allOverlay.map(function(item){
+                if(item.name === 'dian_biaoji'){
+                    maper.removeOverlay(item);
+                }
+            })
+        },
+
+
+
+        //————————————————————————————————————————————————
+        /**
+         * 清空全部文本覆盖物
+         */
+        clearAllLabelOverlay: function () {
+            var me = this;
+            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            var allOverlay = maper.getOverlays();
+            allOverlay.map(function(item){
+                if(item.name === 'wenben_biaoji'){
+                    maper.removeOverlay(item);
+                }
+            })
+        },
+
+
+
+        //————————————————————————————————————————————————
+        /**
+         * 清除一个多边形覆盖物、清除某个多边形覆盖物
+         * @param {string} ps_ply_uid 多边形覆盖物唯一标识符
+         * @param {string} ps_btn_uid 多边形覆盖物上面的按钮覆盖物唯一标识符
+         * @param {Array} ps_uid_arr 要删除的覆盖唯一标识组成的数组。当前多边形覆盖物及内部的子覆盖物(如按钮)唯一标识符组成的数组。eg. ['当前多边形覆盖物的唯一标识符', '内部按钮覆盖物的唯一标识']
+         */
+         removeOnePolyOverlay: function (ps_uid_arr) {
+            var me = this;
+            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            var allOverlay = maper.getOverlays();
+            allOverlay.map(function(item){
+                // if(item.identifier === ps_ply_uid){
+                //     maper.removeOverlay(item);
+                // }
+                // if(item.identifier === ps_btn_uid){
+                //     maper.removeOverlay(item);
+                // }
+                for (var i = 0; i < ps_uid_arr.length; i++){
+                    if(item.identifier === ps_uid_arr[i]){
+                        maper.removeOverlay(item);
+                    }
+                }
+            })
         },
          
          
          
+        /**
+         * 清除全部多边形覆盖物
+         */
+        clearAllPolyOverlay: function () {
+            var me = this;
+            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            var allOverlay = maper.getOverlays();
+            allOverlay.map(function(item){
+                if(item.name === 'duobianxing_biaoji' || item.name == 'anniu_biaoji'){
+                    maper.removeOverlay(item);
+                }
+            })
+        },
+
+
+
+        // /**
+        //  * 清空线覆盖物
+        //  */
+        // clearLineOverlay: function(){
+        // },
+        // /**
+        //  * 清空圆覆盖物
+        //  */
+        // clearCircleOverlay: function(){
+        // },
+        // /**
+        //  * 清空矩形覆盖物
+        //  */
+        // clearRectangleOverlay: function(){
+        // },
+    
+
+
+
+
+
+
+
+        //————————————————————————————————————————————————
+        //  get开头的函数，用于：获取地图各种对象及数据
+        //————————————————————————————————————————————————
         //————————————————————————————————————————————————
         /**
          * 获取地图实例化对象
          * @returns {Object} 返回地图实例化对象。值为null表示还未实例化
          */
-        getMap: function(){
+         getMap: function(){
+            var me = this;
+            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
             return me.$opts.$maper;
         },
 
-
-
-        //————————————————————————————————————————————————
         /**
          * 获取地图当前缩放级别
          * @returns {Number} 返回缩放级别
@@ -646,11 +820,52 @@
             return maper.getZoom();
         },
 
+        /**
+         * 获取地图当前中心点
+         * @returns {Point} 返回中心点地理坐标点
+         */
+        getCenter: function () {
+            var me = this;
+            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            return maper.getCenter();
+        },
+
+        /**
+         * 获取地图根节点容器元素
+         * @returns {HTMLElement} 返回地图容器元素
+         */
+        getContainer: function () {
+            var maper = this.getMap();
+            return maper.getContainer();
+        },
+
+        /**
+         * 获取地图中心点标记图像标注实例
+         * @returns {Marker} 返回中心点标记图像标注实例
+         */
+        getCenterMarker: function () {
+            var me = this;
+            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            return me.$opts.$centerMarker;
+        }, 
+
+
+        /**
+         * 获取地图中心点标记文本标注节点
+         * @returns {HTML Dom} 返回中心点文本标节点
+         */
+        getCenterLabelNode: function () {
+            var me = this;
+            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            return me.$opts.$centerLabelNode;
+        },
+
 
 
         //————————————————————————————————————————————————
         /**
-         * 获取多边形坐标数据
+         * 获取所有 多边形坐标数据
          * @returns {Array} 返回字符串型坐标数组
          */
         getPolyCoordinateData: function () {
@@ -662,7 +877,7 @@
             var allOverlay = maper.getOverlays();
             allOverlay.map(function(item, index){
                 // console.log('item：', item);
-                if(item.name === 'duobianxing'){
+                if(item.name === 'duobianxing_biaoji'){
                     // console.log('item：', item);
                     // console.log('path：', item.getPath());
                     // arr.push(item.ha); // !!!不要使用.ha,因为这个参数名称百度会经常变动 edit 20210923-1
@@ -683,7 +898,7 @@
          
         //————————————————————————————————————————————————
         /**
-         * 获取最后一个多边形覆盖物的经纬度信息
+         * 获取最后一个多边形覆盖物的经纬度信息 test2
          */
         getLastPolyOverLay: function () {
             var me = this;
@@ -698,117 +913,121 @@
         },
 
 
+
+
+
+        //————————————————————————————————————————————————
+        //  set开头的函数，用于：设置或重置地图数据
+        //————————————————————————————————————————————————
         //————————————————————————————————————————————————
         /**
-         * 清空全部覆盖物
+         * 设置中心点标记的标题
+         * @param {HTML|String} ps_content 标题内容。支持HTML
          */
-        clearAllOverlay: function(){
+        setCenterPointLabelTitle: function (ps_content) {
             var me = this;
             if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
-            var maper = me.$opts.$maper;
-            // var r = confirm('确认清除所有覆盖物？');
-            // if(r !== true) return;
-            var overlays = me.settings.overlays;
-            for (var i = 0; i < overlays.length; i++) {
-                maper.removeOverlay(overlays[i]);
+            var node = document.getElementsByClassName('bdCentralLabel');
+            if (node != null && node.length > 0) {
+                // var reg = /.*<[^>]+>.*/; // 验证是有标签
+                node[0].innerHTML = ps_content;
+                dotHelper.setLabelPositionAndSize(me, node); // 调整文本标注的大小和位置
             }
-            me.settings.overlays = []; // 全局赋值1
-            // maper.removeOverlay(me.settings.myPolygon);
-            // me.settings.myPolygon = '';
         },
 
 
 
-        //————————————————————————————————————————————————
         /**
-         * 清空全部点标记覆盖物
+         * 设置地图样式、个性化地图
+         * @param {object} opts 参数对象
+         * [参考] https://lbs.baidu.com/index.php?title=open/custom
          */
-        clearAllMarkOverlay: function () {
+        setMapFashion: function(options){
             var me = this;
             if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
-            var allOverlay = maper.getOverlays();
-            allOverlay.map(function(item){
-                if(item.name === 'dianbiaoji'){
-                    maper.removeOverlay(item);
-                }
-            })
-        },
 
+            var originals = {
+                bases: false, // 是否使用底图模式(干净清爽), 默认false
+                styles: 'normal' // 地图风格。值： normal 默认地图样式, light 清新蓝风格, dark 黑夜风格, bluish 清新蓝绿风格, grayscale 高端灰风格, hardedge 强边界风格, darkgreen 青春绿风格, pink 浪漫粉风格, midnight 午夜蓝风格, grassgreen 自然绿风格, googlelite 精简风格, redalert 红色警戒风格
+            }
+            var finals = utils.combine(true, originals, options || {});
+            // 方案1：快速设置地图样式
+            var style = finals.bases ? 'googlelite' : finals.styles;
+            if (style.toString().replace(/\s+/g, '') !== '') {
+                maper.setMapStyle({
+                    features: ['point', 'road', 'water', 'land', 'building'], // 设置地图上展示的元素种类(这个参数不起作用，奇怪!!!)。值：point 兴趣点, road 道路, water 河流, land 陆地, building 建筑物
+                    style // 设置地图底图样式
+                });
+            }
+            /*
+            [style 值]
+            normal 普通风格
+            light 清新蓝风格
+            dark 黑夜风格
+            bluish 清新蓝绿风格
+            grayscale 高端灰风格
+            hardedge 强边界风格
+            darkgreen 青春绿风格
+            pink 浪漫粉风格
+            midnight 午夜蓝风格
+            grassgreen 自然绿风格
+            googlelite 精简风格
+            redalert 红色警戒风格
+            */
+            
 
-        //————————————————————————————————————————————————
-        /**
-         * 清空全部多边形覆盖物
-         */
-        clearAllPolyOverlay: function () {
-            var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
-            var maper = me.$opts.$maper;
-            var allOverlay = maper.getOverlays();
-            allOverlay.map(function(item){
-                if(item.name === 'duobianxing' || item.name == 'duobianbtn'){
-                    maper.removeOverlay(item);
-                }
-            })
-        },
-
-
-
-        //————————————————————————————————————————————————
-        /**
-         * 清除某个多边形覆盖物
-         * @param {string} ps_ply_uid 多边形覆盖物唯一标识符
-         * @param {string} ps_btn_uid 多边形覆盖物上面的按钮覆盖物唯一标识符
-         * @param {Array} ps_uid_arr 要删除的覆盖唯一标识组成的数组。当前多边形覆盖物及内部的子覆盖物(如按钮)唯一标识符组成的数组。eg. ['当前多边形覆盖物的唯一标识符', '内部按钮覆盖物的唯一标识']
-         */
-        removeOnePolyOverlay: function (ps_uid_arr) {
-            var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
-            var maper = me.$opts.$maper;
-            var allOverlay = maper.getOverlays();
-            allOverlay.map(function(item){
-                // if(item.identifier === ps_ply_uid){
-                //     maper.removeOverlay(item);
-                // }
-                // if(item.identifier === ps_btn_uid){
-                //     maper.removeOverlay(item);
-                // }
-                for (var i = 0; i < ps_uid_arr.length; i++){
-                    if(item.identifier === ps_uid_arr[i]){
-                        maper.removeOverlay(item);
+            // 方案2：自定义地图样式
+            /* var poilabelOnOff = manmadeOnOff = 'on'; // = buildingOnOff = districtlabelOnOff = 'on';
+            if(settings.bases){
+                poilabelOnOff = 'off';
+                manmadeOnOff = 'on';
+            }else{
+                poilabelOnOff = 'on';
+                manmadeOnOff = 'on';
+            }
+            var styleArray =  [{
+                    "featureType": "poilabel",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": poilabelOnOff // 是否显示兴趣点(即常见地标性地点，如教育、医疗、娱乐、酒店、餐饮、大厦、小区等). on 是, off 否
+                    }
+                },{
+                    "featureType": "manmade",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": manmadeOnOff // 是否显示所有人造区域. on 是, off 否
                     }
                 }
-            })
+                // ,{
+                //     "featureType": "building",
+                //     "elementType": "all",
+                //     "stylers": {
+                //         "visibility": "on" // 是否显示建筑物. on 是, off 否
+                //     }
+                // },{
+                //     "featureType": "districtlabel",
+                //     "elementType": "labels",
+                //     "stylers": {
+                //         "visibility": "on" // 是否显示行政村注. on 是, off 否
+                //     }
+                // }
+            ]
+            map.setMapStyle({
+                styleJson: styleArray
+            }) */
+
         },
 
 
 
+
+
+
+
         //————————————————————————————————————————————————
-        // /**
-        //  * 清空全部文本覆盖物
-        //  */
-        // clearLabelOverlay: function(){
-        // },
-        // /**
-        //  * 清空线覆盖物
-        //  */
-        // clearLineOverlay: function(){
-        // },
-        // /**
-        //  * 清空圆覆盖物
-        //  */
-        // clearCircleOverlay: function(){
-        // },
-        // /**
-        //  * 清空矩形覆盖物
-        //  */
-        // clearRectangleOverlay: function(){
-        // },
-        
-
-
-
-
+        //          其它操作函数
+        //————————————————————————————————————————————————
         //————————————————————————————————————————————————
         /**
          * 刷新页面数据(Csharp .net 环境下使用)
@@ -879,6 +1098,8 @@
             }
             return strArr;
         },
+
+        
     };
 
 
@@ -891,7 +1112,7 @@
          * 添加信息窗口
          * @param {Object} 当前控件对象
          * @param {Marker} marker 点标记覆盖物
-         * @param {BMapPoint} point 点标记经纬度对象
+         * @param {Point} point 点标记地理坐标点
          * @param {Object} options 参数对象
          */
         _addInfoWindow: function (me, marker, point, options) {
@@ -925,6 +1146,32 @@
                 });
             }
         },
+
+
+        /**
+         * 调整文本标注的大小和位置
+         * @param {Object} 当前控件对象
+         * @param {HTMLCollection} node 当前点标记节点
+         */
+        setLabelPositionAndSize: function (me, node) {
+            if (node != null && node.length > 0) {
+                var selfNode = node[0],
+                    fatherNode = node[0].parentNode;
+                // 自动调整文本标位置/设置父节点定位偏移量
+                var w = utils.getElementWidth(selfNode),
+                    h = utils.getElementHeight(selfNode);
+                // console.log('w：', w, '\nh：', h);
+                var styles = utils.getElementStyle(fatherNode);
+                var pdLeft = parseFloat(styles.paddingLeft);
+                isNaN(pdLeft) ? 0 : pdLeft;
+                var left = - ((w - pdLeft) / 2),
+                    top = - (h + parseFloat(me.settings.markers.markOptions.image.size) / 2);
+                fatherNode.style.setProperty('top', top + 'px');
+                fatherNode.style.setProperty('left', left + 'px');
+            } 
+        },
+
+
     };
 
 
@@ -1027,7 +1274,7 @@
                 }
             }
             
-            // 实例化鼠标绘制工具
+            // 实例化鼠标绘制工具, 创建鼠标绘制管理类实例化对象
             var drawManager = new BMapLib.DrawingManager(maper, {
                 isOpen: false, // 是否开启绘制模式
                 enableDrawingTool: true, // 是否显示工具栏
@@ -1059,31 +1306,30 @@
             // 鼠标绘制完成后，派发总事件的接口
             drawManager.addEventListener('overlaycomplete', function (e) {
                 // 绘制完成后回调获得覆盖物信息
-                e.overlay.name = 'duobianxing'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
+                e.overlay.name = 'duobianxing_biaoji'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
                 // 统计多边形个数, 给覆盖物添加唯一标识符
-                var count = 0;
+                var total = 0;
                 var allOverlay = maper.getOverlays();
                 allOverlay.map(function (item) {
-                    if (item.name === 'duobianxing') {
-                        count++;
+                    if (item.name === 'duobianxing_biaoji') {
+                        total++;
                     }
                 })
-                var layUid = 'duobianxing-' + count;
-                e.overlay.identifier = layUid; // 添加覆盖物唯一标识符
+                var plyUid = 'identity_duobianxing_' + total;
+                e.overlay.identifier = plyUid; // 添加多边形唯一标识符
                 if (typeof e.overlay.enableEditing != 'undefined') e.overlay.enableEditing();
                 // 全局赋值1
                 me.settings.overlays.push(e.overlay);
                 me.settings.polyLays.push(e.overlay);
                 // 给覆盖物添加操作按钮
                 if (buttoned) {
-                    // var point = me.settings.myOverlay[0];
                     var coord = polygonHelper._getPolyCenter(e.overlay),  // 获取多边形中心点
-                        layNo = '';
+                        plyNo = '';
                     polygonHelper._addOverlayButton(me, {
                         longitude: coord.lng,
                         latitude: coord.lat,
-                        layUid, // 覆盖物唯一标识符，默认空
-                        layNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
+                        plyUid, // 覆盖物唯一标识符，默认空
+                        plyNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
                         btnText // 按钮文本，默认'删除'(可选)
                     });
                 }
@@ -1195,15 +1441,15 @@
             var originals = {
                 longitude: '', // 操作按钮所在经度坐标
                 latitude: '', // 操作按钮所在纬度坐标
-                layUid: '', // 覆盖物唯一标识符，默认空
-                layNo: '', // 覆盖物对应的编号，默认空(可选)。新增时为空
+                plyUid: '', // 多边形覆盖物唯一标识符，默认空
+                plyNo: '', // 多边形覆盖物对应的编号，默认空(可选)。新增时为空
                 btnText: '删除', // 按钮文本，默认'删除'(可选)
                 btnCallback: null // 按钮回调函数，默认null(可选)。返回值e { id: '隐藏值ID字段', polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
             }
             var finals = utils.combine(true, originals, options || {});
             var ps_position = new BMap.Point(finals.longitude, finals.latitude),
-                layUid = finals.layUid,
-                layNo = finals.layNo,
+                plyUid = finals.plyUid,
+                plyNo = finals.plyNo,
                 btnText = finals.btnText;
             
             var opts = {
@@ -1212,36 +1458,36 @@
                 // offset: new BMap.Size(30, 50) //设置文本偏移量  
             }
             
-            var label = new BMap.Label('<div class="bmap__polygon_del" data-bh="' + layNo + '">' + btnText + '</div>', opts);  // 创建文本标注对象  
-            label.enableMassClear(); // 允许覆盖物被清除
-            label.name = 'duobianbtn'; // 添加覆盖物分类标识符
-            var btnUid = 'duobianbtn-' + layUid;
-            label.identifier = btnUid; // 添加按钮唯一标识符
-            label.setStyle({
+            var lbBtn = new BMap.Label('<div class="bmap__polygon_del" data-bh="' + plyNo + '">' + btnText + '</div>', opts);  // 创建文本标注对象  
+            lbBtn.enableMassClear(); // 允许覆盖物被清除
+            lbBtn.name = 'anniu_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+            var btnUid =  plyUid + '_btn'; // eg. 'identity_duobianxing_5_btn'
+            lbBtn.identifier = btnUid; // 添加按钮唯一标识符
+            lbBtn.setStyle({
                 color: "black",
                 fontSize: "12px",
-                backgroundColor: "#fff",      //填充颜色。当参数为空时，圆形将没有填充效果。
+                backgroundColor: "#fff", // 填充颜色。当参数为空时，圆形将没有填充效果。
                 color: "#666",
                 // borderColor: "#2196F3",
                 padding: '6px 10px',
                 borderRadius: '4px'
             });
-            maper.addOverlay(label);
-            me.settings.overlays.push(label); // 全局赋值
+            maper.addOverlay(lbBtn);
+            me.settings.overlays.push(lbBtn); // 全局赋值
 
-            label.addEventListener('click', function (e) {
+            lbBtn.addEventListener('click', function (e) {
                  // console.log('e：', e, '\ncontent：', e.target.content);
                  var content = e.target.content;
                  var reg = /^\<(.*?)data-bh="(.*?)"(.*?)>(.*?)\<\/(.*?)\>/g; // 提取data-*值
                  var ls_data_bh = content.replace(reg, '$2');
                  if (ls_data_bh === '' || typeof ls_data_bh == 'undefined' || ls_data_bh == null) {
-                    me.removePolygonOverlay(layUid, btnUid); // 删除当前多边形覆盖物
+                    me.removeOnePolyOverlay([plyUid, btnUid]); // 删除当前多边形覆盖物
                     return;
                 }
                 if (finals.btnCallback) { // 按钮回调函数
                     finals.btnCallback({
                         id: ls_data_bh,
-                        polyLayId: layUid,
+                        polyLayId: plyUid,
                         btnLayId: btnUid
                     });
                 }
@@ -1628,7 +1874,7 @@
         getElementWidth: function(o) {
             if (!o) return 0;
             // 获取元素的宽度，考虑元素可能被隐藏
-            var styles = window.getComputedStyle(o);
+            var styles = this.getElementStyle(o);
             var w = o.offsetWidth;
             var paddingLeft = parseFloat(styles.paddingLeft);
             var paddingRight = parseFloat(styles.paddingRight);
@@ -1644,6 +1890,35 @@
             }
             return w;
         },
+
+
+
+        /**
+         * 原生js获取元素高度
+         * add 20241122-1
+         * @param {HTML DOM} o 某个元素
+         * @returns 返回该元素的宽度值
+         */
+        getElementHeight: function(o) {
+            if (!o) return 0;
+            // 获取元素的宽度，考虑元素可能被隐藏
+            var styles = this.getElementStyle(o);
+            var h = o.offsetHeight;
+            var paddingTop = parseFloat(styles.paddingTop);
+            var paddingBottom = parseFloat(styles.paddingBottom);
+            var borderTop = parseFloat(styles.borderTopWidth);
+            var borderBottom = parseFloat(styles.borderBottomWidth);
+            // 如果元素被隐藏，宽度可能为0，此时使用内部尺寸作为参考
+            if (h === 0 && !isNaN(paddingTop) && !isNaN(paddingBottom) && !isNaN(borderTop) && !isNaN(borderBottom)) {
+                h = o.clientHeight;
+                h += isNaN(paddingTop) ? 0 : paddingTop;
+                h += isNaN(paddingBottom) ? 0 : paddingBottom;
+                h += isNaN(borderTop) ? 0 : borderTop;
+                h += isNaN(borderBottom) ? 0 : borderBottom;
+            }
+            return h;
+        },
+        
     };
 
 

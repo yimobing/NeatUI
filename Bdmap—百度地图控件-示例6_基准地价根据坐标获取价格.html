@@ -17,7 +17,7 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css"><!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241122-8"><!--百度地图控件-->
     <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_fanwei.css"><!--当前页面样式-->
 </head>
 
@@ -83,7 +83,7 @@
     <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
     <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
     <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义ajax-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-bdmap.js"></script><!--自定义ajax-->
+    <script type="text/javascript" src="assets/neatui/js/neatui-bdmap.js?v=20241122-8"></script><!--自定义ajax-->
     <script type="text/javascript">
         /*+————————————————全局变量————————————————+*/
 
@@ -180,24 +180,27 @@
             center: {
                 city: "", // 城市(可选)，默认空。值：空时根据坐标定位, 非空时根据城市定位。eg.'泉州市', eg.'泉州市惠安县'。
                 coordinate: "118.562186,24.881473",  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
-                caption: "清蒙工业区", // 标题文字(可选)，默认空。
+                caption: "清蒙工业区", // 标题文字(可选)，默认'北京市'。支持HTML
                 describe: "", // 描述文字(可选)，默认空。
-                enableDrag: true, // 是否允许拖拽(可选)，默认false
-                enableClickCreateNew: true, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
-                // 用点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
-                clickCallback: function(e){
-                    $('#c-locate').val(e.lng + ',' + e.lat); // 输入框赋值
-                    $('.bdmap__result').hide(); // 隐藏价格结果区域
-                },
                 // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 complete: function(e){
                     $('#c-locate').val(e.lng + ',' + e.lat);
                 },
+                enableClickCreateNew: true, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
+                // 点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                clickCallback: function(e){
+                    $('#c-locate').val(e.lng + ',' + e.lat); // 输入框赋值
+                    $('.bdmap__result').hide(); // 隐藏价格结果区域
+                    var titleStr = '坐标：<br>' + e.lng + ',' + e.lat;
+                    neuiBdmap.setCenterPointLabelTitle(titleStr);
+                },
+                enableDrag: true, // 是否允许拖拽(可选)，默认false
                 // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 dragEnd: function(e){
                     $('#c-locate').val(e.lng + ',' + e.lat);
                     $('.bdmap__result').hide(); // 隐藏价格结果区域
-                    $('.bdLabel').text('坐标：' + e.lng + ',' + e.lat);
+                    var titleStr = '坐标：<br>' + e.lng + ',' + e.lat;
+                    neuiBdmap.setCenterPointLabelTitle(titleStr);
                 },
             },
 
@@ -288,12 +291,12 @@
                     var ls_dijia_mc = priceData["dijia_mc"],
                         ls_dengji_mc = priceData["dengji_mc"],
                         ls_jiage = priceData["jiage"] + '元/平方米';
-                    var labelText = ls_dijia_mc + '，土地等级：' + ls_dengji_mc + '，基准地价：' + ls_jiage;
+                    var labelText = ls_dijia_mc + '<br>土地等级：' + ls_dengji_mc + '<br>基准地价：' + ls_jiage;
                     $('#c-land-name').text(ls_dijia_mc);
                     $('#c-land-level').text(ls_dengji_mc);
                     $('#c-land-price').text(ls_jiage);
                     $('.bdmap__result').show(); // 显示价格结果区域
-                    $('.bdLabel').html(labelText);
+                    neuiBdmap.setCenterPointLabelTitle(labelText);
                 }
 
                 neui.destroyAnimate();
