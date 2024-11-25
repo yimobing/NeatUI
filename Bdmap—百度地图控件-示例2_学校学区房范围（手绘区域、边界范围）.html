@@ -37,10 +37,10 @@
         <div class="bdmap__editor"><!--edit 20211022-1-->
             <div class="bdmap__picker">
                 <div class="bdmap__coord">
-                    当前学校坐标 <input type="text" id="c-locate">
+                    中心点坐标 <input type="text" id="c-locate">
+                    <button type="button" data-type="save" id="btn-pick-save">保存</button>
                     <button type="button" data-type="copy" id="btn-pick-copy">复制</button>
-                    <button type="button" data-type="save" id="btn-pick-save">保存学校坐标</button>
-                    <label> (拖动点标记可更改坐标) </label>
+                    <label> (拖动中心点或在地图上任意位置点击可更改坐标) </label>
                 </div><!--/.bdmap__coord-->
                 <div class="bdmap__btn">
                     <button type="button" data-type="del" id="btn-poly-del">删除学区范围</button>
@@ -1323,7 +1323,7 @@
 
 
             //——————————————————————————————————————————
-            //=====保存学校坐标按钮
+            //=====保存中心点坐标按钮、保存按钮
             $('#btn-pick-save').on('click', function(){
                 var ls_zuobiao = $('#c-locate').val();
                 var arr = [ ls_zuobiao ]

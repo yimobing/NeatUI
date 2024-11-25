@@ -122,14 +122,14 @@
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
-    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script><!--百度地图api文件 (这里要屏蔽)-->
-    <script type="text/javascript" src="assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具 (这里要屏蔽)-->
-    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script><!--Jq库-->
-    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义ajax-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-bdmap.js?v=20241122-7"></script><!--自定义ajax-->
-    <script type="text/javascript">
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
+    <script src="assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script> <!--Jq库-->
+    <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
+    <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
+    <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241122-7"></script> <!--自定义ajax-->
+    <script>
         /*+————————————————全局变量————————————————+*/
         var g_xuexiao_bh = ''; // '<%=s_xuexiao_bh%>'; // 学校编号 ajax({})
         var g_xuexiao_mc = ''; // 学校名称
@@ -247,7 +247,7 @@
             complete: function(XMLHttpRequest, textStatus){ }
         })
         if(!isHoldOn){
-            return;
+            // return; // 非函数内部不要直接用return 否则会报错
         }
         //END AJAX
         */
@@ -332,7 +332,7 @@
             complete: function(XMLHttpRequest, textStatus){ }
         })
         if(!isHoldOn){
-            return;
+            // return; // 非函数内部不要直接用return 否则会报错
         }
         //END AJAX
         */
@@ -363,10 +363,10 @@
                         var item2 = item1.data[i2];
                         var zb = item2.zuobiao;
                         var tmpArr = item2.zuobiao.split(','),
-                            lng = tmpArr[0], lat = tmpArr[1];
+                            longitude = tmpArr[0], latitude = tmpArr[1];
                         arr.push({
-                            lng,
-                            lat
+                            lng: longitude,
+                            lat: latitude
                         });
                     }
                 }
@@ -513,12 +513,12 @@
         // 开启鼠标绘图功能
         neuiBdmap.createDrawingToolbar({
             enable: true, // 是否启用鼠标绘图功能(可选)，默认true。
-            drawingModes : [  // 工具栏上可以选择出现的绘制模式(可选)，将需要显示的DrawingType以数组型形式传入，如[BMAP_DRAWING_MARKER, BMAP_DRAWING_CIRCLE] 将只显示画点和画圆的选项.
-                // BMAP_DRAWING_MARKER, // 画点(画位置)
-                // BMAP_DRAWING_CIRCLE, // 画圆
-                BMAP_DRAWING_POLYLINE, // 画线
-                BMAP_DRAWING_POLYGON, // 画多边形
-                BMAP_DRAWING_RECTANGLE // 画矩形
+            drawingModes: [ // 工具栏上可以选择出现的绘制模式(可选)，默认空数组表示不显示任何绘制模式。请将需要显示的模式值以数组形式传入。数组元素值：dot 画点(画位置), circle 画圆, line 画线, gon 画多边形, rectangle 画矩形
+                // 'dot', // 画点(画位置)
+                // 'circle', // 画圆
+                'line', // 画线
+                'gon', // 画多边形
+                'rectangle' // 画矩形
             ],
             enableCalculate: false, // 绘制是否进行测距(画线时候)、测面(画圆、多边形、矩形)(可选)，默认false
             drawingOptions: { // 鼠标绘图配置项，即鼠标绘制管理类配置项(可选)。

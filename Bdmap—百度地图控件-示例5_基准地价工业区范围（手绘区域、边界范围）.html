@@ -17,8 +17,8 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241121-5"><!--百度地图控件-->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_fanwei.css?v=20241121-5"><!--当前页面样式-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241125-2"><!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_fanwei.css?v=20241125-2"><!--当前页面样式-->
 </head>
 
 <body>
@@ -61,16 +61,16 @@
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
-    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script><!--百度地图api文件 (这里要屏蔽)-->
-    <script type="text/javascript" src="assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具 (这里要屏蔽)-->
-    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script><!--Jq库-->
-    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义ajax-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-bdmap.js?v=20241121-5"></script><!--自定义ajax-->
-    <script type="text/javascript">
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
+    <script src="assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具 -->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script> <!--Jq库-->
+    <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
+    <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
+    <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241125-2"></script> <!--自定义ajax-->
+    <script>
         /*+————————————————全局变量————————————————+*/
-        var g_dijia_bh = ''; // '<%=s_dijia_bh%>'; // 工业区编号 ajax({})
+        var g_dijia_bh = "<%=s_dijia_bh%>"; // 工业区编号 ajax({})
         var g_dijia_mc = ''; // 工业区名称
         var g_zhongxin_zb = ''; // 地图中心点坐标
         var g_poly_max = 1; // 最多允许画几个多边形
@@ -93,7 +93,7 @@
 
         /**
          * 函数：设置地图宽高
-         * (高度一定要在设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
+         * (高度一定要设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
          */
         function setDituSize(){
             var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
@@ -151,9 +151,10 @@
         //——————————————————————————————————————————
         //======后台返回工业区坐标数据
         var landPriceData = {
-            "return":"ok", "data":[
-                {"dijia_bh":"D1001", "dijia_mc":"清蒙工业区", "zuobiao_zhongxin":"118.611836,24.918225" }
-            ]
+            "return":"ok",
+            "dijia_bh":"D1001", 
+            "dijia_mc":"清蒙工业区", 
+            "zuobiao_zhongxin":"118.611836,24.918225" 
         }
         /*
         //START AJAX
@@ -186,15 +187,18 @@
             complete: function(XMLHttpRequest, textStatus){ }
         })
         if(!isHoldOn){
-            return;
+            // return; // 非函数内部不要直接用return 否则会报错
         }
         //END AJAX
         */
 
         // 全局赋值
-        var firstRowData = landPriceData.data[0];
-        g_dijia_mc = firstRowData["dijia_mc"];
-        g_zhongxin_zb = firstRowData["zuobiao_zhongxin"];
+        if(landPriceData != '' && !$.isEmptyObject(landPriceData)){
+            var firstRowData = landPriceData;
+            g_dijia_mc = firstRowData["dijia_mc"];
+            g_zhongxin_zb = firstRowData["zuobiao_zhongxin"];
+            if(g_zhongxin_zb == '') g_zhongxin_zb = '118.611836,24.918225'; // 中心点坐标为空时，默认指定一个中心点坐标
+        }
         
 
         //——————————————————————————————————————————
@@ -270,7 +274,7 @@
             complete: function(XMLHttpRequest, textStatus){ }
         })
         if(!isHoldOn){
-            return;
+            // return; // 非函数内部不要直接用return 否则会报错
         }
         //END AJAX
         */
@@ -301,10 +305,10 @@
                         var item2 = item1.data[i2];
                         var zb = item2.zuobiao;
                         var tmpArr = item2.zuobiao.split(','),
-                            lng = tmpArr[0], lat = tmpArr[1];
+                            longitude = tmpArr[0], latitude = tmpArr[1];
                         arr.push({
-                            lng,
-                            lat
+                            lng: longitude,
+                            lat: latitude
                         });
                     }
                 }
@@ -371,7 +375,7 @@
             markers: {
                 markOptions: { // 点标记默认配置项(可选)。
                     image: { // 自定义图标(可选)
-                        enable: true, // 是否允许自定义图标(可选)，默认false
+                        enable: false, // 是否允许自定义图标(可选)，默认false
                         path: "assets/neatui/img/", // 图片路径(可选)
                         icon: "bmap_locate_default3.png", // 图片名称(可选)
                         size: 50 // 图片大小(可选)
@@ -402,7 +406,7 @@
                 enable: true,  // 是否添加操作按钮(可选)，默认false
                 text: '删除当前工业区范围', // 操作按钮的文本，默认'删除'
                 callback: function(e){  // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
-                    console.log('e：', e);
+                    // console.log('e：', e);
                     var ls_data_bh = e.id,
                         ls_ply_uid = e.polyLayId,
                         ls_btn_uid = e.btnLayId;
@@ -418,12 +422,12 @@
         // 开启鼠标绘图功能
         neuiBdmap.createDrawingToolbar({
             enable: true, // 是否启用鼠标绘图功能(可选)，默认true。
-            drawingModes : [  // 工具栏上可以选择出现的绘制模式(可选)，将需要显示的DrawingType以数组型形式传入，如[BMAP_DRAWING_MARKER, BMAP_DRAWING_CIRCLE] 将只显示画点和画圆的选项.
-                // BMAP_DRAWING_MARKER, // 画点(画位置)
-                // BMAP_DRAWING_CIRCLE, // 画圆
-                BMAP_DRAWING_POLYLINE, // 画线
-                BMAP_DRAWING_POLYGON, // 画多边形
-                BMAP_DRAWING_RECTANGLE // 画矩形
+            drawingModes: [ // 工具栏上可以选择出现的绘制模式(可选)，默认空数组表示不显示任何绘制模式。请将需要显示的模式值以数组形式传入。数组元素值：dot 画点(画位置), circle 画圆, line 画线, gon 画多边形, rectangle 画矩形
+                // 'dot', // 画点(画位置)
+                // 'circle', // 画圆
+                'line', // 画线
+                'gon', // 画多边形
+                'rectangle' // 画矩形
             ],
             operateButton: { // 操作按钮(可选)
                 buttoned: true, // 是否添加操作按钮(可选)，默认false

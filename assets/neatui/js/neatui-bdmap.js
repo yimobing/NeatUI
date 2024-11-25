@@ -1,21 +1,31 @@
 /**
  * [neuiBdmap]
- * 百度地图控件 纯JS原生版
+ * 百度地图插件 纯JS原生版
  * Version：v1.0.1
  * 还差的功能：参数整合
+ * [兼容说明]：本插件兼容 ie9及以上版本，但不兼容ie8及以下版本(本身百度地图api文件就不支持ie8及以下版本)
  * Author: Mufeng
  * QQ: 1614644937
  * Date: 2021.06.18
- * Update: 2024.11.22
+ * Update: 2024.11.25
  */
 
 
 /**
- * 官网：https://github.com/yimobing/neatui
- * [百度地图资源库]
- * 鼠标绘制工具：http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js
- * GeoUtils类库：http://api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils_min.js
- * 加载检索信息窗口：http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.js
+ * 插件官网：https://github.com/yimobing/neatui
+ * [百度地图开源库]
+   开源库汇总：https://lbsyun.baidu.com/index.php?title=jspopular/openlibrary
+
+  · 鼠标绘制工具条库
+    库文件：http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js
+    类参考：http://api.map.baidu.com/library/DrawingManager/1.4/docs/symbols/BMapLib.DrawingManager.html
+    示例： https://lbsyun.baidu.com/jsdemo/demo/f0_7.htm
+
+  ·GeoUtils类库：
+    http://api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils_min.js
+
+  · 加载检索信息窗口：
+    http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.js
  */
 
 
@@ -68,7 +78,7 @@
                 language: '.net' // 语言类型(可选)： 默认.net。值： .net 即Csharp .aspx页面, .php即php页面
             },
             // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
-            width: '999', // 宽(可选)，默认auto
+            width: 'auto', // 宽(可选)，默认auto
             height: 'auto', // 高(可选)，默认auto
             setSize: null, // 初始化时用函数设置大小(可选)，默认null。优先权大于width/height。
             onResize: null, // 窗口大小变化时用函数设置大小(可选)，默认null。优先权大于width/height。
@@ -214,7 +224,7 @@
             var container = elem.toString().replace(/(\#|\.)/g, '');
             var nodeRoot = document.getElementById(container);
             nodeRoot.classList.add('ne-bd-map-root');
-            // · 设置地图大小
+            // · 设置地图大小 (高度一定设置,不然在服务器环境如.net地图可能不显示)
             var w = me.settings.width.toString().toLocaleLowerCase().replace(/\s+/g, ''),
                 h = me.settings.height.toString().toLocaleLowerCase().replace(/\s+/g, ''),
                 width = parseFloat(w.replace(/(px|%|vw|vh)/g, '')),
@@ -258,7 +268,7 @@
                 }
             }
 
-            // · 根据初始化及窗口大小变化的函数来设置地图宽高
+            // · 根据初始化及窗口大小变化的函数来设置地图大小
             if (me.settings.setSize) {
                 me.settings.setSize();
             }
@@ -281,6 +291,15 @@
                 centerComplete = me.settings.center.complete,
                 centerDragEnd = me.settings.center.dragEnd;
             // 第1步 创建地图实例
+            if (typeof BMap == 'undefined') {
+                var tips = '请先引入百度地图Javascript API 文件！<br>按F12通过控制台查看具体错误信息';
+                var errs = tips.toString().replace(/(<br>)/g, '\n');
+                utils.dialogs(tips);
+                console.error(errs);
+                console.log('引入方法：<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=您的密钥"></script>');
+                console.log('请参考：https://lbsyun.baidu.com/index.php?title=jspopular/guide/helloworld');
+                return;
+            }
             var platOptions = me.settings.draft.platOptions;
             var maper = new BMap.Map(container, platOptions);
             // 第2步 设置中心点坐标
@@ -359,11 +378,11 @@
                     // 当前处于绘图模式时，则不执行点击事件
                     // console.log('mode:', me.settings.drawMode);
                     if (me.settings.drawMode != '' && me.settings.drawMode != 'hander') return;
-                    var lng = e.point.lng, lat = e.point.lat;
+                    var longitude = e.point.lng, latitude = e.point.lat;
                     me.clearAllMarkOverlay(); // 清空点标记覆盖物
                     me.createMarker({ // 重建点标记
                         type: 'zhongxin',
-                        coordinate: lng + ',' + lat,
+                        coordinate: longitude + ',' + latitude,
                         title: centerCaption, 
                         describe: centerDescribe,
                         message: '',
@@ -373,8 +392,8 @@
                     });
                     if (me.settings.center.clickCallback) {
                         me.settings.center.clickCallback({
-                            lng,
-                            lat
+                            lng: longitude,
+                            lat: latitude
                         });
                     }
                 }
@@ -486,9 +505,9 @@
             
             // 添加信息窗口
             dotHelper._addInfoWindow(me, oneMark, markPoint, {
-                title,
-                describe,
-                message
+                title: title,
+                describe: describe,
+                message: message
             });
 
             // 全局赋值1
@@ -648,10 +667,10 @@
                         polygonHelper._addOverlayButton(me, {
                             longitude: coord.lng,
                             latitude: coord.lat,
-                            plyUid, // 覆盖物唯一标识符，默认空
-                            plyNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
-                            btnText, // 按钮文本，默认'删除'(可选)
-                            btnCallback // 按钮回调函数，默认null(可选)
+                            plyUid: plyUid, // 覆盖物唯一标识符，默认空
+                            plyNo: plyNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
+                            btnText: btnText, // 按钮文本，默认'删除'(可选)
+                            btnCallback: btnCallback // 按钮回调函数，默认null(可选)
                         });
                     }
                 }
@@ -957,7 +976,7 @@
             if (style.toString().replace(/\s+/g, '') !== '') {
                 maper.setMapStyle({
                     features: ['point', 'road', 'water', 'land', 'building'], // 设置地图上展示的元素种类(这个参数不起作用，奇怪!!!)。值：point 兴趣点, road 道路, water 河流, land 陆地, building 建筑物
-                    style // 设置地图底图样式
+                    style: style // 设置地图底图样式
                 });
             }
             /*
@@ -1066,7 +1085,7 @@
          * @returns {Boolean} 返回布尔值true或false。
          */
         examineIsInstantiate: function (me, fnName) {
-            var F12Info = '<br>按F12可通过控制台查看具体错误信息';
+            var F12Info = '<br>按F12通过控制台查看具体错误信息';
             if (typeof me.$opts == 'undefined') {
                 var tips = '地图尚未初始化，无法使用函数' + fnName + '()' + F12Info;
                 var errs = tips.toString().replace(/(<br>)/g, '\n');
@@ -1191,14 +1210,25 @@
          */
         _turnOnDrawing: function (me, maper, options) {
             var _this = this;
+            if (typeof BMapLib == 'undefined') {
+                var tips = '请先引入百度地图Javascript API “鼠标绘制工具条库”开源库文件！<br>按F12通过控制台查看具体错误信息';
+                var errs = tips.toString().replace(/(<br>)/g, '\n');
+                utils.dialogs(tips);
+                console.error(errs);
+                console.log('引入方法：<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>');
+                console.log('类参考：http://api.map.baidu.com/library/DrawingManager/1.4/docs/symbols/BMapLib.DrawingManager.html');
+                console.log('示例： https://lbsyun.baidu.com/jsdemo/demo/f0_7.htm');
+                return;
+            }
+
             var originals = {
                 enable: true, // 是否启用鼠标绘图功能(可选)，默认true。
-                drawingModes : [  // 工具栏上可以选择出现的绘制模式(可选)，将需要显示的DrawingType以数组型形式传入，如[BMAP_DRAWING_MARKER, BMAP_DRAWING_CIRCLE] 将只显示画点和画圆的选项.
-                    // BMAP_DRAWING_MARKER, // 画点(画位置)
-                    // BMAP_DRAWING_CIRCLE, // 画圆
-                    BMAP_DRAWING_POLYLINE, // 画线
-                    BMAP_DRAWING_POLYGON, // 画多边形
-                    BMAP_DRAWING_RECTANGLE // 画矩形
+                drawingModes: [ // 工具栏上可以选择出现的绘制模式(可选)，默认空数组表示不显示任何绘制模式。请将需要显示的模式值以数组形式传入。数组元素值：dot 画点(画位置), circle 画圆, line 画线, gon 画多边形, rectangle 画矩形
+                    // 'dot', // 画点(画位置)
+                    // 'circle', // 画圆
+                    // 'line', // 画线
+                    // 'gon',  // 画多边形
+                    // 'rectangle'  // 画矩形
                 ],
                 enableCalculate: false, // 绘制是否进行测距(画线时候)、测面(画圆、多边形、矩形)(可选)，默认false
                 drawingOptions: { // 鼠标绘图配置项，即鼠标绘制管理类配置项(可选)。
@@ -1222,13 +1252,33 @@
             var finals = utils.combine(true, originals, options || {});
             var enable = finals.enable,
                 enableCalculate = finals.enableCalculate,
-                drawingModes = finals.drawingModes,
                 drawingOptions = finals.drawingOptions,
                 buttoned = finals.operateButton.buttoned,
                 btnText = finals.operateButton.btnText,
                 stepDescription = finals.stepDescription;
-            if (enable == false) return;
+            // 设置绘制模式
+            var drawModeArr = finals.drawingModes;
+            var drawingModes = [];
+            for (var i = 0; i < drawModeArr.length; i++){
+                var value = drawModeArr[i].toString().toLocaleLowerCase();
+                var oneMode = '';
+                if (value == 'dot') oneMode = BMAP_DRAWING_MARKER;
+                if (value == 'circle') oneMode = BMAP_DRAWING_CIRCLE;
+                if (value == 'line') oneMode = BMAP_DRAWING_POLYLINE;
+                if (value == 'gon') oneMode = BMAP_DRAWING_POLYGON;
+                if (value == 'rectangle') oneMode = BMAP_DRAWING_RECTANGLE;
+                drawingModes.push(oneMode);
+                // oneMode 值说明
+                // BMAP_DRAWING_MARKER, // 画点(画位置)
+                // BMAP_DRAWING_CIRCLE, // 画圆
+                // BMAP_DRAWING_POLYLINE, // 画线
+                // BMAP_DRAWING_POLYGON, // 画多边形
+                // BMAP_DRAWING_RECTANGLE // 画矩形
+            }
 
+            // 只有允许时才继续执行
+            if (enable == false) return;
+            
             // 创建绘制步骤说明节点
             if (stepDescription.enable) {
                 var stepHtml = [
@@ -1282,9 +1332,9 @@
                     anchor: BMAP_ANCHOR_TOP_RIGHT, // 位置
                     offset: new BMap.Size(5, 5), // 偏离值
                     scale: 0.8, // 工具栏缩放比例
-                    drawingModes, // 工具栏上可以选择出现的绘制模式(可选),将需要显示的DrawingType以数组型形式传入，如[BMAP_DRAWING_MARKER, BMAP_DRAWING_CIRCLE] 
+                    drawingModes: drawingModes // 工具栏上可以选择出现的绘制模式(可选),将需要显示的DrawingType以数组型形式传入，如[BMAP_DRAWING_MARKER, BMAP_DRAWING_CIRCLE] 
                 },
-                enableCalculate, // 绘制是否进行测距(画线时候)、测面(画圆、多边形、矩形)
+                enableCalculate: enableCalculate, // 绘制是否进行测距(画线时候)、测面(画圆、多边形、矩形)
                 circleOptions: drawingOptions, // 圆的样式
                 polylineOptions: drawingOptions, // 线的样式
                 polygonOptions: drawingOptions, // 多边形的样式
@@ -1328,9 +1378,9 @@
                     polygonHelper._addOverlayButton(me, {
                         longitude: coord.lng,
                         latitude: coord.lat,
-                        plyUid, // 覆盖物唯一标识符，默认空
-                        plyNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
-                        btnText // 按钮文本，默认'删除'(可选)
+                        plyUid: plyUid, // 覆盖物唯一标识符，默认空
+                        plyNo: plyNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
+                        btnText: btnText // 按钮文本，默认'删除'(可选)
                     });
                 }
                 // 改变多边形形状
@@ -1928,6 +1978,69 @@
     return Widget;
 });
 
+
+
+
+//————————————————————————————————————————————————————————————————————————————————————
+//                              兼容IE
+//————————————————————————————————————————————————————————————————————————————————————
+(function () {
+    // classlist 兼容ie
+    if (document.body.classList == null && Element) {
+        var wjClassList = {
+            el: null,
+            names: [],
+            getClass: function () {
+                var cNames = this.el.className;
+                this.names = cNames ? cNames.trim().split(/\s+/) : [];
+            },
+            genClass: function () {
+                this.el.className = this.names.join(" ");
+            },
+            add: function (cName) {
+                var i = this.contains(cName);
+                if (i === false) {
+                    this.names.push(cName);
+                    this.genClass();
+                }
+            },
+            remove: function (cName) {
+                var i = this.contains(cName);
+                if (typeof i == "number") {
+                    this.names[i] = "";
+                    this.genClass();
+                }
+            },
+            toggle: function (cName) {
+                var i = this.contains(cName);
+                if (i === false) {
+                    this.add(cName);
+                } else {
+                    this.remove(cName);
+                }
+            },
+            contains: function (cName) {
+                this.getClass();
+
+                var i, len = this.names.length;
+                for (i = 0; i < len; i++) {
+                    if (this.names[i] == cName) {
+                        return i; // 如果存在，返回索引
+                    }
+                }
+                return false;
+            },
+        };
+
+        // 在不支持classList的浏览器中, 在Element的原型中写入此方法
+        Object.defineProperty(Element.prototype, 'classList', {
+            get: function () {
+                wjClassList.el = this;
+                return wjClassList;
+            }
+        });
+    }
+})();
 
 
 
