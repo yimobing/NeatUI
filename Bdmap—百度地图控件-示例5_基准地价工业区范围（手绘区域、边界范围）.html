@@ -390,6 +390,17 @@
         neuiBdmap('map', options);
 
 
+        //————————————————————————————————————————————————
+        // 判断中心点坐标是否有效，若无效，则重置中心点
+        // !!!警告：请勿在地图初始化参数center.complete函数中调用本函数setMapCenter()，否则会陷入死循环导致页面崩溃！
+        if(neuiBdmap.checkCoordinateIsValid(g_zhongxin_zb) == false){
+            neuiBdmap.setMapCenter('泉州', {
+                title: '泉州',
+                describe: ''
+            });
+        }
+
+
 
         //————————————————————————————————————————————————
         // 创建多边形覆盖物
@@ -467,12 +478,11 @@
 
 
         //——————————————————————————————————————————
-        //=====保存中心点坐标按钮
+        //=====保存按钮、保存中心点坐标按钮
         $('#btn-pick-save').on('click', function(){
             var ls_zuobiao = $('#c-locate').val();
             var arr = [ ls_zuobiao ]
-            // console.log('数组：', arr);
-
+            // console.log('数组：', arr); 
             // 开始执行
             var flag = '', msg = '保存成功';
             neui.showAnimate();

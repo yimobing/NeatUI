@@ -6,8 +6,20 @@
  * Update: 2024.11.22
  */
 
+
 /*===============================================================================================*/
-/*                                    1、自定义百度地图样式
+/*                                    1、百度地图原有图层样式修改
+/*===============================================================================================*/
+/* 隐藏默认的百度地图版权信息 */
+.BMap_cpyCtrl span[_cid="1"] { display: none!important; }
+
+/* 隐藏左下角百度地图logo */
+.anchorBL a, .anchorBL img { display: none!important; }
+
+
+
+/*===============================================================================================*/
+/*                                    2、自定义百度地图样式
 /*===============================================================================================*/
 /*+------------------------ 地图根节点 ------------------------+*/
 .ne-bd-map-root {
@@ -20,13 +32,24 @@
 }
 
 /*+------------------------ 地图样式 ------------------------+*/
-/*+ 文本标 +*/
-.BMapLabel.ne_bd_label {
+/*+ 版权信息 +*/
+.ne__bd_copyright{
+	padding: 6px 15px;
+	background-color: #8ea8e0;
+	border-radius: 4px;
+	opacity: .9;
+	filter: alpha(opacity = 90);
+	color: #fff;
+	font-size: 12px;
+	box-shadow: 0 2px 2px #888;
+}
+
+/*+ 文本标注 +*/
+.BMapLabel.ne__bd_label {
 	border: 0 !important;
 	background: transparent !important;
 }
-
-.bdLabel {
+.ne__bd_label_bdLabel {
 	position: relative;
 	background-color: #fff;
 	padding: 12px 25px;
@@ -40,12 +63,12 @@
 	font-weight: bold;
 }
 
-.bdLabel.blue {
+.ne__bd_label_bdLabel.blue {
 	border-color: #1296db;
 	color: #1296db;
 }
 
-.bdLabel:before {
+.ne__bd_label_bdLabel:before {
 	content: '';
 	position: absolute;
 	bottom: -8px;
@@ -60,30 +83,30 @@
 	border-top: 15px solid #fff;
 }
 
-.bdLabel p,
-.bdLabel br {
+.ne__bd_label_bdLabel p,
+.ne__bd_label_bdLabel br {
 	line-height: 1.75;
 }
 
 /*+ 标注点信息窗 +*/
-.bdInfoTitle {
+.ne__bd_info_title {
 	font-size: 16px;
 }
 
-.bdInfoDescribe {
+.ne__bd_info_describe {
 	padding: 5px 8px;
 	font-size: 14px;
 }
 
-.bdInfoDescribe p,
-.bdInfoDescribe br {
+.ne__bd_info_describe p,
+.ne__bd_info_describe br {
 	line-height: 1.75;
 }
 
 
 
 /*===============================================================================================*/
-/*                                    2、百度地图原生样式
+/*                                    3、百度地图原生样式
 /*===============================================================================================*/
 /*
 * [百度地图样式在线资源]

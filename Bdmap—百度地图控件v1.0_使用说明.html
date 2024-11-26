@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>neuiBdmap | 百度地图插件</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+
+<body>
+    <h1> neuiBdmap 百度地图插件</h1>
+    <pre>
+        //================================================================
+        //          说明
+        //================================================================
+        本插件使用原生JS开发，兼容IE9及以上版本，不支持IE8及以下版本。
+        作者：mufeng
+        Q Q : 1614644937
+        官网：https://github.com/yimobing/neatui
+
+        【相关链接】
+        百度地图api密钥申请：http://lbsyun.baidu.com/ （登录后在个人中心就可以新建密钥了）
+        百度地图API参考：http://lbsyun.baidu.com/index.php?title=jspopular
+        百度地图坐标拾取系统：http://api.map.baidu.com/lbsapi/getpoint/index.html
+
+
+        //================================================================
+        //          调用方法
+        //================================================================
+        第1步，引入插件所需的CSS、JS
+        &lt;link type="text/css" rel="stylesheet" href="assets/css/neatui-bdmap.css"&gt;
+        &lt;script src="http://api.map.baidu.com/api?v=2.0&ak=您申请的AK"&gt;&lt;/script&gt;&lt;!--百度地图API库文件--&gt;
+        &lt;!--&lt;script src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"&gt;&lt;/script&gt;--&gt;&lt;!--鼠标绘制工具条库--&gt;
+        &lt;script src="assets/js/neatui-bdmap.js"&gt;&lt;/script&gt;&lt;!--百度地图插件--&gt;
+
+
+        第2步，创建DOM节点用于地图展示
+        &lt;div id="mapDiv"&gt;&lt;/div&gt;
+
+        第3步，调用插件初始化函数，实现创建地图并初始化
+            neuiBdmap('mapDiv', options); 或 neuiBdmap.init('mapDiv', options); 
+        
+        第4步，调用插件内置函数(对外暴露的其它方法)，实现与地图的一系列交互操作
+
+
+        //================================================================
+        //      详细说明
+        //================================================================
+
+        //:::::::::::::::::::::::::::::::::::::
+        //      初始化函数
+        //:::::::::::::::::::::::::::::::::::::
+        一、 初始化函数
+        neuiBdmap(elem, options); 或 neuiBdmap.init(elem, options);
+        其中：
+            elem 地图容器节点ID,即根节点绑定的ID属性值
+            options 地图初始化参数
+            var options = {
+
+            }
+         
+        //:::::::::::::::::::::::::::::::::::::
+        //      内置函数
+        //:::::::::::::::::::::::::::::::::::::
+        本插件内置了一系列的函数，供开发者调用。
+        但所有内置函数都必须在完成地图初始化后才可调用，即必须先调用 neuiBdmap(elem, options) 之后才可调用这些内置函数。
+
+
+        
+
+    </pre>
+</body>
+</html>

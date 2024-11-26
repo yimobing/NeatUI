@@ -17,16 +17,13 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241122-7"><!--百度地图控件-->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_fanwei.css?v=20241122-7"><!--当前页面样式-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241126-3"><!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_fanwei.css"><!--当前页面样式-->
 </head>
 
 <body>
 
     <style>
-        /*隐藏百度地图版权信息*/
-        .BMap_cpyCtrl { display: none; }
-        .anchorBL { display: none; }
          /*+-------------------------+*/
         .bdmap__picker>div{ display: inline-block; vertical-align: top; margin-left: 35px; }
         .bdmap__picker>div:first-child{ margin-left: 0; }
@@ -123,12 +120,12 @@
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
     <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
-    <script src="assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具-->
+    <script src="assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具条库-->
     <script src="assets/libs/jquery-1.8.3.min.js"></script> <!--Jq库-->
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241122-7"></script> <!--自定义ajax-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241126-3"></script> <!--百度地图控件-->
     <script>
         /*+————————————————全局变量————————————————+*/
         var g_xuexiao_bh = ''; // '<%=s_xuexiao_bh%>'; // 学校编号 ajax({})
@@ -211,14 +208,16 @@
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //——————————————————————————————————————————
         //======后台返回学校坐标数据
-        var schoolJson = {
+        var schoolData = {
             "return":"ok", "data":[
+                // testing2
                 {"xuexiao_bh":"X1001", "xuexiao_mc":"泉州五中", "xuexiao_ms":"泉州五中是泉州市最好的学校", "zuobiao":"118.611836,24.918225", "ditu_suofang":"15"}
+                // {"xuexiao_bh":"X1001", "xuexiao_mc":"泉州五中", "xuexiao_ms":"泉州五中是泉州市最好的学校", "zuobiao":"118.611836,undefined", "ditu_suofang":"15"}
             ]
         }
         /*
         //START AJAX
-        var schoolJson = {}
+        var schoolData = {}
         var isHoldOn = true;
         ajax({
             heading: "获取学校坐标",
@@ -238,7 +237,7 @@
             success: function(res){
                 if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
                 // if(res == '') return;
-                schoolJson = JSON.parse(res);
+                schoolData = JSON.parse(res);
             },
             error: function(res){
                 if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -253,10 +252,12 @@
         */
 
         // 全局赋值
-        var firstRowData = schoolJson.data[0];
-        g_xuexiao_mc = firstRowData["xuexiao_mc"];
-        g_zhongxin_zb = firstRowData["zuobiao"];
-        g_ditu_suofang = firstRowData["ditu_suofang"];
+        if(schoolData != '' && !$.isEmptyObject(schoolData)){
+            var firstRowData = schoolData.data[0];
+            g_xuexiao_mc = firstRowData["xuexiao_mc"];
+            g_zhongxin_zb = firstRowData["zuobiao"];
+            g_ditu_suofang = firstRowData["ditu_suofang"];
+        }
         
 
         //——————————————————————————————————————————
@@ -441,6 +442,24 @@
                     enableAutoResize: true // 是否自动适应地图容器变化，默认启用
                 },
                 enableWheelZoom: true, // 是否开启鼠标滚轮缩放功能，仅对PC上有效(可选)，默认true。
+                switchType: { // 切换地图类型(可选)
+                    enable: true, // 是否开启(可选)，默认false
+                    types: ['normal', 'satellite', 'hybrid'], // 配置地图类型(可选)。数组元素可添加的值: normal 普通街道视图, satellite 卫星视图, hybrid 卫星和路网的混合视图 
+                    direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                    offset: { // 位置偏移量(可选)
+                        width: 10, // 水平方向数值(可选)，默认10
+                        height: 50 // 竖直方向数值(可选)，默认50
+                    }
+                },
+                copyright: { // 版权信息(可选)
+                    enable: true, // 是否开启(可选)，默认false
+                    direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                    content: '快评版权所有', // 版权文本信息(可选)，默认空
+                    offset: { // 位置偏移量(可选)
+                        width: 10, // 水平方向数值(可选)，默认10
+                        height: 5 // 竖直方向数值(可选)，默认5
+                    }
+                },
                 personalize: { // 个性化地图(可选)
                     enable: false, // 是否启用(可选)，默认false
                     basePaint: false, // 是否使用个性化的底图模式(干净清爽)(可选)，默认false。
@@ -459,7 +478,8 @@
                     }
                 }
             },
-            infos: { // 信息窗口功能(可选)。
+            // 信息窗口功能(可选)
+            infos: {
                 enable: false, // 是否启用(可选)，默认false
                 width: 0, // 宽(可选)。单位像素，取值范围：0, 220 - 730, 其中0表示自动调整宽
                 height: 0, // 高(可选)。单位像素，取值范围：0, 60 - 650，其中0表示自动调整高
@@ -471,6 +491,18 @@
         //————————————————————————————————————————————————
         // 创建地图并初始化
         neuiBdmap('map', options);
+
+
+
+        //————————————————————————————————————————————————
+        // 判断中心点坐标是否有效，若无效，则重置中心点
+        // !!!警告：请勿在地图初始化参数center.complete函数中调用本函数setMapCenter()，否则会陷入死循环导致页面崩溃！
+        if(neuiBdmap.checkCoordinateIsValid(g_zhongxin_zb) == false){
+            neuiBdmap.setMapCenter('泉州', {
+                title: '泉州',
+                describe: ''
+            });
+        }
 
 
 

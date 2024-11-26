@@ -33,20 +33,22 @@
  * 【关于对覆盖物的标记】
     说明：
     百度地图API中对覆盖物标记的方法有两种
-    一种用 overlay.name='同一个字符串' 来标记同一个覆盖物(如多边形覆盖物)，即同一种覆盖物的 name 属性相同
+    一种用 overlay.name='同一个字符串' 来标记同一个覆盖物(如多边形覆盖物)，即同一种覆盖物的 name 属性相同。name 属性也可以自定义名称为 name2, name3等
     另一种是用 overlay.identifier='一直变化的字符串' 来标记每一个覆盖物，即每一个覆盖物哪怕是同一种覆盖物，它们的 identifier 都不相同
     // eg.
     overlay.name = 'anniu_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
     overlay.identifier = layUid; // 添加覆盖物唯一标识符
 
-    1. 本控件中使用 name 属性来标记相同的覆盖物，name 的值及含义如下：
+    1. 本插件中使用 name 属性来标记相同的覆盖物，name 的值及含义如下：
     // 标记覆盖物类型,方便清除指定覆盖物时用
     duobianxing_biaoji // 多边形覆盖物 polygon
     dian_biaoji // 图像标注覆盖物(点标记覆盖物) Marker
     wenben_biaoji // 文本标注覆盖物 Label
+    center_dian_biaoji // 中心点图像标注覆盖物(点标记覆盖物) Marker
+    center_wenben_biaoji // 中心点文本标注覆盖物 Label
     anniu_biaoji // 按钮覆盖物。一般是显示在多边形时面的按钮
 
-    2. 本控件中使用 identifier 属性来标记每一个覆盖，identifier 的值及含义如下
+    2. 本插件中使用 identifier 属性来标记每一个覆盖，identifier 的值及含义如下
     // 添加覆盖物唯一标识符
     identity_duobianxing_1 // 每个多边形唯一标识符，后面的数字 1 表示 第1个多边形
     identity_duobianxing_1_btn // 每个多边形内部按钮唯一标识符，后面的 1_btn 表示第1个多边形内部的按钮
@@ -71,7 +73,7 @@
     //================================================================
     function Widget(elem, options) {
 
-        // 1. 前台参数
+        // 1. 地图初始化参数(前台参数)
         this.defaults = {
             // 编程语言环境(可选)。注：不同环境下地图展示与交互可能有不同,故可能需要区分下。
             environment: {
@@ -108,6 +110,24 @@
                     enableAutoResize: true // 是否自动适应地图容器变化，默认启用
                 },
                 enableWheelZoom: true, // 是否开启鼠标滚轮缩放功能，仅对PC上有效(可选)，默认true。
+                switchType: { // 切换地图类型(可选)
+                    enable: false, // 是否开启(可选)，默认false
+                    types: ['normal', 'satellite', 'hybrid'], // 配置地图类型(可选)。数组元素可添加的值: normal 普通街道视图, satellite 卫星视图, hybrid 卫星和路网的混合视图 
+                    direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                    offset: { // 位置偏移量(可选)
+                        width: 10, // 水平方向数值(可选)，默认10
+                        height: 50 // 竖直方向数值(可选)，默认50
+                    }
+                },
+                copyright: { // 版权信息(可选)
+                    enable: false, // 是否开启(可选)，默认false
+                    direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                    content: '', // 版权文本信息(可选)，默认空
+                    offset: { // 位置偏移量(可选)
+                        width: 10, // 水平方向数值(可选)，默认10
+                        height: 5 // 竖直方向数值(可选)，默认5
+                    }
+                },
                 personalize: { // 个性化地图(可选)
                     enable: false, // 是否启用(可选)，默认false
                     basePaint: false, // 是否使用个性化的底图模式(干净清爽)(可选)，默认false。
@@ -133,6 +153,7 @@
                 method: "mouseover" // 打开方式(可选). mouseover 鼠标经过点标记时(默认)，click 鼠标点击点标记时
             }
         }
+
 
         // 2. 内部参数
         this.config = {
@@ -182,8 +203,8 @@
         //————————————————————————————————————————————————
         /**
          * 初始化
-         * @param {Selector} elem 地图根节点绑定的ID属性名
-         * @param {Object} options 参数对象
+         * @param {Selector} elem 地图容器节点ID,即根节点绑定的ID属性值
+         * @param {Object} options 地图初始化参数
          */
         init: function (elem, options) {
             var me = this;
@@ -207,7 +228,7 @@
 
 
         //————————————————————————————————————————————————
-        //  create开头的函数，用于：创建控件效果
+        //  create开头的函数，用于：创建地图的各种操作效果
         //————————————————————————————————————————————————
         //————————————————————————————————————————————————
         /**
@@ -290,6 +311,7 @@
                 centerEnableDrag = me.settings.center.enableDrag,
                 centerComplete = me.settings.center.complete,
                 centerDragEnd = me.settings.center.dragEnd;
+        
             // 第1步 创建地图实例
             if (typeof BMap == 'undefined') {
                 var tips = '请先引入百度地图Javascript API 文件！<br>按F12通过控制台查看具体错误信息';
@@ -322,6 +344,22 @@
             if (me.settings.draft.enableWheelZoom) {
                 maper.enableScrollWheelZoom();
             }
+            // 切换地图类型
+            if (me.settings.draft.switchType.enable) {
+                me.setMapType({
+                    types: me.settings.draft.switchType.types,
+                    direction: me.settings.draft.switchType.direction,
+                    offset: me.settings.draft.switchType.offset
+                });
+            }
+            // 添加版权信息
+            if (me.settings.draft.copyright.enable) {
+                me.setMapCopyright({
+                    direction: me.settings.draft.copyright.direction,
+                    content: me.settings.draft.copyright.content,
+                    offset: me.settings.draft.copyright.offset
+                });
+            }
             // 个性化地图
             if (me.settings.draft.personalize.enable) {
                 me.setMapFashion({
@@ -329,21 +367,6 @@
                     styles: me.settings.draft.personalize.baseStyle // 地图风格
                 });
             }
-
-            // 先清空所有覆盖物
-            me.clearAllOverlay();
-            // 添加中心点标记
-            me.createMarker({
-                type: 'zhongxin',
-                coordinate: centerCoordinate,
-                title: centerCaption, 
-                describe: centerDescribe,
-                message: '',
-                dragable: centerEnableDrag,
-                finishCallback: centerComplete,
-                dragEndCallback: centerDragEnd 
-            });
-
             // 添加自定义的HTML节点
             var environment = me.settings.environment;
             var language = environment.language.toString().toLocaleLowerCase();
@@ -362,42 +385,30 @@
                 }
             }
 
-            // 鼠标右键点击事件
-            maper.addEventListener("rightclick", function (e) {
-                // alert(e.point.lng + "," + e.point.lat);
+            // 第5步，添加中心点文本标注
+            me.clearAllOverlay(); // 先清空所有覆盖物
+            // 添加中心点标记
+            me.createMarker({
+                 type: 'zhongxin',
+                 coordinate: centerCoordinate,
+                 title: centerCaption, 
+                 describe: centerDescribe,
+                 message: '',
+                 dragable: centerEnableDrag,
+                 finishCallback: centerComplete,
+                 dragEndCallback: centerDragEnd 
             });
-
+            // 鼠标右键点击事件
+            mouseHelper._mouseRightClick(me, maper);
             // 鼠标左键点击事件
-            maper.addEventListener('click', function (e) {
-                // console.log('点我了e：', e);
-                me.settings.clickTimes++; // 全局赋值1
-                // 点击地图时把中心点坐标移到点击位置
-                if (me.settings.center.enableClickCreateNew) {
-                    // 当前有覆盖物时，则不执行点击事件(即在覆盖物上点击时，只执行覆盖物的click事件，但不执行map的click事件)
-                    if (e.overlay) return;
-                    // 当前处于绘图模式时，则不执行点击事件
-                    // console.log('mode:', me.settings.drawMode);
-                    if (me.settings.drawMode != '' && me.settings.drawMode != 'hander') return;
-                    var longitude = e.point.lng, latitude = e.point.lat;
-                    me.clearAllMarkOverlay(); // 清空点标记覆盖物
-                    me.createMarker({ // 重建点标记
-                        type: 'zhongxin',
-                        coordinate: longitude + ',' + latitude,
-                        title: centerCaption, 
-                        describe: centerDescribe,
-                        message: '',
-                        dragable: centerEnableDrag,
-                        finishCallback: centerComplete,
-                        dragEndCallback: centerDragEnd 
-                    });
-                    if (me.settings.center.clickCallback) {
-                        me.settings.center.clickCallback({
-                            lng: longitude,
-                            lat: latitude
-                        });
-                    }
+            mouseHelper._mouseClick(me, maper, {
+                center: { 
+                    title: centerCaption, 
+                    describe: centerDescribe
                 }
             });
+
+
         },
 
 
@@ -455,14 +466,17 @@
             }
             var oneMark = new BMap.Marker(markPoint, markerOptions);
             oneMark.name = 'dian_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+            if (type == 'zhongxin') {
+                oneMark.name2 = 'center_dian_biaoji';
+            }
             maper.addOverlay(oneMark);
             me.settings.overlays.push(oneMark); // 全局赋值
             me.settings.markerLays.push(oneMark);
 
-            // 添加信息窗
-            var lbClassName = 'bdLabel';
+            // 添加文本标注
+            var lbClassName = 'ne__bd_label_bdLabel';
             if (type == 'zhongxin') {
-                lbClassName += ' bdCentralLabel';
+                lbClassName += ' ne__bd_label_bdCentralLabel';
             }
             var lbText =  '<div class="' + lbClassName + '">' + title + '</div>',
                 lbOptions = {
@@ -488,19 +502,22 @@
                 fontFamily: '微软雅黑'
             })
             label.name = 'wenben_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+            if (type == 'zhongxin') {
+                label.name2 = 'center_wenben_biaoji';
+            }
             oneMark.setLabel(label); // 绑定文本标注到点标记上
             maper.addOverlay(label);
             // 更改文本标注节点样式及位置
             setTimeout(function () {
                 var lbNode = document.getElementsByClassName(lbClassName); // 延时一下才能取非空节点
                 if (lbNode != null && lbNode.length > 0) {
-                    lbNode[0].parentNode.classList.add('ne_bd_label'); // 给父节点添加一个样式名
+                    lbNode[0].parentNode.classList.add('ne__bd_label'); // 给父节点添加一个样式名
                     if (type == 'zhongxin') {
                         // 全局赋值2
                         me.$opts.$centerLabelNode = lbNode[0]; // 中心点文本标注节点
                     }
                 }
-                dotHelper.setLabelPositionAndSize(me, lbNode); // 调整文本标注的大小和位置
+                dotHelper._setLabelPositionAndSize(me, lbNode); // 调整文本标注的大小和位置
             }, 100);
             
             // 添加信息窗口
@@ -538,7 +555,7 @@
                         });
                     }
                     var lbNode = document.getElementsByClassName(lbClassName); // 这里取到的可能是空节点
-                    dotHelper.setLabelPositionAndSize(me, lbNode); // 调整文本标注的大小和位置
+                    dotHelper._setLabelPositionAndSize(me, lbNode); // 调整文本标注的大小和位置
                 });
             }
 
@@ -554,7 +571,7 @@
          */
         createDrawingToolbar: function (options) {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             // 实例化鼠标绘制工具
             drawHelper._turnOnDrawing(me, maper, options);
@@ -569,7 +586,7 @@
          */
         createPolygonOverlays: function (options) {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             var originals = {
                 points: [], // 多边形覆盖物坐标组成的二维数组，有N个多边形数组就有N个元素。
@@ -692,9 +709,9 @@
         /**
          * 清除全部覆盖物
          */
-         clearAllOverlay: function(){
+        clearAllOverlay: function(){
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             // var r = confirm('确认清除所有覆盖物？');
             // if(r !== true) return;
@@ -706,6 +723,27 @@
             // maper.removeOverlay(me.settings.myPolygon);
             // me.settings.myPolygon = '';
         },
+         
+         
+         
+        //————————————————————————————————————————————————
+        /**
+         * 清除中心点标记覆盖物
+         */
+        clearCenterOverlay: function () {
+            var me = this;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            var allOverlay = maper.getOverlays();
+            allOverlay.map(function(item){
+                if(item.name2 === 'center_dian_biaoji'){
+                    maper.removeOverlay(item);
+                }
+                if(item.name2 === 'center_wenben_biaoji'){
+                    maper.removeOverlay(item);
+                }
+            })
+        },
 
          
          
@@ -715,7 +753,7 @@
          */
         clearAllMarkOverlay: function () {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             var allOverlay = maper.getOverlays();
             allOverlay.map(function(item){
@@ -733,7 +771,7 @@
          */
         clearAllLabelOverlay: function () {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             var allOverlay = maper.getOverlays();
             allOverlay.map(function(item){
@@ -754,7 +792,7 @@
          */
          removeOnePolyOverlay: function (ps_uid_arr) {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             var allOverlay = maper.getOverlays();
             allOverlay.map(function(item){
@@ -779,7 +817,7 @@
          */
         clearAllPolyOverlay: function () {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             var allOverlay = maper.getOverlays();
             allOverlay.map(function(item){
@@ -824,7 +862,7 @@
          */
          getMap: function(){
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             return me.$opts.$maper;
         },
 
@@ -834,7 +872,7 @@
          */
         getZoom: function () {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             return maper.getZoom();
         },
@@ -845,7 +883,7 @@
          */
         getCenter: function () {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             return maper.getCenter();
         },
@@ -865,7 +903,7 @@
          */
         getCenterMarker: function () {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             return me.$opts.$centerMarker;
         }, 
 
@@ -876,8 +914,32 @@
          */
         getCenterLabelNode: function () {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             return me.$opts.$centerLabelNode;
+        },
+
+
+        /**
+         * 获取国内某个城市的坐标/根据城市获取坐标
+         * @param {String} ps_city 城市名称.eg. '北京市'
+         * @returns {Function} callback 回调函数。返回值需在回调函数function(e){}中获取。e 为Object类型时表该城市所在的地理坐标点，为String类型时表示没找到该城市
+         * [调用示例]
+            neuiBdmap.getPointByCity('泉州市', function(point){
+                console.log('坐标点：', point); // 格式： K {lng: 118.682446, lat: 24.879952, pf: 'inner'}
+            });
+         */
+        getPointByCity: function (ps_city, callback) {
+            var me = this;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
+           
+            var geoc = new BMap.Geocoder(); // 创建地理编码实例
+            // 回调函数，用于处理地理编码请求后的结果
+            geoc.getPoint(ps_city, function(point) {
+                if (point) 
+                    callback(point);
+                else 
+                    callback('未能找到该城市');
+            }, "中国"); // 第三个参数为城市所在的Country或Region
         },
 
 
@@ -889,7 +951,7 @@
          */
         getPolyCoordinateData: function () {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             // 获取多边形的点坐标
             var arr = [];
@@ -907,7 +969,7 @@
             // 将经纬度坐标转化成字符串型数组
             var coordArr = [ ];
             for(var i = 0; i < arr.length; i++){
-                coordArr.push(helpers.converCoordinateArray2StringArray(arr[i]));
+                coordArr.push(helpers._converCoordinateArray2StringArray(arr[i]));
             }
             // console.log('coordArr：', coordArr);
             return coordArr;
@@ -921,7 +983,7 @@
          */
         getLastPolyOverLay: function () {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             // var box = me.settings.myPolygon ? me.settings.myPolygon : me.settings.overlays[me.settings.overlays.length - 1];
             var box = me.settings.overlays.length == 0 ? me.settings.myPolygon : me.settings.overlays[me.settings.overlays.length - 1];
@@ -939,19 +1001,208 @@
         //  set开头的函数，用于：设置或重置地图数据
         //————————————————————————————————————————————————
         //————————————————————————————————————————————————
+        setCenterPointAndZoom(ps_lng, ps_lat, ps_zoom) {
+            var me = this;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            var point = new BMap.Point(ps_lng, ps_lat);
+            maper.centerAndZoom(point, ps_zoom);
+            if(centerCity.toString().replace(/\s+/g, '') !== ''){
+                maper.setCenter(centerCity);
+            }
+        },
+
+
         /**
          * 设置中心点标记的标题
          * @param {HTML|String} ps_content 标题内容。支持HTML
          */
         setCenterPointLabelTitle: function (ps_content) {
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
-            var node = document.getElementsByClassName('bdCentralLabel');
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
+            var node = document.getElementsByClassName('ne__bd_label_bdCentralLabel');
             if (node != null && node.length > 0) {
                 // var reg = /.*<[^>]+>.*/; // 验证是有标签
                 node[0].innerHTML = ps_content;
-                dotHelper.setLabelPositionAndSize(me, node); // 调整文本标注的大小和位置
+                dotHelper._setLabelPositionAndSize(me, node); // 调整文本标注的大小和位置
             }
+        },
+
+
+
+        /**
+         * 设置地图中心点
+         * !!!警告：请勿在地图初始化参数center.complete函数中调用本函数setMapCenter()，否则会陷入死循环导致页面崩溃！
+         * @param {String} ps_coord_or_city 经纬度坐标或城市名.eg. '116.183501,40.030609' 或 '北京市'
+         * @param {Object} options 其它参数。参见函数内代码
+         */
+        setMapCenter(ps_coord_or_city, options) {
+            var me = this;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            var originals = {
+                zoom: -1, // 缩放级别(可选)，默认-1。值不是3到19之间的整数时会自动缩放到合适的级别
+                title: ps_coord_or_city, // 标题(可选)，默认为经纬度坐标或城市名。支持HTML
+                describe: '' // 描述信息(可选)，默认空。支持HTML
+            }
+            var finals = utils.combine(true, originals, options || {});
+            var zoom = finals.zoom,
+                title = finals.title,
+                describe = finals.describe;
+            
+            // 先清空中心点标记覆盖物
+            me.clearCenterOverlay();
+            // 再创建中心点标记
+            var coordCity = ps_coord_or_city;
+            if (helpers._examineStringIsCoordinate(coordCity)) {
+                // 根据坐标设置中心点
+                var arr = coordCity.split(','),
+                    lng = arr[0], lat = arr[1];
+                    point = new BMap.Point(lng, lat),
+                    coordinate = lng + ',' + lat;
+                maper.setCenter(point); // 设置中心点坐标
+                fnReCreateCenterAndDoneEvent(coordinate); // 重建中心点标记并执行一系列事件
+            }
+            else {
+                // 根据城市设置中心点
+                if (coordCity.toString().replace(/\s+/g, '') !== '') {
+                    maper.setCenter(coordCity); // 设置中心点城市
+                    // 获取城市对应的坐标
+                    me.getPointByCity(coordCity, function (e) {
+                        if (typeof e == 'object') {
+                            var coordinate = e.lng + ',' + e.lat;
+                            // console.log('坐标：', coordinate); // 118.682446,24.879952
+                            fnReCreateCenterAndDoneEvent(coordinate); // 重建中心点标记并执行一系列事件
+                        }
+                    });
+                }
+            }
+
+            // 设置缩放级别
+            if (typeof zoom != 'undefined' && helpers._examineZoomIsValid(zoom)) {
+                // console.log('缩放级别：', zoom);
+                maper.setZoom(parseInt(zoom));
+            }
+           
+
+            /**
+             * 重建中心点标记并执行一系列事件
+             * @param {String} ps_coordinate 中心点地理坐标。eg. '经度,纬度'
+             */
+            function fnReCreateCenterAndDoneEvent(ps_coordinate) {
+                // 添加中心点标注
+                me.createMarker({
+                    type: 'zhongxin',
+                    coordinate: ps_coordinate,
+                    title: title,
+                    describe: describe,
+                    message: '',
+                    dragable: me.settings.center.enableDrag,
+                    finishCallback: me.settings.center.complete,
+                    dragEndCallback: me.settings.center.dragEnd
+                });
+                // 鼠标右键点击事件
+                mouseHelper._mouseRightClick(me, maper);
+                // 鼠标左键点击事件
+                mouseHelper._mouseClick(me, maper, {
+                    center: { 
+                        title: coordCity, 
+                        describe: ''
+                    }
+                });
+            }
+        },
+
+         
+         
+        /**
+         * 设置/切换地图类型
+         * @param {Object} options 参数对象
+         */
+        setMapType: function (options) {
+            var me = this;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            var originals = {
+                types: ['normal', 'satellite'], // 配置地图类型(可选)。数组元素可添加的值: normal 普通街道视图, satellite 卫星视图, hybrid 卫星和路网的混合视图 
+                direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                offset: { // 位置偏移量(可选)
+                    width: 10, // 水平方向数值(可选)，默认10
+                    height: 50 // 竖直方向数值(可选)，默认50
+                }
+            }
+            var finals = utils.combine(true, originals, options || {});
+            var typeArr = finals.types,
+                direction = finals.direction.toString().toLocaleLowerCase(),
+                offset = finals.offset;
+            // 组成要的值
+            var dTypes = [];
+            for (var i = 0; i < typeArr.length; i++) {
+                var value = typeArr[i].toString().toLocaleLowerCase();
+                var oneType = helpers._getMapType(value);
+                if (oneType != '') dTypes.push(oneType);
+            }
+            // console.log('地图类型：', dTypes);
+            if (direction.replace(/\s+/g, '') === '') direction = 'bottomRight';
+            var anchor = helpers._getControlAnchor(direction);
+            // 切换地图类型
+            var dOffW = isNaN(parseFloat(offset.width)) ? originals.offset.width : parseFloat(offset.width),
+                dOffH = isNaN(parseFloat(offset.height)) ? originals.offset.height : parseFloat(offset.height);
+            var mtype1 = new BMap.MapTypeControl({
+                mapTypes: dTypes,
+                anchor: anchor,
+                offset: new BMap.Size(dOffW, dOffH) // 偏移量
+            });
+            maper.addControl(mtype1);
+            // 地图、卫星、三维（相当于地图、混合、三维) 有问题，不能用
+           /*  var city = '泉州市'; // me.settings.city;
+            var mtype2 = new BMap.MapTypeControl({
+                anchor: anchor,
+                offset: new BMap.Size(10, 50)
+            });
+            maper.addControl(mtype2);
+            maper.setCurrentCity(city); //由于有3D图，需要设置城市哦 */
+        },
+
+
+        /**
+         * 设置/添加地图版权信息
+         * @param {Object} options 参数对象
+         */
+        setMapCopyright: function (options) {
+            var me = this;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            var originals = {
+                direction: '', // 位置(可选)，默认空表示右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                content: '', // 版权文本信息(可选)，默认空
+                offset: { // 位置偏移量(可选)
+                    width: 10, // 水平方向数值(可选)，默认10
+                    height: 5 // 竖直方向数值(可选)，默认5
+                }
+            }
+            var finals = utils.combine(true, originals, options || {});
+            var direction = finals.direction.toString().toLocaleLowerCase(),
+                content = finals.content,
+                offset = finals.offset;
+            // console.log('版权内容：', content);
+            // 组成要的值
+            if (direction.replace(/\s+/g, '') === '') direction = 'bottomRight';
+            var anchor = helpers._getControlAnchor(direction);
+            // 添加版权信息
+            var dOffW = isNaN(parseFloat(offset.width)) ? originals.offset.width : parseFloat(offset.width),
+                dOffH = isNaN(parseFloat(offset.height)) ? originals.offset.height : parseFloat(offset.height);
+            var cr = new BMap.CopyrightControl({
+                anchor: anchor,
+                offset: new BMap.Size(dOffW, dOffH)
+            })
+            maper.addControl(cr); //添加版权控件
+            var bs = maper.getBounds(); // 地图可视区域
+            cr.addCopyright({
+                id: 1002, // 默认百度地图有一个版权，id为1，故这里要设置非1的其它值
+                bounds: bs,
+                content: '<div class="ne__bd_copyright">' + content + '</div>',
+            }); 
         },
 
 
@@ -963,7 +1214,7 @@
          */
         setMapFashion: function(options){
             var me = this;
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
 
             var originals = {
@@ -1042,8 +1293,24 @@
 
 
 
+        
+        //————————————————————————————————————————————————
+        //          check 开头的函数为校验函数
+        //————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        /**
+         * 校验经纬度坐标是否有效
+         * @param {String} ps_str 一个字符串或经纬度字符串。 eg. '经度,纬度'
+         * @returns {Boolean} 返回布尔值true or false
+         */
+        checkCoordinateIsValid: function (ps_str) {
+            return helpers._examineStringIsCoordinate(ps_str);
+        },
 
 
+
+
+         
         //————————————————————————————————————————————————
         //          其它操作函数
         //————————————————————————————————————————————————
@@ -1080,11 +1347,11 @@
         /**
          * 校验地图是否已初始化和实例化
          * 用于：在调用地图实例化对象me.$opts.$maper之前要进行校验，防止出错
-         * @param {Object} me 当前控件对象
+         * @param {Object} me 当前插件对象
          * @param {String} fnName 某个函数名。用函数内可使用  arguments.callee.name 来获取函数名
          * @returns {Boolean} 返回布尔值true或false。
          */
-        examineIsInstantiate: function (me, fnName) {
+        _examineIsInstantiate: function (me, fnName) {
             var F12Info = '<br>按F12通过控制台查看具体错误信息';
             if (typeof me.$opts == 'undefined') {
                 var tips = '地图尚未初始化，无法使用函数' + fnName + '()' + F12Info;
@@ -1104,13 +1371,35 @@
         },
 
 
+        /**
+         * 校验一个字符串是否为经纬度坐标
+         * @param {String} ps_str 一个字符串或经纬度字符串。 eg. '经度,纬度'
+         * @returns {Boolean} 返回布尔值true or false
+         */
+        _examineStringIsCoordinate: function (ps_str) {
+            if (typeof ps_str == 'undefined') return false;
+            var reg = /^\d+(\.\d+)?,\d+(\.\d+)?$/; // 验证一个字符串是否为经纬度坐标
+            return reg.test(ps_str) ? true : false;
+        },
+
+
+        /**
+         * 校验地图缩放级别是否有效，即是否在3到19之间
+         * @param {Number} ps_str 数值型字符串
+         * @returns {Boolean} 返回布尔值true or false
+         */
+        _examineZoomIsValid: function (ps_str) {
+            var reg = /^[3-9]$|^1[0-9]$/; // 3到9的任意数字或者以1开头后面跟着0到9的任意数字
+            return reg.test(ps_str) ? true : false;
+        },
+
 
         /**
          * 将经纬度坐标数组转化成字符串数组
          * @param {array} ps_coord_arr 经纬度坐标数组. eg. [{lng:"116.387112", lat:"39.920977"}, {lng:"116.387112", lat:"39.920977"}]
          * @returns {array} 返回字符串数组. eg. ["116.387112,39.920977", "116.387112,39.920977"]
          */
-        converCoordinateArray2StringArray: function(ps_coord_arr){
+        _converCoordinateArray2StringArray: function(ps_coord_arr){
             var strArr = []
             for(var i = 0; i < ps_coord_arr.length; i++){
                 strArr.push(ps_coord_arr[i].lng + "," + ps_coord_arr[i].lat);
@@ -1118,7 +1407,34 @@
             return strArr;
         },
 
-        
+
+        /**
+         * 获取地图控件的定位方式
+         * @param {String} ps_value_str 控件位置。值：topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+         * @returns {ControlAnchor} 返回百度地图控件的定位方式值
+         */
+        _getControlAnchor: function (ps_value_str) {
+            var anchor = BMAP_ANCHOR_BOTTOM_RIGHT;
+            if (ps_value_str == 'topleft') anchor = BMAP_ANCHOR_TOP_LEFT; // 地图的左上角
+            if (ps_value_str == 'topright') anchor = BMAP_ANCHOR_TOP_RIGHT; // 地图的右上角
+            if (ps_value_str == 'bottomleft') anchor = BMAP_ANCHOR_BOTTOM_LEFT; // 地图的左下角
+            if (ps_value_str == 'bottomright') anchor = BMAP_ANCHOR_BOTTOM_RIGHT; // 地图的右下角
+            return anchor;
+        },
+
+
+        /**
+         * 获取地图的类型
+         * @param {String} ps_value_str 地图类型。值： normal 普通街道视图, satellite 卫星视图, hybrid 卫星和路网的混合视图 
+         * @returns {MapType} 返回地图类型值
+         */
+        _getMapType: function (ps_value_str) {
+            var tmp_value = BMAP_NORMAL_MAP;
+            if (ps_value_str == 'normal') tmp_value = BMAP_NORMAL_MAP; // 普通街道视图
+            if (ps_value_str == 'satellite') tmp_value = BMAP_SATELLITE_MAP; // 卫星视图
+            if (ps_value_str == 'hybrid') tmp_value = BMAP_HYBRID_MAP; // 卫星和路网的混合视图
+            return tmp_value;
+        }
     };
 
 
@@ -1129,13 +1445,13 @@
     var dotHelper = {
         /**
          * 添加信息窗口
-         * @param {Object} 当前控件对象
+         * @param {Object} 当前插件对象
          * @param {Marker} marker 点标记覆盖物
          * @param {Point} point 点标记地理坐标点
          * @param {Object} options 参数对象
          */
         _addInfoWindow: function (me, marker, point, options) {
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             if (!me.settings.infos.enable) return;
             var originals = {
@@ -1150,10 +1466,10 @@
             var infoOptions = {
                 width : me.settings.infos.width, // 宽。单位像素，取值范围：0, 220 - 730
                 height: me.settings.infos.height, // 高。单位像素，取值范围：0, 60 - 650
-                title : '<div class="bdInfoTitle">' + title + '</div>', // 标题。支持HTML内容
+                title : '<div class="ne__bd_info_title">' + title + '</div>', // 标题。支持HTML内容
                 message: messsge // 短信内容(可选)。完整的短信内容包括：自定义部分+位置链接，不设置时，显示默认短信内容。短信内容最长为140个字
             }
-            var infoContent = '<div class="bdInfoDescribe">' + describe + '</div>';
+            var infoContent = '<div class="ne__bd_info_describe">' + describe + '</div>';
             var infoDow = new BMap.InfoWindow(infoContent, infoOptions);  // 创建信息窗口对象 
             marker.addEventListener(me.settings.infos.method, function(){       
                 maper.openInfoWindow(infoDow, point);
@@ -1169,10 +1485,10 @@
 
         /**
          * 调整文本标注的大小和位置
-         * @param {Object} 当前控件对象
+         * @param {Object} 当前插件对象
          * @param {HTMLCollection} node 当前点标记节点
          */
-        setLabelPositionAndSize: function (me, node) {
+        _setLabelPositionAndSize: function (me, node) {
             if (node != null && node.length > 0) {
                 var selfNode = node[0],
                     fatherNode = node[0].parentNode;
@@ -1194,7 +1510,75 @@
     };
 
 
+    //================================================================
+    //  鼠标左右键点击监听功能
+    //================================================================
+    var mouseHelper = {
+        /**
+         * 鼠标右键点击事件
+         * @param {Object} me 当前插件对象
+         * @param {Object} maper 地图实例化对象
+         */
+        _mouseRightClick: function (me, maper) {
+            maper.addEventListener("rightclick", function (e) {
+                // alert(e.point.lng + "," + e.point.lat);
+            });
+        },
 
+
+        /**
+         * 鼠标左键点击事件
+         * @param {Object} me 当前插件对象
+         * @param {Object} maper 地图实例化对象
+         * @param {Object} 参数对象。参见函数内代码
+         */
+        _mouseClick: function (me, maper, options) {
+            var originals = {
+                center: { // 中心点(可选)
+                    title: '', // 标题(可选)，默认空。支持HTML
+                    describe: '' // 描述信息(可选)，默认空。支持HTML
+                }
+            }
+            var finals = utils.combine(true, originals, options || {});
+
+            maper.addEventListener('click', function (e) {
+                // console.log('点我了e：', e);
+                me.settings.clickTimes++; // 全局赋值1
+                // 点击地图时把中心点坐标移到点击位置
+                if (me.settings.center.enableClickCreateNew) {
+                    // 当前有覆盖物时，则不执行点击事件(即在覆盖物上点击时，只执行覆盖物的click事件，但不执行map的click事件)
+                    if (e.overlay) return;
+                    // 当前处于绘图模式时，则不执行点击事件
+                    // console.log('mode:', me.settings.drawMode);
+                    if (me.settings.drawMode != '' && me.settings.drawMode != 'hander') return;
+                    var longitude = e.point.lng, latitude = e.point.lat;
+                    var centerCoordinate = longitude + ',' + latitude,
+                        centerCaption = finals.center.title,
+                        centerDescribe = finals.center.describe,
+                        centerEnableDrag = me.settings.center.enableDrag,
+                        centerComplete = me.settings.center.complete,
+                        centerDragEnd = me.settings.center.dragEnd;
+                    me.clearCenterOverlay(); // 清空中心点标记覆盖物
+                    me.createMarker({ // 重建点标记
+                        type: 'zhongxin',
+                        coordinate: centerCoordinate,
+                        title: centerCaption, 
+                        describe: centerDescribe,
+                        message: '',
+                        dragable: centerEnableDrag,
+                        finishCallback: centerComplete,
+                        dragEndCallback: centerDragEnd 
+                    });
+                    if (me.settings.center.clickCallback) {
+                        me.settings.center.clickCallback({
+                            lng: longitude,
+                            lat: latitude
+                        });
+                    }
+                }
+            });
+        }
+    };
 
 
     //================================================================
@@ -1204,7 +1588,7 @@
         /**
          * 启用鼠标绘制功能
          * 参考：鼠标绘制工具条库 https://lbsyun.baidu.com/index.php?title=jspopular/openlibrary
-         * @param {Object} me 当前控件对象
+         * @param {Object} me 当前插件对象
          * @param {Object} maper 地图实例化对象
          * @param {Object} 参数对象。参见函数内代码
          */
@@ -1255,9 +1639,9 @@
                 drawingOptions = finals.drawingOptions,
                 buttoned = finals.operateButton.buttoned,
                 btnText = finals.operateButton.btnText,
-                stepDescription = finals.stepDescription;
+                stepDescription = finals.stepDescription,
+                drawModeArr = finals.drawingModes;
             // 设置绘制模式
-            var drawModeArr = finals.drawingModes;
             var drawingModes = [];
             for (var i = 0; i < drawModeArr.length; i++){
                 var value = drawModeArr[i].toString().toLocaleLowerCase();
@@ -1267,7 +1651,7 @@
                 if (value == 'line') oneMode = BMAP_DRAWING_POLYLINE;
                 if (value == 'gon') oneMode = BMAP_DRAWING_POLYGON;
                 if (value == 'rectangle') oneMode = BMAP_DRAWING_RECTANGLE;
-                drawingModes.push(oneMode);
+                if(oneMode != '') drawingModes.push(oneMode);
                 // oneMode 值说明
                 // BMAP_DRAWING_MARKER, // 画点(画位置)
                 // BMAP_DRAWING_CIRCLE, // 画圆
@@ -1410,7 +1794,7 @@
 
         /*
         * 绘图切换事件，即当绘图工具切换到“拖动地图”模式(光标呈现为一只手)时
-        * @param {Object} me 当前控件对象
+        * @param {Object} me 当前插件对象
         */
         _drawCursorHand: function (me) {
             var handDom = document.getElementsByClassName('BMapLib_hander')[0],
@@ -1482,11 +1866,11 @@
 
         /**
          * 给多边形覆盖物添加操作按钮
-         * @param {Object} me 当前控件对象
+         * @param {Object} me 当前插件对象
          * @param {Object} 参数对象
          */
         _addOverlayButton: function (me, options) {
-            if (!helpers.examineIsInstantiate(me, arguments.callee.name)) return;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             var originals = {
                 longitude: '', // 操作按钮所在经度坐标
@@ -1548,7 +1932,7 @@
          
         /**
          * 显示覆盖物点坐标 (这个函数目前没用到，因为对应界面元素是隐藏的)
-         * @param {Object} me 当前控件对象
+         * @param {Object} me 当前插件对象
          * @param {Array} a 覆盖物点坐标数组。格式： [{lng: 经度, lat: "纬度"}, {lng: 经度, lat: "纬度"}]
          */
         _showLatLon: function (me, a) {
@@ -1572,7 +1956,7 @@
 
         /**
          * 删除覆盖物点坐标  (这个函数目前没用到，因为对应界面元素是隐藏的)
-         * @param {Object} me 当前控件对象
+         * @param {Object} me 当前插件对象
          * @param {Number} i 覆盖物点坐标数组循环值
          */
         _delPoint: function (me, i) {
@@ -1780,7 +2164,7 @@
          * @param {String} str 子节点字符串
          * @param {HTML DOM} el 父节点
          */
-            appendHTML: function(str, el){
+        appendHTML: function(str, el){
             HTMLElement.prototype.appendStr = function(str) {
                 var divTemp = document.createElement("div"), nodes = null, 
                     fragment = document.createDocumentFragment(); // 文档片段，一次性append，提高性能
