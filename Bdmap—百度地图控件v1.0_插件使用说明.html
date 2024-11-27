@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Bdmap | 百度地图插件使用说明</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+
+<body>
+    <h1> neuiBdmap 百度地图插件</h1>
+    <pre>
+        //================================================================
+        //          一、综述
+        //================================================================
+        本插件使用原生JS开发，兼容IE9及以上版本，不支持IE8及以下版本。
+        作者：mufeng
+        Q Q : 1614644937
+        官网：https://github.com/yimobing/neatui
+
+        【相关链接】
+        百度地图api密钥申请：http://lbsyun.baidu.com/ （登录后在个人中心就可以新建密钥了）
+        百度地图API参考：http://lbsyun.baidu.com/index.php?title=jspopular
+        百度地图坐标拾取系统：http://api.map.baidu.com/lbsapi/getpoint/index.html
+
+
+        //================================================================
+        //          二、使用说明
+        //================================================================
+        第1步，引入插件所需的CSS、JS
+        &lt;link type="text/css" rel="stylesheet" href="assets/css/neatui-bdmap.css"&gt; &lt;!--百度地图插件--&gt;
+        &lt;script src="http://api.map.baidu.com/api?v=2.0&ak=您申请的AK"&gt;&lt;/script&gt; &lt;!--百度地图API库文件--&gt;
+        &lt;!--&lt;script src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"&gt;&lt;/script&gt;--&gt; &lt;!--鼠标绘制工具条库--&gt;
+        &lt;script src="assets/libs/bdmap.drawingManager.js"&gt;&lt;/script&gt; &lt;!--鼠标绘制工具条库--&gt;
+        &lt;script src="assets/js/neatui-bdmap.js"&gt;&lt;/script&gt; &lt;!--百度地图插件--&gt;
+
+
+        第2步，创建DOM节点用于地图展示
+        &lt;div id="mapDiv"&gt;&lt;/div&gt;
+
+        第3步，调用插件初始化函数，实现创建地图并初始化
+            neuiBdmap('mapDiv', options); 或 neuiBdmap.init('mapDiv', options); 
+        
+        第4步，调用插件内置函数(即插件对外暴露的其它方法)，实现与地图的一系列交互操作
+
+
+        //================================================================
+        //      三、详细说明
+        //================================================================
+        //————————————————————————————————————————————————
+        //      3-1.初始化函数
+        //————————————————————————————————————————————————
+        一、 初始化函数
+        neuiBdmap(elem, options); 或 neuiBdmap.init(elem, options);
+        其中：
+            elem 地图容器节点ID,即根节点绑定的ID属性值。假设有节点 <div id="container"></div>，则elem值为'container'
+            options 地图初始化参数。值如下：
+            var options = {
+
+                // 编程语言环境(可选)。注：不同环境下地图展示与交互可能有不同,故可能需要区分下。
+                environment: {
+                    language: '.net' // 语言类型(可选)： 默认.net。值： .net 即Csharp .aspx页面, .php即php页面
+                },
+                // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
+                width: 'auto', // 宽(可选)，默认auto
+                height: 'auto', // 高(可选)，默认auto
+                setSize: null, // 初始化时用函数设置大小(可选)，默认null。优先权大于width/height。
+                onResize: null, // 窗口大小变化时用函数设置大小(可选)，默认null。优先权大于width/height。
+                // 地图缩放级别(可选)，默认11。 值：3-19
+                zoom: 11,
+                // 中心点(可选)
+                center: {
+                    city: "", // 城市(可选)，默认空。值：空时根据坐标定位, 非空时根据城市定位。eg.'泉州市', eg.'泉州市惠安县'。
+                    coordinate: "116.404177,39.909652",  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
+                    caption: "北京市", // 标题文字(可选)，默认'北京市'。支持HTML
+                    describe: "", // 描述文字(可选)，默认空。支持HTML
+                    complete: null, // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                    enableClickCreateNew: false, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
+                    clickCallback: null, // 点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                    enableDrag: false, // 是否允许拖拽(可选)，默认false
+                    dragEnd: null // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                },
+
+                // 功能与配置项(可选)
+                draft: { // 地图底图功能(可选)
+                    platOptions: { // 地图默认配置项(可选)。
+                        enableMapClick: false, // 是否启用底图景点可点功能(可选)，默认false。
+                        minZoom: 3, // 地图允许展示的最小级别
+                        maxZoom: 19, // 地图允许展示的最大级别
+                        // mapType: BMAP_NORMAL_MAP, // 地图类型，默认为BMAP_NORMAL_MAP (启用此会报错,原因未知)
+                        enableHighResolution: true, // 是否启用使用高分辨率地图。在iPhone4及其后续设备上，可以通过开启此选项获取更高分辨率的底图，v1.2,v1.3版本默认不开启，v1.4默认为开启状态
+                        enableAutoResize: true // 是否自动适应地图容器变化，默认启用
+                    },
+                    enableWheelZoom: true, // 是否开启鼠标滚轮缩放功能，仅对PC上有效(可选)，默认true。
+                    switchType: { // 切换地图类型(可选)
+                        enable: false, // 是否开启(可选)，默认false
+                        types: ['normal', 'satellite', 'hybrid'], // 配置地图类型(可选)。数组元素可添加的值: normal 普通街道视图, satellite 卫星视图, hybrid 卫星和路网的混合视图 
+                        direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                        offset: { // 位置偏移量(可选)
+                            width: 10, // 水平方向数值(可选)，默认10
+                            height: 50 // 竖直方向数值(可选)，默认50
+                        }
+                    },
+                    copyright: { // 版权信息(可选)
+                        enable: false, // 是否开启(可选)，默认false
+                        direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                        content: '', // 版权文本信息(可选)，默认空
+                        offset: { // 位置偏移量(可选)
+                            width: 10, // 水平方向数值(可选)，默认10
+                            height: 5 // 竖直方向数值(可选)，默认5
+                        }
+                    },
+                    personalize: { // 个性化地图(可选)
+                        enable: false, // 是否启用(可选)，默认false
+                        basePaint: false, // 是否使用个性化的底图模式(干净清爽)(可选)，默认false。
+                        baseStyle: '', // 地图风格，默认空表示使用默认设置。仅当basePaint为false时有效。值： normal 普通风格, light 清新蓝风格, dark 黑夜风格, bluish 清新蓝绿风格, grayscale 高端灰风格, hardedge 强边界风格, darkgreen 青春绿风格, pink 浪漫粉风格, midnight 午夜蓝风格, grassgreen 自然绿风格, googlelite 精简风格(底图模式,干净清爽), redalert 红色警戒风格
+                    }
+                },
+
+                // 点标记功能(可选)
+                markers: {
+                    markOptions: { // 点标记默认配置项(可选)。
+                        image: { // 自定义图标(可选)
+                            enable: false, // 是否允许自定义图标(可选)，默认false
+                            path: "assets/neatui/img/", // 图片路径(可选)
+                            icon: "bmap_locate_blue.png", // 图片名称(可选)
+                            size: 50 // 图片大小(可选)
+                        }
+                    }
+                },
+                
+                // 信息窗功能(可选)
+                infos: {
+                    enable: false, // 是否启用(可选)，默认false
+                    width: 0, // 宽(可选)。单位像素，取值范围：0, 220 - 730, 其中0表示自动调整宽
+                    height: 0, // 高(可选)。单位像素，取值范围：0, 60 - 650，其中0表示自动调整高
+                    method: "mouseover" // 打开方式(可选). mouseover 鼠标经过点标记时(默认)，click 鼠标点击点标记时
+                }
+            }
+         
+
+
+
+
+        //————————————————————————————————————————————————
+        //      3-2.内置函数
+        //————————————————————————————————————————————————
+        本插件内置了一系列的函数，供开发者调用。
+        但所有内置函数都必须在完成地图初始化后才可调用，即必须先调用 neuiBdmap(elem, options) 之后才可调用这些内置函数。
+
+        所有内置函数调用格式： neuiBdmap.fnAAA(); 其中 fnAAA 表示某个内置函数名
+
+        【常用的内置函数如下】
+
+        //————————————————————————————————————————————————
+        //  create 开头的函数，用于：创建地图的各种操作效果
+        //————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        :::::::::::::::::::::::::::::::::::::
+        createMarker(options)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：创建或添加一个图像标注覆盖物(点标记覆盖物)
+        返回值： 返回当前图像标注实例 Marker
+		参数说明：
+            options 参数，格式如下
+            {
+                type: '', // 坐标类型(可选)，默认空。值： zhongxin 中心点坐标, 空 表示其它类型。
+                coordinate: '', // 坐标经纬度字符串. eg. '经度,纬度'
+                title: '', // 标题(可选)，默认空。支持HTML
+                describe: '', // 描述信息(可选)，默认空。支持HTML
+                message: '', // 信息窗口短信内容(可选)，默认空
+                dragable: false, // 是否允许拖拽(可选)，默认false
+                finishCallback: null, // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                dragEndCallback: null // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+            }
+
+
+
+        :::::::::::::::::::::::::::::::::::::
+        createDrawingToolbar(options)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：创建绘图工具栏
+        返回值： 
+		参数说明：
+            options 参数，格式如下
+            {
+                enable: true, // 是否启用鼠标绘图功能(可选)，默认true。
+                drawingModes: [ // 工具栏上可以选择出现的绘制模式(可选)，默认空数组表示不显示任何绘制模式。请将需要显示的模式值以数组形式传入。数组元素值：dot 画点(画位置), circle 画圆, line 画线, gon 画多边形, rectangle 画矩形
+                    // 'dot', // 画点(画位置)
+                    // 'circle', // 画圆
+                    // 'line', // 画线
+                    // 'gon',  // 画多边形
+                    // 'rectangle'  // 画矩形
+                ],
+                enableCalculate: false, // 绘制是否进行测距(画线时候)、测面(画圆、多边形、矩形)(可选)，默认false
+                drawingOptions: { // 鼠标绘图配置项，即鼠标绘制管理类配置项(可选)。
+                    strokeColor: "red", // 边线颜色(可选)，默认红色。
+                    fillColor: "red", // 填充颜色(可选)，默认红色。当参数为空时，圆形将没有填充效果。
+                    strokeWeight: 1, // 边线的宽度，以像素为单位(可选)，默认1px。
+                    strokeOpacity: 0.8, // 边线透明度，取值范围0-1(可选)，默认0.8。
+                    fillOpacity: 0.65,  // 填充的透明度，取值范围0-1(可选)，默认0.65。
+                    strokeStyle: "solid" // 边线的样式，solid或dashed(可选)，默认solid。
+                },
+                operateButton: { // 操作按钮(可选)
+                    buttoned: false, // 是否添加操作按钮(可选)，默认false
+                    btnText: '删除' // 操作按钮的文本(可选)，默认'删除'
+                },
+                stepDescription: { // 绘制步骤说明(可选)
+                    enable: true, // 是否启用功能(可选)，默认true
+                    title: '绘制步骤说明', // 标题(可选)，有默认值
+                    content: '', // 自定义详细的绘制步骤说明(可选)，默认空。支持HTML
+                }
+            }
+
+
+
+
+        :::::::::::::::::::::::::::::::::::::
+        createPolygonOverlays(options)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：创建多个多边形覆盖物
+        返回值： 
+		参数说明： 
+            options 参数，格式如下
+            {
+                points: [], // 多边形经纬度坐标数组，即多边形覆盖物坐标组成的二维数组，有N个多边形数组就有N个元素。
+                // 格式：
+                // [
+                //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..], // 第1个多边形的N个点
+                //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..],// 第2个多边形的M个点
+                //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..] // 第3个多边形的L个点
+                // ];
+                hideValues: [], // 多边形覆盖物标识符数组，即多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
+                buttons: { // 按钮(可选)
+                    enable: false,  // 是否添加操作按钮(可选)，默认false
+                    text: '删除', // 操作按钮的文本，默认'删除'
+                    callback: null // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
+                },
+                skinOptions: { // 外观配置项(可选)。
+                    strokeColor: "red", // 边线颜色(可选)，默认红色。
+                    fillColor: "red", // 填充颜色(可选)，默认红色。当参数为空时，圆形将没有填充效果。
+                    strokeWeight: 1, // 边线的宽度，以像素为单位(可选)，默认1px。
+                    strokeOpacity: 0.8, // 边线透明度，取值范围0-1(可选)，默认0.8。
+                    fillOpacity: 0.65,  // 填充的透明度，取值范围0-1(可选)，默认0.65。
+                    strokeStyle: "solid" // 边线的样式，solid或dashed(可选)，默认solid。
+                }
+            }
+
+        
+
+        //————————————————————————————————————————————————
+        //  remove 和 clear 开头的函数，用于：清除或清空覆盖物
+        //————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        :::::::::::::::::::::::::::::::::::::
+        clearAllOverlay()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：清除全部覆盖物
+
+
+        :::::::::::::::::::::::::::::::::::::
+        clearCenterOverlay()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：清除中心点标记覆盖物
+
+
+        :::::::::::::::::::::::::::::::::::::
+        clearAllMarkOverlay()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：清除全部点标记覆盖物，即图像标注覆盖物
+
+
+        :::::::::::::::::::::::::::::::::::::
+        clearAllLabelOverlay()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：清空全部文本覆盖物
+
+
+        :::::::::::::::::::::::::::::::::::::
+        removeOnePolyOverlay(ps_uid_arr)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：清除一个多边形覆盖物、清除某个多边形覆盖物
+        参数说明：
+        ps_uid_arr 要删除的覆盖唯一标识组成的数组。当前多边形覆盖物及内部的子覆盖物(如按钮)唯一标识符组成的数组。eg. ['当前多边形覆盖物的唯一标识符', '内部按钮覆盖物的唯一标识']
+
+
+        :::::::::::::::::::::::::::::::::::::
+        clearAllPolyOverlay()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：清除全部多边形覆盖物
+
+
+
+
+        //————————————————————————————————————————————————
+        //  get 开头的函数，用于：获取地图各种对象及数据
+        //————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        :::::::::::::::::::::::::::::::::::::
+        getMap()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：获取地图实例化对象
+        返回值： 返回地图实例化对象。值为null表示还未实例化
+
+
+        :::::::::::::::::::::::::::::::::::::
+        getZoom()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：获取地图当前缩放级别
+        返回值： 返回缩放级别
+		参数说明：无
+
+
+        :::::::::::::::::::::::::::::::::::::
+        getCenter()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：获取地图当前中心点
+        返回值： 返回中心点地理坐标点
+		参数说明：无
+
+
+        :::::::::::::::::::::::::::::::::::::
+        getContainer()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：获取地图根节点容器元素
+        返回值： 返回地图容器元素 HTMLElement
+		参数说明：无
+
+
+        :::::::::::::::::::::::::::::::::::::
+        getCenterMarker()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：获取地图中心点标记图像标注实例
+        返回值： 返回中心点标记图像标注实例 Marker
+		参数说明：无
+
+
+        :::::::::::::::::::::::::::::::::::::
+        getCenterLabelNode()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：获取地图中心点标记文本标注节点
+        返回值： 返回中心点文本标节点 HTML DOM
+		参数说明：无
+
+
+        :::::::::::::::::::::::::::::::::::::
+        getPointByCity(ps_city, callback)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：获取国内某个城市的坐标/根据城市获取坐标
+        返回值： 
+		参数说明：
+            ps_city 城市名称.eg. '北京市'
+            callback 回调函数。返回值需在回调函数function(e){}中获取。e 为Object类型时表该城市所在的地理坐标点，为String类型时表示没找到该城市
+        调用举例：
+            getPointByCity('泉州市', function(point){
+                console.log('坐标点：', point); // 格式： K {lng: 118.682446, lat: 24.879952, pf: 'inner'}
+            });
+
+
+
+        :::::::::::::::::::::::::::::::::::::
+        getPolyCoordinateData()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：获取所有多边形坐标数据
+        返回值： 返回字符串型坐标数组
+		参数说明：无
+
+
+        :::::::::::::::::::::::::::::::::::::
+        getLastPolyOverLay()
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：获取最后一个多边形覆盖物的经纬度信息 (该函数仅内部测试用)
+        返回值： 未知
+		参数说明：无
+
+
+
+
+        //————————————————————————————————————————————————
+        //  set 开头的函数，用于：设置或重置地图数据
+        //————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        :::::::::::::::::::::::::::::::::::::
+        setCenterPointLabelTitle(ps_content)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：设置中心点标记的标题
+        返回值： 
+		参数说明：
+            ps_content 标题内容。支持HTML
+
+
+        :::::::::::::::::::::::::::::::::::::
+        setMapCenter(ps_coord_or_city, options)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：设置地图中心点
+        注意： !!!警告：请勿在地图初始化参数center.complete函数中调用本函数setMapCenter()，否则会陷入死循环导致页面崩溃！
+        返回值： 
+		参数说明：
+            ps_coord_or_city 经纬度坐标或城市名.eg. '116.183501,40.030609' 或 '北京市'
+            options 其它参数，格式如下：
+            {
+                zoom: -1, // 缩放级别(可选)，默认-1。值不是3到19之间的整数时会自动缩放到合适的级别
+                title: ps_coord_or_city, // 标题(可选)，默认为经纬度坐标或城市名。支持HTML
+                describe: '' // 描述信息(可选)，默认空。支持HTML
+            }
+
+
+
+
+        :::::::::::::::::::::::::::::::::::::
+        setMapType(options)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：设置/切换地图类型
+        返回值： 
+		参数说明：
+            options 参数，格式如下
+            {
+                types: ['normal', 'satellite'], // 配置地图类型(可选)。数组元素可添加的值: normal 普通街道视图, satellite 卫星视图, hybrid 卫星和路网的混合视图 
+                direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                offset: { // 位置偏移量(可选)
+                    width: 10, // 水平方向数值(可选)，默认10
+                    height: 50 // 竖直方向数值(可选)，默认50
+                }
+            }
+
+
+
+        :::::::::::::::::::::::::::::::::::::
+        setMapCopyright(options)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：设置/添加地图版权信息
+        返回值： 
+		参数说明：
+            options 参数，格式如下
+            {
+                direction: '', // 位置(可选)，默认空表示右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                content: '', // 版权文本信息(可选)，默认空
+                offset: { // 位置偏移量(可选)
+                    width: 10, // 水平方向数值(可选)，默认10
+                    height: 5 // 竖直方向数值(可选)，默认5
+                }
+            }
+
+
+
+        :::::::::::::::::::::::::::::::::::::
+        setMapFashion(options)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：
+        返回值： 
+		参数说明：
+            options 参数，格式如下
+            {
+                bases: false, // 是否使用底图模式(干净清爽), 默认false
+                styles: 'normal' // 地图风格。值： normal 默认地图样式, light 清新蓝风格, dark 黑夜风格, bluish 清新蓝绿风格, grayscale 高端灰风格, hardedge 强边界风格, darkgreen 青春绿风格, pink 浪漫粉风格, midnight 午夜蓝风格, grassgreen 自然绿风格, googlelite 精简风格, redalert 红色警戒风格
+            }
+
+        
+
+
+        //————————————————————————————————————————————————
+        //          check 开头的函数为校验函数
+        //————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        :::::::::::::::::::::::::::::::::::::
+        checkCoordinateIsValid(ps_str)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：校验经纬度坐标是否有效
+        返回值： 返回布尔值true or false
+        参数说明：
+            ps_str 一个字符串或经纬度字符串。 eg. '经度,纬度'
+
+
+
+        :::::::::::::::::::::::::::::::::::::
+        checkZoomIsValid(ps_str)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：校验地图缩放级别是否有效(是否在3到19之间)
+        返回值： 返回布尔值true or false
+        参数说明：
+            ps_str 地图缩放级别。数值类型, 值3到19
+        
+
+
+        //————————————————————————————————————————————————
+        //          其它操作函数
+        //————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        :::::::::::::::::::::::::::::::::::::
+        reloadPageWhenCsharp(ps_is_net)
+        :::::::::::::::::::::::::::::::::::::
+        功能描述：刷新页面数据、重载页面(Csharp .net 环境下使用)
+        返回值： 
+        参数说明：
+            ps_is_net 是否.net环境(可选)，默认true。值为false时将使用 window.location.reload() 进行页面重载操作重载
+        
+    </pre>
+</body>
+</html>

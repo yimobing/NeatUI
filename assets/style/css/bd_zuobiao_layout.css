@@ -1,0 +1,66 @@
+@charset "utf-8";
+/**
+ * 利用百度地图“拖动中心点坐标、绘制多边形边界范围”界面通用样式
+ * Author: Mufeng
+ * Date: 2021.06.18
+ * Update: 2024.11.27
+ */
+
+ 
+/*===============================================================================================*/
+/*                                    页面布局
+/*===============================================================================================*/
+/*+ ---------------- 整体 ---------------- +*/
+html, body { width: 99.5%; margin: 0.25% auto; height: 99.5%; overflow: hidden; }
+/*+ ---------------- 外层区域 ---------------- +*/
+/* 注：地图容器及父级节点一定要设置height高度，不然地图可能无法显示 */
+.bds {
+	position: relative;
+	width: 100%;
+	height: 99%;
+	margin: 0 auto;
+	padding: 8px;
+	overflow: hidden;
+	zoom: 1;
+	border: 1px solid #cac9c9;
+	border-radius: 10px;
+	/* box-shadow: 0 2px 4px 2px #dfdada; */
+	/* overflow: hidden; */
+}
+/*+ ---------------- 地图容器区域 ---------------- +*/
+.bds__map {
+	position: relative;
+	width: 100%;
+	margin: 10px 0 0 0;
+	padding: 3px;
+	border: 1px solid #eaeaea;
+	border-radius: 4px;
+	overflow: hidden;
+}
+/*+ ---------------- 操作区域：表单及按钮 ---------------- +*/
+.bds__editor * {
+	margin: 0;
+	padding: 0;
+	-moz-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+	outline: none;
+	-webkit-tap-highlight-color: transparent;
+	font-size: 14px;
+}
+.bds__editor>div { display: inline-block; vertical-align: top; margin-left: 35px; }
+.bds__editor>div:first-child { margin-left: 0; }
+.bds__editor label { margin-left: 3px; color: #999; font-size: 10px; }
+.bds__editor button[type="button"]{ padding: 0 8px; font-size: 13px; }
+.bds__editor input[type="text"] {
+	min-width: 150px;
+	height: 28px;
+	line-height: 28px\9;
+	margin-left: 10px;
+	padding: 0 5px;
+	background-color: #fcfcfc;
+	border: 1px solid #a59b9b !important;
+	border-radius: 2px;
+}

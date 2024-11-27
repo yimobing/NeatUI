@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>学校学区房范围（手绘区域、边界范围）</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241127-5"> <!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_layout.css?v=20241127-5"> <!--百度地图坐标页面通用布局-->
+</head>
+<body>
+    <style>
+    </style>
+
+    <div class="bds">
+        <div class="bds__editor">
+            <div class="bds__coord">
+                中心点坐标 <input type="text" id="c-locate" readonly>
+                <button type="button" class="ne-btn has-texture blue" id="btn-pick-save">保存</button>
+                <button type="button" class="ne-btn has-texture " id="btn-pick-copy">复制</button>
+                <label> (拖动中心点或在地图上任意位置点击可更改坐标) </label>
+            </div><!--/.bds__coord-->
+            <div class="bds__btn">
+                <button type="button" class="ne-btn has-texture red" id="btn-poly-del">删除学区范围</button>
+                <button type="button" class="ne-btn has-texture blue" id="btn-poly-save">保存学区范围</button>
+            </div><!--/.bds__btn-->
+            <div class="bds__locate">
+                <label>陌生小区，边界难画？请使用：</label>
+                <button type="button" class="ne-btn has-texture green" id="btn-locate">地点定位</button>
+            </div><!--/.bds__locate-->
+        </div><!--/.bds__editor-->
+        <div class="bds__map">
+            <div id="map"></div>
+        </div><!--/.bds__map-->
+    </div><!--/.bds-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件 (这里要屏蔽)-->
+    <script src="assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具 (这里要屏蔽)-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script> <!--Jq库-->
+    <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
+    <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
+    <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241127-5"></script> <!--百度地图控件-->
+    <script>
+
+        /*+————————————————全局变量————————————————+*/
+        var g_xuexiao_bh = ''; // '<%=s_xuexiao_bh%>'; // 学校编号 ajax({})
+        var g_xuexiao_mc = ''; // 学校名称
+        var g_zhongxin_zb = ''; // 地图中心点坐标
+        var g_ditu_suofang = 15; // 地图缩放级别
+        var g_poly_max = -1; // 最多允许画几个多边形。-1 表示不限
+
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        $(function(){
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //                                                   设置区域大小
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            // //=====初始化设置地图宽高
+            // setDituSize();
+            
+            //——————————————————————————————————————————
+            //=====窗口变化事件
+            // $(window).on('resize', function(){
+            //     setDituSize();
+            // });
+
+            //——————————————————————————————————————————
+            /**
+             * 函数：设置地图宽高
+             * (高度一定要在设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
+             */
+            function setDituSize(){
+                var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
+                    winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
+                // 整个区域
+                var eleAll = $('.bds'),
+                    allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
+                    allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
+                    allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
+                    allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
+                    allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
+                    allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
+                    allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
+                    allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
+                //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
+                // 顶部区域
+                var eleTop = $('.bds__editor'),
+                    topHeight = eleTop.outerHeight(true);
+                // 地图区域
+                var eleTu = $('.bds__map'),
+                    tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                    tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
+                    tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
+                    tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
+                    tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
+                    tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                    tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
+                    tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
+                    tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
+                // 计算宽高
+                var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
+                    allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
+                    tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
+                    tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
+                // console.log('bodyWidth：', $('body').width(), '\nallMargLeft:',allMargLeft, '\nallMargRight:',allMargRight, '\nallPadLeft:',allPadLeft, '\nallPadRight:', allPadRight);
+                // console.log('tuMargLeft:',tuMargLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadRight:',tuPadRight);
+                // console.log('--------------------------------');
+                // 设置地图宽高
+                $('.bds__map').css({
+                    width: tuWidth,
+                    height: tuHeight
+                });
+                $('#map').css({
+                    width: eleTu.width(),
+                    height: eleTu.height()
+                });
+            }
+
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //                                                   权限控制
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====后台返回学校审核状态
+            var checkData = {
+                "return": "ok", "data":[{
+                    "check_sh": "0"
+                }]
+            }
+            /*
+            // START AJAX
+            var checkData = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取学校审核状态",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                data: {
+                    "action": "wh_xuexiao_check_sh_sel",
+                    "menu_bh": "<%=s_menu_bh%>",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "xuexiao_bh": g_xuexiao_bh
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    checkData = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                // return; // 非函数内部不要直接用return 否则会报错
+            }
+            // END AJAX
+            */
+
+             // 已审核的记录不显示操作区域
+            if(typeof checkData.data != 'undefined'){ 
+                if(parseInt(checkData.data[0]["check_sh"]) == 1){
+                    $('#btn-pick-save, #btn-poly-del, #btn-poly-save, .bds__mouse').remove();
+                    $('.bds__coord label').css({
+                        display: 'block',
+                        marginTop: '15px',
+                        fontSize: '16px',
+                        color: '#ff0000'
+                    }).text('注意：当前学校已审核，无法进行学校地址坐标、学区坐标的更改与删除操作，如需进行这些操作，请联系审核人取消审核！');
+                }
+            }
+
+
+
+
+            
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //                                                   获取数据
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //======后台返回学校坐标数据
+            var schoolData = {
+                "return":"ok", "data":[{
+                    "xuexiao_bh": "X1001", 
+                    "xuexiao_mc": "泉州五中", 
+                    "xuexiao_ms": "泉州五中是泉州市最好的学校", 
+                    "zuobiao": "118.611836,24.918225", 
+                    "ditu_suofang": "16"
+                }]
+            }
+            /*
+            // START AJAX
+            var schoolData = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取学校中心点坐标数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                data: {
+                    "action": "wh_xuexiao_query_one",
+                    "menu_bh": "<%=s_menu_bh%>",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "xuexiao_bh": g_xuexiao_bh
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    schoolData = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                // return; // 非函数内部不要直接用return 否则会报错
+            }
+            // END AJAX
+            */
+
+            // 全局赋值
+            if(schoolData != '' && !$.isEmptyObject(schoolData)){
+                var firstRowData = schoolData.data[0];
+                g_xuexiao_mc = firstRowData["xuexiao_mc"];
+                g_zhongxin_zb = firstRowData["zuobiao"];
+                g_ditu_suofang = neuiBdmap.checkZoomIsValid(firstRowData["ditu_suofang"]) ? parseInt(firstRowData["ditu_suofang"]) : g_ditu_suofang;
+                // console.log('级别：', g_ditu_suofang)
+            }
+
+
+
+            //——————————————————————————————————————————
+            //======后台返回学区范围坐标数据
+            var coordinateData = { // 泉州市点坐标数组
+                "return":"ok",
+                "data":[
+                    { "weizhi":"1001", "data":[
+                        {"zuobiao":"118.599547, 24.9246154"},
+                        {"zuobiao":"118.607812, 24.9197654"},
+                        {"zuobiao":"118.594948, 24.91308"}
+                    ]},
+                    { "weizhi":"1002", "data":[
+                        {"zuobiao":"118.602206, 24.914588"},
+                        {"zuobiao":"118.612986, 24.912294"},
+                        {"zuobiao":"118.606302, 24.906198"},
+                        {"zuobiao":"118.601991, 24.904035"},
+                        {"zuobiao":"118.598829, 24.908361"}
+                    ]},
+                    { "weizhi":"1003", "data":[
+                        {"zuobiao":"118.609488,24.896851"},
+                        {"zuobiao":"118.6093,24.89628"},
+                        {"zuobiao":"118.608888,24.895311"},
+                        {"zuobiao":"118.608403,24.895458"},
+                        {"zuobiao":"118.608388,24.895506"},
+                        {"zuobiao":"118.608567,24.895937"},
+                        {"zuobiao":"118.608648,24.896178"},
+                        {"zuobiao":"118.608675,24.896371"},
+                        {"zuobiao":"118.608576,24.896412"},
+                        {"zuobiao":"118.608504,24.896432"},
+                        {"zuobiao":"118.608463,24.896507"},
+                        {"zuobiao":"118.608428,24.896613"},
+                        {"zuobiao":"118.60746,24.896912"},
+                        {"zuobiao":"118.607594,24.897138"},
+                        {"zuobiao":"118.607647,24.897144"},
+                        {"zuobiao":"118.607719,24.897251"},
+                        {"zuobiao":"118.608006,24.897612"},
+                        {"zuobiao":"118.607292,24.898022"},
+                        {"zuobiao":"118.607642,24.898518"},
+                        {"zuobiao":"118.609593,24.897216"},
+                        {"zuobiao":"118.609488,24.896851"}
+                    ]}
+                ]
+            }
+            /*
+            // START AJAX
+            var coordinateData = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取学区范围坐标",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                data: {
+                    "action": "wh_xuexiao_xq_zuobiao_query_one",
+                    "menu_bh": "<%=s_menu_bh%>",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "xuexiao_bh": g_xuexiao_bh
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    coordinateData = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                // return; // 非函数内部不要直接用return 否则会报错
+            }
+            // END AJAX
+            */
+
+
+            // 将坐标数据转化经纬度坐标数组
+            /*
+            * 转化后的二维数组格式示例eg：
+                var coordinateArray = [
+                    [
+                        { lng: 116.256515, lat: 39.995242 },
+                        { lng: 116.502579, lat: 39.951893 },
+                        { lng: 116.256515, lat: 39.866882 }
+                    ],[
+                        { lng: 116.264158, lat: 40.31587 },
+                        { lng: 116.280256, lat: 40.188118 },
+                        { lng: 116.417086, lat: 40.189882 }
+                    ]
+                ]
+            */
+            var coordinateArray = [ ];
+            if(typeof coordinateData.data != 'undefined'){
+                for(var i1 = 0; i1 < coordinateData.data.length; i1++){
+                    var item1 = coordinateData.data[i1];
+                    var arr = [ ];
+                    if(typeof item1.data != 'undefined'){
+                        for(var i2 = 0; i2 < item1.data.length; i2++){
+                            var item2 = item1.data[i2];
+                            var zb = item2.zuobiao;
+                            var tmpArr = item2.zuobiao.split(','),
+                                longitude = tmpArr[0], latitude = tmpArr[1];
+                            arr.push({
+                                lng: longitude,
+                                lat: latitude
+                            });
+                        }
+                    }
+                    coordinateArray.push(arr);
+                }
+            }
+
+            // 将坐标数据转化成覆盖物标识符数组
+            var identifyArray = [ ];
+            if(typeof coordinateData.data != 'undefined'){
+                for(var i = 0; i < coordinateData.data.length; i++){
+                    var item = coordinateData.data[i];
+                    identifyArray.push(item["weizhi"]);
+                }
+            }
+
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //                                          百度地图上展示数据并进行交互操作
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //————————————————————————————————————————————————
+            // 地图初始化参数
+            var options = {
+                // 编程语言环境(可选)。注：不同环境下地图展示与交互可能有不同,故可能需要区分下。
+                environment: {
+                    language: '.net' // 语言类型(可选)： 默认.net。值： .net 即Csharp .aspx页面, .php即php页面
+                },
+                // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
+                width: 'auto', // 宽(可选)，默认auto
+                height: 'auto', // 高(可选)，默认auto
+                setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于width/height参数。
+                    // setDituSize();
+                },
+                onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于width/height参数。
+                    // setDituSize();
+                },
+                zoom: g_ditu_suofang, // 地图缩放级别(可选)，默认11。 值：3-19
+                // 中心点(可选)
+                center: {
+                    city: "", // 城市(可选)，默认空。值：空时根据坐标定位, 非空时根据城市定位。eg.'泉州市', eg.'泉州市惠安县'。
+                    coordinate: g_zhongxin_zb,  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
+                    caption: g_xuexiao_mc, // 标题文字(可选)，默认空。
+                    describe: "", // 描述文字(可选)，默认空。
+                    enableDrag: true, // 是否允许拖拽(可选)，默认false
+                    enableClickCreateNew: true, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
+                    // 用点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                    clickCallback: function(e){
+                        $('#c-locate').val(e.lng + ',' + e.lat); // 输入框赋值
+                    },
+                    // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                    complete: function(e){
+                        $('#c-locate').val(e.lng + ',' + e.lat);
+                    },
+                    // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                    dragEnd: function(e){
+                        $('#c-locate').val(e.lng + ',' + e.lat);
+                    },
+                },
+
+                // 点标记功能(可选)
+                markers: {
+                    markOptions: { // 点标记默认配置项(可选)。
+                        image: { // 自定义图标(可选)
+                            enable: false, // 是否允许自定义图标(可选)，默认false
+                            path: "assets/neatui/img/", // 图片路径(可选)
+                            icon: "bmap_locate_default3.png", // 图片名称(可选)
+                            size: 50 // 图片大小(可选)
+                        }
+                    }
+                }
+            }
+
+
+            //————————————————————————————————————————————————
+            // 创建地图并初始化
+            neuiBdmap('map', options);
+
+
+            //————————————————————————————————————————————————
+            // 判断中心点坐标是否有效，若无效，则重置中心点
+            // !!!警告：请勿在地图初始化参数center.complete函数中调用本函数setMapCenter()，否则会陷入死循环导致页面崩溃！
+            if(neuiBdmap.checkCoordinateIsValid(g_zhongxin_zb) == false){
+                neuiBdmap.setMapCenter('泉州', {
+                    title: '泉州东海——市政府所在地',
+                    describe: ''
+                });
+            }
+
+
+
+            //————————————————————————————————————————————————
+            // 创建多边形覆盖物
+            neuiBdmap.createPolygonOverlays({
+                points: coordinateArray, // 多边形覆盖物坐标组成的二维数组，有N个多边形数组就有N个元素。
+                // 格式：
+                // [
+                //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..], // 第1个多边形的N个点
+                //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..],// 第2个多边形的M个点
+                //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..] // 第3个多边形的L个点
+                // ];
+                hideValues: identifyArray, // 多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
+                buttons: { // 按钮(可选)
+                    enable: true,  // 是否添加操作按钮(可选)，默认false
+                    text: '删除当前学区范围', // 操作按钮的文本，默认'删除'
+                    callback: function(e){  // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
+                        // console.log('e：', e);
+                        var ls_data_bh = e.id,
+                            ls_ply_uid = e.polyLayId,
+                            ls_btn_uid = e.btnLayId;
+                        fnDelOneArea(ls_data_bh, ls_ply_uid, ls_btn_uid);
+                    }
+                },
+            });
+
+
+
+
+            //————————————————————————————————————————————————
+            // 开启鼠标绘图功能
+            neuiBdmap.createDrawingToolbar({
+                enable: true, // 是否启用鼠标绘图功能(可选)，默认true。
+                drawingModes: [ // 工具栏上可以选择出现的绘制模式(可选)，默认空数组表示不显示任何绘制模式。请将需要显示的模式值以数组形式传入。数组元素值：dot 画点(画位置), circle 画圆, line 画线, gon 画多边形, rectangle 画矩形
+                    // 'dot', // 画点(画位置)
+                    // 'circle', // 画圆
+                    'line', // 画线
+                    'gon', // 画多边形
+                    'rectangle' // 画矩形
+                ],
+                operateButton: { // 操作按钮(可选)
+                    buttoned: true, // 是否添加操作按钮(可选)，默认false
+                    btnText: '删除当前 学区范围' // 操作按钮的文本(可选)，默认'删除'
+                },
+                stepDescription: { // 绘制步骤说明(可选)
+                    enable: true, // 是否启用功能(可选)，默认true
+                    title: '绘制学区范围步骤说明', // 标题(可选)，有默认值
+                    content: '' // 自定义详细的绘制步骤说明(可选)，默认空。支持HTML
+                }
+            });
+
+
+
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //                                                   系列事件
+            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+            //——————————————————————————————————————————
+            //=====复制按钮、复制当前坐标
+            $('#btn-pick-copy').on('click', function(){
+                var $text = $(this).siblings('#c-locate')
+                var value = $text.val();
+                $text[0].select();
+                document.execCommand("Copy"); // 执行浏览器复制命令
+                var tips = '已复制好，可贴粘！';
+                // alert(tips);
+                neuiDialog.notice({
+                    message: tips,
+                    theme: 'black',
+                    maskOpacity: 1
+                })
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====保存按钮、保存中心点坐标按钮
+            $('#btn-pick-save').on('click', function(){
+                var ls_zuobiao = $('#c-locate').val();
+                // console.log('坐标xx：', ls_zuobiao);
+                // 开始执行
+                var flag = '', msg = '保存成功';
+                neui.showAnimate();
+                setTimeout(function(){
+                    // 后台返回
+                    /*
+                    // START AJAX
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "保存中心点坐标",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "POST",
+                        dataType: "html",
+                        cache: false,
+                        url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                        data: {
+                            "action": "wh_xuexiao_zuobiao_ins",
+                            "menu_bh": "<%=s_menu_bh%>",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "xuexiao_bh": g_xuexiao_bh,
+                            "zuobiao": ls_zuobiao
+                        },
+                        success: function(res){
+                            if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            var json = JSON.parse(res);
+                            flag = json.return == 'ok' ? 1 : 0;
+                            if(!flag) msg = json.data;
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // END AJAX
+                    */
+                    flag = parseInt(1); // 1 成功, 0 失败
+                    if(!flag) msg = '保存失败';
+
+                    neuiDialog.alert({
+                        message: msg,
+                        buttons: ['确定']
+                    })
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+
+
+            
+            //——————————————————————————————————————————
+            //=====保存学区范围按钮
+            $('#btn-poly-save').on('click', function(){
+                var ls_ditu_suofang = neuiBdmap.getZoom(); // 获取地图缩放级别
+                var coordArr = neuiBdmap.getPolyCoordinateData();  // 获取所有多边形坐标数据
+                // console.log('缩放级别：', ls_ditu_suofang);
+                // console.log('坐标：', coordArr);
+                var currentLen = coordArr.length;
+                if(g_poly_max != -1 && currentLen > g_poly_max){
+                    neuiDialog.alert({
+                        animate: true,
+                        message: '最多只能画' + g_poly_max + '个学区范围<br>当前已有' + currentLen + '个，请删除' + (currentLen - g_poly_max) + '个',
+                        buttons: ['确定']
+                    })
+                }
+
+                // 开始执行
+                var marks = '', tips = '保存地图缩放级别成功';
+                var flag = '', msg = '保存成功';
+                neui.showAnimate();
+                setTimeout(function(){
+
+                    // 1. 保存地图缩放级别
+                    // 后台返回
+                    /*
+                    // START AJAX
+                    var isHoldOn = true;
+                    ajax({
+                        heading: "保存地图缩放级别",
+                        debug: false,
+                        async: false, // 取数方式. true 异步, false 同步(默认)
+                        type: "POST",
+                        dataType: "html",
+                        cache: false,
+                        url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                        data: {
+                            "action": "wh_xuexiao_ditu_suofang_ins",
+                            "menu_bh": "<%=s_menu_bh%>",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "xuexiao_bh": g_xuexiao_bh,
+                            "ditu_suofang": ls_ditu_suofang
+                        },
+                        success: function(res){
+                            if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                            var json = JSON.parse(res);
+                            marks = json.return == 'ok' ? 1 : 0;
+                            if(!marks) tips = json.data;
+                        },
+                        error: function(res){
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                        },
+                        beforeSend: function(XMLHttpRequest){ },
+                        complete: function(XMLHttpRequest, textStatus){ }
+                    })
+                    if(!isHoldOn){
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // END AJAX
+                    */
+                    marks = parseInt(1); // 1 成功, 0 失败
+                    if(!marks) tips = '保存地图缩放级别失败';
+    
+                    if(!marks){ // 失败才提示
+                        neuiDialog.alert({
+                            message: tips,
+                            buttons: ['确定']
+                        })
+                        neui.destroyAnimate();
+                        return;
+                    }
+
+
+                    // 2、保存学区范围坐标
+                    for(var i = 0; i < coordArr.length; i++){
+                        var row = coordArr[i];
+                        var xuhao = "100" + (i + 1); // eg.1001, 1002, 1003, ...
+                            data = row;
+                        var saveArr1 = [ xuhao, data ]
+                        // console.log('外部行循环数组:', saveArr1);
+                        var isGoOn = true; // 是否继续循环, true 是, false 否
+                        for(var k = 0; k < data.length; k++){
+                            var ls_weizhi = xuhao,
+                                ls_zuobiao = data[k],
+                                ls_counts = i == 0 && k == 0 ? 0 : ''; // 第一行传0，其它传空
+                            var saveArr2 = [ ls_weizhi, ls_zuobiao, ls_counts ]
+                            // console.log('内部行循环数组：', saveArr2);
+
+                            // 后台返回
+                            /*
+                            // START AJAX
+                            var isHoldOn = true;
+                            ajax({
+                                heading: "保存学区范围坐标",
+                                debug: false,
+                                async: false, // 取数方式. true 异步, false 同步(默认)
+                                type: "POST",
+                                dataType: "html",
+                                cache: false,
+                                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                                data: {
+                                    "action": "wh_xuexiao_xq_zuobiao_ins",
+                                    "menu_bh": "<%=s_menu_bh%>",
+                                    "user": "<%=s_user%>",
+                                    "sjk": "<%=s_sjk%>",
+                                    "xuexiao_bh": g_xuexiao_bh,
+                                    "weizhi": ls_weizhi,
+                                    "zuobiao": ls_zuobiao,
+                                    "counts": ls_counts
+                                },
+                                success: function(res){
+                                    if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    var json = JSON.parse(res);
+                                    flag = json.return == 'ok' ? 1 : 0;
+                                    if(!flag) msg = json.data;
+                                },
+                                error: function(res){
+                                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                },
+                                beforeSend: function(XMLHttpRequest){ },
+                                complete: function(XMLHttpRequest, textStatus){ }
+                            })
+                            if(!isHoldOn){
+                                neui.destroyAnimate();
+                                // return;
+                                // 注意：在for循环中要这样写,才能在后台错误时中断执行 add 20210621-1 下2行
+                                flag = 0; // 1 成功, 0 失败
+                                isGoOn = false;
+                            }
+                            // END AJAX
+                            */
+                            flag = parseInt(1); // 1 成功, 0 失败
+                            if(!flag) msg = '保存失败';
+
+                            if(!flag){
+                                isGoOn = false;
+                                break;
+                            }
+                        } // END 内层FOR
+
+                        if(!isGoOn) break;
+                    } // END 外层FOR
+
+                    neuiDialog.alert({
+                        message: msg,
+                        buttons: ['确定'],
+                        callBack: function(){
+                            if(flag){
+                                // 重载页面
+                                // window.location.reload();
+                                neuiBdmap.reloadPageWhenCsharp();  // ASP.NET中 使用这个
+                            }
+                        }
+                    })
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+
+
+            //————————————————————————————————————————————————
+            /**
+             * 删除一个学区范围、删除一个多边形区域
+             * @param {string} ps_weizhi 学区范围编号
+             * @param {string} ps_ply_uid 多边形覆盖物唯一标识符
+             * @param {string} ps_btn_uid 多边形覆盖物上面的按钮唯一标识符
+             */
+            function fnDelOneArea(ps_weizhi, ps_ply_uid, ps_btn_uid){
+                neuiDialog.alert({
+                    message: '确认删除当前学区范围？',
+                    buttons: ['确定', '取消'],
+                    callBack: function(ret){
+                        if(ret == 1){
+                            // 开始执行
+                            var flag = '', msg = '删除成功';
+                            neui.showAnimate();
+                            setTimeout(function(){
+                                // 后台返回
+                                /*
+                                // START AJAX
+                                var isHoldOn = true;
+                                ajax({
+                                    heading: "删除单个学区范围",
+                                    debug: false,
+                                    async: false, // 取数方式. true 异步, false 同步(默认)
+                                    type: "POST",
+                                    dataType: "html",
+                                    cache: false,
+                                    url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                                    data: {
+                                        "action": "wh_xuexiao_xq_weizhi_del",
+                                        "menu_bh": "<%=s_menu_bh%>",
+                                        "user": "<%=s_user%>",
+                                        "sjk": "<%=s_sjk%>",
+                                        "xuexiao_bh": g_xuexiao_bh,
+                                        "weizhi": ps_weizhi
+                                    },
+                                    success: function(res){
+                                        if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                        var json = JSON.parse(res);
+                                        flag = json.return == 'ok' ? 1 : 0;
+                                        if(!flag) msg = json.data;
+                                    },
+                                    error: function(res){
+                                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    },
+                                    beforeSend: function(XMLHttpRequest){ },
+                                    complete: function(XMLHttpRequest, textStatus){ }
+                                })
+                                if(!isHoldOn){
+                                    neui.destroyAnimate();
+                                    return;
+                                }
+                                // END AJAX
+                                */
+                                flag = parseInt(1); // 1 成功, 0 失败
+                                if(!flag) msg = '删除失败';
+
+                                neuiDialog.alert({
+                                    popup: flag ? false : true, // 成功不弹窗，失败才弹窗
+                                    message: msg,
+                                    buttons: ['确定'],
+                                    callBack: function(){
+                                        if(flag){ // 成功
+                                            neuiBdmap.removeOnePolyOverlay([ps_ply_uid, ps_btn_uid]); // 清除一个多边形覆盖物
+                                        }
+                                    }
+                                })
+
+                                neui.destroyAnimate();
+                            }, 100)
+                        }
+                    }
+                })
+            }
+
+
+
+            //——————————————————————————————————————————
+            //=====删除学区范围按钮、删除全部学区范围
+            $('#btn-poly-del').on('click', function(){
+                neuiDialog.alert({
+                    animate: true,
+                    message: '确认删除学区范围？',
+                    buttons: ['确定', '取消'],
+                    callBack: function(ret){
+                        if(ret == 1){
+                            var coordArr = neuiBdmap.getPolyCoordinateData(); // 获取坐标数据
+                            // console.log('坐标：', coordArr);
+                            // 开始执行
+                            var flag = '', msg = '删除成功';
+                            neui.showAnimate();
+                            setTimeout(function(){
+                                // 后台返回
+                                /*
+                                // START AJAX
+                                var isHoldOn = true;
+                                ajax({
+                                    heading: "删除全部学区范围坐标",
+                                    debug: false,
+                                    async: false, // 取数方式. true 异步, false 同步(默认)
+                                    type: "POST",
+                                    dataType: "html",
+                                    cache: false,
+                                    url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                                    data: {
+                                        "action": "wh_xuexiao_xq_zuobiao_del",
+                                        "menu_bh": "<%=s_menu_bh%>",
+                                        "user": "<%=s_user%>",
+                                        "sjk": "<%=s_sjk%>",
+                                        "xuexiao_bh": g_xuexiao_bh
+                                    },
+                                    success: function(res){
+                                        if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                        var json = JSON.parse(res);
+                                        flag = json.return == 'ok' ? 1 : 0;
+                                        if(!flag) msg = json.data;
+                                    },
+                                    error: function(res){
+                                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    },
+                                    beforeSend: function(XMLHttpRequest){ },
+                                    complete: function(XMLHttpRequest, textStatus){ }
+                                })
+                                if(!isHoldOn){
+                                    neui.destroyAnimate();
+                                    return;
+                                }
+                                // END AJAX
+                                */
+                                flag = parseInt(1); // 1 成功, 0 失败
+                                if(!flag) msg = '删除失败';
+
+                                neuiDialog.alert({
+                                    message: msg,
+                                    buttons: ['确定'],
+                                    callBack: function(){
+                                        if(flag){ // 成功
+                                            neuiBdmap.clearAllPolyOverlay(); // 清除全部多边形覆盖物
+                                        }
+                                    }
+                                })
+
+                                neui.destroyAnimate();
+                            }, 100)
+                        }
+                    }
+                })
+            });
+
+
+
+
+
+            //——————————————————————————————————————————
+            //=====地点定位按钮
+            $('#btn-locate').on('click', function(){
+                // 使用IFRAME打开
+                var linkUrl = 'Bdmap—百度地图控件-示例1_学校地点定位（地点定位，获取城市住宅小区等地点边界）.html'; // ajax({})
+                neui.openIframe({
+                    url: linkUrl,
+                    caption: '地点定位',
+                    // top: '1%',
+                    // width: '98%',
+                    // titleHeight: 45,
+                    // titleFontSize:'18px',
+                    // showCross: true,
+                    // crossDirection: 'right',
+                    closeCallBack: function(){ 
+                        // 重载页面
+                        // window.location.reload();
+                        neuiBdmap.reloadPageWhenCsharp();  // ASP.NET中 使用这个
+                    }
+                })
+            });
+
+
+
+        }); // $(function(){})
+    </script>
+</body>
+</html>

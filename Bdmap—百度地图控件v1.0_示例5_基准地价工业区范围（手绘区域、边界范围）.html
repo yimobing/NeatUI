@@ -12,152 +12,87 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>neuiBdmap | 百度地图控件</title>
+    <title>绘制基准地价工业区范围</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241126-3"><!--百度地图控件-->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_fanwei.css"><!--当前页面样式-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241127-5"> <!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_layout.css?v=20241127-5"> <!--百度地图坐标页面通用布局-->
 </head>
 
 <body>
 
     <style>
-         /*+-------------------------+*/
-        .bdmap__picker>div{ display: inline-block; vertical-align: top; margin-left: 35px; }
-        .bdmap__picker>div:first-child{ margin-left: 0; }
+        .bds__locate { height: 32px; line-height: 32px; }
+        .bds__locate label { color: #ff0000; font-size: 14px; font-weight: 530; }
     </style>
 
-    <div class="bdmap" id="allmap">
-        <div class="bdmap__editor">
-            <div class="bdmap__picker">
-                <div class="bdmap__coord">
-                    当前学校坐标 <input type="text" id="c-locate">
-                    <button type="button" data-type="copy" id="btn-pick-copy">复制</button>
-                    <button type="button" data-type="save" id="btn-pick-save">保存学校坐标</button>
-                    <label> (拖动点标记可更改坐标) </label>
-                </div><!--/.bdmap__coord-->
-                <div class="bdmap__btn">
-                    <button type="button" data-type="del" id="btn-poly-del">删除学区范围</button>
-                    <button type="button" data-type="save" id="btn-poly-save">保存学区范围</button>
-                </div><!--/.bdmap__btn-->
-                <div class="bdmap__locate">
-                    <label>陌生小区，边界难画？请使用：</label>
-                    <button type="button" data-type="save" id="btn-locate">地点定位</button>
-                </div><!--/.bdmap__locate-->
-            </div><!--/.bdmap__picker-->
-            <div class="bdmap__draw"></div><!--/.bdmap__draw-->
-        </div><!--/.bdmap__editor-->
-        <div class="bdmap__map">
+    <div class="bds">
+        <div class="bds__editor">
+            <div class="bds__coord">
+                中心点坐标 <input type="text" id="c-locate" readonly>
+                <button type="button" class="ne-btn has-texture blue" id="btn-pick-save">保存</button>
+                <button type="button" class="ne-btn has-texture" id="btn-pick-copy">复制</button>
+                <label> (拖动中心点或在地图上任意位置点击可更改坐标) </label>
+            </div><!--/.bds__coord-->
+            <div class="bds__btn">
+                <button type="button" class="ne-btn has-texture red" id="btn-poly-del">删除工业区范围</button>
+                <button type="button" class="ne-btn has-texture blue" id="btn-poly-save">保存工业区范围</button>
+            </div><!--/.bds__btn-->
+            <div class="bds__locate">
+                <label>注意：最多只能画一个工业区范围！</label>
+            </div><!--/.bds__locate-->
+        </div><!--/.bds__editor-->
+        <div class="bds__map">
             <div id="map"></div>
-          
-            <div id="showPanelBtn">编辑多边形&lt;</div>
-            <div id="panelWrap">
-                <div id="showOverlayInfo">此处用于展示覆盖物信息</div>
-                <div id="panel"></div>
-            </div>
-        </div><!--/.bdmap__map-->
-    </div><!--/.allmap-->
-    
-    <div id="result">
-        <dl>
-            <dt>绘制工具功能</dt>
-            <dd>
-                <ul>
-                    <li><label><input type="radio" name="openClose1" onclick="bdChinaMap.drawingManager.open()" />打开</label>
-                        <label><input type="radio" name="openClose1" onclick="bdChinaMap.drawingManager.close()" checked="checked" />关闭</label></li>
-                </ul>
-            </dd>
+        </div><!--/.bds__map-->
+    </div><!--/.bds-->
 
-            <dt>是否进行线或面积的计算(单位米)</dt>
-            <dd>
-                <ul>
-                    <li>
-                        <label><input type="radio" name="openClose" onclick="bdChinaMap.drawingManager.enableCalculate()">打开</label> 
-                        <label><input type="radio" name="openClose" onclick="bdChinaMap.drawingManager.disableCalculate()" checked="checked">关闭</label>
-                    </li>
-                </ul>
-            </dd>
-
-            <dt>绘制功能</dt>
-            <dd>
-                <ul>
-                    <li>
-                        <label><input type="radio" name="drawmode"  onclick="bdChinaMap.drawingManager.setDrawingMode(BMAP_DRAWING_MARKER)" checked="checked">画点</label>
-                        <input type="checkbox" id="isInfowindow"> 是否带信息窗口
-                    </li>
-                    <li>
-                        <label><input type="radio" name="drawmode" onclick="bdChinaMap.drawingManager.setDrawingMode(BMAP_DRAWING_CIRCLE)">画圆</label>
-                    </li>
-                    <li>
-                        <label><input type="radio" name="drawmode" onclick="bdChinaMap.drawingManager.setDrawingMode(BMAP_DRAWING_POLYLINE)">画线</label>
-                    </li>
-                    <li>
-                        <label><input type="radio" name="drawmode" onclick="bdChinaMap.drawingManager.setDrawingMode(BMAP_DRAWING_POLYGON)">画多边形</label>
-                    </li>
-                    <li>
-                        <label><input type="radio" name="drawmode" onclick="bdChinaMap.drawingManager.setDrawingMode(BMAP_DRAWING_RECTANGLE)">画矩形</label>
-                    </li>
-                </ul>
-            </dd>
-
-            <dt>覆盖物操作</dt>
-            <dd>
-                <ul>
-                    <li>
-                        <input type="button" value="获取绘制的覆盖物个数" onclick="bdChinaMap.getCount()" />
-                        <input type="button" value="清除所有覆盖物" onclick="bdChinaMap.clearAll()" />
-                        <input type="button" value="获取最后一个覆盖物信息" onclick="bdChinaMap.getOverLay()" />
-                    </li>
-                </ul>
-            </dd>
-        </dl>
-    </div>
     
 
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
     <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
-    <script src="assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具条库-->
+    <script src="assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具 -->
     <script src="assets/libs/jquery-1.8.3.min.js"></script> <!--Jq库-->
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241126-3"></script> <!--百度地图控件-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241127-5"></script> <!--百度地图控件-->
     <script>
         /*+————————————————全局变量————————————————+*/
-        var g_xuexiao_bh = ''; // '<%=s_xuexiao_bh%>'; // 学校编号 ajax({})
-        var g_xuexiao_mc = ''; // 学校名称
+        var g_dijia_bh = "<%=s_dijia_bh%>"; // 工业区编号 ajax({})
+        var g_dijia_mc = ''; // 工业区名称
         var g_zhongxin_zb = ''; // 地图中心点坐标
-        var g_ditu_suofang = ''; // 地图缩放级别
+        var g_poly_max = 1; // 最多允许画几个多边形。-1 表示不限
         
 
 
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-        //                                                   初始化
+        //                                                   设置区域大小
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-        
         //——————————————————————————————————————————
-        // //=====初始化地图宽高 add 20210621-1
+        // //=====初始化设置地图宽高
         // setDituSize();
         
         //——————————————————————————————————————————
-        //=====检测窗口变化事件 edit 20210621-1
+        //=====窗口变化事件
         // $(window).on('resize', function(){
         //     setDituSize();
         // });
 
+        //——————————————————————————————————————————
         /**
-         * 函数：设置地图宽高 edit 20210621-1
+         * 函数：设置地图宽高
          * (高度一定要在设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
          */
-        function setDituSize(){
+         function setDituSize(){
             var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
                 winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
             // 整个区域
-            var eleAll = $('.bdmap'),
+            var eleAll = $('.bds'),
                 allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
                 allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
                 allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
@@ -168,10 +103,10 @@
                 allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
             //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
             // 顶部区域
-            var eleTop = $('.bdmap__editor'),
+            var eleTop = $('.bds__editor'),
                 topHeight = eleTop.outerHeight(true);
             // 地图区域
-            var eleTu = $('.bdmap__map'),
+            var eleTu = $('.bds__map'),
                 tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
                 tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
                 tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
@@ -190,15 +125,16 @@
             // console.log('tuMargLeft:',tuMargLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadRight:',tuPadRight);
             // console.log('--------------------------------');
             // 设置地图宽高
-            $('.bdmap__map').css({
+            $('.bds__map').css({
                 width: tuWidth,
                 height: tuHeight
-            })
+            });
             $('#map').css({
                 width: eleTu.width(),
                 height: eleTu.height()
-            })
+            });
         }
+
 
 
 
@@ -207,37 +143,36 @@
         //                                                      获取数据
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //——————————————————————————————————————————
-        //======后台返回学校坐标数据
-        var schoolData = {
-            "return":"ok", "data":[
-                // testing2
-                {"xuexiao_bh":"X1001", "xuexiao_mc":"泉州五中", "xuexiao_ms":"泉州五中是泉州市最好的学校", "zuobiao":"118.611836,24.918225", "ditu_suofang":"15"}
-                // {"xuexiao_bh":"X1001", "xuexiao_mc":"泉州五中", "xuexiao_ms":"泉州五中是泉州市最好的学校", "zuobiao":"118.611836,undefined", "ditu_suofang":"15"}
-            ]
+        //======后台返回工业区坐标数据
+        var landPriceData = {
+            "return":"ok",
+            "dijia_bh":"D1001", 
+            "dijia_mc":"清蒙工业区", 
+            "zuobiao_zhongxin":"118.611836,24.918225" 
         }
         /*
-        //START AJAX
-        var schoolData = {}
+        // START AJAX
+        var landPriceData = {}
         var isHoldOn = true;
         ajax({
-            heading: "获取学校坐标",
+            heading: "获取工业区中心点坐标数据",
             debug: false,
             async: false, // 取数方式. true 异步, false 同步(默认)
             type: "POST",
             dataType: "html",
             cache: false,
-            url: "../fwh_pub/jk_xuexiao_xq.ashx",
+            url: "../fwh_pub/jk_gongye_jizhun.ashx",
             data: {
-                "action": "wh_xuexiao_query_one",
+                "action": "wh_gongye_jizhun_dijia_one",
                 "menu_bh": "<%=s_menu_bh%>",
                 "user": "<%=s_user%>",
                 "sjk": "<%=s_sjk%>",
-                "xuexiao_bh": g_xuexiao_bh
+                "dijia_bh": g_dijia_bh
             },
             success: function(res){
                 if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
                 // if(res == '') return;
-                schoolData = JSON.parse(res);
+                landPriceData = JSON.parse(res);
             },
             error: function(res){
                 if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -248,21 +183,21 @@
         if(!isHoldOn){
             // return; // 非函数内部不要直接用return 否则会报错
         }
-        //END AJAX
+        // END AJAX
         */
 
         // 全局赋值
-        if(schoolData != '' && !$.isEmptyObject(schoolData)){
-            var firstRowData = schoolData.data[0];
-            g_xuexiao_mc = firstRowData["xuexiao_mc"];
-            g_zhongxin_zb = firstRowData["zuobiao"];
-            g_ditu_suofang = firstRowData["ditu_suofang"];
+        if(landPriceData != '' && !$.isEmptyObject(landPriceData)){
+            var firstRowData = landPriceData;
+            g_dijia_mc = firstRowData["dijia_mc"];
+            g_zhongxin_zb = firstRowData["zuobiao_zhongxin"];
+            if(g_zhongxin_zb == '') g_zhongxin_zb = '118.611836,24.918225'; // 中心点坐标为空时，默认指定一个中心点坐标
         }
         
 
         //——————————————————————————————————————————
-        //======后台返回学区坐标数据
-        var coordinateJson = { // 泉州市点坐标数组
+        //======后台返回工业区范围坐标数据
+        var coordinateData = {
             "return":"ok",
             "data":[
                 { "weizhi":"1001", "data":[
@@ -303,28 +238,28 @@
             ]
         }
         /*
-        //START AJAX
-        var coordinateJson = {}
+        // START AJAX
+        var coordinateData = {}
         var isHoldOn = true;
         ajax({
-            heading: "获取学区坐标",
+            heading: "获取工业区范围坐标",
             debug: false,
             async: false, // 取数方式. true 异步, false 同步(默认)
             type: "POST",
             dataType: "html",
             cache: false,
-            url: "../fwh_pub/jk_xuexiao_xq.ashx",
+            url: "../fwh_pub/jk_gongye_jizhun.ashx",
             data: {
-                "action": "wh_xuexiao_xq_zuobiao_query_one",
+                "action": "wh_gongye_jizhun_zuobiao_query_one",
                 "menu_bh": "<%=s_menu_bh%>",
                 "user": "<%=s_user%>",
                 "sjk": "<%=s_sjk%>",
-                "xuexiao_bh": g_xuexiao_bh
+                "dijia_bh": g_dijia_bh
             },
             success: function(res){
                 if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
                 // if(res == '') return;
-                coordinateJson = JSON.parse(res);
+                coordinateData = JSON.parse(res);
             },
             error: function(res){
                 if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -335,7 +270,7 @@
         if(!isHoldOn){
             // return; // 非函数内部不要直接用return 否则会报错
         }
-        //END AJAX
+        // END AJAX
         */
 
 
@@ -355,9 +290,9 @@
             ]
         */
         var coordinateArray = [ ];
-        if(typeof coordinateJson.data != 'undefined'){
-            for(var i1 = 0; i1 < coordinateJson.data.length; i1++){
-                var item1 = coordinateJson.data[i1];
+        if(typeof coordinateData.data != 'undefined'){
+            for(var i1 = 0; i1 < coordinateData.data.length; i1++){
+                var item1 = coordinateData.data[i1];
                 var arr = [ ];
                 if(typeof item1.data != 'undefined'){
                     for(var i2 = 0; i2 < item1.data.length; i2++){
@@ -377,9 +312,9 @@
 
         // 将坐标数据转化成覆盖物标识符数组
         var identifyArray = [ ];
-        if(typeof coordinateJson.data != 'undefined'){
-            for(var i = 0; i < coordinateJson.data.length; i++){
-                var item = coordinateJson.data[i];
+        if(typeof coordinateData.data != 'undefined'){
+            for(var i = 0; i < coordinateData.data.length; i++){
+                var item = coordinateData.data[i];
                 identifyArray.push(item["weizhi"]);
             }
         }
@@ -398,92 +333,48 @@
             environment: {
                 language: '.net' // 语言类型(可选)： 默认.net。值： .net 即Csharp .aspx页面, .php即php页面
             },
-           // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
+            // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
             width: 'auto', // 宽(可选)，默认auto
             height: 'auto', // 高(可选)，默认auto
             setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于width/height参数。
-                setDituSize();
+                // setDituSize();
             },
             onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于width/height参数。
-                setDituSize();
+                // setDituSize();
             },
-            zoom: g_ditu_suofang, // 地图缩放级别(可选)，默认11。 值：3-19
+            zoom: 15, // 地图缩放级别(可选)，默认11。 值：3-19
             // 中心点(可选)
             center: {
                 city: "", // 城市(可选)，默认空。值：空时根据坐标定位, 非空时根据城市定位。eg.'泉州市', eg.'泉州市惠安县'。
                 coordinate: g_zhongxin_zb,  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
-                caption: g_xuexiao_mc, // 标题文字(可选)，默认'北京市'。支持HTML
-                describe: "", // 描述文字(可选)，默认空。支持HTML
-                // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
-                complete: function(e){
-                    $('#c-locate').val(e.lng + ',' + e.lat);
-                },
+                caption: g_dijia_mc, // 标题文字(可选)，默认空。
+                describe: "", // 描述文字(可选)，默认空。
+                enableDrag: true, // 是否允许拖拽(可选)，默认false
                 enableClickCreateNew: true, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
                 // 用点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 clickCallback: function(e){
                     $('#c-locate').val(e.lng + ',' + e.lat); // 输入框赋值
                 },
-                enableDrag: true, // 是否允许拖拽(可选)，默认false
+                // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                complete: function(e){
+                    $('#c-locate').val(e.lng + ',' + e.lat);
+                },
                 // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 dragEnd: function(e){
                     $('#c-locate').val(e.lng + ',' + e.lat);
                 },
-            },
-           
-
-            // 功能与配置项(可选)
-            draft: { // 地图地图功能(可选)
-                platOptions: { // 地图默认配置项(可选)。
-                    enableMapClick: false, // 是否启用底图景点可点功能(可选)，默认false。
-                    minZoom: 3, // 地图允许展示的最小级别
-                    maxZoom: 19, // 地图允许展示的最大级别
-                    // mapType: BMAP_NORMAL_MAP, // 地图类型，默认为BMAP_NORMAL_MAP (启用此会报错,原因未知)
-                    enableHighResolution: true, // 是否启用使用高分辨率地图。在iPhone4及其后续设备上，可以通过开启此选项获取更高分辨率的底图，v1.2,v1.3版本默认不开启，v1.4默认为开启状态
-                    enableAutoResize: true // 是否自动适应地图容器变化，默认启用
-                },
-                enableWheelZoom: true, // 是否开启鼠标滚轮缩放功能，仅对PC上有效(可选)，默认true。
-                switchType: { // 切换地图类型(可选)
-                    enable: true, // 是否开启(可选)，默认false
-                    types: ['normal', 'satellite', 'hybrid'], // 配置地图类型(可选)。数组元素可添加的值: normal 普通街道视图, satellite 卫星视图, hybrid 卫星和路网的混合视图 
-                    direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
-                    offset: { // 位置偏移量(可选)
-                        width: 10, // 水平方向数值(可选)，默认10
-                        height: 50 // 竖直方向数值(可选)，默认50
-                    }
-                },
-                copyright: { // 版权信息(可选)
-                    enable: true, // 是否开启(可选)，默认false
-                    direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
-                    content: '快评版权所有', // 版权文本信息(可选)，默认空
-                    offset: { // 位置偏移量(可选)
-                        width: 10, // 水平方向数值(可选)，默认10
-                        height: 5 // 竖直方向数值(可选)，默认5
-                    }
-                },
-                personalize: { // 个性化地图(可选)
-                    enable: false, // 是否启用(可选)，默认false
-                    basePaint: false, // 是否使用个性化的底图模式(干净清爽)(可选)，默认false。
-                    baseStyle: '', // 地图风格，默认空表示使用默认设置。仅当basePaint为false时有效。值： normal 普通风格, light 清新蓝风格, dark 黑夜风格, bluish 清新蓝绿风格, grayscale 高端灰风格, hardedge 强边界风格, darkgreen 青春绿风格, pink 浪漫粉风格, midnight 午夜蓝风格, grassgreen 自然绿风格, googlelite 精简风格(底图模式,干净清爽), redalert 红色警戒风格
-                }
             },
 
             // 点标记功能(可选)
             markers: {
                 markOptions: { // 点标记默认配置项(可选)。
                     image: { // 自定义图标(可选)
-                        enable: true, // 是否允许自定义图标(可选)，默认false
+                        enable: false, // 是否允许自定义图标(可选)，默认false
                         path: "assets/neatui/img/", // 图片路径(可选)
-                        icon: "bmap_school.png", // 图片名称(可选)
+                        icon: "bmap_locate_default3.png", // 图片名称(可选)
                         size: 50 // 图片大小(可选)
                     }
                 }
-            },
-            // 信息窗口功能(可选)
-            infos: {
-                enable: false, // 是否启用(可选)，默认false
-                width: 0, // 宽(可选)。单位像素，取值范围：0, 220 - 730, 其中0表示自动调整宽
-                height: 0, // 高(可选)。单位像素，取值范围：0, 60 - 650，其中0表示自动调整高
-                method: "mouseover" // 打开方式(可选). mouseover 鼠标经过点标记时(默认)，click 鼠标点击点标记时        
             }
         }
 
@@ -493,13 +384,12 @@
         neuiBdmap('map', options);
 
 
-
         //————————————————————————————————————————————————
         // 判断中心点坐标是否有效，若无效，则重置中心点
         // !!!警告：请勿在地图初始化参数center.complete函数中调用本函数setMapCenter()，否则会陷入死循环导致页面崩溃！
         if(neuiBdmap.checkCoordinateIsValid(g_zhongxin_zb) == false){
             neuiBdmap.setMapCenter('泉州', {
-                title: '泉州',
+                title: '泉州东海——市政府所在地',
                 describe: ''
             });
         }
@@ -519,23 +409,15 @@
             hideValues: identifyArray, // 多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
             buttons: { // 按钮(可选)
                 enable: true,  // 是否添加操作按钮(可选)，默认false
-                text: '删除多边形', // 操作按钮的文本，默认'删除'
+                text: '删除当前工业区范围', // 操作按钮的文本，默认'删除'
                 callback: function(e){  // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
-                    console.log('e：', e);
+                    // console.log('e：', e);
                     var ls_data_bh = e.id,
                         ls_ply_uid = e.polyLayId,
                         ls_btn_uid = e.btnLayId;
-                    fnDelOneSchoolArea(ls_data_bh, ls_ply_uid, ls_btn_uid);
+                    fnDelOneArea(ls_data_bh, ls_ply_uid, ls_btn_uid);
                 }
             },
-            skinOptions: { // 外观配置项(可选)。
-                strokeColor: "red", // 边线颜色(可选)，默认红色。
-                fillColor: "red", // 填充颜色(可选)，默认红色。当参数为空时，圆形将没有填充效果。
-                strokeWeight: 1, // 边线的宽度，以像素为单位(可选)，默认1px。
-                strokeOpacity: 0.8, // 边线透明度，取值范围0-1(可选)，默认0.8。
-                fillOpacity: 0.65,  // 填充的透明度，取值范围0-1(可选)，默认0.65。
-                strokeStyle: "solid" // 边线的样式，solid或dashed(可选)，默认solid。
-            }
         });
 
 
@@ -552,22 +434,13 @@
                 'gon', // 画多边形
                 'rectangle' // 画矩形
             ],
-            enableCalculate: false, // 绘制是否进行测距(画线时候)、测面(画圆、多边形、矩形)(可选)，默认false
-            drawingOptions: { // 鼠标绘图配置项，即鼠标绘制管理类配置项(可选)。
-                strokeColor: "red", // 边线颜色(可选)，默认红色。
-                fillColor: "red", // 填充颜色(可选)，默认红色。当参数为空时，圆形将没有填充效果。
-                strokeWeight: 1, // 边线的宽度，以像素为单位(可选)，默认1px。
-                strokeOpacity: 0.8, // 边线透明度，取值范围0-1(可选)，默认0.8。
-                fillOpacity: 0.65,  // 填充的透明度，取值范围0-1(可选)，默认0.65。
-                strokeStyle: "solid" // 边线的样式，solid或dashed(可选)，默认solid。
-            },
             operateButton: { // 操作按钮(可选)
                 buttoned: true, // 是否添加操作按钮(可选)，默认false
-                btnText: '删除多边形' // 操作按钮的文本(可选)，默认'删除'
+                btnText: '删除当前工业区范围' // 操作按钮的文本(可选)，默认'删除'
             },
             stepDescription: { // 绘制步骤说明(可选)
                 enable: true, // 是否启用功能(可选)，默认true
-                title: '绘制多边形步骤说明', // 标题(可选)，有默认值
+                title: '绘制工业区范围步骤说明', // 标题(可选)，有默认值
                 content: '' // 自定义详细的绘制步骤说明(可选)，默认空。支持HTML
             }
         });
@@ -579,7 +452,6 @@
          //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //                                          系列事件
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-        //————————————————————————————————————————————————
         //——————————————————————————————————————————
         //=====复制按钮、复制当前坐标
         $('#btn-pick-copy').on('click', function(){
@@ -599,35 +471,33 @@
 
 
         //——————————————————————————————————————————
-        //=====保存学校坐标按钮
+        //=====保存按钮、保存中心点坐标按钮
         $('#btn-pick-save').on('click', function(){
             var ls_zuobiao = $('#c-locate').val();
-            var arr = [ ls_zuobiao ]
-            // console.log('数组：', arr);
-
+            // console.log('坐标xx：', ls_zuobiao);
             // 开始执行
             var flag = '', msg = '保存成功';
             neui.showAnimate();
             setTimeout(function(){
-                //后台返回
+                // 后台返回
                 /*
-                //START AJAX
+                // START AJAX
                 var isHoldOn = true;
                 ajax({
-                    heading: "保存学校坐标",
+                    heading: "保存中心点坐标",
                     debug: false,
                     async: false, // 取数方式. true 异步, false 同步(默认)
                     type: "POST",
                     dataType: "html",
                     cache: false,
-                    url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                    url: "../fwh_pub/jk_gongye_jizhun.ashx",
                     data: {
-                        "action": "wh_xuexiao_zuobiao_ins",
+                        "action": "wh_gongye_jizhun_dijia_zuobiao_zhongxin_upd",
                         "menu_bh": "<%=s_menu_bh%>",
                         "user": "<%=s_user%>",
                         "sjk": "<%=s_sjk%>",
-                        "xuexiao_bh": g_xuexiao_bh,
-                        "zuobiao": ls_zuobiao
+                        "dijia_bh": g_dijia_bh,
+                        "zuobiao_zhongxin": ls_zuobiao
                     },
                     success: function(res){
                         if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -645,9 +515,9 @@
                     neui.destroyAnimate();
                     return;
                 }
-                //END AJAX
+                // END AJAX
                 */
-                flag = parseInt(1); //1 成功, 0 失败
+                flag = parseInt(1); // 1 成功, 0 失败
                 if(!flag) msg = '保存失败';
 
                 neuiDialog.alert({
@@ -663,72 +533,26 @@
 
         
         //——————————————————————————————————————————
-        //=====保存学区范围按钮
+        //=====保存工业区范围按钮
         $('#btn-poly-save').on('click', function(){
             var ls_ditu_suofang = neuiBdmap.getZoom(); // 获取地图缩放级别
-            var coordArr = neuiBdmap.getPolyCoordinateData();  // 获取学区范围坐标数据
-             // console.log('当前地图缩放级别：', ls_ditu_suofang);
-            // console.log('保存时coordArr：', coordArr);
+            var coordArr = neuiBdmap.getPolyCoordinateData();  // 获取所有多边形坐标数据
+            // console.log('缩放级别：', ls_ditu_suofang);
+            // console.log('坐标：', coordArr);
+            var currentLen = coordArr.length;
+            if(g_poly_max != -1 && currentLen > g_poly_max){
+                neuiDialog.alert({
+                    animate: true,
+                    message: '最多只能画' + g_poly_max + '个工业区范围<br>当前已有' + currentLen + '个，请删除' + (currentLen - g_poly_max) + '个',
+                    buttons: ['确定']
+                })
+            }
             // 开始执行
-            var marks = '', tips = '保存地图缩放级别成功';
             var flag = '', msg = '保存成功';
             neui.showAnimate();
             setTimeout(function(){
-
-                // 1. 保存地图缩放级别
-                // 后台返回
-                /*
-                // START AJAX
-                var isHoldOn = true;
-                ajax({
-                    heading: "保存地图缩放级别",
-                    debug: false,
-                    async: false, // 取数方式. true 异步, false 同步(默认)
-                    type: "POST",
-                    dataType: "html",
-                    cache: false,
-                    url: "../fwh_pub/jk_xuexiao_xq.ashx",
-                    data: {
-                        "action": "wh_xuexiao_ditu_suofang_ins",
-                        "menu_bh": "<%=s_menu_bh%>",
-                        "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk%>",
-                        "xuexiao_bh": g_xuexiao_bh,
-                        "ditu_suofang": ls_ditu_suofang
-                    },
-                    success: function(res){
-                        if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        var json = JSON.parse(res);
-                        marks = json.return == 'ok' ? 1 : 0;
-                        if(!marks) tips = json.data;
-                    },
-                    error: function(res){
-                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                    },
-                    beforeSend: function(XMLHttpRequest){ },
-                    complete: function(XMLHttpRequest, textStatus){ }
-                })
-                if(!isHoldOn){
-                    neui.destroyAnimate();
-                    return;
-                }
-                // END AJAX
-                */
-                marks = parseInt(1); // 1 成功, 0 失败
-                if(!marks) tips = '保存地图缩放级别失败';
-
-                if(!marks){ // 失败才提示
-                    neuiDialog.alert({
-                        message: tips,
-                        buttons: ['确定']
-                    })
-                    neui.destroyAnimate();
-                    return;
-                }
-
-
-                // 2、保存学区坐标
-                for(var i = 0; i < coordArr.length; i++){
+                // 保存工业区范围坐标
+                for(var i = 0; i < currentLen; i++){
                     var row = coordArr[i];
                     var xuhao = "100" + (i + 1); // eg.1001, 1002, 1003, ...
                         data = row;
@@ -739,27 +563,27 @@
                         var ls_weizhi = xuhao,
                             ls_zuobiao = data[k],
                             ls_counts = i == 0 && k == 0 ? 0 : ''; // 第一行传0，其它传空
-                        var saveArr2 = [ ls_weizhi, ls_zuobiao, ls_counts ]
-                        // console.log('内部行循环数组：', saveArr2);
+                        var saveArr = [ ls_weizhi, ls_zuobiao, ls_counts ]
+                        // console.log('内部行循环数组：', saveArr);
 
                         // 后台返回
                         /*
                         // START AJAX
                         var isHoldOn = true;
                         ajax({
-                            heading: "保存学区坐标",
+                            heading: "保存工业区范围坐标",
                             debug: false,
                             async: false, // 取数方式. true 异步, false 同步(默认)
                             type: "POST",
                             dataType: "html",
                             cache: false,
-                            url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                            url: "../fwh_pub/jk_gongye_jizhun.ashx",
                             data: {
-                                "action": "wh_xuexiao_xq_zuobiao_ins",
+                                "action": "wh_gongye_jizhun_zuobiao_ins",
                                 "menu_bh": "<%=s_menu_bh%>",
                                 "user": "<%=s_user%>",
                                 "sjk": "<%=s_sjk%>",
-                                "xuexiao_bh": g_xuexiao_bh,
+                                "dijia_bh": g_dijia_bh,
                                 "weizhi": ls_weizhi,
                                 "zuobiao": ls_zuobiao,
                                 "counts": ls_counts
@@ -802,7 +626,8 @@
                     buttons: ['确定'],
                     callBack: function(){
                         if(flag){
-                            // window.location.reload(); // 重载页面
+                            // 重载页面
+                            // window.location.reload();
                             neuiBdmap.reloadPageWhenCsharp();  // ASP.NET中 使用这个
                         }
                     }
@@ -816,14 +641,14 @@
 
         //————————————————————————————————————————————————
         /**
-         * 删除一个学区范围、删除一个多边形区域
-         * @param {string} ps_weizhi 学区编号
+         * 删除一个工业区范围、删除一个多边形区域
+         * @param {string} ps_weizhi 工业区范围编号
          * @param {string} ps_ply_uid 多边形覆盖物唯一标识符
          * @param {string} ps_btn_uid 多边形覆盖物上面的按钮唯一标识符
          */
-         function fnDelOneSchoolArea(ps_weizhi, ps_ply_uid, ps_btn_uid){
+         function fnDelOneArea(ps_weizhi, ps_ply_uid, ps_btn_uid){
             neuiDialog.alert({
-                message: '确认删除当前学区范围？',
+                message: '确认删除当前工业区范围？',
                 buttons: ['确定', '取消'],
                 callBack: function(ret){
                     if(ret == 1){
@@ -831,24 +656,24 @@
                         var flag = '', msg = '删除成功';
                         neui.showAnimate();
                         setTimeout(function(){
-                            //后台返回
+                            // 后台返回
                             /*
-                            //START AJAX
+                            // START AJAX
                             var isHoldOn = true;
                             ajax({
-                                heading: "删除单个学区范围",
+                                heading: "删除单个工业区范围",
                                 debug: false,
                                 async: false, // 取数方式. true 异步, false 同步(默认)
                                 type: "POST",
                                 dataType: "html",
                                 cache: false,
-                                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                                url: "../fwh_pub/jk_gongye_jizhun.ashx",
                                 data: {
-                                    "action": "wh_xuexiao_xq_weizhi_del",
+                                    "action": "wh_gongye_jizhun_zuobiao_weizhi_del",
                                     "menu_bh": "<%=s_menu_bh%>",
                                     "user": "<%=s_user%>",
                                     "sjk": "<%=s_sjk%>",
-                                    "xuexiao_bh": g_xuexiao_bh,
+                                    "dijia_bh": g_dijia_bh,
                                     "weizhi": ps_weizhi
                                 },
                                 success: function(res){
@@ -867,20 +692,18 @@
                                 neui.destroyAnimate();
                                 return;
                             }
-                            //END AJAX
+                            // END AJAX
                             */
-                            flag = parseInt(1); //1 成功, 0 失败
+                            flag = parseInt(1); // 1 成功, 0 失败
                             if(!flag) msg = '删除失败';
 
                             neuiDialog.alert({
-                                //animate: true,
                                 popup: flag ? false : true, // 成功不弹窗，失败才弹窗
                                 message: msg,
                                 buttons: ['确定'],
                                 callBack: function(){
-                                    if(flag){ //成功
-                                        //..
-                                        neuiBdmap.removeOnePolyOverlay([ps_ply_uid, ps_btn_uid]);
+                                    if(flag){ // 成功
+                                        neuiBdmap.removeOnePolyOverlay([ps_ply_uid, ps_btn_uid]); // 清除一个多边形覆盖物
                                     }
                                 }
                             })
@@ -895,39 +718,38 @@
 
 
         //——————————————————————————————————————————
-        //=====删除学区范围按钮、删除全部学区范围
+        //=====删除工业区范围按钮、删除全部工业区范围
         $('#btn-poly-del').on('click', function(){
             neuiDialog.alert({
                 animate: true,
-                message: '确认删除学区范围？',
+                message: '确认删除工业区范围？',
                 buttons: ['确定', '取消'],
                 callBack: function(ret){
                     if(ret == 1){
-                        // 获取学区范围坐标数据
-                        var coordArr = neuiBdmap.getPolyCoordinateData();
-                        // console.log('删除时coordArr：', coordArr);
+                        var coordArr = neuiBdmap.getPolyCoordinateData(); // 获取坐标数据
+                        // console.log('坐标：', coordArr);
                         // 开始执行
                         var flag = '', msg = '删除成功';
                         neui.showAnimate();
                         setTimeout(function(){
-                            //后台返回
+                            // 后台返回
                             /*
-                            //START AJAX
+                            // START AJAX
                             var isHoldOn = true;
                             ajax({
-                                heading: "删除学区坐标",
+                                heading: "删除全部工业区范围坐标",
                                 debug: false,
                                 async: false, // 取数方式. true 异步, false 同步(默认)
                                 type: "POST",
                                 dataType: "html",
                                 cache: false,
-                                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                                url: "../fwh_pub/jk_gongye_jizhun.ashx",
                                 data: {
-                                    "action": "wh_xuexiao_xq_zuobiao_del",
+                                    "action": "wh_gongye_jizhun_zuobiao_del",
                                     "menu_bh": "<%=s_menu_bh%>",
                                     "user": "<%=s_user%>",
                                     "sjk": "<%=s_sjk%>",
-                                    "xuexiao_bh": g_xuexiao_bh
+                                    "dijia_bh": g_dijia_bh
                                 },
                                 success: function(res){
                                     if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -945,9 +767,9 @@
                                 neui.destroyAnimate();
                                 return;
                             }
-                            //END AJAX
+                            // END AJAX
                             */
-                            flag = parseInt(1); //1 成功, 0 失败
+                            flag = parseInt(1); // 1 成功, 0 失败
                             if(!flag) msg = '删除失败';
 
                             neuiDialog.alert({
@@ -955,7 +777,7 @@
                                 buttons: ['确定'],
                                 callBack: function(){
                                     if(flag){ //成功
-                                        neuiBdmap.clearAllPolyOverlay(); // 清除多边形覆盖物
+                                        neuiBdmap.clearAllPolyOverlay(); // 清除全部多边形覆盖物
                                     }
                                 }
                             })
@@ -966,33 +788,6 @@
                 }
             })
         });
-
-
-
-
-
-        //——————————————————————————————————————————
-        //=====地点定位按钮
-        $('#btn-locate').on('click', function(){
-            // 使用IFRAME打开
-            var linkUrl = 'Bdmap—百度地图控件-示例1_学校地点定位（地点定位，获取城市住宅小区等地点边界）.html'; // ajax({})
-            neui.openIframe({
-                url: linkUrl,
-                caption: '地点定位',
-                // top: '1%',
-                // width: '98%',
-                // titleHeight: 45,
-                // titleFontSize:'18px',
-                // showCross: true,
-                // crossDirection: 'right',
-                closeCallBack: function(){ 
-                    // window.location.reload(); // 重载页面
-                    document.getElementById('btn-temp').click(); // ASP.NET中 使用这个
-                }
-            })
-        });
-
-
 
     </script>
 </body>

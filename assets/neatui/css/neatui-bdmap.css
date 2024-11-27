@@ -3,7 +3,7 @@
  * [neui百度地图插件v2.0.0] 测试中
  * Author: Mufeng
  * Date: 2021.06.18
- * Update: 2024.11.22
+ * Update: 2024.11.27
  */
 
 
@@ -24,8 +24,8 @@
 /*+------------------------ 地图根节点 ------------------------+*/
 .ne-bd-map-root {
 	width: 100%;
-	/* height: 100%; */
-	border-radius: 8px;
+	/* height: 100%; */ /* 高度在控件中设置 */
+	border-radius: 4px;
 	-webkit-transition: all 0.5s ease-in-out;
 	transition: all 0.5s ease-in-out;
 	overflow: hidden;
@@ -102,6 +102,64 @@
 .ne__bd_info_describe br {
 	line-height: 1.75;
 }
+
+
+/*+ 鼠标绘制区 +*/
+.bdmap__mouse {
+	position: absolute;
+	top: 50px;
+	right: 25px;
+	opacity: .90;
+	filter: alpha(opacity=90);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90);
+}
+.bdmap__mouse_title {
+	background-color: #8abbff;
+	padding: 8px 20px;
+	border-radius: 4px;
+	color: #fff;
+	text-align: center;
+	font-size: 14px;
+	cursor: pointer;
+}
+.bdmap__mouse_title:after {
+	content: '';
+	display: inline-block;
+	vertical-align: middle;
+	width: 0;
+	height: 0;
+	margin-left: 8px;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-bottom: 4px solid #fff;
+}
+.bdmap__mouse_title.angle-down {
+
+}
+.bdmap__mouse_title.angle-down:after {
+	border-bottom: 0;
+	border-top: 4px solid #fff;
+}
+.bdmap__mouse_step {
+	margin-top: 2px;
+	background-color: #fff;
+	padding: 5px 20px;
+	border-radius: 4px;
+	color: #888;
+	font-size: 12px;
+}
+.bdmap__mouse_step p {
+	margin-top: 2px;
+	font-size: 12px;
+}
+.bdmap__mouse_step p:first-child {
+	margin-top: 0;
+}
+.bdmap__mouse_step p.bold {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
 
 
 

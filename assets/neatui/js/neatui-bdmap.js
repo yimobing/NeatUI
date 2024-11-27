@@ -7,7 +7,7 @@
  * Author: Mufeng
  * QQ: 1614644937
  * Date: 2021.06.18
- * Update: 2024.11.25
+ * Update: 2024.11.27
  */
 
 
@@ -146,7 +146,9 @@
                     }
                 }
             },
-            infos: { // 信息窗口功能(可选)。
+
+            // 信息窗功能(可选)
+            infos: {
                 enable: false, // 是否启用(可选)，默认false
                 width: 0, // 宽(可选)。单位像素，取值范围：0, 220 - 730, 其中0表示自动调整宽
                 height: 0, // 高(可选)。单位像素，取值范围：0, 60 - 650，其中0表示自动调整高
@@ -160,6 +162,9 @@
             status: false, // 地图状态(可选)，默认false。值：true 已加载, false 未加载
             clickTimes: 0, // 记录地图被点击的次数(可选)，默认0。
             loadTimes: 0, // 记录地图重载的次数(可选)，默认0。
+            // 隐藏节点
+            hideContentNodeClassName: 'bdmap__hide_content', // 自定义隐藏节点样式名
+            hideCsharpReloadBtnId: 'btn-net-reload-page', // Charp .net 环境下刷新按钮ID属性值
             // 覆盖物集合
             overlays: [], // 所有覆盖物集合
             markerLays: [], // 点标记覆盖物集合
@@ -228,7 +233,7 @@
 
 
         //————————————————————————————————————————————————
-        //  create开头的函数，用于：创建地图的各种操作效果
+        //  create 开头的函数，用于：创建地图的各种操作效果
         //————————————————————————————————————————————————
         //————————————————————————————————————————————————
         /**
@@ -238,12 +243,16 @@
         createMap: function (elem) {
             var me = this;
             // if (me.settings.status) return;  // 只允许地图加载一次
+
             // 全局赋值1
             me.settings.loadTimes++;
             me.settings.status = true;
+
             // · 地图根节点
             var container = elem.toString().replace(/(\#|\.)/g, '');
-            var nodeRoot = document.getElementById(container);
+            var nodeRoot = document.getElementById(container); // 根节点
+            var nodeParent = nodeRoot.parentNode; // 父节点
+            var nodeBody = document.getElementsByTagName('body'); // body节点
             nodeRoot.classList.add('ne-bd-map-root');
             // · 设置地图大小 (高度一定设置,不然在服务器环境如.net地图可能不显示)
             var w = me.settings.width.toString().toLocaleLowerCase().replace(/\s+/g, ''),
@@ -257,9 +266,16 @@
             if (w != 'fn' || h != 'fn') {
                 var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
                     winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
-                    left = utils.getElementLeft(nodeRoot),
-                    top = utils.getElementTop(nodeRoot);
-                // console.log('left：', left, '\ntop：', top);
+                    left = utils.getElementLeft(nodeParent),
+                    top = utils.getElementTop(nodeParent);
+                // console.log('视窗宽：', winW, '\n视窗高：', winH);
+                var bodyW = 0, bodyH = 0; // 内容大小
+                if (nodeBody != null && nodeBody.length > 0) {
+                    bodyW = utils.getElementWidth(nodeBody[0]);
+                    bodyH = utils.getElementHeight(nodeBody[0]);
+                    winW = winW > bodyW ? bodyW : winW;
+                    winH = winH > bodyH ? bodyH : winH;
+                }
                 // 纯数字时，eg. 800
                 // var numReg = /^([0-9]+)$/gim;
                 // if (numReg.test(width)) width += 'px';
@@ -271,22 +287,44 @@
                 if (h.indexOf('%') >= 0) {
                     height = parseFloat(height) / 100 * winH;
                 }
+
                 // 计算真实宽高
-                var realW = width, realH = height;
+                /**
+                 * 公式：
+                    地图父节点高度 = winH - top - 地图父节点(垂直方向margin总和)
+                    地图容器高度 = 地图父节点高度 - 地图父节点(垂直方向padding总和) - 自身(垂直方向margin总和+padding总和)
+                 */
+                var selfMpbObj = helpers._getElementMarginPaddingBorder(nodeRoot),
+                    fatMpbObj = helpers._getElementMarginPaddingBorder(nodeParent);
+                var fatW = winW,
+                    fatH = winH,
+                    realW = width,
+                    realH = height;
                 if (w.indexOf('auto') >= 0 || w === '') {
-                    realW = winW - left;
+                    fatW = winW - left - fatMpbObj["marginHorizontal"];
+                    realW = fatW - fatMpbObj["paddingHorizontal"] - (selfMpbObj["marginHorizontal"] + selfMpbObj["paddingHorizontal"]);
                 }
                 if (h.indexOf('auto') >= 0 || h === '') {
-                    realH = winH - top - 15;
+                    fatH = winH - top - fatMpbObj["marginVertical"];
+                    realH = fatH - fatMpbObj["paddingVertical"] - (selfMpbObj["marginVertical"] + selfMpbObj["paddingVertical"]);
                 }
-                if (realW == 0) realW = winW;
-                if (realH == 0) realH = winH;
-                // console.log('真实宽度：', realW, '\n真实高度：', realH);
-                nodeRoot.setAttribute('style', 'width: ' + realW + 'px;height: ' + realH + 'px'); // 设置地图宽高
-                if (nodeRoot.parentNode != null) {
-                    var fatherH = realH + 15;
-                    nodeRoot.parentNode.style.setProperty('height', fatherH + 'px'); // 设置地图父节点宽高
-                }
+                // if (realW == 0) realW = winW;
+                // if (realH == 0) realH = winH;
+
+                // console.log('------------------------');
+                // console.log('body宽：', bodyW, '\nbody高：', bodyH);
+                // console.log('视窗调整后宽：', winW, '\n视窗调整后高：', winH);
+                // console.log('Left：', left, '\nTop：', top);
+                // console.log('地图宽：', realW, '\n地图高：', realH);
+                // console.log('父节点宽：', fatW, '\n父节点高：', fatH);
+                // console.log('------------------------');
+
+                // 设置地图容器大小
+                nodeRoot.setAttribute('style', 'width: ' + realW + 'px; height: ' + realH + 'px');
+                // 设置地图父节点大小。分开写是为了防止父节点是body时会覆盖掉body原有样式
+                // nodeParent.setAttribute('style', 'width: ' + fatW + 'px; height: ' + fatH + 'px');
+                nodeParent.style.setProperty('width', fatW + 'px'); 
+                nodeParent.style.setProperty('height', fatH + 'px');
             }
 
             // · 根据初始化及窗口大小变化的函数来设置地图大小
@@ -303,7 +341,7 @@
             // · 创建创建地图实例并初始化
             var zoom = me.settings.zoom;
             var centerCity = me.settings.center.city == '' ? me.defaults.center.city : me.settings.center.city,
-                centerCoordinate = me.settings.center.coordinate == '' ? me.defaults.center.coordinate : me.settings.center.coordinate, // 当中心点坐标为空时,设定一个默认坐标
+                centerCoordinate = me.settings.center.coordinate == '' ? me.defaults.center.coordinate : me.settings.center.coordinate.toString().replace(/\s+/g, ''), // 当中心点坐标为空时,设定一个默认坐标
                 centerLng = centerCoordinate.split(',')[0],
                 centerLat = centerCoordinate.split(',')[1],
                 centerCaption = me.settings.center.caption,
@@ -367,21 +405,25 @@
                     styles: me.settings.draft.personalize.baseStyle // 地图风格
                 });
             }
-            // 添加自定义的HTML节点
+            // 添加自定义隐藏节点
             var environment = me.settings.environment;
             var language = environment.language.toString().toLocaleLowerCase();
             if (language != '') {
-                var hidContentNode = document.createElement('div');
-                hidContentNode.className = 'bdmap__hide_content';
-                hidContentNode.style.setProperty('display', 'none');
-                utils.insertAfter(hidContentNode, document.getElementById(elem));
-                if (language == '.net') {
-                    var refreshHtml = [
-                        '<div class="bdmap__hide_content_refresh">',
-                            '<button type="" id="btn-net-reload-page" style="display: none;">ASP.NET刷新页面用(type属性要放空)</button>',
-                        '</div>'
-                    ].join('\r\n')
-                    hidContentNode.innerHTML = refreshHtml; // 创建.net环境下刷新页面的节点
+                var hidClassName = me.settings.hideContentNodeClassName;
+                var hidNode = document.getElementsByClassName(hidClassName);
+                if (hidNode == null || (hidNode != null && hidNode.length == 0)) {
+                    var hidContentNode = document.createElement('div');
+                    hidContentNode.className = hidClassName; // 'bdmap__hide_content';
+                    hidContentNode.style.setProperty('display', 'none');
+                    utils.insertAfter(hidContentNode, document.getElementById(elem));
+                    if (language == '.net') {
+                        var refreshHtml = [
+                            '<div class="bdmap__hide_refresh">',
+                                '<button type="" id="' + me.settings.hideCsharpReloadBtnId + '" style="display: none;">ASP.NET刷新页面用(type属性要放空)</button>',
+                            '</div>'
+                        ].join('\r\n')
+                        hidContentNode.innerHTML = refreshHtml; // 创建.net环境下刷新页面的节点
+                    }
                 }
             }
 
@@ -442,7 +484,7 @@
             }
             var finals = utils.combine(true, originals, options || {});
             var type= finals.type,
-                coordinate = finals.coordinate,
+                coordinate = finals.coordinate.toString().replace(/\s+/g, ''),
                 title = finals.title,
                 describe = finals.describe,
                 message = finals.message,
@@ -589,14 +631,14 @@
             if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             var originals = {
-                points: [], // 多边形覆盖物坐标组成的二维数组，有N个多边形数组就有N个元素。
+                points: [], // 多边形经纬度坐标数组，即多边形覆盖物坐标组成的二维数组，有N个多边形数组就有N个元素。
                 // 格式：
                 // [
                 //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..], // 第1个多边形的N个点
                 //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..],// 第2个多边形的M个点
                 //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..] // 第3个多边形的L个点
                 // ];
-                hideValues: [], // 多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
+                hideValues: [], // 多边形覆盖物标识符数组，即多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
                 buttons: { // 按钮(可选)
                     enable: false,  // 是否添加操作按钮(可选)，默认false
                     text: '删除', // 操作按钮的文本，默认'删除'
@@ -703,7 +745,7 @@
 
 
         //————————————————————————————————————————————————
-        //  remove和clear开头的函数，用于：清除或清空覆盖物
+        //  remove 和 clear 开头的函数，用于：清除或清空覆盖物
         //————————————————————————————————————————————————
         //————————————————————————————————————————————————
         /**
@@ -786,8 +828,6 @@
         //————————————————————————————————————————————————
         /**
          * 清除一个多边形覆盖物、清除某个多边形覆盖物
-         * @param {string} ps_ply_uid 多边形覆盖物唯一标识符
-         * @param {string} ps_btn_uid 多边形覆盖物上面的按钮覆盖物唯一标识符
          * @param {Array} ps_uid_arr 要删除的覆盖唯一标识组成的数组。当前多边形覆盖物及内部的子覆盖物(如按钮)唯一标识符组成的数组。eg. ['当前多边形覆盖物的唯一标识符', '内部按钮覆盖物的唯一标识']
          */
          removeOnePolyOverlay: function (ps_uid_arr) {
@@ -853,7 +893,7 @@
 
 
         //————————————————————————————————————————————————
-        //  get开头的函数，用于：获取地图各种对象及数据
+        //  get 开头的函数，用于：获取地图各种对象及数据
         //————————————————————————————————————————————————
         //————————————————————————————————————————————————
         /**
@@ -946,7 +986,7 @@
 
         //————————————————————————————————————————————————
         /**
-         * 获取所有 多边形坐标数据
+         * 获取所有多边形坐标数据
          * @returns {Array} 返回字符串型坐标数组
          */
         getPolyCoordinateData: function () {
@@ -979,7 +1019,7 @@
          
         //————————————————————————————————————————————————
         /**
-         * 获取最后一个多边形覆盖物的经纬度信息 test2
+         * 获取最后一个多边形覆盖物的经纬度信息 (该函数仅内部测试用) test2
          */
         getLastPolyOverLay: function () {
             var me = this;
@@ -998,21 +1038,9 @@
 
 
         //————————————————————————————————————————————————
-        //  set开头的函数，用于：设置或重置地图数据
+        //  set 开头的函数，用于：设置或重置地图数据
         //————————————————————————————————————————————————
         //————————————————————————————————————————————————
-        setCenterPointAndZoom(ps_lng, ps_lat, ps_zoom) {
-            var me = this;
-            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
-            var maper = me.$opts.$maper;
-            var point = new BMap.Point(ps_lng, ps_lat);
-            maper.centerAndZoom(point, ps_zoom);
-            if(centerCity.toString().replace(/\s+/g, '') !== ''){
-                maper.setCenter(centerCity);
-            }
-        },
-
-
         /**
          * 设置中心点标记的标题
          * @param {HTML|String} ps_content 标题内容。支持HTML
@@ -1036,7 +1064,7 @@
          * @param {String} ps_coord_or_city 经纬度坐标或城市名.eg. '116.183501,40.030609' 或 '北京市'
          * @param {Object} options 其它参数。参见函数内代码
          */
-        setMapCenter(ps_coord_or_city, options) {
+        setMapCenter: function(ps_coord_or_city, options) {
             var me = this;
             if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
@@ -1056,7 +1084,7 @@
             var coordCity = ps_coord_or_city;
             if (helpers._examineStringIsCoordinate(coordCity)) {
                 // 根据坐标设置中心点
-                var arr = coordCity.split(','),
+                var arr = coordCity.toString().replace(/\s+/g, '').split(','),
                     lng = arr[0], lat = arr[1];
                     point = new BMap.Point(lng, lat),
                     coordinate = lng + ',' + lat;
@@ -1117,7 +1145,7 @@
          
         /**
          * 设置/切换地图类型
-         * @param {Object} options 参数对象
+         * @param {Object} options 参数。参见函数内代码
          */
         setMapType: function (options) {
             var me = this;
@@ -1308,6 +1336,16 @@
         },
 
 
+        /**
+         * 校验地图缩放级别是否有效(是否在3到19之间)
+         * @param {Number} ps_str 地图缩放级别。数值类型, 值3到19
+         * @returns {Boolean} 返回布尔值true or false
+         */
+        checkZoomIsValid: function(ps_str){
+            return helpers._examineZoomIsValid(ps_str);
+        },
+
+
 
 
          
@@ -1316,10 +1354,12 @@
         //————————————————————————————————————————————————
         //————————————————————————————————————————————————
         /**
-         * 刷新页面数据(Csharp .net 环境下使用)
-         * @param {Boolean} ps_is_net 是否.net环境(可选)，默认true
+         * 刷新页面数据、重载页面(Csharp .net 环境下使用)
+         * .net环境下可用此函数取代 window.location.reload(); 
+         * @param {Boolean} ps_is_net 是否.net环境(可选)，默认true。值为false时将使用 window.location.reload() 进行页面重载操作重载
          */
         reloadPageWhenCsharp: function (ps_is_net) {
+            var me = this;
             var isNetEnVironment = typeof ps_is_net == 'undefined' ? true : (ps_is_net === false ? false : true);
             // 普通页面时
             if (!isNetEnVironment) {
@@ -1327,10 +1367,17 @@
             }
             else {
                 // .net的.aspx页面时，使用隐藏按钮 .click() 的刷新方式，可以解决页面重载的诸多问题
-                var node = document.getElementById('btn-net-reload-page');
-                if (node != null) {
-                    node.click(); // ASP.NET中 使用这个
+                var node = document.getElementById(me.settings.hideCsharpReloadBtnId);
+                if (node == null) {
+                    var tips = '提醒：调用函数' + arguments.callee.name + '()之前需先设置地图初始化参数 environment.language的值为".net"';
+                    console.error(tips);
+                    setTimeout(function() {
+                        utils.dialogs(tips);
+                    }, 100);
+                    
+                    return;
                 }
+                node.click(); // ASP.NET中 使用这个
             }
         },
 
@@ -1344,6 +1391,7 @@
     // 函数库，供内部调用
     //================================================================
     var helpers = {
+
         /**
          * 校验地图是否已初始化和实例化
          * 用于：在调用地图实例化对象me.$opts.$maper之前要进行校验，防止出错
@@ -1378,7 +1426,8 @@
          */
         _examineStringIsCoordinate: function (ps_str) {
             if (typeof ps_str == 'undefined') return false;
-            var reg = /^\d+(\.\d+)?,\d+(\.\d+)?$/; // 验证一个字符串是否为经纬度坐标
+            // var reg = /^\d+(\.\d+)?,\d+(\.\d+)?$/; // 验证一个字符串是否为经纬度坐标。不允许有空格
+            var reg = /^(\s+)?\d+(\.\d+)?(\s+)?,(\s+)?\d+(\.\d+)?(\s+)?$/; // 验证一个字符串是否为经纬度坐标。允许逗号前后有空格，经度前及纬度后有空格
             return reg.test(ps_str) ? true : false;
         },
 
@@ -1434,6 +1483,64 @@
             if (ps_value_str == 'satellite') tmp_value = BMAP_SATELLITE_MAP; // 卫星视图
             if (ps_value_str == 'hybrid') tmp_value = BMAP_HYBRID_MAP; // 卫星和路网的混合视图
             return tmp_value;
+        },
+
+
+
+        /**
+         * 获取某个元素的margin,padding值
+         * @param {HTMLElement} o HTML节点元素
+         * @returns {Object} 返回margin和padding的参数对象
+         */
+        _getElementMarginPaddingBorder: function (o) {
+            var style = utils.getElementStyle(o);
+            var mt = parseFloat(style.marginTop.toString().replace(/px/g, '')),
+                mb = parseFloat(style.marginBottom.toString().replace(/px/g, '')),
+                ml = parseFloat(style.marginLeft.toString().replace(/px/g, '')),
+                mr = parseFloat(style.marginRight.toString().replace(/px/g, '')),
+                pt = parseFloat(style.paddingTop.toString().replace(/px/g, '')),
+                pb = parseFloat(style.paddingBottom.toString().replace(/px/g, '')),
+                pl = parseFloat(style.paddingLeft.toString().replace(/px/g, '')),
+                pr = parseFloat(style.paddingRight.toString().replace(/px/g, ''));
+            var bt = parseFloat(style.borderTopWidth.toString().replace(/px/g, '')),
+                bb = parseFloat(style.borderBottomWidth.toString().replace(/px/g, '')),
+                bl = parseFloat(style.borderLeftWidth.toString().replace(/px/g, '')),
+                br = parseFloat(style.borderRightWidth.toString().replace(/px/g, ''));
+            if (isNaN(mt)) mt = 0;
+            if (isNaN(mb)) mb = 0;
+            if (isNaN(ml)) ml = 0;
+            if (isNaN(mr)) mr = 0;
+            if (isNaN(pt)) pt = 0;
+            if (isNaN(pb)) pb = 0;
+            if (isNaN(pl)) pl = 0;
+            if (isNaN(pr)) pr = 0;
+
+            if (isNaN(bt)) bt = 0;
+            if (isNaN(bb)) bb = 0;
+            if (isNaN(bl)) bl = 0;
+            if (isNaN(br)) br = 0;
+            return {
+                marginTop: mt,
+                marginBottom: mb,
+                marginLeft: ml,
+                marginRight: mr,
+                paddingTop: pt,
+                paddingBottom: pb,
+                paddingLeft: pl,
+                paddingRight: pr,
+                borderTop: bt,
+                borderBottom: bb,
+                borderLeft: bl,
+                borderRight: br,
+                // 汇总1
+                marginHorizontal: ml + mr, // 水平方向上的margin值
+                marginVertical: mt + mb, // 垂直方向上的margin值
+                paddingVertical: pl + pr, // 水平方向上的padding值
+                paddingHorizontal: pt + pb, // 垂直方向上的padding值
+                // 汇总2
+                borderHorizontal: bt + bb,  // 水平方向上的border值
+                borderVertical: bl + br // 垂直方向上的border值   
+            }
         }
     };
 
@@ -1679,9 +1786,12 @@
                     '<p>6、拖动图形上的白色小正方框，可更改形状。</p>',
                 ].join('\r\n');
 
+                var mouseClassName = 'bdmap__mouse',
+                    titleClassName = 'bdmap__mouse_title',
+                    stepClassName = 'bdmap__mouse_step';
                 var shuoHtml = [
-                    '<div class="bdmap__mouse-title">' + stepDescription.title + '</div>',
-                    '<div class="bdmap__mouse-step">',
+                    '<div class="' + titleClassName + '">' + stepDescription.title + '</div>',
+                    '<div class="' + stepClassName + '">',
                         // 匿名函数马上执行
                         (function () {
                             var _content  = stepDescription.content;
@@ -1690,12 +1800,12 @@
                     '</div>'
                 ].join('\r\n');
                 var shuoDiv = document.createElement('div');
-                shuoDiv.className = 'bdmap__mouse';
+                shuoDiv.className = mouseClassName;
                 shuoDiv.innerHTML = shuoHtml;
                 utils.insertAfter(shuoDiv, document.getElementById(me.$opts.$container));
                 // 绘制步骤区域显示或隐藏
-                var titleDom = document.getElementsByClassName('bdmap__mouse-title')[0],
-                    listDom = document.getElementsByClassName('bdmap__mouse-step')[0];
+                var titleDom = document.getElementsByClassName(titleClassName)[0],
+                    listDom = document.getElementsByClassName(stepClassName)[0];
                 titleDom.onclick = function () {
                     if (listDom.offsetWidth > 0 || listDom.offsetHeight > 0) { // 显示时
                         titleDom.classList.add('angle-down');
@@ -1990,14 +2100,14 @@
          * 弹出提示信息对话框
          * @param {string} ps_str 提示信息字符串
          */
-         dialogs:function(ps_str){
+        dialogs:function(ps_str){
             var message = ps_str;
             if(typeof neuiDialog != 'undefined'){
                 neuiDialog.alert({
                     message: message,
                     buttons: ['确定']
                 })
-            }else{
+            } else {
                 message = message.toString().replace(/\<br\>/g, '\n'); //<br>换行\n以实现换行
                 alert(message);
             }

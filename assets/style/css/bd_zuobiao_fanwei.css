@@ -3,7 +3,7 @@
  * “利用百度地图拖动中心点坐标、绘制多边形边界范围”通用界面样式
  * Author: Mufeng
  * Date: 2021.06.18
- * Update: 2024.11.21
+ * Update: 2024.11.27
  */
 
  
@@ -11,30 +11,22 @@
 /*                                    1、页面布局
 /*===============================================================================================*/
 /*+------------------------ 主体区域 --------+*/
-html,
-body {
-	width: 99.5%;
-	margin: 0.25% auto;
-	height: 99.5%;
-	overflow: hidden;
-}
-.bdmap__editor * {
-	margin: 0;
-	padding: 0;
-	-moz-box-sizing: border-box;
-	-o-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	-ms-box-sizing: border-box;
-	box-sizing: border-box;
-	outline: none;
-	-webkit-tap-highlight-color: transparent;
-}
+
 dl, dt, dd, ul, li { margin: 0; padding: 0; list-style: none; }
 .red {
 	color: red;
 }
 
-/*一定要 设置height高度 不然地图不显示*/
+
+html, body {
+	width: 99.5%;
+	margin: 0.25% auto;
+	height: 99.5%;
+	overflow: hidden;
+}
+
+/*+ ---------------- 外层区域 ---------------- +*/
+/* 注：地图容器及容器父级节点一定要设置height高度，不然地图不显示 */
 .bdmap {
 	position: relative;
 	margin: 0 auto;
@@ -48,9 +40,7 @@ dl, dt, dd, ul, li { margin: 0; padding: 0; list-style: none; }
 	/* overflow: hidden; */
 }
 
-.bdmap__editor {
-
-}
+/*+ ---------------- 地图容器区域 ---------------- +*/
 .bdmap__map {
 	position: relative;
 	width: 100%;
@@ -62,17 +52,25 @@ dl, dt, dd, ul, li { margin: 0; padding: 0; list-style: none; }
 	overflow: hidden;
 }
 
-
+/*+ ---------------- 操作区域：表单及按钮 ---------------- +*/
 .bdmap__editor {}
-
+.bdmap__editor * {
+	margin: 0;
+	padding: 0;
+	-moz-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+	outline: none;
+	-webkit-tap-highlight-color: transparent;
+}
 .bdmap__editor>div {
 	margin-top: 15px;
 }
-
 .bdmap__editor>div:first-child {
 	margin-top: 0;
 }
-
 .bdmap__editor * {
 	font-size: 14px;
 }
@@ -81,7 +79,6 @@ dl, dt, dd, ul, li { margin: 0; padding: 0; list-style: none; }
 	color: #999;
 	font-size: 10px;
 }
-
 .bdmap__editor input[type="text"] {
 	min-width: 150px;
 	height: 28px;
@@ -92,6 +89,8 @@ dl, dt, dd, ul, li { margin: 0; padding: 0; list-style: none; }
 	border: 1px solid #a59b9b !important;
 	border-radius: 2px;
 }
+
+
 
 .bdmap__editor button[type="button"] {
 	height: 28px !important;
@@ -117,8 +116,10 @@ dl, dt, dd, ul, li { margin: 0; padding: 0; list-style: none; }
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ededed');
 	color: #606060 !important;
 	cursor: pointer;
-
 }
+
+
+
 
 button[type="button"][data-type="copy"] {
 	background-color: #8bbb2e;
@@ -179,70 +180,7 @@ button[type="button"]:hover {
 	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 
-/*坐标拾取器*/
-.bdmap__picker {}
 
-/*图形绘制*/
-.bdmap__draw {}
-
-/*鼠标绘制区*/
-.bdmap__mouse {
-	position: absolute;
-	top: 50px;
-	right: 25px;
-	opacity: .90;
-	filter: alpha(opacity=90);
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90);
-}
-
-.bdmap__mouse-title {
-	background-color: #ff0000;
-	padding: 8px 20px;
-	border-radius: 4px;
-	color: #fff;
-	text-align: center;
-	font-size: 16px;
-	cursor: pointer;
-}
-
-.bdmap__mouse-title:after {
-	content: '';
-	display: inline-block;
-	vertical-align: middle;
-	width: 0;
-	height: 0;
-	margin-left: 8px;
-	border-left: 6px solid transparent;
-	border-right: 6px solid transparent;
-	border-bottom: 12px solid #fff;
-}
-
-.bdmap__mouse-title.angle-down {
-
-}
-.bdmap__mouse-title.angle-down:after {
-	border-bottom: 0;
-	border-top: 12px solid #fff;
-}
-.bdmap__mouse-step {
-	margin-top: 5px;
-	background-color: #fff;
-	padding: 5px 20px;
-	border-radius: 4px;
-	color: #888;
-	font-size: 12px;
-}
-.bdmap__mouse-step p {
-	margin-top: 2px;
-	font-size: 12px;
-}
-.bdmap__mouse-step p:first-child {
-	margin-top: 0;
-}
-.bdmap__mouse-step p.bold {
-	font-size: 1.1em;
-	font-weight: bold;
-}
 
 
 

@@ -15,62 +15,47 @@
     <title>根据坐标获取工业区基准地价</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241125-2"><!--百度地图控件-->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_fanwei.css?v=20241125-2"><!--当前页面样式-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241127-5"> <!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_layout.css?v=20241127-5"> <!--百度地图坐标页面通用布局-->
 </head>
-
 <body>
-
     <style>
-        /*隐藏百度地图版权信息*/
-        .BMap_cpyCtrl { display: none; }
-        .anchorBL { display: none; }
-         /*+-------------------------+*/
-        .bdmap__picker>div{ display: inline-block; vertical-align: top; margin-left: 15px; }
-        .bdmap__picker>div:first-child{ margin-left: 0; }
-        
-        /* 价格结果区域 */
-        .bdmap__result p{ display: inline-block; vertical-align: middle; margin-right: 15px; }
-        .bdmap__result p span,.bdmap__result p em{ font-size: 14px; }
-        .bdmap__result p span{ color: #888; font-weight: 550; }
-        .bdmap__result p em{ color: #444; }
-        
+        /*+ ---------------- 价格结果区域 ---------------- +*/
+        .bds__result { height: 32px; line-height: 32px; }
+        .bds__result p{ display: inline-block; vertical-align: middle; margin-right: 15px; }
+        .bds__result p span,.bds__result p em{ font-size: 14px; }
+        .bds__result p span{ color: #888; font-weight: 550; }
+        .bds__result p em{ color: #444; }  
     </style>
 
-    <div class="bdmap" id="allmap">
-        <div class="bdmap__editor">
-            <div class="bdmap__picker">
-                <div class="bdmap__coord">
-                    中心点坐标 <input type="text" id="c-locate" readonly>
-                    <button type="button" data-type="save" id="btn-get-price">获取基准地价</button>
-                    <label> (拖动中心点或在地图上任意位置点击可更改坐标) </label>
-                </div><!--/.bdmap__coord-->
-                <div class="bdmap__btn">
-                    
-                </div><!--/.bdmap__btn-->
-                <div class="bdmap__result" style="display: none">
-                    <p>
-                        <span>工业区名称：</span>
-                        <em id="c-land-name"></em>
-                    </p>
-                    <p>
-                        <span>土地等级：</span>
-                        <em id="c-land-level"></em>
-                    </p>
-                    <p>
-                        <span>基准地价：</span>
-                        <em id="c-land-price"></em>
-                    </p>
-                </div>
-            </div><!--/.bdmap__picker-->
-            <div class="bdmap__draw"></div><!--/.bdmap__draw-->
-        </div><!--/.bdmap__editor-->
-        <div class="bdmap__map">
+    <div class="bds">
+        <div class="bds__editor">
+            <div class="bds__coord">
+                中心点坐标 <input type="text" id="c-locate" readonly>
+                <button type="button" class="ne-btn has-texture blue" id="btn-get-price">获取基准地价</button>
+                <label> (拖动中心点或在地图上任意位置点击可更改坐标) </label>
+            </div><!--/.bds__coord-->
+            <div class="bds__result" style="display: none">
+                <p>
+                    <span>工业区名称：</span>
+                    <em id="c-land-name"></em>
+                </p>
+                <p>
+                    <span>土地等级：</span>
+                    <em id="c-land-level"></em>
+                </p>
+                <p>
+                    <span>基准地价：</span>
+                    <em id="c-land-price"></em>
+                </p>
+            </div>
+        </div><!--/.bds__editor-->
+        <div class="bds__map">
             <div id="map"></div>
-        </div><!--/.bdmap__map-->
-    </div><!--/.allmap-->
+        </div><!--/.bds__map-->
+    </div><!--/.bds-->
 
     
 
@@ -83,16 +68,15 @@
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241125-2"></script> <!--自定义ajax-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241127-5"></script> <!--百度地图控件-->
     <script>
         /*+————————————————全局变量————————————————+*/
 
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //                                                   初始化
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-        
         //——————————————————————————————————————————
-        // //=====初始化地图宽高
+        //=====初始化地图宽高
         // setDituSize();
         
         //——————————————————————————————————————————
@@ -101,6 +85,8 @@
         //     setDituSize();
         // });
 
+
+        //——————————————————————————————————————————
         /**
          * 函数：设置地图宽高
          * (高度一定要设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
@@ -120,10 +106,10 @@
                 allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
             //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
             // 顶部区域
-            var eleTop = $('.bdmap__editor'),
+            var eleTop = $('.bds__editor'),
                 topHeight = eleTop.outerHeight(true);
             // 地图区域
-            var eleTu = $('.bdmap__map'),
+            var eleTu = $('.bds__map'),
                 tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
                 tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
                 tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
@@ -142,7 +128,7 @@
             // console.log('tuMargLeft:',tuMargLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadRight:',tuPadRight);
             // console.log('--------------------------------');
             // 设置地图宽高
-            $('.bdmap__map').css({
+            $('.bds__map').css({
                 width: tuWidth,
                 height: tuHeight
             })
@@ -170,10 +156,10 @@
             width: 'auto', // 宽(可选)，默认auto
             height: 'auto', // 高(可选)，默认auto
             setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于width/height参数。
-                setDituSize();
+                // setDituSize();
             },
             onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于width/height参数。
-                setDituSize();
+                // setDituSize();
             },
             zoom: 15, // 地图缩放级别(可选)，默认11。 值：3-19
             // 中心点(可选)
@@ -190,7 +176,7 @@
                 // 点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 clickCallback: function(e){
                     $('#c-locate').val(e.lng + ',' + e.lat); // 输入框赋值
-                    $('.bdmap__result').hide(); // 隐藏价格结果区域
+                    $('.bds__result').hide(); // 隐藏价格结果区域
                     var titleStr = '坐标：<br>' + e.lng + ',' + e.lat;
                     neuiBdmap.setCenterPointLabelTitle(titleStr);
                 },
@@ -198,7 +184,7 @@
                 // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 dragEnd: function(e){
                     $('#c-locate').val(e.lng + ',' + e.lat);
-                    $('.bdmap__result').hide(); // 隐藏价格结果区域
+                    $('.bds__result').hide(); // 隐藏价格结果区域
                     var titleStr = '坐标：<br>' + e.lng + ',' + e.lat;
                     neuiBdmap.setCenterPointLabelTitle(titleStr);
                 },
@@ -232,7 +218,7 @@
         //=====获取基准地价按钮
         $('#btn-get-price').on('click', function(){
             var ls_zuobiao = $('#c-locate').val();
-
+            // console.log('坐标yyy:', ls_zuobiao);
             // 开始执行
             var flag = '', msg = '保存成功';
             neui.showAnimate();
@@ -251,7 +237,7 @@
                     "jiage": "1500"
                 }
                 /*
-                //START AJAX
+                // START AJAX
                 var priceData = {}
                 var isHoldOn = true;
                 ajax({
@@ -283,7 +269,7 @@
                 if(!isHoldOn){
                     return;
                 }
-                //END AJAX
+                // END AJAX
                 */
 
                 // 界面操作
@@ -295,7 +281,7 @@
                     $('#c-land-name').text(ls_dijia_mc);
                     $('#c-land-level').text(ls_dengji_mc);
                     $('#c-land-price').text(ls_jiage);
-                    $('.bdmap__result').show(); // 显示价格结果区域
+                    $('.bds__result').show(); // 显示价格结果区域
                     neuiBdmap.setCenterPointLabelTitle(labelText);
                 }
 
