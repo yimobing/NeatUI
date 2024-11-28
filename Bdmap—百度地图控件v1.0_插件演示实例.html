@@ -17,12 +17,28 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241127-5"> <!--百度地图控件-->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_layout.css?v=20241127-5"> <!--百度地图坐标页面通用布局-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241128-1"> <!--百度地图控件-->
 </head>
 <body>
     <style>
-        /*+ ---------------- 测试区域 ---------------- +*/
+        /*+ --------  -------- +*/
+        html, body { width: 99.5%; margin: 0.25% auto; height: 99.5%; overflow: hidden; }
+        /*+ -------- 外层区域：地图容器及父级节点一定要设置height高度，不然地图可能无法显示 -------- +*/
+        .bds { position: relative; width: 100%; height: 99%; margin: 0 auto; padding: 8px; overflow: hidden; zoom: 1; border: 1px solid #cac9c9; border-radius: 10px;  }
+        /*+ -------- 地图容器区域 -------- +*/
+        .bds__map { position: relative; width: 100%; margin: 10px 0 0 0; padding: 3px; border: 1px solid #eaeaea; border-radius: 4px; overflow: hidden; }
+        /*+ -------- 操作区域：表单及按钮 -------- +*/
+        .bds__editor * { margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; font-size: 14px; }
+        .bds__editor>div { display: inline-block; vertical-align: top; margin-left: 35px; }
+        .bds__editor>div:first-child { margin-left: 0; }
+        .bds__editor label { margin-left: 3px; color: #999; font-size: 10px; }
+        .bds__editor button[type="button"]{ padding: 0 8px; font-size: 13px; }
+        .bds__editor input[type="text"] { min-width: 150px; height: 28px; line-height: 28px\9; margin-left: 10px; padding: 0 5px; background-color: #fcfcfc; border: 1px solid #a59b9b !important; border-radius: 2px; }
+        .bds__editor input[type="text"][readonly],
+        .bds__editor input[type="text"]:read-only{ background-color: #fdfdfd!important; }
+
+
+        /*+ -------- 测试区域 -------- +*/
         .bds__lay{ display: none; }
         #result {
             display: none;
@@ -201,7 +217,7 @@
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241127-5"></script> <!--百度地图控件-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241128-1"></script> <!--百度地图控件-->
     <script>
         /*+————————————————全局变量————————————————+*/
         var g_zhongxin_zb = '118.59193,24.910917'; // 地图中心点坐标
@@ -300,6 +316,7 @@
             zoom: g_ditu_suofang, // 地图缩放级别(可选)，默认11。 值：3-19
             // 中心点(可选)
             center: {
+                visible: true, // 是否显示中心点标注(可选)，默认true
                 city: "", // 城市(可选)，默认空。值：空时根据坐标定位, 非空时根据城市定位。eg.'泉州市', eg.'泉州市惠安县'。
                 coordinate: g_zhongxin_zb,  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
                 caption: "泉州领袖天地", // 标题文字(可选)，默认'北京市'。支持HTML
@@ -424,11 +441,13 @@
             //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..] // 第3个多边形的L个点
             // ];
             hideValues: identifyArray, // 多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
+            bgColors: [], // 自定义每个多边形覆盖物背景色数组,默认空数组(可选),优先权大于 skinOptions.fillColor和strokeColor。格式：['#1296db', '#ff0000', '#ffffff']
+            editable: true, // 多边形是否可修改形状(可选)，默认true。值为true时多边形点上将出现一个白色的小正方形可拖动改变形状。
             buttons: { // 按钮(可选)
                 enable: true,  // 是否添加操作按钮(可选)，默认false
                 text: '删除多边形', // 操作按钮的文本，默认'删除'
                 callback: function(e){  // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
-                    console.log('e：', e);
+                    // console.log('e：', e);
                     var ls_data_bh = e.id,
                         ls_ply_uid = e.polyLayId,
                         ls_btn_uid = e.btnLayId;

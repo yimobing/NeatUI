@@ -140,22 +140,27 @@
 	border-bottom: 0;
 	border-top: 4px solid #fff;
 }
-.bdmap__mouse_step {
+.bdmap__mouse_content {
 	margin-top: 2px;
+	height: auto;
+	max-height: 500px;
 	background-color: #fff;
 	padding: 5px 20px;
 	border-radius: 4px;
 	color: #888;
 	font-size: 12px;
+	overflow: hidden;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
 }
-.bdmap__mouse_step p {
+.bdmap__mouse_content p {
 	margin-top: 2px;
 	font-size: 12px;
 }
-.bdmap__mouse_step p:first-child {
+.bdmap__mouse_content p:first-child {
 	margin-top: 0;
 }
-.bdmap__mouse_step p.bold {
+.bdmap__mouse_content p.bold {
 	font-size: 1.1em;
 	font-weight: bold;
 }

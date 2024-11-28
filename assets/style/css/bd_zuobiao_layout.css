@@ -64,3 +64,5 @@ html, body { width: 99.5%; margin: 0.25% auto; height: 99.5%; overflow: hidden; 
 	border: 1px solid #a59b9b !important;
 	border-radius: 2px;
 }
+.bds__editor input[type="text"][readonly],
+.bds__editor input[type="text"]:read-only{ background-color: #fdfdfd!important; }

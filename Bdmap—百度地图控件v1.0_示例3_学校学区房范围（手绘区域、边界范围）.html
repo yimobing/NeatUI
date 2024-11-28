@@ -17,11 +17,25 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241127-5"> <!--百度地图控件-->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_layout.css?v=20241127-5"> <!--百度地图坐标页面通用布局-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241128-1"> <!--百度地图控件-->
 </head>
 <body>
     <style>
+         /*+ --------  -------- +*/
+         html, body { width: 99.5%; margin: 0.25% auto; height: 99.5%; overflow: hidden; }
+        /*+ -------- 外层区域：地图容器及父级节点一定要设置height高度，不然地图可能无法显示 -------- +*/
+        .bds { position: relative; width: 100%; height: 99%; margin: 0 auto; padding: 8px; overflow: hidden; zoom: 1; border: 1px solid #cac9c9; border-radius: 10px;  }
+        /*+ -------- 地图容器区域 -------- +*/
+        .bds__map { position: relative; width: 100%; margin: 10px 0 0 0; padding: 3px; border: 1px solid #eaeaea; border-radius: 4px; overflow: hidden; }
+        /*+ -------- 操作区域：表单及按钮 -------- +*/
+        .bds__editor * { margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; font-size: 14px; }
+        .bds__editor>div { display: inline-block; vertical-align: top; margin-left: 35px; }
+        .bds__editor>div:first-child { margin-left: 0; }
+        .bds__editor label { margin-left: 3px; color: #999; font-size: 10px; }
+        .bds__editor button[type="button"]{ padding: 0 8px; font-size: 13px; }
+        .bds__editor input[type="text"] { min-width: 150px; height: 28px; line-height: 28px\9; margin-left: 10px; padding: 0 5px; background-color: #fcfcfc; border: 1px solid #a59b9b !important; border-radius: 2px; }
+        .bds__editor input[type="text"][readonly],
+        .bds__editor input[type="text"]:read-only{ background-color: #fdfdfd!important; }
     </style>
 
     <div class="bds">
@@ -56,7 +70,7 @@
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241127-5"></script> <!--百度地图控件-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241128-1"></script> <!--百度地图控件-->
     <script>
 
         /*+————————————————全局变量————————————————+*/
@@ -434,7 +448,18 @@
                         $('#c-locate').val(e.lng + ',' + e.lat);
                     },
                 },
-
+                // 功能与配置项(可选)
+                draft: { // 地图底图功能(可选)
+                    switchType: { // 切换地图类型(可选)
+                        enable: true, // 是否开启(可选)，默认false
+                        types: ['normal', 'satellite', 'hybrid'], // 配置地图类型(可选)。数组元素可添加的值: normal 普通街道视图, satellite 卫星视图, hybrid 卫星和路网的混合视图 
+                        direction: 'bottomRight', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                        offset: { // 位置偏移量(可选)
+                            width: 10, // 水平方向数值(可选)，默认10
+                            height: 25 // 竖直方向数值(可选)，默认50
+                        }
+                    }
+                },
                 // 点标记功能(可选)
                 markers: {
                     markOptions: { // 点标记默认配置项(可选)。

@@ -15,114 +15,114 @@
     <title>学校招生服务区（展示某几个地点边界范围）</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"><!--输入下拉控件-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241121-5"><!--百度地图控件-->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zuobiao_fanwei.css?v=20241121-5"><!--当前页面样式-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"> <!--输入下拉控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241128-1"> <!--百度地图控件-->
 </head>
-
 <body>
-    <!--edit 20210731-1 更改了图片名称-->
     <style>
-        .eform-row-query{ margin-left: 20px; }
-        .bdmap__editor{ padding-bottom: 15px; border-bottom: 1px solid #ddd; }
-        .bdmap__editor>div{ margin-top: 0; }
-        .bdmap__editor>div:first-child{ margin-top: 0; }
-        .bdmap__editor:after,
-        .bdmap__editor .eform-row:after{ content: ''; display: block; clear: both; }
-        .bdmap__editor .eform-row{ position: relative; margin-bottom: 5px; margin-right: 10px; float: left;}
-        .bdmap__editor .eform-row-query{ width: auto;}
-        .bdmap__editor .eform-row>div{ float: left; }
-        .bdmap__editor .eform-row>div.item-l{ width: auto; margin-top: 5px; }
-        .bdmap__editor .eform-row>div.item-r{ }
-        .bdmap__editor .eform-row .item-cell{ position: absolute; right: 5px; top: 5px; cursor: pointer; }
-        .bdmap__editor .eform-row .item-cell i{ display: block; width: 16px; height: 16px; background: transparent url('assets/neatui/img/mod_icon_cross_gray@12px.png') 50% 50% no-repeat;}
-        .bdmap__editor input[type="text"]{ min-width: 50px; max-width: 100px; background: #fff; }
-        .bdmap__editor input[type="text"][readonly],
-        .bdmap__editor input[type="text"]:read-only{ background-color: #fdfdfd!important;}
+        /*+ --------  -------- +*/
+        html, body { width: 99.5%; margin: 0.25% auto; height: 99.5%; overflow: hidden; }
+        /*+ -------- 外层区域：地图容器及父级节点一定要设置height高度，不然地图可能无法显示 -------- +*/
+        .bds { position: relative; width: 100%; height: 99%; margin: 0 auto; padding: 8px; overflow: hidden; zoom: 1; border: 1px solid #cac9c9; border-radius: 10px;  }
+        /*+ -------- 地图容器区域 -------- +*/
+        .bds__map { position: relative; width: 100%; margin: 10px 0 0 0; padding: 3px; border: 1px solid #eaeaea; border-radius: 4px; overflow: hidden; }
+        /*+ -------- 操作区域：表单及按钮 -------- +*/
+        .bds__editor * { margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; font-size: 14px; }
+        .bds__editor>div { display: inline-block; vertical-align: top; margin-left: 35px; }
+        .bds__editor>div:first-child { margin-left: 0; }
+        .bds__editor label { margin-left: 3px; color: #999; font-size: 10px; }
+        .bds__editor button[type="button"]{ padding: 0 8px; font-size: 13px; }
+        .bds__editor input[type="text"] { min-width: 150px; height: 28px; line-height: 28px\9; margin-left: 10px; padding: 0 5px; background-color: #fcfcfc; border: 1px solid #a59b9b !important; border-radius: 2px; }
+        .bds__editor input[type="text"][readonly],
+        .bds__editor input[type="text"]:read-only{ background-color: #fdfdfd!important; }
 
-        .bdmap__mouse{ top: 10px; }
-        .bdmap__mouse-step{ max-height: 400px; overflow-y: auto!important; }
-        .bdmap__mouse-step p{ margin-bottom: 5px; }
-        .bdmap__mouse-step p span,
-        .bdmap__mouse-step p em{ display: inline-block; vertical-align: middle; }
-        .bdmap__mouse-step p span{ width: 36px; height: 12px; }
-        .bdmap__mouse-step p em{ margin-left: 10px; color: #777; font-size: 12px; }
-
-        /*隐藏百度地图版权信息*/
-        .BMap_cpyCtrl { display: none; }
-        .anchorBL { display: none; }
-
+        /*+ -------- 顶部搜索区域 -------- +*/
+        .bds__editor .eform-row{ position: relative; margin-bottom: 5px; margin-right: 10px; float: left;}
+        .bds__editor .eform-row>div{ float: left; }
+        .bds__editor .eform-row>div.item-l{ width: auto; margin-top: 5px; }
+        .bds__editor .eform-row .item-cell{ position: absolute; right: 5px; top: 5px; cursor: pointer; }
+        .bds__editor .eform-row .item-cell i{ display: none; width: 12px; height: 12px; background: transparent url('assets/neatui/img/mod_icon_cross_gray@16px.png') 50% 50% no-repeat; background-size: 100% auto; }
+        .bds__editor input[type="text"]{ min-width: 50px; max-width: 100px; background: #fff; }
+        .bds__editor .eform-row.eform-row-query{ margin-left: 20px; }
+        /*+ -------- 地图容器 -------- +*/
+        .infoTips{ padding: 100px 50px; text-align: center; color: #1296db; font-size: 18px; font-weight: 530; } 
+        /*+ -------- 招生服务区说明 -------- +*/
+        .block__explanation_content { max-height: 400px; }
+        .block__explanation_content p { margin-bottom: 5px; }
+        .block__explanation_content p span,
+        .block__explanation_content p em { display: inline-block; vertical-align: middle; }
+        .block__explanation_content p span { width: 36px; height: 12px; }
+        .block__explanation_content p em { margin-left: 10px; color: #777; font-size: 12px; }
     </style>
     
-    <div class="bdmap" id="allmap"><!--edit 20210724-1-->
-        <div class="bdmap__editor search ne-form">
+    <div class="bds">
+        <div class="bds__editor search ne-form">
             <div class="eform-row">
                 <div class="item-l"><label>省份</label></div>
-                <div class="item-r"><input type="text" id="s-province" readonly></div>
+                <div class="item-r"><input type="text" id="s-province" placeholder="请选择省份" readonly></div>
                 <div class="item-cell"><i></i></div>
-            </div><!--/.eform-row-->
+            </div>
             <div class="eform-row">
                 <div class="item-l"><label>城市</label></div>
-                <div class="item-r"><input type="text" id="s-city" readonly></div>
+                <div class="item-r"><input type="text" id="s-city" placeholder="请选择城市" readonly></div>
                 <div class="item-cell"><i></i></div>
-            </div><!--/.eform-row-->
+            </div>
             <div class="eform-row">
                 <div class="item-l"><label>区(县)</label></div>
                 <div class="item-r"><input type="text" id="s-county" readonly></div>
                 <div class="item-cell"><i></i></div>
-            </div><!--/.eform-row-->
+            </div>
             <div class="eform-row">
                 <div class="item-l"><label>街道</label></div>
                 <div class="item-r"><input type="text" id="s-street"></div>
                 <div class="item-cell"><i></i></div>
-            </div><!--/.eform-row-->
+            </div>
             <div class="eform-row">
                 <div class="item-l"><label>社区</label></div>
                 <div class="item-r"><input type="text" id="s-community"></div>
                 <div class="item-cell"><i></i></div>
-            </div><!--/.eform-row-->
+            </div>
             <div class="eform-row">
                 <div class="item-l"><label>学校名称</label></div>
                 <div class="item-r"><input type="text" id="s-school"></div>
                 <div class="item-cell"><i></i></div>
-            </div><!--/.eform-row-->
+            </div>
             <div class="eform-row eform-row-query">
                 <div class="item-r"><button type="button" class="ne-btn has-texture blue" id="btn-query">查询</button></div>
-            </div><!--/.eform-row-->
-        </div><!--/.bdmap__editor .search-->
-        <div class="bdmap__map">
-            <div id="map"></div>
-            <div class="bdmap__mouse">
-                <div class="bdmap__mouse-title">招生服务区说明</div>
-                <div class="bdmap__mouse-step"></div><!--/.bdmap__mouse-step-->
-            </div><!--/.bdmap__mouse-->
-        </div><!--/.bdmap__map-->
-    </div><!--/.allmap-->
+            </div>
+        </div><!--/.bds__editor-->
+        <div class="bds__map">
+            <div id="map">
+                <div class="infoTips">请手动查询数据</div>
+            </div>
+        </div><!--/.bds__map-->
+    </div><!--/.bds-->
     
 
 
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
-    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script><!--百度地图api文件 (这里要屏蔽)-->
-    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script><!--Jq库-->
-    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-inputsearch.js"></script><!--输入下拉控件-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-district.js"></script><!--省市区县数据源-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义ajax-->
-    <script type="text/javascript">
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script> <!--Jq库-->
+    <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
+    <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
+    <script src="assets/neatui/js/neatui-inputsearch.js"></script> <!--输入下拉控件-->
+    <script src="assets/neatui/js/neatui-district.js"></script> <!--省市区县数据源-->
+    <script src="assets/neatui/js/neatui-functions.js"></script> <!--函数库-->
+    <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241128-1"></script> <!--百度地图控件-->
+    <script>
 
         /*+————————————————全局变量————————————————+*/
-        var g_xuexiao_mc = ''; // 学校名称
-        var g_zhongxin_zb = ''; // 地图中心点坐标
+        var g_zhongxin_zb = '118.611836,24.918225'; // 中心点坐标
         
-
+        //——————————————————————————————————————————
         /**
-         * 生成随机颜色  add 20210723-1
+         * 生成随机颜色
+         * @returns {String} 返回16进度的颜色值
          */
         function generateRandColor(){
             var randColor = '#' + Math.random().toString(16).substr(2, 6).toUpperCase(); // 生成随机颜色
@@ -131,985 +131,850 @@
         }
 
 
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                                   初始化
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        //=====初始化地图宽高
+        // setDituSize();
+        
+        //——————————————————————————————————————————
+        //=====检测窗口变化事件
+        // $(window).on('resize', function(){
+        //     setDituSize();
+        // });
+
+
+        //——————————————————————————————————————————
         /**
-         * 创建一条招生服务器说明 add 20210723-1
-         * @param {string} ps_school_name 学校名称
-         * @param {string} ps_school_color 学校颜色
+         * 函数：设置地图宽高
+         * (高度一定要设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
          */
-        function createOneSchoolExplain(ps_school_name, ps_school_color){
-            var node = '.bdmap__mouse-step';
-            var html = '<p><span style="background-color: ' + ps_school_color + ';"></span><em>' + ps_school_name + '</em></p>';
-            $(node).append(html);
+        function setDituSize(){
+            var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
+                winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
+            // 整个区域
+            var eleAll = $('.bdmap'),
+                allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
+                allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
+                allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
+                allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
+                allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
+                allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
+                allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
+                allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
+            //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
+            // 顶部区域
+            var eleTop = $('.bds__editor'),
+                topHeight = eleTop.outerHeight(true);
+            // 地图区域
+            var eleTu = $('.bds__map'),
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
+                tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
+                tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
+                tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
+                tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
+                tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
+            // 计算宽高
+            var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
+                allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
+                tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
+                tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
+            // console.log('bodyWidth：', $('body').width(), '\nallMargLeft:',allMargLeft, '\nallMargRight:',allMargRight, '\nallPadLeft:',allPadLeft, '\nallPadRight:', allPadRight);
+            // console.log('tuMargLeft:',tuMargLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadRight:',tuPadRight);
+            // console.log('--------------------------------');
+            // 设置地图宽高
+            $('.bds__map').css({
+                width: tuWidth,
+                height: tuHeight
+            })
+            $('#map').css({
+                width: eleTu.width(),
+                height: eleTu.height()
+            })
         }
 
 
 
-        /*+————————————————FUNCTION————————————————+*/
-        /*
-         * 百度地图类对象 edit 20210723-1
-         * 参考：http://mobai.blog.51cto.com/
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                                      获取数据
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        /**
+         * 获取学校招生服务区数据
+         * @param {String} ps_sheng_mc 省份
+         * @param {String} ps_shi_mc 城市
+         * @param {String} ps_qu_mc 区县
+         * @param {String} ps_jiedao_mc 街道
+         * @param {String} ps_shequ_mc 社区
+         * @param {String} ps_xuexiao_mc 学校名称
+         * @returns {Object} 返回对象数据
          */
-        var bdChinaMap = {
-            status: false,
-            map: '', // 地图根节点
-            
-            center: '118.611836,24.918225', // 中心点坐标. eg.'经度,纬度'
-            city: '', // 自定义地图中心点城市(可选)。值为空时根据中心点坐标定位, 非空时根据中心点城市定位。eg.'泉州市', eg.'泉州市惠安县'
-            caption: '泉州市', // 中心点说明文字
-            zoom: 11, // 缩放级别(3-19)
-            point: '', // 地图中心点信息. eg. new BMap.Point(经度,纬度)
-            clickCreateNewCenter: false, // 是否启用点击地图时在点击位置新建中心点坐标(可选), 默认false
+        function get_data_school(ps_sheng_mc, ps_shi_mc, ps_qu_mc, ps_jiedao_mc, ps_shequ_mc, ps_xuexiao_mc){ 
+            // 后台返回学校招生服务区数据
+            var datasource = {
+                "return":"ok",
+                "data":[
+                    {"xuexiao_bh":"X1001", "xuexiao_mc":"泉州王宫中学", "data":[
+                        { "weizhi":"W1001", "data":[
+                            {"zuobiao":"118.614387,24.911507"},
+                            {"zuobiao":"118.619202,24.91131"},
+                            {"zuobiao":"118.617334,24.907247"}
+                        ]},
+                        { "weizhi":"W1002", "data":[
+                            {"zuobiao":"118.620496,24.90646"},
+                            {"zuobiao":"118.62646,24.90528"},
+                            {"zuobiao":"118.622436,24.899184"},
+                            {"zuobiao":"118.617477,24.902462"}
+                        ]}
+                    ]},
 
-            marker: '', // 点标记覆盖物
-            label: '', // 信息窗覆盖物
-            overlays: [], // 全部覆盖物
-            
-            default: { // 地图默认配置项,即MapOptions及其它参数(可选)
-                enableMapClick: true // 是否启用底图景点可点功能(可选), 默认启用
-            },
-            image: { // 自定义点标记图标及其它属性(可选)
-                enable: false, // 是否启用(可选)，默认false
-                path: 'assets/neatui/img/', // 图片路径(可选)
-                icon: 'bmap_locate_blue.png', // 图片名称(可选)
-                size: 50 // 图片大小(可选)
-            },
-            infos: { // 自定义信息窗口(可选)
-                enable: false, // 是否启用(可选), 默认false
-                title : '' , // 标题(可选)。默认为中心点说明文字，支持HTML内容
-                message: '', // 短信内容(可选)(这个貌似没用)。完整的短信内容包括：自定义部分+位置链接，不设置时，显示默认短信内容。短信内容最长为140个字
-                content: '', // 内容或描述，比如点标记的地址(可选)。默认空，支持HTML内容
-                width: 0, // 宽。单位像素，取值范围：0, 220 - 730, 其中0表示自动调整宽
-                height: 0, // 高。单位像素，取值范围：0, 60 - 650，其中0表示自动调整高
-                method: 'mouseover' // 打开方式(可选). mouseover 鼠标经过点标记时(默认)，click 鼠标点击点标记时
-            }, 
-            
-            overlaysCache: [],
-            myPoints: [], // 所有坐标点数组
-            myOverlay: [], // 所有覆盖物数组
+                    {"xuexiao_bh":"X1002", "xuexiao_mc":"泉州现代中学", "data":[
+                        { "weizhi":"W2001", "data":[
+                            {"zuobiao":"118.609536,24.901118"},
+                            {"zuobiao":"118.614243,24.899381"},
+                            {"zuobiao":"118.61295,24.896955"},
+                            {"zuobiao":"118.6095,24.900102"}
+                        ]},
+                        { "weizhi":"W2002", "data":[
+                            {"zuobiao":"118.61586,24.898561"},
+                            {"zuobiao":"118.618304,24.89571"},
+                            {"zuobiao":"118.614028,24.894071"},
+                            {"zuobiao":"118.614064,24.894137"}
+                        ]},
+                        { "weizhi":"W2003", "data":[
+                            {"zuobiao":"118.611117,24.903969"},
+                            {"zuobiao":"118.611405,24.901544"},
+                            {"zuobiao":"118.61295,24.901577"},
+                            {"zuobiao":"118.613992,24.903543"}
+                        ]}
+                    ]},
 
-            myLayIdentifier: [], // 覆盖物标识符数组(即让一个标识符对应一个覆盖物)
-            myLayNumber: '', // 覆盖物编号
-            myGroupName: [], // 覆盖物分组名称数组.
+                    {"xuexiao_bh":"X1003", "xuexiao_mc":"泉州第五中学", "data":[
+                        { "weizhi":"W3001", "data":[
+                            {"zuobiao":"118.618582,24.900159"},
+                            {"zuobiao":"118.619463,24.899709"},
+                            {"zuobiao":"118.619579,24.900045"},
+                            {"zuobiao":"118.619049,24.90034"},
+                            {"zuobiao":"118.618807,24.900077"}
+                        ]},
+                        { "weizhi":"W3002", "data":[
+                            {"zuobiao":"118.620478,24.899913"},
+                            {"zuobiao":"118.620011,24.89934"},
+                            {"zuobiao":"118.620523,24.899069"},
+                            {"zuobiao":"118.620945,24.899676"}
+                        ]}
+                    ]},
+                    {"xuexiao_bh":"X1004", "xuexiao_mc":"泉州第一实验小学", "data":[
+                        { "weizhi":"W1001", "data":[
+                            {"zuobiao":"118.595128,24.917275"},
+                            {"zuobiao":"118.606123,24.917275"},
+                            {"zuobiao":"118.606123,24.910262"},
+                            {"zuobiao":"118.595128,24.910262"}
+                        ]}
+                    ]},
 
-            myPolygon: '', // 多边莆
-            drawManager: '',
-            drawMode: '', // 当前绘制模式(可选), 默认空. 值：空 无任何绘制操作, hander 拖动地图(鼠标为一只手), marker 画点, circle 画圆, polyline 画线,  polygon 画多边形, rectangle 画矩形。
-            clickTimes: 0, // 记录地图被点击的次数(可选), 默认0
-            loadTimes: 0, // 记录地图重载的次数(可选), 默认0
-
-            styleOptions: {
-                strokeColor: 'red', // 边线颜色。
-                fillColor: 'red', // 填充颜色。当参数为空时，圆形将没有填充效果。
-                strokeWeight: 1, // 边线的宽度，以像素为单位。
-                strokeOpacity: 0.8, // 边线透明度，取值范围0 - 1。
-                fillOpacity: 0.65,  // 填充的透明度，取值范围0 - 1。
-                strokeStyle: 'solid' // 边线的样式，solid或dashed。
-            },
-
-            /**
-             * 实例化
-             */
-            init: function () {
-                var _this = this;
-                // if (this.status) { // 只允许地图加载一次
-                //     return;
-                // }
-                this.loadTimes++;
-                this.center = this.center == '' ? '118.611836,24.918225' : this.center; // 当中心点坐标为空时,设定一个默认坐标
-                this.status = true;
-                var options = {
-                    enableMapClick: this.default.enableMapClick
-                }
-                this.map = new BMap.Map('map', options);
-                this.point = new BMap.Point(this.center.split(',')[0], this.center.split(',')[1]);
-                var map = this.map;
-                var styleOptions = this.styleOptions;
-                map.centerAndZoom(this.point, 16);
-                map.enableScrollWheelZoom();
-                if(this.city.toString().replace(/([ ]+)/g, '') !== ''){
-                    map.setCenter(this.city);
-                }     
-                // 先清空所有覆盖物
-                _this.clearAll();
-                // 加载多边形
-                if(this.myPoints.length != 0){ // 加载多个已有的多边形
-                    if(this.loadTimes >= 2) $('.bdmap__mouse-step').empty(); // 清空招生服务说明 
-                    for(var i = 0; i < this.myPoints.length; i++){
-                        var row = this.myPoints[i];
-                        var color = generateRandColor();
-                        var schoolName = this.myGroupName[i];
-                        // console.log('学构名称：', schoolName)
-                        createOneSchoolExplain(schoolName, color); // 创建一条招生服务说明
-
-                        for(var k = 0; k < row.length; k++){
-                            this.myOverlay = row[k];
-                            this.myLayNumber = this.myLayIdentifier[k];
-                            if (this.myOverlay) {
-                                this.loadMyOverlay(color);
-                            }
-                        }
-                    }
-                }else{  // 加载一个已有的多边形
-                    if (this.myOverlay) this.loadMyOverlay('red');
-                }
-            },
-
-            /**
-             * 加载已有的覆盖物
-             */
-            loadMyOverlay: function (color) {
-                // console.log('color：', color)
-                var _this = this;
-                var map = this.map;
-                map.centerAndZoom(this.point, this.zoom); // 设置地图中心点
-                // 创建多边形覆盖物
-                var ply = new BMap.Polygon(this.myOverlay, this.styleOptions);
-                this.myPolygon = ply; 
-                try { 
-                    // ply.enableEditing();
-                    ply.setFillColor(color); // 设置多边形填充颜色
-                    ply.setStrokeColor(color); // 设置多边形边线颜色
-                    ply.setFillOpacity(.65); // 设置透明度. 0到1
-                    ply.name = 'duobianxing'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
-                    map.addOverlay(ply);
-                    _this.overlays.push(ply); // 全局赋值
-                } 
-                catch (e) { };
-            },
-
-            /**
-             * 清除所有覆盖物
-             */
-             clearAll: function () {
-                // var r = confirm('确认清除所有覆盖物？');
-                // if(r !== true) return;
-                var map = this.map;
-                var overlays = this.overlays;
-                for (var i = 0; i < overlays.length; i++) {
-                    map.removeOverlay(overlays[i]);
-                }
-                this.overlays.length = 0;
-                map.removeOverlay(this.myPolygon);
-                this.myPolygon = '';
-            }
-        };
-
-
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        $(function(){
-
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //                                                   初始化设置
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-           
-            //——————————————————————————————————————————
-            //=====初始化地图宽高
-            setDituSize();
-            
-            //——————————————————————————————————————————
-            //=====检测窗口变化事件
-            $(window).on('resize', function(){
-                setDituSize();
-            });
-
-            /**
-             * 函数：设置地图宽高
-             * (高度一定要在设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
-             */
-            function setDituSize(){
-                var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
-                    winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
-                // 整个区域
-                var eleAll = $('.bdmap'),
-                    allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
-                    allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
-                    allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
-                    allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
-                    allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
-                    allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
-                    allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
-                    allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
-                //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
-                // 顶部区域
-                var eleTop = $('.bdmap__editor'),
-                    topHeight = eleTop.outerHeight(true);
-                // 地图区域
-                var eleTu = $('.bdmap__map'),
-                    tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
-                    tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
-                    tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
-                    tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
-                    tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
-                    tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
-                    tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
-                    tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
-                    tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
-                // 计算宽高
-                var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
-                    allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
-                    tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
-                    tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
-                // console.log('bodyWidth：', $('body').width(), '\nallMargLeft:',allMargLeft, '\nallMargRight:',allMargRight, '\nallPadLeft:',allPadLeft, '\nallPadRight:', allPadRight);
-                // console.log('tuMargLeft:',tuMargLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadRight:',tuPadRight);
-                // console.log('--------------------------------');
-                // 设置地图宽高
-                $('.bdmap__map').css({
-                    width: tuWidth,
-                    height: tuHeight
-                })
-                $('#map').css({
-                    width: eleTu.width(),
-                    height: eleTu.height()
-                })
+                    {"xuexiao_bh":"X1005", "xuexiao_mc":"泉州第八实验小学", "data":[
+                        { "weizhi":"W2001", "data":[
+                            {"zuobiao":"118.59678,24.913146"},
+                            {"zuobiao":"118.605045,24.913146"},
+                            {"zuobiao":"118.605045,24.906591"},
+                            {"zuobiao":"118.59678,24.906591"}
+                        ]}
+                    ]}
+                ]
             }
 
 
+            /*
+            // START AJAX
+            var datasource = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取学校招生服务区数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                data: {
+                    "action": "wh_xuexiao_xq_zuobiao_query_all",
+                    "menu_bh": "<%=s_menu_bh%>",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "sheng_mc": ps_sheng_mc,
+                    "shi_mc": ps_shi_mc,
+                    "qu_mc": ps_qu_mc,
+                    "jiedao_mc": ps_jiedao_mc,
+                    "shequ_mc": ps_shequ_mc,
+                    "xuexiao_mc": ps_xuexiao_mc
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    datasource = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return {}
+            }
+            // END AJAX
+            */
 
-
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //                                                   系列点击事件
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //——————————————————————————————————————————
-            //=====招生服务区说明显示或隐藏
-            $('.bdmap__mouse-title').on('click', function(){
-                var $this = $(this);
-                var $next = $(this).next();
-                if($next.is(':visible')){
-                    $this.addClass('angle-down');
-                    $next.slideUp('fast');
-                }else{
-                    $this.removeClass('angle-down');
-                    $next.slideDown('fast');
-                }
-            });
-
-
-            //——————————————————————————————————————————
-            //=====清空输入框add 20210724-1
-            $('.bdmap__editor .eform-row .item-cell').on('click', function(){
-                $(this).siblings().find('input:text, textarea').val('');
-            });
-
-
-
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            //                                                  搜索区域事件
-            //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-            // //——————————————————————————————————————————
-            // //=====省份下拉(系统数据源)
-            // $('#s-province').on('click', function(){
-            //     var $this = $(this);
-            //     var provinceJson = neuiDistrict.getProvinceData();
-            //     // console.log('省份：', provinceJson);
-            //     neuiInputsearch({
-            //         source: provinceJson,
-            //         onConfirm: function(e){
-            //             if(e.value != e.oldValue){ // 新老值不一样时，清空城市、区县、街道、社区
-            //                $('#s-city, #s-county, #s-street, #s-community').val('');
-            //             }
-            //         }
-            //     }, $this)
-            // });
-
+            return datasource;
+        }
 
 
 
-            // //——————————————————————————————————————————
-            // //=====城市下拉(系统数据源)
-            // $('#s-city').on('click', function(){
-            //     var $this = $(this);
-            //     var ls_sheng = filter.html($('#s-province').val());
-            //     if(ls_sheng.toString().replace(/([ ]+)/g, '') === '') return;
-            //     var cityJson = neuiDistrict.getCityData(ls_sheng);
-            //     // console.log('城市：', cityJson);
-            //     neuiInputsearch({
-            //         source: cityJson,
-            //         onConfirm: function(e){
-            //             if(e.value != e.oldValue){ // 新老值不一样时，清空区县、街道、社区
-            //                 $('#s-county, #s-street, #s-community').val('');
-            //             }
-            //         }
-            //     }, $this)
-            // });
-
-
-
-            // //——————————————————————————————————————————
-            // //=====区县下拉(系统数据源)
-            // $('#s-county').on('click', function(){
-            //     var $this = $(this);
-            //     var ls_shi = filter.html($('#s-city').val());
-            //     if(ls_shi.toString().replace(/([ ]+)/g, '') === '') return;
-            //     var countyJson = neuiDistrict.getCountyData(ls_shi);
-            //     // console.log('区县：', countyJson);
-            //     neuiInputsearch({
-            //         source: countyJson,
-            //         onConfirm: function(e){
-            //             if(e.value != e.oldValue){ // 新老值不一样时，清空街道、社区
-            //                 $('#s-street, #s-community').val('');
-            //             }
-            //         }
-            //     }, $this)
-            // });
-
-
-
-
-            //——————————————————————————————————————————
-            //=====省份下拉(自定义数据源)
-            $('#s-province').on('click', function(){
-                var $this = $(this);
-                // 后台返回
-                var provinceJson = {
-                    "data":[
-                        {"get_value":"福建省"},
-                        // {"get_value":"浙江省"}
-                    ]
-                }
-
-                /*
-                // START AJAX
-                var provinceJson = {}
-                var isHoldOn = true;
-                ajax({
-                    heading: "获取省份下拉数据",
-                    debug: false,
-                    async: false, // 取数方式. true 异步, false 同步(默认)
-                    type: "POST",
-                    dataType: "html",
-                    cache: false,
-                    url: "../fwh_pub/jk_xuexiao_xq.ashx",
-                    data: {
-                        "action": "wh_xuexiao_get_sheng",
-                        "menu_bh": "<%=s_menu_bh%>",
-                        "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk%>"
-                    },
-                    success: function(res){
-                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        // if(res == '') return;
-                        provinceJson = JSON.parse(res);
-                    },
-                    error: function(res){
-                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                    },
-                    beforeSend: function(XMLHttpRequest){ },
-                    complete: function(XMLHttpRequest, textStatus){ }
+        //——————————————————————————————————————————
+        //=====查询按钮
+        $('#btn-query').on('click', function(){
+            var $this = $(this);
+            var ls_sheng_mc = filter.html($('#s-province').val()),
+                ls_shi_mc = filter.html($('#s-city').val()),
+                ls_qu_mc = filter.html($('#s-county').val()),
+                ls_jiedao_mc = filter.html($('#s-street').val()),
+                ls_shequ_mc = filter.html($('#s-community').val()),
+                ls_xuexiao_mc = filter.html($('#s-school').val());
+            var arr = [ ls_sheng_mc, ls_shi_mc, ls_qu_mc, ls_jiedao_mc, ls_shequ_mc, ls_xuexiao_mc ]
+            // console.log('数组：', arr);
+            
+            // 校验完整性（所有条件必填)
+            // var tips = '';
+            // $(this).parents('.eform-row').prevAll().each(function(){
+            //     var label = $('label', this).text(),
+            //         value = $('input:text, textarea', this).val().toString().replace(/([ ]+)/g, '');
+            //     if(value === '') tips += label + '、';
+            // })
+            // if(tips != ''){
+            //     neuiDialog.alert({
+            //         animate: true,
+            //         message: '请先选择：' + tips.substr(0, tips.length - 1),
+            //         buttons: ['确定']
+            //     })
+            //     return;
+            // }
+            // 校验完整性（部分条件必填) 
+            var tips = '';
+            if(ls_sheng_mc == '') tips += '省份、';
+            if(ls_shi_mc == '') tips += '城市、';
+            if(tips != ''){
+                neuiDialog.alert({
+                    animate: true,
+                    message: '请选择：' + tips.substr(0, tips.length - 1),
+                    buttons: ['确定']
                 })
-                if(!isHoldOn){
-                    neui.destroyAnimate();
-                    return;
-                }
-                // END AJAX
-                */
-                neuiInputsearch({
-                    source: provinceJson,
-                    format: ["get_value"],
-                    autoFill: { // add 20210724-1
-                        oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
-                    },
-                    onConfirm: function(e){
-                        if(e.value != e.oldValue){ // 新老值不一样时，清空城市、区县、街道、社区
-                           $('#s-city, #s-county, #s-street, #s-community').val('');
-                        }
-                    }
-                }, $this)
-            });
+                return;
+            }
 
+            // 开始执行
+            neui.showAnimate();
+            setTimeout(function(){
 
+                // 获取查询到的数据
+                var coordinateData = get_data_school(ls_sheng_mc, ls_shi_mc, ls_qu_mc, ls_jiedao_mc, ls_shequ_mc, ls_xuexiao_mc);
 
-
-            //——————————————————————————————————————————
-            //=====城市下拉(自定义数据源)
-            $('#s-city').on('click', function(){
-                var $this = $(this);
-                var ls_sheng_mc = filter.html($('#s-province').val());            
-                 // 后台返回
-                 var cityJson = {
-                    "data":[
-                        {"get_value":"泉州市"},
-                        {"get_value":"厦门市"},
-                        {"get_value":"福州市"}
-                    ]
-                }
-                /*
-                // START AJAX
-                var cityJson = {}
-                var isHoldOn = true;
-                ajax({
-                    heading: "获取城市下拉数据",
-                    debug: false,
-                    async: false, // 取数方式. true 异步, false 同步(默认)
-                    type: "POST",
-                    dataType: "html",
-                    cache: false,
-                    url: "../fwh_pub/jk_xuexiao_xq.ashx",
-                    data: {
-                        "action": "wh_xuexiao_get_shi",
-                        "menu_bh": "<%=s_menu_bh%>",
-                        "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk%>",
-                        "sheng_mc": ls_sheng_mc
-                    },
-                    success: function(res){
-                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        // if(res == '') return;
-                        cityJson = JSON.parse(res);
-                    },
-                    error: function(res){
-                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                    },
-                    beforeSend: function(XMLHttpRequest){ },
-                    complete: function(XMLHttpRequest, textStatus){ }
-                })
-                if(!isHoldOn){
-                    neui.destroyAnimate();
-                    return;
-                }
-                // END AJAX
-                */
-
-                neuiInputsearch({
-                    source: cityJson,
-                    format: ["get_value"],
-                    autoFill: { // add 20210724-1
-                        selectedFill: true,
-                        oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
-                    },
-                    onConfirm: function(e){
-                        if(e.value != e.oldValue){ // 新老值不一样时，清空区县、街道、社区
-                            $('#s-county, #s-street, #s-community').val('');
-                        }
-                    }
-                }, $this)
-            });
-
-
-
-            //——————————————————————————————————————————
-            //=====区县下拉(自定义数据源)
-            $('#s-county').on('click', function(){
-                var $this = $(this);
-                var ls_sheng_mc = filter.html($('#s-province').val()),
-                    ls_shi_mc = filter.html($('#s-city').val());
-                // 后台返回
-                var countyJson = {
-                    "data":[
-                        {"get_value":"丰泽区"},
-                        {"get_value":"鲤城区"},
-                        {"get_value":"洛江区"},
-                        {"get_value":"泉港区"},
-                        {"get_value":"晋江市"},
-                        {"get_value":"石狮市"},
-                        {"get_value":"南安市"},
-                        {"get_value":"惠安县"},
-                        {"get_value":"安溪县"},
-                        {"get_value":"永春县"},
-                        {"get_value":"德化县"}
-                    ]
-                }
-                /*
-                // START AJAX
-                var countyJson = {}
-                var isHoldOn = true;
-                ajax({
-                    heading: "获取区县下拉数据",
-                    debug: false,
-                    async: false, // 取数方式. true 异步, false 同步(默认)
-                    type: "POST",
-                    dataType: "html",
-                    cache: false,
-                    url: "../fwh_pub/jk_xuexiao_xq.ashx",
-                    data: {
-                        "action": "wh_xuexiao_get_qu",
-                        "menu_bh": "<%=s_menu_bh%>",
-                        "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk%>",
-                        "sheng_mc": ls_sheng_mc,
-                        "shi_mc": ls_shi_mc
-                    },
-                    success: function(res){
-                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        // if(res == '') return;
-                        countyJson = JSON.parse(res);
-                    },
-                    error: function(res){
-                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                    },
-                    beforeSend: function(XMLHttpRequest){ },
-                    complete: function(XMLHttpRequest, textStatus){ }
-                })
-                if(!isHoldOn){
-                    neui.destroyAnimate();
-                    return;
-                }
-                // END AJAX
-                */
-                neuiInputsearch({
-                    source: countyJson,
-                    format: ["get_value"],
-                    autoFill: { // add 20210724-1
-                        selectedFill: true,
-                        oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
-                    },
-                    onConfirm: function(e){
-                        if(e.value != e.oldValue){ // 新老值不一样时，清空街道、社区
-                            $('#s-street, #s-community').val('');
-                        }
-                    }
-                }, $this)
-            });
-
-
-
-            //——————————————————————————————————————————
-            //=====街道下拉
-            $('#s-street').on('click', function(){
-                var $this = $(this);
-                var ls_sheng_mc = filter.html($('#s-province').val()),
-                    ls_shi_mc = filter.html($('#s-city').val()),
-                    ls_qu_mc = filter.html($('#s-county').val());
-                var arr = [ ls_sheng_mc, ls_shi_mc, ls_qu_mc ]
-                // console.log('数组：', arr);
-                // 校验完整性
-                var tips = '';
-                $(this).parents('.eform-row').prevAll().each(function(){
-                    var label = $('label', this).text(),
-                        value = $('input:text, textarea', this).val().toString().replace(/([ ]+)/g, '');
-                    if(value === '') tips += label + '、';
-                })
-                if(tips != ''){
-                    // neuiDialog.alert({
-                    //     animate: true,
-                    //     caption: '提示',
-                    //     message: '请先选择：' + tips.substr(0, tips.length - 1),
-                    //     buttons: ['确定']
-                    // })
-                    return;
-                }
-
-                // 后台返回
-                var streetJson = {
-                    "data":[
-                        {"get_value":"东湖街道"},
-                        {"get_value":"丰泽街道"},
-                        {"get_value":"泉秀街道"},
-                        {"get_value":"清源街道"},
-                        {"get_value":"华大街道"},
-                        {"get_value":"城东街道"},
-                        {"get_value":"东海街道"},
-                        {"get_value":"北峰街道"}
-                    ]
-                }
-                /*
-                // START AJAX
-                var streetJson = {}
-                var isHoldOn = true;
-                ajax({
-                    heading: "获取街道下拉数据",
-                    debug: false,
-                    async: false, // 取数方式. true 异步, false 同步(默认)
-                    type: "POST",
-                    dataType: "html",
-                    cache: false,
-                    url: "../fwh_pub/jk_xuexiao_xq.ashx",
-                    data: {
-                        "action": "wh_xuexiao_get_jiedao",
-                        "menu_bh": "<%=s_menu_bh%>",
-                        "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk%>",
-                        "sheng_mc": ls_sheng_mc,
-                        "shi_mc": ls_shi_mc,
-                        "qu_mc": ls_qu_mc
-                    },
-                    success: function(res){
-                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        // if(res == '') return;
-                        streetJson = JSON.parse(res);
-                    },
-                    error: function(res){
-                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                    },
-                    beforeSend: function(XMLHttpRequest){ },
-                    complete: function(XMLHttpRequest, textStatus){ }
-                })
-                if(!isHoldOn){
-                    neui.destroyAnimate();
-                    return;
-                }
-                // END AJAX
-                */
-
-                neuiInputsearch({
-                    source: streetJson,
-                    format: ["get_value"],
-                    autoFill: { // add 20210724-1
-                        selectedFill: true,
-                        oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
-                    },
-                    onConfirm: function(e){
-                        if(e.value != e.oldValue){ // 新老值不一样时，清空社区
-                           $('#s-community').val('');
-                        }
-                    }
-                }, $this)
-            });
-
-
-
-            //——————————————————————————————————————————
-            //=====社区下拉
-            $('#s-community').on('click', function(){
-                var $this = $(this);
-                var ls_sheng_mc = filter.html($('#s-province').val()),
-                    ls_shi_mc = filter.html($('#s-city').val()),
-                    ls_qu_mc = filter.html($('#s-county').val()),
-                    ls_jiedao_mc = filter.html($('#s-street').val());
-                var arr = [ ls_sheng_mc, ls_shi_mc, ls_qu_mc, ls_jiedao_mc ]
-                // console.log('数组：', arr);
-                // 校验完整性
-                var tips = '';
-                $(this).parents('.eform-row').prevAll().each(function(){
-                    var label = $('label', this).text(),
-                        value = $('input:text, textarea', this).val().toString().replace(/([ ]+)/g, '');
-                    if(value === '') tips += label + '、';
-                })
-                if(tips != ''){
-                    // neuiDialog.alert({
-                    //     animate: true,
-                    //     caption: '提示',
-                    //     message: '请先选择：' + tips.substr(0, tips.length - 1),
-                    //     buttons: ['确定']
-                    // })
-                    return;
-                }
-
-                // 后台返回
-                var communityJson = {
-                    "data":[
-                        {"get_value":"西湖小区"},
-                        {"get_value":"丰泽小区"},
-                        {"get_value":"前坂小区"},
-                        {"get_value":"后坂小区"}
-                    ]
-                }
-                /*
-                // START AJAX
-                var communityJson = {}
-                var isHoldOn = true;
-                ajax({
-                    heading: "获取社区下拉数据",
-                    debug: false,
-                    async: false, // 取数方式. true 异步, false 同步(默认)
-                    type: "POST",
-                    dataType: "html",
-                    cache: false,
-                    url: "../fwh_pub/jk_xuexiao_xq.ashx",
-                    data: {
-                        "action": "wh_xuexiao_get_shequ",
-                        "menu_bh": "<%=s_menu_bh%>",
-                        "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk%>",
-                        "sheng_mc": ls_sheng_mc,
-                        "shi_mc": ls_shi_mc,
-                        "qu_mc": ls_qu_mc,
-                        "jiedao_mc": ls_jiedao_mc
-                    },
-                    success: function(res){
-                        if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        // if(res == '') return;
-                        communityJson = JSON.parse(res);
-                    },
-                    error: function(res){
-                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                    },
-                    beforeSend: function(XMLHttpRequest){ },
-                    complete: function(XMLHttpRequest, textStatus){ }
-                })
-                if(!isHoldOn){
-                    neui.destroyAnimate();
-                    return;
-                }
-                // END AJAX
-                */
-
-                neuiInputsearch({
-                    source: communityJson,
-                    format: ["get_value"],
-                    autoFill: { // add 20210724-1
-                        selectedFill: true,
-                        oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
-                    },
-                    onConfirm: function(e){
-                        if(e.value != e.oldValue){ // 新老值不一样时
-                           //..
-                        }
-                    }
-                }, $this)
-            });
-
-
-
-
-
-            //——————————————————————————————————————————
-            //=====查询按钮
-            $('#btn-query').on('click', function(){
-                var $this = $(this);
-                var ls_sheng_mc = filter.html($('#s-province').val()),
-                    ls_shi_mc = filter.html($('#s-city').val()),
-                    ls_qu_mc = filter.html($('#s-county').val()),
-                    ls_jiedao_mc = filter.html($('#s-street').val()),
-                    ls_shequ_mc = filter.html($('#s-community').val()),
-                    ls_xuexiao_mc = filter.html($('#s-school').val());
-                var arr = [ ls_sheng_mc, ls_shi_mc, ls_qu_mc, ls_jiedao_mc, ls_shequ_mc, ls_xuexiao_mc ]
-                // console.log('数组：', arr);
-                
-                // 校验完整性（所有条件必填) edit 20210724-1
-                // var tips = '';
-                // $(this).parents('.eform-row').prevAll().each(function(){
-                //     var label = $('label', this).text(),
-                //         value = $('input:text, textarea', this).val().toString().replace(/([ ]+)/g, '');
-                //     if(value === '') tips += label + '、';
-                // })
-                // if(tips != ''){
-                //     neuiDialog.alert({
-                //         animate: true,
-                //         caption: '提示',
-                //         message: '请先选择：' + tips.substr(0, tips.length - 1),
-                //         buttons: ['确定']
-                //     })
-                //     return;
-                // }
-                // 校验完整性（部分条件必填) add 20210724-1
-                var tips = '';
-                if(ls_sheng_mc == '') tips += '省份、';
-                if(ls_shi_mc == '') tips += '城市、';
-                if(tips != ''){
+                // 无数据时
+                if($.isEmptyObject(coordinateData) || coordinateData.data.length == 0){
                     neuiDialog.alert({
                         animate: true,
-                        caption: '提示',
-                        message: '请选择：' + tips.substr(0, tips.length - 1),
+                        message: '抱歉，没有找到相应数据，请尝试更改查询条件',
                         buttons: ['确定']
-                    })
+                    });
+                    neui.destroyAnimate();
                     return;
                 }
-
-                
-
-                // 开始执行
-                neui.showAnimate();
-                setTimeout(function(){
-                    
-                    // 后台返回多个学校学区坐标数据
-                    var coordinateJson = {
-                        "return":"ok",
-                        "data":[
-                            {"xuexiao_bh":"X1001", "xuexiao_mc":"泉州王宫中学", "data":[
-                                { "weizhi":"W1001", "data":[
-                                    {"zuobiao":"118.614387,24.911507"},
-                                    {"zuobiao":"118.619202,24.91131"},
-                                    {"zuobiao":"118.617334,24.907247"}
-                                ]},
-                                { "weizhi":"W1002", "data":[
-                                    {"zuobiao":"118.620496,24.90646"},
-                                    {"zuobiao":"118.62646,24.90528"},
-                                    {"zuobiao":"118.622436,24.899184"},
-                                    {"zuobiao":"118.617477,24.902462"}
-                                ]}
-                            ]},
-
-                            {"xuexiao_bh":"X1002", "xuexiao_mc":"泉州现代中学", "data":[
-                                { "weizhi":"W2001", "data":[
-                                    {"zuobiao":"118.609536,24.901118"},
-                                    {"zuobiao":"118.614243,24.899381"},
-                                    {"zuobiao":"118.61295,24.896955"},
-                                    {"zuobiao":"118.6095,24.900102"}
-                                ]},
-                                { "weizhi":"W2002", "data":[
-                                    {"zuobiao":"118.61586,24.898561"},
-                                    {"zuobiao":"118.618304,24.89571"},
-                                    {"zuobiao":"118.614028,24.894071"},
-                                    {"zuobiao":"118.614064,24.894137"}
-                                ]},
-                                { "weizhi":"W2003", "data":[
-                                    {"zuobiao":"118.611117,24.903969"},
-                                    {"zuobiao":"118.611405,24.901544"},
-                                    {"zuobiao":"118.61295,24.901577"},
-                                    {"zuobiao":"118.613992,24.903543"}
-                                ]}
-                            ]},
-
-                            {"xuexiao_bh":"X1003", "xuexiao_mc":"泉州第五中学", "data":[
-                                { "weizhi":"W3001", "data":[
-                                    {"zuobiao":"118.618582,24.900159"},
-                                    {"zuobiao":"118.619463,24.899709"},
-                                    {"zuobiao":"118.619579,24.900045"},
-                                    {"zuobiao":"118.619049,24.90034"},
-                                    {"zuobiao":"118.618807,24.900077"}
-                                ]},
-                                { "weizhi":"W3002", "data":[
-                                    {"zuobiao":"118.620478,24.899913"},
-                                    {"zuobiao":"118.620011,24.89934"},
-                                    {"zuobiao":"118.620523,24.899069"},
-                                    {"zuobiao":"118.620945,24.899676"}
-                                ]}
-                            ]},
-                            {"xuexiao_bh":"X1004", "xuexiao_mc":"泉州第一实验小学", "data":[
-                                { "weizhi":"W1001", "data":[
-                                    {"zuobiao":"118.595128,24.917275"},
-                                    {"zuobiao":"118.606123,24.917275"},
-                                    {"zuobiao":"118.606123,24.910262"},
-                                    {"zuobiao":"118.595128,24.910262"}
-                                ]}
-                            ]},
-
-                            {"xuexiao_bh":"X1005", "xuexiao_mc":"泉州第八实验小学", "data":[
-                                { "weizhi":"W2001", "data":[
-                                    {"zuobiao":"118.59678,24.913146"},
-                                    {"zuobiao":"118.605045,24.913146"},
-                                    {"zuobiao":"118.605045,24.906591"},
-                                    {"zuobiao":"118.59678,24.906591"}
-                                ]}
-                            ]}
+                // 有数据时，进行数据转换
+                var plyBgColorArr = [];  // 多边形背景颜色数组
+                var schoolNameArr = []; // 学校名称数组
+                var schoolBgColorArr = []; // 学校名称对应方块背景色数组
+                // 将坐标数据转化经纬度坐标数组
+                /*
+                * 转化后的二维数组格式示例eg：
+                    var coordinateArray = [
+                        [
+                            { lng: 116.256515, lat: 39.995242 },
+                            { lng: 116.502579, lat: 39.951893 },
+                            { lng: 116.256515, lat: 39.866882 }
+                        ],[
+                            { lng: 116.264158, lat: 40.31587 },
+                            { lng: 116.280256, lat: 40.188118 },
+                            { lng: 116.417086, lat: 40.189882 }
                         ]
-                    }
-
-
-                    /*
-                    // START AJAX
-                    var coordinateJson = {}
-                    var isHoldOn = true;
-                    ajax({
-                        heading: "获取多个学校学区坐标数据",
-                        debug: false,
-                        async: false, // 取数方式. true 异步, false 同步(默认)
-                        type: "POST",
-                        dataType: "html",
-                        cache: false,
-                        url: "../fwh_pub/jk_xuexiao_xq.ashx",
-                        data: {
-                            "action": "wh_xuexiao_xq_zuobiao_query_all",
-                            "menu_bh": "<%=s_menu_bh%>",
-                            "user": "<%=s_user%>",
-                            "sjk": "<%=s_sjk%>",
-                            "sheng_mc": ls_sheng_mc,
-                            "shi_mc": ls_shi_mc,
-                            "qu_mc": ls_qu_mc,
-                            "jiedao_mc": ls_jiedao_mc,
-                            "shequ_mc": ls_shequ_mc,
-                            "xuexiao_mc": ls_xuexiao_mc
-                        },
-                        success: function(res){
-                            if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                            // if(res == '') return;
-                            coordinateJson = JSON.parse(res);
-                        },
-                        error: function(res){
-                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
-                        },
-                        beforeSend: function(XMLHttpRequest){ },
-                        complete: function(XMLHttpRequest, textStatus){ }
-                    })
-                    if(!isHoldOn){
-                        neui.destroyAnimate();
-                        return;
-                    }
-                    // END AJAX
-                    */
-
-
-                    // 将坐标数据转化经纬度坐标数组
-                    /*
-                    * 转化后的格式示例eg：
-                        var coordinateArray = [
-                            [
-                                new BMap.Point(116.256515, 39.995242),
-                                new BMap.Point(116.502579, 39.951893),
-                                new BMap.Point(116.256515, 39.866882)
-                            ],
-                            [
-                                new BMap.Point(116.264158, 40.31587),
-                                new BMap.Point(116.280256, 40.188118),
-                                new BMap.Point(116.417086, 40.189882)
-                            ]
-                        ]
-                    */
-                    var coordinateArray = [ ];
-                    if(typeof coordinateJson.data != 'undefined'){
-                        for(var i1 = 0; i1 < coordinateJson.data.length; i1++){
-                            var item1 = coordinateJson.data[i1];
-                            var tempArr = [ ];
-                            for(var i2 = 0; i2 < item1.data.length; i2++){
-                                var item2 = item1.data[i2];
-                                var arr = [ ];
-                                if(typeof item2.data != 'undefined'){
-                                    for(var i3 = 0; i3 < item2.data.length; i3++){
-                                        var item3 = item2.data[i3];
-                                        var zb = item3.zuobiao;
-                                        var tmpArr = item3.zuobiao.split(','),
-                                            lng= tmpArr[0], lat = tmpArr[1];
-                                        arr.push(new BMap.Point(lng, lat));
-                                    }
+                    ]
+                */
+                var plyCoordArr = [];
+                if(typeof coordinateData.data != 'undefined'){
+                    for(var i1 = 0; i1 < coordinateData.data.length; i1++){
+                        var item1 = coordinateData.data[i1];
+                        var colors = generateRandColor();
+                        // console.log('item1：', item1);
+                        schoolNameArr.push(item1["xuexiao_mc"]);
+                        schoolBgColorArr.push(colors);
+                        for(var i2 = 0; i2 < item1.data.length; i2++){
+                            var item2 = item1.data[i2];
+                            if(typeof item2.data != 'undefined'){
+                                var arr = [];
+                                for(var i3 = 0; i3 < item2.data.length; i3++){
+                                    var item3 = item2.data[i3];
+                                    var zb = item3.zuobiao;
+                                    var tmpArr = item3.zuobiao.split(','),
+                                        longitude = tmpArr[0], latitude = tmpArr[1];
+                                        arr.push({
+                                        lng: longitude,
+                                        lat: latitude
+                                    });
                                 }
-                                tempArr.push(arr);
+                                // console.log('arr：', arr);
+                                plyCoordArr.push(arr);
+                                plyBgColorArr.push(colors);
                             }
-                            coordinateArray.push(tempArr);
                         }
                     }
-                    // console.log('点数组：', coordinateArray);
+                }
 
-                    // 学校名称数组
-                    var schoolNameArray = [ ];
-                    if(typeof coordinateJson.data != 'undefined'){
-                        for(var i = 0; i < coordinateJson.data.length; i++){
-                            var row = coordinateJson.data[i];
-                            schoolNameArray.push(row["xuexiao_mc"]);
+                // console.log('学校名称数组：', schoolNameArr);
+                // console.log('学校方块背景色数组：', schoolBgColorArr);
+                // console.log('多边形坐标数组：', plyCoordArr);
+                // console.log('多边形背景颜色数组：', plyBgColorArr);
+
+                // 将数据显示到地图上
+                load_data_to_ditu(plyCoordArr, plyBgColorArr, schoolNameArr, schoolBgColorArr);
+
+                neui.destroyAnimate();
+            }, 100)
+        });
+
+
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                          百度地图上展示数据并进行交互操作
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        /**
+         * 加载数据
+         * @param {Array} ps_ply_coordinate_arr 多边形坐标数组
+         * @param {Array} ps_ply_color_arr 多边形背景颜色数组
+         * @param {Array} ps_description_title_arr 多边形说明标题数组
+         * @param {Array} ps_description_color_arr 多边形说明方块背景色数组
+         */
+         function load_data_to_ditu(ps_ply_coordinate_arr, ps_ply_color_arr, ps_description_title_arr, ps_description_color_arr){
+            //————————————————————————————————————————————————
+            // 地图初始化参数
+            var options = {
+                // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
+                width: 'auto', // 宽(可选)，默认auto
+                height: 'auto', // 高(可选)，默认auto
+                setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于width/height参数。
+                    // setDituSize();
+                },
+                onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于width/height参数。
+                    // setDituSize();
+                },
+                zoom: 15, // 地图缩放级别(可选)，默认11。 值：3-19
+                // 中心点(可选)
+                center: {
+                    visible: false, // 是否显示中心点标注(可选)，默认true
+                    city: $('#s-city').val() + $('#s-county').val(), // 城市(可选)，默认空。值：空时根据坐标定位, 非空时根据城市定位。eg.'泉州市', eg.'泉州市惠安县'。
+                    coordinate: g_zhongxin_zb,  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
+                    caption: "泉州市", // 标题文字(可选)，默认空。
+                    describe: "", // 描述文字(可选)，默认空。
+                },
+                // 功能与配置项(可选)
+                draft: { // 地图底图功能(可选)
+                    switchType: { // 切换地图类型(可选)
+                        enable: true, // 是否开启(可选)，默认false
+                        types: ['normal', 'satellite', 'hybrid'], // 配置地图类型(可选)。数组元素可添加的值: normal 普通街道视图, satellite 卫星视图, hybrid 卫星和路网的混合视图 
+                        direction: 'bottomRight', // 位置(可选)，默认空右下角。值： topLeft 左上角, topRight 右上角, bottomLeft 左下角, bottomRight 右下角
+                        offset: { // 位置偏移量(可选)
+                            width: 10, // 水平方向数值(可选)，默认10
+                            height: 25 // 竖直方向数值(可选)，默认50
                         }
                     }
-                    // console.log('学校名称数组：', schoolNameArray);
-
-                    // 地图初始化
-                    // console.log('overlayArrray:', coordinateArray)
-                    bdChinaMap.center = g_zhongxin_zb == '' ? '118.611836,24.918225' : g_zhongxin_zb; // '118.611836,24.918225'; // 中心点坐标
-                    bdChinaMap.caption = g_xuexiao_mc == '' ? '泉州市' : g_xuexiao_mc; // '泉州市'; // 中心点说明文字
-                    bdChinaMap.zoom = 15; // 缩放级别
-                    bdChinaMap.image.enable = true;
-                    bdChinaMap.image.icon = 'bmap_school.png';
-                    bdChinaMap.clickCreateNewCenter = true; // 是否启用点击地图时在点击位置新建中心点坐标
-                    bdChinaMap.default.enableMapClick = false; // 是否启用底图景点可点功能
-                    // 加载多个已有的多边形
-                    bdChinaMap.myPoints = coordinateArray;
-                    bdChinaMap.myGroupName = schoolNameArray;
-                    bdChinaMap.city = $('#s-city').val() + $('#s-county').val();
-                    bdChinaMap.init();
+                }
+            }
 
 
-                    // 无数据时
-                    if(coordinateJson.data.length == 0){
-                        neuiDialog.alert({
-                            caption: '提示',
-                            message: '抱歉，没有找到的数据，请尝试更改查询条件',
-                            buttons: ['确定']
-                        })
-                    }
-                    
+            //————————————————————————————————————————————————
+            // 创建地图并初始化
+            neuiBdmap('map', options);
 
 
-                    neui.destroyAnimate();
-                }, 100)
+            //————————————————————————————————————————————————
+            // 判断中心点坐标是否有效，若无效，则重置中心点
+            // !!!警告：请勿在地图初始化参数center.complete函数中调用本函数setMapCenter()，否则会陷入死循环导致页面崩溃！
+            if(neuiBdmap.checkCoordinateIsValid(g_zhongxin_zb) == false){
+                neuiBdmap.setMapCenter('泉州', {
+                    title: '泉州东海——市政府所在地',
+                    describe: ''
+                });
+            }
+
+
+
+            //————————————————————————————————————————————————
+            // 创建多边形覆盖物
+            neuiBdmap.createPolygonOverlays({
+                points: ps_ply_coordinate_arr, // 多边形覆盖物坐标组成的二维数组，有N个多边形数组就有N个元素。
+                // 格式：
+                // [
+                //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..], // 第1个多边形的N个点
+                //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..],// 第2个多边形的M个点
+                //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..] // 第3个多边形的L个点
+                // ];
+                bgColors: ps_ply_color_arr, // 自定义每个多边形覆盖物背景色数组,默认空数组(可选),优先权大于 skinOptions.fillColor和strokeColor。格式：['#1296db', '#ff0000', '#ffffff']
+                editable: false // 多边形是否可修改形状(可选)，默认true。值为true时多边形点上将出现一个白色的小正方形可拖动改变形状。
             });
 
 
+            //————————————————————————————————————————————————
+            // 创建地图右上角说明性内容
+            var contentHtml = '';
+            for(var i = 0; i < ps_description_title_arr.length; i++){
+                var title = ps_description_title_arr[i],
+                    color = ps_description_color_arr[i];
+                contentHtml += [
+                    '<p>',
+                        '<span style="background-color: ' + color + ';"></span>',
+                        '<em>' + title + '</em>',
+                    '</p>'
+                ].join('\r\n');
+            }
+            // 在地图创建一个自定义的浮层
+            neuiBdmap.createFloatingLayer({
+                extClass: "block__explanation", // 自定义内容节点样式名(可选)，有默认值(可为空)
+                position: "absolute", // 定位方式(可选)，默认absolute。值：fixed 固定定位, absolute 绝对定位
+                zIndex: 1, // 层级(可选)，默认1
+                top: 10, // 顶部偏移量(可选)，默认50。值为auto时表示不起作用
+                right: 25, // 右侧偏移量(可选)，默认25。值为auto时表示不起作用
+                left: "auto", // 左侧偏移量(可选)，默认auto表示不起作用
+                bottom: "auto", // 底部偏移量(可选)，默认auto表示不起作用
+                opacity: 0.9, // 透明度(可选)，默认0.9。值：0到1
+                title: "招生服务区说明", // 标题(可选)，默认空
+                content: contentHtml // 内容(可选)，默认空。支持HTML
+            });
+
+        }
 
 
 
 
 
-        }); // $(function(){})
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                                  搜索区域事件
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        //=====清空输入框
+        $('.bds__editor .eform-row .item-cell').on('click', function(){
+            $(this).siblings().find('input:text, textarea').val('');
+        });
+
+
+
+        //——————————————————————————————————————————
+        //=====省份下拉(自定义数据源)
+        $('#s-province').on('click', function(){
+            var $this = $(this);
+            // 后台返回
+            var provinceJson = {
+                "data":[
+                    {"get_value":"福建省"},
+                    // {"get_value":"浙江省"}
+                ]
+            }
+
+            /*
+            // START AJAX
+            var provinceJson = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取省份下拉数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                data: {
+                    "action": "wh_xuexiao_get_sheng",
+                    "menu_bh": "<%=s_menu_bh%>",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>"
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    provinceJson = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return;
+            }
+            // END AJAX
+            */
+            neuiInputsearch({
+                source: provinceJson,
+                format: ["get_value"],
+                autoFill: {
+                    oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
+                },
+                onConfirm: function(e){
+                    if(e.value != e.oldValue){ // 新老值不一样时，清空城市、区县、街道、社区
+                        $('#s-city, #s-county, #s-street, #s-community').val('');
+                    }
+                }
+            }, $this)
+        });
+
+
+
+
+        //——————————————————————————————————————————
+        //=====城市下拉(自定义数据源)
+        $('#s-city').on('click', function(){
+            var $this = $(this);
+            var ls_sheng_mc = filter.html($('#s-province').val());            
+                // 后台返回
+                var cityJson = {
+                "data":[
+                    {"get_value":"泉州市"},
+                    {"get_value":"厦门市"},
+                    {"get_value":"福州市"}
+                ]
+            }
+            /*
+            // START AJAX
+            var cityJson = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取城市下拉数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                data: {
+                    "action": "wh_xuexiao_get_shi",
+                    "menu_bh": "<%=s_menu_bh%>",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "sheng_mc": ls_sheng_mc
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    cityJson = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return;
+            }
+            // END AJAX
+            */
+
+            neuiInputsearch({
+                source: cityJson,
+                format: ["get_value"],
+                autoFill: {
+                    selectedFill: true,
+                    oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
+                },
+                onConfirm: function(e){
+                    if(e.value != e.oldValue){ // 新老值不一样时，清空区县、街道、社区
+                        $('#s-county, #s-street, #s-community').val('');
+                    }
+                }
+            }, $this)
+        });
+
+
+
+        //——————————————————————————————————————————
+        //=====区县下拉(自定义数据源)
+        $('#s-county').on('click', function(){
+            var $this = $(this);
+            var ls_sheng_mc = filter.html($('#s-province').val()),
+                ls_shi_mc = filter.html($('#s-city').val());
+            // 后台返回
+            var countyJson = {
+                "data":[
+                    {"get_value":"丰泽区"},
+                    {"get_value":"鲤城区"},
+                    {"get_value":"洛江区"},
+                    {"get_value":"泉港区"},
+                    {"get_value":"晋江市"},
+                    {"get_value":"石狮市"},
+                    {"get_value":"南安市"},
+                    {"get_value":"惠安县"},
+                    {"get_value":"安溪县"},
+                    {"get_value":"永春县"},
+                    {"get_value":"德化县"}
+                ]
+            }
+            /*
+            // START AJAX
+            var countyJson = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取区县下拉数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                data: {
+                    "action": "wh_xuexiao_get_qu",
+                    "menu_bh": "<%=s_menu_bh%>",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "sheng_mc": ls_sheng_mc,
+                    "shi_mc": ls_shi_mc
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    countyJson = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return;
+            }
+            // END AJAX
+            */
+            neuiInputsearch({
+                source: countyJson,
+                format: ["get_value"],
+                autoFill: {
+                    selectedFill: true,
+                    oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
+                },
+                onConfirm: function(e){
+                    if(e.value != e.oldValue){ // 新老值不一样时，清空街道、社区
+                        $('#s-street, #s-community').val('');
+                    }
+                }
+            }, $this)
+        });
+
+
+
+        //——————————————————————————————————————————
+        //=====街道下拉
+        $('#s-street').on('click', function(){
+            var $this = $(this);
+            var ls_sheng_mc = filter.html($('#s-province').val()),
+                ls_shi_mc = filter.html($('#s-city').val()),
+                ls_qu_mc = filter.html($('#s-county').val());
+            var arr = [ ls_sheng_mc, ls_shi_mc, ls_qu_mc ]
+            // console.log('数组：', arr);
+            // 校验完整性
+            var tips = '';
+            $(this).parents('.eform-row').prevAll().each(function(){
+                var label = $('label', this).text(),
+                    value = $('input:text, textarea', this).val().toString().replace(/([ ]+)/g, '');
+                if(value === '') tips += label + '、';
+            })
+            if(tips != ''){
+                // neuiDialog.alert({
+                //     animate: true,
+                //     message: '请先选择：' + tips.substr(0, tips.length - 1),
+                //     buttons: ['确定']
+                // })
+                return;
+            }
+
+            // 后台返回
+            var streetJson = {
+                "data":[
+                    {"get_value":"东湖街道"},
+                    {"get_value":"丰泽街道"},
+                    {"get_value":"泉秀街道"},
+                    {"get_value":"清源街道"},
+                    {"get_value":"华大街道"},
+                    {"get_value":"城东街道"},
+                    {"get_value":"东海街道"},
+                    {"get_value":"北峰街道"}
+                ]
+            }
+            /*
+            // START AJAX
+            var streetJson = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取街道下拉数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                data: {
+                    "action": "wh_xuexiao_get_jiedao",
+                    "menu_bh": "<%=s_menu_bh%>",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "sheng_mc": ls_sheng_mc,
+                    "shi_mc": ls_shi_mc,
+                    "qu_mc": ls_qu_mc
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    streetJson = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return;
+            }
+            // END AJAX
+            */
+
+            neuiInputsearch({
+                source: streetJson,
+                format: ["get_value"],
+                autoFill: {
+                    selectedFill: true,
+                    oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
+                },
+                onConfirm: function(e){
+                    if(e.value != e.oldValue){ // 新老值不一样时，清空社区
+                        $('#s-community').val('');
+                    }
+                }
+            }, $this)
+        });
+
+
+
+        //——————————————————————————————————————————
+        //=====社区下拉
+        $('#s-community').on('click', function(){
+            var $this = $(this);
+            var ls_sheng_mc = filter.html($('#s-province').val()),
+                ls_shi_mc = filter.html($('#s-city').val()),
+                ls_qu_mc = filter.html($('#s-county').val()),
+                ls_jiedao_mc = filter.html($('#s-street').val());
+            var arr = [ ls_sheng_mc, ls_shi_mc, ls_qu_mc, ls_jiedao_mc ]
+            // console.log('数组：', arr);
+            // 校验完整性
+            var tips = '';
+            $(this).parents('.eform-row').prevAll().each(function(){
+                var label = $('label', this).text(),
+                    value = $('input:text, textarea', this).val().toString().replace(/([ ]+)/g, '');
+                if(value === '') tips += label + '、';
+            })
+            if(tips != ''){
+                // neuiDialog.alert({
+                //     animate: true,
+                //     message: '请先选择：' + tips.substr(0, tips.length - 1),
+                //     buttons: ['确定']
+                // })
+                return;
+            }
+
+            // 后台返回
+            var communityJson = {
+                "data":[
+                    {"get_value":"西湖小区"},
+                    {"get_value":"丰泽小区"},
+                    {"get_value":"前坂小区"},
+                    {"get_value":"后坂小区"}
+                ]
+            }
+            /*
+            // START AJAX
+            var communityJson = {}
+            var isHoldOn = true;
+            ajax({
+                heading: "获取社区下拉数据",
+                debug: false,
+                async: false, // 取数方式. true 异步, false 同步(默认)
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                data: {
+                    "action": "wh_xuexiao_get_shequ",
+                    "menu_bh": "<%=s_menu_bh%>",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "sheng_mc": ls_sheng_mc,
+                    "shi_mc": ls_shi_mc,
+                    "qu_mc": ls_qu_mc,
+                    "jiedao_mc": ls_jiedao_mc
+                },
+                success: function(res){
+                    if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                    // if(res == '') return;
+                    communityJson = JSON.parse(res);
+                },
+                error: function(res){
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            if(!isHoldOn){
+                neui.destroyAnimate();
+                return;
+            }
+            // END AJAX
+            */
+
+            neuiInputsearch({
+                source: communityJson,
+                format: ["get_value"],
+                autoFill: {
+                    selectedFill: true,
+                    oneItemFill: false // 只有一个下拉项时是否自动填充(可选)。
+                },
+                onConfirm: function(e){
+                    if(e.value != e.oldValue){ // 新老值不一样时
+                        //..
+                    }
+                }
+            }, $this)
+        });
+
     </script>
 </body>
 </html>

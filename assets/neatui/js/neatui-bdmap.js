@@ -7,7 +7,7 @@
  * Author: Mufeng
  * QQ: 1614644937
  * Date: 2021.06.18
- * Update: 2024.11.27
+ * Update: 2024.11.28
  */
 
 
@@ -88,6 +88,7 @@
             zoom: 11,
             // 中心点(可选)
             center: {
+                visible: true, // 是否显示中心点标注(可选)，默认true
                 city: "", // 城市(可选)，默认空。值：空时根据坐标定位, 非空时根据城市定位。eg.'泉州市', eg.'泉州市惠安县'。
                 coordinate: "116.404177,39.909652",  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
                 caption: "北京市", // 标题文字(可选)，默认'北京市'。支持HTML
@@ -340,7 +341,8 @@
 
             // · 创建创建地图实例并初始化
             var zoom = me.settings.zoom;
-            var centerCity = me.settings.center.city == '' ? me.defaults.center.city : me.settings.center.city,
+            var centerVisible = me.settings.center.visible,
+                centerCity = me.settings.center.city == '' ? me.defaults.center.city : me.settings.center.city,
                 centerCoordinate = me.settings.center.coordinate == '' ? me.defaults.center.coordinate : me.settings.center.coordinate.toString().replace(/\s+/g, ''), // 当中心点坐标为空时,设定一个默认坐标
                 centerLng = centerCoordinate.split(',')[0],
                 centerLat = centerCoordinate.split(',')[1],
@@ -428,18 +430,20 @@
             }
 
             // 第5步，添加中心点文本标注
-            me.clearAllOverlay(); // 先清空所有覆盖物
-            // 添加中心点标记
-            me.createMarker({
-                 type: 'zhongxin',
-                 coordinate: centerCoordinate,
-                 title: centerCaption, 
-                 describe: centerDescribe,
-                 message: '',
-                 dragable: centerEnableDrag,
-                 finishCallback: centerComplete,
-                 dragEndCallback: centerDragEnd 
-            });
+            if (centerVisible) {
+                me.clearAllOverlay(); // 先清空所有覆盖物
+                // 添加中心点标记
+                me.createMarker({
+                    type: 'zhongxin',
+                    coordinate: centerCoordinate,
+                    title: centerCaption,
+                    describe: centerDescribe,
+                    message: '',
+                    dragable: centerEnableDrag,
+                    finishCallback: centerComplete,
+                    dragEndCallback: centerDragEnd
+                });
+            }
             // 鼠标右键点击事件
             mouseHelper._mouseRightClick(me, maper);
             // 鼠标左键点击事件
@@ -639,6 +643,8 @@
                 //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..] // 第3个多边形的L个点
                 // ];
                 hideValues: [], // 多边形覆盖物标识符数组，即多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
+                bgColors: [], // 自定义每个多边形覆盖物背景色数组,默认空数组(可选),优先权大于 skinOptions.fillColor和strokeColor。格式：['#1296db', '#ff0000', '#ffffff']
+                editable: true, // 多边形是否可修改形状(可选)，默认true。值为true时多边形点上将出现一个白色的小正方形可拖动改变形状。
                 buttons: { // 按钮(可选)
                     enable: false,  // 是否添加操作按钮(可选)，默认false
                     text: '删除', // 操作按钮的文本，默认'删除'
@@ -656,6 +662,8 @@
             var finals = utils.combine(true, originals, options || {});
             var points = finals.points,
                 hideValues = finals.hideValues,
+                bgColors = finals.bgColors,
+                editable = finals.editable,
                 buttoned = finals.buttons.enable,
                 btnText = finals.buttons.text,
                 btnCallback = finals.buttons.callback,
@@ -681,13 +689,23 @@
             // console.log('符合要求的数组：', newPoints);
 
             // 创建多边形覆盖物
+            var defaultBgColor =  skinOptions.fillColor; 
             for (var i = 0; i < newPoints.length; i++) {
                 var onePoint = newPoints[i];
-                var ids = hideValues.length == 0 ? '' : hideValues[i];
+                var oneBgColor = bgColors.length == 0 ? '' : typeof bgColors[i] == 'undefined' ? '' : bgColors[i];
+                var ids = hideValues.length == 0 ? '' : typeof hideValues[i] == 'undefined' ? '' : hideValues[i];
                 var ply = new BMap.Polygon(onePoint, skinOptions);
                 try {
-                    ply.enableEditing();
+                    if (editable) {
+                        ply.enableEditing();
+                    }
                     ply.name = 'duobianxing_biaoji'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
+                    // 自定义每个多边形的颜色
+                    if (oneBgColor != '') {
+                        ply.setFillColor(oneBgColor); // 设置多边形填充颜色
+                        ply.setStrokeColor(oneBgColor); // 设置多边形边线颜色
+                        // ply.setFillOpacity(.65); // 设置透明度. 0到1
+                    }
                     // 统计多边形个数, 给覆盖物添加唯一标识符
                     var total = 1; // 统计多边形覆盖物个数
                     var polyOverlay = maper.getOverlays();
@@ -695,7 +713,7 @@
                         if (item.name === 'duobianxing_biaoji') {
                             total++;
                         }
-                    })
+                    });
                     var plyUid = 'identity_duobianxing_' + total;
                     ply.identifier = plyUid; // 添加多边形唯一标识符
                     maper.addOverlay(ply);
@@ -735,6 +753,16 @@
                 }
                 catch (e) { }
             }
+        },
+
+
+        /**
+         * 在地图创建一个自定义的浮层
+         * @param {Object} 参数。格式见函数内代码
+         */
+        createFloatingLayer: function (options) {
+            var me = this;
+            helpers._createSomeContent(me, options);
         },
 
 
@@ -980,6 +1008,27 @@
                 else 
                     callback('未能找到该城市');
             }, "中国"); // 第三个参数为城市所在的Country或Region
+        },
+
+
+        
+        /**
+         * 获取一组坐标的中心点/根据坐标获取中心点坐标
+         * @param {Array} ps_coord_arr 坐标数组，是一个包含多个坐标的数组，每个坐标是一个Point对象或者是一个包含经度和纬度的对象。格式 [{ lng: 118.602675, lat: 24.917578 }, { lng: 118.61906, lat: 24.904994 }, { lng: 118.609143, lat: 24.897783 }, // ... 更多坐标 ];
+         * @returns 返回该组坐标的中心点坐标，值是由经纬度组成的对象。格式：{ lng: "经度", lat: "纬度" }
+         */
+        getCoordinateCenter: function (ps_coord_arr) {
+            // 累加所有坐标点
+            var x = 0, y = 0;
+            for (var i = 0; i < ps_coord_arr.length; i++) {
+                x += parseFloat(ps_coord_arr[i].lng);
+                y += parseFloat(ps_coord_arr[i].lat);
+            }
+            // 计算平均值以获取中心点并返回
+            return {
+                lng: x / ps_coord_arr.length,
+                lat: y / ps_coord_arr.length
+            }
         },
 
 
@@ -1541,6 +1590,122 @@
                 borderHorizontal: bt + bb,  // 水平方向上的border值
                 borderVertical: bl + br // 垂直方向上的border值   
             }
+        },
+
+
+        /**
+         * 在地图上创建一些自定义的内容
+         * @param {Object} me 当前插件对象
+         * @param {Object} 参数。格式见函数内代码
+         */
+        _createSomeContent: function (me, options) {
+            var originals = {
+                extClass: "", // 自定义内容节点样式名(可选)，默认空
+                position: "absolute", // 定位方式(可选)，默认absolute。值：fixed 固定定位, absolute 绝对定位
+                zIndex: 1, // 层级(可选)，默认1
+                top: 50, // 顶部偏移量(可选)，默认50。值为auto时表示不起作用
+                right: 25, // 右侧偏移量(可选)，默认25。值为auto时表示不起作用
+                left: "auto", // 左侧偏移量(可选)，默认auto表示不起作用
+                bottom: "auto", // 底部偏移量(可选)，默认auto表示不起作用
+                opacity: 0.9, // 透明度(可选)，默认0.9。值：0到1
+                title: "", // 标题(可选)，默认空
+                content: "" // 内容(可选)，默认空。支持HTML
+            }
+            var finals = utils.combine(true, originals, options || {});
+            //
+            var extClass = finals.extClass.toString().replace(/(\#|\.|\s+)/g, ''),
+                position = finals.position,
+                zIndex = finals.zIndex,
+                top = finals.top.toString().replace(/(px||vm|vw|vh|em|rem)/g, ''),
+                right = finals.right.toString().replace(/(px||vm|vw|vh|em|rem)/g, ''),
+                left = finals.left.toString().replace(/(px||vm|vw|vh|em|rem)/g, ''),
+                bottom = finals.bottom.toString().replace(/(px||vm|vw|vh|em|rem)/g, ''),
+                opacity = isNaN(parseFloat(finals.opacity)) ? 0.9 : parseFloat(finals.opacity),
+                title = finals.title,
+                content = finals.content;
+            if (isNaN(parseInt(zIndex))) zIndex = originals.zIndex;
+            if (isNaN(parseFloat(top))) top = originals.top;
+            if (isNaN(parseFloat(right))) right = originals.right;
+            if (isNaN(parseFloat(left))) left = originals.left;
+            if (isNaN(parseFloat(bottom))) bottom = originals.bottom;
+            if (opacity > 1) opacity = parseFloat(opacity / 100).toFixed(1);
+            var opacityPercent = (opacity * 100).toFixed(0);
+            // 利用Object对象将样式对象转化成样式字符串
+            var styleObj = {
+                position: position,
+                "z-index": zIndex,
+                top: top == 'auto' ? top : top + 'px',
+                right: right == 'auto' ? right : right + 'px',
+                left: left == 'auto' ? left : left + 'px',
+                bottom: bottom == 'auto' ? bottom : bottom + 'px',
+                opacity: opacity,
+                filter: 'alpha(opacity=' + opacityPercent + ')',
+                filterProgid: 'progid:DXImageTransform.Microsoft.Alpha(opacity=' + opacityPercent + ')'
+            }
+            var styleStr = '';
+            for (var v in styleObj) {
+                var keys = v.toString() == 'filterProgid' ? 'filter' : v;
+                styleStr += keys + ': ' + styleObj[v] + '; ' // eg. 'position: fixed;'
+            }
+            styleStr = styleStr.toString().substring(0, styleStr.length - 2); // 去掉最后一个分号
+            // console.log('styleStr：', styleStr);
+            // 创建说明性节点
+            var statementClass = 'bdmap__mouse';
+            var extMouseClass = extClass === '' ? '' : ' ' + extClass,
+                extTitleClass = extClass === '' ? '' : ' ' + (extClass + '_title'),
+                extStepClass = extClass === '' ? '' : ' ' + (extClass + '_content');
+            var mouseClassName = statementClass + extMouseClass,
+                titleClassName = statementClass + '_title' + extTitleClass,
+                stepClassName = statementClass + '_content' + extStepClass;
+            var shuoHtml = [
+                (function () {
+                    var tmpHtml = title.toString().replace(/\s+/g, '') === '' ?
+                        ''
+                        :
+                        '<div class="' + titleClassName + '">' + title + '</div>';
+                    return tmpHtml;
+                })(),
+                (function () {
+                    var tmpHtml = content.toString().replace(/\s+/g, '') === '' ?
+                        ''
+                        :
+                        '<div class="' + stepClassName + '">' + content + '</div>'
+                    return tmpHtml;
+                })()
+            ].join('\r\n');
+
+            // 先移除：如果存在，则先移除
+            var nodeCollection = document.getElementsByClassName(statementClass);
+            if (nodeCollection.length > 0) {
+                var nodeToRemove = nodeCollection[0];
+                var nodeParent = nodeToRemove.parentNode;
+                if (nodeParent != null) {
+                    nodeParent.removeChild(nodeToRemove);
+                }
+            }
+            // 再创建
+            var shuoDiv = document.createElement('div');
+            shuoDiv.className = mouseClassName;
+            shuoDiv.innerHTML = shuoHtml;
+            shuoDiv.setAttribute('style', styleStr);
+            utils.insertAfter(shuoDiv, document.getElementById(me.$opts.$container));
+            // 区域显示或隐藏
+            var titleCollection = document.getElementsByClassName(titleClassName),
+                listCollection = document.getElementsByClassName(stepClassName);
+            if (titleCollection.length > 0 && listCollection.length > 0) {
+                var titleDom = titleCollection[0],
+                    listDom = listCollection[0];
+                titleDom.onclick = function () {
+                    if (listDom.offsetWidth > 0 || listDom.offsetHeight > 0) { // 显示时
+                        titleDom.classList.add('angle-down');
+                        listDom.style.setProperty('display', 'none');
+                    }
+                    else { // 隐藏时 
+                        titleDom.classList.remove('angle-down');
+                        listDom.style.setProperty('display', 'block');
+                    }
+                }
+            }
         }
     };
 
@@ -1748,6 +1913,7 @@
                 btnText = finals.operateButton.btnText,
                 stepDescription = finals.stepDescription,
                 drawModeArr = finals.drawingModes;
+
             // 设置绘制模式
             var drawingModes = [];
             for (var i = 0; i < drawModeArr.length; i++){
@@ -1767,9 +1933,6 @@
                 // BMAP_DRAWING_RECTANGLE // 画矩形
             }
 
-            // 只有允许时才继续执行
-            if (enable == false) return;
-            
             // 创建绘制步骤说明节点
             if (stepDescription.enable) {
                 var stepHtml = [
@@ -1786,37 +1949,22 @@
                     '<p>6、拖动图形上的白色小正方框，可更改形状。</p>',
                 ].join('\r\n');
 
-                var mouseClassName = 'bdmap__mouse',
-                    titleClassName = 'bdmap__mouse_title',
-                    stepClassName = 'bdmap__mouse_step';
-                var shuoHtml = [
-                    '<div class="' + titleClassName + '">' + stepDescription.title + '</div>',
-                    '<div class="' + stepClassName + '">',
-                        // 匿名函数马上执行
-                        (function () {
-                            var _content  = stepDescription.content;
-                            return _content.toString().replace(/\s+/g, '') === '' ? stepHtml : _content;  
-                        })(),
-                    '</div>'
-                ].join('\r\n');
-                var shuoDiv = document.createElement('div');
-                shuoDiv.className = mouseClassName;
-                shuoDiv.innerHTML = shuoHtml;
-                utils.insertAfter(shuoDiv, document.getElementById(me.$opts.$container));
-                // 绘制步骤区域显示或隐藏
-                var titleDom = document.getElementsByClassName(titleClassName)[0],
-                    listDom = document.getElementsByClassName(stepClassName)[0];
-                titleDom.onclick = function () {
-                    if (listDom.offsetWidth > 0 || listDom.offsetHeight > 0) { // 显示时
-                        titleDom.classList.add('angle-down');
-                        listDom.style.setProperty('display', 'none');
-                    }
-                    else { // 隐藏时 
-                        titleDom.classList.remove('angle-down');
-                        listDom.style.setProperty('display', 'block');
-                    }
-                }
+                helpers._createSomeContent(me, {
+                    extClass: "",
+                    position: "absolute",
+                    zIndex: 1,
+                    top: 50, 
+                    right: 25,
+                    left: "auto",
+                    bottom: "auto",
+                    opacity: 0.9,
+                    title: stepDescription.title,
+                    content: stepDescription.content.toString().replace(/\s+/g, '') === '' ? stepHtml : stepDescription.content
+                });
             }
+            
+            // 只有允许时才继续执行
+            if (enable == false) return;
             
             // 实例化鼠标绘制工具, 创建鼠标绘制管理类实例化对象
             var drawManager = new BMapLib.DrawingManager(maper, {
@@ -1956,7 +2104,7 @@
     var polygonHelper = {
 
         /**
-        * 获取多边形中心点
+        * 获取多边形中心点/获取某个多边形的中心点
         * @param {overlay} ps_ply 多边形覆盖物对象
         * @returns {Object} 返回多边形中心点坐标。格式： { lng: "经度", lat: "纬度" }
         */
@@ -1998,8 +2146,8 @@
             
             var opts = {
                 position: ps_position, // 指定文本标注所在的地理位置. eg.new BMap.Point(118.599547, 24.9246154) 
-                offset: new BMap.Size(0, 0) //设置文本偏移量  
-                // offset: new BMap.Size(30, 50) //设置文本偏移量  
+                offset: new BMap.Size(-50, -30) //设置文本偏移量  
+                // offset: new BMap.Size(0, 0) //设置文本偏移量  
             }
             
             var lbBtn = new BMap.Label('<div class="bmap__polygon_del" data-bh="' + plyNo + '">' + btnText + '</div>', opts);  // 创建文本标注对象  
