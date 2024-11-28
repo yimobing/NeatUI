@@ -1012,13 +1012,13 @@ var utilities = {
 
     /**
      * !! 生成随机颜色
-     * @returns 返回颜色值
+     * @returns 返回16进制的颜色值(带#号)。格式: #RRGGBB 或 #RGB
      */
-    getRandomColor: function(){
+    getRandomColor: function () {
+        // return '#' + Math.random().toString(16).substr(2, 6).toUpperCase(); // 生成随机颜色
         return (function(m,s,c){
-        return (c ? arguments.callee(m,s,c-1) : '#') +
-            s[m.floor(m.random() * 16)]
-        })(Math,'0123456789abcdef',5)
+            return (c ? arguments.callee(m,s,c-1) : '#') + s[m.floor(m.random() * 16)]
+        })(Math,'0123456789abcdef', 5)
     },
 
 
