@@ -7,7 +7,7 @@
  * Author: Mufeng
  * QQ: 1614644937
  * Date: 2021.06.18
- * Update: 2024.11.28
+ * Update: 2024.11.29
  */
 
 
@@ -46,12 +46,14 @@
     wenben_biaoji // 文本标注覆盖物 Label
     center_dian_biaoji // 中心点图像标注覆盖物(点标记覆盖物) Marker
     center_wenben_biaoji // 中心点文本标注覆盖物 Label
-    anniu_biaoji // 按钮覆盖物。一般是显示在多边形时面的按钮
+    anniu_biaoji // 按钮覆盖物。一般是显示在多边形上面的按钮
+    info_biaoji // 文本信息覆盖物。一般是显示在多边形上面的文本信息
 
     2. 本插件中使用 identifier 属性来标记每一个覆盖，identifier 的值及含义如下
     // 添加覆盖物唯一标识符
     identity_duobianxing_1 // 每个多边形唯一标识符，后面的数字 1 表示 第1个多边形
     identity_duobianxing_1_btn // 每个多边形内部按钮唯一标识符，后面的 1_btn 表示第1个多边形内部的按钮
+    identity_duobianxing_1_text //  每个多边形内部文本信息唯一标识符，后面的 1_text 表示第1个多边形内部的文本信息
  */
 
 
@@ -537,20 +539,22 @@
                     }
                 }
             var label = new BMap.Label(lbText, lbOptions);
-            label.setStyle({
-                color: 'blue',
-                borderRadius: '5px',
-                borderColor: '#ccc',
-                padding: '10px',
-                fontSize: '16px',
-                height: '30px',
-                lineHeight: '30px',
-                fontFamily: '微软雅黑'
-            })
+            label.enableMassClear(); // 允许覆盖物被清除
             label.name = 'wenben_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
             if (type == 'zhongxin') {
                 label.name2 = 'center_wenben_biaoji';
             }
+            label.setStyle({
+                padding: '10px',
+                height: '30px',
+                lineHeight: '30px',
+                // backgroundColor: "#fff",
+                borderRadius: '5px',
+                borderColor: '#ccc',
+                color: 'blue',
+                fontSize: '16px',
+                fontFamily: '微软雅黑'
+            });
             oneMark.setLabel(label); // 绑定文本标注到点标记上
             maper.addOverlay(label);
             // 更改文本标注节点样式及位置
@@ -643,12 +647,13 @@
                 //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..] // 第3个多边形的L个点
                 // ];
                 hideValues: [], // 多边形覆盖物标识符数组，即多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
-                bgColors: [], // 自定义每个多边形覆盖物背景色数组,默认空数组(可选),优先权大于 skinOptions.fillColor和strokeColor。格式：['#1296db', '#ff0000', '#ffffff']
+                titles: [], // 自定义每个多边形覆盖标题即文本描述数组(可选),默认空数组。数组元素支持HTML
+                bgColors: [], // 自定义每个多边形覆盖物背景色数组(可选),默认空数组。优先权大于 skinOptions.fillColor和strokeColor。格式：['#1296db', '#ff0000', '#ffffff']
                 editable: true, // 多边形是否可修改形状(可选)，默认true。值为true时多边形点上将出现一个白色的小正方形可拖动改变形状。
                 buttons: { // 按钮(可选)
                     enable: false,  // 是否添加操作按钮(可选)，默认false
                     text: '删除', // 操作按钮的文本，默认'删除'
-                    callback: null // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
+                    callback: null // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyObj: "多边形覆盖物对象", polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
                 },
                 skinOptions: { // 外观配置项(可选)。
                     strokeColor: "red", // 边线颜色(可选)，默认红色。
@@ -663,6 +668,7 @@
             var points = finals.points,
                 hideValues = finals.hideValues,
                 bgColors = finals.bgColors,
+                titles = finals.titles,
                 editable = finals.editable,
                 buttoned = finals.buttons.enable,
                 btnText = finals.buttons.text,
@@ -691,9 +697,10 @@
             // 创建多边形覆盖物
             var defaultBgColor =  skinOptions.fillColor; 
             for (var i = 0; i < newPoints.length; i++) {
-                var onePoint = newPoints[i];
-                var oneBgColor = bgColors.length == 0 ? '' : typeof bgColors[i] == 'undefined' ? '' : bgColors[i];
-                var ids = hideValues.length == 0 ? '' : typeof hideValues[i] == 'undefined' ? '' : hideValues[i];
+                var onePoint = newPoints[i],
+                    oneBgColor = bgColors.length == 0 ? '' : typeof bgColors[i] == 'undefined' ? '' : bgColors[i],
+                    oneTitle = titles.length == 0 ? '' : typeof titles[i] == 'undefined' ? '' : titles[i],
+                    ids = hideValues.length == 0 ? '' : typeof hideValues[i] == 'undefined' ? '' : hideValues[i];
                 var ply = new BMap.Polygon(onePoint, skinOptions);
                 try {
                     if (editable) {
@@ -736,14 +743,28 @@
                         me.settings.drawMode = 'hander'; // 全局赋值1
                     });
                     // polygonHelper._showLatLon(me, ply.getPath()); // 绘制完成时显示覆盖物点信息
-                    
+
+                    var coord = polygonHelper._getPolyCenter(ply),  // 获取多边形中心点
+                        plyNo = ids,
+                        longitude = coord.lng,
+                        latitude = coord.lat;
+                    // 给覆盖物添加文本信息
+                    if (oneTitle != '') {
+                        polygonHelper._addOverlayLabel(me, ply, {
+                            longitude: longitude,
+                            latitude: latitude,
+                            plyUid: plyUid, // 覆盖物唯一标识符，默认空
+                            plyNo: plyNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
+                            title: oneTitle,
+                            content: ''
+                        });
+                    }
                     // 给覆盖物添加操作按钮
                     if (buttoned) {
-                        var coord = polygonHelper._getPolyCenter(ply),  // 获取多边形中心点
-                            plyNo = ids;
-                        polygonHelper._addOverlayButton(me, {
-                            longitude: coord.lng,
-                            latitude: coord.lat,
+                       
+                        polygonHelper._addOverlayButton(me, ply, {
+                            longitude: longitude,
+                            latitude: latitude,
                             plyUid: plyUid, // 覆盖物唯一标识符，默认空
                             plyNo: plyNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
                             btnText: btnText, // 按钮文本，默认'删除'(可选)
@@ -1997,6 +2018,8 @@
             // drawManager.addEventListener('rectanglecomplete', function(e, overlay){})
             // 鼠标绘制完成后，派发总事件的接口
             drawManager.addEventListener('overlaycomplete', function (e) {
+                var ply = e.overlay;
+                // console.log('plyxx：', ply);
                 // 绘制完成后回调获得覆盖物信息
                 e.overlay.name = 'duobianxing_biaoji'; // 覆盖物分类标识符（标记覆盖物类型,方便清除指定类型的覆盖物）
                 // 统计多边形个数, 给覆盖物添加唯一标识符
@@ -2017,7 +2040,7 @@
                 if (buttoned) {
                     var coord = polygonHelper._getPolyCenter(e.overlay),  // 获取多边形中心点
                         plyNo = '';
-                    polygonHelper._addOverlayButton(me, {
+                    polygonHelper._addOverlayButton(me, ply, {
                         longitude: coord.lng,
                         latitude: coord.lat,
                         plyUid: plyUid, // 覆盖物唯一标识符，默认空
@@ -2121,13 +2144,66 @@
         },
 
 
+        /**
+         * 给多边形覆盖物添加文本标注
+         * @param {Object} me 当前插件对象
+         * @param {Polygon} 多边形覆盖物对象
+         * @param  {Object} 其它参数
+         */
+        _addOverlayLabel: function (me, polyObj, options) {
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            var originals = {
+                longitude: '', // 操作按钮所在经度坐标
+                latitude: '', // 操作按钮所在纬度坐标
+                plyUid: '', // 多边形覆盖物唯一标识符，默认空
+                plyNo: '', // 多边形覆盖物对应的编号，默认空(可选)。新增时为空
+                title: '', // 多边形覆盖上自定义的文本信息(可选),默认空
+                content: '' // 多边形覆盖上的内容(可选), 默认空
+            }
+            var finals = utils.combine(true, originals, options || {});
+            var position = new BMap.Point(finals.longitude, finals.latitude),
+                plyUid = finals.plyUid,
+                plyNo = finals.plyNo,
+                title = finals.title,
+                content = finals.content;
+            var textUid = plyUid + '_text'; // 多边形文本信息唯一标识符 eg. 'identity_duobianxing_5_btn'
+            // console.log('多边形覆盖物对象：', polyObj);
+            var txtHtml = '<div class="bmap__polygon_info" data-ply-overlay="' + polyObj + '" data-bh="' + plyNo + '" data-ply-uid="' + plyUid + '" data-ply-txt-uid="' + textUid + '">' + title + '</div>';
+            var btOpts = {
+                position: position, // 指定文本标注所在的地理位置. eg.new BMap.Point(118.599547, 24.9246154) 
+                offset: new BMap.Size(-50, -30) //设置文本偏移量  
+                // offset: new BMap.Size(0, 0) //设置文本偏移量  
+            }
+            var label = new BMap.Label(txtHtml, btOpts);  // 创建文本标注对象  
+            label.enableMassClear(); // 允许覆盖物被清除
+            label.name = 'info_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+            label.identifier = textUid; // 添加多边形文本信息唯一标识符
+            label.setStyle({
+                padding: '5px 8px',
+                backgroundColor: "#fff", // 填充颜色。当参数为空时，圆形将没有填充效果。
+                borderColor: "#fff", // #2196F3
+                borderRadius: '2px',
+                color: "#777", // #5e9fdc
+                fontSize: "10px",
+                boxShadow: "0 1px 0px #ccc"
+            });
+            maper.addOverlay(label);
+
+            // 全局赋值1
+            me.settings.overlays.push(label);
+            me.settings.labelLays.push(label);
+        },
+
+
 
         /**
          * 给多边形覆盖物添加操作按钮
          * @param {Object} me 当前插件对象
-         * @param {Object} 参数对象
+         * @param {Polygon} 多边形覆盖物对象
+         * @param {Object} 其它参数
          */
-        _addOverlayButton: function (me, options) {
+        _addOverlayButton: function (me, polyObj, options) {
             if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
             var originals = {
@@ -2139,35 +2215,39 @@
                 btnCallback: null // 按钮回调函数，默认null(可选)。返回值e { id: '隐藏值ID字段', polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
             }
             var finals = utils.combine(true, originals, options || {});
-            var ps_position = new BMap.Point(finals.longitude, finals.latitude),
+            var position = new BMap.Point(finals.longitude, finals.latitude),
                 plyUid = finals.plyUid,
                 plyNo = finals.plyNo,
                 btnText = finals.btnText;
             
-            var opts = {
-                position: ps_position, // 指定文本标注所在的地理位置. eg.new BMap.Point(118.599547, 24.9246154) 
+            var btnUid = plyUid + '_btn'; // 多边形按钮唯一标识符 eg. 'identity_duobianxing_5_btn'
+            // console.log('多边形覆盖物对象：', polyObj);
+            var btHtml = '<div class="bmap__polygon_del" data-ply-overlay="' + polyObj + '" data-bh="' + plyNo + '" data-ply-uid="' + plyUid + '" data-ply-bt-uid="' + btnUid + '">' + btnText + '</div>';
+            var btOpts = {
+                position: position, // 指定文本标注所在的地理位置. eg.new BMap.Point(118.599547, 24.9246154) 
                 offset: new BMap.Size(-50, -30) //设置文本偏移量  
                 // offset: new BMap.Size(0, 0) //设置文本偏移量  
             }
-            
-            var lbBtn = new BMap.Label('<div class="bmap__polygon_del" data-bh="' + plyNo + '">' + btnText + '</div>', opts);  // 创建文本标注对象  
-            lbBtn.enableMassClear(); // 允许覆盖物被清除
-            lbBtn.name = 'anniu_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
-            var btnUid =  plyUid + '_btn'; // eg. 'identity_duobianxing_5_btn'
-            lbBtn.identifier = btnUid; // 添加按钮唯一标识符
-            lbBtn.setStyle({
-                color: "black",
-                fontSize: "12px",
-                backgroundColor: "#fff", // 填充颜色。当参数为空时，圆形将没有填充效果。
-                color: "#666",
-                // borderColor: "#2196F3",
+            var label = new BMap.Label(btHtml, btOpts);  // 创建文本标注对象  
+            label.enableMassClear(); // 允许覆盖物被清除
+            label.name = 'anniu_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+            label.identifier = btnUid; // 添加多边形按钮唯一标识符
+            label.setStyle({
                 padding: '6px 10px',
-                borderRadius: '4px'
+                backgroundColor: "#fff", // 填充颜色。当参数为空时，圆形将没有填充效果。
+                borderColor: "#f66877",
+                borderRadius: '4px',
+                color: "#666",
+                fontSize: "12px"
             });
-            maper.addOverlay(lbBtn);
-            me.settings.overlays.push(lbBtn); // 全局赋值
+            maper.addOverlay(label);
 
-            lbBtn.addEventListener('click', function (e) {
+            // 全局赋值1
+            me.settings.overlays.push(label);
+            me.settings.labelLays.push(label);
+
+            // 点击按钮事件/多边形的按钮点击事件
+            label.addEventListener('click', function (e) {
                  // console.log('e：', e, '\ncontent：', e.target.content);
                  var content = e.target.content;
                  var reg = /^\<(.*?)data-bh="(.*?)"(.*?)>(.*?)\<\/(.*?)\>/g; // 提取data-*值
@@ -2178,9 +2258,10 @@
                 }
                 if (finals.btnCallback) { // 按钮回调函数
                     finals.btnCallback({
-                        id: ls_data_bh,
-                        polyLayId: plyUid,
-                        btnLayId: btnUid
+                        id: ls_data_bh, // 隐藏值ID字段
+                        polyObj: polyObj, // 多边形覆盖物对象
+                        polyLayId: plyUid, // 多边形覆盖物唯一标识符
+                        btnLayId: btnUid // 按钮覆盖物唯一标识符
                     });
                 }
             });

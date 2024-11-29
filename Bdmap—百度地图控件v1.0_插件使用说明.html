@@ -241,12 +241,13 @@
                 //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..] // 第3个多边形的L个点
                 // ];
                 hideValues: [], // 多边形覆盖物标识符数组，即多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
-                bgColors: [], // 自定义每个多边形覆盖物背景色数组,默认空数组(可选),优先权大于 skinOptions.fillColor和strokeColor。格式：['#1296db', '#ff0000', '#ffffff']
+                titles: [], // 自定义每个多边形覆盖标题即文本描述数组(可选),默认空数组。数组元素支持HTML
+                bgColors: [], // 自定义每个多边形覆盖物背景色数组(可选),默认空数组。优先权大于 skinOptions.fillColor和strokeColor。格式：['#1296db', '#ff0000', '#ffffff']
                 editable: true, // 多边形是否可修改形状(可选)，默认true。值为true时多边形点上将出现一个白色的小正方形可拖动改变形状。
                 buttons: { // 按钮(可选)
                     enable: false,  // 是否添加操作按钮(可选)，默认false
                     text: '删除', // 操作按钮的文本，默认'删除'
-                    callback: null // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
+                    callback: null // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyObj: "多边形覆盖物对象", polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
                 },
                 skinOptions: { // 外观配置项(可选)。
                     strokeColor: "red", // 边线颜色(可选)，默认红色。

@@ -18,7 +18,7 @@
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-inputsearch.css"> <!--输入下拉控件-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241128-1"> <!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241129-1"> <!--百度地图控件-->
 </head>
 <body>
     <style>
@@ -113,7 +113,7 @@
     <script src="assets/neatui/js/neatui-district.js"></script> <!--省市区县数据源-->
     <script src="assets/neatui/js/neatui-functions.js"></script> <!--函数库-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241128-1"></script> <!--百度地图控件-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241129-1"></script> <!--百度地图控件-->
     <script>
 
         /*+————————————————全局变量————————————————+*/
@@ -398,7 +398,9 @@
                     return;
                 }
                 // 有数据时，进行数据转换
+                var plyCoordArr = []; // 多边形坐标数组
                 var plyBgColorArr = [];  // 多边形背景颜色数组
+                var plyInfoArr = []; // 多边形文本信息数组
                 var schoolNameArr = []; // 学校名称数组
                 var schoolBgColorArr = []; // 学校名称对应方块背景色数组
                 // 将坐标数据转化经纬度坐标数组
@@ -415,14 +417,14 @@
                             { lng: 116.417086, lat: 40.189882 }
                         ]
                     ]
-                */
-                var plyCoordArr = [];
+                */  
                 if(typeof coordinateData.data != 'undefined'){
                     for(var i1 = 0; i1 < coordinateData.data.length; i1++){
                         var item1 = coordinateData.data[i1];
                         var colors = generateRandColor();
                         // console.log('item1：', item1);
-                        schoolNameArr.push(item1["xuexiao_mc"]);
+                        var tmp_xuexiao_mc = item1["xuexiao_mc"];
+                        schoolNameArr.push(tmp_xuexiao_mc);
                         schoolBgColorArr.push(colors);
                         for(var i2 = 0; i2 < item1.data.length; i2++){
                             var item2 = item1.data[i2];
@@ -441,6 +443,7 @@
                                 // console.log('arr：', arr);
                                 plyCoordArr.push(arr);
                                 plyBgColorArr.push(colors);
+                                plyInfoArr.push(tmp_xuexiao_mc);
                             }
                         }
                     }
@@ -452,7 +455,7 @@
                 // console.log('多边形背景颜色数组：', plyBgColorArr);
 
                 // 将数据显示到地图上
-                load_data_to_ditu(plyCoordArr, plyBgColorArr, schoolNameArr, schoolBgColorArr);
+                load_data_to_ditu(plyCoordArr, plyInfoArr, plyBgColorArr, schoolNameArr, schoolBgColorArr);
 
                 neui.destroyAnimate();
             }, 100)
@@ -467,11 +470,12 @@
         /**
          * 加载数据
          * @param {Array} ps_ply_coordinate_arr 多边形坐标数组
+         * @param {Array} ps_ply_color_arr 多边形文本信息数组
          * @param {Array} ps_ply_color_arr 多边形背景颜色数组
-         * @param {Array} ps_description_title_arr 多边形说明标题数组
-         * @param {Array} ps_description_color_arr 多边形说明方块背景色数组
+         * @param {Array} ps_description_title_arr 说明标题数组
+         * @param {Array} ps_description_color_arr 说明方块背景色数组
          */
-         function load_data_to_ditu(ps_ply_coordinate_arr, ps_ply_color_arr, ps_description_title_arr, ps_description_color_arr){
+         function load_data_to_ditu(ps_ply_coordinate_arr, ps_ply_info_arr, ps_ply_color_arr, ps_description_title_arr, ps_description_color_arr){
             //————————————————————————————————————————————————
             // 地图初始化参数
             var options = {
@@ -535,6 +539,7 @@
                 //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..],// 第2个多边形的M个点
                 //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..] // 第3个多边形的L个点
                 // ];
+                titles: ps_ply_info_arr, // 自定义每个多边形覆盖标题即文本描述数组(可选),默认空数组。数组元素支持HTML
                 bgColors: ps_ply_color_arr, // 自定义每个多边形覆盖物背景色数组,默认空数组(可选),优先权大于 skinOptions.fillColor和strokeColor。格式：['#1296db', '#ff0000', '#ffffff']
                 editable: false // 多边形是否可修改形状(可选)，默认true。值为true时多边形点上将出现一个白色的小正方形可拖动改变形状。
             });

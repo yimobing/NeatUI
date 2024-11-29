@@ -17,7 +17,7 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241128-1"> <!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241129-1"> <!--百度地图控件-->
 </head>
 <body>
     <style>
@@ -46,7 +46,6 @@
         <div class="bds__editor">
             <div class="bds__coord">
                 中心点坐标 <input type="text" id="c-locate" readonly>
-                <button type="button" class="ne-btn has-texture blue" id="btn-pick-save">保存</button>
                 <button type="button" class="ne-btn has-texture" id="btn-pick-copy">复制</button>
                 <label> (拖动中心点或在地图上任意位置点击可更改坐标) </label>
             </div><!--/.bds__coord-->
@@ -74,7 +73,7 @@
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241128-1"></script> <!--百度地图控件-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241129-1"></script> <!--百度地图控件-->
     <script>
         /*+————————————————全局变量————————————————+*/
         var g_dijia_bh = "<%=s_dijia_bh%>"; // 工业区编号 ajax({})
@@ -465,7 +464,7 @@
             },
             stepDescription: { // 绘制步骤说明(可选)
                 enable: true, // 是否启用功能(可选)，默认true
-                title: '绘制工业区范围步骤说明', // 标题(可选)，有默认值
+                title: '工业区范围绘制步骤', // 标题(可选)，有默认值
                 content: '' // 自定义详细的绘制步骤说明(可选)，默认空。支持HTML
             }
         });
@@ -496,15 +495,29 @@
 
 
         //——————————————————————————————————————————
-        //=====保存按钮、保存中心点坐标按钮
-        $('#btn-pick-save').on('click', function(){
-            var ls_zuobiao = $('#c-locate').val();
-            // console.log('坐标xx：', ls_zuobiao);
+        //=====保存按钮、保存工业区范围按钮
+        $('#btn-poly-save').on('click', function(){
+            var ls_zuobiao = $('#c-locate').val(), // 中心点坐标
+                ls_ditu_suofang = neuiBdmap.getZoom(), // 获取地图缩放级别
+                coordArr = neuiBdmap.getPolyCoordinateData();  // 获取所有多边形坐标数据
+            // console.log('中心点坐标：', ls_zuobiao);
+            // console.log('缩放级别：', ls_ditu_suofang);
+            // console.log('坐标：', coordArr);
+            var currentLen = coordArr.length;
+            if(g_poly_max != -1 && currentLen > g_poly_max){
+                neuiDialog.alert({
+                    animate: true,
+                    message: '工业区范围最多只能画' + g_poly_max + '个<br>当前已有' + currentLen + '个，请删除' + (currentLen - g_poly_max) + '个',
+                    buttons: ['确定']
+                })
+            }
             // 开始执行
+            var marks = '', tips = '保存中心点坐标成功';
             var flag = '', msg = '保存成功';
             neui.showAnimate();
             setTimeout(function(){
-                // 后台返回
+
+                // 1.保存中心点坐标
                 /*
                 // START AJAX
                 var isHoldOn = true;
@@ -527,8 +540,8 @@
                     success: function(res){
                         if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
                         var json = JSON.parse(res);
-                        flag = json.return == 'ok' ? 1 : 0;
-                        if(!flag) msg = json.data;
+                        marks = json.return == 'ok' ? 1 : 0;
+                        if(!marks) tips = json.data;
                     },
                     error: function(res){
                         if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -542,41 +555,20 @@
                 }
                 // END AJAX
                 */
-                flag = parseInt(1); // 1 成功, 0 失败
-                if(!flag) msg = '保存失败';
+                marks = parseInt(1); // 1 成功, 0 失败
+                if(!marks) tips = '保存中心坐标失败';
 
-                neuiDialog.alert({
-                    message: msg,
-                    buttons: ['确定']
-                })
-                neui.destroyAnimate();
-            }, 100)
-        });
+                if(!marks){ // 失败才提示
+                    neuiDialog.alert({
+                        message: tips,
+                        buttons: ['确定']
+                    })
+                    neui.destroyAnimate();
+                    return;
+                }
 
 
-
-
-        
-        //——————————————————————————————————————————
-        //=====保存工业区范围按钮
-        $('#btn-poly-save').on('click', function(){
-            var ls_ditu_suofang = neuiBdmap.getZoom(); // 获取地图缩放级别
-            var coordArr = neuiBdmap.getPolyCoordinateData();  // 获取所有多边形坐标数据
-            // console.log('缩放级别：', ls_ditu_suofang);
-            // console.log('坐标：', coordArr);
-            var currentLen = coordArr.length;
-            if(g_poly_max != -1 && currentLen > g_poly_max){
-                neuiDialog.alert({
-                    animate: true,
-                    message: '最多只能画' + g_poly_max + '个工业区范围<br>当前已有' + currentLen + '个，请删除' + (currentLen - g_poly_max) + '个',
-                    buttons: ['确定']
-                })
-            }
-            // 开始执行
-            var flag = '', msg = '保存成功';
-            neui.showAnimate();
-            setTimeout(function(){
-                // 保存工业区范围坐标
+                // 2.保存工业区范围坐标
                 for(var i = 0; i < currentLen; i++){
                     var row = coordArr[i];
                     var xuhao = "100" + (i + 1); // eg.1001, 1002, 1003, ...
@@ -635,7 +627,7 @@
                         // END AJAX
                         */
                         flag = parseInt(1); // 1 成功, 0 失败
-                        if(!flag) msg = '保存失败';
+                        if(!flag) msg = '保存工业区范围坐标失败';
 
                         if(!flag){
                             isGoOn = false;
@@ -747,7 +739,7 @@
         $('#btn-poly-del').on('click', function(){
             neuiDialog.alert({
                 animate: true,
-                message: '确认删除工业区范围？',
+                message: '确认删除所有工业区范围？',
                 buttons: ['确定', '取消'],
                 callBack: function(ret){
                     if(ret == 1){
