@@ -188,6 +188,19 @@
         //——————————————————————————————————————————
         //=====定位地点按钮
         $('#btn-locate').on('click', function(){
+            fnQueryBoundary();
+        });
+        //=====输入框绑定Enter键
+        document.addEventListener('DOMContentLoaded', function() {
+            var input = document.getElementById('s-community'); 
+            input.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    fnQueryBoundary();
+                }
+            });
+        });
+        // 子函数：查询地点边界
+        function fnQueryBoundary(){
             // var patter = /['省'|'市'|'区'|'县']$/; // 行政区域：省、直辖市、地级市、或区县
             var patter = /((?!(小区|社区)).)(省|市|区|县)$/; // 匹配行政区域(省市区县).排除掉小区和社区
             var word = $('#s-community').val();
@@ -216,7 +229,7 @@
                 }
                 neui.destroyAnimate();
             }, 100);
-        });
+        }
 
 
 

@@ -940,7 +940,9 @@
             //=====地点定位按钮
             $('#btn-locate').on('click', function(){
                 // 使用IFRAME打开
-                var linkUrl = 'Bdmap—百度地图控件-示例1_学校地点定位（地点定位，获取城市住宅小区等地点边界）.html'; // ajax({})
+                var linkUrl = 'Bdmap—百度地图控件v1.0_示例2_学校学区房地点定位（获取行政区域,小区等地点边界）.html'; // ajax({})
+                linkUrl += '?m=<%=s_menu_bh%>&s=<%=s_sjk%>&x=' + g_xuexiao_bh;
+                window.open(linkUrl)
                 neui.openIframe({
                     url: linkUrl,
                     caption: '地点定位',
