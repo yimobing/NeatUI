@@ -7,7 +7,7 @@
  * Author: Mufeng
  * QQ: 1614644937
  * Date: 2021.06.18
- * Update: 2024.11.29
+ * Update: 2024.12.03
  */
 
 
@@ -84,8 +84,9 @@
             // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
             width: 'auto', // 宽(可选)，默认auto
             height: 'auto', // 高(可选)，默认auto
-            setSize: null, // 初始化时用函数设置大小(可选)，默认null。优先权大于width/height。
-            onResize: null, // 窗口大小变化时用函数设置大小(可选)，默认null。优先权大于width/height。
+            autoResize: true, // 窗口变化时是否自动调整地图大小(可选)，默认true
+            setSize: null, // 初始化时用函数设置大小(可选)，默认null。优先权大于参数width/height/autoResize
+            onResize: null, // 窗口大小变化时用函数设置大小(可选)，默认null。优先权大于参数width/height/autoResize
             // 地图缩放级别(可选)，默认11。 值：3-19
             zoom: 11,
             // 中心点(可选)
@@ -266,7 +267,8 @@
             if (isNaN(height)) height = 0;
             // console.log('w：', w, '\h：', h);
             // console.log('width：', width, '\nheight：', height);
-            if (w != 'fn' || h != 'fn') {
+            // 函数：设置地图大小
+            var fnSetMapSize = function () {
                 var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
                     winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
                     left = utils.getElementLeft(nodeParent),
@@ -330,12 +332,19 @@
                 nodeParent.style.setProperty('height', fatH + 'px');
             }
 
+            // · 初始化设置地图大小
+            if (w != 'fn' || h != 'fn') {
+                fnSetMapSize();
+            }
             // · 根据初始化及窗口大小变化的函数来设置地图大小
             if (me.settings.setSize) {
                 me.settings.setSize();
             }
             if (me.settings.onResize) {
                 window.onresize = function () {
+                    if (me.settings.autoResize) {
+                        fnSetMapSize();
+                    }
                     me.settings.onResize();
                 }
             }
@@ -469,15 +478,9 @@
          */
         createMarker: function(options){
             var me = this;
-            if (typeof me.$opts == 'undefined') {
-                console.error('地图尚未初始化，无法使用函数' + arguments.callee.name);
-                return;
-            }
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
             var maper = me.$opts.$maper;
-            if (maper == null) {
-                console.error('地图尚未实例化，无法使用函数' + arguments.callee.name);
-                return;
-            }
+
             var originals = {
                 type: '', // 坐标类型(可选)，默认空。值： zhongxin 中心点坐标, 空 表示其它类型。
                 coordinate: '', // 坐标经纬度字符串. eg. '经度,纬度'
@@ -521,65 +524,68 @@
             me.settings.overlays.push(oneMark); // 全局赋值
             me.settings.markerLays.push(oneMark);
 
-            // 添加文本标注
-            var lbClassName = 'ne__bd_label_bdLabel';
-            if (type == 'zhongxin') {
-                lbClassName += ' ne__bd_label_bdCentralLabel';
-            }
-            var lbText =  '<div class="' + lbClassName + '">' + title + '</div>',
-                lbOptions = {
-                    position: markPoint, // 指定文本标注所在的地理位置
-                    // offset: new BMap.Size(30, -30) // 设置文本偏移量
-                    width: 0,     // 宽度(220-730) 0 自动调整
-                    maxWidth: 500,  // 最大宽度(220-730)
-                    height: 0,     // 高度(60-650) 0 自动调整
-                    offset: { // 位置偏移
-                        width: -40, 
-                        height: -75
-                    }
+            // 添加文本标注和信息窗
+            if (title != '') {
+                // 添加文本标注
+                var lbClassName = 'ne__bd_label_bdLabel';
+                if (type == 'zhongxin') {
+                    lbClassName += ' ne__bd_label_bdCentralLabel';
                 }
-            var label = new BMap.Label(lbText, lbOptions);
-            label.enableMassClear(); // 允许覆盖物被清除
-            label.name = 'wenben_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
-            if (type == 'zhongxin') {
-                label.name2 = 'center_wenben_biaoji';
-            }
-            label.setStyle({
-                padding: '10px',
-                height: '30px',
-                lineHeight: '30px',
-                // backgroundColor: "#fff",
-                borderRadius: '5px',
-                borderColor: '#ccc',
-                color: 'blue',
-                fontSize: '16px',
-                fontFamily: '微软雅黑'
-            });
-            oneMark.setLabel(label); // 绑定文本标注到点标记上
-            maper.addOverlay(label);
-            // 更改文本标注节点样式及位置
-            setTimeout(function () {
-                var lbNode = document.getElementsByClassName(lbClassName); // 延时一下才能取非空节点
-                if (lbNode != null && lbNode.length > 0) {
-                    lbNode[0].parentNode.classList.add('ne__bd_label'); // 给父节点添加一个样式名
-                    if (type == 'zhongxin') {
-                        // 全局赋值2
-                        me.$opts.$centerLabelNode = lbNode[0]; // 中心点文本标注节点
+                var lbText = '<div class="' + lbClassName + '">' + title + '</div>',
+                    lbOptions = {
+                        position: markPoint, // 指定文本标注所在的地理位置
+                        // offset: new BMap.Size(30, -30) // 设置文本偏移量
+                        width: 0,     // 宽度(220-730) 0 自动调整
+                        maxWidth: 500,  // 最大宽度(220-730)
+                        height: 0,     // 高度(60-650) 0 自动调整
+                        offset: { // 位置偏移
+                            width: -40,
+                            height: -75
+                        }
                     }
+                var label = new BMap.Label(lbText, lbOptions);
+                label.enableMassClear(); // 允许覆盖物被清除
+                label.name = 'wenben_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+                if (type == 'zhongxin') {
+                    label.name2 = 'center_wenben_biaoji';
                 }
-                dotHelper._setLabelPositionAndSize(me, lbNode); // 调整文本标注的大小和位置
-            }, 100);
+                label.setStyle({
+                    padding: '10px',
+                    height: '30px',
+                    lineHeight: '30px',
+                    // backgroundColor: "#fff",
+                    borderRadius: '5px',
+                    borderColor: '#ccc',
+                    color: 'blue',
+                    fontSize: '16px',
+                    fontFamily: '微软雅黑'
+                });
+                oneMark.setLabel(label); // 绑定文本标注到点标记上
+                maper.addOverlay(label);
+                // 更改文本标注节点样式及位置
+                setTimeout(function () {
+                    var lbNode = document.getElementsByClassName(lbClassName); // 延时一下才能取非空节点
+                    if (lbNode != null && lbNode.length > 0) {
+                        lbNode[0].parentNode.classList.add('ne__bd_label'); // 给父节点添加一个样式名
+                        if (type == 'zhongxin') {
+                            // 全局赋值2
+                            me.$opts.$centerLabelNode = lbNode[0]; // 中心点文本标注节点
+                        }
+                    }
+                    dotHelper._setLabelPositionAndSize(me, lbNode); // 调整文本标注的大小和位置
+                }, 100);
             
-            // 添加信息窗口
-            dotHelper._addInfoWindow(me, oneMark, markPoint, {
-                title: title,
-                describe: describe,
-                message: message
-            });
+                // 添加信息窗口
+                dotHelper._addInfoWindow(me, oneMark, markPoint, {
+                    title: title,
+                    describe: describe,
+                    message: message
+                });
 
-            // 全局赋值1
-            me.settings.overlays.push(label);
-            me.settings.labelLays.push(label);
+                // 全局赋值1
+                me.settings.overlays.push(label);
+                me.settings.labelLays.push(label);
+            }
            
             // 创建完成事件
             if (finals.finishCallback) {
@@ -648,6 +654,7 @@
                 // ];
                 hideValues: [], // 多边形覆盖物标识符数组，即多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
                 titles: [], // 自定义每个多边形覆盖标题即文本描述数组(可选),默认空数组。数组元素支持HTML
+                titleStyle: {}, // 自定义每个多边形覆盖物标题即文本描述信息的样式(可选),默认空对象但是有默认的样式。对象内的键值写法要遵循css驼峰写法. eg. { fontSize: "14px", borderRadius: "4px"}
                 bgColors: [], // 自定义每个多边形覆盖物背景色数组(可选),默认空数组。优先权大于 skinOptions.fillColor和strokeColor。格式：['#1296db', '#ff0000', '#ffffff']
                 editable: true, // 多边形是否可修改形状(可选)，默认true。值为true时多边形点上将出现一个白色的小正方形可拖动改变形状。
                 buttons: { // 按钮(可选)
@@ -656,12 +663,12 @@
                     callback: null // 回调函数(可选)，默认null。返回值e { id: '隐藏值ID字段', polyObj: "多边形覆盖物对象", polyLayId: '多边形覆盖物唯一标识符', btnLayId: '按钮覆盖物唯一标识符'}
                 },
                 skinOptions: { // 外观配置项(可选)。
-                    strokeColor: "red", // 边线颜色(可选)，默认红色。
                     fillColor: "red", // 填充颜色(可选)，默认红色。当参数为空时，圆形将没有填充效果。
-                    strokeWeight: 1, // 边线的宽度，以像素为单位(可选)，默认1px。
-                    strokeOpacity: 0.8, // 边线透明度，取值范围0-1(可选)，默认0.8。
                     fillOpacity: 0.65,  // 填充的透明度，取值范围0-1(可选)，默认0.65。
-                    strokeStyle: "solid" // 边线的样式，solid或dashed(可选)，默认solid。
+                    strokeWeight: 1, // 边线的宽度，以像素为单位(可选)，默认1px。
+                    strokeStyle: "solid", // 边线的样式，solid或dashed(可选)，默认solid。
+                    strokeColor: "red", // 边线颜色(可选)，默认红色。
+                    strokeOpacity: 0.8 // 边线透明度，取值范围0-1(可选)，默认0.8。
                 }
             }
             var finals = utils.combine(true, originals, options || {});
@@ -669,6 +676,7 @@
                 hideValues = finals.hideValues,
                 bgColors = finals.bgColors,
                 titles = finals.titles,
+                titleStyle = finals.titleStyle,
                 editable = finals.editable,
                 buttoned = finals.buttons.enable,
                 btnText = finals.buttons.text,
@@ -683,14 +691,21 @@
             // maper.centerAndZoom(me.$opts.$centerPoint, me.$opts.$zoom); // 设置地图中心点
 
             // 数据转化
-            var newPoints = []
-            for (var i = 0; i < points.length; i++) {
-                var one = points[i];
-                for (var k = 0; k < one.length; k++) {
-                    var row = one[k];
-                    one[k] = new BMap.Point(row.lng, row.lat);
+            var newPoints = [];
+            if (typeof points != 'undefined') {
+                for (var i = 0; i < points.length; i++) {
+                    var one = points[i];
+                    for (var k = 0; k < one.length; k++) {
+                        var row = one[k];
+                        if (row instanceof BMap.Point == false) {
+                            one[k] = new BMap.Point(row.lng, row.lat);
+                        }
+                    }
+                    newPoints.push(one);
                 }
-                newPoints.push(one);
+            }
+            else {
+                console.error('函数' + arguments.callee.name + '()，参数options.points为undefined，请检查');
             }
             // console.log('符合要求的数组：', newPoints);
 
@@ -756,12 +771,12 @@
                             plyUid: plyUid, // 覆盖物唯一标识符，默认空
                             plyNo: plyNo, // 覆盖物对应的编号，默认空(可选)。新增时为空
                             title: oneTitle,
+                            labelStyle: titleStyle,
                             content: ''
                         });
                     }
                     // 给覆盖物添加操作按钮
                     if (buttoned) {
-                       
                         polygonHelper._addOverlayButton(me, ply, {
                             longitude: longitude,
                             latitude: latitude,
@@ -1036,9 +1051,15 @@
         /**
          * 获取一组坐标的中心点/根据坐标获取中心点坐标
          * @param {Array} ps_coord_arr 坐标数组，是一个包含多个坐标的数组，每个坐标是一个Point对象或者是一个包含经度和纬度的对象。格式 [{ lng: 118.602675, lat: 24.917578 }, { lng: 118.61906, lat: 24.904994 }, { lng: 118.609143, lat: 24.897783 }, // ... 更多坐标 ];
-         * @returns 返回该组坐标的中心点坐标，值是由经纬度组成的对象。格式：{ lng: "经度", lat: "纬度" }
+         * @returns 返回该组坐标的中心点坐标，值是由经纬度组成的对象。格式：{ lng: "经度(有可能空)", lat: "纬度(有可能空)" }
          */
         getCoordinateCenter: function (ps_coord_arr) {
+            if (!Array.isArray(ps_coord_arr) || ps_coord_arr.length == 0) {
+                return {
+                    lng: '',
+                    lat: ''
+                }
+            }
             // 累加所有坐标点
             var x = 0, y = 0;
             for (var i = 0; i < ps_coord_arr.length; i++) {
@@ -1046,9 +1067,10 @@
                 y += parseFloat(ps_coord_arr[i].lat);
             }
             // 计算平均值以获取中心点并返回
-            return {
-                lng: x / ps_coord_arr.length,
-                lat: y / ps_coord_arr.length
+            var digit = 6; // 保留的小数位数
+            return{ 
+                lng: parseFloat(x / ps_coord_arr.length).toFixed(digit),
+                lat: parseFloat(y / ps_coord_arr.length).toFixed(digit)
             }
         },
 
@@ -1057,7 +1079,12 @@
         //————————————————————————————————————————————————
         /**
          * 获取所有多边形坐标数据
-         * @returns {Array} 返回字符串型坐标数组
+         * @returns {Array} 返回所有多边形(假设有N个)经纬度坐标字符串组成的二维数组
+         * 返回值格式：
+            [
+                ['118.599547,24.9246154', '118.607812,24.9197654', '118.594948,24.91308'], // 第2个多边形
+                ['118.602206,24.914588', '118.612986,24.912294', '118.606302,24.906198'],  // 第2个多边形
+            ]
          */
         getPolyCoordinateData: function () {
             var me = this;
@@ -1085,8 +1112,8 @@
             return coordArr;
         },
 
-         
-         
+
+
         //————————————————————————————————————————————————
         /**
          * 获取最后一个多边形覆盖物的经纬度信息 (该函数仅内部测试用) test2
@@ -1384,8 +1411,231 @@
             map.setMapStyle({
                 styleJson: styleArray
             }) */
-
         },
+
+
+
+        /**
+         * 设置某个行政区边界(地点定位功能)
+         * 即：创建省、直辖市、地级市、或区县的行政边界
+         * @param {String} name 行政区域名称,一般是省、直辖市、地级市、或区县的名称。eg. 福建省, 泉州市, 丰泽区
+         * @param {Function} callback 回调函数(可选)。数据以回调函数的参数形式返回。返回值e格式：{ coords: "边界经纬度标数组,用于创建边界(N个多边形)", geos: "边界地理坐标数组,用于调整地图视野" }
+        */
+        setRegionBoundary: function(name, callback){
+            var me = this;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            // 查询行政区域的边界
+            var bdary = new BMap.Boundary(); // 创建行政区域搜索的对象实例
+            bdary.get(name, function (rs) {
+                // console.log('rs：', rs);
+                var coordinateArr = [], // 边界经纬度坐标数组，二维数组。用于创建N个多边形
+                    geoPointArr = []; // 边界地理坐标数组，一维数组。用于调整地图视野
+                var count = rs.boundaries.length; // 行政区域的点有多少个
+                for (var i = 0; i < count; i++) {
+                    var boundaryStr = rs.boundaries[i];
+                    // console.log('坐标字符串：', boundaryStr);
+                    var oneRegion = [];
+                    var tempArr = boundaryStr.split(';');
+                    for (var k = 0; k < tempArr.length; k++){
+                        var oneStr = tempArr[k].toString().replace(/\s+/g, '');
+                        var oneArr = oneStr.split(',');
+                        var lng = oneArr[0], lat = oneArr[1];
+                        oneRegion.push({
+                            lng: lng,
+                            lat: lat
+                        });
+                        geoPointArr.push(new BMap.Point(lng, lat));
+                    }
+                    coordinateArr.push(oneRegion);
+                }
+                // console.log('行政区域边界经纬度标数组：', coordinateArr);
+                // console.log('行政区域边界地理坐标数组：', geoPointArr);
+                // 创建行政区域边界
+                if (coordinateArr.length > 0) {
+                    // 最大的那个多边形行政区域才添加文本信息
+                    var titleArr = [];
+                    var defaultIndex = 0;
+                    var maxLen = coordinateArr[defaultIndex].length;
+                    var maxIndex = defaultIndex;
+                    for (var i = defaultIndex + 1; i < coordinateArr.length; i++) {
+                        var nowLen = coordinateArr[i].length;
+                        if (nowLen > maxLen) {
+                            maxIndex = i;
+                            maxLen = nowLen;
+                        }
+                    }
+                    // console.log('maxLenIndex：', maxIndex);
+                    for (var i = 0; i < coordinateArr.length; i++) {
+                        var txt = maxIndex == i ? name : '';
+                        titleArr.push(txt);
+                    }
+                    me.clearAllOverlay(); // 清除全部覆盖物
+                    // 创建行政区域边界
+                    me.createPolygonOverlays({
+                        points: coordinateArr,
+                        titles: titleArr,
+                        titleStyle: {
+                            backgroundColor: "#fff",
+                            border: "0",
+                            borderRadius: "20px",
+                            color: "#0064fc", // "#5a5d63",
+                            fontSize: "28px",
+                            fontWeight: "550",
+                            boxShadow: "none",
+                            opacity: .75,
+                            filter: "alpha(opacity=75)",
+                            filter: "progid:DXImageTransform.Microsoft.Alpha(opacity=75)"
+                        },
+                        editable: false,
+                        skinOptions: {
+                            fillColor: "#fff",
+                            fillOpacity: .3,
+                            strokeWeight: 2,
+                            strokeStyle: "dashed",
+                            strokeColor: "#0064fc",
+                            strokeOpacity: 1
+                        }
+                    });
+                }
+                else {
+                    utils.dialogs('抱歉，没有找到对应的地点边界1');
+                }
+
+                // 根据坐标自动调整地图视野
+                if (geoPointArr.length > 0) {
+                    maper.setViewport(geoPointArr);
+                }
+                // 回调
+                if (callback) {
+                    callback({
+                        coords: coordinateArr, // 边界经纬度标数组,用于创建边界(N个多边形)
+                        geos: geoPointArr // 边界地理坐标数组,用于调整地图视野
+                    });
+                }
+            });
+        },
+
+
+
+        /**
+         * 设置某个地点的边界(地点定位功能)
+         * 即：使用本地检索方法获取某个地点的边界
+         * @param {String} name 地点名称，一般是小地名,比如某个小区、学校、商场等
+         * @param {Function} callback 回调函数(可选)。数据以回调函数的参数形式返回。返回值e格式：{ coords: "边界经纬度标数组,用于创建边界(N个多边形)", geos: "边界地理坐标数组,用于调整地图视野" }
+         */
+        setLocationBoundary: function (name, callback) {
+            var me = this;
+            if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
+            var maper = me.$opts.$maper;
+            // 使用本地检索方法获取某个地点的边界
+            var local = new BMap.LocalSearch(maper, {
+                renderOptions: {
+                    map: maper
+                }
+            });
+            var fnName = arguments.callee.name.toString();
+            // 设置添加标注后的回调函数。参数： pois: Array ，通过marker属性可得到其对应的标注
+            local.setMarkersSetCallback(function (pois) {
+                // console.log('pois：', pois);
+                me.clearAllOverlay(); // 清除全部覆盖物
+                // // 创建标注点
+                // for (var i = 0; i < pois.length; i++) {
+                //     var onePois = pois[i];
+                //     var point = onePois.point;
+                //     var lng = point.lng, lat = point.lat;
+                //     var marker = new BMap.Marker(point);
+                // }
+                // 根据获取到的poi id，查询边界坐标集合并画多边形
+                var uid = pois.length > 0 && typeof pois[0].uid != 'undefined' ? pois[0].uid : '';
+                if (typeof jQuery == 'undefined') {
+                    var F12Info = '<br>按F12通过控制台查看具体错误信息';
+                    var tips = '提醒：函数' + fnName + '()需jQuery库文件的支持<br>请先引入jq文件<br>可从以下网址合适版本的jquery文本<br>https://www.bootcdn.cn/jquery/' + F12Info;
+                    var errs = tips.toString().replace(/(<br>)/g, '\n');
+                    utils.dialogs(tips);
+                    console.error(errs)
+                    return;
+                }
+                fnQueryUid(uid, callback);
+            });
+            // 根据检索词发起检索
+            local.search(name);
+            // me.clearAllOverlay(); // 清除全部覆盖物
+
+            // 子函数：百度地图获取根据POI(感兴趣点)区域边界
+            // @param {String|Number} uid 
+            function fnQueryUid(uid, callsBack) {
+                $.ajax({
+                    async: false,
+                    url: "http://map.baidu.com/?pcevaname=pc4.1&qt=ext&ext_ver=new&l=12&uid=" + uid,
+                    dataType: "jsonp", // jsonp用于解决主流浏览器的跨域数据访问的问题
+                    jsonp: "callback", //传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(一般默认为 callback
+                    timeout: 3000,
+                    success: function (res) {
+                        var content = res.content;
+                        // console.log('content：', content);
+                        var coordinateArr = [], // 边界经纬度坐标数组，二维数组。用于创建N个多边形
+                            geoPointArr = []; // 边界地理坐标数组，一维数组。用于调整地图视野
+                        // 创建地点边界
+                        if (null != content.geo && content.geo != undefined) { // 有找到地点
+                            var geo = content.geo;
+                            var result = helpers._convertGeoString2Points(geo);
+                            coordinateArr = result.locates;
+                            geoPointArr = result.geos;
+                            // console.log('geo：', geo);
+                            // console.log('经纬度坐标数组', coordinateArr);
+                            // console.log('地理坐标数组：', geoPointArr);
+                            var titleArr = [];
+                            for (var i = 0; i < coordinateArr.length; i++){
+                                titleArr.push(name);
+                            }
+                            // 创建地点边界
+                            me.createPolygonOverlays({
+                                points: coordinateArr,
+                                titles: titleArr,
+                                titleStyle: {
+                                    backgroundColor: "#fff",
+                                    border: "0",
+                                    borderRadius: "20px",
+                                    color: "#0064fc", // "#5a5d63",
+                                    fontSize: "28px",
+                                    fontWeight: "550",
+                                    boxShadow: "none",
+                                    opacity: .75,
+                                    filter: "alpha(opacity=75)",
+                                    filter: "progid:DXImageTransform.Microsoft.Alpha(opacity=75)"
+                                },
+                                editable: false,
+                                skinOptions: {
+                                    fillColor: "#fff",
+                                    fillOpacity: .3,
+                                    strokeWeight: 2,
+                                    strokeStyle: "solid",
+                                    strokeColor: "#0064fc",
+                                    strokeOpacity: 1
+                                }
+                            });
+                        }
+                        else { // 没找到地点
+                            utils.dialogs('抱歉，没有找到对应的地点边界2');
+                        }
+
+                        // 根据坐标自动调整地图视野
+                        if (geoPointArr.length > 0) {
+                            maper.setViewport(geoPointArr);
+                        }
+                        // 回调
+                        if (callsBack) {
+                            callsBack({
+                                coords: coordinateArr, // 边界经纬度标数组,用于创建边界(N个多边形)
+                                geos: geoPointArr // 边界地理坐标数组,用于调整地图视野
+                            });
+                        }
+                    }
+                });
+            }
+        },
+
 
 
 
@@ -1726,6 +1976,64 @@
                         listDom.style.setProperty('display', 'block');
                     }
                 }
+            }
+        },
+
+
+
+        /**
+         * 坐标转换：将编码过的多边形geo地理坐标字符串转化成地理坐标数组
+         * @param {String} ps_geo_str 编码过的多边形geo地理坐标字符串
+         * @returns {Object} 返回值为一个对象。格式：{ locates: "边界经纬度标数组,用于创建地点边界(N个多边形)", geos: "边界地理坐标数组,用于调整地图视野" }
+         */
+        _convertGeoString2Points: function(ps_geo_str) {
+            // console.log(coordinate);
+            var locateCoordinateArr = [], // 地点边界经纬度坐标数组，二维数组。用于创建N个多边形
+                geoPointArr = []; // 地点边界地理坐标数组，一维数组。用于调整地图视野
+            var pointStr = '';
+            if (ps_geo_str) {
+                var projection = BMAP_NORMAL_MAP.getProjection(); // 返回地图类型所使用的投影实例
+                if (ps_geo_str && ps_geo_str.indexOf("-") >= 0) {
+                    ps_geo_str = ps_geo_str.split('-');
+                }
+                // 取点集合
+                var tempCoArr = ps_geo_str[1];
+                if (tempCoArr && tempCoArr.indexOf(",") >= 0) {
+                    tempCoArr = tempCoArr.replace(";", "").split(",");
+                }
+                // 分割点，两个一组，组成百度米制坐标
+                var tempCoordArr = [];
+                for (var i = 0, len = tempCoArr.length; i < len; i++) {
+                    var obj = new Object();
+                    obj.lng = tempCoArr[i];
+                    obj.lat = tempCoArr[i + 1];
+                    tempCoordArr.push(obj);
+                    i++;
+                }
+                // 遍历米制坐标，转换为经纬度
+                var oneLocateArr = [];
+                for (var i = 0, len = tempCoordArr.length; i < len; i++) {
+                    var pos = tempCoordArr[i];
+                    var point = projection.pointToLngLat(new BMap.Pixel(pos.lng, pos.lat));
+                    var pStr = [point.lng, point.lat].toString(); // eg. '经度,纬度'
+                    pointStr += (pStr + ";");
+                    if(pStr.replace(/\s+/g, '') !== ''){
+                        // pointArr.push(pStr);
+                        var lngLatArr = pStr.split(",");
+                        var lng = isNaN(parseFloat(lngLatArr[0])) ? '' : parseFloat(lngLatArr[0]),
+                            lat = isNaN(parseFloat(lngLatArr[1])) ? '' : parseFloat(lngLatArr[1]);
+                        geoPointArr.push(new BMap.Point(lng, lat));
+                        oneLocateArr.push({
+                            lng: lng,
+                            lat: lat
+                        });
+                    }
+                }
+                locateCoordinateArr.push(oneLocateArr);
+            }
+            return {
+                locates: locateCoordinateArr, // 边界经纬度标数组,用于创建地点边界(N个多边形)
+                geos: geoPointArr // 边界地理坐标数组,用于调整地图视野
             }
         }
     };
@@ -2158,7 +2466,19 @@
                 latitude: '', // 操作按钮所在纬度坐标
                 plyUid: '', // 多边形覆盖物唯一标识符，默认空
                 plyNo: '', // 多边形覆盖物对应的编号，默认空(可选)。新增时为空
-                title: '', // 多边形覆盖上自定义的文本信息(可选),默认空
+                title: '', // 多边形覆盖物自定义的文本信息(可选),默认空
+                labelStyle: { // 多边形覆盖物文本信息样式(可选)，默认空对象
+                    padding: '3px 6px',
+                    backgroundColor: "#fff", // 填充颜色。当参数为空时，圆形将没有填充效果。
+                    borderColor: "#fff", // #2196F3
+                    borderRadius: '2px',
+                    color: "#666", // #5e9fdc
+                    fontSize: "11px",
+                    boxShadow: "0 1px 0px #fafafa",
+                    opacity: 1,
+                    filter: "alpha(opacity=100)",
+                    filter: "progid:DXImageTransform.Microsoft.Alpha(opacity=100)"
+                },
                 content: '' // 多边形覆盖上的内容(可选), 默认空
             }
             var finals = utils.combine(true, originals, options || {});
@@ -2166,6 +2486,7 @@
                 plyUid = finals.plyUid,
                 plyNo = finals.plyNo,
                 title = finals.title,
+                lbStyle = finals.labelStyle,
                 content = finals.content;
             var textUid = plyUid + '_text'; // 多边形文本信息唯一标识符 eg. 'identity_duobianxing_5_btn'
             // console.log('多边形覆盖物对象：', polyObj);
@@ -2179,15 +2500,7 @@
             label.enableMassClear(); // 允许覆盖物被清除
             label.name = 'info_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
             label.identifier = textUid; // 添加多边形文本信息唯一标识符
-            label.setStyle({
-                padding: '5px 8px',
-                backgroundColor: "#fff", // 填充颜色。当参数为空时，圆形将没有填充效果。
-                borderColor: "#fff", // #2196F3
-                borderRadius: '2px',
-                color: "#777", // #5e9fdc
-                fontSize: "10px",
-                boxShadow: "0 1px 0px #ccc"
-            });
+            label.setStyle(lbStyle);
             maper.addOverlay(label);
 
             // 全局赋值1

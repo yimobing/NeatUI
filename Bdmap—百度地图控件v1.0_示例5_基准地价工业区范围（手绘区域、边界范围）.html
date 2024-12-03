@@ -17,7 +17,7 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241129-1"> <!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241202-1"> <!--百度地图控件-->
 </head>
 <body>
     <style>
@@ -73,14 +73,17 @@
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241129-1"></script> <!--百度地图控件-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241202-1"></script> <!--百度地图控件-->
     <script>
         /*+————————————————全局变量————————————————+*/
+        // 默认值
+        var defaultCenterCoordinate = '118.611836,24.918225'; // 默认中心点坐标
+        var maxPolyAmount = 1; // 最多允许画几个多边形。-1 表示不限
+        //
         var g_dijia_bh = "<%=s_dijia_bh%>"; // 工业区编号 ajax({})
         var g_dijia_mc = ''; // 工业区名称
-        var g_zhongxin_zb = ''; // 地图中心点坐标
-        var g_poly_max = 1; // 最多允许画几个多边形。-1 表示不限
-        
+        var g_zhongxin_zb = ''; // 地图中心点坐标 
+
 
 
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -161,7 +164,8 @@
             "return":"ok",
             "dijia_bh":"D1001", 
             "dijia_mc":"清蒙工业区", 
-            "zuobiao_zhongxin":"118.611836,24.918225" 
+            "zuobiao_zhongxin":"118.611836,24.918225"
+            // "zuobiao_zhongxin": "118.600769,24.919154"  // 多边形中心点
         }
         /*
         // START AJAX
@@ -204,7 +208,7 @@
             var firstRowData = landPriceData;
             g_dijia_mc = firstRowData["dijia_mc"];
             g_zhongxin_zb = firstRowData["zuobiao_zhongxin"];
-            if(g_zhongxin_zb == '') g_zhongxin_zb = '118.611836,24.918225'; // 中心点坐标为空时，默认指定一个中心点坐标
+            if(g_zhongxin_zb == '') g_zhongxin_zb = defaultCenterCoordinate; // 中心点坐标为空时，默认指定一个中心点坐标
         }
         
 
@@ -362,8 +366,8 @@
                 coordinate: g_zhongxin_zb,  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
                 caption: g_dijia_mc, // 标题文字(可选)，默认空。
                 describe: "", // 描述文字(可选)，默认空。
-                enableDrag: true, // 是否允许拖拽(可选)，默认false
-                enableClickCreateNew: true, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
+                enableDrag: false, // 是否允许拖拽(可选)，默认false
+                enableClickCreateNew: false, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
                 // 用点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 clickCallback: function(e){
                     $('#c-locate').val(e.lng + ',' + e.lat); // 输入框赋值
@@ -375,7 +379,7 @@
                 // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 dragEnd: function(e){
                     $('#c-locate').val(e.lng + ',' + e.lat);
-                },
+                }
             },
             // 功能与配置项(可选)
             draft: { // 地图底图功能(可选)
@@ -441,7 +445,7 @@
                         ls_btn_uid = e.btnLayId;
                     fnDelOneArea(ls_data_bh, ls_ply_uid, ls_btn_uid);
                 }
-            },
+            }
         });
 
 
@@ -497,20 +501,45 @@
         //——————————————————————————————————————————
         //=====保存按钮、保存工业区范围按钮
         $('#btn-poly-save').on('click', function(){
-            var ls_zuobiao = $('#c-locate').val(), // 中心点坐标
-                ls_ditu_suofang = neuiBdmap.getZoom(), // 获取地图缩放级别
+            // !!!出错警示：同一个函数内有多个接口，接口字段值变量名相同可能会引发莫名其妙的错误
+            var ls_zhongxin_zuobiao = $('#c-locate').val(), // 中心点坐标
                 coordArr = neuiBdmap.getPolyCoordinateData();  // 获取所有多边形坐标数据
-            // console.log('中心点坐标：', ls_zuobiao);
+            // var ls_ditu_suofang = neuiBdmap.getZoom(); // 获取地图缩放级别
+            // console.log('中心点坐标：', ls_zhongxin_zuobiao);
+            // console.log('范围坐标：', coordArr);
             // console.log('缩放级别：', ls_ditu_suofang);
-            // console.log('坐标：', coordArr);
-            var currentLen = coordArr.length;
-            if(g_poly_max != -1 && currentLen > g_poly_max){
+            // 限制最多只能画几个多边形
+            if(maxPolyAmount != -1 && coordArr.length > maxPolyAmount){
                 neuiDialog.alert({
                     animate: true,
-                    message: '工业区范围最多只能画' + g_poly_max + '个<br>当前已有' + currentLen + '个，请删除' + (currentLen - g_poly_max) + '个',
+                    message: '工业区范围最多只能画' + maxPolyAmount + '个<br>当前已有' + coordArr.length + '个，请删除' + (coordArr.length - maxPolyAmount) + '个',
                     buttons: ['确定']
-                })
+                });
+                return;
             }
+            // 取一个多边形的中心坐标
+            var plyPointArr = [];
+            for(var i = 0; i < coordArr.length; i++){
+                var one = coordArr[i];
+                for(var k = 0; k < one.length; k++){
+                    var row = one[k];
+                    var tmpArr = row.split(',');
+                    plyPointArr.push({
+                        lng: tmpArr[0],
+                        lat: tmpArr[1]
+                    });
+                }
+            }
+            // console.log('plyPointArr：', plyPointArr);
+            if(plyPointArr.length > 0){
+                var plyCenterPoint = neuiBdmap.getCoordinateCenter(plyPointArr);
+                var lng = plyCenterPoint.lng, lat = plyCenterPoint.lat;
+                if(lng != '' && lat != ''){
+                    ls_zhongxin_zuobiao = lng + ',' + lat;
+                    // console.log('多边形中心点坐标：', ls_zhongxin_zuobiao);
+                }
+            }
+
             // 开始执行
             var marks = '', tips = '保存中心点坐标成功';
             var flag = '', msg = '保存成功';
@@ -535,7 +564,7 @@
                         "user": "<%=s_user%>",
                         "sjk": "<%=s_sjk%>",
                         "dijia_bh": g_dijia_bh,
-                        "zuobiao_zhongxin": ls_zuobiao
+                        "zuobiao_zhongxin": ls_zhongxin_zuobiao
                     },
                     success: function(res){
                         if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -569,20 +598,19 @@
 
 
                 // 2.保存工业区范围坐标
-                for(var i = 0; i < currentLen; i++){
+                for(var i = 0; i < coordArr.length; i++){
                     var row = coordArr[i];
                     var xuhao = "100" + (i + 1); // eg.1001, 1002, 1003, ...
                         data = row;
-                    var saveArr1 = [ xuhao, data ]
+                    // var saveArr1 = [ xuhao, data ]
                     // console.log('外部行循环数组:', saveArr1);
                     var isGoOn = true; // 是否继续循环, true 是, false 否
                     for(var k = 0; k < data.length; k++){
                         var ls_weizhi = xuhao,
                             ls_zuobiao = data[k],
                             ls_counts = i == 0 && k == 0 ? 0 : ''; // 第一行传0，其它传空
-                        var saveArr = [ ls_weizhi, ls_zuobiao, ls_counts ]
-                        // console.log('内部行循环数组：', saveArr);
-
+                        // var saveArr2 = [ ls_weizhi, ls_zuobiao, ls_counts ]
+                        // console.log('内部行循环数组：', saveArr2);
                         // 后台返回
                         /*
                         // START AJAX
@@ -643,6 +671,11 @@
                     buttons: ['确定'],
                     callBack: function(){
                         if(flag){
+                            // 重置地图中心点
+                            $('#c-locate').val(ls_zhongxin_zuobiao); // 界面赋值
+                            neuiBdmap.setMapCenter(ls_zhongxin_zuobiao, {
+                                title: g_dijia_mc
+                            });
                             // 重载页面
                             // window.location.reload();
                             neuiBdmap.reloadPageWhenCsharp();  // ASP.NET中 使用这个

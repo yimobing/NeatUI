@@ -17,7 +17,7 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241129-1"> <!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241202-1"> <!--百度地图控件-->
 </head>
 <body>
     <style>
@@ -57,12 +57,10 @@
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
     <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
-    <script src="assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具-->
     <script src="assets/libs/jquery-1.8.3.min.js"></script> <!--Jq库-->
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
-    <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241129-1"></script> <!--百度地图控件-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241202-1"></script> <!--百度地图控件-->
     <script>
         /*+————————————————全局变量————————————————+*/
 
@@ -89,7 +87,7 @@
             var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
                 winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
             // 整个区域
-            var eleAll = $('.bdmap'),
+            var eleAll = $('.bds'),
                 allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
                 allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
                 allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
@@ -135,7 +133,7 @@
 
 
 
-        
+
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //                                          百度地图上展示数据并进行交互操作
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -145,10 +143,11 @@
            // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
             width: 'auto', // 宽(可选)，默认auto
             height: 'auto', // 高(可选)，默认auto
-            setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于width/height参数。
+            autoResize: true, // 窗口变化时是否自动调整地图大小(可选)，默认true
+            setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于参数width/height/autoResize
                 // setDituSize();
             },
-            onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于width/height参数。
+            onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于参数width/height/autoResize
                 // setDituSize();
             },
             zoom: 13, // 地图缩放级别(可选)，默认11。 值：3-19

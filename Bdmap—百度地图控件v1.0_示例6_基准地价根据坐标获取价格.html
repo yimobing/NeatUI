@@ -17,7 +17,7 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241129-1"> <!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241202-1"> <!--百度地图控件-->
 </head>
 <body>
     <style>
@@ -83,7 +83,7 @@
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241129-1"></script> <!--百度地图控件-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241202-1"></script> <!--百度地图控件-->
     <script>
         /*+————————————————全局变量————————————————+*/
 
@@ -110,7 +110,7 @@
             var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
                 winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
             // 整个区域
-            var eleAll = $('.bdmap'),
+            var eleAll = $('.bds'),
                 allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
                 allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
                 allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
@@ -246,7 +246,6 @@
             var ls_zuobiao = $('#c-locate').val();
             // console.log('坐标yyy:', ls_zuobiao);
             // 开始执行
-            var flag = '', msg = '保存成功';
             neui.showAnimate();
             setTimeout(function(){
                 // 后台返回价格数据
@@ -302,13 +301,20 @@
                 if(!$.isEmptyObject(priceData) && typeof priceData["jiage"] != 'undefined'){
                     var ls_dijia_mc = priceData["dijia_mc"],
                         ls_dengji_mc = priceData["dengji_mc"],
-                        ls_jiage = priceData["jiage"] + '元/平方米';
+                        ls_jiage = priceData["jiage"] == '' ? '' :  priceData["jiage"] + '元/平方米';
                     var labelText = ls_dijia_mc + '<br>土地等级：' + ls_dengji_mc + '<br>基准地价：' + ls_jiage;
                     $('#c-land-name').text(ls_dijia_mc);
                     $('#c-land-level').text(ls_dengji_mc);
                     $('#c-land-price').text(ls_jiage);
                     $('.bds__result').show(); // 显示价格结果区域
                     neuiBdmap.setCenterPointLabelTitle(labelText);
+                }
+                else{
+                    neuiDialog.alert({
+                        animate: true,
+                        message: '抱歉，没有获取到基准地价',
+                        buttons: ['确定']
+                    })
                 }
 
                 neui.destroyAnimate();

@@ -158,59 +158,81 @@
         /*             搜索地名显示边界    
         /*+----------------------------------------+*/
         /**
-         * 获取区域边界
-         * @param {string} ps_site 区域名称(如省市区名称、社区名称、小区名称)
+         * 设置某个行政区域的边界 testing
+         * 即：获取省、直辖市、地级市、或区县的行政边界
+         * @param {String} name 省、直辖市、地级市、或区县的名称。eg. 福建省, 泉州市, 丰泽区
+         * @param {Function} callback 回调函数返回到客户端的回调函数，数据以回调函数的参数形式返回。返回结果是一个数组
          */
-        var getBoundary = function(ps_site){
-            var bdary = new BMap.Boundary();
-            bdary.get(ps_site, function (rs) {       // 获取行政区域
-                map.clearOverlays(); // 清除地图覆盖物       
+        var setRegionBoundary = function(name){
+            var maper = map;
+            var bdary = new BMap.Boundary(); // 创建行政区域搜索的对象实例
+            // 查询行政区域的边界
+            bdary.get(name, function (rs) {       // 获取行政区域
+                // console.log('rs：', rs);
+                maper.clearOverlays(); // 清除地图覆盖物 
+                var pointsArr = []; // 多边形点坐标数据
                 var count = rs.boundaries.length; // 行政区域的点有多少个
                 for (var i = 0; i < count; i++) {
                     // 建立多边形覆盖物
-                    var ply = new BMap.Polygon(rs.boundaries[i], {
+                    var points = rs.boundaries[i];
+                    // console.log('点坐标：', points);
+                    var ply = new BMap.Polygon(points, {
                         strokeWeight: 1,
                         strokeColor: "#ff0000"
                     });
-                    map.addOverlay(ply); // 添加覆盖物
-                    map.setViewport(ply.getPath()); // 调整视野         
+                    maper.addOverlay(ply); // 添加覆盖物
+                    var path = ply.getPath(); // 返回多边型的点数组
+                    for(var k = 0; k < path.length; k++){
+                        pointsArr.push(path[k]);
+                    }
+                    // console.log('path', path);
                 }
+                // console.log('行政区域所有点：', pointsArr);
+                // 调整地图视野
+                maper.setViewport(pointsArr); // 根据坐标自动调整地图视野
+                // map.setViewport(new BMap.point('经度', '纬度'), 5); // 根据中心点和缩放级别手动调整地图视野
             });
         }
 
 
 
         /**
-         * 定位区域
-         * 小地名，使用本地检索方法
-         * @param {string} ps_site 区域名称，地点名称(如省市区名称、社区名称、小区名称)
+         * 设置某个地点的边界
+         * 即：使用本地检索方法获取某个地点的边界
+         * @param {String} name 地点名称，一般是小地名,比如某个小区、学校、商场等
          */
-        var dingWei = function (ps_site) {
-            var local = new BMap.LocalSearch(map, {
+        var setLocationBoundary = function (name) {
+            var maper = map;
+            var local = new BMap.LocalSearch(maper, {
                 renderOptions: {
-                    map: map
+                    map: maper
                 }
             });
+            // 设置添加标注后的回调函数。参数： pois: Array ，通过marker属性可得到其对应的标注
             local.setMarkersSetCallback(function (pois) {
-                // console.log(pois);
-                // 清除所有覆盖物后，在叠加第一个点
-                map.clearOverlays();
+                // console.log('pois：', pois);
+                maper.clearOverlays();  // 清除所有覆盖物后再叠加第一个点
                 for (var i = 0; i < pois.length; i++) {
                     var marker = new BMap.Marker(pois[i].point);
-                    map.addOverlay(marker);
+                    maper.addOverlay(marker);
                 }
-                // 根据获取到的poi id，查询边界坐标集合，画多边形
+                // 根据获取到的poi id，查询边界坐标集合并画多边形
                 // var uid = pois[0].uid;
                 var uid = pois.length > 0 && typeof pois[0].uid != 'undefined' ? pois[0].uid : '';
                 queryUid(uid);
-            })
-            local.search(ps_site);
-            map.clearOverlays();
+            });
+            // 根据检索词发起检索
+            local.search(name);
+            maper.clearOverlays();
         }
 
 
 
+        
         // 函数：获取小区信息
+        /**
+         * 百度地图获取根据POI(感兴趣点)区域边界
+         */
         function queryUid(uid) {
             $.ajax({
                 async: false,
@@ -222,25 +244,17 @@
                     // console.log('content：', content)
                     if (null != content.geo && content.geo != undefined) { // 有找到地点
                         var geo = content.geo;
-                        var points = coordinateToPoints(geo);
-                        // point分组，得到多边形的每一个点，画多边形
-                        if (points && points.indexOf(";") >= 0) {
-                            points = points.split(";");
-                        }
-                        // 过滤数组中的空元素
-                        var tempArr = [ ];
-                        for(var i = 0; i < points.length; i++){
-                            if(points[i].toString().replace(/([ ]+)/g, '') !== '') tempArr.push(points[i]);
-                        }
-                        points = tempArr;
-                        // console.log('points：', points, '\ntempArr：', tempArr); // 坐标点数组
-                        var arr = [];
-                        for (var i = 0; i < points.length - 1; i++) {
-                            var temp = points[i].split(",");
-                            arr.push(new BMap.Point(parseFloat(temp[0]), parseFloat(temp[1])));
-                        }
-                        var polygon = new BMap.Polygon(arr, { strokeColor: "blue", strokeWeight: 2, strokeOpacity: 0.5 }); // 创建多边形
-                        map.addOverlay(polygon); // 增加多边形
+                        var points = convertGeoString2Points(geo);
+                        // console.log('geo：', geo);
+                        console.log('points：', points);
+                        // 创建多边形
+                        var polygon = new BMap.Polygon(points, 
+                            { 
+                                strokeColor: "blue", 
+                                strokeWeight: 2, 
+                                strokeOpacity: 0.5 
+                        });
+                        map.addOverlay(polygon); // 增加多边形覆盖物
                         // 全局赋值
                         g_searchCoordinateArr = points;
                     }
@@ -255,39 +269,48 @@
 
 
 
-        // 函数：坐标转换
-        function coordinateToPoints(coordinate) {
+        /**
+         * 坐标转换：将编码过的多边形geo地理坐标字符串转化成地理坐标数组
+         * @param {String} ps_geo_str 编码过的多边形geo地理坐标字符串
+         * @returns {Array} 返回多边形地理坐标数组.格式： [[{lng: "", lat: ""}, {lng: "", lat: ""}], [{lng: "", lat: ""}, {lng: "", lat: ""}]]
+         */
+        function convertGeoString2Points(ps_geo_str) {
             // console.log(coordinate);
-            var points = "";
-            if (coordinate) {
-                var projection = BMAP_NORMAL_MAP.getProjection();
-
-                if (coordinate && coordinate.indexOf("-") >= 0) {
-                    coordinate = coordinate.split('-');
+            var pointArr = [];
+            var pointStr = '';
+            if (ps_geo_str) {
+                var projection = BMAP_NORMAL_MAP.getProjection(); // 返回地图类型所使用的投影实例
+                if (ps_geo_str && ps_geo_str.indexOf("-") >= 0) {
+                    ps_geo_str = ps_geo_str.split('-');
                 }
                 // 取点集合
-                var tempCo = coordinate[1];
-                if (tempCo && tempCo.indexOf(",") >= 0) {
-                    tempCo = tempCo.replace(";", "").split(",");
+                var tempCoArr = ps_geo_str[1];
+                if (tempCoArr && tempCoArr.indexOf(",") >= 0) {
+                    tempCoArr = tempCoArr.replace(";", "").split(",");
                 }
                 // 分割点，两个一组，组成百度米制坐标
-                var tempPoints = [];
-                for (var i = 0, len = tempCo.length; i < len; i++) {
+                var tempCoordArr = [];
+                for (var i = 0, len = tempCoArr.length; i < len; i++) {
                     var obj = new Object();
-                    obj.lng = tempCo[i];
-                    obj.lat = tempCo[i + 1];
-                    tempPoints.push(obj);
+                    obj.lng = tempCoArr[i];
+                    obj.lat = tempCoArr[i + 1];
+                    tempCoordArr.push(obj);
                     i++;
                 }
                 // 遍历米制坐标，转换为经纬度
-                for (var i = 0, len = tempPoints.length; i < len; i++) {
-                    // var pos = coordinate[i].split(',');
-                    var pos = tempPoints[i];
+                for (var i = 0, len = tempCoordArr.length; i < len; i++) {
+                    var pos = tempCoordArr[i];
                     var point = projection.pointToLngLat(new BMap.Pixel(pos.lng, pos.lat));
-                    points += ([point.lng, point.lat].toString() + ";");
+                    var pStr = [point.lng, point.lat].toString(); // eg. '经度,纬度'
+                    pointStr += (pStr + ";");
+                    if(pStr.replace(/\s+/g, '') !== ''){
+                        // pointArr.push(pStr);
+                        var lngLatArr = pStr.split(",");
+                        pointArr.push(new BMap.Point(parseFloat(lngLatArr[0]), parseFloat(lngLatArr[1])));
+                    }
                 }
             }
-            return points;
+            return pointArr;
         }
 
 
@@ -461,15 +484,13 @@
             //——————————————————————————————————————————
             //=====定位地点按钮
             $('#btn-locate').on('click', function(){
-                var patter = /['省'|'市'|'区'|'县']$/; // 正则表达式，满足条件后调用
+                // var patter = /['省'|'市'|'区'|'县']$/; // 行政区域：省、直辖市、地级市、或区县
+                var patter = /((?!(小区|社区)).)(省|市|区|县)$/; // 匹配行政区域(省市区县).排除掉小区和社区
                 var word = document.getElementById('s-community').value;
-                if (patter.test(word) == true) { // 关键字结尾是省市县区
-                    getBoundary(word);
-                    if (/社区|小区$/.test(word) == true) { // 因为区后面结尾，会有小区和社区，即做了一个字方法
-                        dingWei(word);
-                    }
-                } else { // 关键字结尾没有省市县区结尾
-                    dingWei(word);
+                if (patter.test(word)) { // 关键字结尾是省市区县,且不是小区或社区
+                    setRegionBoundary(word);
+                } else {
+                    setLocationBoundary(word);
                 }
             });
 
@@ -566,6 +587,7 @@
                                     });
                                 }
                                 var ls_data = JSON.stringify(coordJson);
+                                console.log('ls_data：', ls_data);
 
                                 // 后台返回
                                 /*

@@ -17,7 +17,7 @@
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241128-1"> <!--百度地图控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241203-1"> <!--百度地图控件-->
 </head>
 <body>
     <style>
@@ -217,12 +217,15 @@
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
-    <script src="assets/neatui/js/neatui-bdmap.js?v=20241128-1"></script> <!--百度地图控件-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241203-1"></script> <!--百度地图控件-->
     <script>
         /*+————————————————全局变量————————————————+*/
-        var g_zhongxin_zb = '118.59193,24.910917'; // 地图中心点坐标
+        // 默认值
+        var defaultCenterCoordinate = '118.611836,24.918225'; // 默认中心点坐标
+        var maxPolyAmount = 1; // 最多允许画几个多边形。-1 表示不限
+        //
+        var g_zhongxin_zb = defaultCenterCoordinate; // 地图中心点坐标
         var g_ditu_suofang = 15; // 地图缩放级别，3到19
-        var g_poly_max = 1; // 最多允许画几个多边形
 
 
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -307,10 +310,11 @@
            // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
             width: 'auto', // 宽(可选)，默认auto
             height: 'auto', // 高(可选)，默认auto
-            setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于width/height参数。
+            autoResize: true, // 窗口变化时是否自动调整地图大小(可选)，默认true
+            setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于参数width/height/autoResize
                 // setDituSize();
             },
-            onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于width/height参数。
+            onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于参数width/height/autoResize
                 // setDituSize();
             },
             zoom: g_ditu_suofang, // 地图缩放级别(可选)，默认11。 值：3-19
@@ -442,6 +446,7 @@
             // ];
             hideValues: identifyArray, // 多边形覆盖物隐藏值组成的一维数组(可选)，默认空数组。格式：[1001, 1002, 1003]。注：当界面上对某个多边形进行操作需用到该多边形的"隐藏值ID字段"时,可把后端提供的N个多边形的"隐藏值ID字段"push到本参数数组里传递进来，界面可通过按钮中的data-bh属性取得该隐藏值。
             titles: [], // 自定义每个多边形覆盖标题即文本描述数组(可选),默认空数组。数组元素支持HTML
+            titleStyle: { }, // 自定义每个多边形覆盖物标题即文本描述信息的样式(可选),默认空对象但是有默认的样式。对象内的键值写法要遵循css驼峰写法. eg. { fontSize: "14px", borderRadius: "4px"}
             bgColors: [], // 自定义每个多边形覆盖物背景色数组(可选),默认空数组。优先权大于 skinOptions.fillColor和strokeColor。格式：['#1296db', '#ff0000', '#ffffff']
             editable: true, // 多边形是否可修改形状(可选)，默认true。值为true时多边形点上将出现一个白色的小正方形可拖动改变形状。
             buttons: { // 按钮(可选)
@@ -528,9 +533,8 @@
         //——————————————————————————————————————————
         //=====保存按钮、保存中心点坐标按钮
         $('#btn-pick-save').on('click', function(){
-            var ls_zuobiao = $('#c-locate').val();
-            var arr = [ ls_zuobiao ]
-            // console.log('数组：', arr); 
+            var ls_zhongxin_zuobiao = $('#c-locate').val();
+            // console.log('中心点坐标：', ls_zhongxin_zuobiao);
             // 开始执行
             var flag = '', msg = '保存成功';
             neui.showAnimate();
@@ -552,7 +556,7 @@
                         "menu_bh": "<%=s_menu_bh%>",
                         "user": "<%=s_user%>",
                         "sjk": "<%=s_sjk%>",
-                        "zuobiao_zhongxin": ls_zuobiao
+                        "zuobiao_zhongxin": ls_zhongxin_zuobiao
                     },
                     success: function(res){
                         if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -590,15 +594,15 @@
         //——————————————————————————————————————————
         //=====保存多边形按钮
         $('#btn-poly-save').on('click', function(){
-            var ls_ditu_suofang = neuiBdmap.getZoom(); // 获取地图缩放级别
             var coordArr = neuiBdmap.getPolyCoordinateData();  // 获取所有多边形坐标数据
-             // console.log('当前地图缩放级别：', ls_ditu_suofang);
-            // console.log('保存时coordArr：', coordArr);
-            var currentLen = coordArr.length;
-            if(currentLen > g_poly_max){
+            // var ls_ditu_suofang = neuiBdmap.getZoom(); // 获取地图缩放级别
+            // console.log('范围坐标：', coordArr);
+            // console.log('缩放级别：', ls_ditu_suofang);
+            // 限制最多只能画几个多边形
+            if(coordArr.length > maxPolyAmount){
                 neuiDialog.alert({
                     animate: true,
-                    message: '最多只能画' + g_poly_max + '个多边形<br>当前已有' + currentLen + '个，请删除' + (currentLen - g_poly_max) + '个',
+                    message: '最多只能画' + maxPolyAmount + '个多边形<br>当前已有' + coordArr.length + '个，请删除' + (coordArr.length - maxPolyAmount) + '个',
                     buttons: ['确定']
                 })
             }
@@ -607,7 +611,7 @@
             neui.showAnimate();
             setTimeout(function(){
                 // 保存工业区范围坐标
-                for(var i = 0; i < currentLen; i++){
+                for(var i = 0; i < coordArr.length; i++){
                     var row = coordArr[i];
                     var xuhao = "100" + (i + 1); // eg.1001, 1002, 1003, ...
                         data = row;

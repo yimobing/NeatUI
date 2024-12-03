@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>学区房地点定位</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241203-1"> <!--百度地图控件-->
+    <!--<script type="text/javascript">if (top.location != self.location) { top.location = self.location; }</script>-->
+</head>
+<body>
+    <style>
+        /*+ --------  -------- +*/
+        html, body { width: 99.5%; margin: 0.25% auto; height: 99.5%; overflow: hidden; }
+        /*+ -------- 外层区域：地图容器及父级节点一定要设置height高度，不然地图可能无法显示 -------- +*/
+        .bds { position: relative; width: 100%; height: 99%; margin: 0 auto; padding: 8px; overflow: hidden; zoom: 1; border: 1px solid #cac9c9; border-radius: 10px;  }
+        /*+ -------- 地图容器区域 -------- +*/
+        .bds__map { position: relative; width: 100%; margin: 10px 0 0 0; padding: 3px; border: 1px solid #eaeaea; border-radius: 4px; overflow: hidden; }
+        /*+ -------- 操作区域：表单及按钮 -------- +*/
+        .bds__editor * { margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; font-size: 14px; }
+        .bds__editor>div { display: inline-block; vertical-align: top; margin-left: 35px; }
+        .bds__editor>div:first-child { margin-left: 0; }
+        .bds__editor label { margin-left: 3px; color: #999; font-size: 10px; }
+        .bds__editor button[type="button"]{ padding: 0 8px; font-size: 13px; }
+        .bds__editor input[type="text"] { min-width: 150px; height: 28px; line-height: 28px\9; margin-left: 10px; padding: 0 5px; background-color: #fcfcfc; border: 1px solid #a59b9b !important; border-radius: 2px; }
+        .bds__editor input[type="text"][readonly],
+        .bds__editor input[type="text"]:read-only{ background-color: #fdfdfd!important; }
+
+        /*+ -------- 本页样式 -------- +*/
+        .bds__coord{ width: 100%; }
+        .bds__coord input[type="text"]{ width: 25%; border-color: #ddd!important; }
+        .bds__coord input[type="text"]::-webkit-input-placeholder {color: #e2dcdc; font-size: 12px; }
+        .bds__coord input[type="text"]::-moz-placeholder { color: #e2dcdc; font-size: 12px; }
+        .bds__coord input[type="text"]:-moz-placeholder { color: #e2dcdc; font-size: 12px; }
+        .bds__coord input[type="text"]:-ms-input-placeholder{ color: #e2dcdc; font-size: 12px; }
+    </style>
+
+    <div class="bds">
+        <div class="bds__editor">
+            <div class="bds__coord">
+                <input type="text" id="s-community" baiduSug="1" value="浦西万达广场" placeholder="地点关键词，如云谷小区、南益湖景花园、浦西万达广场"  onblur="this.placeholder='地点关键词，如云谷小区、南益湖景花园、浦西万达广场'" onfocus="this.placeholder=''">
+                <button type="button" class="ne-btn has-3d green" id="btn-locate">定位地点边界</button>
+                <button type="button" class="ne-btn has-3d blue" id="btn-poly-save">保存地点边界(学区范围)</button>
+            </div>
+        </div><!--/.bds__editor-->
+        <div class="bds__map">
+            <div id="map"></div>
+        </div><!--/.bds__map-->
+    </div><!--/.bds-->
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!-- 百度地图api文件-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script> <!--Jq库-->
+    <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
+    <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
+    <script src="assets/neatui/js/neatui-opensug.js"></script> <!--百度搜索框下拉提示-->
+    <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
+    <script src="assets/neatui/js/neatui-bdmap.js?v=20241203-1"></script> <!--百度地图控件-->
+    <script>
+        /*+————————————————全局变量————————————————+*/
+        var g_xuexiao_bh = "<%=s_xuexiao_bh%>"; // 学校编号 ajax({})
+        var g_locationCoordArr = []; // 地点边界经纬度坐标数组
+
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                                   设置区域大小
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        //=====初始化设置地图宽高
+        // setDituSize();
+        
+        //——————————————————————————————————————————
+        //=====窗口变化事件
+        // $(window).on('resize', function(){
+        //     setDituSize();
+        // });
+
+
+        //——————————————————————————————————————————
+        /**
+         * 函数：设置地图宽高
+         * (高度一定要在设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
+         */
+         function setDituSize(){
+            var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
+                winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
+            // 整个区域
+            var eleAll = $('.bds'),
+                allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
+                allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
+                allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
+                allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
+                allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
+                allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
+                allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
+                allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
+            //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
+            // 顶部区域
+            var eleTop = $('.bds__editor'),
+                topHeight = eleTop.outerHeight(true);
+            // 地图区域
+            var eleTu = $('.bds__map'),
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
+                tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
+                tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
+                tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
+                tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
+                tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
+            // 计算宽高
+            var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
+                allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
+                tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
+                tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
+            // console.log('bodyWidth：', $('body').width(), '\nallMargLeft:',allMargLeft, '\nallMargRight:',allMargRight, '\nallPadLeft:',allPadLeft, '\nallPadRight:', allPadRight);
+            // console.log('tuMargLeft:',tuMargLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadRight:',tuPadRight);
+            // console.log('--------------------------------');
+            // 设置地图宽高
+            $('.bds__map').css({
+                width: tuWidth,
+                height: tuHeight
+            });
+            $('#map').css({
+                width: eleTu.width(),
+                height: eleTu.height()
+            });
+        }
+
+
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                          百度地图上展示数据并进行交互操作
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        // 地图初始化参数
+        var options = {
+            // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
+            width: 'auto', // 宽(可选)，默认auto
+            height: 'auto', // 高(可选)，默认auto
+            autoResize: true, // 窗口变化时是否自动调整地图大小(可选)，默认true
+            setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于参数width/height/autoResize
+                // setDituSize();
+            },
+            onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于参数width/height/autoResize
+                // setDituSize();
+            },
+            zoom: 15, // 地图缩放级别(可选)，默认11。 值：3-19
+            // 中心点(可选)
+            center: {
+                visible: false, // 是否显示中心点标注(可选)，默认true
+                city: "", // 城市(可选)，默认空。值：空时根据坐标定位, 非空时根据城市定位。eg.'泉州市', eg.'泉州市惠安县'。
+                coordinate: "118.611836,24.918225",  // 坐标(可选)，默认为首都北京天安门广场的坐标, eg."经度,纬度"。
+                caption: "泉州市", // 标题文字(可选)，默认'北京市'。支持HTML
+                describe: "" // 描述文字(可选)，默认空。支持HTML
+            }
+        }
+
+
+        //————————————————————————————————————————————————
+        // 创建地图并初始化
+        neuiBdmap('map', options);
+
+
+
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                          系列事件
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        //=====定位地点按钮
+        $('#btn-locate').on('click', function(){
+            // var patter = /['省'|'市'|'区'|'县']$/; // 行政区域：省、直辖市、地级市、或区县
+            var patter = /((?!(小区|社区)).)(省|市|区|县)$/; // 匹配行政区域(省市区县).排除掉小区和社区
+            var word = $('#s-community').val();
+            if(word.toString().replace(/\s+/g, '') === ''){
+                neuiDialog.alert({
+                    animate: true,
+                    message: '请输入地点关键词',
+                    buttons: ['确定']
+                })
+                return;
+            }
+            neui.showAnimate();
+            setTimeout(function(){
+                if (patter.test(word)) { // 关键字结尾是省市区县,且不是小区或社区
+                    // 设置某个行政区的边界
+                    neuiBdmap.setRegionBoundary(word, function(e){
+                        // console.log('e1：', e);
+                        g_locationCoordArr = e.geos; // 全局赋值
+                    });
+                } else {
+                    // 设置某个地点的边界
+                    neuiBdmap.setLocationBoundary(word, function(e){
+                        // console.log('e2：', e);
+                        g_locationCoordArr = e.geos; // 全局赋值
+                    });
+                }
+                neui.destroyAnimate();
+            }, 100);
+        });
+
+
+
+        //——————————————————————————————————————————
+        //=====保存按钮、保存地点按钮、保存学区范围按钮
+        $('#btn-poly-save').on('click', function(){
+            var maper = neuiBdmap.getMap();
+            var coordArr = g_locationCoordArr;
+            var ls_ditu_suofang = maper.getZoom(); // 获取地图缩放级别
+            // console.log('地图缩放级别：', ls_ditu_suofang);
+            // console.log('地点边界地理坐标数组：', coordArr);
+            // 校验数据
+            if(coordArr.length == 0){
+                neuiDialog.alert({
+                    animate: true,
+                    message: '没有找到相应地点，无需保存',
+                    buttons: ['确定']
+                })
+                return;
+            }
+            // 开始执行
+            neuiDialog.alert({
+                animate: true,
+                message: '确认保存地点边界吗？',
+                buttons: ['确定', '取消'],
+                callBack: function(ret){           
+                    if(ret == 1){
+                        // 开始执行
+                        var marks = '', tips = '保存地图缩放级别成功';
+                        var flag = '', msg = '保存成功';
+                        neui.showAnimate();
+                        setTimeout(function(){              
+                            // 1. 保存地图缩放级别(这个页面要再保存，防止跟父页面起冲突)
+                            // 后台返回
+                            /*
+                            // START AJAX
+                            var isHoldOn = true;
+                            ajax({
+                                heading: "保存地图缩放级别",
+                                debug: false,
+                                async: false, // 取数方式. true 异步, false 同步(默认)
+                                type: "POST",
+                                dataType: "html",
+                                cache: false,
+                                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                                data: {
+                                    "action": "wh_xuexiao_ditu_suofang_ins",
+                                    "menu_bh": "<%=s_menu_bh%>",
+                                    "user": "<%=s_user%>",
+                                    "sjk": "<%=s_sjk%>",
+                                    "xuexiao_bh": g_xuexiao_bh,
+                                    "ditu_suofang": ls_ditu_suofang
+                                },
+                                success: function(res){
+                                    if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    var json = JSON.parse(res);
+                                    marks = json.return == 'ok' ? 1 : 0;
+                                    if(!marks) tips = json.data;
+                                },
+                                error: function(res){
+                                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                },
+                                beforeSend: function(XMLHttpRequest){ },
+                                complete: function(XMLHttpRequest, textStatus){ }
+                            })
+                            if(!isHoldOn){
+                                neui.destroyAnimate();
+                                return;
+                            }
+                            // END AJAX
+                            */
+                            marks = parseInt(1); // 1 成功, 0 失败
+                            if(!marks) tips = '保存地图缩放级别失败';
+            
+                            if(!marks){ // 失败才提示
+                                neuiDialog.alert({
+                                    caption: '提示',
+                                    message: tips,
+                                    buttons: ['确定']
+                                })
+                                neui.destroyAnimate();
+                                return;
+                            }
+
+                            // 2、保存学区坐标
+                            var ls_weizhi =  "2" + Math.ceil(Math.random() * 10) + Math.ceil(Math.random() * 1000); // 生成随机数
+                            var coordData = { "data": [] }
+                            for(var k = 0; k < coordArr.length; k++){
+                                coordData.data.push({
+                                    "zuobiao": coordArr[k]
+                                });
+                            }
+                            var ls_data = JSON.stringify(coordData);
+                            // console.log('ls_data：', ls_data);
+
+                            // 后台返回
+                            /*
+                            // START AJAX
+                            var isHoldOn = true;
+                            ajax({
+                                heading: "保存学区范围坐标",
+                                debug: false,
+                                async: false, // 取数方式. true 异步, false 同步(默认)
+                                type: "POST",
+                                dataType: "html",
+                                cache: false,
+                                url: "../fwh_pub/jk_xuexiao_xq.ashx",
+                                data: {
+                                    "action": "wh_xuexiao_xq_zuobiao_one_ins",
+                                    "menu_bh": "<%=s_menu_bh%>",
+                                    "user": "<%=s_user%>",
+                                    "sjk": "<%=s_sjk%>",
+                                    "xuexiao_bh": g_xuexiao_bh,
+                                    "weizhi": ls_weizhi,
+                                    "data": ls_data
+                                },
+                                success: function(res){
+                                    if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                    var json = JSON.parse(res);
+                                    flag = json.return == 'ok' ? 1 : 0;
+                                    if(!flag) msg = json.data;
+                                },
+                                error: function(res){
+                                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
+                                },
+                                beforeSend: function(XMLHttpRequest){ },
+                                complete: function(XMLHttpRequest, textStatus){ }
+                            })
+                            if(!isHoldOn){
+                                neui.destroyAnimate();
+                                return;
+                            }
+                            // END AJAX
+                            */
+                            flag = parseInt(1); // 1 成功, 0 失败
+                            if(!flag) msg = '保存失败，该地点已存在！';
+                            
+                            neuiDialog.alert({
+                                message: msg,
+                                buttons: ['确定']
+                            })
+
+                            neui.destroyAnimate();
+
+                        }, 100)
+                    }
+                }
+            })
+        });
+
+    </script>
+</body>
+</html>
