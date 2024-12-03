@@ -15,7 +15,7 @@
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css?v=20241203-1"> <!--对话框-->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css?v=20241203-1"> <!--百度地图控件-->
     <!--<script type="text/javascript">if (top.location != self.location) { top.location = self.location; }</script>-->
 </head>
@@ -65,7 +65,7 @@
     <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!-- 百度地图api文件-->
     <script src="assets/libs/jquery-1.8.3.min.js"></script> <!--Jq库-->
     <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
-    <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
+    <script src="assets/neatui/js/neatui-dialog.js?v=20241203-1"></script> <!--对话框-->
     <script src="assets/neatui/js/neatui-opensug.js"></script> <!--百度搜索框下拉提示-->
     <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
     <script src="assets/neatui/js/neatui-bdmap.js?v=20241203-1"></script> <!--百度地图控件-->
@@ -306,7 +306,6 @@
             
                             if(!marks){ // 失败才提示
                                 neuiDialog.alert({
-                                    caption: '提示',
                                     message: tips,
                                     buttons: ['确定']
                                 })
