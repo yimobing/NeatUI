@@ -2326,6 +2326,7 @@
             // drawManager.addEventListener('rectanglecomplete', function(e, overlay){})
             // 鼠标绘制完成后，派发总事件的接口
             drawManager.addEventListener('overlaycomplete', function (e) {
+                console.log('e.drawingMode:', e.drawingMode); // testing
                 var ply = e.overlay;
                 // console.log('plyxx：', ply);
                 // 绘制完成后回调获得覆盖物信息
@@ -2358,25 +2359,28 @@
                 }
                 // 改变多边形形状
                 e.overlay.addEventListener("lineupdate", function (event) { // 拖动边线进行编辑时监听事件
-                    // console.log('event:', event);
+                    console.log('lineupdate:', event);
                     me.settings.drawMode = e.drawingMode; // 全局赋值
                     polygonHelper._showLatLon(me, event.currentTarget.ha);
                 });
                 e.overlay.addEventListener("mouseover", function (event) { // 鼠标进入时的监听事件
-                    // console.log('鼠标进入了e：', e)
+                    console.log('鼠标进入了e：', e)
                     me.settings.drawMode = e.drawingMode; // 全局赋值
                 });
                 e.overlay.addEventListener("mouseout", function (event) { // 鼠标离开时的监听事件
-                    // console.log('鼠标离开了e：', e)
+                    console.log('鼠标离开了e：', e)
                     me.settings.drawMode = 'hander'; // 全局赋值
                 });
                 if (typeof e.overlay.getPath != 'undefined') { // 绘制完成时显示覆盖物点信息
                     polygonHelper._showLatLon(me, e.overlay.getPath());
                 }
-                
+                var modes = drawManager.getDrawingMode();
+                console.log('modes：', modes);
+
                 // 默认的画折线、多边形完成之后它会关闭地图绘制状态(鼠标会自动切换为一只手),但画点、折线、矩形完成后并不会关闭地图绘制状态
+                // 设置画点、折线、矩形时完成后关闭地图的绘制状态，使鼠标切换为一只手
                 if (['marker', 'circle', 'rectangle'].indexOf(e.drawingMode) >= 0) {
-                    drawManager.close(); // 设置画点、折线、矩形时完成后关闭地图的绘制状态，使鼠标切换为一只手
+                    drawManager.close();
                 }
                 // 全局赋值1
                 // me.settings.drawMode = ['polyline', 'polygon'].indexOf(e.drawingMode) >= 0 ? 'hander' : e.drawingMode; // 画折线、多边形完成之后它会自动切换到鼠标为一只手
