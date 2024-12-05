@@ -19,12 +19,12 @@
 	<meta http-equiv="Cache-Control" content="no-transform">
 	<meta http-equiv="Cache-Control" content="no-siteapp">
 	<title>Dialog | 对话框插件</title>
-	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
-	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框控件-->
-	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
-	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-keyboard.css"><!--数字键盘控件-->
-	<link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
-	<link type="text/css" rel="stylesheet" href="test//css/demo-dialog.css"><!--本页demo样式-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框控件-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"> <!--表单布局-->
+	<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-keyboard.css"> <!--数字键盘控件-->
+	<link type="text/css" rel="stylesheet" href="test//css/demo-dialog.css"> <!--本页demo样式-->
+	<link type="text/css" rel="stylesheet" href="highlight/11.3.1/styles/monokai.min.css"> <!-- 代码高亮库 -->
 </head>
 
 <body>
@@ -146,12 +146,14 @@
 				<div class="doc-action">普通对话框</div>
 				<div class="doc-code">
 					<pre>
+						<code class="language-javascript">
 						neuiDialog.alert({
 							animate: true,
 							caption: '提示',
 							message: '保存成功',
 							buttons: ['确定']
 						})
+						</code>
 					</pre>
 				</div>
 			</div><!--.doc-->
@@ -159,6 +161,7 @@
 				<div class="doc-action">有回调的对话框</div>
 				<div class="doc-code">
 					<pre>
+						<code class="language-javascript">
 						neuiDialog.alert({
 							animate: true,
 							caption: '提示',
@@ -166,7 +169,8 @@
 							buttons: ['确定'],
 							callBack: function(ret){
 							}
-						})						
+						})	
+						</code>					
 					</pre>
 				</div>
 			</div><!--.doc-->
@@ -174,6 +178,7 @@
 				<div class="doc-action">确认对话框</div>
 				<div class="doc-code">
 					<pre>
+						<code class="language-javascript">
 						neuiDialog.alert({
 							animate: true,
 							caption: '提示',
@@ -184,7 +189,8 @@
 						
 								}
 							}
-						})											
+						})
+						</code>										
 					</pre>
 				</div>
 			</div><!--.doc-->
@@ -194,11 +200,10 @@
 	</div><!--/panel-grid-demo-->
 
 	<script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script>
-	<script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
-	<script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框插件-->
-	<script type="text/javascript" src="assets/neatui/js/neatui-keyboard.js"></script><!--数字键盘控件-->
-	<script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
-	<!--<script type="text/javascript" href="highlight/highlight.min.js"></script>--><!--代码高亮-->
+	<script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框插件-->
+	<script type="text/javascript" src="assets/neatui/js/neatui-keyboard.js"></script> <!--数字键盘控件-->
+	<script src="highlight/11.3.1/highlight.min.js"></script> <!-- 代码高亮库 -->
 	<!--[if lt IE 9]>
 		<script type="text/javascript" src="js/html5shiv.min.js"></script>
 		<script type="text/javascript" src="js/respond.min.js"></script>
@@ -335,14 +340,7 @@
 		/*▦✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚演示Demo✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚✚▦*/
 
 		/*+----------------------------------------+*/
-        //=====代码块高亮
-        hljs.initHighlightingOnLoad()
-        hljs.configure({
-            languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
-        });
-        document.querySelectorAll('pre').forEach((block) => {
-            hljs.highlightBlock(block);
-        });
+		hljs.highlightAll(); // 代码块高亮
 
 
 

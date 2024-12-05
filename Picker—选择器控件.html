@@ -16,9 +16,9 @@
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-picker.css">
-    <link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
+    <link type="text/css" rel="stylesheet" href="highlight/11.3.1/styles/monokai.min.css"> <!-- 代码高亮库 -->
     <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
-    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+    <script>if(top.location != self.location){ top.location = self.location; }</script>
     <base target="_self">
 </head>
 <body>
@@ -57,7 +57,7 @@
         </section>
         <section class="panel__code">
 <pre>
-
+    <code class="language-javascript">
     --------------------------------------------
             picker选择器使用示例
             请先引入jQuery
@@ -105,6 +105,8 @@
         onChange: function(e){ }, // 在选择器选中的值发生变化的时候回调(可选)。e格式：{id:"新隐藏值", value:"新显示值", oldId:"旧隐藏值", oldValue:"旧显示值"}
         onClose: function(){ } // 选择器关闭后的回调(可选)。
     }
+
+    </code>
 </pre>
         </section><!--/.panel__code-->
 
@@ -157,24 +159,17 @@
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
-    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script>
-    <script type="text/javascript" src="assets/libs/jquery.chineseDistricts.js"></script><!--全国省市区数据源-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-picker.js"></script><!--Picker选择器-->
-    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
-    <script type="text/javascript">
+    <script src="assets/libs/jquery-1.8.3.min.js"></script>
+    <script src="assets/libs/jquery.chineseDistricts.js"></script> <!--全国省市区数据源-->
+    <script src="assets/neatui/js/neatui-picker.js"></script> <!--Picker选择器-->
+    <script src="highlight/11.3.1/highlight.min.js"></script> <!-- 代码高亮库 -->
+    <script>
 
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //+                                                     初始化事件
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-        //——————————————————————————————————————————
-        //=====代码块高亮
-        hljs.initHighlightingOnLoad()
-        hljs.configure({
-            languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
-        });
-        document.querySelectorAll('pre').forEach((block) => {
-            hljs.highlightBlock(block);
-        });
+        //————————————————————————————————————————————————
+		hljs.highlightAll(); // 代码块高亮
 
 
 

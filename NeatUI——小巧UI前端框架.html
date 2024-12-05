@@ -16,9 +16,8 @@
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css">
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
-    <link type="text/css" rel="stylesheet" href="assets/font-awesome/css/font-awesome.css"><!--图标库-->
-    <link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"> <!--表单布局-->
+    <link type="text/css" rel="stylesheet" href="assets/font-awesome/css/font-awesome.css"> <!--图标库-->
     <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
     <!--<script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>-->
     <!--[if lt IE 9]>
@@ -356,9 +355,6 @@
     <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
     <script type="text/javascript" src="assets/neatui/js/neatui-form.js"></script><!--表单布局-->
     <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
-    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
-	<!--<script type="text/javascript" href="highlight/highlight.min.js"></script>--><!--代码高亮-->
-
     <script type="text/javascript">
 
         /*+————————————————全局变量————————————————+*/
@@ -374,15 +370,6 @@
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //+                                                     初始化事件
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-             //——————————————————————————————————————————
-            //=====代码块高亮
-            hljs.initHighlightingOnLoad()
-            hljs.configure({
-                languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
-            });
-            document.querySelectorAll('pre').forEach((block) => {
-                hljs.highlightBlock(block);
-            });
 
 
 

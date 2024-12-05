@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Axios自定义封装控件</title>
-    <link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
     <link type="text/css" rel="stylesheet" href="assets/lib/element-ui@2.15.13/index.css">
+    <link type="text/css" rel="stylesheet" href="highlight/11.3.1/styles/monokai.min.css"> <!-- 代码高亮库 -->
 </head>
 <body>
     <style>
@@ -31,7 +31,104 @@
        
         <div class="instruction">
             <div class="instruction__caption caption">控件使用说明</div>
-            <pre></pre>
+            <pre>
+                <code>
+/**
+* --------------------------------
+* [1、控件调用方法]
+* --------------------------------
+【方法】
+① $axios(options).then().catch(); // 自定义请求方式，即通过配置options配置项的参数method='post'或'get'来设置请求方式
+② $axios.get(url, config).then().catch(); // GET 请求
+③ $axios.post(url, data, config).then().catch(); // POST 请求
+④ $axios.all([promise1, promise1, ...]).then().catch(); // 并发请求。 promise1, promise2等实例是一个 POST 或 GET 请求
+【说明】
+    ①中指定 method='get' 时相当于②
+    ①中指定 method='post' 时相当于③
+
+* --------------------------------
+*  [2、配置项参数说明]
+* --------------------------------
+    options 和 config 配置项除了新增几个自定义的参数，其余和原生配置项完全一样
+    具体参考
+    Axios 官网：http://www.axios-js.com/zh-cn/docs/
+    Vue2 Axios 教程：https://www.runoob.com/vue2/vuejs-ajax-axios.html
+
+    2-1. options 配置参数如下
+    var options = {
+        // · 自定义参数
+        debug: false, // 是否启用调试功能(可选)，默认false。false时接口有问题将显示“友好提示信息”，true时接口有问题将显示“直接提示信息”
+        vue: null, // vue实例化对象，用于弹窗(可选)。如不传则为null，表示默认使用alert弹窗。
+
+        // · 原生参数，即 Axios API 里的“请求配置项”，控件里默认只写出部分，您可根据需要进行添加
+        // 即将被发送的自定义请求头。即发送给后台的数据格式，不同的数据格式后台接收方法也不同。
+        // GET 请求时，默认使用的是“查询格式的字符串”，前端即使指定“JSON格式的字符串”也不起作用，请知悉！
+        // headers: { "Content-Type": "application/x-www-form-urlencoded" },// 查询格式的字符串格。eg. "?a=3&b=5"
+        headers: { "Content-Type": "application/json" }, // JSON格式字符串。eg. "{a:3, b:5}"
+        method: "get",  // 请求方法(可选)，默认 get
+        baseURL: "", // 自动加在url前面，除非url是一个绝对 URL(可选)。它可以通过设置一个 `baseURL` 便于为实例的方法传递相对 URL
+        url: "", // 用于请求的服务器地址
+        params: { // 请求方法为 "GET" 时与请求一起发送的 URL 参数
+
+        },
+        data: { // 请求方法为 "POST", "PUT" 和 "PATCH" 时请求主体被发送的数据
+            
+        },
+        timeout: 5000 // 指定请求超时的毫秒数(可选)，超时的话请求将被中断，默认设置为5秒。0 表示无超时时间。
+        // 其它参数见Axios官网
+        //..
+    };
+
+    2-2. config 配置项没有 url 和 method 两个参数(即使设置也不起作用)，其余参数和options完全一样。
+
+
+* --------------------------------
+    [3、控件使用示例]
+* --------------------------------
+    例1.
+    $axios(options).then(res => {
+        // 1.接口响应正常且执行成功时
+        // 只有以下情况才会跑到 then 里
+        // 如：接口执行成功，即eg. {return:"ok", data: "成功时数据"} 
+        console.log('res：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        this.leaderData = res.data;
+    }).catch(errs => {
+        // 2.接口响应错误或执行失败时
+        // 以下情况都会跑到 catch 里
+        // 如：网络断开、超时、服务器错误、接口地址错误等，或者接口执行失败 eg.{return:"error", data: "失败信息"}
+        console.log('errs：', errs);
+    });
+
+    例2.
+    $axios.post(url, data, config).then(res => {
+        console.log('res：', res);
+        var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        //..
+    }).catch(errs => {
+        //..
+    });
+
+    例3.
+    $axios.get(url, config).then(res => {
+        console.log('res：', res);
+        var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
+        //..
+    }).catch(errs => {
+        //..
+    });
+    
+    例4.
+    var p1 = $axios(options);
+    var p2 = $axios(options);
+    var p = [p1, p2];
+    $axios.all(p).then(values => {
+        // 这里取到的是N个接口返回值组成的数组。eg. [{return:"ok", data: []}, {return:"ok", data: []}]
+    }).catch(errs => {
+        // 只要有一个promise实例出现错误，就会跳到这里
+    });
+*/
+                </code>
+            </pre>
         </div><!--/.instruction-->
         <div class="info">
             <div class="info__caption caption">控件使用实例</div>
@@ -46,6 +143,7 @@
                 </div><!--/.info__content-->
                 <div class="info__code">
 <pre>
+    <code class="language-javascript">
     // 方法1，通过 method 指定请求方式
     $axios({
         debug: true,
@@ -79,6 +177,7 @@
     }).catch(errs => {
         console.log('errs1：', errs);
     });
+    </code>
 </pre>
                 </div><!--/.info__code-->
             </div><!--/.info__group-->
@@ -94,7 +193,8 @@
                 </div><!--/.info__content-->
                 <div class="info__code">
 <pre>
-     // 方法1，通过 method 指定请求方式
+    <code class="language-javascript">
+    // 方法1，通过 method 指定请求方式
     $axios({
         debug: true,
         headers: {'Content-Type': 'application/json'},
@@ -131,6 +231,7 @@
     }).catch(errs => {
         console.log('errs2：', errs);
     });
+    </code>
 </pre>
                 </div><!--/.info__code-->
             </div><!--/.info__group-->
@@ -161,6 +262,7 @@
                 </div><!--/.info__content-->
                 <div class="info__code">
 <pre>
+    <code class="language-javascript">
     var p = [getDataSchool(this), getDataStudent(this)];
     $axios.all(p).then(values => {
         console.log('values：', values); // 这里取到的是N个接口返回值组成的数组。eg. [{return:"ok", data: []}, {return:"ok", data: []}]
@@ -208,6 +310,7 @@
             }
         });
     }
+    </code>
 </pre>
                 </div><!--/.info__code-->
             </div><!--/.info__group-->
@@ -215,164 +318,19 @@
     </div><!--/#app-->
 
 
-    <script src="assets/lib/vue@2.6.14/vue.min.js"></script><!--Vue2库-->
-    <script src="assets/lib/axios/axios.min.js"></script><!--原生Axios库-->
-    <script src="assets/lib/element-ui@2.15.13/index.js"></script><!--ELmentUI库-->
-    <script src="assets/lib/mock/mock-min.js"></script><!--Mock模拟数据-->
-    <script src="assets/neatui/js/neatui-axios.js"></script><!--Axios自定义封装控件-->
-    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
-	<!--<script type="text/javascript" href="highlight/highlight.min.js"></script>--><!--代码高亮-->
-    <script type="statement">
-
-        //========================================================================================================
-        // 一、控件使用说明
-        //========================================================================================================
-        /*————————————————————————————————————————————————————————————————————————————————————————————————
-        /**
-         * --------------------------------
-         * [1、控件调用方法]
-         * --------------------------------
-         【方法】
-           ① $axios(options).then().catch(); // 自定义请求方式，即通过配置options配置项的参数method='post'或'get'来设置请求方式
-           ② $axios.get(url, config).then().catch(); // GET 请求
-           ③ $axios.post(url, data, config).then().catch(); // POST 请求
-           ④ $axios.all([promise1, promise1, ...]).then().catch(); // 并发请求。 promise1, promise2等实例是一个 POST 或 GET 请求
-        【说明】
-            ①中指定 method='get' 时相当于②
-            ①中指定 method='post' 时相当于③
-
-        * --------------------------------
-        *  [2、配置项参数说明]
-        * --------------------------------
-            options 和 config 配置项除了新增几个自定义的参数，其余和原生配置项完全一样
-            具体参考
-            Axios 官网：http://www.axios-js.com/zh-cn/docs/
-            Vue2 Axios 教程：https://www.runoob.com/vue2/vuejs-ajax-axios.html
-
-            2-1. options 配置参数如下
-            var options = {
-                // · 自定义参数
-                debug: false, // 是否启用调试功能(可选)，默认false。false时接口有问题将显示“友好提示信息”，true时接口有问题将显示“直接提示信息”
-                vue: null, // vue实例化对象，用于弹窗(可选)。如不传则为null，表示默认使用alert弹窗。
-
-                // · 原生参数，即 Axios API 里的“请求配置项”，控件里默认只写出部分，您可根据需要进行添加
-                // 即将被发送的自定义请求头。即发送给后台的数据格式，不同的数据格式后台接收方法也不同。
-                // GET 请求时，默认使用的是“查询格式的字符串”，前端即使指定“JSON格式的字符串”也不起作用，请知悉！
-                // headers: { "Content-Type": "application/x-www-form-urlencoded" },// 查询格式的字符串格。eg. "?a=3&b=5"
-                headers: { "Content-Type": "application/json" }, // JSON格式字符串。eg. "{a:3, b:5}"
-                method: "get",  // 请求方法(可选)，默认 get
-                baseURL: "", // 自动加在url前面，除非url是一个绝对 URL(可选)。它可以通过设置一个 `baseURL` 便于为实例的方法传递相对 URL
-                url: "", // 用于请求的服务器地址
-                params: { // 请求方法为 "GET" 时与请求一起发送的 URL 参数
-
-                },
-                data: { // 请求方法为 "POST", "PUT" 和 "PATCH" 时请求主体被发送的数据
-                    
-                },
-                timeout: 5000 // 指定请求超时的毫秒数(可选)，超时的话请求将被中断，默认设置为5秒。0 表示无超时时间。
-                // 其它参数见Axios官网
-                //..
-            };
-
-            2-2. config 配置项没有 url 和 method 两个参数(即使设置也不起作用)，其余参数和options完全一样。
-      
-
-        * --------------------------------
-            [3、控件使用示例]
-        * --------------------------------
-            例1.
-            $axios(options).then(res => {
-                // 1.接口响应正常且执行成功时
-                // 只有以下情况才会跑到 then 里
-                // 如：接口执行成功，即eg. {return:"ok", data: "成功时数据"} 
-                console.log('res：', res); // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-                this.leaderData = res.data;
-            }).catch(errs => {
-                // 2.接口响应错误或执行失败时
-                // 以下情况都会跑到 catch 里
-                // 如：网络断开、超时、服务器错误、接口地址错误等，或者接口执行失败 eg.{return:"error", data: "失败信息"}
-                console.log('errs：', errs);
-            });
-
-            例2.
-            $axios.post(url, data, config).then(res => {
-                console.log('res：', res);
-                var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-                //..
-            }).catch(errs => {
-                //..
-            });
-
-            例3.
-            $axios.get(url, config).then(res => {
-                console.log('res：', res);
-                var result = res.data; // 这里取到的是接口返回的值。eg. {return:"ok", data: []}
-                //..
-            }).catch(errs => {
-                //..
-            });
-            
-            例4.
-            var p1 = $axios(options);
-            var p2 = $axios(options);
-            var p = [p1, p2];
-            $axios.all(p).then(values => {
-                // 这里取到的是N个接口返回值组成的数组。eg. [{return:"ok", data: []}, {return:"ok", data: []}]
-            }).catch(errs => {
-                // 只要有一个promise实例出现错误，就会跳到这里
-            });
-
-        ————————————————————————————————————————————————————————————————————————————————————————————————
-        */
-     </script>
-
-
-
-
-     <script>
-
-        //========================================================================================================
-        // 二、 代码配置
-        //========================================================================================================
+    <script src="assets/lib/vue@2.6.14/vue.min.js"></script> <!--Vue2库-->
+    <script src="assets/lib/axios/axios.min.js"></script> <!--原生Axios库-->
+    <script src="assets/lib/element-ui@2.15.13/index.js"></script> <!--ELmentUI库-->
+    <script src="assets/lib/mock/mock-min.js"></script> <!--Mock模拟数据-->
+    <script src="assets/neatui/js/neatui-axios.js"></script> <!--Axios自定义封装控件-->
+	<script src="highlight/11.3.1/highlight.min.js"></script> <!-- 代码高亮库 -->
+    <script>
         //————————————————————————————————————————————————
-        // 将“控件使用说明”的代码复制到某个DOM节点里，展示给用户看
-        var domList = document.getElementsByTagName("script");
-        // console.log('domList：', domList);
-        var domStatement;
-        for(var k = 0; k < domList.length; k++){
-            var item = domList[k];
-            var type = item.getAttribute('type');
-            if(type == 'statement'){
-                domStatement = item;
-                break;
-            }
-        }
-        var html = domStatement.innerHTML;
-        var child = document.getElementsByClassName('instruction')[0].childNodes;
-        // console.log('child：', child);
-        child[3].innerHTML = html;
-
-
-
-
-
-        //————————————————————————————————————————————————
-        //=====代码块高亮
-        hljs.initHighlightingOnLoad()
-        hljs.configure({
-            languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
-        });
-        document.querySelectorAll('pre').forEach((block) => {
-            hljs.highlightBlock(block);
-        });
-        
-
-      
-
+		hljs.highlightAll(); // 代码块高亮
 
 
         //========================================================================================================
-        // 三、控件调用实例
+        // 控件使用实例
         //========================================================================================================
         //————————————————————————————————————————————————
         // Vue中使用实例

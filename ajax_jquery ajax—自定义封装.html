@@ -15,7 +15,7 @@
     <title>AJAX | 自定义封装ajax</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
-    <link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
+    <link type="text/css" rel="stylesheet" href="highlight/11.3.1/styles/stackoverflow-light.min.css"> <!-- 代码高亮库 -->
 </head>
 <body>
     <div class="wrap">
@@ -24,7 +24,7 @@
         </section>
         <section class="panel-code">
             <pre>
-
+                <code class="language-javascript">
 
                 //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
                 //                                              一、引入自定义的ajax
@@ -486,17 +486,15 @@
                 }, 100)
 
 
-
-
+                </code>
             </pre>
         </section>
     </div><!--/.wrap-->
 
 
-    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script>
-    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
-	<!--<script type="text/javascript" href="highlight/highlight.min.js"></script>--><!--代码高亮-->
-    <script type="text/javascript">
+    <script src="assets/libs/jquery-1.8.3.min.js"></script>
+    <script src="highlight/11.3.1/highlight.min.js"></script> <!-- 代码高亮库 -->
+    <script>
         /*+----------------全局变量----------------+*/
         /*+----------------FUNCTION----------------+*/
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -507,15 +505,8 @@
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
             //+                                                     初始化事件
             //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-             //——————————————————————————————————————————
-            //=====代码块高亮
-            hljs.initHighlightingOnLoad()
-            hljs.configure({
-                languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
-            });
-            document.querySelectorAll('pre').forEach((block) => {
-                hljs.highlightBlock(block);
-            });
+            //————————————————————————————————————————————————
+		    hljs.highlightAll(); // 代码块高亮
 
         });
     </script>

@@ -16,18 +16,18 @@
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css">
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"><!--表单布局-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css"><!--日历控件-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-picker.css"><!--Picker选择器-->
-    <link type="text/css" rel="stylesheet" href="assets/font-awesome/css/font-awesome.css"><!--图标库-->
-    <link type="text/css" rel="stylesheet" href="highlight/styles/monokai-sublime.css"><!--代码高亮-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-form.css"> <!--表单布局-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-calendar.css"> <!--日历控件-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-picker.css"> <!--Picker选择器-->
+    <link type="text/css" rel="stylesheet" href="assets/font-awesome/css/font-awesome.css"> <!--图标库-->
+    <link type="text/css" rel="stylesheet" href="highlight/11.3.1/styles/monokai.min.css"> <!-- 代码高亮库 -->
     <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
-    <!--<script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>-->
+    <!--<script>if(top.location != self.location){ top.location = self.location; }</script>-->
     <!--[if lt IE 9]>
-        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/html5shiv/r29/html5.min.js"></script>
-        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
-        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/rem/1.3.4/js/rem.min.js"></script>
-        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/json2/20160511/json2.min.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/html5shiv/r29/html5.min.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/rem/1.3.4/js/rem.min.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/json2/20160511/json2.min.js"></script>
     <![endif]-->
 </head>
 <body>
@@ -61,46 +61,48 @@
                 <div class="code__title">代码结构</div>
                 <div class="code__doc">
 <pre>
-    [总布局]
-    ne-form> eform-order + eform-caption + eform-content + eform-button
-   
-    [各部分]
-    eform-order > 序号
-    eform-caption > 文字内容
-    eform-content > eform-row > erow-column > item-box > item-l + item-r + item-cell.absolute.has-cell-btn[data-type="must"][data-type="tip"][data-type="cross"]
-    eform-content > eform-row > item-r.block > item-box > label + input || textarea + item-cell[data-type="must"]
 
-    eform-button > button
+    <code class="language-javascript">
+        [总布局]
+            ne-form> eform-order + eform-caption + eform-content + eform-button
     
-    
-    [item-r 的几咱组合]
-    item-r>input
-    item-r>input+em.r-unit{右侧单位}
-    item-r>input+em.r-unit.has-cell-cross{右侧单位} （右侧有输入框打叉图标）
-    item-r>input+em.r-unit.r-tel>a[class="hover"][href="tel:电话号码"] (电话号码)
+        [各部分]
+            eform-order > 序号
+            eform-caption > 文字内容
+            eform-content > eform-row > erow-column > item-box > item-l + item-r + item-cell.absolute.has-cell-btn[data-type="must"][data-type="tip"][data-type="cross"]
+            eform-content > eform-row > item-r.block > item-box > label + input || textarea + item-cell[data-type="must"]
 
-    [item-cell 的几种组合]
-    item-cell.absolute
-    item-cell[data-type="cross"]{输入框配套的打叉图标,用于清空输入框}
-    item-cell>button{右侧按钮}
-    item-cell[data-type="must"]{必填项红色星号*}
-    item-cell[data-type="tip"]{右侧提示文字}
-    [其中]
-    · erow-column, item-box 可选
-    
-    [class属性值]
-    ne-form的class属性值：.theme-popular.has-border.dotted.has-icon-left.has-must-left.has-must-aline
-    eform-button的class属性值：child-w-100.child-no-border 
+            eform-button > button
+            
+        
+        [item-r 的几咱组合]
+            item-r>input
+            item-r>input+em.r-unit{右侧单位}
+            item-r>input+em.r-unit.has-cell-cross{右侧单位} （右侧有输入框打叉图标）
+            item-r>input+em.r-unit.r-tel>a[class="hover"][href="tel:电话号码"] (电话号码)
 
-    [class说明]
-    ·   .theme-popular 表示输入框无边框的流行样式
-        .has-border 表示有边框, .dotted 表示边框为虚线， 
-        .has-icon-left 表示图标居于文字左侧,  
-        .has-must-aline 表示星号必填要对齐(可以让“部分行有星号，部分行无星号时”输入框统一对齐)
-        .has-must-left 表示星号必填居于文字左侧
-        .child-w-100 子元素宽度100%
-        .child-no-border 子元素无边框
+        [item-cell 的几种组合]
+            item-cell.absolute
+            item-cell[data-type="cross"]{输入框配套的打叉图标,用于清空输入框}
+            item-cell>button{右侧按钮}
+            item-cell[data-type="must"]{必填项红色星号*}
+            item-cell[data-type="tip"]{右侧提示文字}
+        [其中]
+            · erow-column, item-box 可选
+        
+        [class属性值]
+            ne-form的class属性值：.theme-popular.has-border.dotted.has-icon-left.has-must-left.has-must-aline
+            eform-button的class属性值：child-w-100.child-no-border 
 
+        [class说明]
+            .theme-popular 表示输入框无边框的流行样式
+            .has-border 表示有边框, .dotted 表示边框为虚线， 
+            .has-icon-left 表示图标居于文字左侧,  
+            .has-must-aline 表示星号必填要对齐(可以让“部分行有星号，部分行无星号时”输入框统一对齐)
+            .has-must-left 表示星号必填居于文字左侧
+            .child-w-100 子元素宽度100%
+            .child-no-border 子元素无边框
+    </code>
 </pre>
                 </div>
             </section>
@@ -249,33 +251,16 @@
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
-    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script>
-    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-form.js"></script><!--表单布局-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-calendar.js"></script><!--日历控件-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-picker.js"></script><!--Picker选择器-->
-    <script src="http://apps.bdimg.com/libs/highlight.js/9.1.0/highlight.min.js"></script><!--代码高亮-->
-	<!--<script type="text/javascript" href="highlight/highlight.min.js"></script>--><!--代码高亮-->
-    <script type="text/javascript">
-        /*+----------------全局变量----------------+*/
-        /*+----------------FUNCTION----------------+*/
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        $(function(){
+    <script src="assets/libs/jquery-1.8.3.min.js"></script>
+    <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
+    <script src="assets/neatui/js/neatui-form.js"></script> <!--表单布局-->
+    <script src="assets/neatui/js/neatui-calendar.js"></script> <!--日历控件-->
+    <script src="assets/neatui/js/neatui-picker.js"></script> <!--Picker选择器-->
+    <script src="highlight/11.3.1/highlight.min.js"></script> <!-- 代码高亮库 -->
+    <script>
 
-            //——————————————————————————————————————————
-            //=====代码块高亮
-            hljs.initHighlightingOnLoad()
-            hljs.configure({
-                languages: ['javascript', 'java', 'python', 'css', 'php', 'c#']
-            });
-            document.querySelectorAll('pre').forEach((block) => {
-                hljs.highlightBlock(block);
-            });
-
-            
-        }); //$(function(){});
+        //————————————————————————————————————————————————
+		hljs.highlightAll(); // 代码块高亮
 
     </script>
 </body>
