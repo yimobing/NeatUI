@@ -1812,7 +1812,7 @@
          * @param {HTMLElement} o HTML节点元素
          * @returns {Object} 返回margin和padding的参数对象
          */
-        _getElementMarginPaddingBorder: function (o) {
+         _getElementMarginPaddingBorder: function (o) {
             var style = utils.getElementStyle(o);
             var mt = parseFloat(style.marginTop.toString().replace(/px/g, '')),
                 mb = parseFloat(style.marginBottom.toString().replace(/px/g, '')),
@@ -1839,6 +1839,7 @@
             if (isNaN(bb)) bb = 0;
             if (isNaN(bl)) bl = 0;
             if (isNaN(br)) br = 0;
+
             return {
                 marginTop: mt,
                 marginBottom: mb,
@@ -1855,8 +1856,9 @@
                 // 汇总1
                 marginHorizontal: ml + mr, // 水平方向上的margin值
                 marginVertical: mt + mb, // 垂直方向上的margin值
-                paddingVertical: pl + pr, // 水平方向上的padding值
-                paddingHorizontal: pt + pb, // 垂直方向上的padding值
+                paddingHorizontal: pl + pr, // 水平方向上的padding值
+                paddingVertical: pt + pb, // 垂直方向上的padding值
+                
                 // 汇总2
                 borderHorizontal: bt + bb,  // 水平方向上的border值
                 borderVertical: bl + br // 垂直方向上的border值   
