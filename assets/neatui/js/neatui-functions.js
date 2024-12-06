@@ -123,6 +123,63 @@ if(!Array.prototype.forEach){
 };
 
 
+/**
+ * ie10- 兼容 classlist
+ */ 
+ if (document.body.classList == null && Element) {
+    var wjClassList = {
+        el: null,
+        names: [],
+        getClass: function () {
+            var cNames = this.el.className;
+            this.names = cNames ? cNames.trim().split(/\s+/) : [];
+        },
+        genClass: function () {
+            this.el.className = this.names.join(" ");
+        },
+        add: function (cName) {
+            var i = this.contains(cName);
+            if (i === false) {
+                this.names.push(cName);
+                this.genClass();
+            }
+        },
+        remove: function (cName) {
+            var i = this.contains(cName);
+            if (typeof i == "number") {
+                this.names[i] = "";
+                this.genClass();
+            }
+        },
+        toggle: function (cName) {
+            var i = this.contains(cName);
+            if (i === false) {
+                this.add(cName);
+            } else {
+                this.remove(cName);
+            }
+        },
+        contains: function (cName) {
+            this.getClass();
+
+            var i, len = this.names.length;
+            for (i = 0; i < len; i++) {
+                if (this.names[i] == cName) {
+                    return i; // 如果存在，返回索引
+                }
+            }
+            return false;
+        },
+    };
+
+    // 在不支持classList的浏览器中, 在Element的原型中写入此方法
+    Object.defineProperty(Element.prototype, 'classList', {
+        get: function () {
+            wjClassList.el = this;
+            return wjClassList;
+        }
+    });
+};
 
 
 /**
@@ -1130,8 +1187,32 @@ var utilities = {
         }
         return o.childNodes;
     },
-    
 
+
+
+    /**
+     * 原生js查找特定类名的子孙节点(包含孙子节点) (兼容ie6+)
+     * @param {HTML Element} o 当前节点
+     * @param {String} 要找的子孙节点的样式名.eg. 'aaa'
+     * @returns {Array} 返回找到的子孙节点组成的数组。空数组表示没找到
+     */
+    getChildrenElement: function (o, className) {
+        var result = [];
+        function search(node) {
+            if (Array.from(node.classList).includes(className)) {
+                result.push(node);
+            }
+            var child = node.children;
+            Array.prototype.forEach.call(child, function(element) {
+                search(element);
+            });
+        }
+        search(o);
+        return result;
+    },
+
+
+     
     /**
      * 原生js获取第一个子节点 (兼容ie6+)
      * 注：已排除文本、空格，换行符
