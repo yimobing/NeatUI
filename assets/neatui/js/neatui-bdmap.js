@@ -2101,8 +2101,8 @@
                 // console.log('w：', w, '\nh：', h);
                 var styles = utils.getElementStyle(fatherNode);
                 var pdLeft = parseFloat(styles.paddingLeft);
-                isNaN(pdLeft) ? 0 : pdLeft;
-                var left = - ((w - pdLeft) / 2),
+                var pl = isNaN(pdLeft) ? 0 : pdLeft;
+                var left = - ((w - pl) / 2),
                     top = - (h + parseFloat(me.settings.markers.markOptions.image.size) / 2);
                 fatherNode.style.setProperty('top', top + 'px');
                 fatherNode.style.setProperty('left', left + 'px');

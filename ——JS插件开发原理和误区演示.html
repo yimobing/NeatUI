@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> 插件开发原理和误区演示 </title>
+    <link type="text/css" rel="stylesheet" href="highlight/11.3.1/styles/stackoverflow-light.min.css"> <!-- 代码高亮库 -->
+</head>
+<body>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        body{ width: 98%; margin: 25px auto; padding: 15px 20px; }
+        .caption{ margin-bottom: 25px; color: #333; font-size: 20px; font-weight: bold; }
+        .title{ margin-bottom: 15px; color: #666; font-size: 16px; font-style: italic;  }
+        .grid{ margin-bottom: 25px;  padding: 15px 20px; border: 3px solid lightskyblue; border-radius: 4px; }
+        .grid__caption{ margin-bottom: 10px; color: #1296db; font-size: 20px; font-weight: 550; }
+        .grid__title{ margin-bottom: 5px; color: #999; font-size: 16px; }
+        .grid__result{ margin-bottom: 5px; color: lightcoral; font-size: 16px; font-weight: 550; }
+        .grid__form{ padding: 8px 15px;  border: 1px solid #ddd; border-radius: 4px; }
+        .grid__form_row { margin-top: 5px; }
+        .grid__form_row:first-child{ margin-top: 0; }
+        .grid__code, .grid__example{ margin-top: 5px; }
+        .grid__code_title, .grid__example_title{ display: inline-block; background-color: #a5a0a0; padding: 4px 10px; color: #f9f8f8; font-size: 12px; }
+        input{ padding: 4px 8px; border: 1px solid #fafafa; border-radius: 4px; color: #fff; font-size: 14px; font-weight: 550; }
+    </style>
+
+    <div class="caption">演示一个插件在同一个页面多处调用，每次调用时插件根元素(绑定的元素)指向是否分别生效</div>
+    <div class="title">按F12在控制台查看插件根元素指向，并观看界面上N秒后输入框字体是否会分别变大。如果没有分别变大，表示插件根元素指向有问题，也就是插件写法有问题，此问题会导致插件只能调用一处，不能同时多处调用！</div>
+    <div class="grid">
+        <div class="grid__caption"> 第1种写法：函数直接传参，无法多处调用 (无法直接调用原型方法，会出错)</div>
+        <div class="grid__title"> 描述：直接调用插件对外暴露的函数，插件所有对外暴露的方法都写在该函数原型上 </div>
+        <div class="grid__result"> 结果：只有最后一次调用生效，即N秒后只有最后一个输入框文字会变大 </div>
+        <div class="grid__form">
+            <div class="grid__form_row"><input type="text" id="foreign" value="外国"></div>
+            <div class="grid__form_row"><input type="text" id="china" value="中国"></div>
+        </div>
+        <div class="grid__example">
+            <div class="grid__example_title">调用示例</div>
+            <div class="grid__example_detail" id="example_country"></div>
+        </div>
+        <div class="grid__code">
+            <div class="grid__code_title">插件源码</div>
+            <div class="grid__code_detail" id="code_country"></div>
+        </div>
+    </div><!--/.grid-->
+
+    <div class="grid">
+        <div class="grid__caption"> 第2种写法：函数先实例化，后调用原型方法传参，可多处调用，就是要使用 new 实例化麻烦 (和第1种写法代码几乎完全相同，区别之处只有插件的构造函数上) </div>
+        <div class="grid__title"> 描述：将插件对外暴露的函数进行实例化，插件所有对外暴露的方法都写在该函数原型上，拿着实例化对象可调用插件原型函数。 </div>
+        <div class="grid__result"> 结果：每次调用都会生效，即N秒后所有输入框的文字都会变大 </div>
+        <div class="grid__form">
+            <div class="grid__form_row"><input type="text" id="fujian" value="福建省"></div>
+            <div class="grid__form_row"><input type="text" id="guangdong" value="广东省"></div>
+        </div>
+        <div class="grid__example">
+            <div class="grid__example_title">调用示例</div>
+            <div class="grid__example_detail" id="example_province"></div>
+        </div>
+        <div class="grid__code">
+            <div class="grid__code_title">插件源码</div>
+            <div class="grid__code_detail" id="code_province"></div>
+        </div>
+    </div><!--/.grid-->
+
+    <div class="grid">
+        <div class="grid__caption"> 第3种写法：函数直接传参，可多处调用 (无法调用插件内私有函数的原型方法，要调用原型方法只能在插件对外暴露的函数上自定义一些原型方法) </div>
+        <div class="grid__title"> 描述：直接调用插件对外暴露的函数，插件只对外暴露一个函数，所有其它方法都写在插件内部一个私有函数的原型上 </div>
+        <div class="grid__result"> 结果：每次调用都会生效，即N秒后所有输入框文字都会变大 </div>
+        <div class="grid__form">
+            <div class="grid__form_row"><input type="text" id="fuzhou" value="福州"></div>
+            <div class="grid__form_row"><input type="text" id="guangzhou" value="广州"></div>
+        </div>
+        <div class="grid__example">
+            <div class="grid__example_title">调用示例</div>
+            <div class="grid__example_detail" id="example_city"></div>
+        </div>
+        <div class="grid__code">
+            <div class="grid__code_title">插件源码</div>
+            <div class="grid__code_detail" id="code_city"></div>
+        </div>
+    </div><!--/.grid-->
+
+
+    <div class="grid">
+        <div class="grid__caption"> 第4种写法：函数直接传参，可实例化后调用原型方法，可多处调用。即：想用函数时就直接用函数，想调用原型方法就先实例化一下！ </div>
+        <div class="grid__title"> 描述：直接调用插件对外暴露的函数和插件内部私有构造函数的原型方法 </div>
+        <div class="grid__result"> 结果：每次调用都会生效，即N秒后所有输入框文字都会变大 </div>
+        <div class="grid__form">
+            <div class="grid__form_row"><input type="text" id="fengze" value="丰泽区"></div>
+            <div class="grid__form_row"><input type="text" id="licheng" value="鲤城区"></div>
+            <div class="grid__form_row"><input type="text" id="luojiang" value="洛江区"></div>
+            <div class="grid__form_row"><input type="text" id="quangang" value="泉港区"></div>
+            <div class="grid__form_row"><input type="text" id="anxi" value="安溪县"></div>
+            <div class="grid__form_row"><input type="text" id="dehua" value="德化县"></div>
+        </div>
+        <div class="grid__example">
+            <div class="grid__example_title">调用示例</div>
+            <div class="grid__example_detail" id="example_county"></div>
+        </div>
+        <div class="grid__code">
+            <div class="grid__code_title">插件源码</div>
+            <div class="grid__code_detail" id="code_county"></div>
+        </div>
+    </div><!--/.grid-->
+
+
+   
+
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script src="highlight/11.3.1/highlight.min.js"></script> <!-- 代码高亮库 -->
+    <!-- ======================== 通用函数 ================-->
+    <script>
+
+        //————————————————————————————————————————————————
+        /**
+         * 原生JS合并对象
+         */
+        function combine(deep, defs, opts, method){
+            var options = {};
+            if(typeof deep === 'boolean') options = { isDeep: deep === false ? false : true };
+            else options =  { isDeep: false }
+            if (typeof method === 'object') options = method;
+
+            /**
+             * 子函数：合并对象
+             * @param {object} options 选项
+             * @returns {object} 返回合并后的对象
+             * [参考]：https://segmentfault.com/a/1190000011492291
+             * [示例]
+                // eg1.普通合并(浅合并)
+                var target = EXT().merge(data1, data2);
+                // eg2. isDeep 选择是否进行深合并。true 深度合并, false 浅合并，默认true
+                var target = EXT({ isDeep: false }).merge(data1, data2);
+                // eg3. includePrototype：选择是否要遍历对象的原型链，默认为 true
+                var target = EXT({ includePrototype: false }).merge(data1, data2);
+                // eg4. forEach：对每个合并项进行自定义处理
+                var target = EXT({
+                    forEach: function(target, name, sourceItem) {
+                        target[name] = sourceItem + 'hello， 自定义每个合并项';
+                        return target;
+                    }
+                }).merge(data1, data2);
+            */
+            function EXT(options) {
+                return new EXT.prototype.init(options);
+            };
+            EXT.fn = EXT.prototype = {
+                type: function(o) {
+                    return Object.prototype.toString.call(o).slice(8, -1).toLowerCase();
+                },
+                typeMap: {
+                    object: function() {
+                        return {};
+                    },
+                    array: function() {
+                        return [];
+                    }
+                },
+                // 默认配置项
+                defaults: {  
+                    isDeep: true, // 是否深合并，默认true
+                    isToEmptyObject: true, // 是否合并到空对象上
+                    includePrototype: true, // 是否遍历合并源对象原型链上的属性，默认true
+                    forEach: function(target, name, sourceItem) { // 用于对每个合并项进行自定义修正
+                        target[name] = sourceItem;
+                        return target;
+                    }
+                },
+                // 将配置项合并到默认配置项
+                init: function(options) {
+                    for (var name in options) {
+                        this.defaults[name] = options[name];
+                    }
+                    return this;
+                },
+                merge: function() {
+                    var self = this,
+                        _default = self.defaults,
+                        i = 1,
+                        length = arguments.length,
+                        // 根据是否全并到空对象{}中，决定对象采取”引用”还是“只赋值不引用”的方式
+                        // config = arguments[0] || {},
+                        config = _default.isToEmptyObject ? JSON.parse(JSON.stringify(arguments[0] || {})) : arguments[0] || {}, // 默认配置项
+                        source,
+                        configItem,
+                        sourceItem,
+                        tiType,
+                        siType,
+                        clone,
+                        name;
+                    // console.log('默认配置项defs：', defs, '\n默认配置项config：', config, '\n第1个参数：', arguments[0]);
+                    for (; i < length; i++) {
+                        // 判断源对象是否为空
+                        if ((source = arguments[i]) != null) {
+                            for (name in source) {
+                                var hasPro = source.hasOwnProperty(name);
+                                // 是否遍历源对象的原型链
+                                if (hasPro || _default.includePrototype) {
+                                    configItem = config[name];
+                                    sourceItem = source[name];
+                                    tiType = self.type(configItem);
+                                    siType = self.type(sourceItem);
+                                    // 防止出现回环
+                                    if (config === sourceItem) {
+                                        continue;
+                                    }
+                                    // 如果复制的是对象或者数组
+                                    if (_default.isDeep && sourceItem != null && self.typeMap[siType]) {
+                                        clone = configItem != null && tiType === siType ? configItem : self.typeMap[siType]();
+                                        // 递归
+                                        config[name] = self.merge(clone, sourceItem);
+                                    } else {
+                                        clone = hasPro ? config : config.__proto__;
+                                        // 处理每一个合并项
+                                        clone = _default.forEach.call(self, clone, name, sourceItem);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return config;
+                }
+            };
+            EXT.fn.init.prototype = EXT.fn;
+
+            // 调用并返回结果
+            return EXT(options).merge(defs, opts);
+        }
+    </script>
+
+
+    <!-- ======================== 第1种写法插件原代码及调用示例 ======================== -->
+    <script id="widget_country">
+        // 国家
+        ; (function (root, factory) {
+            if (typeof define === 'function' && define.amd) { // amd
+                define(factory);
+            } else if (typeof exports === 'object') { // umd
+                module.exports = factory();
+            } else {
+                window.MyCountry = factory();
+            }
+        })(this, function () {
+            
+            // 插件构造函数，即对外暴露的函数名，挂载到 window 对象上
+            function MyCountry(elem, options) {
+                // console.log('this：', this); // 这里的this指向window对象
+                // 因为 this指向window对象，故不能用 this.init()
+                MyCountry.prototype.init(elem, options); // !!! 直接调用函数原型的 init 方法。前台调用函数时会默认执行 init 方法
+            };
+            
+           // 插件构造函数原型模式定义实例方法，外部实例化函数后可直接调用
+            MyCountry.prototype = {
+                init: function (elem, opts) {
+                    // 初始化代码，比如添加事件监听器等
+                    this.defaults = {
+                        backgroundColor: 'lightcyan', // 背景色
+                        intervals: 2000 // 多少毫秒后文字变大
+                    }
+                    this.settings = combine(true, this.defaults, opts);
+                    var color = this.settings.backgroundColor;
+                    this.changeBackground(elem, color);
+                },
+        
+                /**
+                 * 改变元素背景色
+                 * @param {Selector} elem 元素
+                 * @param {String} color 背景色颜色值
+                 */
+                changeBackground: function (elem, color) {
+                    if (elem == '' || elem == null) {
+                        console.error('绑定的节点为空，请检查!');
+                        return;
+                    }
+                    this.element = document.querySelector(elem); // 根据选择器获取插件根元素(绑定的元素)
+                    this.element.style.backgroundColor = color;
+                    // 延时操作，可查看插件根元素(绑定的元素)是否分别生效，还是只是最后一个根元素生效
+                    var duration = typeof this.settings == 'undefined' ? 2000 : this.settings.intervals;
+                    setTimeout(() => {
+                        console.log('-------- 第1种写法 START --------');
+                        console.log('根元素-ID：', elem);
+                        console.log('根元素-节点：', this.element);
+                        this.element.style.fontSize = "24px"; // 让字体增大
+                    }, duration);
+                },
+            };
+        
+            // 返回对象
+            return MyCountry;
+        
+        });        
+    </script>
+
+    <script id="call_country">
+        //————————————————————————————————————————————————
+        // 直接调用函数, 只有最后一个输入框字体会变大
+        MyCountry('#foreign', {
+            backgroundColor: 'lightpink', // 背景色
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+
+        MyCountry('#china', {
+            backgroundColor: 'lightgreen', // 背景色
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+
+        // 可调用原型链上的方法
+        // MyCountry.prototype.changeBackground('#china', 'orange');
+
+
+        // 下面这样可以，但有点奇怪
+        // 实例化插件内的韩素媛，所有输入框字体都会变大
+        // var province1 = new MyCountry('#foreign', {
+        //     backgroundColor: 'lightpink', // 背景色
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+        // province1.init('#foreign', {
+        //     backgroundColor: 'lightpink', // 背景色
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+
+        // var province2 = new MyCountry('#china', {
+        //     backgroundColor: 'lightgreen', // 背景色
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+        // province2.init('#china', {
+        //     backgroundColor: 'lightgreen', // 背景色
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+    </script>
+
+
+    <!-- ======================== 第2种写法插件原代码及调用示例 ======================== -->
+    <script id="widget_province">
+        // 省份
+        ; (function (root, factory) {
+            if (typeof define === 'function' && define.amd) { // amd
+                define(factory);
+            } else if (typeof exports === 'object') { // umd
+                module.exports = factory();
+            } else {
+                window.MyProvince = factory();
+            }
+        })(this, function () {
+
+            // 插件构造函数，即对外暴露的函数名，挂载到 window 对象上
+            function MyProvince() {
+                // console.log('this：', this); // 这里的this指向函数本身
+            };
+            
+            // 插件构造函数原型模式定义实例方法，外部实例化函数后可直接调用
+            MyProvince.prototype = {
+                init: function (elem, opts) {
+                    // 初始化代码，比如添加事件监听器等
+                    this.defaults = {
+                        backgroundColor: 'lightcyan', // 背景色
+                        intervals: 2000 // 多少毫秒后文字变大
+                    }
+                    this.settings = combine(true, this.defaults, opts);
+                    var color = this.settings.backgroundColor;
+                    this.changeBackground(elem, color);
+                },
+
+                /**
+                 * 改变元素背景色
+                 * @param {Selector} elem 元素
+                 * @param {String} color 背景色颜色值
+                 */
+                changeBackground: function (elem, color) {
+                    if (elem == '' || elem == null) {
+                        console.error('绑定的节点为空，请检查!');
+                        return;
+                    }
+                    this.element = document.querySelector(elem); // 根据选择器获取插件根元素(绑定的元素)
+                    this.element.style.backgroundColor = color;
+                    // 延时操作，可查看插件根元素(绑定的元素)是否分别生效，还是只是最后一个根元素生效
+                    var duration = typeof this.settings == 'undefined' ? 2000 : this.settings.intervals;
+                    setTimeout(() => {
+                        console.log('-------- 第2种写法 START --------');
+                        console.log('根元素-ID：', elem);
+                        console.log('根元素-节点：', this.element);
+                        this.element.style.fontSize = "24px"; // 让字体增大
+                    }, duration);
+                },
+            };
+            
+            // 返回对象
+            return MyProvince;
+        }); 
+    </script>
+
+    <script id="call_province">
+        //————————————————————————————————————————————————
+        // 以实例对象方式调用插件内暴露的函数
+        var province1 = new MyProvince();
+        province1.init('#fujian', {
+            backgroundColor: 'lightpink', // 背景色
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+
+        var province2 = new MyProvince();
+        province2.init('#guangdong', {
+            backgroundColor: 'lightgreen', // 背景色
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+    </script>
+
+
+    <!-- ======================== 第3种写法插件原代码及调用示例 ======================== -->
+    <script id="widget_city">
+        // 城市
+        ; (function (root, factory) {
+            if (typeof define === 'function' && define.amd) { // amd
+                define(factory);
+            } else if (typeof exports === 'object') { // umd
+                module.exports = factory();
+            } else {
+                window.MyCity = factory();
+            }
+        })(this, function () {
+
+            // 插件构造函数，即对外暴露的函数名，挂载到 window 对象上
+            function MyCity(elem, options) {
+                // console.log('this：', this); // 这里的this指向window对象
+                return new MyPlugin(elem, options);
+            };
+            
+            
+            // 定义一个新的构造函数(私有函数)
+            var MyPlugin = function (elem, opts) {
+                this.init(elem, opts);
+            };
+
+            
+            // 新的构造函数原型模式定义实例方法，仅内部调用(私有的)
+            MyPlugin.prototype = {
+                init: function (elem, opts) {
+                    // 初始化代码，比如添加事件监听器等
+                    this.defaults = {
+                        backgroundColor: 'lightcyan', // 背景色
+                        intervals: 2000 // 多少毫秒后文字变大
+                    }
+                    this.settings = combine(true, this.defaults, opts);
+                    var color = this.settings.backgroundColor;
+                    this.changeBackground(elem, color);
+                },
+
+                /**
+                 * 改变元素背景色
+                 * @param {Selector} elem 元素
+                 * @param {String} color 背景色颜色值
+                 */
+                changeBackground: function (elem, color) {
+                    if (elem == '' || elem == null) {
+                        console.error('绑定的节点为空，请检查!');
+                        return;
+                    }
+                    this.element = document.querySelector(elem); // 根据选择器获取插件根元素(绑定的元素)
+                    this.element.style.backgroundColor = color;
+                    // 延时操作，可查看插件根元素(绑定的元素)是否分别生效，还是只是最后一个根元素生效
+                    var duration = typeof this.settings == 'undefined' ? 2000 : this.settings.intervals;
+                    setTimeout(() => {
+                        console.log('-------- 第3种写法 START --------');
+                        console.log('根元素-ID：', elem);
+                        console.log('根元素-节点：', this.element);
+                        this.element.style.fontSize = "24px"; // 让字体增大
+                    }, duration);
+                }
+            };
+            
+            // MyCity.prototype = MyPlugin.prototype; // 将私有函数的原型上的所有属性赋给对外暴露函数的原型上，让用户可通过实例化公有函数，拿着实例化对象进行调用
+            // 返回对象
+            return MyCity;
+
+        });    
+    </script>
+
+    <script id="call_city">
+        //————————————————————————————————————————————————
+        // 直接调用插件内的函数
+        // 这里 MyCity.prototype.init 是调用不到的,因为 init 是插件内部构造函数的方法，并未对外暴露
+        MyCity('#fuzhou', {
+            backgroundColor: 'lightpink', // 背景色
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+        MyCity('#guangzhou', {
+            backgroundColor: 'lightgreen', // 背景色
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+
+        //————————————————————————————————————————————————
+        // 下面这样也行，但有点怪，相当于参数传了两次
+        // 先实例化函数，再调用函数原型上的方法，但实例化函数和调用原型上的方法时都传递入了参数，有点怪。
+        // 我们的目标是实例化时可选择传参或不传参，调用原型上的方法才传入参数
+        // var city1 = new MyCity('#fuzhou', {
+        //     backgroundColor: 'lightpink', // 背景色
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+        // city1.init('#fuzhou', {
+        //     backgroundColor: 'lightyellow', // 背景色
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+        
+        // var city2 = new MyCity('#guangzhou', {
+        //     backgroundColor: 'lightgreen', // 背景色
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+        // city2.init('#guangzhou', {
+        //     backgroundColor: 'lightblue', // 背景色
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+
+    </script>
+
+
+    <!-- ======================== 第4种写法插件原代码及调用示例 ======================== -->
+    <script id="widget_county">
+        // 区县
+        ; (function (root, factory) {
+            if (typeof define === 'function' && define.amd) { // amd
+                define(factory);
+            } else if (typeof exports === 'object') { // umd
+                module.exports = factory();
+            } else {
+                window.MyCounty = factory();
+            }
+        })(this, function () {
+            // 插件构造函数，即对外暴露的函数名，挂载到 window 对象上
+            function MyCounty(element, config) {
+                if (arguments.length == 0) {
+                    return new MyPlugin();
+                }
+                else {
+                    var elem = element, opts = config;
+                    if (arguments.length == 1 && typeof element === 'object') {
+                        elem = '';
+                        opts = config;
+                    }
+                    return new MyPlugin(elem, opts);
+                }
+            }
+
+            // 定义一个新的构造函数(私有函数)
+            var MyPlugin = function(elem, options) {
+                // console.log('this：', this); // 这里的this指向函数本身
+                if (arguments.length != 0) {
+                    this.init(elem, options);
+                    // MyPlugin.prototype.init(elem, options); // 这样调用会导致多个实例化对象指向都是相同的
+                }
+            };
+            // 新的构造函数原型模式定义实例方法，仅内部调用(私有的)
+            MyPlugin.prototype = {
+                init: function (elem, opts) {
+                    // 初始化代码，比如添加事件监听器等
+                    this.defaults = {
+                        backgroundColor: 'lightcyan', // 背景色
+                        intervals: 2000 // 多少毫秒后文字变大
+                    }
+                    this.settings = combine(true, this.defaults, opts);
+                    var color = this.settings.backgroundColor;
+                    this.changeBackground(elem, color);
+                },
+                /**
+                * 改变元素背景色
+                * @param {Selector} elem 元素
+                * @param {String} color 背景色颜色值
+                */
+                changeBackground: function (elem, color) {
+                    if (elem == '' || elem == null) {
+                        console.error('绑定的节点为空，请检查!');
+                        return;
+                    }
+                    this.element = document.querySelector(elem); // 根据选择器获取插件根元素(绑定的元素)
+                    this.element.style.backgroundColor = color;
+                    // 延时操作，可查看插件根元素(绑定的元素)是否分别生效，还是只是最后一个根元素生效
+                    var duration = typeof this.settings == 'undefined' ? 2000 : this.settings.intervals;
+                    setTimeout(() => {
+                        console.log('-------- 第4种写法 START --------');
+                        console.log('根元素-ID：', elem);
+                        console.log('根元素-节点：', this.element);
+                        this.element.style.fontSize = "24px"; // 让字体增大
+                    }, duration);
+                }
+            };
+            
+            // 返回对象
+            return MyCounty;
+        });
+    </script>
+
+    <script id="call_county">
+        //————————————————————————
+        // 调用方式1：直接调用函数
+        // 丰泽区、鲤城区
+        MyCounty('#fengze', {
+            backgroundColor: 'tomato',
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+        MyCounty('#licheng', {
+            backgroundColor: 'palevioletred',
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+
+        //————————————————————————
+        // 调用方式2：先实例化函数，拿着实例化对象调用原型上的方法
+        // 洛江区、泉港区
+        var bds1 = new MyCounty();
+        var bds2 = new MyCounty();
+        bds1.init('#luojiang', {
+            backgroundColor: 'rebeccapurple', // 背景色
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+        bds2.init('#quangang', {
+            backgroundColor: 'mediumpurple',
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+        // 安溪县、德化县
+        var bds3 = new MyCounty();
+        var bds4 = new MyCounty();
+        bds3.changeBackground('#anxi', 'limegreen');
+        bds4.changeBackground('#dehua', 'mediumseagreen');
+    </script>
+
+
+
+
+    <!-- ======================== 界面上显示插件实现的代码 ======================== -->
+    <script>
+        //————————————————————————————————————————————————
+		hljs.highlightAll(); // 代码块高亮
+
+        //————————————————————————————————————————————————
+        // 将代码显示在界面上
+        // 第1种写法调用示例和插件源码
+        document.getElementById('code_country').innerHTML = [
+            '<pre>',
+                '<code class="language-javascript">',
+                    document.querySelector('#widget_country').innerHTML,
+                '</code>',
+            '</pre>'
+        ].join('\r\n');
+        document.getElementById('example_country').innerHTML = [
+            '<pre>',
+                '<code class="language-javascript">',
+                    document.querySelector('#call_country').innerHTML,
+                '</code>',
+            '</pre>'
+        ].join('\r\n');
+
+        // 第2种写法调用示例和插件源码
+        document.getElementById('code_province').innerHTML = [
+            '<pre>',
+                '<code class="language-javascript">',
+                    document.querySelector('#widget_province').innerHTML,
+                '</code>',
+            '</pre>'
+        ].join('\r\n');
+        document.getElementById('example_province').innerHTML = [
+            '<pre>',
+                '<code class="language-javascript">',
+                    document.querySelector('#call_province').innerHTML,
+                '</code>',
+            '</pre>'
+        ].join('\r\n');
+        
+
+        // 第3种写法调用示例和插件源码
+        document.getElementById('code_city').innerHTML = [
+            '<pre>',
+                '<code class="language-javascript">',
+                    document.querySelector('#widget_city').innerHTML,
+                '</code>',
+            '</pre>'
+        ].join('\r\n');
+        document.getElementById('example_city').innerHTML = [
+            '<pre>',
+                '<code class="language-javascript">',
+                    document.querySelector('#call_city').innerHTML,
+                '</code>',
+            '</pre>'
+        ].join('\r\n');
+
+        // 第4种写法调用示例和插件源码
+        document.getElementById('code_county').innerHTML = [
+            '<pre>',
+                '<code class="language-javascript">',
+                    document.querySelector('#widget_county').innerHTML,
+                '</code>',
+            '</pre>'
+        ].join('\r\n');
+        document.getElementById('example_county').innerHTML = [
+            '<pre>',
+                '<code class="language-javascript">',
+                    document.querySelector('#call_county').innerHTML,
+                '</code>',
+            '</pre>'
+        ].join('\r\n');
+
+    </script>
+
+</body>
+</html>

@@ -73,8 +73,7 @@
     //================================================================
     // 构造函数
     //================================================================
-    function Widget(elem, options) {
-
+    function Widget() {
         // 1. 地图初始化参数(前台参数)
         this.defaults = {
             // 编程语言环境(可选)。注：不同环境下地图展示与交互可能有不同,故可能需要区分下。
@@ -84,6 +83,10 @@
             // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
             width: 'auto', // 宽(可选)，默认auto
             height: 'auto', // 高(可选)，默认auto
+            // 参数 add 20241205-1
+            minWidth: 250, // 最小高度(可选)，默认250
+            minHeight: 250, // 最小高度(可选)，默认250
+       
             autoResize: true, // 窗口变化时是否自动调整地图大小(可选)，默认true
             setSize: null, // 初始化时用函数设置大小(可选)，默认null。优先权大于参数width/height/autoResize
             onResize: null, // 窗口大小变化时用函数设置大小(可选)，默认null。优先权大于参数width/height/autoResize
@@ -221,8 +224,8 @@
             me.settings = utils.combine(true, settings, options || {}); // 全局赋值1
             me.$opts = { // 全局赋值2
                 $maper: null, // 地图实例化对象
-                $container: null, // 地图根节点容器ID
-                $nodeRoot: null, // 地图根节点DOM
+                $nodeContainer: null, // 地图容器节点
+                $nodeRoot: null, // 地图根节点
                 $zoom: null, // 地图缩放级别
                 $centerPoint: null, // 地图中心点地理坐标
                 $centerMarker: null, // 中心点图像标注实例
@@ -247,39 +250,68 @@
         createMap: function (elem) {
             var me = this;
             // if (me.settings.status) return;  // 只允许地图加载一次
-
             // 全局赋值1
             me.settings.loadTimes++;
             me.settings.status = true;
 
-            // · 地图根节点
-            var container = elem.toString().replace(/(\#|\.)/g, '');
-            var nodeRoot = document.getElementById(container); // 根节点
-            var nodeParent = nodeRoot.parentNode; // 父节点
+            // · 创建地图各种节点
+            // 创建地图容器节点
+            var o = elem.toString().replace(/(\#|\.)/g, '');
+            var nodeContainer = document.getElementById(o) != null ?
+                document.getElementById(o) :
+                (
+                    document.getElementsByClassName(o).length > 0 ? document.getElementsByClassName(o)[0] : null
+                );
+            if (nodeContainer == null) {
+                var tips = '地图绑定的节点' + elem + '不存在，请检查是否存在id="' + o + '"或class="' + o + '"的元素';
+                var errs = tips.toString().replace(/(<br>)/g, '\n');
+                utils.dialogs(tips);
+                console.error(errs);
+                return;
+            }
+            // 创建地图祖宗节点
+            var ancestorId = 'ne_bd_ancestor_' + utils.generateRandomChar();
+            var nodeAncestor = document.createElement('div');
+            nodeAncestor.className = 'ne__bd_ancestor';
+            nodeAncestor.id = ancestorId;
+            nodeContainer.appendChild(nodeAncestor);
+            // 创建地图根节点
+            var rootId = 'ne_bd_root_' + utils.generateRandomChar();
+            var nodeRoot = document.createElement('div');
+            nodeRoot.className = 'ne__bd_root';
+            nodeRoot.id = rootId;
+            nodeAncestor.appendChild(nodeRoot);
+            // 创建地图父节点
+            var nodeParent = nodeRoot.parentNode; // 地图父节点
             var nodeBody = document.getElementsByTagName('body'); // body节点
-            nodeRoot.classList.add('ne-bd-map-root');
+
             // · 设置地图大小 (高度一定设置,不然在服务器环境如.net地图可能不显示)
             var w = me.settings.width.toString().toLocaleLowerCase().replace(/\s+/g, ''),
                 h = me.settings.height.toString().toLocaleLowerCase().replace(/\s+/g, ''),
                 width = parseFloat(w.replace(/(px|%|vw|vh)/g, '')),
                 height = parseFloat(h.replace(/(px|%|vw|vh)/g, ''));
-            if (isNaN(width)) width = 0;
-            if (isNaN(height)) height = 0;
-            // console.log('w：', w, '\h：', h);
-            // console.log('width：', width, '\nheight：', height);
+            var minWidth = parseFloat(me.settings.minWidth.toString().toLocaleLowerCase().replace(/(\s+|px|%|vw|vh)/g, '')),
+                minHeight = parseFloat(me.settings.minHeight.toString().toLocaleLowerCase().replace(/(\s+|px|%|vw|vh)/g, ''));
+            if (isNaN(width)) width = 'auto';
+            if (isNaN(height)) height = 'auto';
+            if (isNaN(minWidth)) minWidth = me.defaults.minWidth;
+            if (isNaN(minHeight)) minHeight = me.defaults.minHeight;
+
             // 函数：设置地图大小
             var fnSetMapSize = function () {
                 var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
                     winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
-                    left = utils.getElementLeft(nodeParent),
-                    top = utils.getElementTop(nodeParent);
-                // console.log('视窗宽：', winW, '\n视窗高：', winH);
+                    selfLeft = utils.getElementLeft(nodeRoot),
+                    selfTop = utils.getElementTop(nodeRoot),
+                    fatLeft = utils.getElementLeft(nodeParent),
+                    fatTop = utils.getElementTop(nodeParent);
                 var bodyW = 0, bodyH = 0; // 内容大小
+                var panelW = winW, panelH = winH; // 地图面板大小
                 if (nodeBody != null && nodeBody.length > 0) {
                     bodyW = utils.getElementWidth(nodeBody[0]);
                     bodyH = utils.getElementHeight(nodeBody[0]);
-                    winW = winW > bodyW ? bodyW : winW;
-                    winH = winH > bodyH ? bodyH : winH;
+                    panelW = winW > bodyW ? bodyW : winW;
+                    panelH = winH > bodyH ? bodyH : winH;
                 }
                 // 纯数字时，eg. 800
                 // var numReg = /^([0-9]+)$/gim;
@@ -287,41 +319,62 @@
                 // if (numReg.test(height)) height += 'px';
                 // 百分数时转化换具体数值，eg. 80%
                 if (w.indexOf('%') >= 0) {
-                    width = parseFloat(width) / 100 * winW;
+                    width = parseFloat(width) / 100 * panelW;
                 }
                 if (h.indexOf('%') >= 0) {
-                    height = parseFloat(height) / 100 * winH;
+                    height = parseFloat(height) / 100 * panelH;
                 }
 
-                // 计算真实宽高
+                // 
                 /**
-                 * 公式：
-                    地图父节点高度 = winH - top - 地图父节点(垂直方向margin总和)
-                    地图容器高度 = 地图父节点高度 - 地图父节点(垂直方向padding总和) - 自身(垂直方向margin总和+padding总和)
+                 * 计算地图真实大小公式：
+                    地图父节点高度 = panelH - 地图父节点top - 地图父节点(垂直方向margin总和)
+                    // 地图实际高度 = 父节点高度 - 父节点(垂直方向padding总和) - 自身(垂直方向margin总和+padding总和)
+                    地图实际高度 = 父节点高度 - ( 父节点top - 自身top) - 自身(垂直marginBottom + 垂直方向 padding总和)
                  */
                 var selfMpbObj = helpers._getElementMarginPaddingBorder(nodeRoot),
                     fatMpbObj = helpers._getElementMarginPaddingBorder(nodeParent);
-                var fatW = winW,
-                    fatH = winH,
-                    realW = width,
-                    realH = height;
-                if (w.indexOf('auto') >= 0 || w === '') {
-                    fatW = winW - left - fatMpbObj["marginHorizontal"];
-                    realW = fatW - fatMpbObj["paddingHorizontal"] - (selfMpbObj["marginHorizontal"] + selfMpbObj["paddingHorizontal"]);
-                }
-                if (h.indexOf('auto') >= 0 || h === '') {
-                    fatH = winH - top - fatMpbObj["marginVertical"];
-                    realH = fatH - fatMpbObj["paddingVertical"] - (selfMpbObj["marginVertical"] + selfMpbObj["paddingVertical"]);
-                }
-                // if (realW == 0) realW = winW;
-                // if (realH == 0) realH = winH;
+                // var minusW = fatMpbObj["paddingHorizontal"] + (selfMpbObj["marginHorizontal"] + selfMpbObj["paddingHorizontal"]),
+                //     minusH = fatMpbObj["paddingVertical"] + (selfMpbObj["marginVertical"] + selfMpbObj["paddingVertical"]);
+                var minusW = (selfLeft - fatLeft) + (selfMpbObj["marginLeft"] + selfMpbObj["paddingHorizontal"]),
+                    minusH = (selfTop - fatTop) + (selfMpbObj["marginBottom"] + selfMpbObj["paddingVertical"]);
+                if (minusW < 0) minusW = 0;
+                if (minusH < 0) minusH = 0;
 
+                // 计算地图大小
+                // var fatW = panelW, fatH = panelH,
+                // var realW = width, realH = height;
+                var fatW = 0, fatH = 0;
+                var realW = 0, realH = 0;
+                var isAutoSize = (w.indexOf('auto') >= 0 || w === '') || (h.indexOf('auto') >= 0 || h === '') ? true : false;
+                if (isAutoSize) { // 自动宽高时=>根据父节点计算地图尺寸
+                    fatW = panelW - fatLeft - fatMpbObj["marginHorizontal"];
+                    realW = fatW - minusW;
+                    fatH = panelH - fatTop - fatMpbObj["marginVertical"];
+                    realH = fatH - minusH;
+                }
+                else { // 指定宽高时=>根据地图大小计算父节点尺寸
+                    realW = width;
+                    fatW = realW + minusW;
+                    realH = height;
+                    fatH = realH + minusH;
+                }
+                // 地图小于最小尺寸时
+                if (realW < minWidth || realH < minHeight) {
+                    realW = minWidth;
+                    fatW = realW + minusW;
+                    realH = minHeight;
+                    fatH = realH + minusH;
+                }
                 // console.log('------------------------');
-                // console.log('body宽：', bodyW, '\nbody高：', bodyH);
-                // console.log('视窗调整后宽：', winW, '\n视窗调整后高：', winH);
-                // console.log('Left：', left, '\nTop：', top);
-                // console.log('地图宽：', realW, '\n地图高：', realH);
-                // console.log('父节点宽：', fatW, '\n父节点高：', fatH);
+                // console.log('视窗宽：', winW, ', 高：', winH);
+                // console.log('body宽：', bodyW, ', 高：', bodyH);
+                // console.log('面板宽：', panelW, ', 高：', panelH);
+                // console.log('自身Left：', selfLeft, ', Top：', selfTop);
+                // console.log('父节点Left：', fatLeft, ', Top：', fatTop);
+                // console.log('父节点宽：', fatW, ', 高：', fatH);
+                // console.log('减去的宽：', minusW, ', 高：', minusH);
+                // console.log('地图宽：', realW, ', 高：', realH);
                 // console.log('------------------------');
 
                 // 设置地图容器大小
@@ -374,7 +427,7 @@
                 return;
             }
             var platOptions = me.settings.draft.platOptions;
-            var maper = new BMap.Map(container, platOptions);
+            var maper = new BMap.Map(rootId, platOptions);
             // 第2步 设置中心点坐标
             var centerPoint = new BMap.Point(centerLng, centerLat);
             // 第3步 地图初始化同时设置地图展示级别
@@ -385,10 +438,20 @@
 
             // 全局赋值2
             me.$opts.$maper = maper; // 地图实例化对象
-            me.$opts.$container = elem; // 地图容器ID
-            me.$opts.$nodeRoot = nodeRoot; // 地图根节点DOM
+            me.$opts.$nodeContainer = nodeContainer; // 地图容器节点
+            me.$opts.$nodeRoot = nodeRoot; // 地图根节点
             me.$opts.$zoom = zoom; // 地图缩放级别
             me.$opts.$centerPoint = centerPoint; // 中心点地理坐标
+
+            // testing
+            me.$nodeContainer = nodeContainer;
+            console.log('nodeRoot：', nodeRoot);
+            setTimeout(() => {
+                console.log('container2-X：', elem);
+                console.log('container2-Y:', me.$opts.$nodeContainer);
+                console.log('container3-Z：', me.$nodeContainer);
+                console.log('--------------------');
+            }, 2000);
 
             // 第4步，开始与地图进行交互操作
             // 允许使用鼠标滚轮控制缩放
@@ -428,7 +491,7 @@
                     var hidContentNode = document.createElement('div');
                     hidContentNode.className = hidClassName; // 'bdmap__hide_content';
                     hidContentNode.style.setProperty('display', 'none');
-                    utils.insertAfter(hidContentNode, document.getElementById(elem));
+                    utils.insertAfter(hidContentNode, document.getElementById(rootId));
                     if (language == '.net') {
                         var refreshHtml = [
                             '<div class="bdmap__hide_refresh">',
@@ -524,15 +587,41 @@
             me.settings.overlays.push(oneMark); // 全局赋值
             me.settings.markerLays.push(oneMark);
 
+            var isUseCustomOverlay = true; // 创建文本标注对象时是否使用“自定义覆盖物”的方式来创建
+
             // 添加文本标注和信息窗
             if (title != '') {
                 // 添加文本标注
                 var lbClassName = 'ne__bd_label_bdLabel';
-                if (type == 'zhongxin') {
-                    lbClassName += ' ne__bd_label_bdCentralLabel';
+                var lbExtClassName = ''; // 其它样式名
+                if (type == 'zhongxin') { // 中心点时起一个新的样式名
+                    lbExtClassName = ' ne__bd_label_bdCentralLabel';
                 }
-                var lbText = '<div class="' + lbClassName + '">' + title + '</div>',
-                    lbOptions = {
+                // testing
+                var lbContent = '<div class="' + lbClassName + lbExtClassName + '">' + title + '</div>';
+                if (isUseCustomOverlay) {
+                    var label = customizeHelper.addLabelOverLay(me, markPoint, lbContent); // 自定义文本标注覆盖物
+                    label.name = 'wenben_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+                    if (type == 'zhongxin') {
+                        label.name2 = 'center_wenben_biaoji';
+                    }
+                    maper.addOverlay(label);
+                    // 更改文本标注节点样式及位置
+                    var childElems = utils.getChildrenElement(me.$opts.$nodeRoot, lbClassName);
+                    var lbNode = childElems.length > 0 ? childElems[0] : null;
+                    // console.log('子元素：', childElems);
+                    if (lbNode != null) {
+                        lbNode.parentNode.classList.add('ne__bd_label'); // 给父节点添加一个样式名
+                        // 全局赋值2
+                        if (type == 'zhongxin') {
+                            me.$opts.$centerLabelNode = lbNode;
+                        }
+                    }
+                    dotHelper._setLabelPositionAndSize(me, lbNode, isUseCustomOverlay); // 调整文本标注的大小和位置
+                }
+
+                else {
+                    var lbOptions = {
                         position: markPoint, // 指定文本标注所在的地理位置
                         // offset: new BMap.Size(30, -30) // 设置文本偏移量
                         width: 0,     // 宽度(220-730) 0 自动调整
@@ -543,37 +632,41 @@
                             height: -75
                         }
                     }
-                var label = new BMap.Label(lbText, lbOptions);
-                label.enableMassClear(); // 允许覆盖物被清除
-                label.name = 'wenben_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
-                if (type == 'zhongxin') {
-                    label.name2 = 'center_wenben_biaoji';
-                }
-                label.setStyle({
-                    padding: '10px',
-                    height: '30px',
-                    lineHeight: '30px',
-                    // backgroundColor: "#fff",
-                    borderRadius: '5px',
-                    borderColor: '#ccc',
-                    color: 'blue',
-                    fontSize: '16px',
-                    fontFamily: '微软雅黑'
-                });
-                oneMark.setLabel(label); // 绑定文本标注到点标记上
-                maper.addOverlay(label);
-                // 更改文本标注节点样式及位置
-                setTimeout(function () {
-                    var lbNode = document.getElementsByClassName(lbClassName); // 延时一下才能取非空节点
-                    if (lbNode != null && lbNode.length > 0) {
-                        lbNode[0].parentNode.classList.add('ne__bd_label'); // 给父节点添加一个样式名
-                        if (type == 'zhongxin') {
-                            // 全局赋值2
-                            me.$opts.$centerLabelNode = lbNode[0]; // 中心点文本标注节点
-                        }
+                    var label = new BMap.Label(lbContent, lbOptions); // 创建文本标注对象
+                    label.enableMassClear(); // 允许覆盖物被清除
+                    label.name = 'wenben_biaoji'; // 标记覆盖物类型,方便清除指定覆盖物时用
+                    if (type == 'zhongxin') {
+                        label.name2 = 'center_wenben_biaoji';
                     }
-                    dotHelper._setLabelPositionAndSize(me, lbNode); // 调整文本标注的大小和位置
-                }, 100);
+                    label.setStyle({ // 自定义文本标注样式
+                        padding: '10px',
+                        height: '30px',
+                        lineHeight: '30px',
+                        // backgroundColor: "#fff",
+                        borderRadius: '5px',
+                        borderColor: '#ccc',
+                        color: 'blue',
+                        fontSize: '16px',
+                        fontFamily: '微软雅黑'
+                    });
+                    oneMark.setLabel(label); // 绑定文本标注到点标记上
+                    maper.addOverlay(label);
+
+                    // 更改文本标注节点样式及位置
+                    setTimeout(function () { // 延时一下才能取到非空节点
+                        var lbCollection = document.getElementsByClassName(lbClassName);
+                        // console.log('文本标注集合：', lbCollection);
+                        for (var i = 0; i < lbCollection.length; i++) {
+                            var lbNode = lbCollection[i];
+                            lbNode.parentNode.classList.add('ne__bd_label'); // 给父节点添加一个样式名
+                            // 全局赋值2
+                            if (type == 'zhongxin') {
+                                me.$opts.$centerLabelNode = lbNode;
+                            }
+                            dotHelper._setLabelPositionAndSize(me, lbNode, isUseCustomOverlay); // 调整文本标注的大小和位置
+                        }
+                    }, 100);   
+                }
             
                 // 添加信息窗口
                 dotHelper._addInfoWindow(me, oneMark, markPoint, {
@@ -599,9 +692,11 @@
                     lat: latitude
                 });
             }
+
             // 拖拽事件
             if (dragable) {
                 oneMark.enableDragging();
+                
                 // 拖拽完成时会触发此事件
                 oneMark.addEventListener('dragend', function (e) {
                     if (finals.dragEndCallback) {
@@ -610,8 +705,9 @@
                             lat: e.point.lat
                         });
                     }
-                    var lbNode = document.getElementsByClassName(lbClassName); // 这里取到的可能是空节点
-                    dotHelper._setLabelPositionAndSize(me, lbNode); // 调整文本标注的大小和位置
+                    var childElems = utils.getChildrenElement(me.$opts.$nodeRoot, lbClassName);
+                    var lbNode = childElems.length > 0 ? childElems[0] : null; // 这里取到的可能是空节点
+                    dotHelper._setLabelPositionAndSize(me, lbNode, isUseCustomOverlay); // 调整文本标注的大小和位置
                 });
             }
 
@@ -1145,10 +1241,11 @@
         setCenterPointLabelTitle: function (ps_content) {
             var me = this;
             if (!helpers._examineIsInstantiate(me, arguments.callee.name)) return;
-            var node = document.getElementsByClassName('ne__bd_label_bdCentralLabel');
-            if (node != null && node.length > 0) {
+            var childElems = utils.getChildrenElement(me.$opts.$nodeRoot, 'ne__bd_label_bdCentralLabel');
+            var node = childElems.length > 0 ? childElems[0] : null;
+            if (node != null) {
                 // var reg = /.*<[^>]+>.*/; // 验证是有标签
-                node[0].innerHTML = ps_content;
+                node.innerHTML = ps_content;
                 dotHelper._setLabelPositionAndSize(me, node); // 调整文本标注的大小和位置
             }
         },
@@ -1839,6 +1936,7 @@
             if (isNaN(bb)) bb = 0;
             if (isNaN(bl)) bl = 0;
             if (isNaN(br)) br = 0;
+
             return {
                 marginTop: mt,
                 marginBottom: mb,
@@ -1855,8 +1953,9 @@
                 // 汇总1
                 marginHorizontal: ml + mr, // 水平方向上的margin值
                 marginVertical: mt + mb, // 垂直方向上的margin值
-                paddingVertical: pl + pr, // 水平方向上的padding值
-                paddingHorizontal: pt + pb, // 垂直方向上的padding值
+                paddingHorizontal: pl + pr, // 水平方向上的padding值
+                paddingVertical: pt + pb, // 垂直方向上的padding值
+                
                 // 汇总2
                 borderHorizontal: bt + bb,  // 水平方向上的border值
                 borderVertical: bl + br // 垂直方向上的border值   
@@ -1959,7 +2058,7 @@
             shuoDiv.className = mouseClassName;
             shuoDiv.innerHTML = shuoHtml;
             shuoDiv.setAttribute('style', styleStr);
-            utils.insertAfter(shuoDiv, document.getElementById(me.$opts.$container));
+            utils.insertAfter(shuoDiv, me.$opts.$nodeContainer);
             // 区域显示或隐藏
             var titleCollection = document.getElementsByClassName(titleClassName),
                 listCollection = document.getElementsByClassName(stepClassName);
@@ -2087,21 +2186,29 @@
         /**
          * 调整文本标注的大小和位置
          * @param {Object} 当前插件对象
-         * @param {HTMLCollection} node 当前点标记节点
+         * @param {HTML Element} node 当前点标记节点(空节点时可能为null)
+         * @param {Boolean} ps_is_custom_overlay 是否自定义的覆盖物(可选)，默认false
          */
-        _setLabelPositionAndSize: function (me, node) {
-            if (node != null && node.length > 0) {
-                var selfNode = node[0],
-                    fatherNode = node[0].parentNode;
+        _setLabelPositionAndSize: function (me, node, ps_is_custom_overlay) {
+            if (node != null) {
+                var isCustomed = typeof ps_is_custom_overlay == 'undefined' ? false : (ps_is_custom_overlay === true ? true : false);
+                var selfNode = node, fatherNode = node.parentNode;
                 // 自动调整文本标位置/设置父节点定位偏移量
                 var w = utils.getElementWidth(selfNode),
                     h = utils.getElementHeight(selfNode);
                 // console.log('w：', w, '\nh：', h);
                 var styles = utils.getElementStyle(fatherNode);
                 var pdLeft = parseFloat(styles.paddingLeft);
-                isNaN(pdLeft) ? 0 : pdLeft;
-                var left = - ((w - pdLeft) / 2),
-                    top = - (h + parseFloat(me.settings.markers.markOptions.image.size) / 2);
+                var pl = isNaN(pdLeft) ? 0 : pdLeft;
+                var left = 0, top = 0, topMinusNumc = 0;
+                if (isCustomed) {
+                    left = parseFloat(styles.left);
+                    top = parseFloat(styles.top);
+                    topMinusNumc = 15;
+                }
+                left -= ((w - pl) / 2);
+                top -= (h + parseFloat(me.settings.markers.markOptions.image.size) / 2) + topMinusNumc;
+               
                 fatherNode.style.setProperty('top', top + 'px');
                 fatherNode.style.setProperty('left', left + 'px');
             } 
@@ -2326,7 +2433,6 @@
             // drawManager.addEventListener('rectanglecomplete', function(e, overlay){})
             // 鼠标绘制完成后，派发总事件的接口
             drawManager.addEventListener('overlaycomplete', function (e) {
-                console.log('e.drawingMode:', e.drawingMode); // testing
                 var ply = e.overlay;
                 // console.log('plyxx：', ply);
                 // 绘制完成后回调获得覆盖物信息
@@ -2359,28 +2465,25 @@
                 }
                 // 改变多边形形状
                 e.overlay.addEventListener("lineupdate", function (event) { // 拖动边线进行编辑时监听事件
-                    console.log('lineupdate:', event);
+                    // console.log('event:', event);
                     me.settings.drawMode = e.drawingMode; // 全局赋值
                     polygonHelper._showLatLon(me, event.currentTarget.ha);
                 });
                 e.overlay.addEventListener("mouseover", function (event) { // 鼠标进入时的监听事件
-                    console.log('鼠标进入了e：', e)
+                    // console.log('鼠标进入了e：', e)
                     me.settings.drawMode = e.drawingMode; // 全局赋值
                 });
                 e.overlay.addEventListener("mouseout", function (event) { // 鼠标离开时的监听事件
-                    console.log('鼠标离开了e：', e)
+                    // console.log('鼠标离开了e：', e)
                     me.settings.drawMode = 'hander'; // 全局赋值
                 });
                 if (typeof e.overlay.getPath != 'undefined') { // 绘制完成时显示覆盖物点信息
                     polygonHelper._showLatLon(me, e.overlay.getPath());
                 }
-                var modes = drawManager.getDrawingMode();
-                console.log('modes：', modes);
-
+                
                 // 默认的画折线、多边形完成之后它会关闭地图绘制状态(鼠标会自动切换为一只手),但画点、折线、矩形完成后并不会关闭地图绘制状态
-                // 设置画点、折线、矩形时完成后关闭地图的绘制状态，使鼠标切换为一只手
                 if (['marker', 'circle', 'rectangle'].indexOf(e.drawingMode) >= 0) {
-                    drawManager.close();
+                    drawManager.close(); // 设置画点、折线、矩形时完成后关闭地图的绘制状态，使鼠标切换为一只手
                 }
                 // 全局赋值1
                 // me.settings.drawMode = ['polyline', 'polygon'].indexOf(e.drawingMode) >= 0 ? 'hander' : e.drawingMode; // 画折线、多边形完成之后它会自动切换到鼠标为一只手
@@ -2641,6 +2744,64 @@
 
 
 
+    //================================================================
+    //  百度地图自定义覆盖物功能 testing
+    //================================================================
+    var customizeHelper = {
+        /**
+         * 创建自定义的文本标注覆盖物
+         * @param {Object} me 当前插件对象
+         * @param {Point} geoPoint 地理坐标点
+         * @param {String} htmlContent 文本标注内容(支持HTML)
+         * @returns {Overlay} 返回文本标注覆盖物对象
+         */
+        addLabelOverLay: function (me, geoPoint, htmlContent) {
+            var maper = me.getMap();
+            function LabelLays(point, html) {
+                this._point = point;
+                this._html = html;
+                // LabelOverlay.prototype.initialize(); // 因为继承自BMap.Overlay，故无需手动初始化
+            }
+            LabelLays.prototype = new BMap.Overlay(); // 继承自BMap.Overlay
+            /**
+             * 用于实始化覆盖物。自定义覆盖物时需要实现此方法。
+             * 创建了一个div元素并将其作为标注添加到地图的标签层上
+             * 当调用maper.addOverlay时，API将自动调用此方法
+             */
+            LabelLays.prototype.initialize = function () {
+                var div = this._div = document.createElement('div');
+                div.style.position = 'absolute';
+                div.style.whiteSpace = 'nowrap';
+                div.innerHTML = this._html;
+                maper.getPanes().labelPane.appendChild(div); // 将html内容添加到地图中
+                this.updatePosition(); // 初始化时更新位置
+                return div; // 自定义覆盖物时需要将覆盖物对应的HTML元素返回
+            };
+            /**
+             * 更新标注的位置,使其始终在地图上的指定点上
+             */
+            LabelLays.prototype.updatePosition = function () {
+                var position = maper.pointToOverlayPixel(this._point); // 根据地理坐标获取对应的覆盖物容器的坐标，此方法用于自定义覆盖物
+                // console.log('position：', position);
+                this._div.style.left = position.x + 'px';
+                this._div.style.top = position.y + 'px';
+            };
+
+            /**
+             * 当地图状态发生变化时，由系统调用对覆盖物进行绘制。自定义覆盖物需要实现此方法。此方法会在 initialize 中自动调用，无需手动调用
+             */
+            LabelLays.prototype.draw = function () {
+               
+            };
+            
+            // return new LabelOverlay(geoPoint, htmlContent).updatePosition();
+            return new LabelLays(geoPoint, htmlContent);
+        }
+    };
+
+
+
+
 
 
     //================================================================
@@ -2662,6 +2823,14 @@
                 message = message.toString().replace(/\<br\>/g, '\n'); //<br>换行\n以实现换行
                 alert(message);
             }
+        },
+
+
+        /**
+         * 生成随机字符串
+         */
+        generateRandomChar:function(){
+            return Math.random().toString(36).substring(2);
         },
 
 
@@ -2892,6 +3061,27 @@
         },
 
 
+        /**
+         * 原生js查找特定类名的子孙节点(包含孙子节点) (兼容ie6+)
+         * @param {HTML Element} o 当前节点
+         * @param {String} 要找的子孙节点的样式名.eg. 'aaa'
+         * @returns {Array} 返回找到的子孙节点组成的数组。空数组表示没找到
+         */
+        getChildrenElement: function (o, className) {
+            var result = [];
+            function search(node) {
+                if (Array.from(node.classList).includes(className)) {
+                    result.push(node);
+                }
+                var child = node.children;
+                Array.prototype.forEach.call(child, function(element) {
+                    search(element);
+                });
+            }
+            search(o);
+            return result;
+        },
+
 
         /**
          * 原生js获取元素style属性
@@ -3030,7 +3220,21 @@
 //                              兼容IE
 //————————————————————————————————————————————————————————————————————————————————————
 (function () {
-    // classlist 兼容ie
+
+    /**
+     * ie9-兼容forEach
+     */
+    if(!Array.prototype.forEach){
+        Array.prototype.forEach = function(callback){
+            for (var i = 0; i < this.length; i++){
+                callback.apply(this, [this[i], i, this]);
+            }
+        }
+    };
+    
+    /**
+     * ie10- 兼容 classlist
+     */ 
     if (document.body.classList == null && Element) {
         var wjClassList = {
             el: null,
@@ -3084,7 +3288,81 @@
                 return wjClassList;
             }
         });
-    }
+    };
+
+
+    /**
+     * ie11-兼容Array.from
+     */
+    if (!Array.from) {
+        Array.from = (function () {
+            var toStr = Object.prototype.toString;
+            var isCallable = function (fn) {
+            return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+            };
+            var toInteger = function (value) {
+            var number = Number(value);
+            if (isNaN(number)) { return 0; }
+            if (number === 0 || !isFinite(number)) { return number; }
+            return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+            };
+            var maxSafeInteger = Math.pow(2, 53) - 1;
+            var toLength = function (value) {
+            var len = toInteger(value);
+            return Math.min(Math.max(len, 0), maxSafeInteger);
+            };
+            // The length property of the from method is 1.
+            return function from(arrayLike/*, mapFn, thisArg */) {
+            // 1. Let C be the this value.
+            var C = this;
+            // 2. Let items be ToObject(arrayLike).
+            var items = Object(arrayLike);
+            // 3. ReturnIfAbrupt(items).
+            if (arrayLike == null) {
+                throw new TypeError("Array.from requires an array-like object - not null or undefined");
+            }  
+            // 4. If mapfn is undefined, then let mapping be false.
+            var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+            var T;
+            if (typeof mapFn !== 'undefined') {
+                // 5. else
+                // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+                if (!isCallable(mapFn)) {
+                throw new TypeError('Array.from: when provided, the second argument must be a function');
+                }
+                // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+                if (arguments.length > 2) {
+                T = arguments[2];
+                }
+            }
+            // 10. Let lenValue be Get(items, "length").
+            // 11. Let len be ToLength(lenValue).
+            var len = toLength(items.length);
+            // 13. If IsConstructor(C) is true, then
+            // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
+            // 14. a. Else, Let A be ArrayCreate(len).
+            var A = isCallable(C) ? Object(new C(len)) : new Array(len);
+            // 16. Let k be 0.
+            var k = 0;
+            // 17. Repeat, while k < len… (also steps a - h)
+            var kValue;
+            while (k < len) {
+                kValue = items[k];
+                if (mapFn) {
+                A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+                } else {
+                A[k] = kValue;
+                }
+                k += 1;
+            }
+            // 18. Let putStatus be Put(A, "length", len, true).
+            A.length = len;
+            // 20. Return A.
+            return A;
+            };
+        }());
+    };
+
 })();
 
 

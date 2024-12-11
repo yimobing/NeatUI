@@ -5,6 +5,13 @@
 *  参考文档：
     JavaScript中new一个函数和直接调用函数的区别：https://www.cnblogs.com/vicky-li/p/8669549.html
     JavaScript中call()、apply()、bind() 的用法：https://www.runoob.com/w3cnote/js-call-apply-bind.html
+    JS中关于为什么调用构造函数要使用new的详细解读：https://blog.csdn.net/2301_79858914/article/details/141089368
+    Javascript函数执行、new机制以及继承: https://segmentfault.com/a/1190000011452776
+    JavaScript 如何不使用`new` ： https://cloud.tencent.com/developer/information/JavaScript%3A%E5%A5%BD%E7%9A%84%E9%83%A8%E5%88%86%20-%20%E5%A6%82%E4%BD%95%E4%B8%8D%E4%BD%BF%E7%94%A8%60new%60
+
+    插件的封装方式：https://www.cnblogs.com/joyco773/p/10769293.html
+
+    如何开发原生的 JavaScript 插件(知识点+写法)：https://www.cnblogs.com/cboyce/p/6029782.html
     JS封装——构建自己的jQuery插件： https://www.jianshu.com/p/7e6c25563685
     原生js插件的封装写法： https://www.cnblogs.com/wgb1234/articles/16640397.html
 *
@@ -205,7 +212,7 @@ $('#id').NeDate(opts); // opts是一个对象
      * @param {HTML DOM Node} elem 绑定的元素。eg. '#ID节点', '.类名节点'
      * @param {Ojbect} options 参数配置项
      */
-    function NDate(elem, options) {
+    function MyPlugin(elem, options) {
         // “构造函数模式”定义实例属性，这些属性是独立的，即改变某个实例的属性并不影响其它实例的属性
         // this.a = '';
         // this.b = '';
@@ -225,13 +232,12 @@ $('#id').NeDate(opts); // opts是一个对象
      * @param {Ojbect} options 参数配置项
      */
     function DateInitialize(me, elem, options) {
-        console.log('初始化');
         var defaults = {
             name: "穆桂英",
             sex: 18,
             age: "女"
         }
-        var settings = helpers.extend(true, {}, defaults, options || {}); // 合并对象
+        var settings = utils.extend(true, {}, defaults, options || {}); // 合并对象
         me.$defaults = defaults;
         me.$opts = settings; // 方便其它地方直接调用
         //...
@@ -245,7 +251,7 @@ $('#id').NeDate(opts); // opts是一个对象
      * @param {HTML DOM Node} o 绑定的元素。eg. '#ID节点', '.类名节点'
      * @param {Object} opts 参数配置项
      */
-    NDate.prototype.init = function (o, opts) {
+     MyPlugin.prototype.init = function (o, opts) {
         new DateInitialize(this, o, opts);
     };
 
@@ -257,31 +263,30 @@ $('#id').NeDate(opts); // opts是一个对象
      * @param {string} value2 参数2
      * @param {string} value3 参数3
      */
-    NDate.prototype.load = function (value1, value2, value3) {
+     MyPlugin.prototype.load = function (value1, value2, value3) {
         console.log('城市', value1, value2, value3);
         console.log('默认参数：', this.$defaults);
         console.log('配置参数：', this.$opts);
-        methods._getCity();
+        helpers._getCity();
     };
 
     //...
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //  二、内置函数库 methods
+    //  二、内置函数库
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    var methods = {
+    var helpers = {
         _getCity: function () {
             
         }
-    }; // END methods
-
+    }; 
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //  三、工具库，帮助对象 helpers
+    //  三、工具库
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    var helpers = {
+    var utils = {
         /**
         * 原生JS合并对象
         */
@@ -289,13 +294,13 @@ $('#id').NeDate(opts); // opts是一个对象
             // eg.
             return {}
         }
-    }; // END helpers
+    };
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //  四、返回对象
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    return NDate;
+    return MyPlugin;
 });
 
 
@@ -318,6 +323,8 @@ date.load('泉州市', '福建省份GDP第一的城市', '362600'); // 调用控
 
 //————————————————————————————————————————————————————————————————————————————————————
 // 封装实例2：控件对象既可当函数使用，又可当对象使用。
+//  !!! 弊病(缺点)说明： 这种方式 var aaa = createNewInstace() 中 aaa 相当于是一个实例化的对象(即实例化插件构造函数）
+// 如果同一个页面多处调用插件的话，插件绑定的根元素指向会指向最后一个绑定的元素。
 //————————————————————————————————————————————————————————————————————————————————————
 ;(function(root, factory){
     if (typeof define === 'function' && define.amd) { // amd
@@ -341,8 +348,6 @@ date.load('泉州市', '福建省份GDP第一的城市', '362600'); // 调用控
         }
     };
 
-
-
     //================================================================
     // 原型模式定义实例方法
     //================================================================
@@ -354,10 +359,6 @@ date.load('泉州市', '福建省份GDP第一的城市', '362600'); // 调用控
             this.settings = utils.extend(true, {}, this.defaults, options || {});
         }
     };
-
-
-
-
 
     //================================================================
     // 函数库，供内部调用
@@ -371,10 +372,6 @@ date.load('泉州市', '福建省份GDP第一的城市', '362600'); // 调用控
             
         }
     };
-
-
-
-
 
 
     //================================================================
