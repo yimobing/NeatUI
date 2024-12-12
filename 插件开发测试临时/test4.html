@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test4</title>
+</head>
+<body>
+    <style>
+        .wrap__row{ margin-bottom: 15px; }
+        input{ border: 1px solid #ddd; color: #fff; }
+    </style>
+    <div class="wrap">
+        <div class="grid__form_row"><input type="text" id="fengze" value="丰泽区"></div>
+        <div class="grid__form_row"><input type="text" id="licheng" value="鲤城区"></div>
+        <div class="grid__form_row"><input type="text" id="luojiang" value="洛江区"></div>
+        <div class="grid__form_row"><input type="text" id="quangang" value="泉港区"></div>
+        <div class="grid__form_row"><input type="text" id="anxi" value="安溪县"></div>
+        <div class="grid__form_row"><input type="text" id="dehua" value="德化县"></div>
+        <div class="grid__form_row"><input type="text" id="jinjiang" value="晋江市"></div>
+        <div class="grid__form_row"><input type="text" id="nanan" value="南安市"></div>
+    </div>
+
+    <script src="net-function.js"></script>
+    <script src="widget4.js"></script>
+    <script>
+
+        //————————————————————————
+        // 这里 MyPlugin.init 是调用不到的,结果为 undefined
+        // var plugin1 = createNewInstace();
+        // plugin1('#plugin1', {
+        //     backgroundColor: 'orange',
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+
+        // var plugin2 = createNewInstace();
+        // plugin2.init('#plugin2', {
+        //     backgroundColor: 'purple',
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+
+
+        //————————————————————————
+        // 调用方式1：直接调用函数
+        // 丰泽区、鲤城区
+        MyCounty('#fengze', {
+            backgroundColor: 'tomato',
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+        MyCounty('#licheng', {
+            backgroundColor: 'palevioletred',
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+
+        //————————————————————————
+        // 调用方式2：先实例化函数，拿着实例化对象调用原型上的方法
+        // 洛江区、泉港区
+        var bds1 = new MyCounty();
+        var bds2 = new MyCounty();
+        bds1.init('#luojiang', {
+            backgroundColor: 'rebeccapurple', // 背景色
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+        bds2.init('#quangang', {
+            backgroundColor: 'mediumpurple',
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+        // 安溪县、德化县
+        var bds3 = new MyCounty();
+        var bds4 = new MyCounty();
+        bds3.changeBackground('#anxi', 'limegreen');
+        bds4.changeBackground('#dehua', 'mediumseagreen');
+
+
+
+        plugins.init('#jinjiang', {
+            backgroundColor: 'orange',
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+        plugins.init('#nanan', {
+            backgroundColor: 'purple',
+            intervals: 2000 // 多少毫秒后文字变大
+        });
+
+
+
+        
+
+    </script>
+</body>
+</html>

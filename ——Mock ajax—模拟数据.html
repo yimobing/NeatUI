@@ -72,7 +72,16 @@
                         // timeout: "100-2000", // 延时m到n毫秒返回
                     });
 
-                    // 拦截ajax请求并返回数据
+                    // 不使用ajax时直接模拟数据
+                    var datasource = Mock.mock({
+                        "return": "ok",
+                        "user_xm": "@cname", // 姓名，随机2-3个字符串的姓名，eg. 张三, 李四, 王五六
+                        "user_sex|1": ["男", "女"], // 性别，随机男或女
+                        "user_age|7-50": 7, // 年龄，随机 7到50岁
+                    });
+                    console.log('模拟数据源为：', datasource);
+                    
+                    // 使用ajax时，拦截ajax请求并返回数据
                     Mock.mock("/jk/get_user_info.ashx?param=1", "post", function(v){
                         console.log('后台传过来的参数：', v);
                         // 关于 v.body 的类型为字符串或对象，分以下情况：
@@ -147,7 +156,16 @@
             // 格式2
             // timeout: "100-2000", // 延时m到n毫秒返回
         });
-        // 拦截ajax请求并返回数据
+        // 不使用ajax时直接模拟数据
+        var datasource = Mock.mock({
+            "return": "ok",
+            "user_xm": "@cname", // 姓名，随机2-3个字符串的姓名，eg. 张三, 李四, 王五六
+            "user_sex|1": ["男", "女"], // 性别，随机男或女
+            "user_age|7-50": 7, // 年龄，随机 7到50岁
+        });
+        console.log('模拟数据源为：', datasource);
+
+        // 使用ajax时，拦截ajax请求并返回数据
         Mock.mock("../../jk/pub_user_jk/get_user_info.ashx?param=1", "post", function(v){
             console.log('后台传过来的参数：', v);
             // 关于 v.body 的类型为字符串或对象，分以下情况：
