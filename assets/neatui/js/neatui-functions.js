@@ -1170,7 +1170,7 @@ var utilities = {
 
 
     /**
-     * 原生js获取子节点元素集合(不含孙子节点) (兼容ie6+)
+     * 原生js获取所有子节点或指定子节点元素集合(不含孙子节点) (兼容ie6+)
      * 注：已排除文本、空格，换行符
      * @param {HTML DOM} o 当前节点
      * @param {String} className 指定要找的子孙节点的样式名(可选) .eg. 'aaa'
@@ -1337,7 +1337,7 @@ var utilities = {
 
 
     /**
-     * 原生js获取后面所有的兄弟节点 (兼容ie6+)
+     * 原生js获取后面所有的兄弟节点或后面指定的某些兄弟节点 (兼容ie6+)
      * 注：已排除文本、空格，换行符
      * @param {HTML DOM} o 当前元素对象节点
      * @param {String} classNameOrTagName 要找的后面的兄弟节点样式名或标签名(可选)。eg. 'aaa', 'ul'
