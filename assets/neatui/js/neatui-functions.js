@@ -1354,7 +1354,6 @@ var utilities = {
                 index = i;
             }else{
                 if (index != -1 && i > index) {
-                    console.log('兄弟节点-child：', child); 
                     if (typeof classNameOrTagName != 'undefined') {
                         var className = Array.from(child.classList),
                             tagName = child.tagName.toString().toLocaleLowerCase();
