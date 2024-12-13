@@ -1173,9 +1173,10 @@ var utilities = {
      * 原生js获取子节点元素集合(不含孙子节点) (兼容ie6+)
      * 注：已排除文本、空格，换行符
      * @param {HTML DOM} o 当前节点
-     * @returns {NodeList || null} 返回子节点集合或null
+     * @param {String} className 指定要找的子孙节点的样式名(可选) .eg. 'aaa'
+     * @returns {NodeList || Array} 返回所有子节点集合(可能为null)，或者某个特定样式名的子节点集合(可能为空数组)
      */
-    getChildElement: function(o){
+     getChildElement: function(o, className){
         if(o == null) return null;
         var children = o.childNodes;
         for (var i = 0; i < children.length; i++) {
@@ -1185,7 +1186,16 @@ var utilities = {
                 o.removeChild(children[i]);
             }
         }
-        return o.childNodes;
+        var childNodeList = o.childNodes;
+        var result = [];
+        if (typeof className != 'undefined') {
+            childNodeList.forEach(function (node) {
+                if (Array.from(node.classList).includes(className)) {
+                    result.push(node);
+                }
+            })
+        }
+        return (typeof className == 'undefined') ? childNodeList : result;
     },
 
 
@@ -1193,7 +1203,7 @@ var utilities = {
     /**
      * 原生js查找特定类名的子孙节点(包含孙子节点) (兼容ie6+)
      * @param {HTML Element} o 当前节点
-     * @param {String} 要找的子孙节点的样式名.eg. 'aaa'
+     * @param {String} className 要找的子孙节点的样式名.eg. 'aaa'
      * @returns {Array} 返回找到的子孙节点组成的数组。空数组表示没找到
      */
     getChildrenElement: function (o, className) {
@@ -1330,9 +1340,10 @@ var utilities = {
      * 原生js获取后面所有的兄弟节点 (兼容ie6+)
      * 注：已排除文本、空格，换行符
      * @param {HTML DOM} o 当前元素对象节点
+     * @param {String} classNameOrTagName 要找的后面的兄弟节点样式名或标签名(可选)。eg. 'aaa', 'ul'
      * @returns {Array} 返回数组，数组中的元素为dom对象
      */
-    getAllNextElement: function(o){
+    getAllNextElement: function(o, classNameOrTagName){
         var arr = [];
         var parent = o.parentNode;
         if(parent == null) return [];
@@ -1342,7 +1353,19 @@ var utilities = {
             if(child == o){
                 index = i;
             }else{
-                if(index != -1 && i > index) arr.push(child);
+                if (index != -1 && i > index) {
+                    console.log('兄弟节点-child：', child); 
+                    if (typeof classNameOrTagName != 'undefined') {
+                        var className = Array.from(child.classList),
+                            tagName = child.tagName.toString().toLocaleLowerCase();
+                        if (className.includes(classNameOrTagName) || tagName == classNameOrTagName) {
+                            arr.push(child);
+                        }
+                    }
+                    else {
+                        arr.push(child);
+                    }
+                }
             }
         }
         return arr;
