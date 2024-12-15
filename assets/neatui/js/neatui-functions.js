@@ -1212,7 +1212,7 @@ var utilities = {
         var result = [];
         function search(node) {
             var classArr = Array.from(node.classList),
-                tagName = node.tagName.toString().toLocaleLowerCase();
+                tagname = node.tagName.toString().toLocaleLowerCase();
             if (classArr.includes(classOrTagName) || tagname == classOrTagName) {
                 result.push(node);
             }
