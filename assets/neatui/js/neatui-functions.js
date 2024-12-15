@@ -1169,14 +1169,15 @@ var utilities = {
     },
 
 
+
     /**
-     * 原生js获取所有子节点或指定子节点元素集合(不含孙子节点) (兼容ie6+)
+     * 原生js获取所有子节点或指定子节点元素集合(不含孙子节点) (兼容ie6+) 
      * 注：已排除文本、空格，换行符
      * @param {HTML DOM} o 当前节点
-     * @param {String} className 指定要找的子孙节点的样式名(可选) .eg. 'aaa'
+     * @param {String} classOrTagName 指定要找的子节点的样式名或标签名(可选) .eg. 'user', 'input'
      * @returns {NodeList || Array} 返回所有子节点集合(可能为null)，或者某个特定样式名的子节点集合(可能为空数组)
      */
-     getChildElement: function(o, className){
+    getChildElement: function(o, classOrTagName){
         if(o == null) return null;
         var children = o.childNodes;
         for (var i = 0; i < children.length; i++) {
@@ -1188,28 +1189,31 @@ var utilities = {
         }
         var childNodeList = o.childNodes;
         var result = [];
-        if (typeof className != 'undefined') {
+        if (typeof classOrTagName != 'undefined') {
             childNodeList.forEach(function (node) {
-                if (Array.from(node.classList).includes(className)) {
+                var classArr = Array.from(node.classList),
+                    tagname = node.tagName.toString().toLocaleLowerCase();
+                if (classArr.includes(classOrTagName) || tagname == classOrTagName) {
                     result.push(node);
                 }
             })
         }
-        return (typeof className == 'undefined') ? childNodeList : result;
+        return (typeof classOrTagName == 'undefined') ? childNodeList : result;
     },
-
 
 
     /**
      * 原生js查找特定类名的子孙节点(包含孙子节点) (兼容ie6+)
      * @param {HTML Element} o 当前节点
-     * @param {String} className 要找的子孙节点的样式名.eg. 'aaa'
+     * @param {String} classOrTagName 要找的子孙节点的样式名或标签名.eg. 'user', 'input'
      * @returns {Array} 返回找到的子孙节点组成的数组。空数组表示没找到
      */
-    getChildrenElement: function (o, className) {
+    getChildrenElement: function (o, classOrTagName) {
         var result = [];
         function search(node) {
-            if (Array.from(node.classList).includes(className)) {
+            var classArr = Array.from(node.classList),
+                tagName = node.tagName.toString().toLocaleLowerCase();
+            if (classArr.includes(classOrTagName) || tagname == classOrTagName) {
                 result.push(node);
             }
             var child = node.children;
@@ -1233,6 +1237,7 @@ var utilities = {
         if(o == null) return null;
         return o.children[0];
     },
+
 
 
     /**
@@ -1336,14 +1341,16 @@ var utilities = {
     },
 
 
+
+
     /**
-     * 原生js获取后面所有的兄弟节点或后面指定的某些兄弟节点 (兼容ie6+)
+     * 原生js获取后面所有的兄弟节点 (兼容ie6+)
      * 注：已排除文本、空格，换行符
      * @param {HTML DOM} o 当前元素对象节点
-     * @param {String} classNameOrTagName 要找的后面的兄弟节点样式名或标签名(可选)。eg. 'aaa', 'ul'
+     * @param {String} classOrTagName 要找的后面的兄弟节点样式名或标签名(可选)。eg. 'user', 'input'
      * @returns {Array} 返回数组，数组中的元素为dom对象
      */
-    getAllNextElement: function(o, classNameOrTagName){
+    getAllNextElement: function(o, classOrTagName){
         var arr = [];
         var parent = o.parentNode;
         if(parent == null) return [];
@@ -1354,10 +1361,10 @@ var utilities = {
                 index = i;
             }else{
                 if (index != -1 && i > index) {
-                    if (typeof classNameOrTagName != 'undefined') {
+                    if (typeof classOrTagName != 'undefined') {
                         var className = Array.from(child.classList),
                             tagName = child.tagName.toString().toLocaleLowerCase();
-                        if (className.includes(classNameOrTagName) || tagName == classNameOrTagName) {
+                        if (className.includes(classOrTagName) || tagName == classOrTagName) {
                             arr.push(child);
                         }
                     }
