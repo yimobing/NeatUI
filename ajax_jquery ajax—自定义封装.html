@@ -60,11 +60,12 @@
                     · heading     接口中文名称或描述(字符型)
                     · debug       是否启用调试模式(布尔型). true 是, false 否。本地环境 true, 但生产环境下建议 false
                     · clean: false, // 是否去掉请求地址中的某些后辍参数,默认false(可选)。注：目前正则还没写好,只能去掉链接地址中只有一个参数，多个参数无法只去掉某一个。
+                    // 使用 Mock 模拟数据时，项目正式上线时，只要将 clean 设为 true，控件就会自动去掉 url 请求地址中的某几个字符串，这几个字符串见参数 matches: ['param']
                     · matches: [], // 请求地址中的后辍参数组成的数组,默认空数组(可选). 仅当 clean=true时有效.eg. matches['param'], 则url为'aabb.com?param=1&add=2' 将变成 'aabb.com?add=2'
 
                     // JQuery Ajax 原生的参数说明
                     async: false, // 请求是否异步(可选)。原始的默认是true
-                    type: "GET", // 请求类型(可选)。值：get 或 post。注：有 data 参数时，若使用 Mock.js 模拟数据则要设置 type='POST'
+                    type: "POST", // 请求类型(可选)。值：get 或 post。注：有 data 参数时，若使用 Mock.js 模拟数据则要设置 type='POST'
                     dataType: "html", // 服务器响应的数据类型(可选)
                     cache: false, // 浏览器是否缓存被请求页面(可选)。原始的默认是true
                     timeout: 10000, // 请求超时时间, 默认10秒(可选)。单位毫秒
@@ -136,14 +137,15 @@
                 var json = {}
                 $.ajax({
                     async: false, // 取数方式. true 异步(默认), false 同步
-                    type: "GET",
+                    type: "POST",
                     dataType: "html",
                     cache: false,
                     url: "",
                     data: {
                         "action": "",
                         "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk%>"
+                        "sjk": "<%=s_sjk%>",
+                        "menu_bh": "<%=s_menu_bh%>",
                     },
                     success: function(res){
                         if(!res || $.isEmptyObject(res)) return;
@@ -176,16 +178,17 @@
                     heading: "获取XX数据",
                     debug: false,
                     clean: false,
-                    matches: [],
+                    matches: ['param'],
                     async: false, // 取数方式. true 异步, false 同步(默认)
-                    type: "GET",
+                    type: "POST",
                     dataType: "html",
                     cache: false,
                     url: "",
                     data: {
                         "action": "",
                         "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk%>"
+                        "sjk": "<%=s_sjk%>",
+                        "menu_bh": "<%=s_menu_bh%>",
                     },
                     success: function(res){
                         if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -223,16 +226,17 @@
                         heading: "保存XX数据",
                         debug: false,
                         clean: false,
-                        matches: [],
+                        matches: ['param'],
                         async: false, // 取数方式. true 异步, false 同步(默认)
-                        type: "GET",
+                        type: "POST",
                         dataType: "html",
                         cache: false,
                         url: "",
                         data: {
                             "action": "",
                             "user": "<%=s_user%>",
-                            "sjk": "<%=s_sjk%>"
+                            "sjk": "<%=s_sjk%>",
+                            "menu_bh": "<%=s_menu_bh%>",
                         },
                         success: function(res){
                             if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -292,16 +296,17 @@
                                     heading: "删除xx数据",
                                     debug: false,
                                     clean: false,
-                                    matches: [],
+                                    matches: ['param'],
                                     async: false, // 取数方式. true 异步, false 同步(默认)
-                                    type: "GET",
+                                    type: "POST",
                                     dataType: "html",
                                     cache: false,
                                     url: "",
                                     data: {
                                         "action": "",
                                         "user": "<%=s_user%>",
-                                        "sjk": "<%=s_sjk%>"
+                                        "sjk": "<%=s_sjk%>",
+                                        "menu_bh": "<%=s_menu_bh%>",
                                     },
                                     success: function(res){
                                         if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -365,16 +370,17 @@
                             heading: "保存XX数据",
                             debug: false,
                             clean: false,
-                            matches: [],
+                            matches: ['param'],
                             async: false, // 取数方式. true 异步, false 同步(默认)
-                            type: "GET",
+                            type: "POST",
                             dataType: "html",
                             cache: false,
                             url: "",
                             data: {
                                 "action": "",
                                 "user": "<%=s_user%>",
-                                "sjk": "<%=s_sjk%>"
+                                "sjk": "<%=s_sjk%>",
+                                "menu_bh": "<%=s_menu_bh%>",
                             },
                             success: function(res){
                                 if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
@@ -432,16 +438,17 @@
                                 heading: "保存XX数据",
                                 debug: false,
                                 clean: false,
-                                matches: [],
+                                matches: ['param'],
                                 async: false, // 取数方式. true 异步, false 同步(默认)
-                                type: "GET",
+                                type: "POST",
                                 dataType: "html",
                                 cache: false,
                                 url: "",
                                 data: {
                                     "action": "",
                                     "user": "<%=s_user%>",
-                                    "sjk": "<%=s_sjk%>"
+                                    "sjk": "<%=s_sjk%>",
+                                    "menu_bh": "<%=s_menu_bh%>",
                                 },
                                 success: function(res){
                                     if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; }
