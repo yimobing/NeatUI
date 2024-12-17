@@ -266,9 +266,10 @@
 	
 		var stateColumn = typeof configure["stateColumn"] == 'undefined' ? null : configure["stateColumn"],
 			isStateCol = stateColumn == null ? false : (typeof stateColumn["show"] == 'undefined' ? false : (stateColumn["show"] === true ? true : false)); //默认false
-			stateInitValue = stateColumn == null ? '' : (typeof stateColumn["value"] == 'undefined' ? '' : stateColumn["value"]),
+		stateInitValue = stateColumn == null ? '' : (typeof stateColumn["value"] == 'undefined' ? '' : stateColumn["value"]),
 			unsaveText = stateColumn == null ? '未保存' : (typeof stateColumn["unsaveText"] == 'undefined' ? '未保存' : stateColumn["unsaveText"]),
-			savedText = stateColumn == null ? '已保存' : (typeof stateColumn["savedText"] == 'undefined' ? '已保存' : stateColumn["savedText"]);
+			savedText = stateColumn == null ? '已保存' : (typeof stateColumn["savedText"] == 'undefined' ? '已保存' : stateColumn["savedText"]),
+			isStateVisible = stateColumn == null ? false : (stateColumn["visible"] === true ? true : false);
 
 		var isSorted = typeof configure["isSorted"] == 'undefined' ? true : (configure["isSorted"] === false ? false : true); //默认true
 		var serialColumnWidth = customize == null ? ceilW : parseFloat(customize["serialColumnWidth"]);
@@ -490,11 +491,12 @@
 					_headHTML += '<div class="' + _colClass + _stickyClass + '" data-title="' + title + '" data-field="' + field + '" data-type="' + type +　'" data-sort="' + orderway + '" data-must="' + must + '" data-unique="' + unique + '" data-digit="' + digit + '" data-sub="' + subtotal + '"' + _dataDefaultStr + _dataHideStr + _dataMeshDirecStr + _dataMeshNumcStr + ' style="width:' + width + 'px' + _displayStr + _colBgColorStr + _colColorStr + '"><span>' + title + '</span>' + _subtitleStr + _arrowStr + '</div>';
 					
 					//后面列
-					if(j == (columnsArr.length - 1)){
+					if (j == (columnsArr.length - 1)) {
+						var stateColumnStyle = isStateVisible ? '' : ' style="display: none"';
 						if(isStateCol) {
 							_arrowStr = _arrowSvg;
 							//_headHTML += '<div class="col-status" data-sort="' + orderway + '"><span>状态</span>' + _arrowStr + '</div>'; //状态列
-							_headHTML += '<div class="col-status" data-title="状态" data-field="status" data-sort="' + orderway + '" data-must="0" data-unique="0"><span>状态</span>' + '</div>'; //状态列
+							_headHTML += '<div class="col-status" data-title="状态" data-field="status" data-sort="' + orderway + '" data-must="0" data-unique="0"' + stateColumnStyle + '><span>状态</span>' + '</div>'; //状态列
 						}
 					}
 				}
@@ -695,9 +697,10 @@
 							'</div>';
 				
 				//后面列
-				if(j == (columnsArr.length - 1)){
+				if (j == (columnsArr.length - 1)) {
+					var stateColumnStyle = isStateVisible ? '' : ' style="display: none"';
 					if(isStateCol) {
-						_bodyHTML +='<div class="col-status">'+
+						_bodyHTML +='<div class="col-status"' + stateColumnStyle + '>'+
 									' <input type="text" class="i-t-state no-border" value="' + stateInitValue + '" disabled>'+
 									'</div>'; //状态列
 					}

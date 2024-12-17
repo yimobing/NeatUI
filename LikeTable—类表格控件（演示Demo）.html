@@ -136,10 +136,11 @@
             retainIllegalChar:false // 单元格内容是否保留非法字符(防止向数据库写入非法字符(可选). true 是, false 否(默认).  false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
         },
         stateColumn:{ // 状态(可选)
-            show:true, // 是否显示, 默认false.(可选)
-            value:'', // 初始值,默认空(可选)
-            unsaveText:'未保存', // 数据有更改时的文(可选)
-            savedText:'已保存' // 数据无更改时的文(可选)
+            show: true, // 是否创建状态列, 默认false(可选)。值为false时界面上没有状态列这个元素
+            visible: false, // 是否显示，默认false(可选)。仅当show=true时，设置本参数才有意义，换而言之，想要界面有创建状态列但又不显示出来，可设置 show为true 且 visible为false
+            value: '', // 初始值,默认空(可选)
+            unsaveText: '未保存', // 数据有更改时的文(可选)
+            savedText: '已保存' // 数据无更改时的文(可选)
         },
         columns:[
             /*{
