@@ -247,12 +247,13 @@
 			headHeight = typeof configure["headHeight"] == 'undefined' ? 'auto' : (configure["headHeight"] == 'auto' ? 'auto' : parseFloat(configure["headHeight"]) + 'px'),
 			headHasBgColor = typeof configure["headHasBgColor"] == 'undefined' ? true : (configure["headHasBgColor"] === false ? false : true), //默认true
 			headWrap = typeof configure["headWrap"] == 'undefined' ? false : (configure["headWrap"] === true ? true : false), //默认false. add 20200408-1
-			headSubWrap = typeof configure["headSubWrap"] == 'undefined' ? true: (configure["headSubWrap"] === false ? false: true), //默认true
+			headSubWrap = typeof configure["headSubWrap"] == 'undefined' ? true : (configure["headSubWrap"] === false ? false : true), //默认true
 			rowHeight = typeof configure["rowHeight"] == 'undefined' ? 'auto' : parseFloat(configure["rowHeight"]),
 			tbodyHeight = typeof configure["tbodyHeight"] == 'undefined' ? 'auto' : parseFloat(configure["tbodyHeight"]),
 			topHeight = typeof configure["topHeight"] == 'undefined' ? 'auto' : parseFloat(configure["topHeight"]),
 			botHeight = typeof configure["botHeight"] == 'undefined' ? 'auto' : parseFloat(configure["botHeight"]),
-			nestDepth = typeof configure["nestDepth"] == 'undefined' ? 1 : parseInt(configure["nestDepth"]);
+			nestDepth = typeof configure["nestDepth"] == 'undefined' ? 1 : parseInt(configure["nestDepth"]),
+			widthMinusTwoFold = typeof configure["widthMinusTwoFold"] == 'undefined' ? true : configure["widthMinusTwoFold"] === false ? false : true;
 
 		var customize = typeof configure["customize"] == 'undefined' ? null : configure["customize"];
 		var primaryKey = typeof configure["primaryKey"] == 'undefined' ? null : configure["primaryKey"];
@@ -789,7 +790,7 @@
 				}
 			}
 			
-
+			// testing
 			var offsetTop = $parent.offset().top, //距离屏幕顶部距离
 				offsetLeft = $parent.offset().left; //距离屏幕左侧距离
 			var isOverScreen = width < winW ? false : true; //表格宽是否超过屏幕宽			
@@ -801,7 +802,7 @@
 
 			var toperH = topHeight > offsetTop && topHeight < winH ? topHeight : offsetTop,
 				boterH = botHeight + $($.privateProperty.footerNode).outerHeight(true);
-			var	tableW = parseFloat(winW - 2 * parseFloat(minusW) - 5),
+			var	tableW = widthMinusTwoFold ? parseFloat(winW - 2 * parseFloat(minusW) - 5) : parseFloat(winW - parseFloat(minusW) - 5),
 				//tableH = parseFloat(winH - toperH - boterH - bodyPad - wrapPad - 5),
 				tableH = parseFloat(winH - toperH - boterH - 10),
 				captionH = parseFloat($parent.find('.table-caption').children().length == 0 ? 0 : $parent.find('.table-caption').outerHeight(true)),
@@ -819,7 +820,10 @@
 			else{ //多张表格时
 				contentH = tbodyHeight == 'auto' ? $parent.find('.list-content').outerHeight(true) : tbodyHeight;
 			}
-			//console.log('winH:',winH, 'toperH:', toperH, ' boterH:',boterH, ' titleH:',titleH, ' captionH:',captionH, ' tableH:',tableH, 'contentH:',contentH);
+			// console.log('$parent：', $parent);
+			// console.log('offsetLeft：', offsetLeft);
+			// console.log('winH:',winH, 'toperH:', toperH, ' boterH:',boterH, ' titleH:',titleH, ' captionH:',captionH, ' tableH:',tableH, 'contentH:',contentH);
+			// console.log('tableW：', tableW);
 
 			$parent.find('.table-content').css({'width':tableW});
 			$parent.find('.table-inner').css({'width':innerW}); 

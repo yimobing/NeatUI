@@ -112,6 +112,7 @@
         headHasBgColor:false, // 表头是否有背景(可选),默认true
         headWrap:true, // 表头是否换行（一般用于有副标题时才设为true),默认true.(可选)(该属性暂时无效,不起作用)
         headSubWrap:true, // 表头单位是否换行(不想换行时请确保列足够宽,否则依然会自动换行(可选).默认true
+        widthMinusTwoFold: true, // 表格宽度是否减去两倍，默认true(可选)。此参数仅当表格宽度异常时使用。默认表格是占满全屏，系统会自动减去两倍的offsetLeft值，故当表格左右两边无其它元素时设为true, 当表格左侧有其它元素时则要设置false，不然宽度会异常
         rowHeight:'auto', // 表身行高, auto 自动（默认）, 其它大于0的数字如：30 表示高30px.(可选)
         tbodyHeight:'auto', // 自定义表格内容高度. auto 自动(默认). 其它大于0的数字如：300 表示高300px.(可选)
         topHeight: 'auto', // $('.operate').outerHeight(true) + $('.search').outerHeight(true), // 表格以外上面部分高度(如header部分(可选). auto 自动(默认)，系统会自动计算表格距离顶部的距离; 其它大于0的数字如：150 表示高150px.
