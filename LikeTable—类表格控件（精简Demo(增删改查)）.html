@@ -100,6 +100,8 @@
 		var g_dyw_type_fz_mc = ''; //分组名称
 
 		//=====列表及分页
+		var $rootNode = $('.history'); // 列表根节点
+    	var $tableDom = ''; // 指定表格根节点(多张表格时必须指定,单张表格时可选). 请在创建表格的函数中进行赋值.
 		var PAGESIZE = 30; //每页几条记录
 		var g_setJson = { //表格列字段配置
 			headHeight:50, //表头高度. auto 自动(默认). 其它大于0的数字如：50 表示高50px. (可选)
@@ -257,6 +259,8 @@
 					extension: '.xls' //拓展名。 .xls(excel 2003)(默认), .xlsx (excel 2007,2010)
 				}
 			})
+
+			$tableDom = $rootNode.find('.ne-like-table'); // 全局赋值
 
 			if($rootNode.is(':visible')) $('.operation').show();
 			else $rootNode.hide();
@@ -662,17 +666,24 @@
 			/*+--------------------------------------------------------+*/
 			//=====新增按钮
 			$('#btn-add-one').on('click', function(){
-                var tableDom = $rootNode.find('.ne-like-table');
-                if(tableDom.length == 0){
+
+                if($tableDom == '' || $tableDom.length == 0){
+                	// 没有表格时添加一条纯空行记录
                     $rootNode.neuiLikeTable({
-                        pureRow: true,
+                        pureRow: true, // 是否创建一条空行记录,即表格一条记录也没有却要凭空新增一行(可选).值：true 是, false 否(默认). 将本参数值设为true, dataJson设为空对象{}或单行数据{name:"张三"}
                         setJson: g_setJson,
                         dataJson: {}
-                    })
+                    });
+                    $tableDom = $rootNode.find('.ne-like-table'); // 全局赋值值
                 }else{
-					neuiLikeTable.insertOneRow({});
+                	// 有表格时，新建一空行
+					neuiLikeTable.insertOneRow({}); // 新建一空行或非空行. source为数据源. source为空时(即''或{})则新建空行,非空时(如{name:"张三"})则新建非空行
+
 				}
-				neuiLikeTable.setSomeColumnCanWrite(["dyw_type_fz_bh"], 0); //指定第N行(索引值)中某些列(英文字段)为可写状态
+
+				// neuiLikeTable.giveValue2SomeColumn(0, ["字段1", "字段2"], [ 字段1的值, 字段2的值 ], $tableDom); // 给指定的某行某些列赋值。参数：第1个参数为行索引值，第2个参数为列字段组成的数组，第3个参数为列值组成的数组，第4个参数为表格根节点对象(可选)
+
+				neuiLikeTable.setSomeColumnCanWrite(["dyw_type_fz_bh"], 0); // 指定第N行(索引值)中某些列(英文字段)为可写状态
 			});
 			
 

@@ -85,6 +85,20 @@
         · var json = neuiLikeTable.getTableSelectedData($tableDom); // 获取表格选中行数据（“选择”一列有打钩的行组成的json数组）
         · var tips = neuiLikeTable.checkEmptyRow(0, $tableDom); // 校验第0行各个必填列的完整性. 要检验所有行时 0 改成 'all'
         · var tips = neuiLikeTable.checkRepeatRow($tableDom); // 校验重复行(即检验第Y列第M行与第N行是否一样). 一般先设置某一列的unique=true,才使用本函数进行校验
+
+
+        添加按钮时，表格节点可能为空，没能创建出来，故要使用下述方式
+        var tableDom = $rootNode.find('.ne-like-table');
+        if(tableDom.length == 0){
+            $rootNode.neuiLikeTable({
+                setJson: g_setJson,
+                dataJson: {},
+                pureRow: true // 是否创建一条空行记录,即表格一条记录也没有却要凭空新增一行(可选).值：true 是, false 否(默认). 将本参数值设为true, dataJson设为空对象{}或单行数据{name:"张三"}
+            })
+        }else{
+            neuiLikeTable.insertOneRow({});
+            // neuiLikeTable.addOneRow(tableDom); // 或$tableDom
+        }
     */
 
     /*+————————————————全局变量————————————————+*/
@@ -126,23 +140,23 @@
         isRowHeightEqual:false, // 每一行的行高是否相同，默认fals(可选). 值：true 是(每一行的行高相同，即取所有行中最高的那行作为每一行的行高), false 否(每一行的行高不同，会根据每一行的内容自动调整)
         isVerticalScrollBar:false, // 是否显示浏览器垂直滚动条,默认false(即：默认浏览器垂直滚动条overflow:hidden)(仅当nestDepth=1时有效)
         emptyDataTips:'抱歉，没有找到相应数据..', // 无数据时的提示文(可选)
-        primaryKey:{ // 主键列(可选)
-            field:['lsh_id','xh_self'],  // 可多个字段. eg. [':lsh_id1','lsh_id2']
-            show:true // 是否显示,默认false.(可选)
+        primaryKey: { // 主键列(可选)
+            field: [ "lsh_id", "xh_self"],  // 可多个字段. eg. ["字段1", "字段2"]
+            show: true // 是否显示,默认false.(可选)
         },
-        customize:{ // 自定义属(可选)
-            serialColumnWidth:50, // 序号列(可选),默认50
-            discoloration:true, // 是否隔行变(可选),默认false
-            retainIllegalChar:false // 单元格内容是否保留非法字符(防止向数据库写入非法字符(可选). true 是, false 否(默认).  false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
+        customize: { // 自定义属(可选)
+            serialColumnWidth: 50, // 序号列(可选),默认50
+            discoloration: true, // 是否隔行变(可选),默认false
+            retainIllegalChar: false // 单元格内容是否保留非法字符(防止向数据库写入非法字符(可选). true 是, false 否(默认).  false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
         },
-        stateColumn:{ // 状态(可选)
+        stateColumn: { // 状态(可选)
             show: true, // 是否创建状态列, 默认false(可选)。值为false时界面上没有状态列这个元素
             visible: false, // 是否显示，默认false(可选)。仅当show=true时，设置本参数才有意义，换而言之，想要界面有创建状态列但又不显示出来，可设置 show为true 且 visible为false
             value: '', // 初始值,默认空(可选)
             unsaveText: '未保存', // 数据有更改时的文(可选)
             savedText: '已保存' // 数据无更改时的文(可选)
         },
-        columns:[
+        columns: [
             /*{
                 // --------参数1：基本参数
                 title:'', // 标题
@@ -469,16 +483,23 @@
                     // bgColor:'#7b72e9',
                     theme:'warning',
                     callback:function(e1, e2){  // 新增一行按钮
-                        var tableDom = $rootNode.find('.ne-like-table');
-                        if(tableDom.length == 0){
+                        // var tableDom = $rootNode.find('.ne-like-table');
+                        if($tableDom == '' || $tableDom.length == 0){
+                            // 没有表格时添加一条纯空行记录
                             $rootNode.neuiLikeTable({
                                 setJson: g_setJson,
                                 dataJson: {},
                                 pureRow: true // 是否创建一条空行记录,即表格一条记录也没有却要凭空新增一行(可选).值：true 是, false 否(默认). 将本参数值设为true, dataJson设为空对象{}或单行数据{name:"张三"}
-                            })
+                            });
+                            $tableDom = $rootNode.find('.ne-like-table'); // 全局赋值值
                         }else{
-                            neuiLikeTable.addOneRow(tableDom); // 或$tableDom
+                            // 有表格时，新建一空行
+                            // neuiLikeTable.addOneRow($tableDom); 
+                            neuiLikeTable.insertOneRow({}); // 新建一空行或非空行. source为数据源. source为空时(即''或{})则新建空行,非空时(如{name:"张三"})则新建非空行
                         }
+
+                        // neuiLikeTable.giveValue2SomeColumn(0, ["字段1", "字段2"], [ 字段1的值, 字段2的值 ], $tableDom); // 给指定的某行某些列赋值。参数：第1个参数为行索引值，第2个参数为列字段组成的数组，第3个参数为列值组成的数组，第4个参数为表格根节点对象(可选)
+                        // neuiLikeTable.setSomeColumnCanWrite(["字段1"], 0); // 指定第N行(索引值)中某些列(英文字段)为可写状态
                     
                     }
                 },{
