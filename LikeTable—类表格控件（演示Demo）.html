@@ -155,9 +155,9 @@
             show: true, // 是否创建状态列, 默认false(可选)。值为false时界面上没有状态列这个元素
             visible: false, // 是否显示，默认false(可选)。仅当show=true时，设置本参数才有意义，换而言之，想要界面有创建状态列但又不显示出来，可设置 show为true 且 visible为false
             value: '', // 初始值,默认空(可选)
-            newRecordText: '新记录', // 新记录的标记文字，默认'新记录'(可选)
-            unsaveText: '未保存', // 数据有更改时的文字，默认'未保存'(可选)
-            savedText: '已保存' // 数据无更改时的文字，默认'已保存'(可选)
+            newRecordText: 'i', // 新记录的标记文字，默认'新记录'(可选)
+            unsaveText: 'u', // 数据有更改时的文字，默认'未保存'(可选)
+            savedText: 's' // 数据无更改时的文字，默认'已保存'(可选)
         },
         columns: [
             /*{
@@ -926,6 +926,11 @@
                 else{
                     neuiLikeTable.changeRowStatus(ls_row_index, 'saved', $tableDom); // 更改“状态列”文本
                     neuiLikeTable.setSomeColumnReadonly(['mj'], ls_row_index); // 指定第N行(索引值)中某些列(英文字段)为只读状态
+
+                    // neuiLikeTable.setSomeColumnReadonly(["字段名1"], ls_row_index); // 指定第N行(索引值)中某些列(英文字段)为只读状态
+                    // neuiLikeTable.giveValue2SomeColumn(ls_row_index, ["status"], ['s']); // 给第N行的某几列设置值。比如已保存标记为s
+                    // neuiLikeTable.changeRowStatus(ls_row_index, 's', $tableDom); // 更改“状态列”文本。比如已保存标记为s
+
                 }
             }
             neuiDialog.alert({
