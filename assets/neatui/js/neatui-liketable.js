@@ -1,10 +1,10 @@
 /**
 * [neuiLikeTable]
-* 类表格控件
+* 类表格控件，需jQuery 1.8.3 以下支持
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
-* Author:ChenMufeng
+* Author: ChenMufeng
 * Date: 2020.03.26
-* Update:2024.10.16
+* Update: 2024.12.21
 
 */
 (function($){
@@ -268,6 +268,7 @@
 			isStateCol = stateColumn == null ? false : (typeof stateColumn["show"] == 'undefined' ? false : (stateColumn["show"] === true ? true : false)); //默认false
 		stateInitValue = stateColumn == null ? '' : (typeof stateColumn["value"] == 'undefined' ? '' : stateColumn["value"]),
 			unsaveText = stateColumn == null ? '未保存' : (typeof stateColumn["unsaveText"] == 'undefined' ? '未保存' : stateColumn["unsaveText"]),
+			newRecordText = stateColumn == null ? '新记录' : (typeof stateColumn["newRecordText"] == 'undefined' ? '新记录' : (stateColumn["newRecordText"] == '' ? '新记录' :  stateColumn["newRecordText"])), // add 20241221-1
 			savedText = stateColumn == null ? '已保存' : (typeof stateColumn["savedText"] == 'undefined' ? '已保存' : stateColumn["savedText"]),
 			isStateVisible = stateColumn == null ? false : (stateColumn["visible"] === true ? true : false);
 
@@ -1137,7 +1138,7 @@
 				var isNoSaveData = false;
 				$parent.find('.list-one').each(function(){
 					var status = $(this).find('.i-t-state').val();
-					if(status == unsaveText) {
+					if(status == unsaveText || (newRecordText != '' && status == newRecordText)) {
 						isNoSaveData = true;
 						return false;
 					}
@@ -1314,6 +1315,7 @@
 		ps_obj.find('input:text:not(.no-border), textarea:not(.no-border)').bind('input propertychange', function(){ //兼容IE9-
 			var $this = $(this);
 			var $state = $this.parents('.list-one').find('.i-t-state');
+			var nowStateValue = $state.val();
 			//限制输入类型
 			var value = $this.val();
 			var colIndex = $this.parent().index();
@@ -1334,13 +1336,20 @@
 				value = limitation.onlyInterval(value);
 				$this.val(value);
 			}
-			//更改状态
+			//更改状态 edit 20241221-1
 			var nowValue = $this.val(); //新值
 			var oldValue = $this.attr('data-focus-value'); //旧值
-			if(nowValue != oldValue){
-				$state.addClass('red').val(unsaveText);
-			}else{
-				$state.removeClass('red').val(savedText);
+			// console.log('nowStateValue：', nowStateValue);
+			// console.log('newRecordText：', newRecordText);
+			if (nowStateValue != newRecordText) {
+				if (nowValue != oldValue) {
+					$state.addClass('red').val(unsaveText);
+				} else {
+					$state.removeClass('red').val(savedText);
+				}
+			}
+			else {
+				$state.addClass('red').val(newRecordText);
 			}
 		})
 	}
@@ -1517,15 +1526,16 @@
 		var _parent = ps_obj.find('.list-content');
 		var new_row_hao = _parent.children().length; //新行号
 		var dom = montage == 'before' ? _parent.children(':first-child') : _parent.children(':last-child');
-		dom.find('.cell-radio-group>div').each(function(k){ //重置radio单选
+		dom.find('.cell-radio-group>div').each(function (k) { //重置radio单选
 			var _radio = $('input:radio', this);
 			var name = _radio.attr('name').toString().replace(/[\d]/g, ''),
 				id = _radio.attr('id').toString().replace(/[\d]/g, '');
-			_radio.attr({'name': name + new_row_hao, 'id': id + new_row_hao});
+			_radio.attr({ 'name': name + new_row_hao, 'id': id + new_row_hao });
 			$('label', this).attr('for', id + new_row_hao);
-			if(k == 0) $(this).find('input:radio').removeAttr('checked'); //最后一个选中
+			if (k == 0) $(this).find('input:radio').removeAttr('checked'); //最后一个选中
 			else $(this).find('input:radio').attr('checked', true);
-		})
+		});
+		dom.find('.col-status > input').val(newRecordText); // add  20241221-1
 		_parent.children().each(function(i){ //循环每一列
 			var index = i + 1;
 			$(this).find('.col-order>span').text(index); //重置序号
@@ -1581,6 +1591,7 @@
 			if(k == 0) $(this).find('input:radio').removeAttr('checked'); //最后一个选中
 			else $(this).find('input:radio').attr('checked', true);
 		})
+		cloneDom.find('.col-status > input').val(newRecordText); // add  20241221-1
 		_parent.prepend(cloneDom); //克隆一列
 		_parent.children().each(function(i){ //循环每一列
 			var index = i + 1;

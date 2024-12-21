@@ -149,12 +149,15 @@
             discoloration: true, // 是否隔行变(可选),默认false
             retainIllegalChar: false // 单元格内容是否保留非法字符(防止向数据库写入非法字符(可选). true 是, false 否(默认).  false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
         },
+        // 
+        // 注：使用 neuiLikeTable.addOneRow()、neuiLikeTable.insertOneRow() 添加新行时，会默认把状态列的值赋值为参数的 stateColumn.newRecordText 的值
         stateColumn: { // 状态(可选)
             show: true, // 是否创建状态列, 默认false(可选)。值为false时界面上没有状态列这个元素
             visible: false, // 是否显示，默认false(可选)。仅当show=true时，设置本参数才有意义，换而言之，想要界面有创建状态列但又不显示出来，可设置 show为true 且 visible为false
             value: '', // 初始值,默认空(可选)
-            unsaveText: '未保存', // 数据有更改时的文(可选)
-            savedText: '已保存' // 数据无更改时的文(可选)
+            newRecordText: '新记录', // 新记录的标记文字，默认'新记录'(可选)
+            unsaveText: '未保存', // 数据有更改时的文字，默认'未保存'(可选)
+            savedText: '已保存' // 数据无更改时的文字，默认'已保存'(可选)
         },
         columns: [
             /*{
@@ -661,7 +664,7 @@
      * 全部保存按钮、批量保存按钮
      */
     function saveAll(){
-        var saveArr = neuiLikeTable.getTableListData();
+        var dataArr = neuiLikeTable.getTableListData();
         // console.log('所有行数据:', arr);
         // 校验完整性
         var tips = neuiLikeTable.checkEmptyRow('all', $tableDom); // 校验所有行
@@ -685,6 +688,15 @@
             })
             return;
         }
+        // 过滤数据，仅将新插入或未保存的数据提交后台
+        var newArr = [] 
+        dataArr.forEach(function(item){
+            if(item.status.value == 'u' || item.status.value == 'i'){
+                newArr.push(item);
+            }
+        });
+        // console.log('未保存的数据：', newArr);
+            
         // 开始执行
         neuiDialog.alert({
             animate: true,
@@ -692,7 +704,7 @@
             buttons: ['确定', '取消'],
             callBack: function(ret){
                 if(ret == 1){
-                    saveFunc(saveArr);
+                    saveFunc(newArr);
                 }
             }
         })
@@ -778,13 +790,18 @@
             for(var i = 0; i < ps_arr.data.length; i++){
                 var row = ps_arr.data[i];
                 var ls_row_index = row["row"] - 1; // 行索引值
+                // var ls_status = row["status"].value; // 已保存标记. i 新记录, u 有修改, s 已保存
+                // console.log('状态：', ls_status);
                 var ls_wz_bh = row["key"].value,
                     ls_lpmc = row["qydcb_mc"].value; // 系统楼盘名称
                 var oneArr = [ ls_wz_bh, ls_lpmc ];
                 // console.log('arr:', oneArr);
-
+                
+                // if(ls_status == 'i'){ // 新插入未保存的记录
                 if(ls_wz_bh == ''){ // 新插入未保存的记录
                     flag = 1;
+                    neuiLikeTable.deleteOneRow(ls_row_index - rowCount);
+                    rowCount++;
                 }else{
                     // 后台返回
                     /*
@@ -860,6 +877,8 @@
             for(var i = 0; i < ps_arr.data.length; i++){
                 var row = ps_arr.data[i];
                 var ls_row_index = row["row"] - 1; // 行索引值
+                // var ls_status = row["status"].value; // 已保存标记. i 新记录, u 有修改, s 已保存
+                // console.log('状态xx：', ls_status);
                 var ls_area = row["area"].value, 
                     ls_dizhi = row["dizhi"].value;
                 var oneArr = [ls_area, ls_dizhi];
@@ -1106,6 +1125,31 @@
         $('#btn-save-all').on('click', function(){
             saveAll();
         });
+
+
+
+        //——————————————————————————————————————————
+        // 表格：某某列下拉
+        // $(document).off('click', '.col-xx').on('click', '.col-xx', function(){
+        //     var $this = $(this);
+        //     var $input = $this.find('.i-t-xx-bh');
+        //     neuiDropdown({
+        //         caption: '选择aabb',
+        //         json: source,
+        //         format: ["bh", "value"],
+        //         beautifyScrollBar: false, // 是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式
+        //         callBack:function(e){
+        //             // console.log('单个下拉回调：', e);
+        //             $this.siblings().find('.i-t-cwdm').text(e.id);
+        //             // 重置保存标记为u
+        //             var ls_row_index = $this.parent().index(); // 行号索引值
+        //             var ls_state = $this.siblings().find('.i-t-state').val();
+        //             if(ls_state != 'i'){
+        //                 neuiLikeTable.giveValue2SomeColumn(ls_row_index, ["status"], ['u']); // 给第N行的某几列设置值。比如已保存标记为s
+        //             }
+        //         }
+        //     }, $input)
+        // });
 
 
 
