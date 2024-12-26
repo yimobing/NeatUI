@@ -1303,7 +1303,8 @@
 	 * 当单元格值发生变化时，状态栏的文本也变化
 	 * @param {object} ps_obj 表格根节点对象
 	 */
-	var onFocusInputFunc = function(ps_obj){
+	var onFocusInputFunc = function (ps_obj) {
+		// 输入框聚焦
 		ps_obj.on('focus','input:text:not(.no-border), textarea:not(.no-border)',function(){
 			var $this = $(this);
 			var $state = $this.parents('.list-one').find('.i-t-state');
@@ -1311,6 +1312,7 @@
 				$this.attr('data-focus-value', $this.val());
 			}
 		})
+		// 输入框时
 		//ps_obj.on('input','input:text:not(.no-border),textarea:not(.no-border)',function(){
 		ps_obj.find('input:text:not(.no-border), textarea:not(.no-border)').bind('input propertychange', function(){ //兼容IE9-
 			var $this = $(this);
@@ -1347,6 +1349,30 @@
 				} else {
 					$state.removeClass('red').val(savedText);
 				}
+			}
+			else {
+				$state.addClass('red').val(newRecordText);
+			}
+		})
+
+		// 复选框时
+		ps_obj.find('input:checkbox:not(.no-border)').on('click', function () {
+			var $state = $(this).parents('.list-one').find('.i-t-state');
+			var nowStateValue = $state.val();
+			// var value = $(this).prop('checked') ? 1 : 0;
+			if (nowStateValue != newRecordText) {
+				$state.addClass('red').val(unsaveText);
+			}
+			else {
+				$state.addClass('red').val(newRecordText);
+			}
+		})
+		// radio 单选
+		ps_obj.find('input:radio:not(.no-border)').on('click', function () {
+			var $state = $(this).parents('.list-one').find('.i-t-state');
+			var nowStateValue = $state.val();
+			if (nowStateValue != newRecordText) {
+				$state.addClass('red').val(unsaveText);
 			}
 			else {
 				$state.addClass('red').val(newRecordText);
