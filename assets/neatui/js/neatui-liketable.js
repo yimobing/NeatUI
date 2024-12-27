@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author: ChenMufeng
 * Date: 2020.03.26
-* Update: 2024.12.21
+* Update: 2024.12.27
 
 */
 (function($){
@@ -829,8 +829,11 @@
 			// console.log('winH:',winH, 'toperH:', toperH, ' boterH:',boterH, ' titleH:',titleH, ' captionH:',captionH, ' tableH:',tableH, 'contentH:',contentH);
 			// console.log('tableW：', tableW);
 
-			$parent.find('.table-content').css({'width':tableW});
-			$parent.find('.table-inner').css({'width':innerW}); 
+			// edit 20241227-1
+			// $parent.find('.table-content').css({ 'width': tableW });
+			$parent.find('.table-content').css({ 'max-width': tableW });
+
+			$parent.find('.table-inner').css({ 'width': innerW}); 
 			titleH = parseFloat($parent.find('.list-title').outerHeight(true)); //重新赋值,兼容IE,因为IE中此时titleH会发生变化（必须!!)
 			$parent.find('.list-content').css({'max-height':contentH, 'margin-top': titleH}); /*设定滚动区域高度 22为横向滚动条的高度*/
 			
