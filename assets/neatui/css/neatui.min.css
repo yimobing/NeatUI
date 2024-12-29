@@ -4,7 +4,7 @@
 * 小巧UI前端框架
 * Author：mufeng
 * Date: 2021.01.11
-* Update: 2024.12.27
+* Update: 2024.12.29
 *================================================*/
 
 /*+================================================================================+*/
@@ -942,7 +942,40 @@ pre, pre code {
     border-color: #f55a4e;
     color: #fccbc7;
 }
-
+/*橙色立体*/
+.ne-button.has-3d>button.orange,
+.ne-btn.has-3d.orange{
+    border-color: #f99d1c;
+    color: #fff;
+    background-color: #f8971b;
+}
+.ne-button.has-3d>button.orange:hover,
+.ne-btn.has-3d.orange:hover{
+   background-color: #fab358;
+}
+.ne-button.has-3d>button.orange[disabled],
+.ne-btn.has-3d.orange[disabled]{
+    background: #f8971b;
+    border-color: #e3ba84;
+    color: #fff;
+}
+/*棕色立体*/
+.ne-button.has-3d>button.brown,
+.ne-btn.has-3d.brown{
+    border-color: #bf7f87;
+    color: #fff;
+    background-color: #bf7f87;
+}
+.ne-button.has-3d>button.brown:hover,
+.ne-btn.has-3d.brown:hover{
+   background-color: #e5b4ba;
+}
+.ne-button.has-3d>button.brown[disabled],
+.ne-btn.has-3d.brown[disabled]{
+    background: #c1989d;
+    border-color: #cbc3c4;
+    color: #ebebeb;
+}
 
 
 
@@ -982,24 +1015,24 @@ pre, pre code {
 /*绿色质感*/
 .ne-button.has-texture>button.green,
 .ne-btn.has-texture.green{
-	color: #e8f0de!important;
-	border: solid 1px #538312;
+	color: #f9f9f9!important;
+	border: solid 1px #08ba61;
 	background: #64991e;
-	background: -webkit-gradient(linear, left top, left bottom, from(#7db72f), to(#4e7d0e));
-	background: -moz-linear-gradient(top,  #7db72f,  #4e7d0e);
-	background: linear-gradient(to left bottom, #7db72f, #4e7d0e);
-	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#7db72f', endColorstr='#4e7d0e');
+	background: -webkit-gradient(linear, left top, left bottom, from(#c9ddb1), to(#1acb73));
+	background: -moz-linear-gradient(top,  #c9ddb1,  #1acb73);
+	background: linear-gradient(to left bottom, #c9ddb1, #1acb73);
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#c9ddb1', endColorstr='#1acb73');
 }
 /*红色质感*/
 .ne-button.has-texture>button.red,
 .ne-btn.has-texture.red{
-	color: #fae7e9!important;
+	color: #ffffff!important;
 	border: solid 1px #b73948;
 	background: #da5867;
-	background: -webkit-gradient(linear, left top, left bottom, from(#f16c7c), to(#bf404f));
-	background: -moz-linear-gradient(top,  #f16c7c,  #bf404f);
-	background: linear-gradient(to left bottom, #f16c7c, #bf404f);
-	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f16c7c', endColorstr='#bf404f');
+	background: -webkit-gradient(linear, left top, left bottom, from(#dfc4bf), to(#d04f5e));
+	background: -moz-linear-gradient(top,  #dfc4bf  #d04f5e);
+	background: linear-gradient(to left bottom, #dfc4bf, #d04f5e);
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfc4bf', endColorstr='#d04f5e');
 }
 /*橙色质感*/
 .ne-button.has-texture>button.orange,
@@ -1011,6 +1044,17 @@ pre, pre code {
 	background: -moz-linear-gradient(top,  #faa51a,  #f47a20);
 	background: linear-gradient(to left bottom, #faa51a, #f47a20);
 	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#faa51a', endColorstr='#f47a20');
+}
+/*棕色质感*/
+.ne-button.has-texture>button.brown,
+.ne-btn.has-texture.brown{
+	color: #ffffff!important;
+	border: solid 1px #bb848b;
+	background: #da5867;
+	background: -webkit-gradient(linear, left top, left bottom, from(#dfc4bf), to(#bf7f87));
+	background: -moz-linear-gradient(top,  #dfc4bf  #d04f5e);
+	background: linear-gradient(to left bottom, #dfc4bf, #bf7f87);
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfc4bf', endColorstr='#bf7f87');
 }
  /*灰色质感*/
 .ne-button.has-texture>button.gray,
