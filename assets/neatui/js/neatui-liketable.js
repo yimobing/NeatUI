@@ -794,7 +794,7 @@
 				}
 			}
 			
-			// testing
+			// test6
 			var offsetTop = $parent.offset().top, //距离屏幕顶部距离
 				offsetLeft = $parent.offset().left; //距离屏幕左侧距离
 			var isOverScreen = width < winW ? false : true; //表格宽是否超过屏幕宽			
@@ -1070,7 +1070,7 @@
 		/*+------------------------------+*/
 		//__·回调(输入框或按钮点击事件))
 		//$parent.find('button:button').off('click').on('click',function(){
-		$parent.off('click', 'button:button,input,textarea').on('click', 'button:button,input,textarea', function(){ //兼容动态新增的行
+		$parent.off('click', 'button:button,input,textarea').on('click', 'button:button,input,textarea', function (e) { // 兼容动态新增的行
 			var row_index = $(this).parents('.list-one').index();
 			var allJson = getFormData($parent);
 			var oneJson = allJson["data"][row_index]; //只取当前行数据
@@ -1082,10 +1082,33 @@
 				return;
 			}
 			var items = columnsArr[colIndex];
+			
+			// add 20241230-1
+			if(items.stopPropagation){
+				e.stopPropagation();
+			}
+			if(items.preventDefault){
+				e.preventDefault();
+			}
+
 			if(items.callBack){
 				items.callBack(oneJson);
 			}
 		})
+
+		// 点击每一行时当前行高亮 add 20241230-1
+		$parent.off('click', '.list-one').on("click", '.list-one', function () {
+			$(this).addClass('active').siblings().removeClass('active');
+		});
+		$(document).on('click', function (e) {
+			var event = e || window.event;
+			var target = event.target || event.srcElement;
+			var closet = $(target).closest($parent);
+			// console.log('close：', closet);
+			if (closet.length == 0) {
+				$parent.find('.list-one').removeClass('active');
+			}
+		});
 		
 
 		/*+------------------------------+*/

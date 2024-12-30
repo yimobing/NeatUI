@@ -4,7 +4,7 @@
 * [类表格控件]样式-
 * Author：ChenMufeng
 * PubDate：2020.11.11
-* Update: 2022.11.15
+* Update: 2024.12.30
 * ----------------------
 */
 /*body{overflow-y: hidden!important;} /*禁止垂直方向出现滚动条,已在插件中用参数进行控制*/
@@ -112,6 +112,13 @@
 .like-table .list-one:first-child{margin-top:0; padding-top:0; border:0;}
 .like-table .list-one:after{content:''; display:block; clear:both;}
 
+.like-table .list-one:hover{
+	/* background-color: #f7f7f7!important; */
+} 
+.like-table .list-one.active{
+	background-color: #f1e9f2!important;
+} 
+
 /*隔行变色*/
 .like-table .list-one.interlacing{background-color:#f9faf9;}
 
@@ -125,6 +132,18 @@
 .like-table .list-one textarea{width:100%; padding:3px 5px; background-color:#fff; border:1px solid #ddd; border-radius:2px; font-size: 13px; }
 .like-table .list-one input[type="text"]{max-height:100%; *width:85%; _width:85%; zoom: 1; }
 .like-table .list-one textarea{height:100%;  *width:90%; _width:90%; zoom: 1; overflow-y:auto;-webkit-overflow-scrolling:touch; }
+
+.like-table .list-one input[type="text"]:focus,
+.like-table .list-one textarea:focus{
+	border-color: #f155ce;
+}
+.like-table .list-one input[type="text"][readonly]:focus,
+.like-table .list-one textarea[readonly]:focus{
+	border-color: #ddd;
+}
+
+
+
 
 /*内容按钮*/
 .like-table .list-one button{cursor: pointer;}
