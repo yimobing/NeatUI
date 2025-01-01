@@ -4,7 +4,7 @@
 * [类表格控件]样式-
 * Author：ChenMufeng
 * PubDate：2020.11.11
-* Update: 2024.12.30
+* Update: 2025.01.01
 * ----------------------
 */
 /*body{overflow-y: hidden!important;} /*禁止垂直方向出现滚动条,已在插件中用参数进行控制*/
@@ -112,8 +112,9 @@
 .like-table .list-one:first-child{margin-top:0; padding-top:0; border:0;}
 .like-table .list-one:after{content:''; display:block; clear:both;}
 
-.like-table .list-one:hover{
+.like-table.has-hover .list-one:hover{
 	/* background-color: #f7f7f7!important; */
+	background-color: #f1e9f2!important;
 } 
 .like-table .list-one.active{
 	background-color: #f1e9f2!important;

@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author: ChenMufeng
 * Date: 2020.03.26
-* Update: 2024.12.27
+* Update: 2025.01.01
 
 */
 (function($){
@@ -260,6 +260,7 @@
 		var isCheckboxCol = typeof configure["isCheckboxCol"] == 'undefined' ? false : (configure["isCheckboxCol"] === true ? true : false); //默认false
 		var isSerialCol = typeof configure["isSerialCol"] == 'undefined' ? true : (configure["isSerialCol"] === false ? false : true); //默认true
 		var isCeilLine = typeof configure["isCeilLine"] == 'undefined' ? false : (configure["isCeilLine"] === true ? true : false); //默认false
+		var isHoverChangeColor = typeof configure["isHoverChangeColor"] == 'undefined' ? false : (configure["isHoverChangeColor"] === true ? true : false); //默认false
 		var isRowHeightEqual = typeof configure["isRowHeightEqual"] == 'undefined' ? false : (configure["isRowHeightEqual"] === true ? true : false); //默认false
 		var isVerticalScrollBar = typeof configure["isVerticalScrollBar"] == 'undefined' ? false : (configure["isVerticalScrollBar"] === true ? true : false); //默认false
 		var isShowBrowserVerticalBar = nestDepth > 1 ? true : isVerticalScrollBar;
@@ -296,6 +297,7 @@
 		var _headSubClass = headSubWrap ? ' has-sub-wrap' : '';
 		var _headStyle = headHeight == 'auto' ? '' : 'style="height:' + headHeight + '"';
 		var _tbClass = isCeilLine ? ' has-border ceil-pad-' + ceilPad : '';
+		_tbClass += isHoverChangeColor == false ? '' : ' has-hover';
 
 		/*+------------------------------+*/
 		//---创建外层节点
