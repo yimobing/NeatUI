@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author: ChenMufeng
 * Date: 2020.03.26
-* Update: 2025.01.01
+* Update: 2025.01.02
 
 */
 (function($){
@@ -264,7 +264,10 @@
 		var isRowHeightEqual = typeof configure["isRowHeightEqual"] == 'undefined' ? false : (configure["isRowHeightEqual"] === true ? true : false); //默认false
 		var isVerticalScrollBar = typeof configure["isVerticalScrollBar"] == 'undefined' ? false : (configure["isVerticalScrollBar"] === true ? true : false); //默认false
 		var isShowBrowserVerticalBar = nestDepth > 1 ? true : isVerticalScrollBar;
-	
+		// add and edit 20250101
+		// var isStopPropagation = typeof configure["isStopPropagation"] == 'undefined' ? false : (configure["isStopPropagation"] === true ? true : false); //默认false
+		// var isPreventDefault = typeof configure["isPreventDefault"] == 'undefined' ? false : (configure["isPreventDefault"] === true ? true : false); //默认false
+
 		var stateColumn = typeof configure["stateColumn"] == 'undefined' ? null : configure["stateColumn"],
 			isStateCol = stateColumn == null ? false : (typeof stateColumn["show"] == 'undefined' ? false : (stateColumn["show"] === true ? true : false)); //默认false
 		stateInitValue = stateColumn == null ? '' : (typeof stateColumn["value"] == 'undefined' ? '' : stateColumn["value"]),
@@ -1384,7 +1387,15 @@
 		})
 
 		// 复选框时
-		ps_obj.find('input:checkbox:not(.no-border)').on('click', function () {
+		ps_obj.find('input:checkbox:not(.no-border)').on('click', function (e) {
+			e.stopPropagation(); // add 20250102-1
+			// if(isStopPropagation){
+			// 	e.stopPropagation();
+			// }
+			// if(isPreventDefault){
+			// 	e.preventDefault();
+			// }
+
 			var $state = $(this).parents('.list-one').find('.i-t-state');
 			var nowStateValue = $state.val();
 			// var value = $(this).prop('checked') ? 1 : 0;
@@ -1396,7 +1407,14 @@
 			}
 		})
 		// radio 单选
-		ps_obj.find('input:radio:not(.no-border)').on('click', function () {
+		ps_obj.find('input:radio:not(.no-border)').on('click', function (e) {
+			e.stopPropagation();  // add 20250102-1
+			// if(isStopPropagation){
+			// 	e.stopPropagation();
+			// }
+			// if(isPreventDefault){
+			// 	e.preventDefault();
+			// }
 			var $state = $(this).parents('.list-one').find('.i-t-state');
 			var nowStateValue = $state.val();
 			if (nowStateValue != newRecordText) {
