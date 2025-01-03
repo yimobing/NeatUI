@@ -41,8 +41,22 @@
         <div class="content">
             <pre>
                 [ 控件使用说明 ]
-                调用方式：
+                调用方式有两种
+                    方式1：直接调用
                     neuiFrame(elem, options);
+                    这种方式只能调用控件默认的init()方法，无法调用控件对外暴露的其它方法
+
+                    方式2： 先实例化，再调用
+                    var neFrame = new neuiFrame(); // 实例化IFRAME嵌入页面控件对象
+                    neFrame.init(elem, options);
+
+                    然后拿着这个实例化对象可以调用控件对外暴露的其它方法：
+                    neFrame.hideGobackButton(); // 隐藏返回按钮
+                    neFrame.hideCloseButton(); // 隐藏关闭按钮
+                    neFrame.showGobackButton(); // 显示返回按钮
+                    neFrame.showCloseButton(); // 显示关闭按钮
+
+
                 参数说明：
                     elem 为用户要嵌入iframe绑定的节点。eg. '#节点ID属性名', '.节点属性名'
                     options 为选项参数，类型为是一个Object对象，参数如下：

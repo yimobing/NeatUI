@@ -220,6 +220,14 @@
             methods._setControlStyle(me, userNode, rootClassName, skeletonClassName);
         }
 
+        // 全局赋值
+        var rootNode = document.getElementsByClassName(rootClassName)[0],
+            frameNode = document.getElementsByClassName(skeletonClassName)[0];
+        me.$opts.$elBind = userNode;
+        me.$opts.$elRoot = rootNode;
+        me.$opts.$elframe = frameNode;
+
+
         // 返回按钮点击及回调事件
         if (me.$opts.goback.enable) {
             methods._closeFrame(me, userNode, rootClassName, 'goback');
@@ -248,6 +256,50 @@
         new FrameInitialize(this, o, opts);
     };
 
+
+    /**
+     * !! 显示关闭按钮
+     */
+    NFrame.prototype.showCloseButton = function () {
+        var me = this;
+        var classname = 'ne__fm_close';
+        var el = me.$opts.$elRoot.getElementsByClassName(classname)[0];
+        el.style.display = '';
+    };
+
+
+    /**
+     * !! 隐藏关闭按钮
+     */
+     NFrame.prototype.hideCloseButton = function () {
+        var me = this;
+        var classname = 'ne__fm_close';
+        var el = me.$opts.$elRoot.getElementsByClassName(classname)[0];
+        el.style.display = 'none';
+    };
+
+
+
+    /**
+     * !! 显示返回按钮
+     */
+     NFrame.prototype.showGobackButton = function () {
+        var me = this;
+        var classname = 'ne__fm_goback';
+        var el = me.$opts.$elRoot.getElementsByClassName(classname)[0];
+        el.style.display = '';
+    };
+
+
+    /**
+     * !! 隐藏返回按钮
+     */
+     NFrame.prototype.hideGobackButton = function () {
+        var me = this;
+        var classname = 'ne__fm_goback';
+        var el = me.$opts.$elRoot.getElementsByClassName(classname)[0];
+        el.style.display = 'none';
+    };
 
 
 
