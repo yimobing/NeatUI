@@ -1,0 +1,93 @@
+@charset "utf-8";
+/**================================================
+ * [neuiFrame]
+ * IFRAME框架控件
+ * 调用控件即可直接嵌入一个iframe页面，浏览器窗口调整时，iframe子页面大小也会自动调整
+ * Author：Mufeng
+ * Date: 2024.10.08
+ * Update: 2025.01.03
+*================================================*/
+
+/*+------------------------  ------------------------+*/
+.ne__frame{ 
+    position: relative;
+	width: 100%;
+}
+.ne__fm_caption{
+    position: relative;
+    display: inline-block;
+    width: 80%;
+    margin: 0 10% 0 10%;
+	padding: 3px;
+    text-align: center;
+    color: #777;
+    font-size: 18px;
+    font-weight: 550;
+}
+.ne__fm_goback{
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    display: inline-block;
+    width: auto;
+    padding: 4px 10px;
+    background: #575757;
+    opacity: .45;
+    filter: alpha(opacity = 45);
+    border-radius: 0 12px 12px 0;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;  
+}
+.ne__fm_goback:before{
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 3px;
+    border-style: solid;
+    border-color: #fff;
+    border-width: 1px 1px 0 0;
+    transform: rotate(-135deg);
+}
+.ne__fm_goback:hover,
+.ne__fm_goback:hover .ne__fm_goback:before{
+    background-color: #999;
+}
+.ne__fm_close{
+    position: absolute;
+    display: inline-block;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    background-color: #f6f6f6;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    text-indent: -999999px;
+    color: #888;
+    font-size: 12px;
+    cursor: pointer;
+}
+.ne__fm_close:hover{
+    opacity: .6;
+    filter: alpha(opacity = 60);
+}
+.ne__fm_close:before,
+.ne__fm_close:after{
+    content: '';
+    position: absolute;
+    display: inline-block;
+    width: 1px;
+    height: 16px;
+    top: 3px;
+    left: 50%;
+    background-color: #000;
+}
+.ne__fm_close:before{
+    transform: rotate(45deg);
+}
+.ne__fm_close:after{
+    transform: rotate(-45deg);
+}

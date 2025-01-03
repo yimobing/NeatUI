@@ -15,8 +15,9 @@
     <title>neFrame IFRAME嵌入页面控件 </title>
     <meta name="keywords" content="">
     <meta name="description" content="">
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架 -->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框 -->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-iframe.css"> <!-- IFRAME嵌入页面控件 -->
 </head>
 <body>
     <style>
@@ -46,18 +47,20 @@
                     elem 为用户要嵌入iframe绑定的节点。eg. '#节点ID属性名', '.节点属性名'
                     options 为选项参数，类型为是一个Object对象，参数如下：
                     {
-                        src: '', // 框架链接地址(必须)
+                        src: "", // 框架链接地址(必须)
                         refresh: false, // 是否刷新绑定的节点中的页面，默认false(可选)。值为true 时将重建页面，false 时不会重建页面。注：当点击不同按钮时要在同一个绑定的节点下面显示不同的页面，请将本参数设为true。
+
                         // 指定框架宽高。注：当框架实际宽高<=0时，系统将自动把浏览器视窗高度作为框架宽高。
-                        width: 'auto', // 框架宽度，默认auto表示系统自动计算(可选)。接受百分比如50%、带或不带单位的数值型如100px。
-                        height: 'auto', // 框架高度，默认auto表示系统自动计算(可选)。接受百分比如50%、带或不带单位的数值型如100px。
-                        // 自定义框架左侧、右侧距离。仅当 width != 'auto' 时有效
-                        left: 'auto', // 框架以外左侧距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
-                        right: 'auto', // 框架以外右侧距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
-                        // 自定义框架顶部、底部距离。仅当 height != 'auto' 时有效
-                        top: 'auto', // 框架以外顶部距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
-                        bottom: 'auto', // 框架以外底部距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
-                        // 框架误差纠正，若不想启用误差纠正功能，请设置参数 width, height 为具体数值即可。注：以下参数当 width = 'auto' 时宽度纠正参数失效，height = 'auto' 时高度纠正参数失效。
+                        width: "auto", // 框架宽度，默认auto表示系统自动计算(可选)。接受百分比如50%、带或不带单位的数值型如100px。
+                        height: "auto", // 框架高度，默认auto表示系统自动计算(可选)。接受百分比如50%、带或不带单位的数值型如100px。
+                        // 自定义框架左侧、右侧距离。仅当 width != "auto" 时有效
+                        left: "auto", // 框架以外左侧距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                        right: "auto", // 框架以外右侧距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                        // 自定义框架顶部、底部距离。仅当 height != "auto" 时有效
+                        top: "auto", // 框架以外顶部距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+                        bottom: "auto", // 框架以外底部距离，默认auto(可选)。接受带或不带单位的数值型如100px。值：auto 或 0 系统将自动计算。
+
+                        // 框架误差纠正，若不想启用误差纠正功能，请设置参数 width, height 为具体数值即可。注：以下参数当 width = "auto" 时宽度纠正参数失效，height = "auto" 时高度纠正参数失效。
                         corrected: true, // 是否启用框架宽高值误差纠正功能，默认true(可选)
                         inaccuracy: 0, // 统一设置框架宽高误差值，默认0(可选)。建议值14，仅当 corrected = true 且 deviation.enable = false 时有效。注：1.系统将在框架宽高基础上再减去该参数的值。2.参数值为0时，自动将把浏览器滚动条宽度作为误差值。
                         deviation: { // 分开设置框架宽高误差值(可选)。仅当 corrected 且 deviation.enable = true 时 有效。生效后参数 inaccuracy 失效。
@@ -65,7 +68,44 @@
                             horizontal: 0, // 水平方向宽度误差值，默认0(可选)。注：系统将在框架宽度基础上再减去该参数的值。
                             vertical: 0 // 垂直方向高度误差值，默认0(可选)。注：系统将在框架高度基础上再减去该参数的值。
                         },
-                        // 回调函数
+
+                        // 视图配置
+                        visible: true, // 是否默认显示绑定节点内容，默认true(可选)。如果希望初始化控件时不显示绑定节点，可将值置为false，而后手动显示节点内容。一般情况下，请勿置为false。
+                        fatherSelector: "", // 绑定节点的父节点，默认空(可选)。eg. "#id", ".classname"。有时在绑定节点上方或下方可能会有自定义的内容，布局时可能要在绑定节点外层添加一个父节点，便可将父节点填在此处。父节点和绑定节点显示与隐藏是联动一致的，要么同时显示要么同时隐藏。
+                        caption: "", // 标题，默认空(可选)
+
+                        // 框架打开方式(可选)
+                        openWay: {
+                            method: "embed", // 打开方式，默认embed(可选)。值： embed 嵌入, newtab 新选项卡窗口, control 按住ctrl键的同时以新选项卡窗口打开页面(仅当 pressKeyCtrl 为true时有效)(此时页面嵌入到绑定节点且在新窗口中打开页面)
+                            pressKeyCtrl: false // 是否按住ctrl键，默认false(可选)。说明：值取自界面按钮点击事件属性 event.ctrlKey，如要确认是否按住ctrl键，请把 event.ctrlKey 传入即可
+                        },
+
+                        // 返回按钮(可选)
+                        goback: {
+                            enable: false, // 是否显示返回按钮，默认false(可选)
+                            text: "返回", // 返回按钮的文字，默认“返回”(可选)
+                            position: "absolute", // 定位方式，默认绝对定位(可选)
+                            offset: { // 偏移量(可选)
+                                top: 0,
+                                left: 0
+                            },
+                            callback: null // 点击返回按钮的回调，默认null(可选)
+                        },
+
+                        // 关闭按钮(可选)
+                        close: {
+                            enable: false, // 是否显示关闭按钮，默认false(可选)
+                            text: "关闭", // 关闭按钮的文字，默认“关闭”(可选)
+                            position: "absolute", // 定位方式，默认绝对定位(可选)
+                            offset: { // 偏移量(可选)
+                                top: 0,
+                                right: 0
+                            },
+                            callback: null // 点击关闭按钮的回调，默认null(可选)
+                        },
+
+
+                        // 其它配置
                         resize: null // 浏览器窗口大小变化时的回调函数，默认null(可选)
                     }
             </pre>
@@ -103,16 +143,34 @@
             </div><!--/.grid__collect-->
         </div><!--/.grid-->
 
+
+        <div class="grid">
+            <div class="grid__caption"> 分组3 </div>
+            <div class="grid__title"> 有返回按钮+关闭按钮，自由选择页面是以嵌入还是以新窗口方式打开 </div>
+            <div class="grid__subtitle"> 
+                点击按钮时按住ctrl键，能以新窗口方式打开，同时页面还会嵌入到绑定的节点中
+            </div>
+            <div class="grid__list grid__group_3">
+                <div class="grid__list_one">页面将嵌入到绑定节点下</div>
+            </div><!--/.grid__list-->
+            <div class="grid__result">
+                <div class="page_3">
+                    <div class="page_3_title">菜鸟教程网站</div>
+                    <div class="page_3_content"></div>
+                </div>
+            </div><!--/.grid__collect-->
+        </div><!--/.grid-->
+
     </div><!--/.wrap-->
 
 
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
-    <script src="assets/libs/jquery-1.8.3.min.js"></script><!--Jq库-->
-    <script src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
-    <script src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
-    <script src="assets/neatui/js/neatui-iframe.js"></script><!-- IFRAME嵌入页面控件-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script> <!-- Jq库 -->
+    <script src="assets/neatui/js/neatui.min.js"></script> <!-- 前端框架 -->
+    <script src="assets/neatui/js/neatui-dialog.js"></script> <!-- 对话框 -->
+    <script src="assets/neatui/js/neatui-iframe.js"></script> <!-- IFRAME嵌入页面控件 -->
     <script>
         /*+————————————————全局变量————————————————+*/
         
@@ -215,6 +273,48 @@
             $(this).parent().siblings('.grid__result').children().eq(index).show().siblings().hide();
             loadTheDifferrentNodePage(index);
         });
+
+
+
+        //——————————————————————————————————————————
+        // 分组3
+        $('.grid__group_3 .grid__list_one').on('click', function(){
+            var elem = '.page_3_content';
+            var fatherSelector = '.page_3';
+            var linkUrl = 'https://www.runoob.com';
+            neuiFrame(elem, {
+                src: linkUrl, // 框架链接地址(必须)
+                // 返回按钮(可选)
+                goback: {
+                    enable: true, // 是否显示返回按钮，默认false(可选)
+                    text: "返回", // 返回按钮的文字，默认“返回”(可选)
+                    position: 'absolute', // 定位方式，默认绝对定位(可选)
+                    offset: { // 偏移量(可选)
+                        top: 0,
+                        left: 5
+                    },
+                    callback: function(){ // 点击返回按钮的回调，默认null(可选)
+                        alert('我是返回按钮，你已清空节点！');
+                    }
+                },
+                // 关闭按钮(可选)
+                close: {
+                    enable: true, // 是否显示关闭按钮，默认false(可选)
+                    text: "关闭", // 关闭按钮的文字，默认“关闭”(可选)
+                    position: 'absolute', // 定位方式，默认绝对定位(可选)
+                    offset: { // 偏移量(可选)
+                        top: 20,
+                        right: 10
+                    },
+                    callback: function(){ // 点击关闭按钮的回调，默认null(可选)
+                        alert('我是关闭按钮，你已清空节点！');
+                    }
+                }
+            });
+        });
+        
+
+
 
 
     </script>
