@@ -1096,8 +1096,9 @@
 				e.preventDefault();
 			}
 
-			if(items.callBack){
-				items.callBack(oneJson);
+			if (items.callBack) {
+				var event = e || window.event;
+				items.callBack(oneJson, event);
 			}
 		})
 

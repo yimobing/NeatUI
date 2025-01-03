@@ -245,7 +245,7 @@
                 // --------参数4：回调
                 stopPropagation: false, // 是否阻止事件向上(向父元素)冒泡，默认false(可选)
                 preventDefault: false, // 是否阻止默认事件，默认false(可选)
-                callBack:function(e){ // 回调函(可选)，一般用于输入框或按钮点击时. e 为当前按钮所在行各列的数据组成的数据. 格式: {target:"当前元素的jq对象", row: "行号", rowIndex:"行号索引值", xuhao:"序号"}
+                callBack: function(e, event){ // 回调函(可选)，一般用于输入框或按钮点击时. e 为当前按钮所在行各列的数据组成的数据, event 为点击事件(使用其它控件可能有用). e 格式: {target:"当前元素的jq对象", row: "行号", rowIndex:"行号索引值", xuhao:"序号"}。
                     // console.log('e:',e)
                 }
                 
@@ -371,7 +371,7 @@
 					direction:'next', // 合并方向(可选). next 向下合并(默认), prev 向上合并
 					numeral:2 // 合并的列数(可选)
                 },
-                callBack:function(e){
+                callBack:function(e, event){
                     saveOne(e);
                 }
             },{
@@ -387,7 +387,7 @@
                 b_icon:'trash',
                 b_onlyImage:true,
                 code: 'eval(parseFloat([\"mj"]) > 150 ? "": "$(this).find(\'.btn-delete\').hide()" )', // 面积小于150的隐藏“删除”按钮
-                callBack:function(e){
+                callBack:function(e, event){
                     delOne(e);
                 }
             }
