@@ -344,6 +344,7 @@
 
 				closeWindow: false, //是否禁用按钮(是否一点击按钮就关闭窗口,默认true)
 				openBack: null, //窗口加载完成后的回调函数
+				closeBack: null, // 点返回或打叉图标时的回调函数(可选) add 20250105
 				callBack: null, //点按钮后的回调函数(可选)
 				closeFeed: function(){ //关闭窗口, 供callBack等函数调用,用来关闭窗口(可选)
 					closeFeedback($(parentId));
@@ -536,6 +537,9 @@
 			//...关闭按钮事件
 			$(document).off('click', parentId + ' .feedback-close').on('click', parentId + ' .feedback-close',function(){
 				closeFeedback($(this));
+				if(settings.closeBack){
+					settings.closeBack();
+				}
 			});
 			
 

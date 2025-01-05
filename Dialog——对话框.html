@@ -323,6 +323,7 @@
 			closeWindow:false, //是否一点击按钮就关闭窗口,默认false
 			closeFeed: function(){} //关闭窗口, 供callBack等函数调用,用来关闭窗口(可选)
 			openBack:function(){}, //窗口加载完成后的回调函数(常用于动态元素加载完成后,做一些其它的事)
+			closeBack: function(){}, // 点返回或打叉图标时的回调函数(可选) add 20250105
 			callBack:function(ret){ //点按钮后的回调函数(可选) ret 按钮索引值
 				var _this = this;
 				_this.closeFeed(); //_this.closeWindow = true //关闭当前输入框窗口
