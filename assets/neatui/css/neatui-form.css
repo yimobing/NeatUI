@@ -5,7 +5,7 @@
  * 说明：兼容IE8+
  * Author: Mufeng
  * Date: 2021.01.09
- * Update: 2021.11.23
+ * Update: 2025.01.06
  */
 
 /*+--------------------------------+*/
@@ -35,7 +35,7 @@ body{
 	background-color: #fff;
 	/*background-color: #f4f4f4;*/
 	line-height: 1.5;
-	font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', 'Helvetica Neue', 'Helvetica,sans-serif';
+	font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', '-apple-system-font', 'BlinkMacSystemFont', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
 	/*font-size: 14px;*/
 	font-size: .7rem;
 	color: #212121;
@@ -233,7 +233,7 @@ header, footer, main, section, menu, nav, article, aside, hgroup, summary, detai
     border-radius: 2px;
     color: #586075;
     font-size: 14px;
-    font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', 'Helvetica Neue', 'Helvetica,sans-serif';
+    font-family: 'Hiragino Sans GB W3', 'Hiragino Sans GB', 'microsoft yahei', 'Sim sun', '-apple-system-font', 'BlinkMacSystemFont', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif';
 }
 .item-r input[type="text"],
 .item-r input[type="password"],
