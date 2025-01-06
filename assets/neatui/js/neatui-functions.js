@@ -2412,8 +2412,9 @@ var checker = {
      * eg. 11 是纯数字, 11., 11.5, 11.53不是纯数字
      */
     checkIsNumeric: function(ps_str){
+        var value = typeof ps_str == 'undefined' ? '' : ps_str;
         var reg = /^[0-9]+$/;
-        return reg.test(ps_str.toString()) ? true : false;
+        return reg.test(value.toString()) ? true : false;
     },
 
 
@@ -2424,8 +2425,9 @@ var checker = {
      * eg. 1.5, 11.5, 11.53, -1.5, -11.5, -11.53 是数值类型, 11. , 11.53.5 不是数值类型
      */
     checkIsNumerType: function(ps_str){
+        var value = typeof ps_str == 'undefined' ? '' : ps_str;
 		var reg = /^[0-9]+(\.[0-9]+)?$/;
-        return reg.test(ps_str.toString()) ? true : false;
+        return reg.test(value.toString()) ? true : false;
     },
     
 
@@ -2436,8 +2438,9 @@ var checker = {
      * eg. 11.5, 11.53是小数, 11, 11. 不是小数
      */
     checkIsDecimal: function(ps_str){
+        var value = typeof ps_str == 'undefined' ? '' : ps_str;
         var reg = /^\-?[0-9]+\.[0-9]+$/;
-        return reg.test(ps_str.toString()) ? true : false;
+        return reg.test(value.toString()) ? true : false;
     },
 
 
@@ -2447,9 +2450,10 @@ var checker = {
      * @returns {boolean} 返回布尔值. true 是整数, false 不是整数
      * eg. 11, -11 是整数, 11., -11., 11.5, -11.5不是整数
      */
-    checkIsInteger: function(ps_str){
+    checkIsInteger: function (ps_str) {
+        var value = typeof ps_str == 'undefined' ? '' : ps_str;
         var reg = /^\-?[0-9]+$/;
-        return reg.test(ps_str.toString()) ? true : false;
+        return reg.test(value.toString()) ? true : false;
     },
 
 
