@@ -1826,6 +1826,25 @@ var sortingAlgorithm = {
 //                                                  calendar 日期对象，日历对象, 用于操作与日期相关的动作
 //=====================================================================================================================
 var calendar = {
+    /**
+     * 比较两个时间字符串的大小
+     * @param {String} dateStr1 时间字符串1
+     * @param {String} dateStr2 时间字符串2
+     * @return {String} 返回比较符号。值： < 表示时间字符串1比2早(小), > 表示时间字符串1比2晚(大), = 表示两个时间一样
+     */
+    compareTwoDates: function(dateStr1, dateStr2) {
+        const date1 = new Date(dateStr1);
+        const date2 = new Date(dateStr2);
+        if (date1.getTime() > date2.getTime()) {
+            return ">";
+        } else if (date1.getTime() < date2.getTime()) {
+            return "<";
+        } else {
+            return "=";
+        }
+    },
+
+
 	/**
 	 * 判断字符串是否为日期(时间)格式(此处不考虑只有年份的日期.如"2018")
 	 * @param {string} str 字符串
