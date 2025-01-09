@@ -1280,8 +1280,10 @@
 						value = colations.html(value, bools); //过滤html标签
 					}
 				}
-				total += parseFloat(value);
-			})
+				total += isNaN(parseFloat(value)) ? 0 : parseFloat(value);
+			});
+			if (/^(?=.*\.)([0-9\.]+)$/.test(total)) total = total.toFixed(2); // 若小计是小数(包含小数点)，则保留两位小数
+			// else if (/^([0-9]+)$/.test(total) && total == 0) total = ''; // 若小计是整数0，则赋空
 			subValueArr.push({"column":index, "value":total});
 		}
 		//console.log('subValueArr:', subValueArr, 'dotArr:',dotArr);
