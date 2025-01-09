@@ -226,16 +226,17 @@
         me.$opts.$elBind = userNode;
         me.$opts.$elRoot = rootNode;
         me.$opts.$elframe = frameNode;
+        me.$opts.$classRoot = rootClassName;
 
 
         // 返回按钮点击及回调事件
         if (me.$opts.goback.enable) {
-            methods._closeFrame(me, userNode, rootClassName, 'goback');
+            methods._goCloseBtnClickEvent(me, userNode, rootClassName, 'goback');
         }
 
         // 关闭按钮点击及回调事件
         if (me.$opts.close.enable) {
-            methods._closeFrame(me, userNode, rootClassName, 'close');
+            methods._goCloseBtnClickEvent(me, userNode, rootClassName, 'close');
         }
 
         // 回调
@@ -254,6 +255,15 @@
      */
     NFrame.prototype.init = function (o, opts) {
         new FrameInitialize(this, o, opts);
+    };
+
+
+    /**
+     * !! 关闭iframe框架
+     */
+    NFrame.prototype.shutdownFrame = function () {
+        var me = this;
+        methods._closeFrame(me, me.$opts.$elBind);
     };
 
 
@@ -390,31 +400,23 @@
 
 
         /**
-         * 关闭框架并执行回调
-         *  @param {Object} me 控件自身对象
+         * 返回按钮及关闭按钮点击事件
+         * @param {Object} me 控件自身对象
          * @param {HTMLDOM} 用户绑定的节点
          * @param {String} root_class_name 根节点样式名
          * @paam {String} ps_type 按钮类型。值： goback 返回按钮, close 关闭按钮
          */
-         _closeFrame: function (me, user_node, root_class_name, ps_type) {
+        _goCloseBtnClickEvent: function (me, user_node, root_class_name, ps_type) {
+            var _this = this;
             var rootNode = document.getElementsByClassName(root_class_name)[0];
             var btnClassName = '';
             if (ps_type == 'goback') btnClassName = 'ne__fm_goback';
             else if (ps_type == 'close') btnClassName = 'ne__fm_close';
-            var clickNode = rootNode.getElementsByClassName(btnClassName);
+             var clickNode = rootNode.getElementsByClassName(btnClassName);
             if (clickNode.length == 0) return;
-            clickNode[0].addEventListener('click', function (e) {
-                user_node.innerHTML = ''; // 清空内容
-                user_node.setAttribute('style', 'display: none'); // 隐藏绑定节点
-                // 隐藏父节点
-                var elFather = helpers.getNodeByClassId(me.$opts.fatherSelector);
-                if (elFather != null) { // 父节点存在时
-                    var fatherStyles = elFather.getAttribute('style');
-                    if (fatherStyles != null && fatherStyles.toString().replace(/\s+/g, '').indexOf('display:none') < 0) {
-                        elFather.style.display = 'none';
-                        // elFather.setAttribute('style', 'display: none');
-                    }
-                }
+             clickNode[0].addEventListener('click', function (e) {
+                 _this._closeFrame(me, user_node); // 关闭iframe框架
+                // 根据按钮类型执行回调
                 if (ps_type == 'goback' && me.$opts.goback.callback) {
                     me.$opts.goback.callback();
                 }
@@ -424,6 +426,26 @@
             }); 
         },
 
+        
+         /**
+          * 关闭iframe框架
+          * @param {Object} me 控件自身对象
+          * @param {HtmlElement} elBindNode 用户绑定的节点
+          */
+        _closeFrame: function (me, elBindNode) {
+            // 隐藏绑定节点并清空内容
+            elBindNode.innerHTML = ''; // 清空绑定节点内容
+            elBindNode.setAttribute('style', 'display: none'); // 隐藏绑定节点
+            // 隐藏父节点
+            var elFather = helpers.getNodeByClassId(me.$opts.fatherSelector);
+            if (elFather != null) { // 父节点存在时
+                var fatherStyles = elFather.getAttribute('style');
+                if (fatherStyles != null && fatherStyles.toString().replace(/\s+/g, '').indexOf('display:none') < 0) {
+                    elFather.style.display = 'none';
+                    // elFather.setAttribute('style', 'display: none');
+                }
+            }
+         },
          
          
         /**
