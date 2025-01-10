@@ -1579,8 +1579,9 @@
 	 * 即在有数据的列表上添加一行,且该行各列值不空
 	 * @param {object} ps_source 数据源
 	 * @param {object} ps_obj 当前表格对象(可选)
+	 * param {object} ps_opts 其它参数对象(可选)
 	 */
-	var insertNewRow = function(ps_source, ps_obj){
+	var insertNewRow = function(ps_source, ps_obj, ps_opts){
 		if(typeof ps_obj == 'undefined') ps_obj = $($.privateProperty.tableRootNode);
 		if(typeof ps_obj == 'undefined') return;
 		if(ps_obj.length == 0) return;
@@ -1595,7 +1596,10 @@
 			new_source = {data:[{}]}
 		}
 		opt["dataJson"] = new_source;
-		var montage = 'before';
+		var montage = 'before'; // 新插入行的位置。值： before 第1行, after 最后一行
+		if (typeof ps_opts != 'undefined') {
+			if (ps_opts["position"] == 'after') montage = 'after';
+		}
 		$.refreshData(opt, {"root":ps_obj, "dump":false, "isAdding":true, "outfit":true, "montage":montage, "undefinedEmpty":true});
 		//界面上
 		var _parent = ps_obj.find('.list-content');
@@ -3139,9 +3143,10 @@ var neuiLikeTable = {
 	 * 即在有数据的列表上添加一行,且该行各列值不空
 	 * @param {object} ps_source 数据源
 	 * @param {object} ps_obj 当前表格对象(可选)
+	 * @param {object} ps_opts 其它参数对象
 	 */
-	insertOneRow:function(ps_source, ps_obj){
-		$('body').insertNewRow(ps_source, ps_obj);
+	insertOneRow:function(ps_source, ps_obj, ps_opts){
+		$('body').insertNewRow(ps_source, ps_obj, ps_opts);
 	},
 
 	/**

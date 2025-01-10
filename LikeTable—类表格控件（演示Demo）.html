@@ -72,18 +72,32 @@
     * 几个插件内部自定义的函数非常有用,如下（以下示例中 $tableDom为指定表格根节点，当只有一张表格时$tableDom为可选项）
         · $.privateProperty.pageCurpage['history'] = 1; // 重置序号
         · neuiLikeTable.addOneRow($tableDom); // 新建一空行
-        · neuiLikeTable.insertOneRow(source, $tableDom); // 新建一空行或非空行. source为数据源. source为空时(即''或{})则新建空行,非空时(如{name:"张三"})则新建非空行
+		
+		  // 新建一空行或非空行. source为数据源. source为空时(即''或{})则新建空行,非空时(如{name:"张三"})则新建非空行。$tableDom 为指定表格Dom对象，第3个参数为其它参数(比如指定新插入行为第1行还是最后一行)
+        · neuiLikeTable.insertOneRow(source, $tableDom, {
+			position: "before" // 新行插入位置。值：before 插入到第1行, after 插入到最后一行
+		  });
+		  
         · neuiLikeTable.deleteOneRow(5, $tableDom); // 删除某一行. 5代表该行索引值
+		
         · neuiLikeTable.setSomeColumnReadonly(["yhjcnf", "dizhi"], 0); // 指定第N行(索引值)中某些列(英文字段)为只读状态 (仅限参数 columns.mode = 'input|textarea' && colmns.disabled=false 时有效)
+		
         · neuiLikeTable.setSomeColumnCanWrite(["yhjcnf", "dizhi"], 0); // 指定第N行(索引值)中某些列(英文字段)为可写状态 (仅限参数 columns.mode = 'input|textarea' && colmns.disabled=true 时有效)
+		
         · neuiLikeTable.changeRowStatus(0, status, $tableDom); // 更改第1行(索引值0)的“状态列”文本为“已保存”. 所有行时，0 改成 'all'。status参数为自定义状态(可选),值：saved 已保存(默认), unsave 未保存。$tableDom参数为表格根对象(可选)
+		
         · neuiLikeTable.selectAllRow($tableDom); // 全选
         · neuiLikeTable.selectNoneRow($tableDom); // 全不选
         · neuiLikeTable.invertAllRow($tableDom); // 反选
+		
         · neuiLikeTable.giveValue2SomeColumn(1, ["username","sex"], ['张三', '李四'], $tableDom); 给指定的某行某些列赋值。参数：第1个参数为行索引值，第2个参数为列字段组成的数组，第3个参数为列值组成的数组，第4个参数为表格根节点对象(可选)
+		
         · var json = neuiLikeTable.getTableListData($tableDom); // 获取表格全部数据(所有行、列组成的json数组)
+		
         · var json = neuiLikeTable.getTableSelectedData($tableDom); // 获取表格选中行数据（“选择”一列有打钩的行组成的json数组）
+		
         · var tips = neuiLikeTable.checkEmptyRow(0, $tableDom); // 校验第0行各个必填列的完整性. 要检验所有行时 0 改成 'all'
+		
         · var tips = neuiLikeTable.checkRepeatRow($tableDom); // 校验重复行(即检验第Y列第M行与第N行是否一样). 一般先设置某一列的unique=true,才使用本函数进行校验
 
 
