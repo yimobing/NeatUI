@@ -1433,11 +1433,23 @@
 	 * 获取表格内部表单数据
 	 * @param {object} ps_obj 当前表格对象(可选)
 	 */
-	var getFormData = function(ps_obj){
+	var getFormData = function (ps_obj) {
+		// 修复前端传递过来表格dom，由于dom没更新取到的依然是旧数据的bug edit 20250111-1 
+		// 特别是点击了上一页、下一页等翻页后，表格取到的数据依然是翻页页数据的bug
+		// console.log('ps_obj：', ps_obj);
 		var error = {"data":[]}
-		if(typeof ps_obj == 'undefined') ps_obj = $($.privateProperty.tableRootNode);
+		if (typeof ps_obj == 'undefined') ps_obj = $($.privateProperty.tableRootNode);
+		else {
+			var node_ids = ps_obj.attr('id');
+			if ($('#' + node_ids).length == 0) {
+				ps_obj = $($.privateProperty.tableRootNode);
+			}
+		}
 		if(typeof ps_obj == 'undefined') return error;
 		if(ps_obj.length == 0) return error;
+		// console.log('ps_obj2：', ps_obj);
+		// console.log('tableRootNode：', $($.privateProperty.tableRootNode));
+
 		var rowArr = [];
 		ps_obj.find('.list-one').not('.list-summary').each(function(i){ //行(不包含小计行、合计行)
 			if($(this).children().length == 0) return false; // 中断循环
