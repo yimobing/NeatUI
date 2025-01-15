@@ -280,6 +280,7 @@
 		var serialColumnWidth = customize == null ? ceilW : parseFloat(customize["serialColumnWidth"]);
 		var discoloration = customize == null ? false: customize["discoloration"] === true ? true : false;
 		var retainIllegalChar = customize == null ? false: customize["retainIllegalChar"] === true ? true : false;
+		var subRowtitle = customize == null ? "小计" : customize["subRowTitle"]; // add 20250115-1
 
 		//重写
 		rowHeight = isNaN(rowHeight) ? 'auto' : rowHeight;
@@ -754,7 +755,7 @@
 
 		/*+------------------------------+*/
 		//__· 创建小计行
-		createSubRow($parent);
+		createSubRow($parent, subRowtitle);
 		
 
 		/*+------------------------------+*/
@@ -1226,13 +1227,16 @@
 	/**
 	 * 创建小计行
 	 * @param {object} ps_obj 表格根节点对象
+	 * @param {String} ps_title 自定义小计行标题
 	 */
-	var createSubRow = function(ps_obj){
+	var createSubRow = function(ps_obj, ps_title){
 		if(typeof ps_obj == 'undefined') ps_obj = $($.privateProperty.tableRootNode);
 		if(typeof ps_obj == 'undefined') return;
 		if(ps_obj.length == 0) return;
 
-		if(ps_obj.find('.list-one').length < 2) return; //小于2行中断执行
+		if (ps_obj.find('.list-one').length < 2) return; //小于2行中断执行
+		if (ps_obj.find('.list-summary').length != 0) return; // 如果已存在小计行则中断，防止重复创建 add 20250115-1
+
 		var subColumnIndexArr = [];
 		ps_obj.find('.list-title>div').each(function(u){
 			var index = u;
@@ -1288,11 +1292,10 @@
 		}
 		//console.log('subValueArr:', subValueArr, 'dotArr:',dotArr);
 		if(subValueArr.length == 0) return;
-
 		var clone = ps_obj.find('.list-one:last-child').clone().addClass('list-summary').removeClass('interlacing'); //复制最后一行
 		clone.children().each(function(u){
 			$(this).empty();
-			if(u == 0) $(this).addClass('col-summary').text('小计');
+			if(u == 0) $(this).addClass('col-summary').text(ps_title);
 			for(var m = 0; m < subValueArr.length; m++){
 				var dot = dotArr[m];
 				var one = subValueArr[m];
@@ -1451,7 +1454,7 @@
 		// console.log('tableRootNode：', $($.privateProperty.tableRootNode));
 
 		var rowArr = [];
-		ps_obj.find('.list-one').not('.list-summary').each(function(i){ //行(不包含小计行、合计行)
+		ps_obj.find('.list-one').not('.list-summary, .list-total').each(function(i){ //行(不包含小计行、合计行)
 			if($(this).children().length == 0) return false; // 中断循环
 			var ls_row_index = i;
 			var ls_hang_hao = ls_row_index + 1;
@@ -1585,6 +1588,40 @@
 	}
 
 
+	/**
+	 * 创建合计行 add 20250115-2
+	 * 即在表格最后一行添加一个合计行
+	 * @param {object} ps_source 数据源
+	 * @param {object} ps_obj 当前表格对象(可选)
+	 * @param {object} ps_opts 其它参数对象(可选)
+	 */
+	var addAddUpRow = function(ps_source, ps_obj, ps_opts){
+		if(typeof ps_obj == 'undefined' || ps_obj == null) ps_obj = $($.privateProperty.tableRootNode);
+		if(typeof ps_obj == 'undefined') return;
+		if (ps_obj.length == 0) return;
+		if (ps_obj.find('.list-one').length < 2) return; //小于2行中断执行
+		if (ps_obj.find('.list-total').length != 0) return; // 如果已存在合计行则中断，防止重复创建
+		var originals = {
+			title: "合计" // 合计行标题
+		}
+		var finals = $.extend(true, {}, originals, ps_opts || {});
+		
+		var clone = ps_obj.find('.list-one:last-child').clone().addClass('list-total').removeClass('interlacing'); //复制最后一行
+		clone.children().each(function(u){
+			$(this).empty();
+			if (u == 0) $(this).addClass('col-total').text(finals.title);
+			var classNames = $(this).attr('class').toString().replace(/(col-)/g, '');
+			// console.log('classnames：', classNames);
+			for (var v in ps_source) {
+				if (classNames.indexOf(v) >= 0) {
+					$(this).html('<span>' + ps_source[v] + '</span>');
+					break;
+				}
+			}
+		})
+		ps_obj.find('.list-content').append(clone);
+	}
+
 
 	/**
 	 * 新增一行(非空行)  edit 20201114-1
@@ -1594,7 +1631,7 @@
 	 * param {object} ps_opts 其它参数对象(可选)
 	 */
 	var insertNewRow = function(ps_source, ps_obj, ps_opts){
-		if(typeof ps_obj == 'undefined') ps_obj = $($.privateProperty.tableRootNode);
+		if(typeof ps_obj == 'undefined' || ps_obj == null) ps_obj = $($.privateProperty.tableRootNode);
 		if(typeof ps_obj == 'undefined') return;
 		if(ps_obj.length == 0) return;
 
@@ -1613,9 +1650,11 @@
 			if (ps_opts["position"] == 'after') montage = 'after';
 		}
 		$.refreshData(opt, {"root":ps_obj, "dump":false, "isAdding":true, "outfit":true, "montage":montage, "undefinedEmpty":true});
-		//界面上
+		// 界面上
+		
+
 		var _parent = ps_obj.find('.list-content');
-		var new_row_hao = _parent.children().length; //新行号
+		var new_row_hao = _parent.children().length; // 新行号
 		var dom = montage == 'before' ? _parent.children(':first-child') : _parent.children(':last-child');
 		dom.find('.cell-radio-group>div').each(function (k) { //重置radio单选
 			var _radio = $('input:radio', this);
@@ -1627,11 +1666,37 @@
 			else $(this).find('input:radio').attr('checked', true);
 		});
 		dom.find('.col-status > input').val(newRecordText); // add  20241221-1
-		_parent.children().each(function(i){ //循环每一列
+		_parent.children().each(function (i) { //循环每一列
 			var index = i + 1;
 			$(this).find('.col-order>span').text(index); //重置序号
-		})
-		ps_obj.find('.list-content, .table-scrollbar').animate({scrollTop: 0}, 'slow'); //滚动条滚动到顶部
+		});
+
+		// 光标聚焦在第1个必填的输入框上(该输入框必须是可写入非禁用状态的) add 20250115-1
+		dom.children().each(function (i) {
+			if (ps_obj.find('.list-title').children().eq(i).attr('data-must') == '1') {
+				var $child = $(this).children();
+				var tagname = $child[0].tagName.toString().toLocaleLowerCase();
+				var tagReadonly = $child.attr('readonly') || '',
+					tabDisabled = $child.attr('disabled') || '';
+				// console.log('tabname：', tagname)
+				// console.log('只读：', tagReadonly)
+				// console.log('禁用：', tabDisabled);
+				if ($(this).is(':visible') && (tagname == 'input' || tagname == 'textarea') && (tagReadonly == '' && tabDisabled == '')){
+					$child.focus();
+				}
+			}
+		});
+		// 滚动条滚动到指定位置 edit 20250115-1
+		var $scrollBar = ps_obj.find('.list-content, .table-scrollbar');
+		if (montage == 'before') {
+			$scrollBar.animate({ scrollTop: 0 }, 'slow'); //滚动条滚动到顶部
+		}
+		else if (montage == 'after') {
+			var maxScrollTop = $scrollBar[0].scrollHeight - $scrollBar.innerHeight();
+			// console.log('maxScrollTop：', maxScrollTop);
+			$scrollBar.animate({ scrollTop: maxScrollTop }, 'slow'); //滚动条滚动到底部
+		}
+		
 
 		//数据源更改,排序时才不会依然是原先的数据源
 		var allSource = {data:[]}
@@ -3078,6 +3143,7 @@
 		neuiLikeTable: tablePC.init,
 		bindPage2Selector: bindPage2Selector,
 		getFormData: getFormData,
+		addAddUpRow: addAddUpRow,
 		insertNewRow: insertNewRow,
 		addNewRow: addNewRow,
 		deleteAnRow: deleteAnRow,
@@ -3148,6 +3214,16 @@ var neuiLikeTable = {
 		return source;
 	},
 
+
+	/**
+	 * 创建合计行 add 20250115-2
+	 * @param {object} ps_source 数据源
+	 * @param {object} ps_obj 当前表格对象(可选)
+	 * @param {object} ps_opts 其它参数对象
+	 */
+	createAddUpRow: function (ps_source, ps_obj, ps_opts) {
+		$('body').addAddUpRow(ps_source, ps_obj, ps_opts);
+	},
 
 
 	/**

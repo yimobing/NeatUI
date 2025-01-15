@@ -71,9 +71,24 @@
     /*
     * 几个插件内部自定义的函数非常有用,如下（以下示例中 $tableDom为指定表格根节点，当只有一张表格时$tableDom为可选项）
         · $.privateProperty.pageCurpage['history'] = 1; // 重置序号
+        · neuiLikeTable.createAddUpRow(source, $tableDom, options); // 创建合计行
+
+        第1个参数 source 为指定合计行上要合计的字段，是一个一维Object对象
+        第2个参数 $tableDom 为指定表格Dom对象，值可以为undefined或null
+        第3个参数 为其它参数。格式 { title: "合计行标题"}
+        // eg.
+        neuiLikeTable.createAddUpRow({
+            "jine_keyong": 1880, // 可用金额
+            "jine_chongzhi_lj": 2880, // 充值金额累计
+            "jine_zengsong_lj": 3880, // 赠送金额累计
+            "jine_xiaofei_lj": 4880, // 消费金额累计
+        }, null, {
+            title: "合计" // 合计行标题
+        });
+
+
         · neuiLikeTable.addOneRow($tableDom); // 新建一空行
-		
-		  // 新建一空行或非空行. source为数据源. source为空时(即''或{})则新建空行,非空时(如{name:"张三"})则新建非空行。$tableDom 为指定表格Dom对象，第3个参数为其它参数(比如指定新插入行为第1行还是最后一行)
+		  // 新建一空行或非空行. source为数据源. source为空时(即''或{})则新建空行,非空时(如{name:"张三"})则新建非空行。$tableDom 为指定表格Dom对象，值可以为undefined或null，第3个参数为其它参数(比如指定新插入行为第1行还是最后一行)
         · neuiLikeTable.insertOneRow(source, $tableDom, {
 			position: "before" // 新行插入位置。值：before 插入到第1行, after 插入到最后一行
 		  });
@@ -163,6 +178,7 @@
             serialColumnWidth: 50, // 序号列(可选),默认50
             discoloration: true, // 是否隔行变(可选),默认false
             retainIllegalChar: false // 单元格内容是否保留非法字符(防止向数据库写入非法字符(可选). true 是, false 否(默认).  false时去掉所有html标签(但标签之间正常的字符会被留下)  true时会保留html标签,但标签会被转成字符串.
+            subRowTitle: "小计", // 自定义小计行标题，默认"小计"(可选) add 20250115-1
         },
         // 
         // 注：使用 neuiLikeTable.addOneRow()、neuiLikeTable.insertOneRow() 添加新行时，会默认把状态列的值赋值为参数的 stateColumn.newRecordText 的值
