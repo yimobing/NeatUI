@@ -280,7 +280,7 @@
 		var serialColumnWidth = customize == null ? ceilW : parseFloat(customize["serialColumnWidth"]);
 		var discoloration = customize == null ? false: customize["discoloration"] === true ? true : false;
 		var retainIllegalChar = customize == null ? false: customize["retainIllegalChar"] === true ? true : false;
-		var subRowtitle = customize == null ? "小计" : customize["subRowTitle"]; // add 20250115-1
+		var subRowtitle = customize == null ? "小计" : typeof customize["subRowTitle"] == 'undefined' ? '小计' : customize["subRowTitle"]; // add 20250115-1
 
 		//重写
 		rowHeight = isNaN(rowHeight) ? 'auto' : rowHeight;
