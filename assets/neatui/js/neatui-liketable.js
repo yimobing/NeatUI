@@ -376,7 +376,6 @@
 		$.privateProperty.changedTxt = savedText;
 		$.privateProperty.remainIllegalChar = retainIllegalChar;
 
-
 		/*+------------------------------+*/
 		//---创建表头与表身
 		var snippetArr = []; //代码片段(二维数组,每个元素是一个json对象. eg. [{row:"行索引", "message":"JS代码"}, [{row:"行索引", "message":"JS代码"}])
@@ -1441,7 +1440,7 @@
 		// 特别是点击了上一页、下一页等翻页后，表格取到的数据依然是翻页页数据的bug
 		// console.log('ps_obj：', ps_obj);
 		var error = {"data":[]}
-		if (typeof ps_obj == 'undefined') ps_obj = $($.privateProperty.tableRootNode);
+		if (typeof ps_obj == 'undefined' || ps_obj == null) ps_obj = $($.privateProperty.tableRootNode);
 		else {
 			var node_ids = ps_obj.attr('id');
 			if ($('#' + node_ids).length == 0) {
@@ -1589,24 +1588,34 @@
 
 
 	/**
-	 * 创建合计行 add 20250115-2
+	 * 创建合计行 add 20250115-2 20250115-3
 	 * 即在表格最后一行添加一个合计行
 	 * @param {object} ps_source 数据源
 	 * @param {object} ps_obj 当前表格对象(可选)
 	 * @param {object} ps_opts 其它参数对象(可选)
 	 */
 	var addAddUpRow = function(ps_source, ps_obj, ps_opts){
-		if(typeof ps_obj == 'undefined' || ps_obj == null) ps_obj = $($.privateProperty.tableRootNode);
-		if(typeof ps_obj == 'undefined') return;
-		if (ps_obj.length == 0) return;
-		if (ps_obj.find('.list-one').length < 2) return; //小于2行中断执行
-		if (ps_obj.find('.list-total').length != 0) return; // 如果已存在合计行则中断，防止重复创建
 		var originals = {
-			title: "合计" // 合计行标题
+			title: "合计", // 合计行标题，默认'合计'(可选)
+			atLeastTwoRow: true // 是否至少2行才创建合计行，默认true。如果希望翻页后少于两行也创建合计行，则设为false
 		}
 		var finals = $.extend(true, {}, originals, ps_opts || {});
+
+		// 修复前端传递过来表格dom，由于dom没更新取到的依然是旧数据的bug edit 20250115-3
+		// 特别是点击了上一页、下一页等翻页后，表格取到的数据依然是翻页页数据的bug
+		if(typeof ps_obj == 'undefined' || ps_obj == null) ps_obj = $($.privateProperty.tableRootNode);
+		else {
+			var node_ids = ps_obj.attr('id');
+			if ($('#' + node_ids).length == 0) {
+				ps_obj = $($.privateProperty.tableRootNode);
+			}
+		}
+		if (typeof ps_obj == 'undefined') return;
+		if (ps_obj.length == 0) return;
+		if (finals.atLeastTwoRow && ps_obj.find('.list-one').length < 2) return; // 小于2行中断执行
+		if (ps_obj.find('.list-total').length != 0) return; // 如果已存在合计行则中断，防止重复创建
 		
-		var clone = ps_obj.find('.list-one:last-child').clone().addClass('list-total').removeClass('interlacing'); //复制最后一行
+		var clone = ps_obj.find('.list-one:last-child').clone().addClass('list-total').removeClass('interlacing'); // 复制最后一行
 		clone.children().each(function(u){
 			$(this).empty();
 			if (u == 0) $(this).addClass('col-total').text(finals.title);
@@ -2413,6 +2422,12 @@
 					if(opt.pagination.loadMore) json["root"] = ele;
 					$.refreshData(opt, json); //刷新表格
                 }
+
+				// add 20250115-3
+				if (opt.pagination.complete) { // 翻页完成表格创建完成后执行的回调
+					opt.pagination.complete();
+				}
+
 				destroyAnimate();
             },100)  
 		}
