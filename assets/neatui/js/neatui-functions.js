@@ -1894,6 +1894,54 @@ var calendar = {
 		return (Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s);
     },
 
+
+    /**
+     * 获取当前时间。eg. 2017-09-05 14:32:21
+     * @param {Object} 参数对象
+     * @returns {String} 返回当前日期
+     */
+    getNowTime: function (options) {
+        var originals = {
+            zero: true, // 月日时分秒不足10的是否前面补0，默认true
+            format: "yyyy-MM-dd HH:mm:ss", // 日期格式，可自由组合常见的日期格式。其中 yyyy 年份, MM 月份, HH 小时, mm 分钟, ss 秒。
+        }
+        var finals = $.extend(true, {}, originals, options);
+        var isZero = finals.zero,
+            formatStr = finals.format;
+        var mydate = new Date();
+		var Y = mydate.getFullYear(),
+			M = mydate.getMonth() + 1,
+			D = mydate.getDate(),
+			h = mydate.getHours(),
+			m = mydate.getMinutes(),
+            s = mydate.getSeconds();
+        if (isZero) {
+            if (M < 10) M = '0' + M;
+            if (D < 10) D = '0' + D;
+            if (h < 10) h = '0' + h;
+            if (m < 10) m = '0' + m;
+            if (s < 10) s = '0' + s;
+        }
+        if (formatStr == 'yyyy-MM-dd HH:mm:ss') return Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s; // 2017-09-05 14:32:21
+        else if (formatStr == 'yyyyMMddHHmmss') return Y + M + D + h + m + s; // eg. 20170905143221
+        else if (formatStr == 'yyyy-MM-dd') return Y + '-' + M + '-' + D; // 2017-09-05
+        else if (formatStr == '年-月-日') return Y + '年' + M + '月' + D + '日'; // eg. 20217年09月05日
+        else if (formatStr == '年-月') return Y + '年' + M + '月'; // eg. 2017年09月
+        else if (formatStr == '月-日') return M + '月' + D + '日'; // eg. 09月05日
+        
+        else if (formatStr == 'yyyy/MM/dd') return Y + '/' + M + '/' + D; // 2017/09/05
+        else if (formatStr == 'dd/MM/yyyy') return D + '/' + M + '/' + Y; // 05/09/2017
+        else if(formatStr == 'HH:mm:ss') return h + ':' + m + ':' + s; // 14:32:21
+            
+        else if(formatStr == 'MM/dd/yyyy') return M + '/' + D + '/' + Y; // 09/05/2017
+        else if(formatStr == 'yyyy-MM-dd HH:mm') return Y + '-' + M + '-' + D + ' ' + h + ':' + m; // 2017-09-05 14:32
+        else if(formatStr == 'MM-dd HH:mm:ss') return M + '-' + D + ' ' + h + ':' + m + ':' + s; // 09-05 14:32:21
+        else if(formatStr == 'MM-dd HH:mm') return M + '-' + D + ' ' + h + ':' + m; // 09-05 14:32
+        else if(formatStr == 'MM-dd') return M + '-' + D; // 09-05
+        else if(formatStr == 'dd/MM') return D + '/' + M; // 05/09
+        else if (formatStr == 'HH:mm') return h + ':' + m; // 14:32
+    },
+
 	/**
 	 * 格式化日期 / 标准化日期时间
 	 * 说明: 该方法有效防止后台传数据格式发生变化. eg.10-19-2017 <==> 2017/10/19
