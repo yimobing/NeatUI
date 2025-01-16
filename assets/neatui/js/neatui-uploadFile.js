@@ -7,7 +7,7 @@
  * Version：v1.0.0
  * Author: MuFeng
  * Date: 2023.05.24
- * Update: 2023.06.21
+ * Update: 2025.01.16
  */
 //================================================================================================
 //              一、控件开始
@@ -37,6 +37,7 @@
             // 默认参数
             var defaults = {
                 enable: true, // 是否启用上传功能(可选)，默认true
+                extClass: '', // 自定义根节点样式名(可选)，默认空
                 fileType: [], // ['png', 'gif', 'jpg', 'jpeg', 'pdf'], // 文件类型限制(必须)，默认为空，表示不限制文件类型
                 fileSize: 300, // 文件大小限制，单位KB(可选)，默认300KB。若是以MB为单位，如要限制成20MB，则写成 20*1024
                 multiple: true, // 是否允许使用批量上传功能(可选)，默认true
@@ -58,7 +59,7 @@
                 successLabel: '上传成功', // 上传成功后显示的提示文字(可选)
                 repeatLabel: '文件重复', // 文件有重复时显示的提示文字(可选)，仅当skipRepeatFile=true时有效。
                 failLabel: '上传失败', // 上传失败后的显示的提示文字(可选)
-                showThumb: true, // 是否显示缩略图(可选)，默认true
+                showThumb: true, // 是否显示缩略图(可选)，默认true。注：非图片无法显示缩略图
                 showSize: true, // 是否显示文件大小(可选)，默认true
                 showProgress: true, // 是否显示进度条(可选)，默认true
                 showCross: true, // 是否显示打叉图标用以删除当前文件(可选)，默认true
@@ -67,7 +68,8 @@
                 overflow: 'auto', // 上传文件列表如果超过一屏，是否显示滚动条(可选)，默认auto。值：auto 使用浏览器的滚动条, scroll 使用区区域的滚动条(可本区域显示自己的滚动条)
                 maxHeight: 0, // 自定义文件列表高度，仅当overflow='scroll'时有效(可选)，默认0。当overflow='scroll'时，系统将自会自动调整区域高度，若想自定义一个高度请设置具体的高度值，如370表示370px
 
-                form: { // 上传区域表单功能(可选)
+                // 上传区域表单功能(可选)
+                form: {
                     // 内置表单
                     enable: true, // 是否启用内置表单功能(可选)，默认true
                     valid: true, // 点上传按钮是内置表单是否必填(可选)，默认true
@@ -75,6 +77,11 @@
                     placeholder: '', // 内置表单输入框的placeholder属性值(可选)，默认true
                     // 外置表单，即自定义表单
                     customHTML: '' // 外置表单(可选)，非空时内置表单功能将不起作用。只有在enable=true且当前参数值不为空时才起作用。
+                },
+                // 预览图片(可选)  add 20250116-1
+                preview: {
+                    enable: false, // 是否启用(可选)，默认false。注：非图片无法预览
+                    extClass: '' // 自定义预览区域的样式名(可选)，默认空
                 },
                 callBack: function (e) { // 开始上传按钮回调事件
                     
@@ -228,7 +235,7 @@
                 return;
             }
             var rootNode = document.createElement('div');
-            rootNode.className = 'ne__upload';
+            rootNode.className = 'ne__upload' + (me.$opts.extClass == '' ? '' : ' ' + me.$opts.extClass);
             rootNode.style.width = dWidth;
             appNode.appendChild(rootNode);
 
@@ -345,124 +352,204 @@
                 me.$FilesArr = []; // 先重置为空(必须)
                 var _listHtml = '';
                 for(var i = 0; i < fList.length; i++){
-                    var item = fList[i];
-                    me.$FilesArr.push(item);
-                    var _name = item.name,
-                        _size = Math.ceil(item.size / 1024), // bite变kb
-                        _type = item.type;
+                    var file = fList[i];
+                    // console.log('item：', item); // 一个文件的信息
+                    me.$FilesArr.push(file);
+                    var _name = file.name,
+                        _size = Math.ceil(file.size / 1024), // bite变kb
+                        _type = file.type;
                     var _nameNotSuffix = _name.substr(0, _name.lastIndexOf('.')); // 文件名无后辍。 最后一个点号出现的索引值
                     _listHtml += [
                         '<div class="neUpload__one">',
-                            (
-                                // 匿名函数马上执行
-                                (function(){
-                                    // 序号
-                                    var _tmpHtml = '';
-                                    if(me.$opts.showOrder){
-                                        _tmpHtml += '<div class="neUpload__order">' + (i + 1) + '</div>';
-                                    }
-                                    return _tmpHtml;
-                                })()
-                            ),     
-                            (
-                                
-                                // 匿名函数马上执行
-                                (function(){
-                                    // 缩略图
-                                    var _tmpHtml = '';
-                                    if(me.$opts.showThumb){
+                        '<div class="neUpload__content">',
+                        (
+                            // 匿名函数马上执行
+                            (function () {
+                                // 序号
+                                var _tmpHtml = '';
+                                if (me.$opts.showOrder) {
+                                    _tmpHtml += '<div class="neUpload__order">' + (i + 1) + '</div>';
+                                }
+                                return _tmpHtml;
+                            })()
+                        ),
+                        (
+                                    
+                            // 匿名函数马上执行
+                            (function () {
+                                // 缩略图
+                                var _tmpHtml = '';
+                                if (me.$opts.showThumb) {
+                                    _tmpHtml = [
+                                        '<div class="neUpload__thumb">',
+                                        '<img class="' + tagThumbClassName + '" src="">',
+                                        '</div>'
+                                    ].join('\r\n')
+                                }
+                                return _tmpHtml;
+                            })()
+                        ),
+                        '<div class="neUpload__detail">',
+                        '<div class="neUpload__form">',
+                        (
+                            // 匿名函数马上执行
+                            (function () {
+                                // 内置表单
+                                var _tmpHtml = '';
+                                if (me.$opts.form.enable && me.$UseOutForm == false) {
+                                    _tmpHtml = [
+                                        '<div class="' + tagFormInClassName + '">',
+                                        '<span>' + me.$opts.form.label + '：</span>',
+                                        '<input type="text" placeholder="' + me.$opts.form.placeholder + '" onblur="this.placeholder=\'' + me.$opts.form.placeholder + '\'" onfocus="this.placeholder=\'\'" value="' + _nameNotSuffix + '">',
+                                        '</div>'
+                                    ].join('\r\n')
+                                }
+                                return _tmpHtml;
+                            })()
+                        ),
+                        (
+                            // 匿名函数马上执行
+                            (function () {
+                                // 自定义表单
+                                var _tmpHtml = '';
+                                if (me.$opts.form.enable) {
+                                    if (me.$UseOutForm) {
                                         _tmpHtml = [
-                                            '<div class="neUpload__thumb">',
-                                                '<img class="' + tagThumbClassName + '" src="">',
+                                            '<div class="' + tagFormOutClassName + '">',
+                                            me.$opts.form.customHTML,
                                             '</div>'
-                                        ].join('\r\n')  
+                                        ].join('\r\n')
                                     }
-                                    return _tmpHtml;
-                                })()
-                            ),
-                            '<div class="neUpload__detail">',
-                                '<div class="neUpload__form">',
-                                    (
-                                        // 匿名函数马上执行
-                                        (function(){
-                                            // 内置表单
-                                            var _tmpHtml = '';
-                                            if(me.$opts.form.enable){ 
-                                                _tmpHtml = [
-                                                    '<div class="' + tagFormInClassName + '">',
-                                                        '<span>' + me.$opts.form.label + '：</span>',
-                                                        '<input type="text" placeholder="' + me.$opts.form.placeholder + '" onblur="this.placeholder=\'' + me.$opts.form.placeholder + '\'" onfocus="this.placeholder=\'\'" value="' + _nameNotSuffix + '">',
-                                                    '</div>'
-                                                ].join('\r\n')
-                                            }
-                                            return _tmpHtml;
-                                        })()
-                                    ),
-                                    (
-                                        // 匿名函数马上执行
-                                        (function(){
-                                            // 自定义表单
-                                            var _tmpHtml = '';
-                                            if(me.$opts.form.enable){
-                                                if(me.$UseOutForm){
-                                                    _tmpHtml = [
-                                                        '<div class="' + tagFormOutClassName + '">',
-                                                        me.$opts.form.customHTML,
-                                                        '</div>'
-                                                    ].join('\r\n')
-                                                }
-                                            }
-                                            return _tmpHtml; 
-                                        })()
-                                    ),
-                                '</div><!--/.neUpload__form-->',
-                                '<div class="neUpload__info">',
-                                    (
-                                        // 匿名函数马上执行
-                                        (function(){
-                                            var tmpSize = helpers.getFormatSize(_size);
-                                            var _tmpHtml = '';
-                                            if(me.$opts.showSize){
-                                                _tmpHtml += '<span class="neUpload__info_size">' + tmpSize + '</span>';
-                                            }
-                                            return _tmpHtml;
-                                        })()
-                                    ),
-                                    '<span class="neUpload__info_name">' + _name + '</span>',
-                                '</div>',
-                                '<div class="neUpload__progress">',
-                                    '<span class="neUpload__progress_state' + dStatusClassName + '">等待上传</span>',
-                                    (
-                                        (function(){
-                                            var _tmpHtml = '';
-                                            if(cShowProgress){
-                                                _tmpHtml= [
-                                                    '<progress value="0" max="100"></progress>',
-                                                    '<span class="neUpload__progress_percent">0%</span>'
-                                                ].join('\r\n')
-                                            }
-                                            return _tmpHtml;
-                                        })()
-                                    ),
-                                '</div>',
-                            '</div><!--/.neUPload__details-->',
-                            (
-                                // 匿名函数马上执行
-                                (function(){
-                                    var _tmpHtml = '';
-                                    if(me.$opts.showCross){
-                                        _tmpHtml += '<div class="neUpload__remove" title="删除"></div>'; // 打叉节点(删除)
-                                    }
-                                    return _tmpHtml;
-                                })()
-                            ),
-                            '<div class="neUpload__tick" style="display: none"></div>', // 打勾节点(成功)
-                            '<div class="neUpload__sigh" style="display: none"></div>', // 感叹节点(失败)
+                                }
+                                return _tmpHtml;
+                            })()
+                        ),
+                        '</div><!--/.neUpload__form-->',
+                        '<div class="neUpload__info">',
+                        (
+                            // 匿名函数马上执行
+                            (function () {
+                                var tmpSize = helpers.getFormatSize(_size);
+                                var _tmpHtml = '';
+                                if (me.$opts.showSize) {
+                                    _tmpHtml += '<span class="neUpload__info_size">' + tmpSize + '</span>';
+                                }
+                                return _tmpHtml;
+                            })()
+                        ),
+                        '<span class="neUpload__info_name">' + _name + '</span>',
+                        '</div>',
+                        '<div class="neUpload__progress">',
+                        '<span class="neUpload__progress_state' + dStatusClassName + '">等待上传</span>',
+                        (
+                            (function () {
+                                var _tmpHtml = '';
+                                if (cShowProgress) {
+                                    _tmpHtml = [
+                                        '<progress value="0" max="100"></progress>',
+                                        '<span class="neUpload__progress_percent">0%</span>'
+                                    ].join('\r\n')
+                                }
+                                return _tmpHtml;
+                            })()
+                        ),
+                        '</div>',
+                        '</div><!--/.neUPload__details-->',
+                        (
+                            // 匿名函数马上执行
+                            (function () {
+                                var _tmpHtml = '';
+                                if (me.$opts.showCross) {
+                                    _tmpHtml += '<div class="neUpload__remove" title="删除"></div>'; // 打叉节点(删除)
+                                }
+                                return _tmpHtml;
+                            })()
+                        ),
+                        '<div class="neUpload__tick" style="display: none"></div>', // 打勾节点(成功)
+                        '<div class="neUpload__sigh" style="display: none"></div>', // 感叹节点(失败)   
+                        '</div><!--/.neUpload__content-->',
+                        (
+                            // 预览图片
+                            (function () {
+                                var preExtClass = me.$opts.preview.extClass == '' ? '' : ' ' + me.$opts.preview.extClass;
+                                return me.$opts.preview.enable == false ? '' : '<div class="neUpload__preview' + preExtClass + '"></div>';   
+                            })()
+                                
+                        ),
                         '</div><!--/.neUpload__one-->'
                     ].join('\r\n')
                 }
 
                 me.$ListDom.innerHTML = _listHtml;
+
+                // 显示缩略图+ 预览图片 add 20250116-1
+                // FileReader的onload事件是异步的，故要用async await进行同步处理
+                if (typeof window !== 'undefined' && window.document) {
+                    // 在浏览器环境中
+                    const hasAsyncAwait = (async function () { })() instanceof Promise;
+                    const hasPromise = typeof Promise !== 'undefined';
+                    // console.log('Async/Await支持:', hasAsyncAwait);
+                    // console.log('Promise支持:', hasPromise); 
+                    if (hasAsyncAwait == false) {
+                        helpers.prompt('您当前浏览器不支持async await，故无法预览！');
+                        return;
+                    }
+                    if (hasPromise == false) {
+                        helpers.prompt('您当前浏览器不支持promise，故无法预览文件！');
+                        return;
+                    }
+
+                    previewFile();
+                    async function previewFile() {
+                        for (var i = 0; i < fList.length; i++) {
+                            var $elOne = document.querySelectorAll('.neUpload__one'),
+                                $elPic = $elOne[i].getElementsByClassName(tagThumbClassName)[0];
+                                $elCpt = $elOne[i].getElementsByClassName('neUpload__preview')[0];
+                            // console.log('elPic：', $elPic);
+                            // console.log('cpt：', $elCpt);
+                            var file = fList[i];
+                            if (file && /^image\//i.test(file.type)) { // 仅当文件是图片类型
+                                var img_url = await readFileUrl(file);
+                                // 缩略图
+                                if (typeof $elPic != 'undefined') {
+                                    $elPic.src = img_url;
+                                }
+                                // 预览图
+                                if (typeof $elCpt != 'undefined') {
+                                    var imgElement = document.createElement("img");
+                                    imgElement.src = img_url;
+                                    $elCpt.appendChild(imgElement);
+                                }
+                            }
+                            else {
+                                if (typeof $elPic != 'undefined') {
+                                    $elPic.setAttribute('alt', '不是图片，无法显示缩略图');
+                                }
+                                console.error('不是图片，无法预览');
+                            }
+                        }
+                    }
+                    
+                    function readFileUrl(file) {
+                        return new Promise(function (resolve, reject) {
+                            var reader = new FileReader(); // 创建FileReader对象
+                            reader.readAsDataURL(file); // 读取文件内容
+                            // 定义文件读取完成后的响应函数
+                            reader.onload = function (evt) {
+                                var imgSrc = evt.target.result; // 当前读取的图片DataURL
+                                resolve(imgSrc);
+                                // 将图片添加到预览容器中
+                                // var previewContainer = document.getElementById("previewImg");
+                                // var imgElement = document.createElement("img");
+                                // imgElement.className = 'imgPreview'; // 可为图片添加样式
+                                // imgElement.src = imgSrc;
+                                // previewContainer.appendChild(imgElement);
+                            }
+                        })
+                    }
+                }
+
+
                 //~~~~~~~~ 5. 执行系列事件1 ~~~~~~~~
                 _this.fnOnRemoveFile(me); // 删除文件事件
                 
