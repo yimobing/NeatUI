@@ -15,10 +15,10 @@
     <title>sheetExcel —— 导入导出EXCEL控件</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"><!--前端框架-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"><!--对话框-->
-    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-sheetExcel.css"><!--导入导出EXCEL控件-->
-    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!--对话框-->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-sheetExcel.css"> <!--导入导出EXCEL控件-->
+    <script>if(top.location != self.location){ top.location = self.location; }</script>
 </head>
 <body>
     <style>
@@ -83,6 +83,18 @@
         <div class="controls__caption">控件调用方式</div>
         <div class="controls__demo">
             <pre>
+                引入样式及库文件：
+                &lt;link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-sheetExcel.css"&gt; &lt;!--导入导出EXCEL控件--&gt;
+                &lt;script src="assets/libs/xlsx.core.min.js"&gt;&lt;/script&gt; &lt;!--SheetJS的js-xlsx基础库--&gt;
+                &lt;script src="assets/libs/xlsx.bundle.js"&gt;&lt;/script&gt; &lt;!--xlsx-js-style表格样式库,基于SheetJS--&gt;
+                &lt;script src="assets/neatui/js/neatui-sheetExcel.js"&gt;&lt;/script&gt; &lt;!--导入导出EXCEL控件--&gt;
+
+                文件说明：
+                xlsx.core.min.js 是 sheetJS库基础版(免费的)。
+                xlsx.bundle.js 是一个第三方库(不是sheetJs开发的)，用于设置表格样式。当本控件导出选项参数options或options启用样式设置时，即 opts.style.enable 设置为 true 时就需要引入此库文件。
+                neatui-sheetExcel.js 和 neatui-sheetExcel.css 是本人在基于sheetJS基础上进行封装的(即本控件)，你在使用过程中调用到的任何方法都需要引入此文件。
+
+
                 控件内置了以下函数。
                 neuiSheetExcel(options); // 初始化控件，支持导入、导出表格数据
                 neuiSheetExcel.exportExcel(arr, opts); // 仅导出表格数据，不需要先初始化控件
@@ -197,6 +209,33 @@
                     }
                 }
 
+                // cellFormatStyle 对象设置示例：
+                // 单元格样式 格式 eg.
+                var cellFormatStyle = {
+                    alignment: {
+                        horizontal: 'center'
+                    },
+                    font: { // 字体设置
+                        sz: 12,
+                        bold: true,
+                        color: {
+                            rgb: '000000'// 十六进制，不带#
+                        }
+                    },
+                    alignment: { // 文字居中
+                        horizontal: 'center',
+                        vertical: 'center',
+                        wrapText: true
+                    },
+                    border: {
+                        top: { style: 'thin' },
+                        right: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        left: { style: 'thin' }
+                    }
+                }
+                
+
                 (3) 使用示例：参数本页示例部分。
 
 
@@ -265,14 +304,14 @@
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
-    <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script><!--jQ库-->
-    <script type="text/javascript" src="assets/libs/xlsx.core.min.js"></script><!--SheetJS的js-xlsx基础库-->
-    <script type="text/javascript" src="assets/libs/xlsx.bundle.js"></script><!--xlsx-js-style表格样式库,基于SheetJS-->
-    <script type="text/javascript" src="assets/neatui/js/neatui.min.js"></script><!--前端框架-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-dialog.js"></script><!--对话框-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-ajax.js"></script><!--自定义AJAX-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-sheetExcel.js"></script><!--导入导出EXCEL控件-->
-    <script type="text/javascript" src="assets/neatui/js/neatui-functions.js"></script><!--函数库-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script> <!--jQ库-->
+    <script src="assets/libs/xlsx.core.min.js"></script> <!--SheetJS的js-xlsx基础库-->
+    <script src="assets/libs/xlsx.bundle.js"></script> <!--xlsx-js-style表格样式库,基于SheetJS-->
+    <script src="assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
+    <script src="assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
+    <script src="assets/neatui/js/neatui-ajax.js"></script> <!--自定义AJAX-->
+    <script src="assets/neatui/js/neatui-sheetExcel.js"></script> <!--导入导出EXCEL控件-->
+    <script src="assets/neatui/js/neatui-functions.js"></script> <!--函数库-->
     <script type="text/javascript">
         /*+————————————————全局变量————————————————+*/
  
