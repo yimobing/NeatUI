@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>批量上传图片</title>
+    <title>批量上传图片或文件</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css">
@@ -58,53 +58,55 @@
 
                     var options = {
                         enable: true, // 是否启用上传功能(可选)，默认true
-                        extClass: '', // 自定义根节点样式名(可选)，默认空
-                        fileType: [], // ['png', 'gif', 'jpg', 'jpeg', 'pdf'], // 文件类型限制(必须)，默认为空，表示不限制文件类型
+                        extClass: "", // 自定义根节点样式名(可选)，默认空
+                        fileType: [], // ["png", "gif", "jpg", "jpeg", "pdf"], // 文件类型限制(必须)，默认为空，表示不限制文件类型
                         fileSize: 300, // 文件大小限制，单位KB(可选)，默认300KB。若是以MB为单位，如要限制成20MB，则写成 20*1024
+                        filePixel: "", // 文件尺寸像素建议，默认空(可选)。一般仅当图片要限制质量大小时，才会使用尺寸像素建议。eg. "建议图片像素150px*150px"
                         multiple: true, // 是否允许使用批量上传功能(可选)，默认true
-                        width: 600, // 区域宽度，默认单位为px(可选)，默认600px。可传像素值600或600px表示600px，或传百分比'60%'
-                        increment: true, // 文件是否使用“增量模式”进行上传(可选)，默认true。true 是表示“增量模式”， false 否表示“替换模式”
+                        width: 600, // 区域宽度，默认单位为px(可选)，默认600px。可传像素值600或600px表示600px，或传百分比"60%"
+                        increment: false, // 文件是否使用“增量模式”进行上传(可选)，默认false。true 是表示“增量模式”， false 否表示“替换模式”
                         // [增量模式说明] 
                         // true 每次选择文件会和“已有列表中的文件”进行比较，若有新文件则把它添加到列表中，若无则不添加; 
                         // false 每次选择文件会把“已有列表中的文件”替换成当前选择的文件。
                         // 举例：“已有列表中的文件”为[1,2,3,4]，当前选择了文件[2,3,5,6]，则true时列表中的文件会变成[1,2,3,5,6]，false时列表中文件会变成[2,3,5,6]
                         
                         // 文件重复自动跳过 add 20230616-1
-                        skipRepeatFile: true, // 是否启用文件重复自动跳过功能(可选)，默认true。主要用于后端文件检查，如果检查到文件重复，则界面上手动移除重复的
-                        skipMessage: '文件重复，自动跳过', // 文件重复自动跳过功能提示文字(可选)。仅当 skipRepeatFile=true时有效。
-
+                        skipRepeatFile: false, // 是否启用文件重复自动跳过功能(可选)，默认false。主要用于后端文件检查，如果检查到文件重复，则界面上手动移除重复的
+                        skipMessage: "文件重复，自动跳过", // 文件重复自动跳过功能提示文字(可选)。仅当 skipRepeatFile=true时有效。
+        
                         //
-                        chooseButtonLabel: '选择文件', // 选择文件按钮的显示文字(可选)
-                        upButtonLabel: '开始上传', // 上传按钮的显示文字(可选)
-                        suggestionLabel: '', // 建议信息(可选)，默认空。若为空系统将根据文件类型及限制的大小输出一段文字，如”只能上传png/gif/jpg/jpeg文件，且大小不超过500KB”
-                        successLabel: '上传成功', // 上传成功后显示的提示文字(可选)
-                        repeatLabel: '文件重复', // 文件有重复时显示的提示文字(可选)，仅当skipRepeatFile=true时有效。
-                        failLabel: '上传失败', // 上传失败后的显示的提示文字(可选)
-                        showThumb: true, // 是否显示缩略图(可选)，默认true
+                        chooseButtonLabel: "选择文件", // 选择文件按钮的显示文字(可选)
+                        upButtonLabel: "开始上传", // 上传按钮的显示文字(可选)
+                        suggestionLabel: "", // 建议信息(可选)，默认空。若为空系统将根据文件类型及限制的大小输出一段文字，如”只能上传png/gif/jpg/jpeg文件，且大小不超过500KB”
+                        successLabel: "上传成功", // 上传成功后显示的提示文字(可选)
+                        repeatLabel: "文件重复", // 文件有重复时显示的提示文字(可选)，仅当skipRepeatFile=true时有效。
+                        failLabel: "上传失败", // 上传失败后的显示的提示文字(可选)
+                        showThumb: true, // 是否显示缩略图(可选)，默认true。注：非图片无法显示缩略图
                         showSize: true, // 是否显示文件大小(可选)，默认true
                         showProgress: true, // 是否显示进度条(可选)，默认true
                         showCross: true, // 是否显示打叉图标用以删除当前文件(可选)，默认true
                         showOrder: true, // 是否显示文件序号(可选)，默认true
-
-                        overflow: 'auto', // 上传文件列表如果超过一屏，是否显示滚动条(可选)，默认auto。值：auto 使用浏览器的滚动条, scroll 使用区区域的滚动条(可本区域显示自己的滚动条)
-                        maxHeight: 0, // 自定义文件列表高度，仅当overflow='scroll'时有效(可选)，默认0。当overflow='scroll'时，系统将自会自动调整区域高度，若想自定义一个高度请设置具体的高度值，如370表示370px
-
+        
+                        overflow: "auto", // 上传文件列表如果超过一屏，是否显示滚动条(可选)，默认auto。值：auto 使用浏览器的滚动条, scroll 使用区区域的滚动条(可本区域显示自己的滚动条)
+                        maxHeight: 0, // 自定义文件列表高度，仅当overflow="scroll"时有效(可选)，默认0。当overflow="scroll"时，系统将自会自动调整区域高度，若想自定义一个高度请设置具体的高度值，如370表示370px
+        
                         // 上传区域表单功能(可选)
                         form: {
                             // 内置表单
-                            enable: true, // 是否启用内置表单功能(可选)，默认true
+                            enable: false, // 是否启用内置表单功能(可选)，默认false
                             valid: true, // 点上传按钮是内置表单是否必填(可选)，默认true
-                            label: '文件名', // 内置表单的文本(可选)，默认'文件名'
-                            placeholder: '', // 内置表单输入框的placeholder属性值(可选)，默认true
+                            label: "文件名", // 内置表单的文本(可选)，默认"文件名"
+                            placeholder: "", // 内置表单输入框的placeholder属性值(可选)，默认true
                             // 外置表单，即自定义表单
-                            customHTML: '' // 外置表单(可选)，非空时内置表单功能将不起作用。只有在enable=true且当前参数值不为空时才起作用。
+                            customHTML: "" // 外置表单(可选)，非空时内置表单功能将不起作用。只有在enable=true且当前参数值不为空时才起作用。
                         },
-                        // 预览图片(可选)
+                        // 预览图片(可选)  add 20250116-1
                         preview: {
-                            enable: true, // 是否启用(可选)，默认false。注：非图片无法预览
-                            extClass: '' // 自定义预览区域的样式名(可选)，默认空
+                            enable: false, // 是否启用(可选)，默认false。注：非图片无法预览
+                            extClass: "" // 自定义预览区域的样式名(可选)，默认空
                         },
                         callBack: function (e) { // 开始上传按钮回调事件
+                            
                         }
                     }
 
@@ -217,55 +219,56 @@
             // 1.初始化
             oneCase.init('#app', {
                 enable: true, // 是否启用上传功能(可选)，默认true
-                extClass: '', // 自定义根节点样式名(可选)，默认空
-                fileType: ['png', 'gif', 'jpg', 'jpeg', 'xlsx'], // 文件类型限制(必须)，默认空。
+                extClass: "", // 自定义根节点样式名(可选)，默认空
+                fileType: ["png", "gif", "jpg", "jpeg", "xlsx"], // 文件类型限制(必须)，默认空。
                 fileSize: 300, // 文件大小限制，单位KB(可选)，默认300KB。若是以MB为单位，如要限制成20MB，则写成 20*1024
+                filePixel: "建议图片像素150px*150px", // 文件尺寸像素建议，默认空(可选)。一般仅当图片要限制质量大小时，才会使用尺寸像素建议。eg. "建议图片像素150px*150px"
                 multiple: true, // 是否允许使用批量上传功能(可选)，默认true
-                width: 600, // 区域宽度，默认单位为px(可选)，默认600px。可传像素值600或600px表示600px，或传百分比'60%'
-                increment: true, // 文件是否使用“增量模式”进行上传(可选)，默认true。true 是表示“增量模式”， false 否表示“替换模式”
+                width: 600, // 区域宽度，默认单位为px(可选)，默认600px。可传像素值600或600px表示600px，或传百分比"60%"
+                increment: true, // 文件是否使用“增量模式”进行上传(可选)，默认false。true 是表示“增量模式”， false 否表示“替换模式”
                 // [增量模式说明] 
                 // true 每次选择文件会和“已有列表中的文件”进行比较，若有新文件则把它添加到列表中，若无则不添加; 
                 // false 每次选择文件会把“已有列表中的文件”替换成当前选择的文件。
                 // 举例：“已有列表中的文件”为[1,2,3,4]，当前选择了文件[2,3,5,6]，则true时列表中的文件会变成[1,2,3,5,6]，false时列表中文件会变成[2,3,5,6]
 
                 // 文件重复自动跳过 add 20230616-1
-                skipRepeatFile: true, // 是否启用文件重复自动跳过功能(可选)，默认true。主要用于后端文件检查，如果检查到文件重复，则界面上手动移除重复的
-                skipMessage: '文件重复，自动跳过', // 文件重复自动跳过功能提示文字(可选)。仅当 skipRepeatFile=true时有效。
+                skipRepeatFile: true, // 是否启用文件重复自动跳过功能(可选)，默认false。主要用于后端文件检查，如果检查到文件重复，则界面上手动移除重复的
+                skipMessage: "文件重复，自动跳过", // 文件重复自动跳过功能提示文字(可选)。仅当 skipRepeatFile=true时有效。
 
-                chooseButtonLabel: '选择文件', // 选择文件按钮的显示文字(可选)
-                upButtonLabel: '开始上传', // 上传按钮的显示文字(可选)
-                suggestionLabel: '', // 建议信息(可选)，默认空。若为空系统将根据文件类型及限制的大小输出一段文字，如”只能上传png/gif/jpg/jpeg文件，且大小不超过500KB”
-                successLabel: '上传成功', // 上传成功后显示的提示文字(可选)
-                repeatLabel: '文件重复', // 文件有重复时显示的提示文字(可选)，仅当skipRepeatFile=true时有效。
-                failLabel: '上传失败', // 上传失败后的显示的提示文字(可选)
+                chooseButtonLabel: "选择文件", // 选择文件按钮的显示文字(可选)
+                upButtonLabel: "开始上传", // 上传按钮的显示文字(可选)
+                suggestionLabel: "", // 建议信息(可选)，默认空。若为空系统将根据文件类型及限制的大小输出一段文字，如”只能上传png/gif/jpg/jpeg文件，且大小不超过500KB”
+                successLabel: "上传成功", // 上传成功后显示的提示文字(可选)
+                repeatLabel: "文件重复", // 文件有重复时显示的提示文字(可选)，仅当skipRepeatFile=true时有效。
+                failLabel: "上传失败", // 上传失败后的显示的提示文字(可选)
                 showThumb: true, // 是否显示缩略图(可选)，默认true
                 showSize: true, // 是否显示文件大小(可选)，默认true
                 showProgress: true, // 是否显示进度条(可选)，默认true
                 showCross: true, // 是否显示打叉图标用以删除当前文件(可选)，默认true
                 showOrder: true, // 是否显示文件序号(可选)，默认true
 
-                overflow: 'scroll', // 文件列表如果超过一屏，是否显示滚动条(可选)，默认auto。值：auto 使用浏览器的滚动条, scroll 使用自己的滚动条(可本区域显示自己的滚动条)
-                maxHeight: 0, // 自定义文件列表高度，仅当overflow='scroll'时有效(可选)，默认0。当overflow='scroll'时，系统将自会自动调整区域高度，若想自定义一个高度请设置具体的高度值，如370表示370px
+                overflow: "scroll", // 文件列表如果超过一屏，是否显示滚动条(可选)，默认auto。值：auto 使用浏览器的滚动条, scroll 使用自己的滚动条(可本区域显示自己的滚动条)
+                maxHeight: 0, // 自定义文件列表高度，仅当overflow="scroll"时有效(可选)，默认0。当overflow="scroll"时，系统将自会自动调整区域高度，若想自定义一个高度请设置具体的高度值，如370表示370px
         
                 // 上传区域表单功能(可选)
                 form: {
                     // 内置表单
-                    enable: true, // 是否启用内置表单功能(可选)，默认true
+                    enable: true, // 是否启用内置表单功能(可选)，默认false
                     valid: true, // 点上传按钮时内置表单是否必填(可选)，默认true
-                    label: '案件编号', // 内置表单的文本(可选)，默认'文件名'
-                    placeholder: '请填写案件编号', // 内置表单输入框的placeholder属性值(可选)，默认true
+                    label: "案件编号", // 内置表单的文本(可选)，默认"文件名"
+                    placeholder: "请填写案件编号", // 内置表单输入框的placeholder属性值(可选)，默认true
                     // 外置表单，即自定义表单
-                    customHTML: '' // 外置表单(可选)，非空时内置表单功能将不起作用。只有在enable=true且当前参数值不为空时才起作用。
+                    customHTML: "" // 外置表单(可选)，非空时内置表单功能将不起作用。只有在enable=true且当前参数值不为空时才起作用。
                 },
                 // 预览图片(可选)
                 preview: {
                     enable: true, // 是否启用(可选)，默认false。注：非图片无法预览
-                    extClass: '' // 自定义预览区域的样式名(可选)，默认空
+                    extClass: "" // 自定义预览区域的样式名(可选)，默认空
                 },
                 callBack: function(e){ // 开始上传按钮回调
-                    // console.log('e：', e);
+                    // console.log("e：", e);
                     var isContinue= fnRunCheck(e);
-                    // console.log('真正等待上传的文件：', e);
+                    // console.log("真正等待上传的文件：", e);
                     if(isContinue){
                         fnRunUpload(e);
                     }
