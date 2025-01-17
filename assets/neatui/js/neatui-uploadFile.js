@@ -584,14 +584,16 @@
                     var oldElement = oldArr[index]; // 要移除的文件在原文件中的索引值
                     var newIndex = me.$FilesArr.indexOf(oldElement);
                     // 更新列表
-                    var parentNode = item.parentNode,
+                    var parentNode = item.parentNode.parentNode,
                         grandNode = parentNode.parentNode;
                         nextBrotherDom = helpers.getAllNextElement(parentNode), // 后面的兄弟节点
                     // console.log('祖父节点：', grandNode, '\n父节点：', parentNode);
                     // console.log('后面的兄弟节点：', nextBrotherDom);
                     grandNode.removeChild(parentNode); // 移除当前节点
                     nextBrotherDom.forEach(function(v, cIndex){ // 更新序号
-                        v.getElementsByClassName('neUpload__order')[0].innerText = newIndex + cIndex + 1;
+                        if (v.getElementsByClassName('neUpload__order').length > 0) {
+                            v.getElementsByClassName('neUpload__order')[0].innerText = newIndex + cIndex + 1;
+                        }
                     });
                     // 更新数据
                     // me.$FilesArr.splice(index, 1); // 不能这样
