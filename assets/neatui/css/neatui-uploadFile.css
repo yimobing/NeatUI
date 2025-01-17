@@ -79,6 +79,10 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
     color: #fff;
     cursor: pointer;
 }
+.neUpload__operate button[type="button"]:hover{
+	opacity: .6;
+	filter: alpha(opacity = 60);
+}
 .neUpload__tips {
 	margin-top: 10px;
     color: #666;
