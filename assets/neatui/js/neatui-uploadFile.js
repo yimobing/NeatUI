@@ -38,6 +38,7 @@
             var defaults = {
                 enable: true, // 是否启用上传功能(可选)，默认true
                 extClass: "", // 自定义根节点样式名(可选)，默认空
+                allowMore: false, // 是否允许一个绑定节点下创建多个控件(可选)，默认false
                 fileType: [], // ["png", "gif", "jpg", "jpeg", "pdf"], // 文件类型限制(必须)，默认为空，表示不限制文件类型
                 fileSize: 300, // 文件大小限制，单位KB(可选)，默认300KB。若是以MB为单位，如要限制成20MB，则写成 20*1024
                 filePixel: "", // 文件尺寸像素建议，默认空(可选)。一般仅当图片要限制质量大小时，才会使用尺寸像素建议。eg. "建议图片像素150px*150px"
@@ -235,6 +236,9 @@
             if(typeof appNode == 'undefined'){
                 helpers.prompt('您绑定的节点不存在，请检查' + elem.toString() + '是否存在');
                 return;
+            }
+            if (me.$opts.allowMore == false && appNode.getElementsByClassName('ne__upload').length != 0) { // 如果不允许创建多个控件，则先清空根节点下的内容
+                appNode.innerHTML = '';
             }
             var rootNode = document.createElement('div');
             rootNode.className = 'ne__upload' + (me.$opts.extClass == '' ? '' : ' ' + me.$opts.extClass);
