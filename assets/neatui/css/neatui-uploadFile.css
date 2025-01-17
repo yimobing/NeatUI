@@ -6,7 +6,7 @@
  * Version：v1.0.0
  * Author: Mufeng
  * Date: 2023.05.24
- * Update: 2025.01.16
+ * Update: 2025.01.17
  */
 /*+-------------------------+*/
 *{margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -198,9 +198,11 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
 
 .neUpload__preview img{
 	width: auto;
-	max-width: 50%;
+	max-width: 98%;
 	height: auto;
-	max-height: 100px;
+	max-height: 300px;
+	margin: 0 auto;
+	text-align: center;
 }
 
 .neUpload__order{
