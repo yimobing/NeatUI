@@ -348,10 +348,13 @@ if (!Element.prototype.closest) {
             qu = result.qu;
         }
     */
-    $.getUrlParam = function(name){
+    $.getUrlParam = function (name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var r = window.location.search.substr(1).match(reg);
-        if(r != null) return decodeURI(r[2]);
+        if (r != null) {
+            var str = r[2].toString().replace(/(%3C%=|%3C%|%%3E)/g, ''); // 去掉 <%= 和 %>
+            return decodeURI(str);
+        }
         return null;
     };
 })(jQuery);
