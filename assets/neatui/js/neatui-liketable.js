@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author: ChenMufeng
 * Date: 2020.03.26
-* Update: 2025.01.02
+* Update: 2025.01.20
 
 */
 (function($){
@@ -411,7 +411,7 @@
 					fontColor = typeof row["fontColor"] == 'undefined' ? null : row["fontColor"],
 					b_alt = typeof row["b_alt"] == 'undefined' ? null : row["b_alt"],
 					b_onlyImage = typeof row["b_onlyImage"] == 'undefined' ? false : (row["b_onlyImage"] == true ? true : false), //默认false
-					align = typeof row["align"] == 'undefined' ? 'left' : row["align"],
+					align = typeof row["align"] == 'undefined' ? '' : row["align"],
 					colHeadBgColor = typeof row["colHeadBgColor"] == 'undefined' ? '' : row["colHeadBgColor"],
 					colHeadColor = typeof row["colHeadColor"] == 'undefined' ? '' : row["colHeadColor"],
 					colArrowColor = typeof row["colArrowColor"] == 'undefined' ? '' : row["colArrowColor"],
@@ -453,7 +453,7 @@
 				var _displayStr = display != 'none' ? '' : ';display:none;';
 				var _colClass = (field == '' || field == null) ? 'col-' + mode : 'col-' + field;
 				var _stickyClass = sticky ? ' foremost' : '';
-				var _alignClass = align == 'left' ? '' : ' ' + align;
+				var _alignClass = align == '' ? '' : (align == 'left' ? ' left' : ' ' + align);
 				var _colBgColorStr = colHeadBgColor == '' ? '' : ';background-color:' + colHeadBgColor;
 				var _colColorStr = colHeadColor == '' ? '' : ';color:' + colHeadColor;
 				var _arrowStyle = colArrowColor == '' ? '' : ' style="color:' + colArrowColor + '"';
