@@ -57,12 +57,13 @@
                 --------------------------------
                 var options = {
                     // 控件自定义的参数
-                    · heading     接口中文名称或描述(字符型)
-                    · debug       是否启用调试模式(布尔型). true 是, false 否。本地环境 true, 但生产环境下建议 false
-                    · clean: false, // 是否去掉请求地址中的某些后辍参数,默认false(可选)。注：目前正则还没写好,只能去掉链接地址中只有一个参数，多个参数无法只去掉某一个。
+                    heading: "", // 接口中文名称或描述(字符型)
+                    debug: false, // 是否启用调试模式(布尔型). true 是, false 否。本地环境 true, 但生产环境下建议 false
+                    clean: false, // 是否去掉请求地址中的某些后辍参数,默认false(可选)。注：目前正则还没写好,只能去掉链接地址中只有一个参数，多个参数无法只去掉某一个。
                     // 使用 Mock 模拟数据时，项目正式上线时，只要将 clean 设为 true，控件就会自动去掉 url 请求地址中的某几个字符串，这几个字符串见参数 matches: ['param']
-                    · matches: [], // 请求地址中的后辍参数组成的数组,默认空数组(可选). 仅当 clean=true时有效.eg. matches['param'], 则url为'aabb.com?param=1&add=2' 将变成 'aabb.com?add=2'
-
+                    matches: [], // 请求地址中的后辍参数组成的数组,默认空数组(可选). 仅当 clean=true时有效.eg. matches['param'], 则url为'aabb.com?param=1&add=2' 将变成 'aabb.com?add=2'
+					loginTimeoutPage: "", // 登录超时跳转页面链接地址，默认空表示不跳转。add 20250120-1
+					 
                     // JQuery Ajax 原生的参数说明
                     async: false, // 请求是否异步(可选)。原始的默认是true
                     type: "POST", // 请求类型(可选)。值：get 或 post。注：有 data 参数时，若使用 Mock.js 模拟数据则要设置 type='POST'
@@ -119,7 +120,8 @@
 
                 // ②.获取数据时
                 if(toolTip.zeroLengthTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 数组长度为零时提醒,其它情况不提醒(警告级别 WARNING)
-                if(toolTip.mistakeTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 犯错就提醒(严格级别 STRICT)
+                if(toolTip.mistakeTips(res, this.url, this.heading, this.debug, this.loginTimeoutPage)) { isHoldOn = false; return; } // 犯错就提醒(严格级别 STRICT)
+				其中 toolTip.mistakeTips() 最后一个参数 this.loginTimeoutPage 是非必须(可选)的
 
                 // 2、ERROR函数中
                 if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) { isHoldOn = false; return; } // 接口不通ERROR提醒(致命错误 ERROR)

@@ -3,7 +3,7 @@
  * [jquery ajax自定义封装]
  * Author: mufeng
  * Date: 2021.01.04
- * Update: 2025.01.20
+ * Update: 2021.06.10
  */
 //========================================================================================================================
 //                                                          一、jQuery控件
@@ -46,7 +46,6 @@
                 // 自定义的参数
                 heading: "", // 接口描述(中文)
                 debug: false, // 是否启用调试模式,默认false. 调试模式下会把具体错误信息提示给用户看,非调试模式下只会给用户友好提示信息
-                loginTimeoutPage: "", // 登录超时跳转页面链接地址，默认空表示不跳转。add 20250120-1
                 // add 20241017-1
                 clean: false, // 是否去掉请求地址中的某些后辍参数,默认false(可选)。注：目前正则还没写好,只能去掉链接地址中只有一个参数，多个参数无法只去掉某一个。
                 matches: [], // 请求地址中的后辍参数组成的数组,默认空数组(可选). 仅当 clean=true时有效.eg. matches['param'], 则url为'aabb.com?param=1&add=2' 将变成 'aabb.com?add=2'
@@ -131,42 +130,37 @@
          * @param {string} ps_url 接口地址
          * @param {string} ps_describe 接口描述
          * @param {boolean} ps_debug 是否启用调试模式. true 是(不显示友好信息), false 否(要显示友好信息)
-         * @param {string} ps_timeout_page 超时的时候重定向跳转到哪个页面(可选)
          * @returns (boolean) 返回值： false 接口正常, true 接口有错误(eg.return不等于ok)
          */
-        mistake: function(ps_msg, ps_url, ps_describe, ps_debug, ps_timeout_page){
+        mistake: function(ps_msg, ps_url, ps_describe, ps_debug){
             if(typeof ps_url == 'undefined') return false;
             if(typeof ps_describe == 'undefined') ps_describe = '';
             var ps_action = utilities.getStringParams('action', ps_url); 
             var debug = typeof ps_debug == 'undefined' ? false : (ps_debug.toString().toLocaleLowerCase() === 'true' ? true : false);
-            if (!methods.empty(ps_msg, ps_url, ps_describe, debug)) { //ok状态：有返回数据
+            if(!methods.empty(ps_msg, ps_url, ps_describe, debug)){ //ok状态：有返回数据
                 //· 执行失败
                 //当返回的信息里含有“登录超时”等字眼时，则直接弹出返回的信息，否则弹出自定义的错误信息
                 var json = JSON.parse(ps_msg);
 
-                // 登录超时的时候要跳转到的页面链接地址。返回值信息要同时包含“登录”和“超时”两个字眼。格式eg: {"return": "error", "data": "登录超时，请重新登录"}
-                var tmpMsgs = typeof json.data == 'undefined' ? '' : json.data;
-                var timeOutRecirectPage = typeof ps_timeout_page == 'undefined' ? '' : (tmpMsgs.indexOf("登录") >= 0 && tmpMsgs.indexOf("超时") >= 0 ? ps_timeout_page : '');
-                
                 if(typeof json["return"] != 'undefined'){
                     if(json["return"] != 'ok'){
                         var messages = typeof json["data"] == 'undefined' ? json["return"] : json["data"];
-                        // utilities.toast(ps_action, ps_describe, messages, "fails", debug ? false : true, timeOutRecirectPage);
+                        // utilities.toast(ps_action, ps_describe, messages, "fails", debug ? false : true);
                         var isFriendly = typeof json["data"] != 'undefined' ? false : (debug ? false : true);
-                        utilities.toast(ps_action, ps_describe, messages, "fails", isFriendly, timeOutRecirectPage);
+                        utilities.toast(ps_action, ps_describe, messages, "fails", isFriendly);
                         return true;
                     }
                 }
                 else if(typeof json["result"] != 'undefined'){
                     if(json["result"] != 'ok'){
                         var messages = typeof json["data"] == 'undefined' ? json["result"] : json["data"];
-                        utilities.toast(ps_action, ps_describe, messages, "fails", debug ? false : true, timeOutRecirectPage);
+                        utilities.toast(ps_action, ps_describe, messages, "fails", debug ? false : true);
                         return true;
                     }
                 }
                 else{
                     var messages = ps_msg;
-                    utilities.toast(ps_action, ps_describe, messages, "nonstandard", debug ? false : true, timeOutRecirectPage);
+                    utilities.toast(ps_action, ps_describe, messages, "nonstandard", debug ? false : true);
                     return true;
                 }
                 return false;
@@ -234,14 +228,13 @@
          * @param {string} ps_msg 接口返回的字符串
          * @param {string} ps_type 错误类型. 值："empty" 空,  "notObject" 非标准JSON, "notData" 不含data属性, "zeroData" 空数组, "fails" 接口有通,但执行失败, "errors" 接口进入error状态
          * @param {boolean} ps_isFriendMsg 是否只显示友好提示信息.
-         * @param {string} ps_timeout_page 超时的时候重定向跳转到哪个页面(可选)
          */
-        toast: function (ps_action, ps_describe, ps_msg, ps_type, ps_isFriendMsg, ps_timeout_page) {
+        toast:function(ps_action, ps_describe, ps_msg, ps_type, ps_isFriendMsg){
             var action = (ps_action != '' && ps_action != null && typeof ps_action != 'undefined') ? ps_action : '';
             var description = ps_describe === '' ? '' : '“' + ps_describe + '”';
             var msg = ps_msg;
             if(ps_isFriendMsg){
-                this.dialogs(infos["friend"], ps_timeout_page);
+                this.dialogs(infos["friend"]);
             }else{  
                 var tips = '';
                 if(ps_type == "fails"){ // 接口有通(即进入success),但执行失败.
@@ -262,7 +255,7 @@
                         tips += '<br>返回的字符串：' + msg;
                     }
                 }
-                this.dialogs(tips, ps_timeout_page);
+                this.dialogs(tips);
             }
         },
 
@@ -270,27 +263,18 @@
         /**
          * 弹出提示信息对话框
          * @param {string} ps_str 提示信息字符串
-         * @param {string} ps_redirect_page 重定向的页面链接地址
          */
-        dialogs:function(ps_str, ps_redirect_page){
+        dialogs:function(ps_str){
             var message = ps_str;
             if(typeof neuiDialog != 'undefined'){
                 neuiDialog.alert({
                     // caption: '提示',
                     message: message,
-                    buttons: ['确定'],
-                    callBack: function () {
-                        if (typeof ps_redirect_page != 'undefined' && ps_redirect_page.toString().replace(/\s+/g, '') != '') {
-                            window.location.href = ps_redirect_page;
-                        }
-                    }
+                    buttons: ['确定']
                 })
             }else{
                 message = message.toString().replace(/\<br\>/g, '\n'); //<br>换行\n以实现换行
                 alert(message);
-                if (typeof ps_redirect_page != 'undefined' && ps_redirect_page.toString().replace(/\s+/g, '') != '') {
-                    window.location.href = ps_redirect_page;
-                }
             }
         },
 
@@ -428,11 +412,10 @@ var toolTip = {
      * @param {string} ps_url 接口地址
      * @param {string} ps_describe 接口描述
      * @param {boolean} ps_debug 是否启用调试模式
-     * @param {string} ps_timeout_page 超时的时候重定向跳转到哪个页面(可选)
      * @returns (boolean) 返回值： true 接口一切正常, false 接口有错误
      */
-    mistakeTips: function(ps_msg, ps_url, ps_describe, ps_debug, ps_timeout_page){
-        return $('body').neuiAjax('mistake', ps_msg, ps_url, ps_describe, ps_debug, ps_timeout_page);
+    mistakeTips: function(ps_msg, ps_url, ps_describe, ps_debug){
+        return $('body').neuiAjax('mistake', ps_msg, ps_url, ps_describe, ps_debug);
     },
 
 
