@@ -3,7 +3,7 @@
  * [jquery ajax自定义封装]
  * Author: mufeng
  * Date: 2021.01.04
- * Update: 2025.01.20
+ * Update: 2025.01.21
  */
 //========================================================================================================================
 //                                                          一、jQuery控件
@@ -145,9 +145,9 @@
                 var json = JSON.parse(ps_msg);
 
                 // 登录超时的时候要跳转到的页面链接地址。返回值信息要同时包含“登录”和“超时”两个字眼。格式eg: {"return": "error", "data": "登录超时，请重新登录"}
-                var tmpMsgs = typeof json.data == 'undefined' ? '' : json.data;
-                var timeOutRecirectPage = typeof ps_timeout_page == 'undefined' ? '' : (tmpMsgs.indexOf("登录") >= 0 && tmpMsgs.indexOf("超时") >= 0 ? ps_timeout_page : '');
-                
+                var tmpMsgs = typeof json.data == 'undefined' ? '' : (typeof json.data == 'number' || typeof json.data == 'string' ? json.data : '');
+                var timeOutRecirectPage = typeof ps_timeout_page == 'undefined' ? '' : (tmpMsgs.toString().indexOf("登录") >= 0 && tmpMsgs.toString().indexOf("超时") >= 0 ? ps_timeout_page : '');
+   
                 if(typeof json["return"] != 'undefined'){
                     if(json["return"] != 'ok'){
                         var messages = typeof json["data"] == 'undefined' ? json["return"] : json["data"];
