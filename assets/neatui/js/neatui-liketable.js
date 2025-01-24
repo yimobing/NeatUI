@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author: ChenMufeng
 * Date: 2020.03.26
-* Update: 2025.01.20
+* Update: 2025.01.24
 
 */
 (function($){
@@ -1613,8 +1613,11 @@
 		if (typeof ps_obj == 'undefined') return;
 		if (ps_obj.length == 0) return;
 		if (finals.atLeastTwoRow && ps_obj.find('.list-one').length < 2) return; // 小于2行中断执行
-		if (ps_obj.find('.list-total').length != 0) return; // 如果已存在合计行则中断，防止重复创建
-		
+		// edit 20250124-1
+		// if (ps_obj.find('.list-total').length != 0) return; // 如果已存在合计行则中断，防止重复创建
+		if (ps_obj.find('.list-total').length != 0) {  // 如果已存在合计行则先删除原有合计行，再重新创建
+			ps_obj.find('.list-total').remove();
+		}
 		var clone = ps_obj.find('.list-one:last-child').clone().addClass('list-total').removeClass('interlacing'); // 复制最后一行
 		clone.children().each(function(u){
 			$(this).empty();
