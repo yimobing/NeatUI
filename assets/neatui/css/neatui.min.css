@@ -46,7 +46,7 @@ html,body{
 	margin: 0 auto;
 	padding: 0;
 	-webkit-text-size-adjust: 100%;
-	-webkit-tap-highlight-color:rgba(0, 0, 0, 0); 
+	-webkit-tap-highlight-color:rgba(0, 0, 0, 0);  /* ios去掉点击时阴影 */
 	/*-webkit-touch-callout: none;*/
 	/*-webkit-user-select: none;
 	-moz-user-select: none;
@@ -58,7 +58,7 @@ html,body{
 /* 以下两个属性值为 none 时, 将禁止用户复制内容，即鼠标无法选中文本更无法复制文本 */
 *:not(input,textarea) { 
     /* -webkit-touch-callout: none; */ /*禁用系统默认菜单*/
-    /* -webkit-user-select: none; */ /*禁止用户选择文本*/
+    /* -webkit-user-select: none; */ /*禁止用户选择文本*/ /*禁止用户选择文本,选中元素. ios中将属性设置在input、textarea标签上会起到禁止输入作用*/
 }
 
 html{font-size: 20px;}
