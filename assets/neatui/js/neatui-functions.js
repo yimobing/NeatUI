@@ -1943,6 +1943,10 @@ var calendar = {
         else if(formatStr == 'MM-dd') return M + '-' + D; // 09-05
         else if(formatStr == 'dd/MM') return D + '/' + M; // 05/09
         else if (formatStr == 'HH:mm') return h + ':' + m; // 14:32
+		
+		else if(formatStr == 'yyyy') return M; // 当年， 如 2025年
+		else if(formatStr == 'MM') return M; // 当月，如 02月
+		else if(formatStr == 'dd') return D; // 当天，如 15号
     },
 
 	/**
