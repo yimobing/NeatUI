@@ -1875,30 +1875,6 @@ var calendar = {
 
 
     /**
-	 * 获取当天日期. eg.2017-09-05 14:32:21
-	 * @param {boolean} isZeroize 小于10的时间是否被零, 默认true(可选).
-	 */
-    getToday:function(isZeroize){
-		var mydate = new Date();
-		var Y = mydate.getFullYear(),
-			M = mydate.getMonth() + 1,
-			D = mydate.getDate(),
-			h = mydate.getHours(),
-			m = mydate.getMinutes(),
-			s = mydate.getSeconds();
-		var bools= isZeroize === undefined ? true : (isZeroize === false ? false : true);
-		if(bools){//小于10的月分及天数前面是否补0(默认补0，如果函数传递参数false则不补0)
-			if(M < 10) M = '0' + M;
-			if(D < 10) D = '0' + D;
-			if(h < 10) h = '0' + h;
-			if(m < 10) m = '0' + m;
-			if(s < 10) s = '0' + s;
-		}
-		return (Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s);
-    },
-
-
-    /**
      * 获取当前时间。eg. 2017-09-05 14:32:21
      * @param {Object} 参数对象
      * @returns {String} 返回当前日期
@@ -1939,92 +1915,187 @@ var calendar = {
         else if(formatStr == 'MM/dd/yyyy') return M + '/' + D + '/' + Y; // 09/05/2017
         else if(formatStr == 'yyyy-MM-dd HH:mm') return Y + '-' + M + '-' + D + ' ' + h + ':' + m; // 2017-09-05 14:32
         else if(formatStr == 'MM-dd HH:mm:ss') return M + '-' + D + ' ' + h + ':' + m + ':' + s; // 09-05 14:32:21
-        else if(formatStr == 'MM-dd HH:mm') return M + '-' + D + ' ' + h + ':' + m; // 09-05 14:32
+        else if (formatStr == 'MM-dd HH:mm') return M + '-' + D + ' ' + h + ':' + m; // 09-05 14:32
+        else if(formatStr == 'yyyy-MM') return Y + '-' + M; // 2024-09
         else if(formatStr == 'MM-dd') return M + '-' + D; // 09-05
         else if(formatStr == 'dd/MM') return D + '/' + M; // 05/09
         else if (formatStr == 'HH:mm') return h + ':' + m; // 14:32
 		
-		else if(formatStr == 'yyyy') return M; // 当年， 如 2025年
+		else if(formatStr == 'yyyy') return Y; // 当年， 如 2025年
 		else if(formatStr == 'MM') return M; // 当月，如 02月
-		else if(formatStr == 'dd') return D; // 当天，如 15号
+        else if (formatStr == 'dd') return D; // 当天，如 15号
+        else if (formatStr == 'HH') return h; // 当前小时，如 23点
+        else if (formatStr == 'mm') return m; // 当前分钟，如 25分
+        else if(formatStr == 'ss') return s; // 当前秒数，如 59秒
     },
 
-	/**
-	 * 格式化日期 / 标准化日期时间
-	 * 说明: 该方法有效防止后台传数据格式发生变化. eg.10-19-2017 <==> 2017/10/19
-	 * 思路：后台的时间日期 => 时间戳 =>标准的时间日期 y=年，m=月，d=天，h=时，u=分，s=秒
-	 * @param {string} dateTime 日期字符串。必须是以下格式的日期：“月-日-年”、“年/月/日”、“年-月-日”。eg. 10-19-2017、2017/10/19、2017-10-19. eg. 10-19-2017 14:52:31、2017/10/19 14:52:31、2017-10-19 14:52:31
-	 * @param {string} formatStr 自定义日期格式(可选).默认返回"年-月-日 时:分:秒"的格式. eg1. "yyyy-MM-dd HH:mm:ss" 返回"年-月-日 时:分:秒"eg2. "yyyy-MM-dd" 返回"年-月-日"
-	 * @returns {string} 返回自定义格式的日期字符串(标准化日期字符串) 或 日期JSON对象(里面包含年、月、日、时、分、秒字段)
-	 * eg. var a="2017/12/31 23:12:54"; console.log(dateFormat(a));
-	 */
-	dateFormat:function(dateTime, formatStr){
-		var dateTime = ( /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase()) || (window.ActiveXObject || "ActiveXObject" in window) ) ? dateTime.toString().replace(/-/g, '/') :  dateTime; // 短横线-换成斜杠/以兼容ios和ie
-		var formatStr = typeof formatStr == 'undefined' ? 'yyyy-MM-dd HH:mm:ss' : formatStr;
-		var dateParse = Date.parse(new Date(dateTime));//转成时间戳
-		var time = new Date(dateParse);//再转成标准时间
-        if(time == 'Invalid Date'){
-            alert('您传递的日期字符串无效，请检查是否为“月-日-年”、“年/月/日”、“年-月-日”格式\n如果是，则检查月份是否超出12月、天数是否超出31天！');
-            return '';
+
+    /**
+     * 获取本月第一天
+     * @returns {String} 返回本月第1天的日期eg. 2025-05-01
+     */
+    getMonthFirstDay: function () {
+        var yearMonth = this.getNowTime({ format: "yyyy-MM" });
+        var day = '01';
+        return yearMonth + '-' + day;
+    },
+
+
+    /**
+     * 获取本月最后一天
+     * @returns {String} 返回本月最后一天的日期eg. 2025-05-31
+     */
+    getMonthLastDay: function () {
+        var year = this.getNowTime({ format: "yyyy" }),
+            month =  this.getNowTime({ format: "MM" });
+        var day = '30';
+        if(month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) day = '31'; // 1,3,5,7,8,10,12月为大月
+        // if(month == 4 || month == 6 || month == 9 || month == 11) day = '30'; // 4,6,9,11月为小月
+        if(month == 2){
+            if(year % 4 == 0) day = '29'; // 闰年2月共有29天
+            else day = '28'; // 平年2月只有28天
         }
-		var y = String(time.getFullYear());
-		var m = String(time.getMonth()+1);
-		var d = String(time.getDate());
-		var h = String(time.getHours());
-		var u = String(time.getMinutes());
-		var s = String(time.getSeconds());
-        if(m < 10) m = '0' + m;
-        if(d < 10) d = '0' + d;
-        if(h < 10) h = '0' + h;
-        if(u < 10) u = '0' + u;
-        if(s < 10) s = '0' + s;
-		if(formatStr == 'yyyy-MM-dd HH:mm:ss') return y + '-' + m + '-' + d + ' ' + h + ':' + u + ':' + s;
-		else if(formatStr == 'yyyy-MM-dd HH:mm') return y + '-' + m + '-' + d + ' ' + h + ':' + u;
-        else if(formatStr == 'MM-dd HH:mm:ss') return m + '-' + d + ' ' + h + ':' + u + ':' + s;
-        else if(formatStr == 'MM-dd HH:mm') return m + '-' + d + ' ' + h + ':' + u;
-		else if(formatStr == 'yyyy-MM-dd') return y + '-' + m + '-' + d;
-		else if(formatStr == 'dd/MM/yyyy') return d + '/' + m + '/' + y;
-		else if(formatStr == 'MM/dd/yyyy') return m + '/' + d + '/' + y;
-		else if(formatStr == 'yyyy/MM/dd') return y + '/' + m + '/' + d;
-		else if(formatStr == 'MM-dd') return m + '-' + d;
-		else if(formatStr == 'dd/MM') return d + '/' + m;
-		else if(formatStr == 'HH:mm:ss') return h + ':' + u + ':' + s;
-		else if(formatStr == 'HH:mm') return h + ':' + u;
-        else if(formatStr == '年-月-日') return y + '年' + m + '月' + d + '日'; // eg. 2021年8月12日
-		else return {"year":y, "mon":m, "day":d, "hours":h, "minutes":u, "seconds":s}; //return m+"/"+d//直接输入自己想要的格式
-	},
+        return year + '-' + month + '-' + day;
+    },
+
+
+    /**
+     * 获取本季度第一天
+     * @returns {String} 返回本季度第一天的日期eg. 2025-04-01
+     */
+    getQuarterFirstDay: function () {
+        var year = this.getNowTime({ format: "yyyy" }),
+            month = this.getNowTime({ format: "MM" });
+        // 1,2,3为第1季度; 4,5,6为第2季度; 7,8,9为第3季度; 10,11,12为第4季度
+        var startMon = month;
+        // if(month % 3 == 1) startMon = month; // 1,4,7,10月
+        if ((parseInt(month) + 1) % 3 == 0) startMon = parseInt(month) - 1; // 2,5,8,11月
+        if (parseInt(month) % 3 == 0) startMon = parseInt(month) - 2; // 3,6,9,12月
+        var startDay = '01';
+        if(startMon < 10) startMon = '0' + startMon;
+        return year + '-' + startMon + '-' + startDay;
+    },
 
 
 
-	/**
-	 * 根据当天获取某一天、获取当天几天前或几天后的某一天的日期
-     * 注：旧版本：不再维护，统一维护到 getNDay()函数里
-	 * @param {Number} day 天数(可缺省), 默认当天
-	 * @returns {string} 返回某一天的日期. eg. 2020-05-07
-	 * eg. getDay(0) 当天,  getDay(7)) 7天后, getDay(-7) 7天前
-	 */
-	getDay:function(day){
-		function doHandleDate(d){
-		　　var m = d;
-		　　if(d.toString().length == 1){
-		　　　　m = "0" + d;
-		　　}
-		　　return m;
-		}
-		if(typeof day == 'undefined') day = 0;
-		var today = new Date();
-		var targetday_milliseconds=today.getTime() + 1000*60*60*24*day;
-		today.setTime(targetday_milliseconds); // 注意，这行是关键代码
-		var tYear = today.getFullYear();
-		var tMonth = today.getMonth();
-		var tDate = today.getDate();
-		tMonth = doHandleDate(tMonth + 1);
-		tDate = doHandleDate(tDate);
-		return tYear + "-" + tMonth + "-" + tDate;
-	},
+    /**
+     * 获取本季度最后一天
+     * @returns {String} 返回本季度最后一天的日期eg. 2025-04-30
+     */
+    getQuarterLastDay: function () {
+        var year = this.getNowTime({ format: "yyyy" }),
+            month = this.getNowTime({ format: "MM" });
+        // 1,2,3为第1季度; 4,5,6为第2季度; 7,8,9为第3季度; 10,11,12为第4季度
+        // 每个季度的最后一个月分别为：3月,6月,9月,12月（其中3月、12月为大月有31天，6月、9月为小月只有30天）
+        var endMon = month; // 季度结束月份
+        if (month % 3 == 1) endMon = parseInt(month) + 2;  // 1,4,7,10月
+        if ((parseInt(month) + 1) % 3 == 0) endMon = parseInt(month) + 1; // 2,5,8,11月
+        if (parseInt(month) % 3 == 0) endMon = parseInt(month); // 3,6,9,12月
+        var endDay = '30';
+        if (endMon == 3 || endMon == 12) endDay = '31'; // 3月、12月为大月
+        // else // 6月，9月为小月
+        if(endMon < 10) endMon = '0' + endMon;
+        return year + '-' + endMon + '-' + endDay;
+    },
 
 
+    /**
+     * 获取本年第一天
+     * @returns {String} 返回本年第一天的日期eg. 2025-01-01
+     */
+    getYearFirstDay: function () {
+        var year = this.getNowTime({ format: "yyyy" }),
+            month = '01',
+            day = '01';
+        return year + '-' + month + '-' + day;
+    },
 
+
+    /**
+     * 获取本年最后一天
+     * @returns {String} 返回本年最后一天的日期eg. 2025-12-31
+     */
+    getYearLastDay: function(){
+        var year = this.getNowTime({ format: "yyyy" }),
+            month = '12',
+            day = '31';
+        return year + '-' + month + '-' + day;
+    },
+
+
+    /**
+     * 获取上月初
+     * @returns {String} 返回上月初的日期eg. 2025-02-01
+     */
+     getLastMonthFirstDay: function () {
+        var year = this.getNowTime({ format: "yyyy" }),
+            month = this.getNowTime({ format: "MM" });
+        if (parseInt(month) - 1 <= 0) { // 上月为1月时
+            month = 12; // 月为去年12月
+            year = parseInt(year) - 1; // 年为去年
+        }
+        else{
+            month = parseInt(month) - 1;
+        }
+        var day = '01';
+        if (month < 10) month = '0' + month;
+        return year + '-' + month + '-' + day;
+    },
+
+
+    /**
+     * 获取上月末
+     * @returns {String} 返回上月末的日期eg. 2025-02-28
+     */
+    getLastMonthLastDay: function () {
+        var year = this.getNowTime({ format: "yyyy" }),
+            month = this.getNowTime({ format: "MM" });
+        if (parseInt(month - 1) <= 0) { // 上月为1月时
+            month = 12; // 月为去年12月
+            year = parseInt(year) - 1; // 年为去年
+        }
+        else{
+            month = parseInt(month) - 1;
+        }
+        var day = '30';
+        if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) day = '31'; // 1,3,5,7,8,10,12月为大月
+        // if(month == 4 || month == 6 || month == 9 || month == 11) day = '30'; // 4,6,9,11月为小月
+        if (month == 2) {
+            if (year % 4 == 0) day = '29'; // 闰年2月共有29天
+            else day = '28'; // 平年2月只有28天
+        }
+        if (month < 10) month = '0' + month;
+        return year + '-' + month + '-' + day;
+    },
+
+
+    /**
+     * 获取上年初
+     * @returns {String} 返回上年初的日期eg. 2024-01-01
+     */
+    getLastYearFirstDay: function () {
+        var year = this.getNowTime({ format: "yyyy" }),
+            month = '01',
+            day = '01';
+        year = year - 1;
+        return year + '-' + month + '-' + day;
+    },
+
+     
+    /**
+     * 获取上年末
+     * @returns {String} 返回上年末的日期eg. 2024-12-31
+     */
+    getLastYearLastDay: function () {
+        var year = this.getNowTime({ format: "yyyy" }),
+            month = '12',
+            day = '31';
+        year = year - 1;
+        return year + '-' + month + '-' + day;
+    },
+
+
+     
     /**
      * 获取当前时间的N天前或者N天后
      * @param {Number} day 正数表示N天前，负数表示N天后
@@ -2122,7 +2193,107 @@ var calendar = {
         }
         return (ps_num_arr_str instanceof Array ? resultWeekArr : resultWeekArr[0]);
     },
+    
 
+
+    /**
+	 * 获取当天日期. eg.2017-09-05 14:32:21
+	 * @param {boolean} isZeroize 小于10的时间是否被零, 默认true(可选).
+	 */
+     getToday:function(isZeroize){
+		var mydate = new Date();
+		var Y = mydate.getFullYear(),
+			M = mydate.getMonth() + 1,
+			D = mydate.getDate(),
+			h = mydate.getHours(),
+			m = mydate.getMinutes(),
+			s = mydate.getSeconds();
+		var bools= isZeroize === undefined ? true : (isZeroize === false ? false : true);
+		if(bools){//小于10的月分及天数前面是否补0(默认补0，如果函数传递参数false则不补0)
+			if(M < 10) M = '0' + M;
+			if(D < 10) D = '0' + D;
+			if(h < 10) h = '0' + h;
+			if(m < 10) m = '0' + m;
+			if(s < 10) s = '0' + s;
+		}
+		return (Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s);
+    },
+
+
+
+	/**
+	 * 格式化日期 / 标准化日期时间
+	 * 说明: 该方法有效防止后台传数据格式发生变化. eg.10-19-2017 <==> 2017/10/19
+	 * 思路：后台的时间日期 => 时间戳 =>标准的时间日期 y=年，m=月，d=天，h=时，u=分，s=秒
+	 * @param {string} dateTime 日期字符串。必须是以下格式的日期：“月-日-年”、“年/月/日”、“年-月-日”。eg. 10-19-2017、2017/10/19、2017-10-19. eg. 10-19-2017 14:52:31、2017/10/19 14:52:31、2017-10-19 14:52:31
+	 * @param {string} formatStr 自定义日期格式(可选).默认返回"年-月-日 时:分:秒"的格式. eg1. "yyyy-MM-dd HH:mm:ss" 返回"年-月-日 时:分:秒"eg2. "yyyy-MM-dd" 返回"年-月-日"
+	 * @returns {string} 返回自定义格式的日期字符串(标准化日期字符串) 或 日期JSON对象(里面包含年、月、日、时、分、秒字段)
+	 * eg. var a="2017/12/31 23:12:54"; console.log(dateFormat(a));
+	 */
+	dateFormat:function(dateTime, formatStr){
+		var dateTime = ( /iphone|ipod|mac|ipad/i.test(navigator.userAgent.toLocaleLowerCase()) || (window.ActiveXObject || "ActiveXObject" in window) ) ? dateTime.toString().replace(/-/g, '/') :  dateTime; // 短横线-换成斜杠/以兼容ios和ie
+		var formatStr = typeof formatStr == 'undefined' ? 'yyyy-MM-dd HH:mm:ss' : formatStr;
+		var dateParse = Date.parse(new Date(dateTime));//转成时间戳
+		var time = new Date(dateParse);//再转成标准时间
+        if(time == 'Invalid Date'){
+            alert('您传递的日期字符串无效，请检查是否为“月-日-年”、“年/月/日”、“年-月-日”格式\n如果是，则检查月份是否超出12月、天数是否超出31天！');
+            return '';
+        }
+		var y = String(time.getFullYear());
+		var m = String(time.getMonth()+1);
+		var d = String(time.getDate());
+		var h = String(time.getHours());
+		var u = String(time.getMinutes());
+		var s = String(time.getSeconds());
+        if(m < 10) m = '0' + m;
+        if(d < 10) d = '0' + d;
+        if(h < 10) h = '0' + h;
+        if(u < 10) u = '0' + u;
+        if(s < 10) s = '0' + s;
+		if(formatStr == 'yyyy-MM-dd HH:mm:ss') return y + '-' + m + '-' + d + ' ' + h + ':' + u + ':' + s;
+		else if(formatStr == 'yyyy-MM-dd HH:mm') return y + '-' + m + '-' + d + ' ' + h + ':' + u;
+        else if(formatStr == 'MM-dd HH:mm:ss') return m + '-' + d + ' ' + h + ':' + u + ':' + s;
+        else if(formatStr == 'MM-dd HH:mm') return m + '-' + d + ' ' + h + ':' + u;
+		else if(formatStr == 'yyyy-MM-dd') return y + '-' + m + '-' + d;
+		else if(formatStr == 'dd/MM/yyyy') return d + '/' + m + '/' + y;
+		else if(formatStr == 'MM/dd/yyyy') return m + '/' + d + '/' + y;
+		else if(formatStr == 'yyyy/MM/dd') return y + '/' + m + '/' + d;
+		else if(formatStr == 'MM-dd') return m + '-' + d;
+		else if(formatStr == 'dd/MM') return d + '/' + m;
+		else if(formatStr == 'HH:mm:ss') return h + ':' + u + ':' + s;
+		else if(formatStr == 'HH:mm') return h + ':' + u;
+        else if(formatStr == '年-月-日') return y + '年' + m + '月' + d + '日'; // eg. 2021年8月12日
+		else return {"year":y, "mon":m, "day":d, "hours":h, "minutes":u, "seconds":s}; //return m+"/"+d//直接输入自己想要的格式
+	},
+
+
+
+	/**
+	 * 根据当天获取某一天、获取当天几天前或几天后的某一天的日期
+     * 注：旧版本：不再维护，统一维护到 getNDay()函数里
+	 * @param {Number} day 天数(可缺省), 默认当天
+	 * @returns {string} 返回某一天的日期. eg. 2020-05-07
+	 * eg. getDay(0) 当天,  getDay(7)) 7天后, getDay(-7) 7天前
+	 */
+	getDay:function(day){
+		function doHandleDate(d) {
+            var m = d;
+            if (d.toString().length == 1) {
+                m = "0" + d;
+            }
+            return m;
+        }
+		if(typeof day == 'undefined') day = 0;
+		var today = new Date();
+		var targetday_milliseconds=today.getTime() + 1000*60*60*24*day;
+		today.setTime(targetday_milliseconds); // 注意，这行是关键代码
+		var tYear = today.getFullYear();
+		var tMonth = today.getMonth();
+		var tDate = today.getDate();
+		tMonth = doHandleDate(tMonth + 1);
+		tDate = doHandleDate(tDate);
+		return tYear + "-" + tMonth + "-" + tDate;
+	},
 
 
     /**
