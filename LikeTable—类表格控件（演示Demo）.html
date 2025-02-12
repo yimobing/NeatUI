@@ -112,6 +112,9 @@
 		
         · var json = neuiLikeTable.getTableSelectedData($tableDom); // 获取表格选中行数据（“选择”一列有打钩的行组成的json数组）
 		
+		
+		· var json = neuiLikeTable.getTableRowData(ps_row_index || $row, $tableDom); // 获取表格某一行的数据。 ps_row_index | $row 行号索引值或行对象, 第2个参数为表格对象可选
+		
         · var tips = neuiLikeTable.checkEmptyRow(0, $tableDom); // 校验第0行各个必填列的完整性. 要检验所有行时 0 改成 'all'
 		
         · var tips = neuiLikeTable.checkRepeatRow($tableDom); // 校验重复行(即检验第Y列第M行与第N行是否一样). 一般先设置某一列的unique=true,才使用本函数进行校验
@@ -129,6 +132,28 @@
             neuiLikeTable.insertOneRow({});
             // neuiLikeTable.addOneRow(tableDom); // 或$tableDom
         }
+		
+		
+		//——————————————————————————————————————————
+		· 表格某行某列的点击事件
+		// 方式1： 使用选择器 [data-column-field="字段名"] 。推荐使用这种方式，可减少修改了字段名后点击事件忘记修改的疏漏之处。
+		$(document).off('click', '[data-column-field="sfje_caiwu"]').on('click', '[data-column-field="sfje_caiwu"]', function(){
+            var $row = $(this).parents('.list-one'),
+				ls_row_index = $row.index();
+            var rowData = neuiLikeTable.getTableRowData($row); // 或 var rowData = neuiLikeTable.getTableRowData(ls_row_index); // 取某一行的数据
+            console.log('rowData：', rowData); // 当前行数据
+			var ls_sfdjh = rowData["sfdjh"]; // 取该行 sfdjh 这一列的值
+        });
+		
+		// 方式2：使用选择器 '.i-t-字段名'
+		$(document).off('click', '.i-t-sfje_caiwu').on('click', '.i-t-sfje_caiwu', function(){
+            var $row = $(this).parents('.list-one'),
+				ls_row_index = $row.index();
+            var rowData = neuiLikeTable.getTableRowData($row); // 或 var rowData = neuiLikeTable.getTableRowData(ls_row_index); // 取某一行的数据
+            console.log('rowData：', rowData); // 当前行数据
+			var ls_sfdjh = rowData["sfdjh"]; // 取该行 sfdjh 这一列的值
+        });
+		
     */
 
     /*+————————————————全局变量————————————————+*/

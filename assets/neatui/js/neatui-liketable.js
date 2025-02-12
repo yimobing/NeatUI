@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author: ChenMufeng
 * Date: 2020.03.26
-* Update: 2025.01.24
+* Update: 2025.02.12
 
 */
 (function($){
@@ -698,7 +698,7 @@
 				else _colContentStr = _editBoxStr + _compoBoxStr;
 				var _rUnitStr = r_unit == null ? '' : '<em class="em-unit">' + r_unit + '</em>';
 				var _rIconStr = r_icon == null ? ''  : '<i class="i-icon fa fa-' + r_icon + '"></i>';
-				_bodyHTML += '<div class="' + _colClass + _alignClass + _stickyClass + '" data-column-index="' + j + '" style="width:' + width + 'px' + _cellColorStr + _cellSizeStr + _displayStr + '">'+ 
+				_bodyHTML += '<div class="' + _colClass + _alignClass + _stickyClass + '" data-column-index="' + j + '" data-column-field="' + field + '" style="width:' + width + 'px' + _cellColorStr + _cellSizeStr + _displayStr + '">'+ 
 								_colContentStr + _rUnitStr + _rIconStr + 
 							'</div>';
 				
@@ -3230,6 +3230,24 @@ var neuiLikeTable = {
 			}
 		})
 		return source;
+	},
+
+	/**
+	 * 获取表格某一行的数据
+	 * @param {Numnber|Object} ps_row_index 行号索引值或行对象
+	 * @param {Object} ps_obj 指定表格根节点对象(当页面只有一张表格时则可选)
+	 * @returns {Object} 返回某一行的数据，值为一维对象
+	 */
+	getTableRowData: function (ps_row_index, ps_obj) {
+		var json = $('body').getFormData(ps_obj);
+		var source = { data: [] }
+		if (typeof ps_row_index == 'object') ps_row_index = ps_row_index.index();
+		$.each(json.data, function(i, item){
+			if(ps_row_index == item["rowIndex"]){
+				source.data.push(item);
+			}
+		})
+		return source.data.length > 0 ? source.data[0] : {};
 	},
 
 
