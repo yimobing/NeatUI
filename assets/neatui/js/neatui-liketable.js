@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author: ChenMufeng
 * Date: 2020.03.26
-* Update: 2025.02.12
+* Update: 2025.02.19
 
 */
 (function($){
@@ -1588,16 +1588,19 @@
 
 
 	/**
-	 * 创建合计行 add 20250115-2 20250115-3
-	 * 即在表格最后一行添加一个合计行
+	 * 创建合计行或聚合行 add 20250115-2 20250115-3
+	 * 即在表格最后一行添加一个合计行或指定行后面添加一个聚合行
 	 * @param {object} ps_source 数据源
 	 * @param {object} ps_obj 当前表格对象(可选)
 	 * @param {object} ps_opts 其它参数对象(可选)
 	 */
 	var addAddUpRow = function(ps_source, ps_obj, ps_opts){
 		var originals = {
-			title: "合计", // 合计行标题，默认'合计'(可选)
-			atLeastTwoRow: true // 是否至少2行才创建合计行，默认true。如果希望翻页后少于两行也创建合计行，则设为false
+			title: "合计", // 标题，默认'合计'(可选)
+			colIndex: 0, // 标题放在哪一列(可选)，默认0表示第一列
+			rowIndex: -1, // 插入到哪一行后面(可选)，默认-1表示最后一行后面
+			backgroundColor: "auto", // 自定义整行背景(可选)，默认auto表示根据系统
+			atLeastTwoRow: true // 是否至少2行才创建(可选)，默认true。如果希望翻页后少于两行也创建，则设为false
 		}
 		var finals = $.extend(true, {}, originals, ps_opts || {});
 
@@ -1613,25 +1616,53 @@
 		if (typeof ps_obj == 'undefined') return;
 		if (ps_obj.length == 0) return;
 		if (finals.atLeastTwoRow && ps_obj.find('.list-one').length < 2) return; // 小于2行中断执行
-		// edit 20250124-1
-		// if (ps_obj.find('.list-total').length != 0) return; // 如果已存在合计行则中断，防止重复创建
-		if (ps_obj.find('.list-total').length != 0) {  // 如果已存在合计行则先删除原有合计行，再重新创建
-			ps_obj.find('.list-total').remove();
-		}
-		var clone = ps_obj.find('.list-one:last-child').clone().addClass('list-total').removeClass('interlacing'); // 复制最后一行
-		clone.children().each(function(u){
-			$(this).empty();
-			if (u == 0) $(this).addClass('col-total').text(finals.title);
-			var classNames = $(this).attr('class').toString().replace(/(col-)/g, '');
-			// console.log('classnames：', classNames);
-			for (var v in ps_source) {
-				if (classNames.indexOf(v) >= 0) {
-					$(this).html('<span>' + ps_source[v] + '</span>');
-					break;
-				}
+
+		var row_index = finals.rowIndex,
+			bg_color = finals.backgroundColor;
+		// console.log('bg_color：', bg_color)
+		if(row_index == -1){ // 最后一行创建合计行
+			// edit 20250124-1
+			// if (ps_obj.find('.list-total').length != 0) return; // 如果已存在合计行则中断，防止重复创建
+			if (ps_obj.find('.list-total').length != 0) {  // 如果已存在合计行则先删除原有合计行，再重新创建
+				ps_obj.find('.list-total').remove();
 			}
-		})
-		ps_obj.find('.list-content').append(clone);
+			var clone = ps_obj.find('.list-one:last-child').clone().addClass('list-total').removeClass('list-summary interlacing'); // 复制最后一行
+			clone.children().each(function(u){
+				$(this).empty();
+				if (u == finals.colIndex) $(this).addClass('col-total').removeClass('col-summary').text(finals.title);
+				var classNames = $(this).attr('class').toString().replace(/(col-)/g, '');
+				// console.log('classnames：', classNames);
+				for (var v in ps_source) {
+					if (classNames.indexOf(v) >= 0) {
+						$(this).html('<span>' + ps_source[v] + '</span>');
+						break;
+					}
+				}
+			})
+			ps_obj.find('.list-content').append(clone);
+			if (bg_color != 'auto') {
+				ps_obj.find('.list-one:last-child')[0].style.backgroundColor = bg_color;
+			}
+		}
+		else { // 任意行后面创建聚合行
+			var clone = ps_obj.find('.list-content').children().eq(row_index).clone().addClass('list-gather').removeClass('interlacing'); // 复制指定行
+			clone.children().each(function (u) {
+				$(this).empty();
+				if (u == finals.colIndex) $(this).addClass('col-gather').text(finals.title);
+				var classNames = $(this).attr('class').toString().replace(/(col-)/g, '');
+				// console.log('classnames：', classNames);
+				for (var v in ps_source) {
+					if (classNames.indexOf(v) >= 0) {
+						$(this).html('<span>' + ps_source[v] + '</span>');
+						break;
+					}
+				}
+			});
+			clone.insertAfter(ps_obj.find('.list-content').children().eq(row_index));
+			if (bg_color != 'auto') {
+				ps_obj.find('.list-content').children().eq(row_index + 1)[0].style.backgroundColor = bg_color;
+			}
+		}
 	}
 
 
@@ -3252,7 +3283,7 @@ var neuiLikeTable = {
 
 
 	/**
-	 * 创建合计行 add 20250115-2
+	 * 创建合计行或聚合行 add 20250115-2
 	 * @param {object} ps_source 数据源
 	 * @param {object} ps_obj 当前表格对象(可选)
 	 * @param {object} ps_opts 其它参数对象

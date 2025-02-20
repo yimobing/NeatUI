@@ -71,7 +71,10 @@
     /*
     * 几个插件内部自定义的函数非常有用,如下（以下示例中 $tableDom为指定表格根节点，当只有一张表格时$tableDom为可选项）
         · $.privateProperty.pageCurpage['history'] = 1; // 重置序号
-        · neuiLikeTable.createAddUpRow(source, $tableDom, options); // 创建合计行
+		
+		// 表格插入一行
+		// 在表格最后一行添加一个合计行，或在表格指定行后面添加一个聚合行
+        · neuiLikeTable.createAddUpRow(source, $tableDom, options); // 创建合计行或聚合行
 
         第1个参数 source 为指定合计行上要合计的字段，是一个一维Object对象
         第2个参数 $tableDom 为指定表格Dom对象，值可以为undefined或null
@@ -83,8 +86,11 @@
             "jine_zengsong_lj": 3880, // 赠送金额累计
             "jine_xiaofei_lj": 4880, // 消费金额累计
         }, null, {
-            title: "合计"  // 合计行标题，默认'合计'(可选)
-            atLeastTwoRow: true // 是否至少2行才创建“合计行”，默认true。如果希望翻页后少于两行也创建合计行，则设为false
+            title: "合计",  // 标题，默认'合计'(可选)
+			colIndex: 0, // 标题放在哪一列(可选)，默认0表示第一列
+			rowIndex: -1, // 插入到哪一行后面(可选)，默认-1表示最后一行后面
+			backgroundColor: "auto", // 自定义整行背景(可选)，默认auto表示根据系统
+            atLeastTwoRow: true // 是否至少2行才创建(可选)，默认true。如果希望翻页后少于两行也创建，则设为false
         });
 
 

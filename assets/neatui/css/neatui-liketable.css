@@ -4,7 +4,7 @@
 * [类表格控件]样式-
 * Author：ChenMufeng
 * PubDate：2020.11.11
-* Update: 2025.01.20
+* Update: 2025.02.19
 * ----------------------
 */
 /*body{overflow-y: hidden!important;} /*禁止垂直方向出现滚动条,已在插件中用参数进行控制*/
@@ -123,9 +123,43 @@
 /*隔行变色*/
 .like-table .list-one.interlacing{background-color:#f9faf9;}
 
-/*小计行、合计行*/
-.like-table .list-summary{background-color: #f9faf9;font-weight: bold;border-style: solid;border-color: #f0ecec;border-width: 1px 0 1px 0;}
-.like-table .col-summary{}
+/*小计行、合计行、聚合行*/
+
+/* 小计行 */
+.like-table .list-summary{
+	background-color: seashell;
+	color: #dc5b5b;
+	font-size: 13px;
+	font-weight: 550;
+	border-style: solid;
+	border-color: #f0ecec;
+	border-width: 1px 0 1px 0;
+}
+.like-table .col-summary{ }
+
+/* 合计行 */
+.like-table .list-total{
+	background-color: rgb(243 229 237);
+	color: slategray;
+	font-size: 13px;
+	font-weight: 550;
+	border-style: solid;
+	border-color: #f0ecec;
+	border-width: 1px 0 1px 0;
+}
+.like-table .col-total{ }
+
+/* 聚合行 */
+.like-table .list-gather{
+	background-color: #f3f3f3;
+	color: slategray;
+	font-size: 12px;
+	font-weight: 550;
+}
+.like-table .list-gather + .list-gather{
+	background-color: #efefef;
+}
+.like-table .col-gather{ }
 
 
 /*内容输入框*/
