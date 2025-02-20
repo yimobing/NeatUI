@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author: ChenMufeng
 * Date: 2020.03.26
-* Update: 2025.02.19
+* Update: 2025.02.20
 
 */
 (function($){
@@ -405,6 +405,7 @@
 					height = typeof row["height"] == 'undefined' ? 'auto' : parseFloat(row["height"]),
 					type = typeof row["type"] == 'undefined' ? 'string' : row["type"],
 					mode = typeof row["mode"] == 'undefined' ? 'normal' : row["mode"],
+					constant = typeof row["constant"] == 'undefined' ? false : (row["constant"] === true ? true : false),
 					name = typeof row["name"] == 'undefined' ? null : row["name"],
 					label = typeof row["label"] == 'undefined' ? null : row["label"],
 					fontSize = typeof row["fontSize"] == 'undefined' ? null : row["fontSize"],
@@ -412,6 +413,8 @@
 					b_alt = typeof row["b_alt"] == 'undefined' ? null : row["b_alt"],
 					b_onlyImage = typeof row["b_onlyImage"] == 'undefined' ? false : (row["b_onlyImage"] == true ? true : false), //默认false
 					align = typeof row["align"] == 'undefined' ? '' : row["align"],
+					underline = typeof row["underline"] == 'undefined' ? false : (row["underline"] === true ? true : false),
+					droped = typeof row["drop"] == 'undefined' ? false : (row["drop"] === true ? true : false),
 					colHeadBgColor = typeof row["colHeadBgColor"] == 'undefined' ? '' : row["colHeadBgColor"],
 					colHeadColor = typeof row["colHeadColor"] == 'undefined' ? '' : row["colHeadColor"],
 					colArrowColor = typeof row["colArrowColor"] == 'undefined' ? '' : row["colArrowColor"],
@@ -428,13 +431,13 @@
 					defaults = typeof row["default"] == 'undefined' ? '' : row["default"],
 					hiddens = typeof row["hidden"] == 'undefined' ? '' : row["hidden"],
 					component = typeof row["component"] == 'undefined' ? null : row["component"],
+					component2 = typeof row["component2"] == 'undefined' ? null : row["component2"],
 					format = typeof row["format"] == 'undefined' ? null : row["format"],
 					code = typeof row["code"] == 'undefined' ? null : row["code"],
 					choice = typeof row["choice"] == 'undefined' ? null : row["choice"],
 					digit = typeof row["digit"] == 'undefined' ? '' : ( ISNAN(parseInt(row["digit"])) ? '' : parseInt(row["digit"]) ),
 					subtotal = typeof row["subtotal"] == 'undefined' ? '0' : row["subtotal"] == true ? '1' : '0', //默认false(即0)
 					merge = typeof row["merge"] == 'undefined' ? null : row["merge"]; //add 20201110-2
-
 				//__·重算值
 				height = isNaN(height) ? 'auto' : height;
 				if(colHeadBgColor != '') columnHasMargin = false;
@@ -442,8 +445,8 @@
 
 
 				//__·校验：
-				//必须有field字段	
-				if(mode != 'button' && mode.indexOf('mark') < 0 && (field == null || field == '')){
+				//必须有field字段 edit 20250220-1
+				if(constant == false && mode != 'button' && mode.indexOf('mark') < 0 && (field == null || field == '')){
 					var tips = title == '' ? '' : '【' + title + '】一列';
 					console.log('警告：SETJSON COLUMNS第' + (i+1) + '个元素' + tips + '必须填写FIELD属性');
 					return;
@@ -454,12 +457,13 @@
 				var _colClass = (field == '' || field == null) ? 'col-' + mode : 'col-' + field;
 				var _stickyClass = sticky ? ' foremost' : '';
 				var _alignClass = align == '' ? '' : (align == 'left' ? ' left' : ' ' + align);
+				var _dropClass = droped !== true ? '' : ' can-drop';
+				var _underlineClass = underline == false ? '' : ' has-bot-line';
 				var _colBgColorStr = colHeadBgColor == '' ? '' : ';background-color:' + colHeadBgColor;
 				var _colColorStr = colHeadColor == '' ? '' : ';color:' + colHeadColor;
 				var _arrowStyle = colArrowColor == '' ? '' : ' style="color:' + colArrowColor + '"';
 				var _cellColorStr = fontColor == null ? '' : ';color:' + fontColor;
 				var _cellSizeStr = fontSize == null ? '' : ';font-size:' + fontSize;
-				
 
 				//__·表头
 				//头部HTML
@@ -508,31 +512,66 @@
 				}
 
 				//__·表身
-				var _editBoxStr = '', _compoBoxStr = '';
+				var _editBoxStr = '', _compoBoxStr = '', _compoBoxStr2 = '';
 				var _borderClass = border != 'none' ? '' : ' no-border'; 
 				var _readonlyStr = !readonly ? '' : ' readonly';
 				var _disabledStr = !disabled ? '' : ' disabled';
 				var _bIconStr = b_icon == null ? ''  : '<i class="fa fa-' + b_icon + '"></i>';
 				var cWidth = 0;
-				var cAlign = '';
+				var cAlign = '', cAlign2 = '';
 				if(component != null){ //单元格内容组合		
 					cAlign = typeof component["align"] == 'undefined' ? 'right' : component["align"];
 					var	cMode = typeof component["mode"] == 'undefined' ? 'button' : component["mode"],
 						cLabel =typeof component["label"] == 'undefined' ? '' : component["label"],
 						cPlaceholder = typeof component["placeholder"] == 'undefined' ? '' : component["placeholder"],
 						cName = typeof component["name"] == 'undefined' ? '' : component["name"],
+						cTheme = typeof component["theme"] == 'undefined' ? '' : component["theme"],
 						cWidth = typeof component["width"] == 'undefined' ? btnW  : parseFloat(component["width"]);
 					if(cMode == 'button'){
 						var _marginStr = cAlign == 'left' ? 'margin-right:' + marginL +'px;' : 'margin-left:' + marginL + 'px;';
-						var _btnClass = cName == '' ? '' : 'btn-' + cName;
+						var _btnClass = '';
+						if (cName != '') {
+							_btnClass += 'btn-' + cName;
+							_btnClass = _btnClass.replace(/(btn-btn-)/g, 'btn-');
+						}
+						if (cTheme != '') {
+							_btnClass += ' ' + cTheme;
+						}
 						var _cHeightStr = height == 'auto' ? '' : 'height:' + height + 'px;';
 						var _cStyleStr = ' style="width:' + cWidth + 'px;' + _cHeightStr + _marginStr + 'padding:0;"';
 						_compoBoxStr = '<button type="button" class="' + _btnClass + '"' +  _cStyleStr + '>' + cLabel + '</button>';
 					}
 				}
+				// add 20250220-1
+				if(component2 != null){ // 单元格内容组合2		
+					cAlign2 = typeof component2["align"] == 'undefined' ? 'right' : component2["align"];
+					var	cMode = typeof component2["mode"] == 'undefined' ? 'button' : component2["mode"],
+						cLabel =typeof component2["label"] == 'undefined' ? '' : component2["label"],
+						cPlaceholder = typeof component2["placeholder"] == 'undefined' ? '' : component2["placeholder"],
+						cName = typeof component2["name"] == 'undefined' ? '' : component2["name"],
+						cTheme = typeof component2["theme"] == 'undefined' ? '' : component2["theme"],
+						cWidth = typeof component2["width"] == 'undefined' ? btnW  : parseFloat(component2["width"]);
+					if(cMode == 'button'){
+						var _marginStr = cAlign2 == 'left' ? 'margin-right:' + marginL +'px;' : 'margin-left:' + marginL + 'px;';
+						var _btnClass = '';
+						if (cName != '') {
+							_btnClass += 'btn-' + cName;
+							_btnClass = _btnClass.replace(/(btn-btn-)/g, 'btn-');
+						}
+						if (cTheme != '') {
+							_btnClass += ' ' + cTheme;
+						}
+						var _cHeightStr = height == 'auto' ? '' : 'height:' + height + 'px;';
+						var _cStyleStr = ' style="width:' + cWidth + 'px;' + _cHeightStr + _marginStr + 'padding:0;"';
+						_compoBoxStr2 = '<button type="button" class="' + _btnClass + '"' +  _cStyleStr + '>' + cLabel + '</button>';
+					}
+				}
 
 				var eWidth = width - cWidth - marginL;
 				if(isCeilLine) eWidth -= ceilPad * 2 + 2; //有边线时要减去padding*2，再减去边线宽2px
+				if (mode.indexOf('span') >= 0) { //span标签 add 20250220-1
+					eWidth -= 7; // span 标签宽度再减去一定的值
+				}
 				var _eWidthStr = eWidth == width ? '' : 'width:' + eWidth+ 'px;';
 				var _eHeightStr = height == 'auto' ? '' : 'height:' + height + 'px';				
 				var _fieldClass = (field == null || field == '') ? '' : 'i-t-' + field;
@@ -540,7 +579,10 @@
 
 				//取数据值
 				var textVal = (value == '' ? items[field] : value);
-				if(isUndefinedEmpty){
+				if(constant){ // add 20250220-1
+					textVal = value;
+				}
+				if (isUndefinedEmpty) {
 					textVal = typeof textVal == 'undefined' ? '' : textVal;
 				}
 				var initialVal = textVal;
@@ -608,8 +650,8 @@
 						}
 					}
 				}
-				if(mode.indexOf('span') >= 0){ //span标签
-					_editBoxStr = '<span class="' + _fieldClass + _nameClass + _borderClass + '"' + _dataBhStr + '>' + textVal + '</span>';
+				if(mode.indexOf('span') >= 0){ //span标签 edit 20250220-1
+					_editBoxStr = '<span class="' + _fieldClass + _nameClass + _borderClass + '"' + _dataBhStr + ' style="' + _eWidthStr + _eHeightStr + '">' + textVal + '</span>';
 				}
 				if(mode.indexOf('input') >= 0){ //单行文本
 					_editBoxStr = '<input type="text" class="' + _fieldClass + _nameClass + _borderClass + '" value="'+ textVal + '"' + _dataBhStr + _readonlyStr + _disabledStr + _placeholderStr + _focusStr + _blurStr + ' style="' + _eWidthStr + _eHeightStr + '">';
@@ -692,14 +734,18 @@
 					}
 				}
 
-				//中间列
+				//中间列 testing
 				var _colContentStr = '';
 				if(cAlign == 'left') _colContentStr = _compoBoxStr + _editBoxStr;
 				else _colContentStr = _editBoxStr + _compoBoxStr;
+
+				if(cAlign2 == 'left') _colContentStr = _compoBoxStr2 + _colContentStr;
+				else _colContentStr = _colContentStr + _compoBoxStr2;
+
 				var _rUnitStr = r_unit == null ? '' : '<em class="em-unit">' + r_unit + '</em>';
 				var _rIconStr = r_icon == null ? ''  : '<i class="i-icon fa fa-' + r_icon + '"></i>';
-				_bodyHTML += '<div class="' + _colClass + _alignClass + _stickyClass + '" data-column-index="' + j + '" data-column-field="' + field + '" style="width:' + width + 'px' + _cellColorStr + _cellSizeStr + _displayStr + '">'+ 
-								_colContentStr + _rUnitStr + _rIconStr + 
+				_bodyHTML += '<div class="' + _colClass + _alignClass + _underlineClass + _dropClass + _stickyClass + '" data-column-index="' + j + '" data-column-field="' + field + '" style="width:' + width + 'px' + _cellColorStr + _cellSizeStr + _displayStr + '">'+ 
+								_colContentStr + _rUnitStr + _rIconStr +
 							'</div>';
 				
 				//后面列

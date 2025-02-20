@@ -4,7 +4,7 @@
 * [类表格控件]样式-
 * Author：ChenMufeng
 * PubDate：2020.11.11
-* Update: 2025.02.19
+* Update: 2025.02.20
 * ----------------------
 */
 /*body{overflow-y: hidden!important;} /*禁止垂直方向出现滚动条,已在插件中用参数进行控制*/
@@ -185,6 +185,43 @@
 .like-table .list-one button.border-zero{border: 0;}
 .like-table .list-one button i.fa{margin-right: 4px;}
 
+.like-table button[type="button"]{
+    width: auto;
+    height: auto;
+    line-height: 1;
+    padding: 5px 5px;
+    border: 1px solid #c5cbce;
+    border-radius: 2px;
+    color: #868b8d;
+    font-size: 12px;
+}
+.like-table button[type="button"].gray{
+    background-color: #ededed;
+    color: #666;
+}
+.like-table button[type="button"].blue{
+    border-color: #80d0fc;
+    color: #00bfff;
+}
+.like-table button[type="button"].red{
+    border-color: #eca0a0;
+    color: #eca0a0;
+}
+.like-table button[type="button"].green{
+    border-color: rgb(215 233 215);
+    color: rgb(128 185 128);
+}
+.like-table button[type="button"]:hover{
+    opacity: .75;
+    filter: alpha(opacity=75);
+}
+.like-table button[type="button"][disabled]{
+    cursor: not-allowed;
+    border-color: #ededed;
+    color: #d3d3d3;
+}
+
+
 /*输入框readonly disabled样式*/
 .like-table .list-one input:disabled, 
 .like-table .list-one input[disabled], 
@@ -268,10 +305,49 @@
 	_display:inline; 
 	*display:inline; 
 	*zoom:1; 
+	cursor: default;
 }
 .like-table .column>div.left button,
 .like-table .column>div.center button,
 .like-table .column>div.right button{margin:0 auto; text-align:center!important; font-size: 13px; }
+.like-table .column>div.has-bot-line>*{
+	text-decoration: underline;
+	cursor: pointer;
+}
+.like-table .column>div.has-bot-line>*:hover{
+	color: #ff0000;
+}
+
+.like-table .column>div.can-drop{
+	cursor: pointer;
+}
+.like-table .column>div.can-drop:after{
+	content: '';
+	position: absolute;
+	right: 15px;
+	top: 50%;
+	-webkit-transform: translateY(-50%) rotate(135deg);
+	-moz-transform: translateY(-50%) rotate(135deg);
+	-o-transform: translateY(-50%) rotate(135deg);
+	transform: translateY(-50%) rotate(135deg);
+	display: inline-block;
+	width: 5px;
+	height: 5px;
+	border-style: solid;
+	border-width: 1px 1px 0 0;
+	border-color: #888;
+}
+
+.like-table .column>div.can-drop>*{
+	padding-right: 20px;
+	cursor: pointer!important;
+}
+
+.like-table .column>div.can-drop:hover:after{
+	opacity: .6;
+	filter: alpha(opacity = 60);
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+}
 
 /*列之间没有margin值时*/
 .like-table.no-col-margin .column>div{margin:0;}

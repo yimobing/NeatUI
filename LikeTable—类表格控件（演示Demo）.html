@@ -72,7 +72,7 @@
     * 几个插件内部自定义的函数非常有用,如下（以下示例中 $tableDom为指定表格根节点，当只有一张表格时$tableDom为可选项）
         · $.privateProperty.pageCurpage['history'] = 1; // 重置序号
 		
-		// 表格插入一行
+		// 表格插入一行 edit 20250220-1
 		// 在表格最后一行添加一个合计行，或在表格指定行后面添加一个聚合行
         · neuiLikeTable.createAddUpRow(source, $tableDom, options); // 创建合计行或聚合行
 
@@ -251,6 +251,8 @@
                 must:false, // 是否必填字(可选), true 是, false 否(默认)
                 unique:false, // 是否唯一值(该列在每一行的值是否唯一). true 是(即该列每一行的值都应该不同), false 否(默认)
                 align:'left', // 水平对齐. left 左, center 中(默认), right (可选) 
+				underline: false, // 是否添加下划线(可选)，默认false。一般用于点击文本时打开某个链接。 add 20250220-1
+				drop: false, // 是否为下拉类型(可选)，默认false。值为true时，右侧将有一个向下的箭头，且光标呈现手抓形状。一般用于下拉数据。add 20250220-1
                 r_unit:'平米', // 右侧单(可选)
                 r_icon:'chevron-down', // 右侧箭头(采用font-awesome图标库(可选), 默认为空.
                 readonly:false, // 是否只读. true 是, false 否(默认(可选)
@@ -274,24 +276,41 @@
                 colArrowColor:'rgb(177,0,0)', // 列头排序箭头颜(可选)
                
                 // --------参数3：少用但很实用的参数
+				constant: false, // 值是否为常量/常数(可选)，默认false。值为true时，field 参数可放空或可选，且与参数value配合使用便可随意增加一列常数列，值为参数value设定的值。 add 20250220-1
                 value:', // 初始值(可选).注意：本参数存在时，将覆盖列表数据的值, 一般仅在mode='mark'或input['mark']或textarea['mark']时才使用本参数
                 asHidVal:false, // 即本列数据值是否作为隐藏值(即编号)(可选), 默认false. 注：1.true时,值将写入元素的data-bh*属性中;2.不要与参数hide同时设置
                 default:', // 默认显示值(可选). 一般的,只有当新增一条记录时才使用本参数.
                 hidden:', // 默认隐藏值(即编号)(可选). 一般的,只有当新增一条记录时才使用本参数.
 
-                digit:', // 小数点位数(可选), 默认空. (一般只有浮点型数据才须指定小数点位数)
-                subtotal:false, // 各行值是否需要小计(可选), 默认false
-                component:{ // 其它组合，比如右侧有按钮(可选)
-                    align:'right', // 位置. right 右（默认）, left 左
-                    mode:'button', // 类型. button 按钮(默认), input 单行文本, textarea 多行文本
-                    label:'查询', // 名称(mode='button'时为按钮名秒, mode='input'或'textarea'时为初始值)
-                    placeholder:', // 占位符（权当mode='input'或'textarea'时)
-                    name:'btn-query-house', // 元素属性class
-                    width:35 // 宽（px)
+                digit: '', // 小数点位数(可选), 默认空. (一般只有浮点型数据才须指定小数点位数)
+                subtotal: false, // 各行值是否需要小计(可选), 默认false
+				
+				// component 和 component2 两个参数可用于设置一个单元格中输入框左右两边各有一个按钮，或右边两个按钮，或左边两个按钮
+				// 组合参数1
+                component: { // 其它组合，比如右侧有按钮(可选)
+                    align: 'right', // 位置. right 右（默认）, left 左
+                    mode: 'button', // 类型. button 按钮(默认), input 单行文本, textarea 多行文本
+                    label: '查询', // 名称(mode='button'时为按钮名秒, mode='input'或'textarea'时为初始值)
+                    placeholder: '', // 占位符（权当mode='input'或'textarea'时)
+                    name: 'btn-query-house', // 元素属性class
+                    width: 35 // 宽（px)
+					theme: "" // 按钮主题，默认空。值：red 红色, blue 蓝色, green 绿色, gray 灰色(背景色为灰色)
                 },
-                merge:{ // 一级表头合并(可选)
-					direction:'next', // 合并方向(可选). next 向下合并(默认), prev 向上合并
-					numeral:2 // 合并的列数(可选)
+				// 组合参数2
+				component2: { // 其它组合，比如右侧有按钮(可选)
+                    align: 'left', // 位置. right 右（默认）, left 左
+                    mode: 'button', // 类型. button 按钮(默认), input 单行文本, textarea 多行文本
+                    label: '查询', // 名称(mode='button'时为按钮名秒, mode='input'或'textarea'时为初始值)
+                    placeholder: '', // 占位符（权当mode='input'或'textarea'时)
+                    name: 'btn-query-house', // 元素属性class
+                    width: 35 // 宽（px)
+					theme: "" // 按钮主题，默认空。值：red 红色, blue 蓝色, green 绿色, gray 灰色(背景色为灰色)
+                },
+				
+				
+                merge: { // 一级表头合并(可选)
+					direction: 'next', // 合并方向(可选). next 向下合并(默认), prev 向上合并
+					numeral: 2 // 合并的列数(可选)
                 },
                 format:'eval( ["a"] * ["b"] )', // 自定义值，计算公式，即“当值是由同一行某些单元格算出来”(可选).
                                                 // 其中 ["a"] * ["b"] 表示取“字段a剩以字段 b”作为结果
@@ -349,6 +368,7 @@
                 width:150,
                 mode:'input',
                 readonly:true,
+				drop: true, // 下拉类型。右侧将会出现一个下拉箭头，且光标呈手抓形状
                 colHeadBgColor:'#c0ece0', 
                 colArrowColor:'rgb(19,181,147)'
             },{
@@ -381,11 +401,11 @@
                 height:58,
                 mode:'textarea',
                 component:{ 
-                    align:'right',
-                    mode:'button',
-                    label:'查询', 
-                    name:'query-house ne-btn has-texture no-bg-img', // 元素属性class
-                    width:35 // 宽（px)
+                    align: 'right',
+                    mode: 'button',
+                    label: '查询', 
+                    name: 'query-house ne-btn has-texture no-bg-img', // 元素属性class
+                    width: 35 // 宽（px)
                 } 
             },{
                 title:'有无电梯', 
