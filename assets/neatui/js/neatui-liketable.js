@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author: ChenMufeng
 * Date: 2020.03.26
-* Update: 2025.02.20
+* Update: 2025.02.21
 
 */
 (function($){
@@ -521,14 +521,16 @@
 				var cAlign = '', cAlign2 = '';
 				if(component != null){ //单元格内容组合		
 					cAlign = typeof component["align"] == 'undefined' ? 'right' : component["align"];
-					var	cMode = typeof component["mode"] == 'undefined' ? 'button' : component["mode"],
-						cLabel =typeof component["label"] == 'undefined' ? '' : component["label"],
+					var cMode = typeof component["mode"] == 'undefined' ? 'button' : component["mode"],
+						cLabel = typeof component["label"] == 'undefined' ? '' : component["label"],
 						cPlaceholder = typeof component["placeholder"] == 'undefined' ? '' : component["placeholder"],
 						cName = typeof component["name"] == 'undefined' ? '' : component["name"],
 						cTheme = typeof component["theme"] == 'undefined' ? '' : component["theme"],
-						cWidth = typeof component["width"] == 'undefined' ? btnW  : parseFloat(component["width"]);
+						cWidth = typeof component["width"] == 'undefined' ? btnW : parseFloat(component["width"]),
+						cTopLevel = typeof component["topLevel"] == 'undefined' ? true : (component["topLevel"] == false ? false : true);
+					var _importStr = cTopLevel ? '!important' : '';
 					if(cMode == 'button'){
-						var _marginStr = cAlign == 'left' ? 'margin-right:' + marginL +'px;' : 'margin-left:' + marginL + 'px;';
+						var _marginStr = (cAlign == 'left' ? 'margin-right:' + marginL +'px' : 'margin-left:' + marginL + 'px') + _importStr + ';';
 						var _btnClass = '';
 						if (cName != '') {
 							_btnClass += 'btn-' + cName;
@@ -537,8 +539,9 @@
 						if (cTheme != '') {
 							_btnClass += ' ' + cTheme;
 						}
-						var _cHeightStr = height == 'auto' ? '' : 'height:' + height + 'px;';
-						var _cStyleStr = ' style="width:' + cWidth + 'px;' + _cHeightStr + _marginStr + 'padding:0;"';
+						var _cHeightStr = height == 'auto' ? '' : ('height:' + height + 'px' + _importStr + ';');
+						var _cStyleStr = ' style="width:' + cWidth + 'px' + _importStr + ';' + _cHeightStr + _marginStr + '"';
+						_cStyleStr = _cStyleStr.replace(/(;;)/g, ';');
 						_compoBoxStr = '<button type="button" class="' + _btnClass + '"' +  _cStyleStr + '>' + cLabel + '</button>';
 					}
 				}
@@ -550,9 +553,11 @@
 						cPlaceholder = typeof component2["placeholder"] == 'undefined' ? '' : component2["placeholder"],
 						cName = typeof component2["name"] == 'undefined' ? '' : component2["name"],
 						cTheme = typeof component2["theme"] == 'undefined' ? '' : component2["theme"],
-						cWidth = typeof component2["width"] == 'undefined' ? btnW  : parseFloat(component2["width"]);
+						cWidth = typeof component2["width"] == 'undefined' ? btnW  : parseFloat(component2["width"]),
+						cTopLevel = typeof component2["topLevel"] == 'undefined' ? true : (component2["topLevel"] == false ? false : true);
+					var _importStr = cTopLevel ? '!important' : '';
 					if(cMode == 'button'){
-						var _marginStr = cAlign2 == 'left' ? 'margin-right:' + marginL +'px;' : 'margin-left:' + marginL + 'px;';
+						var _marginStr = (cAlign2 == 'left' ? 'margin-right:' + marginL +'px' : 'margin-left:' + marginL + 'px') + _importStr + ';';
 						var _btnClass = '';
 						if (cName != '') {
 							_btnClass += 'btn-' + cName;
@@ -561,13 +566,15 @@
 						if (cTheme != '') {
 							_btnClass += ' ' + cTheme;
 						}
-						var _cHeightStr = height == 'auto' ? '' : 'height:' + height + 'px;';
-						var _cStyleStr = ' style="width:' + cWidth + 'px;' + _cHeightStr + _marginStr + 'padding:0;"';
+						var _cHeightStr = height == 'auto' ? '' : ('height:' + height + 'px' + _importStr + ';');
+						var _cStyleStr = ' style="width:' + cWidth + 'px' + _importStr + ';' + _cHeightStr + _marginStr + '"';
+						_cStyleStr = _cStyleStr.replace(/(;;)/g, ';');
 						_compoBoxStr2 = '<button type="button" class="' + _btnClass + '"' +  _cStyleStr + '>' + cLabel + '</button>';
 					}
 				}
 
 				var eWidth = width - cWidth - marginL;
+				if (component2 != null) eWidth = eWidth - cWidth - marginL;
 				if(isCeilLine) eWidth -= ceilPad * 2 + 2; //有边线时要减去padding*2，再减去边线宽2px
 				if (mode.indexOf('span') >= 0) { //span标签 add 20250220-1
 					eWidth -= 7; // span 标签宽度再减去一定的值
@@ -666,7 +673,7 @@
 					var _btnClass = field == null || field == '' ? '' : ' btn-' + field; // edit 20221115 by mufeng
 					var _altTitle = b_alt == null ? label : b_alt;
 					var _lbTextStr = b_onlyImage ? '' : label;
-					_editBoxStr = '<button type="button" class="border-zero' + _btnClass + _nameClass + '" title="' + _altTitle + '" style="width:' + _w + 'px; height:28px; line-height:28px; padding:0;' + _cellSizeStr + _cellColorStr + '">' + _bIconStr + _lbTextStr + '</button>';
+					_editBoxStr = '<button type="button" class="' + _btnClass + _nameClass + '" title="' + _altTitle + '" style="width:' + _w + 'px; height:28px; line-height:28px;' + _cellSizeStr + _cellColorStr + '">' + _bIconStr + _lbTextStr + '</button>';
 				}
 				if(mode.indexOf('radio') >= 0){ //radio单选
 					var yesVal = '1', noVal = '0';
@@ -734,7 +741,7 @@
 					}
 				}
 
-				//中间列 testing
+				//中间列
 				var _colContentStr = '';
 				if(cAlign == 'left') _colContentStr = _compoBoxStr + _editBoxStr;
 				else _colContentStr = _editBoxStr + _compoBoxStr;
@@ -2071,7 +2078,23 @@
 						_this.text(tmp_value);
 					}else{
 						var _ele = _this.children();
-						var tagname = _ele[0].tagName.toLocaleLowerCase();
+						// edit 20250221-1
+						// var tagname = _ele[0].tagName.toLocaleLowerCase();
+						var tagname = null;
+						if (_ele.length == 1) { // 当单元格内仅有一个元素时
+							tagname = _ele[0].tagName.toLocaleLowerCase();
+						}
+						else { // 当单元格内有多个元素时
+							for (var v = 0; v < _ele.length; v++){
+								var _tag = _ele[v].tagName.toLocaleLowerCase();
+								if (['span', 'input', 'textarea'].includes(_tag)) {
+									_ele = $(_ele[v]);
+									tagname = _tag;
+									break;
+								}
+							}
+						}
+						// console.log('_ele：', _ele, '\ntabname：', tagname);
 						if(tagname == 'input' || tagname == 'textarea'){
 							_ele.val(tmp_value);
 						}else if(tagname == 'span'){

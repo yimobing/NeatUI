@@ -295,6 +295,7 @@
                     name: 'btn-query-house', // 元素属性class
                     width: 35 // 宽（px)
 					theme: "" // 按钮主题，默认空。值：red 红色, blue 蓝色, green 绿色, gray 灰色(背景色为灰色)
+					topLevel: true // 宽高等样式是否优先生效，默认true。true时这里设置的样式级别将高于样式文件里的设置。false 时按钮宽高等将根据样式表里的设置。
                 },
 				// 组合参数2
 				component2: { // 其它组合，比如右侧有按钮(可选)
@@ -304,7 +305,8 @@
                     placeholder: '', // 占位符（权当mode='input'或'textarea'时)
                     name: 'btn-query-house', // 元素属性class
                     width: 35 // 宽（px)
-					theme: "" // 按钮主题，默认空。值：red 红色, blue 蓝色, green 绿色, gray 灰色(背景色为灰色)
+					theme: "", // 按钮主题，默认空。值：red 红色, blue 蓝色, green 绿色, gray 灰色(背景色为灰色)
+					topLevel: true // 宽高等样式是否优先生效，默认true。true时这里设置的样式级别将高于样式文件里的设置。false 时按钮宽高等将根据样式表里的设置。
                 },
 				
 				
@@ -397,15 +399,16 @@
                 title:'系统楼盘', 
                 field:'qydcb_mc',
                 must:true,
-                width:130,
-                height:58,
+                width: 150,
+                height: 58,
                 mode:'textarea',
                 component:{ 
                     align: 'right',
                     mode: 'button',
                     label: '查询', 
                     name: 'query-house ne-btn has-texture no-bg-img', // 元素属性class
-                    width: 35 // 宽（px)
+                    width: 40, // 宽（px)
+					topLevel: true // 宽高等样式是否优先生效，默认true。true时这里设置的样式级别将高于样式文件里的设置。false 时按钮宽高等将根据样式表里的设置。
                 } 
             },{
                 title:'有无电梯', 
@@ -462,7 +465,7 @@
                 title:'操作', 
                 width:100,
                 mode:'button',
-                name:'btn-delete',
+                name:'btn-delete no-border',
                 align:'center',
                 fontSize:'18px',
                 fontColor:'red',
