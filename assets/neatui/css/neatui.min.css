@@ -929,7 +929,7 @@ pre, pre code {
 .ne-button.has-3d>button.red,
 .ne-btn.has-3d.red{
     border-color: #F44336;
-    color: #fff;
+    color: #fff!important;
     background-color: #F44336;
 }
 .ne-button.has-3d>button.red:hover,
@@ -940,13 +940,13 @@ pre, pre code {
 .ne-btn.has-3d.red[disabled]{
     background: #f55a4e;
     border-color: #f55a4e;
-    color: #fccbc7;
+    color: #fccbc7!important;
 }
 /*橙色立体*/
 .ne-button.has-3d>button.orange,
 .ne-btn.has-3d.orange{
     border-color: #f99d1c;
-    color: #fff;
+    color: #fff!important;
     background-color: #f8971b;
 }
 .ne-button.has-3d>button.orange:hover,
@@ -957,13 +957,13 @@ pre, pre code {
 .ne-btn.has-3d.orange[disabled]{
     background: #f8971b;
     border-color: #e3ba84;
-    color: #fff;
+    color: #fff!important;
 }
 /*棕色立体*/
 .ne-button.has-3d>button.brown,
 .ne-btn.has-3d.brown{
     border-color: #bf7f87;
-    color: #fff;
+    color: #fff!important;
     background-color: #bf7f87;
 }
 .ne-button.has-3d>button.brown:hover,
@@ -974,7 +974,7 @@ pre, pre code {
 .ne-btn.has-3d.brown[disabled]{
     background: #c1989d;
     border-color: #cbc3c4;
-    color: #ebebeb;
+    color: #ebebeb!important;
 }
 
 

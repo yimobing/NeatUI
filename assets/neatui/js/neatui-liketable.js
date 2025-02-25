@@ -4,7 +4,7 @@
 * 特点: 支持多表格，在单表格时支持分页方式为“下拉加载更多”
 * Author: ChenMufeng
 * Date: 2020.03.26
-* Update: 2025.02.21
+* Update: 2025.02.25
 
 */
 (function($){
@@ -758,9 +758,12 @@
 				//后面列
 				if (j == (columnsArr.length - 1)) {
 					var stateColumnStyle = isStateVisible ? '' : ' style="display: none"';
-					if(isStateCol) {
+					if (isStateCol) {
+						// edit 20250225-1
+						var state_first_value = items["status"];
+						var state_new_value = typeof state_first_value == 'undefined' || state_first_value == '' ? stateInitValue : state_first_value;
 						_bodyHTML +='<div class="col-status"' + stateColumnStyle + '>'+
-									' <input type="text" class="i-t-state no-border" value="' + stateInitValue + '" disabled>'+
+									' <input type="text" class="i-t-state no-border" value="' + state_new_value + '" disabled>'+
 									'</div>'; //状态列
 					}
 				}
