@@ -576,3 +576,5 @@ function createNewInstace(config){
     return instance;
 }
 var $axios = createNewInstace();
+
+export default $axios; // 供ES6可导入 add 20250402-1
