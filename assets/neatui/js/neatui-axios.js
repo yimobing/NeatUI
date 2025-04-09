@@ -376,11 +376,29 @@
             // if (_this != null && typeof _this.loading != 'undefined') {
             //     _this.loading = false;
             // }
+            
             // 弹出提示信息窗口
-            if (_this != null && typeof _this.$alert == 'function') {
+            if (_this != null && typeof _this.$alert == 'function') { // element ui
                 _this.$alert(str, title, {
                     type: type,
                     dangerouslyUseHTMLString: true
+                });
+            }
+            else if (_this != null && typeof _this.$dialog == 'function') { // vant ui
+                // _this.$toast.loading({
+                //     message: str, 
+                //     forbidClick: true,
+                //     icon: 'warning',
+                //     closeOnClick: false
+                //     // type: 'fail',
+                //     // loadingType: 'spinner',
+                //     // duration: 2000 
+                // });
+                _this.$dialog.alert({
+                    title: title,
+                    message: str
+                    // theme: 'round-button'
+                    // confirmButtonColor: '#F56C6C'
                 });
             }
             else {
