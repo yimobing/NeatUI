@@ -394,6 +394,9 @@
                 //     // loadingType: 'spinner',
                 //     // duration: 2000 
                 // });
+                if(typeof _this.$toast == 'function'){
+                    _this.$toast.clear();  // 关闭转圈，防止forbidClick设置true时 dialog 无法点击
+                }
                 _this.$dialog.alert({
                     title: title,
                     message: str
