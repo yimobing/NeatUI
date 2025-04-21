@@ -524,6 +524,7 @@ var utilities = {
      * 即：截取url字符串中的某个参数值
      * @param {string} ps_key 要接收的参数名(可选). 若不存在,则返回null; 若缺省或空,则返回字符串各个参数组成的object对象
      * @param {string} ps_url url字符串(可选)。 若缺省或空,则自动读取当前浏览器中的链接地址
+     * @returns {String|null} 返回参数对应的值，若参数不存在则返回null
      * eg. 
      * 当前页面地址：https://www.xxx.com?a=1&b=2&c=3
      * var str = 'https://www.yyy.com?d=3&e=4&f=5';
@@ -541,8 +542,9 @@ var utilities = {
             if(param[0].toString().replace(/([ ]+)/g, '') != '') paramsObj[param[0]] = param[1];
         }
         if(ps_key){
-            var paramValue = typeof paramsObj[ps_key] == 'undefined' ? paramsObj[ps_key] : decodeURI(paramsObj[ps_key]); //解码
-            return paramValue || null;
+            ps_key = ps_key.toString().replace(/(%3C%=|%3C%|%%3E)/g, ''); // 去掉 <%= 和 %>
+            var paramValue = typeof paramsObj[ps_key] == 'undefined' ? null : decodeURI(paramsObj[ps_key]); //解码
+            return paramValue == null ?　null : paramValue;
         }
         return paramsObj;
     },
