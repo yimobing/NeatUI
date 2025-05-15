@@ -4,7 +4,7 @@
  * 调用控件即可直接嵌入一个iframe页面，浏览器窗口调整时，iframe子页面大小也会自动调整
  * Author：Mufeng
  * Date: 2024.10.08
- * Update: 2025.01.03
+ * Update: 2025.05.15
  */
 ; (function (root, factory) {
     if (typeof define === 'function' && define.amd) { // AMD规范
@@ -322,7 +322,7 @@
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     var methods = {
         /**
-         * 设置控件样式
+         * 设置控件样式 edit 20250515-1
          * @param {Object} me 控件自身对象
          * @param {HTMLDOM} 用户绑定的节点
          * @param {String} root_class_name 根节点样式名
@@ -363,38 +363,72 @@
             // console.log('框架宽度误差值：', numcW, ', 高度误差值：', numcH);
             var realW = (w == 'auto' || w == '') ? (winW - leftW - rightW - numcW) : w,
                 realH = (h == 'auto' || h == '') ? (winH - topH - botH - numcH) : h;
-            if (realW.toString().indexOf('%') < 0) { // 宽度不是百分比时
-                if (realW <= 0) realW = winW;
-                realW += 'px';
+
+            // add and edit 20250515-1
+            var elFame = skeletonNode;
+            if(document.domain != ''){ // 同一域下时,避免跨域时出错。注：以下代码本地直接打开无效, 只有在web目录中打开才生效
+                if (elFame.attachEvent){
+                    elFame.attachEvent("onload", function(){  // ie8及以下版本
+                        fnResetFameHeight();
+                        fnSetFameStyle();
+                    });
+                } else { // ie9或现代浏览器
+                    elFame.onload = function(){
+                        fnResetFameHeight();
+                        fnSetFameStyle();
+                    }
+                }  
             }
-            if (realH.toString().indexOf('%') < 0) { // 高度不是百分比时
-                if (realH <= 0) realH = winH;
-                realH += 'px';
+            else { // 本地打开或不同域下时
+                fnSetFameStyle();
             }
-            // console.log('框架真实宽度：', realW, ', 真实高度：', realH);
-            // 设置节点样式 edit 20241016-1
-            var _rootStyStr = 'width: ' + realW + '; height: ' + realH + ';'; // 'width: 100%; height: 100%;';
-            var _skeStyStr = 'width: 100%; height: 100%;  overflow: auto; -webkit-overflow-scrolling: touch;';
-            // 写法1：这种写法ie不支持
-            // rootNode.style = _rootStyStr;
-            // skeletonNode.style = _skeStyStr;
-            // 写法2：兼容ie的写法
-            rootNode.setAttribute('style', _rootStyStr);
-            skeletonNode.setAttribute('style', _skeStyStr);
-            /* 
-            // 【说明】
-            // 注： 设置 DOM 节点的样式时，某些写法ie是不支持的
-            // ie 不支持的写法
-            dom.style = 'width: 100px; height: 100px';
-            // ie 支持的写法1
-            dom.setAttribute('style', 'width: 100px; height: 100px');
-            // ie 支持的写法2
-            dom.style.width = '100px';
-            dom.style.height = '100px';
-            // ie 支持的写法3
-            dom.style.setProperty('width', '100px');
-            dom.style.setProperty('height', '100px');
-            */
+
+            // 同一域下时重置框架高度
+            function fnResetFameHeight(){
+                    var iDoc = elFame.contentDocument || elFame.contentWindow.document; // 兼容写法取子页面document对象
+                    var sHeight = iDoc.documentElement.scrollHeight || iDoc.body.scrollHeight, // 兼容写法获取子页面高度
+                        cHeight = iDoc.documentElement.clientHeight || iDoc.body.clientHeight; // 兼容写法取子页面可见区域高度
+                    var height = Math.max(sHeight, cHeight); // 子页面高度，取其中的最大值
+                    // console.log('框架高度-height：', height);
+                    realH = height; // 重置真实高度
+                    // console.log('realH-x：', realH);
+            }
+
+            // 设置框架样式
+            function fnSetFameStyle(){
+                if (realW.toString().indexOf('%') < 0) { // 宽度不是百分比时
+                    if (realW <= 0) realW = winW;
+                    realW += 'px';
+                }
+                if (realH.toString().indexOf('%') < 0) { // 高度不是百分比时
+                    if (realH <= 0) realH = winH;
+                    realH += 'px';
+                }
+                // console.log('框架真实宽度：', realW, ', 真实高度：', realH);
+                // 设置节点样式 edit 20241016-1
+                var _rootStyStr = 'width: ' + realW + '; height: ' + realH + ';'; // 'width: 100%; height: 100%;';
+                var _skeStyStr = 'width: 100%; height: 100%;  overflow: auto; -webkit-overflow-scrolling: touch;';
+                // 写法1：这种写法ie不支持
+                // rootNode.style = _rootStyStr;
+                // skeletonNode.style = _skeStyStr;
+                // 写法2：兼容ie的写法
+                rootNode.setAttribute('style', _rootStyStr);
+                skeletonNode.setAttribute('style', _skeStyStr);
+                /* 
+                // 【说明】
+                // 注： 设置 DOM 节点的样式时，某些写法ie是不支持的
+                // ie 不支持的写法
+                dom.style = 'width: 100px; height: 100px';
+                // ie 支持的写法1
+                dom.setAttribute('style', 'width: 100px; height: 100px');
+                // ie 支持的写法2
+                dom.style.width = '100px';
+                dom.style.height = '100px';
+                // ie 支持的写法3
+                dom.style.setProperty('width', '100px');
+                dom.style.setProperty('height', '100px');
+                */
+            }
         },
 
 
