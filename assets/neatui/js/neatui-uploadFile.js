@@ -725,12 +725,14 @@
                     return item.replace(/\./g, ''); // 去掉点号
                 })
                 var nowIndex = null, nowType = '';
-                for(var i = 0; i < newArr.length; i++){
-                    var _type = newArr[i];
-                    if(me.$opts.fileType.indexOf(_type) < 0){
-                        nowIndex = i;
-                        nowType = _type;
-                        break;
+                if(me.$opts.fileType.length != 0){
+                    for(var i = 0; i < newArr.length; i++){
+                        var _type = newArr[i];
+                        if(me.$opts.fileType.indexOf(_type) < 0){
+                            nowIndex = i;
+                            nowType = _type;
+                            break;
+                        }
                     }
                 }
                 if(nowIndex != null){
