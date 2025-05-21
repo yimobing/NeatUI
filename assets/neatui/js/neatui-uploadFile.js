@@ -40,7 +40,7 @@
                 extClass: "", // 自定义根节点样式名(可选)，默认空
                 allowMore: false, // 是否允许一个绑定节点下创建多个控件(可选)，默认false
                 fileType: [], // ["png", "gif", "jpg", "jpeg", "pdf"], // 文件类型限制(必须)，默认为空，表示不限制文件类型
-                fileSize: 300, // 文件大小限制，单位KB(可选)，默认300KB。若是以MB为单位，如要限制成20MB，则写成 20*1024
+                fileSize: -1, // 文件大小限制，单位KB(可选)，默认-1表示不限制。若是以MB为单位，如要限制成20MB，则写成 20*1024
                 filePixel: "", // 文件尺寸像素建议，默认空(可选)。一般仅当图片要限制质量大小时，才会使用尺寸像素建议。eg. "建议图片像素150px*150px"
                 multiple: true, // 是否允许使用批量上传功能(可选)，默认true
                 width: 600, // 区域宽度，默认单位为px(可选)，默认600px。可传像素值600或600px表示600px，或传百分比"60%"
@@ -66,6 +66,7 @@
                 showProgress: true, // 是否显示进度条(可选)，默认true
                 showCross: true, // 是否显示打叉图标用以删除当前文件(可选)，默认true
                 showOrder: true, // 是否显示文件序号(可选)，默认true
+                showFileName: true, // 是否显示文件名称(可选)，默认true
 
                 overflow: "auto", // 上传文件列表如果超过一屏，是否显示滚动条(可选)，默认auto。值：auto 使用浏览器的滚动条, scroll 使用区区域的滚动条(可本区域显示自己的滚动条)
                 maxHeight: 0, // 自定义文件列表高度，仅当overflow="scroll"时有效(可选)，默认0。当overflow="scroll"时，系统将自会自动调整区域高度，若想自定义一个高度请设置具体的高度值，如370表示370px
@@ -227,7 +228,14 @@
             var dUseOutForm = me.$opts.form.customHTML.toString().replace(/([\s]+)/g, '') === '' ? false : true; // 是否使用外置表单
             var dStatusClassName = cShowProgress ? '' : ' no-speed'; // 无进度条时的样式
             var dPixLabel = me.$opts.filePixel;
-            var dSuggestLabel = cSuggestLabel.toString().replace(/(\s+)/g, '') !== '' ? cSuggestLabel : ('只能上传' + me.$opts.fileType.join('、') + '文件，且大小不超过' + helpers.getFormatSize(me.$opts.fileSize) + '。' + dPixLabel);
+            var dShowFileName = me.$opts.showFileName;
+            var _typeLabelStr = me.$opts.fileType.length == 0 ? '' : '只能上传' + me.$opts.fileType.join('、') + '文件。',
+                _sizeLabelStr = me.$opts.fileSize == -1 ? '' : '文件大小不超过' + helpers.getFormatSize(me.$opts.fileSize) + '。' + dPixLabel + '。';
+            var dSuggestLabel = cSuggestLabel.toString().replace(/(\s+)/g, '') !== '' ? 
+                cSuggestLabel : 
+                (
+                    _typeLabelStr + _sizeLabelStr 
+                );
                 
 
             // 创建根节点
@@ -443,7 +451,7 @@
                                 return _tmpHtml;
                             })()
                         ),
-                        '<span class="neUpload__info_name">' + _name + '</span>',
+                        dShowFileName === false ? '' : '<span class="neUpload__info_name">' + _name + '</span>',
                         '</div>',
                         '<div class="neUpload__progress">',
                         '<span class="neUpload__progress_state' + dStatusClassName + '">等待上传</span>',
@@ -700,7 +708,7 @@
                 var nowIndex = null, nowSize = null;
                 for(var i = 0; i < fSizes.length; i++){
                     var _file = fSizes[i]
-                    if(_file > me.$opts.fileSize){
+                    if(me.$opts.fileSize != -1 && _file > me.$opts.fileSize){
                         nowIndex = i;
                         nowSize = _file;
                         break;
