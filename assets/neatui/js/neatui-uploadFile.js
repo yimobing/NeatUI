@@ -7,7 +7,7 @@
  * Version：v1.0.0
  * Author: MuFeng
  * Date: 2023.05.24
- * Update: 2025.01.17
+ * Update: 2025.05.22
  */
 //================================================================================================
 //              一、控件开始
@@ -57,6 +57,7 @@
                 //
                 chooseButtonLabel: "选择文件", // 选择文件按钮的显示文字(可选)
                 upButtonLabel: "开始上传", // 上传按钮的显示文字(可选)
+                buttonSize: "normal", // 按钮大小，默认normal。值： normal 正常按钮, small 小型按钮
                 suggestionLabel: "", // 建议信息(可选)，默认空。若为空系统将根据文件类型及限制的大小输出一段文字，如”只能上传png/gif/jpg/jpeg文件，且大小不超过500KB”
                 successLabel: "上传成功", // 上传成功后显示的提示文字(可选)
                 repeatLabel: "文件重复", // 文件有重复时显示的提示文字(可选)，仅当skipRepeatFile=true时有效。
@@ -254,11 +255,12 @@
             appNode.appendChild(rootNode);
 
             // 创建顶部节点
+            var btnClassName = me.$opts.buttonSize == 'small' ? ' size-small' : '';
             var _topHtml = [
                 '<div class="neUpload__top">',
                     '<div class="neUpload__operation">',
                         '<div class="neUpload__choose">',
-                            '<div class="neUpload__file">',
+                            '<div class="neUpload__file' + btnClassName + '">',
                                 '<button type="button" id="btn__choose">' + me.$opts.chooseButtonLabel + '</button>',
                                 '<input type="file" id="' + tagFileId + '" accept="' + dFileType + '"' + dMultipleStr + '>',
                             '</div><!--/.neUpload__file-->',
@@ -280,7 +282,7 @@
                             })()
                         ),
                         
-                        '<div class="neUpload__operate">',
+                        '<div class="neUpload__operate' + btnClassName + '">',
                             '<button type="button" id="btn_upload">' + me.$opts.upButtonLabel + '</button>',
                         '</div><!--/.neUpload__operate-->',
                     '</div><!--/.neUpload__operation-->',

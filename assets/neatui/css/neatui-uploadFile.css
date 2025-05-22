@@ -6,7 +6,7 @@
  * Version：v1.0.0
  * Author: Mufeng
  * Date: 2023.05.24
- * Update: 2025.01.17
+ * Update: 2025.05.22
  */
 /*+-------------------------+*/
 *{margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -83,6 +83,22 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
 	opacity: .6;
 	filter: alpha(opacity = 60);
 }
+/* 小型按钮*/
+.neUpload__file.size-small {
+	width: 70px;
+}
+.neUpload__file.size-small button[type="button"] {
+	padding: 6px 8px;
+	font-size: 12px;
+}
+.neUpload__operate.size-small{
+    
+}
+.neUpload__operate.size-small button[type="button"]{
+    padding: 6px 10px;
+	font-size: 12px;
+}
+
 .neUpload__tips {
 	margin-top: 10px;
     color: #666;
