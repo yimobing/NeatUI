@@ -4,7 +4,7 @@
  * axios 自定义封装接口
  * Author: Mufeng
  * Date: 2023.06.15
- * Update: 2023.06.15
+ * Update: 2025.06.10
  *  [调用方法]
     $axios(options).then().catch(); // 自定义请求方式，即通过配置options配置项的参数method='post'或'get'来设置请求方式
     $axios.post(url, data, config).then().catch(); // POST 请求
@@ -36,6 +36,7 @@
             debug: false, // 是否启用调试功能(可选)，默认false。false时接口有问题将显示“友好提示信息”，true时接口有问题将显示“直接提示信息”
             vue: null, // vue实例化对象，用于弹窗(可选)。如不传则为null，表示默认使用alert弹窗。
             original: true, // 接口返回值是否为axios原生数据(可选)，默认true。值：true 是(原生数据), false 否(后端接口数据，即response.data原生数据再取data) add 20250403-1
+            popup: true, // 报错机制。出现错误时是否使用弹窗弹出错误信息，默认true。某些特殊情况下比如for循环时多次错误不想多次弹出错误信息时，可将本参数置为false，再在前台中使用自定义弹出错误信息。 add 20250610
 
             // · 原生参数，即 Axios API 里的“请求配置项”，控件里默认只写出部分，您可根据需要进行添加
             // 即将被发送的自定义请求头。即发送给后台的数据格式，不同的数据格式后台接收方法也不同。
@@ -217,19 +218,31 @@
                             abnormalMsg += '<br>接口名称：' + action;
                             abnormalMsg += '<br>接口返回值：<br>' + JSON.stringify(result);
                         }
-                        utils.toast(config.vue, abnormalMsg, {type: 'warning', title: '提示'});
-                        return Promise.reject({ message: abnormalMsg, response: result });
+                        if(config.popup){
+                            utils.toast(config.vue, abnormalMsg, {type: 'warning', title: '提示'});
+                        }
+                        return Promise.reject({
+                            message: abnormalMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
+                            error: result, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
+                            data: datas // 用户请求的数据
+                        })
                     }
                     // 接口操作失败时
                     else if (result["return"] != 'ok') {
                         var failMsg = typeof result["data"] == 'undefined' || result["data"] == '' ? '未知错误，请稍后再试' : result["data"];
                         var isLoginOverTime = failMsg.indexOf('登录超时') >= 0 ? true : false; // 是否登录超时，未实现
-                        utils.toast(config.vue, failMsg, {
-                            logout: isLoginOverTime,
-                            type: 'warning',
-                            title: '操作失败'
-                        });
-                        return Promise.reject({ message: failMsg, response: result });
+                        if(config.popup){
+                            utils.toast(config.vue, failMsg, {
+                                logout: isLoginOverTime,
+                                type: 'warning',
+                                title: '操作失败'
+                            })
+                        }
+                        return Promise.reject({
+                            message: failMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
+                            error: result, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
+                            data: datas // 用户请求的数据
+                        })
                     }
                 }
 
@@ -242,10 +255,17 @@
                         unknownMsg += '接口请求失败！';
                         unknownMsg += '<br>接口名称：' + action;
                     }
-                    utils.toast(config.vue, unknownMsg, {type: 'error'});
-                    return Promise.reject(response);
+                    if(config.popup){
+                        utils.toast(config.vue, unknownMsg, {type: 'error'});
+                    }
+                    return Promise.reject({
+                        message: unknownMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
+                        error: response.data || response, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
+                        data: datas // 用户请求的数据
+                    })
                 }
-                return config.original ? response : response.data;
+
+                return config.original ? response : response.data; // 响应正常的返回值
             },
             
             // 2-2. 响应错误时做些什么。状态态码超出 2xx 范围的状态码都会触发该函数
@@ -334,9 +354,15 @@
                 else { // 报错提示信息
                     errMsg += error.message;
                     errMsg += '<br>接口名称：' + action;
-                }  
-                utils.toast(config.vue, errMsg, {type: 'error', title: '出错了Error'}); // 弹出错误信息
-                return Promise.reject(error); // 返回处理结果
+                } 
+                if(config.popup){
+                    utils.toast(config.vue, errMsg, {type: 'error', title: '出错了Error'}); // 弹出错误信息
+                }
+                return Promise.reject({
+                    message: errMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
+                    error: error, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
+                    data: datas // 用户请求的数据
+                })
             }
         );
 
