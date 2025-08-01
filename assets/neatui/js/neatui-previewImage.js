@@ -1,12 +1,14 @@
 /**
 * ------------------------------------
 * [neuiPreviewImage]
-* 图片放大预览旋转控件
-* 功能：旋转特效基于Jquery.Rorate.js二次开发的图片放大预览控件，可360度旋转
-* 兼容：ie6+
+* 图片预览控件
+* 功能：可对图片进行放大预览、旋转、按住鼠标左键拖拽图片(移动图片位置)、鼠标滚轮前后滚动可放大或缩小图片
+* 兼容性说明：支持ie9+。注：移动图片位置、鼠标滚轮滚动放大缩小图片功能只支持ie9+；旋转图片功能支持ie6+
+* 开发说明：旋转特效基于Jquery.Rorate.js二次开发的图片放大预览控件，可360度旋转
 * 注意：如果使用asp.net winform的webBrowser控件嵌入网页，则本插件代码不能有任何控制台输出调试语句console.log() (有就必须注释掉)，不然asp.net中的页面无法正常放大并旋转图片。
 * Author: ChenMufeng
-* Update: 2021.10.13
+* Date: 2021.10.13
+* Update: 2025.08.01
 * ------------------------------------
 */
 /*
@@ -38,6 +40,11 @@
               direction: 'wise', //点击图片时旋转方向. wise 顺时针(默认), anti 逆时针
               showCloseButton:true, //是否显示关闭按钮,默认true
               zIndex: 50, //层级，默认50
+              enableDraggedMove: true, // 是否支持按住鼠标左键来移动图片，默认true
+              enableMouseRollerScale: true, // 是否支持使用鼠标滚轮前后滚动时放大或缩小图片，默认true
+              enableDoubleClickStretch: true, // 是否支持双击图片时放大图片，默认true
+              rollerScaleRange: 0.05, // 使用鼠标滚轮放大缩小的幅度，默认0.05。值越大就能越快地放大缩小，反之亦然
+              doubleClickScaleRange: 0.2  // 双击图片时放大缩小的幅度，默认0.2。值越大就能越快地放大缩小，反之亦然
             }
             var settings = $.extend(true, {}, defaults, options || {});
             if(settings.imgSource == '' || typeof settings.imgSource == 'undefined') return;
@@ -61,16 +68,27 @@
                  '</div><!--/.preview-area-->',
                  '<div class="preview-mask"' + _maskStyle + '></div>',
                  '<div class="preview-rotate">',
-                  '<div class="rotate-infos">图片旋转</div>',
-                  '<div class="rotate-tips" style="display:none"><!--ie9以下浏览器时-->',
-                    '<p>点图片，' + _direcStr + '旋转' + _degreStr + '。</p>',
+                  '<div class="rotate-infos">图片操作</div>',
+                  '<div class="rotate-tips">',
+                    // '<p>点图片，' + _direcStr + '旋转' + _degreStr + '。</p>',
+                    (
+                      (function(){
+                        var _tmpHtml = '';
+                        if(settings.enableMouseRollerScale) {
+                          _tmpHtml = '<p>使用鼠标滚轮前后滚动，可放大或缩小图片。</p>';
+                        }
+                        return _tmpHtml;
+                      })()
+                    ),
                     '<p>点图片以外区域，关闭图片。</p>',
                   '</div>',
                   '<div class="rotate-buttons"><!--ie9以ie9以上浏览器-->',
                     '<p class="rot-btn rot-btn-normal"><i></i><span>复位</span></p>',
-                    '<p class="rot-btn rot-btn-wise"><i></i><span>顺时针</span></p>',
-                    '<p class="rot-btn rot-btn-anti"><i></i><span>逆时针</span></p>',
-                    '<p class="rot-btn rot-btn-close"><i></i><span>关闭</span></p>',
+                    '<p class="rot-btn rot-btn-wise"><i></i><span>顺时针旋转</span></p>',
+                    '<p class="rot-btn rot-btn-anti"><i></i><span>逆时针旋转</span></p>',
+                    '<p class="rot-btn rot-btn-stretch"><i></i><span>放大图片<br>(支持鼠标滚轮)</span></p>',
+                    '<p class="rot-btn rot-btn-shrink"><i></i><span>缩小图片<br>(支持鼠标滚轮)</span></p>',
+                    '<p class="rot-btn rot-btn-close"><i></i><span>关闭图片</span></p>',
                   '</div>',
                  '</div><!--/.review-rotate-->',
                 '</div><!--/.ne-preview-image-->'
@@ -83,6 +101,7 @@
             var $picture = $('.pv-picture');//大图
             var $img = $('#pic-img');//图片
             var imgUrl = settings.imgSource; //大图URL
+
             //显示大图
             $img.attr('src', imgUrl);
             $(outerNode).fadeIn('fast');
@@ -110,13 +129,16 @@
             function donSeriralEvents(){
               var imgW = image.width, imgH = image.height;
               //图片打开方式与位置
-              var winW = $(window).outerWidth(), winH = $(window).outerHeight();
-              var leftW = (winW - imgW) / 2, topH = (winH - imgH) /3; 
-              if(leftW<0) leftW = 35;
-              if(topH<0) topH = 35;
-              topH  = topH < 0 ? 35 : topH;
-              //console.log('imgSrc:',imgSrc, '\nwinW:',winW, '\nimgW:',imgW, '\nimgH:',imgH, '\nwinH:',winH, '\ntopH:',topH);
-              $picture.css({'left':leftW,'right':leftW,'top':topH/*,'bottom':topH*/});
+              var imgInfoObj = getPicturePositionInfo();
+              var leftW = imgInfoObj.left,
+                  topH = imgInfoObj.top;
+              $picture.css({
+                left: leftW,
+                // right: leftW,
+                top: topH,
+                // bottom: topH,
+                'background-image': 'url("' + imgUrl + '")', // 设置父元素背景图片为当前图片。利用背景图 对 移动图片即“鼠标按住拽移动”是关键
+              });
               $('html,body').css({'height':'100%','overflow':'hidden'});
     
               //=====点击放大图片区域防止冒泡
@@ -127,13 +149,13 @@
               /*+----------------+*/
               //=====点击打叉图标,关闭大图
               //$(document).on('click',function(){
-              $('.pic-close').on('click',function(){
+              $('.pic-close, .rot-btn-close').on('click',function(){
                 closeImageBlock();
               })
 
-              //======点击其它区域,关闭大图
+              //======点击其它区域,关闭大图 
               $(document).on('click', function(e) {
-                if ($(e.target).closest('#pic-img').length != 0) return; //e.target.closest(selector).length==0 说明点击的不是元素selector区域,反之则是
+                if ($(e.target).closest('#pic-img').length != 0 || $(e.target).closest('.pv-picture').length != 0 || $(e.target).closest('.preview-rotate').length != 0) return; //e.target.closest(selector).length==0 说明点击的不是元素selector区域,反之则是
                 closeImageBlock();
               })
 
@@ -147,7 +169,183 @@
                 $picture.removeAttr('style');
                 $('html,body').removeAttr('style');
               }
-    
+              
+              
+              //————————————————————————————————————————————————
+              // 图片放大移动：按住鼠标可移动图片、使用鼠标滚轮可放大、缩小图片
+              var isIE = window.ActiveXObject || "ActiveXObject" in window; // 是否ie
+              var elePhoto = document.querySelector(".pv-picture"); 
+              // 鼠标按下拖拽事件,现代浏览器
+              if(settings.enableDraggedMove){
+                elePhoto.onmousedown = function (e) {
+                    if(getIeVersion() < 8) return;
+                    window.onmousemove = function (event) {
+                        elePhoto.style.left =
+                            event.clientX - e.target.offsetWidth / 2 + "px";
+                        elePhoto.style.top =
+                            event.clientY - e.target.offsetHeight / 2 + "px";
+                    };
+                };
+                // 松开鼠标时
+                elePhoto.onmouseup = function () {
+                    window.onmousemove = null;
+                };
+              }
+            
+              // 鼠标滚轮事件,兼容ie8+
+              var scale = 1;
+              var zoom = 1;
+              var increment = settings.rollerScaleRange; // 0.05; // 放大缩小的幅度
+              if(settings.enableMouseRollerScale) {
+                if (elePhoto.addEventListener) {
+                    elePhoto.addEventListener("wheel", handleMouseWheel);
+                } else {
+                    elePhoto.attachEvent("onmousewheel", handleMouseWheel); // ie8
+                }
+                function handleMouseWheel(event) {
+                    var delta = 0;
+                    if (event.wheelDelta) {
+                        // 检查 IE 或旧版浏览器
+                        delta = event.wheelDelta;
+                    } else if (event.deltaY) {
+                        // 兼容ie
+                        delta = -event.deltaY; // 注意 deltaY 的方向可能与你的期望相反
+                    } else if (event.detail) {
+                        // Firefox 的旧版本
+                        delta = -event.detail * 40; // 乘以40是为了标准化
+                    }
+                    if (delta > 0) {
+                        // 放大
+                        var rotateStr = getTransformRotateAttribute(elePhoto);
+                        // console.log('rotateStr：', rotateStr);
+                        var transformStyle = "scale(" + scale + ")";
+                        if(rotateStr != '') transformStyle += rotateStr;
+                        scale += increment;
+                        elePhoto.style.transform = transformStyle;
+
+                        if (isIE) {
+                            zoom += increment;
+                            elePhoto.style.zoom = zoom;
+                            
+                            // 重置图片位置，不然图片会一直往右往下放大
+                            var obj = getPicturePositionInfo();
+                            var win_w = obj.viewWidth, win_h = obj.viewHeight,
+                                img_w = obj.imgWidth, img_h = obj.imgHeight;
+                            var plusW = img_w * (zoom - 1), plusH = img_h * (zoom - 1);
+                            var realW = img_w + plusW, realH = img_h + plusH;
+                            elePhoto.style.left = (win_w - realW) / 2 + 'px';
+                            elePhoto.style.top = (win_h - realH) / 2 + 'px';
+                        }
+                    } else {
+                        // 缩小
+                        var rotateStr = getTransformRotateAttribute(elePhoto);
+                        // console.log('rotateStr：', rotateStr);
+                        var transformStyle = "scale(" + scale + ")";
+                        if(rotateStr != '') transformStyle += rotateStr;
+
+                        scale -= increment;
+                        if(scale <=0) scale = 0.1;
+                        elePhoto.style.transform = transformStyle;
+                        if (isIE) {
+                            zoom -= increment;
+                            if(zoom <=0) zoom = 0.1;
+                            elePhoto.style.zoom = zoom;
+                            // 重置图片位置，不然图片会一直往右往下缩小
+                            var obj = getPicturePositionInfo();
+                            var win_w = obj.viewWidth, win_h = obj.viewHeight,
+                                img_w = obj.imgWidth, img_h = obj.imgHeight;
+                            var minusW = img_w * (1 - zoom), minusH = img_h * (1 - zoom);
+                            var realW = img_w - minusW, realH = img_h - minusH;
+                            elePhoto.style.left = (win_w - realW) / 2 + 'px';
+                            elePhoto.style.top = (win_h - realH) / 2 + 'px';
+                        }
+                    }
+                }
+              }
+
+              // 使用按钮点击放大、缩小
+              var btnIncrement = settings.doubleClickScaleRange; // 0.2; // 放大缩小的幅度
+              // 放大图片按钮
+              $('.rot-btn-stretch').on('click', function(){
+                var rotateStr = getTransformRotateAttribute(elePhoto);
+                // console.log('rotateStr：', rotateStr);
+                var transformStyle = "scale(" + scale + ")";
+                if(rotateStr != '') transformStyle += rotateStr;
+
+                scale += btnIncrement;
+                elePhoto.style.transform = transformStyle;
+
+                if (isIE) {
+                    zoom += btnIncrement;
+                    elePhoto.style.zoom = zoom;
+                    
+                    // 重置图片位置，不然图片会一直往右往下放大
+                    var obj = getPicturePositionInfo();
+                    var win_w = obj.viewWidth, win_h = obj.viewHeight,
+                        img_w = obj.imgWidth, img_h = obj.imgHeight;
+                    var plusW = img_w * (zoom - 1), plusH = img_h * (zoom - 1);
+                    var realW = img_w + plusW, realH = img_h + plusH;
+                    elePhoto.style.left = (win_w - realW) / 2 + 'px';
+                    elePhoto.style.top = (win_h - realH) / 2 + 'px';
+                }
+              });
+
+              // 缩小图片按钮
+              $('.rot-btn-shrink').on('click', function(){
+                var rotateStr = getTransformRotateAttribute(elePhoto);
+                // console.log('rotateStr：', rotateStr);
+                var transformStyle = "scale(" + scale + ")";
+                if(rotateStr != '') transformStyle += rotateStr;
+
+                scale -= btnIncrement;
+                if(scale <=0) scale = 0.1;
+                elePhoto.style.transform = transformStyle;
+
+                if (isIE) {
+                    zoom -= btnIncrement;
+                    if(zoom <=0 ) zoom = 0.1;
+                    elePhoto.style.zoom = zoom;
+
+                    // 重置图片位置，不然图片会一直往右往下缩小
+                    var obj = getPicturePositionInfo();
+                    var win_w = obj.viewWidth, win_h = obj.viewHeight,
+                        img_w = obj.imgWidth, img_h = obj.imgHeight;
+                    var minusW = img_w * (1 - zoom), minusH = img_h * (1 - zoom);
+                    var realW = img_w - minusW, realH = img_h - minusH;
+                    elePhoto.style.left = (win_w - realW) / 2 + 'px';
+                    elePhoto.style.top = (win_h - realH) / 2 + 'px';
+                }
+              });
+
+              // 双击图片时放大图片
+              if(settings.enableDoubleClickStretch) {
+                $picture.on('dblclick', function(){
+                  var rotateStr = getTransformRotateAttribute(elePhoto);
+                  // console.log('rotateStr：', rotateStr);
+                  var transformStyle = "scale(" + scale + ")";
+                  if(rotateStr != '') transformStyle += rotateStr;
+
+                  scale += btnIncrement;
+                  elePhoto.style.transform = transformStyle;
+
+                  if (isIE) {
+                      zoom += btnIncrement;
+                      elePhoto.style.zoom = zoom;
+                      // 重置图片位置，不然图片会一直往右往下放大
+                      var obj = getPicturePositionInfo();
+                      var win_w = obj.viewWidth, win_h = obj.viewHeight,
+                          img_w = obj.imgWidth, img_h = obj.imgHeight;
+                      var plusW = img_w * (zoom - 1), plusH = img_h * (zoom - 1);
+                      var realW = img_w + plusW, realH = img_h + plusH;
+                      elePhoto.style.left = (win_w - realW) / 2 + 'px';
+                      elePhoto.style.top = (win_h - realH) / 2 + 'px';
+                  }
+                })
+              }
+
+              
+
+
               /*+------- 图片旋转---------+*/
               var angles = 0; 
               var degrees = settings.degrees; //每次旋转的度数
@@ -160,9 +358,10 @@
                     e.stopPropagation();
                     angles +=degrees;
                     //为兼容IE8及以下浏览器,这里不能使用$img, 而要用 $('图片节点ID'), 不能无法转动图片
-                    $('#pic-img').rotate({ animateTo:angles}); 
+                    // $('#pic-img').rotate({ animateTo:angles}); 
                     //$img.rotate({ animateTo:angles});
                     //$(this).rotate({ animateTo:angles});
+                    $('.pv-picture').rotate({ animateTo: angles});  // 改成转动父节点，以便图片可移动、放大
                     wiseCount++;
                   }
                 }
@@ -174,8 +373,9 @@
                     e.stopPropagation();
                     angles +=-degrees;
                     //为兼容IE8及以下浏览器,这里不能使用$img, 而要用 $('图片节点ID'), 不能无法转动图片
-                    $('#pic-img').rotate({ animateTo:angles}); 
+                    // $('#pic-img').rotate({ animateTo:angles}); 
                     //$img.rotate({ animateTo:angles});
+                    $('.pv-picture').rotate({ animateTo: angles});  // 改成转动父节点，以便图片可移动、放大
                     antiCount++;
                   }
                 }
@@ -185,7 +385,7 @@
               if(settings.direction == 'anti') $img.rotate(antiClockJson);
               else $img.rotate(wiseClockJson);
               
-              //=====停止旋转/旋转复位
+              //=====复位按钮
               $(".rot-btn-normal").rotate({
                 bind:{
                   click: function(e){
@@ -199,12 +399,98 @@
                     alert('顺时针总度数：'+wiseDegree, '\n逆时针总度数：'+antiDegree, '\n总旋转度数：'+allDegree, '\n余数：'+remainDegree, '\n多少度复位：'+returnDegree);
                     $img.rotate({ animateTo:returnDegree})
                     */
-                    $img.rotate({ animateTo:360})
+                    // 停止旋转
+                    // // $img.rotate({ animateTo: 360});
+                    // $('.pv-picture').rotate({ animateTo: 360});  // 改成转动父节点，以便图片可移动、放大
+                    $('.pv-picture').rotate(0); // 旋转到0度，不带动画
+                   
+
+                    // 不再放大缩小
+                    elePhoto.style.transform = "scale(1)";
+                    if (isIE) {
+                        elePhoto.style.zoom = 1;
+                    }
+                    // 不再移动
+                    $picture.css({
+                      left: leftW,
+                      top: topH
+                    });
                   }
                 }
               })
               
-            } //END FUNCTION preventEvent
+            }; //END FUNCTION donSeriralEvents
+
+
+            //===== 获取初始时图片位置信息，left, top等
+            function getPicturePositionInfo(){
+              var imgW = image.width, imgH = image.height;
+              // 图片打开方式与位置
+              var winW = $(window).outerWidth(), winH = $(window).outerHeight();
+              var leftW = (winW - imgW) / 2, topH = (winH - imgH) /3; 
+              if(leftW<0) leftW = 35;
+              if(topH<0) topH = 35;
+              topH  = topH < 0 ? 35 : topH;
+              // console.log('imgSrc:',imgUrl, '\nwinW:',winW, '\nimgW:',imgW, '\nimgH:',imgH, '\nwinH:',winH, '\ntopH:',topH);
+              return {
+                viewWidth: winW,
+                viewHeight: winH,
+                imgWidth: imgW,
+                imgHeight: imgH,
+                left: leftW,
+                top: topH
+              }
+            };
+
+            /**
+               * 获取IE浏览器版本号
+               * @returns {number|string} 若是ie浏览器则返回对应版本号(整数), 否则返回一段文字
+               */
+             function getIeVersion() {
+              var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+              var isIE = window.ActiveXObject || "ActiveXObject" in window;
+              if (isIE) {
+                  var reIE = new RegExp("MSIE (\\d+\\.\\d+);");
+                  reIE.test(userAgent);
+                  var version = parseFloat(RegExp["$1"]);
+                  if (userAgent.indexOf("MSIE 6.0") != -1) {
+                      return 6;
+                  } else if (version == 7) {
+                      return 7;
+                  } else if (version == 8) {
+                      return 8;
+                  } else if (version == 9) {
+                      return 9;
+                  } else if (version == 10) {
+                      return 10;
+                  } else if (userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
+                      return 11;
+                  } else {
+                      return 5; //IE版本过低(ie5以下版本)
+                  }
+              } else {
+                  return 999999;
+              }
+            };
+
+
+            /**
+             * 返回某个元素的transform rotate属性值
+             * @param {HtmlElement} o 元素对象
+             * @return {String} 返回 rotate属性值。eg. rotate(-45deg)
+             */
+            function getTransformRotateAttribute(o){
+                var currentTransform = o.style.transform || '';
+                // console.log('currentTransform：', currentTransform)
+                var str = '';
+                if(currentTransform.indexOf('rotate') >= 0) {
+                  str = currentTransform.replace(/(.*?)(\s*)rotate\(([0-9\.\-]+)deg\){1,}/, ' rotate($3deg)');
+                    // console.log('str：', str);
+                }
+                return str;
+            }
+
+
         }, //END FUNCTION
         
         
@@ -500,9 +786,21 @@
         }
           else if (supportedCSS)
           return function(angle){
+
+            // 当transform 含有scale时 edit by chr 20250801
+            // this._angle = angle;
+            // this._img.style[supportedCSS] = "rotate("+(angle%360)+"deg)";
+            // this._img.style[supportedCSSOrigin] = this._parameters.center.join(" ");
+
+            var currentTransform = this._img.style[supportedCSS] || '';
+            var scaleStr = '';
+            if(currentTransform.indexOf('scale') >= 0) {
+                scaleStr = currentTransform.replace(/(\s*)scale\(([0-9\.]+)\)(\s*)(.*)/, 'scale($2)');
+                // console.log('scale-x：', scaleStr);
+            }
             this._angle = angle;
-            this._img.style[supportedCSS]="rotate("+(angle%360)+"deg)";
-            this._img.style[supportedCSSOrigin]=this._parameters.center.join(" ");
+            this._img.style[supportedCSS] = scaleStr == '' ? "rotate("+(angle%360)+"deg)" : scaleStr + " rotate("+(angle%360)+"deg)";
+            this._img.style[supportedCSSOrigin] = this._parameters.center.join(" ");
           }
           else
             return function(angle)

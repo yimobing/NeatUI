@@ -13,7 +13,7 @@
 <title>PreviewImage | 图片放大预览旋转(兼容IE6+)</title>
 <meta name="keywords" content="">
 <meta name="description" content="">
-<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-previewImage.css"><!--图片放大预览旋转-->
+<link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-previewImage.css?v=202508011855"><!--图片放大预览旋转-->
 </head>
 <body>
 <style>
@@ -46,7 +46,7 @@
 
 
 <script type="text/javascript" src="assets/libs/jquery-1.8.3.min.js"></script>
-<script type="text/javascript" src="assets/neatui/js/neatui-previewImage.js"></script><!--图片放大预览旋转-->
+<script type="text/javascript" src="assets/neatui/js/neatui-previewImage.js?v=202508011855"></script><!--图片放大预览旋转-->
 
 <script type="text/javascript">
 ///////////////////////////////////////////////////////////////
@@ -64,7 +64,12 @@ $(function(){
 				degrees: 45, // 每次旋转度数
 				direction: 'wise', // 点击图片时旋转方向. wise 顺时针(默认), anti 逆时针
 				showCloseButton:true, // 是否显示关闭按钮,默认true
-				zIndex: 50 // 层级(可选), 默认50
+				zIndex: 50, // 层级(可选), 默认50
+				enableDraggedMove: true, // 是否支持按住鼠标左键来移动图片，默认true
+				enableMouseRollerScale: true, // 是否支持使用鼠标滚轮前后滚动时放大或缩小图片，默认true
+				enableDoubleClickStretch: true, // 是否支持双击图片时放大图片，默认true
+				rollerScaleRange: 0.05, // 使用鼠标滚轮放大缩小的幅度，默认0.05。值越大就能越快地放大缩小，反之亦然
+              	doubleClickScaleRange: 0.2  // 双击图片时放大缩小的幅度，默认0.2。值越大就能越快地放大缩小，反之亦然
 			})
 	});
 
