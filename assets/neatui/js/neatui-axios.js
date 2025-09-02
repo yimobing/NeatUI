@@ -399,6 +399,14 @@
             if (typeof elementUi != 'undefined' && typeof elementUi.destroyAnimate == 'function') {
                 elementUi.destroyAnimate();
             }
+            else {
+                // 如果 elementUi 不存在(后面引入就可能不存在，但又有调用转圈)，这时直接删除转圈节点 add 20250902
+                var elements = document.getElementsByClassName('ne-loading');
+                if(elements.length > 0){
+                    var child = elements[0];
+                    child.parentNode.removeChild(child);
+                }
+            }
             // if (_this != null && typeof _this.loading != 'undefined') {
             //     _this.loading = false;
             // }
