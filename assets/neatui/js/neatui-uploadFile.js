@@ -587,8 +587,7 @@
                 }
                 
             }); // END on change
-
-
+            
             //~~~~~~~~ 6. 执行系列事件2 ~~~~~~~~
             // 判断是否选择文件完成之后直接上传 edit 20250909-1
             if(me.$opts.isChooseFileOverUpload == false){ 
@@ -741,7 +740,7 @@
                     "uploadDom": dataParams["uploadDom"], // 开始上传文件按钮DOM对象
                     "skipDom": dataParams["skipDom"] // 文件重复自动跳过节点
                 }
-                me.$opts.callBack(params);
+                me.$opts.chooseFileOverCallBack(params);
             }
         }, // END fnOnChooseOverUpload()
 
