@@ -7,7 +7,7 @@
  * Version：v1.0.0
  * Author: MuFeng
  * Date: 2023.05.24
- * Update: 2025.09.09
+ * Update: 2025.05.22
  */
 //================================================================================================
 //              一、控件开始
@@ -87,13 +87,6 @@
                     enable: false, // 是否启用(可选)，默认false。注：非图片无法预览
                     extClass: "" // 自定义预览区域的样式名(可选)，默认空
                 },
-
-                // add 20250909-1
-                isChooseFileOverUpload: false, // 选择文件完成之后是否直接上传文件，默认false(可选)
-                chooseFileOverCallBack: function(e) { // 选择文件完成之后的回调事件。仅在 isChooseFileOverUpload = true 时有效。
-
-                },
-
                 callBack: function (e) { // 开始上传按钮回调事件
                     
                 }
@@ -288,6 +281,7 @@
                                 return _tmpHtml;
                             })()
                         ),
+                        
                         '<div class="neUpload__operate' + btnClassName + '">',
                             '<button type="button" id="btn_upload">' + me.$opts.upButtonLabel + '</button>',
                         '</div><!--/.neUpload__operate-->',
@@ -332,11 +326,7 @@
                 me.$ListDom.style.maxHeight = scrollHeight;
                 me.$ListDom.style.overflowY = 'auto';
             }
-
-            // 判断是否选择文件完成之后直接上传 add 20250909-1
-            if(me.$opts.isChooseFileOverUpload){
-                me.$UploadDom.style = 'display: none'; // 隐藏上传按钮
-            }
+            
 
             //~~~~~~~~ 4. 创建文件列表节点 ~~~~~~~~
             // [事件] 选择文件事件、选择文件按钮
@@ -577,24 +567,14 @@
 
 
                 //~~~~~~~~ 5. 执行系列事件1 ~~~~~~~~
-                // 判断是否选择文件完成之后直接上传 edit 20250909-1
-                if(me.$opts.isChooseFileOverUpload){
-                    me.$ListDom.style = 'display: none'; // 隐藏列表
-                    _this.fnOnChooseOverUpload(me); // 选择文件完成之后的回调事件
-                }
-                else {
-                    _this.fnOnRemoveFile(me); // 删除文件事件
-                }
+                _this.fnOnRemoveFile(me); // 删除文件事件
                 
             }); // END on change
 
 
             //~~~~~~~~ 6. 执行系列事件2 ~~~~~~~~
-            // 判断是否选择文件完成之后直接上传 edit 20250909-1
-            if(me.$opts.isChooseFileOverUpload == false){ 
-                _this.fnOnPreviewThumb(me); // 缩略图预览事件
-                _this.fnOnBtnUpload(me); // 上传文件事件
-            }
+            _this.fnOnPreviewThumb(me); // 缩略图预览事件
+            _this.fnOnUpload(me); // 上传文件事件
 
         }, // END doneInit()
 
@@ -690,12 +670,132 @@
 
         //————————————————————————————————————————————————
         /**
-         * !! 事件：点击上传按钮上传文件：开始上传按钮 edit 20250909-1
+         * !! 事件：上传文件、上传文件按钮、开始上传按钮
          * @param {object} me 控件自身对象
          */
-        fnOnBtnUpload: function (me) {
-            var _this = this;
-            me.$UploadDom.addEventListener('click', function (e) {
+        fnOnUpload: function (me) {
+             me.$UploadDom.addEventListener('click', function (e) {
+                // edit 20230616-1
+                var fList = me.$FilesArr; // 这里不能直接取 me.$FileDom.files，因为界面上有可能移除文件
+                // console.log('文件列表1：', me.$FilesArr);
+                // console.log('文件列表2:', me.$FileDom.files);
+                // ·------各种判断------
+                // 必须要选择文件才能上传
+                if(fList.length == 0){
+                    helpers.prompt('请选择要上传的文件！');
+                    return;
+                }
+                // 获取文件信息组成数组
+                var fNames = [], // 文件名数组(含后辍)，如['aaa.jpg', 'bbb.png']
+                    fSizes = [], // 文件大小(单位：KB)数组，如[50, 30, 80]
+                    fTypes = []; // 文件类型数组，即文件名后辍数组，如['.pdf', '.jpg', '.png']
+                var fNotSufNames = []; // 文件名数组(不含后辍)
+                for(var i = 0; i < fList.length; i++){
+                    var _file = fList[i];
+                    // console.log('一个文件：', _file);
+                    var _name = _file.name,
+                        _size = Math.ceil(_file.size / 1024),
+                        // type = one.type,
+                        _type = _name.substr(_name.lastIndexOf('.')).toLocaleLowerCase(); // 文件名后辍，不包含点号
+                    fNames.push(_name);
+                    fSizes.push(_size);
+                    fTypes.push(_type);
+                    fNotSufNames.push(_name.substr(0, _name.lastIndexOf('.')));
+                }
+                // console.log('文件名(有后辍)：', fNames);
+                // console.log('文件大小：', fSizes);
+                // console.log('文件类型：', fTypes);
+                // console.log('文件名(无后辍)：', fNotSufNames);
+                // 限制文件大小
+                var nowIndex = null, nowSize = null;
+                for(var i = 0; i < fSizes.length; i++){
+                    var _file = fSizes[i]
+                    if(me.$opts.fileSize != -1 && _file > me.$opts.fileSize){
+                        nowIndex = i;
+                        nowSize = _file;
+                        break;
+                    }
+                }
+                if(nowIndex != null){
+                    var currentSize = helpers.getFormatSize(nowSize),  // 当前文件大小
+                        maxSize = helpers.getFormatSize(me.$opts.fileSize);  // 允许的最大大小
+                    helpers.prompt('上传文件不得大于' + maxSize + '<br>第' + (nowIndex + 1) + '个文件大小为' + currentSize + '，已超过' + maxSize);
+                    return;
+                }
+                // 限制文件类型
+                var newArr = fTypes.map(function(item){
+                    return item.replace(/\./g, ''); // 去掉点号
+                })
+                var nowIndex = null, nowType = '';
+                if(me.$opts.fileType.length != 0){
+                    for(var i = 0; i < newArr.length; i++){
+                        var _type = newArr[i];
+                        if(me.$opts.fileType.indexOf(_type) < 0){
+                            nowIndex = i;
+                            nowType = _type;
+                            break;
+                        }
+                    }
+                }
+                if(nowIndex != null){
+                    helpers.prompt('您上传的文件不是' + me.$opts.fileType.join(',') + '文件<br>(第' + (nowIndex + 1) + '个文件为' + nowType + '文件)');
+                    return;
+                }
+                
+
+                // ·------取表单数据------
+                // 内置表单
+                var inFormData = [];
+                // 格式1：
+                // var inList = document.querySelectorAll('.' + tagFormInClassName + ' input[type="text"], textarea');
+                // for(var i = 0; i < inList.length; i++){
+                //     inFormData.push({
+                //         value: inList[i].value
+                //     });
+                // }
+                // 格式2
+                var inList = document.querySelectorAll('.' + tagFormInClassName);
+                inList.forEach(function(item){
+                    var $input = item.querySelectorAll('input[type="text"], textarea');
+                    var arr = [];
+                    for(var i = 0; i < $input.length; i++){
+                        arr.push($input[i].value);
+                    }
+                    inFormData.push({
+                        value: arr
+                    })
+                });
+                // console.log('内置表单值：', inFormData);
+                // 外置表单
+                var outFormData = [];
+                var outList = document.querySelectorAll('.' + tagFormOutClassName);
+                outList.forEach(function(item){
+                    var $box = item.querySelectorAll('input[type="text"], textarea');
+                    var arr = [];
+                    for(var i = 0; i < $box.length; i++){
+                        arr.push($box[i].value);
+                    }
+                    outFormData.push({
+                        value: arr
+                    })
+                });
+                // console.log('外置表单值：', outFormData);
+                // 没有表单时，直接返回文件名数组，处理成统一的格式
+                var singleNameData = [];
+                for(var i = 0; i < fNotSufNames.length; i++){
+                    singleNameData.push({
+                        value: [fNotSufNames[i]]
+                    })
+                }
+                var fData = me.$opts.form.enable ? (me.$UseOutForm ? outFormData : inFormData) : singleNameData;
+                 
+                // 全局赋值
+                // 方便前端调用 handleRepeate()时， callBack 回调数据也跟着更新 add 20230621-1 test1
+                me.$FilesNames = fNames; // 文件名数组(含后辍)，如['aaa.jpg', 'bbb.png']
+                me.$FilesSizes = fSizes; // 文件大小(单位：KB)数组，如[50, 30, 80]
+                me.$FilesTypes = fTypes;  // 文件类型数组，即文件名后辍数组，如['.pdf', '.jpg', '.png']
+                me.$FilesData = fData; // 表单数据
+                 
                 // ·------开始执行上传操作------
                 // 隐藏某些文本信息
                 var successDom = document.querySelectorAll('.neUpload__progress_state');
@@ -704,190 +804,20 @@
                 });
                 // 回调
                 if (me.$opts.callBack) {
-                    var dataParams = _this.fnGetUploadParams(me);
                     var params = {
-                        "files": dataParams["files"], // 文件列表
-                        "fileNames": dataParams["fileNames"], // 文件名数据
-                        "fileSizes": dataParams["fileSizes"],
-                        "fileTypes": dataParams["fileTypes"],
-                        "fileData": dataParams["fileData"], // 表单数据
-                        "fileDom": dataParams["fileDom"], // 选择文件按钮DOM对象
-                        "uploadDom": dataParams["uploadDom"], // 开始上传文件按钮DOM对象
-                        "skipDom": dataParams["skipDom"] // 文件重复自动跳过节点
+                        "files": fList, // 文件列表
+                        "fileNames": fNames, // 文件名数据
+                        "fileSizes": fSizes,
+                        "fileTypes": fTypes,
+                        "fileData": fData, // 表单数据
+                        "fileDom": me.$FileDom, // 选择文件按钮DOM对象
+                        "uploadDom": me.$UploadDom, // 开始上传文件按钮DOM对象
+                        "skipDom": me.$SkipDom // 文件重复自动跳过节点
                     }
                     me.$opts.callBack(params);
                 }
             });
-
-        }, // END fnOnBtnUpload()
-
-
-
-         /**
-         * !! 事件：选择文件完成之后上传文件：选择文件之后直接上传 add 20250909-1
-         * @param {object} me 控件自身对象
-         */
-        fnOnChooseOverUpload: function (me) {
-            var _this = this;
-            if (me.$opts.chooseFileOverCallBack) {
-                var dataParams = _this.fnGetUploadParams(me);
-                var params = {
-                    "files": dataParams["files"], // 文件列表
-                    "fileNames": dataParams["fileNames"], // 文件名数据
-                    "fileSizes": dataParams["fileSizes"],
-                    "fileTypes": dataParams["fileTypes"],
-                    "fileData": dataParams["fileData"], // 表单数据
-                    "fileDom": dataParams["fileDom"], // 选择文件按钮DOM对象
-                    "uploadDom": dataParams["uploadDom"], // 开始上传文件按钮DOM对象
-                    "skipDom": dataParams["skipDom"] // 文件重复自动跳过节点
-                }
-                me.$opts.callBack(params);
-            }
-        }, // END fnOnChooseOverUpload()
-
-
-
-
-
-
-        /**
-         * 获取上传文件时的一系列参数 add 20250909-1
-         * @param {object} me 控件自身对象
-         * @returns 返回一系列参数对象
-         */
-        fnGetUploadParams: function(me){
-            // edit 20230616-1
-            var fList = me.$FilesArr; // 这里不能直接取 me.$FileDom.files，因为界面上有可能移除文件
-            // console.log('文件列表1：', me.$FilesArr);
-            // console.log('文件列表2:', me.$FileDom.files);
-            // ·------各种判断------
-            // 必须要选择文件才能上传
-            if(fList.length == 0){
-                helpers.prompt('请选择要上传的文件！');
-                return;
-            }
-            // 获取文件信息组成数组
-            var fNames = [], // 文件名数组(含后辍)，如['aaa.jpg', 'bbb.png']
-                fSizes = [], // 文件大小(单位：KB)数组，如[50, 30, 80]
-                fTypes = []; // 文件类型数组，即文件名后辍数组，如['.pdf', '.jpg', '.png']
-            var fNotSufNames = []; // 文件名数组(不含后辍)
-            for(var i = 0; i < fList.length; i++){
-                var _file = fList[i];
-                // console.log('一个文件：', _file);
-                var _name = _file.name,
-                    _size = Math.ceil(_file.size / 1024),
-                    // type = one.type,
-                    _type = _name.substr(_name.lastIndexOf('.')).toLocaleLowerCase(); // 文件名后辍，不包含点号
-                fNames.push(_name);
-                fSizes.push(_size);
-                fTypes.push(_type);
-                fNotSufNames.push(_name.substr(0, _name.lastIndexOf('.')));
-            }
-            // console.log('文件名(有后辍)：', fNames);
-            // console.log('文件大小：', fSizes);
-            // console.log('文件类型：', fTypes);
-            // console.log('文件名(无后辍)：', fNotSufNames);
-            // 限制文件大小
-            var nowIndex = null, nowSize = null;
-            for(var i = 0; i < fSizes.length; i++){
-                var _file = fSizes[i]
-                if(me.$opts.fileSize != -1 && _file > me.$opts.fileSize){
-                    nowIndex = i;
-                    nowSize = _file;
-                    break;
-                }
-            }
-            if(nowIndex != null){
-                var currentSize = helpers.getFormatSize(nowSize),  // 当前文件大小
-                    maxSize = helpers.getFormatSize(me.$opts.fileSize);  // 允许的最大大小
-                helpers.prompt('上传文件不得大于' + maxSize + '<br>第' + (nowIndex + 1) + '个文件大小为' + currentSize + '，已超过' + maxSize);
-                return;
-            }
-            // 限制文件类型
-            var newArr = fTypes.map(function(item){
-                return item.replace(/\./g, ''); // 去掉点号
-            })
-            var nowIndex = null, nowType = '';
-            if(me.$opts.fileType.length != 0){
-                for(var i = 0; i < newArr.length; i++){
-                    var _type = newArr[i];
-                    if(me.$opts.fileType.indexOf(_type) < 0){
-                        nowIndex = i;
-                        nowType = _type;
-                        break;
-                    }
-                }
-            }
-            if(nowIndex != null){
-                helpers.prompt('您上传的文件不是' + me.$opts.fileType.join(',') + '文件<br>(第' + (nowIndex + 1) + '个文件为' + nowType + '文件)');
-                return;
-            }
-            
-
-            // ·------取表单数据------
-            // 内置表单
-            var inFormData = [];
-            // 格式1：
-            // var inList = document.querySelectorAll('.' + tagFormInClassName + ' input[type="text"], textarea');
-            // for(var i = 0; i < inList.length; i++){
-            //     inFormData.push({
-            //         value: inList[i].value
-            //     });
-            // }
-            // 格式2
-            var inList = document.querySelectorAll('.' + tagFormInClassName);
-            inList.forEach(function(item){
-                var $input = item.querySelectorAll('input[type="text"], textarea');
-                var arr = [];
-                for(var i = 0; i < $input.length; i++){
-                    arr.push($input[i].value);
-                }
-                inFormData.push({
-                    value: arr
-                })
-            });
-            // console.log('内置表单值：', inFormData);
-            // 外置表单
-            var outFormData = [];
-            var outList = document.querySelectorAll('.' + tagFormOutClassName);
-            outList.forEach(function(item){
-                var $box = item.querySelectorAll('input[type="text"], textarea');
-                var arr = [];
-                for(var i = 0; i < $box.length; i++){
-                    arr.push($box[i].value);
-                }
-                outFormData.push({
-                    value: arr
-                })
-            });
-            // console.log('外置表单值：', outFormData);
-            // 没有表单时，直接返回文件名数组，处理成统一的格式
-            var singleNameData = [];
-            for(var i = 0; i < fNotSufNames.length; i++){
-                singleNameData.push({
-                    value: [fNotSufNames[i]]
-                })
-            }
-            var fData = me.$opts.form.enable ? (me.$UseOutForm ? outFormData : inFormData) : singleNameData;
-             
-            // 全局赋值
-            // 方便前端调用 handleRepeate()时， callBack 回调数据也跟着更新 add 20230621-1 test1
-            me.$FilesNames = fNames; // 文件名数组(含后辍)，如['aaa.jpg', 'bbb.png']
-            me.$FilesSizes = fSizes; // 文件大小(单位：KB)数组，如[50, 30, 80]
-            me.$FilesTypes = fTypes;  // 文件类型数组，即文件名后辍数组，如['.pdf', '.jpg', '.png']
-            me.$FilesData = fData; // 表单数据
-
-            return {
-                "files": fList, // 文件列表
-                "fileNames": fNames, // 文件名数据
-                "fileSizes": fSizes,
-                "fileTypes": fTypes,
-                "fileData": fData, // 表单数据
-                "fileDom": me.$FileDom, // 选择文件按钮DOM对象
-                "uploadDom": me.$UploadDom, // 开始上传文件按钮DOM对象
-                "skipDom": me.$SkipDom // 文件重复自动跳过节点
-            }
-        },
+        }, // END fnOnUpload()
 
 
 

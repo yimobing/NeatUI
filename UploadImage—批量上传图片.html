@@ -108,13 +108,18 @@
                             enable: false, // 是否启用(可选)，默认false。注：非图片无法预览
                             extClass: "" // 自定义预览区域的样式名(可选)，默认空
                         },
+
+                        isChooseFileOverUpload: false, // 选择文件完成之后是否直接上传文件，默认false(可选)
+                        chooseFileOverCallBack: function(e) { // 选择文件完成之后的回调事件。仅在 isChooseFileOverUpload = true 时有效。
+
+                        },  
                         callBack: function (e) { // 开始上传按钮回调事件
                             
                         }
                     }
 
                     【说明】
-                    callBack 回调参数e返回的数据如下
+                    callBack 和 chooseFileOverCallBack 回调参数e返回的数据如下
                     {
                         "files": "", // 文件列表
                         "fileNames": "",// 文件名数据
@@ -271,6 +276,14 @@
                     enable: true, // 是否启用(可选)，默认false。注：非图片无法预览
                     extClass: "" // 自定义预览区域的样式名(可选)，默认空
                 },
+
+
+                isChooseFileOverUpload: false, // 选择文件完成之后是否直接上传文件，默认false(可选)
+                chooseFileOverCallBack: function(e) { // 选择文件完成之后的回调事件。仅在 isChooseFileOverUpload = true 时有效。
+                    // console.log('ex：', e)
+                }, 
+
+
                 callBack: function(e){ // 开始上传按钮回调
                     // console.log("e：", e);
                     var isContinue= fnRunCheck(e);
