@@ -7,7 +7,7 @@
  * Version：v1.0.0
  * Author: MuFeng
  * Date: 2023.05.24
- * Update: 2025.09.09
+ * Update: 2025.10.15
  */
 //================================================================================================
 //              一、控件开始
@@ -65,6 +65,7 @@
                 showThumb: true, // 是否显示缩略图(可选)，默认true。注：非图片无法显示缩略图
                 showSize: true, // 是否显示文件大小(可选)，默认true
                 showProgress: true, // 是否显示进度条(可选)，默认true
+                progressPopup: false, // 是否有单独的弹出进度条，即进度条是否以弹出窗口的形式(可选)，默认false add 20251016-1
                 showCross: true, // 是否显示打叉图标用以删除当前文件(可选)，默认true
                 showOrder: true, // 是否显示文件序号(可选)，默认true
                 showFileName: true, // 是否显示文件名称(可选)，默认true
@@ -305,6 +306,7 @@
             var fDom = document.getElementById(tagFileId); // 选择文件的节点
             var lDom = document.getElementsByClassName(tagListClassName)[0]; // 文件列表节点
             // 全局赋值
+            me.$RootNode = rootNode;
             me.$UseOutForm = dUseOutForm; // 是否使用外置表单
             me.$FileDom = fDom; // 选择文件节点
             me.$ListDom = lDom; // 文件列表节点
@@ -799,7 +801,9 @@
             if(nowIndex != null){
                 var currentSize = helpers.getFormatSize(nowSize),  // 当前文件大小
                     maxSize = helpers.getFormatSize(me.$opts.fileSize);  // 允许的最大大小
-                helpers.prompt('上传文件不得大于' + maxSize + '<br>第' + (nowIndex + 1) + '个文件大小为' + currentSize + '，已超过' + maxSize);
+                var tips = '上传文件不得大于' + maxSize;
+                if(me.$opts.multiple) tips += '<br>第' + (nowIndex + 1) + '个文件大小为' + currentSize + '，已超过' + maxSize;
+                helpers.prompt(tips);
                 return;
             }
             // 限制文件类型
@@ -911,11 +915,11 @@
                 var sighDom = lists[i].getElementsByClassName('neUpload__sigh')[0];
                 if(index == i){
                     // 更新进度条
-                    proDom.setAttribute('value', value);
-                    proDom.setAttribute('max', max);
+                    if(typeof proDom != 'undefined') proDom.setAttribute('value', value);
+                    if(typeof proDom != 'undefined') proDom.setAttribute('max', max);
                     // 更新百分比
                     var percent =  (parseFloat(value) / parseFloat(max)) * 100;
-                    percentDom.innerText = parseInt(percent) == 100 ? '100%' : percent.toFixed(2) + '%';
+                    if(typeof percentDom != 'undefined') percentDom.innerText = parseInt(percent) == 100 ? '100%' : percent.toFixed(2) + '%';
                     // 更新状态：显示“上传中”或“上传成功”或“上传失败”字样
                     successDom.removeAttribute('style');
                     if(value == max){
@@ -928,7 +932,76 @@
                     else{
                         successDom.innerText = '上传中..';
                     }
-                    
+                }
+
+                // 创建单独的弹出进度条 add 20251016-1
+                if(me.$opts.progressPopup) {
+                    if(index == i){
+                        var domList = document.getElementsByClassName('neUpload__speed_' + i);
+                        if(domList.length > 0){
+                            for(var k = 0; k < domList.length; k++){
+                                domList[k].parentNode.removeChild(domList[k]);  // 销毁弹出进度条
+                            }
+                        }
+                        var singleProgressNode = document.createElement('div');
+                        singleProgressNode.className = 'neUpload__speed neUpload__speed_' + i;
+                        singleProgressNode.innerHTML = [
+                            '<div class="neUpload__speed_progress">',
+                                '<span class="neUpload__speed_progress_title">上传进度</span>',
+                                '<span class="neUpload__speed_progress_state"></span>',
+                                '<progress value="10681" max="10681"></progress>',
+                                '<span class="neUpload__speed_progress_percent">100%</span>',
+                                '<span class="neUpload__speed_progress_close"></span>',
+                            '</div>',
+                            '<div class="neUpload__speed_mask"></div>'
+                        ].join('\r\n')
+                        me.$RootNode.appendChild(singleProgressNode);
+                        
+                        var domSpeedList = document.getElementsByClassName('neUpload__speed'), // 所有节点
+                            $domSpeed = document.getElementsByClassName('neUpload__speed_' + i)[0],
+                            $domProgress = $domSpeed.getElementsByTagName('progress')[0],
+                            $domPercent = $domSpeed.getElementsByClassName('neUpload__speed_progress_percent')[0],
+                            $domSuccess = $domSpeed.getElementsByClassName('neUpload__speed_progress_state')[0],
+                            $domClose = $domSpeed.getElementsByClassName('neUpload__speed_progress_close')[0],
+                            $domMask = $domSpeed.getElementsByClassName('neUpload__speed_mask')[0];
+                   
+                        // 更新进度条
+                        $domProgress.setAttribute('value', value);
+                        $domProgress.setAttribute('max', max);
+
+                        // 更新百分比
+                        var percent =  (parseFloat(value) / parseFloat(max)) * 100;
+                        $domPercent.innerText = parseInt(percent) == 100 ? '100%' : percent.toFixed(2) + '%';
+                        // 更新状态：显示“上传中”或“上传成功”或“上传失败”字样
+                        $domSuccess.removeAttribute('style');
+                        if(value == max){
+                            $domSuccess.innerText = me.$opts.successLabel;
+                        }
+                        else{
+                            $domSuccess.innerText = '上传中..';
+                        }
+                        setTimeout(function(){
+                            $domSpeed.style = 'display: none';
+                            // $domSpeed.parentNode.removeChild($domSpeed); // 销毁弹出进度条
+                        }, 100); 
+                   
+                        $domClose.onclick = function(){
+                            $domSpeed.parentNode.removeChild($domSpeed); // 销毁弹出进度条
+                            // 清除所有节点
+                            for(var k = 0; k < domSpeedList.length; k++){
+                                var domNow = domSpeedList[k];
+                                domNow.parentNode.removeChild(domNow);
+                            }
+                        }
+                        $domMask.onclick = function(){
+                            $domSpeed.parentNode.removeChild($domSpeed); // 销毁弹出进度条
+                            // 清除所有节点
+                            for(var k = 0; k < domSpeedList.length; k++){
+                                var domNow = domSpeedList[k];
+                                domNow.parentNode.removeChild(domNow);
+                            }
+                        }
+                    }
                 }
             }
         }, // END doneProgress()
@@ -1016,6 +1089,19 @@
                     successDom.removeAttribute('style');
                     successDom.innerText = me.$opts.failLabel;
                     helpers.addClass(successDom, 'red');
+                }
+
+                // 如果有单独的弹出进度条 add 20251016-1
+                if(me.$opts.progressPopup) {
+                    if(index == i){
+                        var $domFailSpeed = document.getElementsByClassName('neUpload__speed_' + i)[0];
+                        $domSuccess = $domFailSpeed.getElementsByClassName('neUpload__speed_progress_state')[0],
+                        $domFailSpeed.style = 'display:block';
+                        // 更新状态：显示“上传失败”字样
+                        $domSuccess.removeAttribute('style');
+                        $domSuccess.innerText = me.$opts.failLabel;
+                        helpers.addClass($domSuccess, 'red');
+                    }
                 }
             }
         }, // END doneFail()

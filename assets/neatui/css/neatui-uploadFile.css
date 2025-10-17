@@ -6,7 +6,7 @@
  * Version：v1.0.0
  * Author: Mufeng
  * Date: 2023.05.24
- * Update: 2025.05.22
+ * Update: 2025.10.15
  */
 /*+-------------------------+*/
 *{margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -63,6 +63,7 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
     border: 1px solid red;
     opacity: 0;
     filter: alpha(opacity=0);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .neUpload__operate{
     position: absolute;
@@ -82,6 +83,7 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
 .neUpload__operate button[type="button"]:hover{
 	opacity: .6;
 	filter: alpha(opacity = 60);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 }
 /* 小型按钮*/
 .neUpload__file.size-small {
@@ -171,6 +173,93 @@ html,body{width: 100%; margin: 0 auto; padding: 0; -webkit-text-size-adjust: 100
 	font-size: 13px;
 }
 
+
+/*+-------------------------+*/
+.neUpload__speed {
+	
+}
+
+.neUpload__speed_mask {
+	position: fixed;
+	z-index: 98;
+	top: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+	background: #000;
+	opacity: .5;
+	filter: alpha(opacity = 50);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+}
+
+.neUpload__speed_progress{
+	position: fixed;
+	z-index: 99;
+	top: 100px;
+	left: 0;
+	right: 0;
+	width: 320px;
+	margin: 0 auto;
+	padding: 50px 15px;
+	background-color: #fff;
+	border: 1px solid #ebebeb;
+	border-radius: 4px;
+	box-shadow: 0 1px 1px #e2e2e2;
+}
+.neUpload__speed_progress_title,
+.neUpload__speed_progress_percent,
+.neUpload__speed_progress_state{
+	position: absolute;
+	z-index: 1;
+	top: 30px;
+}
+.neUpload__speed_progress_title {
+	top: 5px;
+	left: 10px;
+	color: #777;
+	font-size: 16px;
+	font-weight: 520;
+}
+.neUpload__speed_progress_percent {
+	right: 80px;
+	color: #333;
+    font-size: 13px;
+}
+.neUpload__speed_progress_state{
+    right: 15px;
+    color: #749f74;
+    font-size: 13px;
+}
+.neUpload__speed_progress_state.red{
+	color: #ff0000;
+}
+.neUpload__speed_progress progress {
+	width: 100%;
+}
+.neUpload__speed_progress_close {
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: block;
+	width: 18px;
+	height: 18px;
+	border-style: solid;
+	border-color: #ddd;
+	border-width: 0 0 1px 1px;
+	cursor: pointer;
+	background-repeat: no-repeat;
+	background-color: transparent;
+	background-size: 100% auto;
+	background-position: 50% 50%;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAASdJREFUWEftlt0NwjAMhC+bsBEdATYwk9RMAEzACrABIzAKslSkENL4p0F9oW9VWt+Xc+w4YeUnrayPP8CXA0S0SSltx3E89kwPEQ0Ansz8yOPWAOTDK4AzM+97QBDRDsAJwIGZuQkgi9kPiyGyWBdmFpCPZ/YQ9oDQxIWkWQVLICziKkA0HVZxE4AXwiNuBrBCeMVdABpERNwNMAcRFQ8BlBAA7lOTqda51sjCl1G2a9EIiYcdKFyQ13DHDDmQ5xzAbUpBCMINUDtwSzqmC6B12qMQZgBLqUUgTAAW8Xe5eSFUAI94BMJ6Hbvr3OqEZSBxi3ucqAJEbJ9ruZoTraE0vPMSxjWUylgOYCinV+1S0dbNY7kWqPe6Woa9Bc1j+a+F3/FXd+AFmXzeIaiAPQUAAAAASUVORK5CYII=');
+}
+.neUpload__speed_progress_close:hover {
+	opacity: .8;
+	filter: alpha(opacity = 80);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+}
 
 
 /*+-------------------------+*/

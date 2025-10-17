@@ -230,7 +230,7 @@
                 extClass: "", // 自定义根节点样式名(可选)，默认空
                 allowMore: false, // 是否允许一个绑定节点下创建多个控件(可选)，默认false
                 fileType: ["png", "gif", "jpg", "jpeg", "xlsx"], // 文件类型限制(必须)，默认为空，表示不限制文件类型
-                fileSize: -1, // 文件大小限制，单位KB(可选)，默认-1表示不限。若是以MB为单位，如要限制成20MB，则写成 20*1024
+                fileSize: -1, // -1, // 文件大小限制，单位KB(可选)，默认-1表示不限。若是以MB为单位，如要限制成20MB，则写成 20*1024
                 filePixel: "建议图片像素150px*150px", // 文件尺寸像素建议，默认空(可选)。一般仅当图片要限制质量大小时，才会使用尺寸像素建议。eg. "建议图片像素150px*150px"
                 multiple: true, // 是否允许使用批量上传功能(可选)，默认true
                 width: 600, // 区域宽度，默认单位为px(可选)，默认600px。可传像素值600或600px表示600px，或传百分比"60%"
@@ -254,6 +254,7 @@
                 showThumb: true, // 是否显示缩略图(可选)，默认true
                 showSize: true, // 是否显示文件大小(可选)，默认true
                 showProgress: true, // 是否显示进度条(可选)，默认true
+                progressPopup: true, // 是否有单独的弹出进度条，即进度条是否以弹出窗口的形式(可选)，默认false add 20251015-1
                 showCross: true, // 是否显示打叉图标用以删除当前文件(可选)，默认true
                 showOrder: true, // 是否显示文件序号(可选)，默认true
                 showFileName: true, // 是否显示文件名称(可选)，默认true
@@ -280,7 +281,12 @@
 
                 isChooseFileOverUpload: false, // 选择文件完成之后是否直接上传文件，默认false(可选)
                 chooseFileOverCallBack: function(e) { // 选择文件完成之后的回调事件。仅在 isChooseFileOverUpload = true 时有效。
-                    // console.log('ex：', e)
+                    // console.log("e：", e);
+                    var isContinue= fnRunCheck(e);
+                    // console.log("真正等待上传的文件：", e);
+                    if(isContinue){
+                        fnRunUpload(e);
+                    }
                 }, 
 
 
