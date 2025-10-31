@@ -4,7 +4,7 @@
  * axios 自定义封装接口
  * Author: Mufeng
  * Date: 2023.06.15
- * Update: 2025.06.10
+ * Update: 2025.10.31
  *  [调用方法]
     $axios(options).then().catch(); // 自定义请求方式，即通过配置options配置项的参数method='post'或'get'来设置请求方式
     $axios.post(url, data, config).then().catch(); // POST 请求
@@ -37,6 +37,7 @@
             vue: null, // vue实例化对象，用于弹窗(可选)。如不传则为null，表示默认使用alert弹窗。
             original: true, // 接口返回值是否为axios原生数据(可选)，默认true。值：true 是(原生数据), false 否(后端接口数据，即response.data原生数据再取data) add 20250403-1
             popup: true, // 报错机制。出现错误时是否使用弹窗弹出错误信息，默认true。某些特殊情况下比如for循环时多次错误不想多次弹出错误信息时，可将本参数置为false，再在前台中使用自定义弹出错误信息。 add 20250610
+            loginTimeoutRedirectPage: '', // 登录超时的时候跳转的页面(可选)，默认空 add 20251031-1
 
             // · 原生参数，即 Axios API 里的“请求配置项”，控件里默认只写出部分，您可根据需要进行添加
             // 即将被发送的自定义请求头。即发送给后台的数据格式，不同的数据格式后台接收方法也不同。
@@ -52,7 +53,7 @@
             data: { // 请求方法为 "POST", "PUT" 和 "PATCH" 时请求主体被发送的数据
                 
             },
-            timeout: 5000 // 指定请求超时的毫秒数(可选)，超时的话请求将被中断，默认设置为5秒。0 表示无超时时间。
+            timeout: 5000, // 指定请求超时的毫秒数(可选)，超时的话请求将被中断，默认设置为5秒。0 表示无超时时间。
             // 其它参数见Axios官网
             //..
         }
@@ -230,14 +231,19 @@
                     // 接口操作失败时
                     else if (result["return"] != 'ok') {
                         var failMsg = typeof result["data"] == 'undefined' || result["data"] == '' ? '未知错误，请稍后再试' : result["data"];
-                        var isLoginOverTime = failMsg.indexOf('登录超时') >= 0 ? true : false; // 是否登录超时，未实现
+
+                        // edit and add 20251031-1
+                        var isLoginOverTime = ["登录超时", "登陆超时"].includes(failMsg) ? true : false; // 是否登录超时，未实现 
+                        var redirect_page = isLoginOverTime ? config.loginTimeoutRedirectPage : ''; 
                         if(config.popup){
                             utils.toast(config.vue, failMsg, {
                                 logout: isLoginOverTime,
                                 type: 'warning',
-                                title: '操作失败'
+                                title: '操作失败',
+                                logoutPageUrl: redirect_page
                             })
                         }
+
                         return Promise.reject({
                             message: failMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
                             error: result, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
@@ -389,11 +395,13 @@
             var defaults = {
                 title: '', // 标题名称(可选)，默认空
                 logout: false, // 是否登录超时(可选)，默认false
+                logoutPageUrl: '', // 登录超时的时候跳转的页面(可选)，默认false add 20251031-1
                 type: 'error' // 弹窗类型(可选)。info 消息提示(默认), warning 警告提示, error 错误提示，success 成功提示
             }
             var settings = this.extend(true, {}, defaults, opts || {});
             var title = settings.title,
                 logout = settings.logout,
+                logout_page_url = settings.logoutPageUrl,
                 type = settings.type;
             // 销毁转圈
             if (typeof elementUi != 'undefined' && typeof elementUi.destroyAnimate == 'function') {
@@ -416,7 +424,11 @@
                 _this.$alert(str, title, {
                     type: type,
                     dangerouslyUseHTMLString: true
-                });
+                }).then(() => {
+                    if(logout_page_url != '') {
+                        window.location.href = logout_page_url;
+                    }
+                })
             }
             else if (_this != null && typeof _this.$dialog == 'function') { // vant ui
                 // _this.$toast.loading({
@@ -436,6 +448,10 @@
                     message: str
                     // theme: 'round-button'
                     // confirmButtonColor: '#F56C6C'
+                }).then(() => {
+                    if(logout_page_url != '') {
+                        window.location.href = logout_page_url;
+                    }
                 });
             }
             else {
