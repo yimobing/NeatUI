@@ -1930,6 +1930,9 @@ var neuiSearchBox = {
                     var _valueStr = '';
                     var _itemIdStr = ''; //搜索项元素ID标识
                     var _mainStyle = '';
+                     // add 20251111-2
+                    var _dataLabelStr = '';
+                    var _dataHidValueStr = '';
 
                     if(type == 'input' || type == 'textarea'){ //单行或多行输入
                         _valueStr = '';
@@ -1995,6 +1998,11 @@ var neuiSearchBox = {
                             _itemIdStr = _nameStr;
                             _mainStyle = ' style="display: none"';
                             _mainStr += '<div class="search-box-main-item">';
+
+                            // add 20251111-2
+                            _dataLabelStr = ' data-label="' + value + '"';
+                            _dataHidValueStr = ' data-hid-value="' + hid + '"';
+
                             var isSingleMoreCheckCount = 0; //单选时是否有多个选中项
                             for(var k = 0; k < data.length; k++){
                                 var one = data[k];
@@ -2017,7 +2025,7 @@ var neuiSearchBox = {
                         }
                     }			
                     allHtml += [
-                        '<div class="search-box"' + _itemIdStr + '>',
+                        '<div class="search-box"' + _itemIdStr + _dataLabelStr + _dataHidValueStr + '>',
                             '<div class="search-box-head' + _headClassName + '">',
                                 '<div class="search-box-head-label">',
                                     '<label>' + label + '</label>',
@@ -2160,15 +2168,33 @@ var neuiSearchBox = {
                         elSIcon.removeClass('up').addClass('down');
                     }
                 })
-                //单选
+                // 单选
                 $('.search-box-main-radio .option').on('click', function(){
                     $(this).addClass('checked').siblings().removeClass('checked');
-                    var value = $(this).text();
+                    // add 20251111-2
+                    var value = $(this).text(),
+                        bh = typeof $(this).attr('data-bh') == 'undefined' ? '' : $(this).attr('data-bh');
                     $(this).parents('.search-box-main-radio').siblings('.search-box-head-radio').find('.search-box-head-value').text(value);
+                    $(this).parents('.search-box-main-radio').parent().attr('data-label', value).attr('data-hid-value', bh);
                 })
-                //多选
+                // 多选
                 $('.search-box-main-checkbox .option').on('click', function(){
                     $(this).hasClass('checked') ? $(this).removeClass('checked') : $(this).addClass('checked');
+
+                    // add 20251111-2
+                    var hidIdStr = '', labelStr = '';
+                    $('.search-box-main-checkbox .option').each(function(){
+                        if($(this).hasClass('checked')) {
+                            var bh = typeof $(this).attr('data-bh') == 'undefined' ? '' : $(this).attr('data-bh'),
+                                text = $(this).text();
+                            hidIdStr += bh + ',';
+                            labelStr += text + ',';
+                        }
+                    })
+                    if(hidIdStr != '') hidIdStr = hidIdStr.substring(0, hidIdStr.length - 1); // 去掉最后一个逗号
+                    if(labelStr != '') labelStr = labelStr.substring(0, labelStr.length - 1); // 去掉最后一个逗号
+                    $(this).parents('.search-box-main-checkbox').parent().attr('data-label', labelStr).attr('data-hid-value', hidIdStr);
+
                 })
             }
         },
