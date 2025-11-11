@@ -956,6 +956,7 @@
                             '<button type="button"' + _btnIdStr + _btnClassStr + '>' + _btnIconStr + _btnText + '</button>',
                         '</div>'
                         ].join('\r\n');
+                        _crossClass = ' has-cell-btn has-cell-btn-word-' + _btnText.length;
                     }
                     // 单个右侧按钮
                     // var _btnIdStr = typeof buttons.id == 'undefined' ? '' : ' id="' + buttons.id + '"',
@@ -970,7 +971,7 @@
                     //     '</div>'
                     // ].join('\r\n');
 
-                    _crossClass = ' has-cell-btn has-cell-btn-word-' + _btnText.length;
+                    // _crossClass = ' has-cell-btn has-cell-btn-word-' + _btnText.length;
                 }
 
                 if(press != null){
