@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,address=no">
+    <meta name="application-name" content="内评系统">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>移动端表格MeuiMobile演示Demo</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-mobiletable.css">
+</head>
+<body>
+    <style>
+        body{ padding:  10px 15px;}
+         h1{ margin-bottom:  15px; font-size:  18px; font-weight:  normal; text-align:  center; display: none;} 
+        .ne-btn{ margin-left:  5px!important; padding:  0 10px; height:  28px; line-height:  28px; border-radius:  1px!important; font-size:  13px; } 
+        .section-search{ }
+        .section-operate{ }
+        .section-content{ margin-top:  15px;}
+        .eform-one{ flex-wrap:  nowrap;}
+        .eform-box{ }
+        .eform-box-text{ width:  100%; flex: 1; -webkit-flex: 1; -moz-flex: 1; -o-flex: 1;}
+        .eform-box-button{ width: 60px;}
+        .eform-l label{ width: 60px;}
+        .eform-box input[type="text"]{  height: 28px; line-height:  28px; border-radius:  1px;}
+    </style>
+    <div class="wrap">
+        <header>
+            <h1>数据来源权重设置</h1>
+        </header>
+        <main>
+            <section class="section-search eform-layout">
+                <div class="eform-one">
+                    <div class="eform-box eform-box-text">
+                        <div class="eform-l"><label>省市区</label></div>
+                        <div class="eform-r"><input type="text" id="i-s-location" readonly></div>
+                    </div><!--/.eform-box-->
+                    <div class="eform-box eform-box-button"></div><!--/.eform-box-->
+                </div><!--/.eform-one-->
+                <div class="eform-one">
+                    <div class="eform-box eform-box-text">
+                        <div class="eform-l"><label>楼盘名称</label></div>
+                        <div class="eform-r"><input type="text" id="i-s-house" placeholder="请输入楼盘名称" onblur="this.placehoder='请输入楼盘名称'" onfocus="this.placehoder=''"></div>
+                    </div><!--/.eform-box-->
+                    <div class="eform-box eform-box-button">
+                        <button type="button" id="btn-query" class="ne-btn linear">查询</button>
+                    </div><!--/.eform-box-->
+                </div><!--/.eform-one-->
+            </section><!--/.section-search-->
+            <section class="section-operate ne-button-group">
+                <button type="button" id="btn-chooseAll" class="ne-btn radius">全选</button>
+                <button type="button" id="btn-chooseReverse" class="ne-btn radius">反选</button>
+                <button type="button" id="btn-chooseNone" class="ne-btn radius">全不选</button>
+                <button type="button" id="btn-add" class="ne-btn radius darkblack">增加</button>
+                <button type="button" id="btn-del" class="ne-btn radius red">删除</button>
+                <button type="button" id="btn-save" class="ne-btn radius blue">保存</button>
+            </section><!--/.section-operate-->
+            <section class="section-content">
+                <div class="panel-table mtable ne-mobileTable"></div><!--/.panel-table-->
+            </section><!--.section-content-->
+        </main>
+    </div><!--/.wrap-->
+
+    <!--// // // // // // // // // // // // // // ++JS开始++// // // // // // // // // // // // // // // // // // // // // // // // // // // -->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script>
+    <script src="assets/neatui/js/neatui.min.js"></script>
+    <script src="assets/neatui/js/neatui-dialog.js"></script>
+    <script src="assets/neatui/js/neatui-mobiletable.js"></script>
+    <script src="assets/neatui/js/neatui-functions.js"></script>
+    <script src="js/common.js"></script>
+    <script> 
+        /*+-------------全局变量---------------+*/
+        // ======
+
+
+        /*+-------------FUNCTION---------------+*/
+        /**
+         * 获取固定表头行数组
+         * @param { json} json json数组
+         * @return { array} 返回数组
+         */
+        function get_frozenRowArray(json){ 
+            var arr = [];
+            if(typeof json.data != 'undefined'){ 
+                $.each(json.data, function(i, item){ 
+                    arr.push(item["laiyuan_mc"]);
+                })
+            }
+            console.log('arr：', arr);
+            return arr; 
+        }
+
+        // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // 
+        // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // 
+        // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // 
+        $(function(){ 
+
+            /*+--------------------------------------------------------+*/
+            // =====获取数据来源权重
+            var dataSource = { 
+                data: [
+                     { "laiyuan_bh": "1001", "laiyuan_mc": "快评", "lpmc": "泉州浦西万达广场泉州浦西万达广场泉州浦西万达广场泉州浦西万达广场泉州浦西万达广场泉州浦西万达广场泉州浦西万达广场123", "quanzhong": "0.25"},
+                     { "laiyuan_bh": "1002", "laiyuan_mc": "贝壳挂牌", "lpmc": "晋江宝龙城市广场", "quanzhong": "0.35"},
+                     { "laiyuan_bh": "1003", "laiyuan_mc": "安居客挂牌", "lpmc": "北峰万达城", "quanzhong": "0.30"},
+                     { "laiyuan_bh": "1004", "laiyuan_mc": "近期成交案例", "lpmc": "城东星光耀广场", "quanzhong": "0.10"}
+                ]
+            }
+
+            /*
+            // START AJAX
+            var weightJson = { }
+            var isHoldOn = true;
+            ajax({ 
+                heading: "获取xx",
+                debug:  false,
+                url: "../",
+                data:  { 
+                    "action": "",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk %>"
+                },
+                success: function(res){ 
+                    if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) {  isHoldOn = false; return; }
+                    weightJson = JSON.parse(res);
+                },
+                error:  function(res){ 
+                    if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) {  isHoldOn = false; return; }
+                },
+                beforeSend:  function(XMLHttpRequest) {  },
+                complete:  function(XMLHttpRequest, textStatus) {  }
+            }) 
+            if(!isHoldOn) { 
+                neui.destroyAnimate();
+                return;
+            }
+            // END AJAX
+            */
+
+
+
+            // +------------------------------------------------------------------------------------------------------------------------
+            // +                                                      +表格配置+
+            // +------------------------------------------------------------------------------------------------------------------------
+            /*+--------------------------------------------------------+*/
+            // =====配置固定列(锁定列）字段. 
+            // 没有字段时 eg. var frozenConfig = { }
+            /*
+            * 字段：
+            width 宽度默认'auto'（可选), 也可直接写数值如100或px值如'100px'
+            columns 各个列（可选)
+                ·title 列名,
+                ·rows 该列每一行组成的数组. eg.rows['快评', '贝壳', '安居客']
+            */
+            var frozenConfig = { 
+                width:  200,
+                columns: [
+                    { title: "数据来源", rows: get_frozenRowArray(dataSource)}
+                    // { title: "数据来源2", rows: get_frozenRowArray(weightJson)},
+                    // { title: "数据来源3", rows: get_frozenRowArray(weightJson)}
+                ]
+            }
+            // var frozenConfig = { }
+
+
+            /*+--------------------------------------------------------+*/
+            // =====配置滚动列字段
+            /**
+             * 字段：
+             primaryKey 主键.可多个 (可选)
+             discoloration: false 是否隔行换行. true 是, false 否(默认)
+             isCeilLine: true     是否有边线. true 是(默认), false 否
+             columns 各个列
+                · title 标题(列名)
+                · field 列字段（英文）
+                · mode: "input", 显示方式. input 单行文本（默认), none 普通(即纯文本,无任何标签包裹)，span 标签文本, textarea 多行文本,  
+                · type 列字符类型(可选). 
+                    string 字符串(默认), 
+                    decimal 小数（正负小数），要转化成百分数. decimal[positive] 正小数, decimal[negative] 负小数
+                    int 整数(正负整数), int[positive] 正整数, int[negative] 负整数, 
+                    float 浮点数（正负浮点）, float[positive] 正浮点数, float[negative] 负浮点数
+                    bool 布尔型.
+                    radio 单选型 
+
+                · display 自定义界面显示内容(可选). 当type为布尔型、按钮型时特别有用.
+                        - display属性是一个json，格式：{ name: "btn-choose", text: "请选择", zero: "请选择", nonezero: "查看"", empty: "我不想空"}
+                        其中：  name class属性（一般type=button时自定义按钮class属性)(可选). 默认"btn-freedom"
+                                text 显示文本（一般type=button时自定义按钮显示文本)(可选). 默认"按钮"
+                                zero 值为零时显示的文本(可选). 默认"否"
+                                nonezero 值非零时显示的文本(可选). 默认"是"
+                                empty 空值时显示的文本(可选). 
+
+                    [当type='radio'时] display参数如下: 
+                        display: { name: "lock", zero: "女", zeroValue: "0", nonezero: "男", nonezeroValue: "1"}
+                        上述表示:  界面上显示 ·男  ·女, 取值时若勾选女,则值为0, 若勾选男,则值为1
+                    name 表示radio的name属性, 
+                    zero和nonezero 表示零值和非零值时单选按钮"界面上显示值",比如:  是, 否
+                    zeroValue和noneZero 表示零值和非零值时单选按钮"传递给最后给前台的值"(即input value属性值)
+
+                · align 水平对齐方式,仅当mode!='none'时有效(可选). left 左（默认）, center 中, right 右
+                · r_unit 右侧单位 (可选)
+                · readonly 是否只读 (可选). 默认false
+                · disabled 是否禁用 (可选). 默认false
+                · bgWhite 输入框背景强制为白色(可选). 默认false
+                · visible 列是否可见(可选). 默认true
+                · width 列宽(可选)
+                · height 单元格高,仅当mode!='none'&&mode!='input'时有效(可选)， 该属性一般设置了也无效,一般设置width属性即可。
+                · subTotal 列是否要作合计(可选)
+                · digit 列值保留的小数位数(可选)
+            */
+            var scrollConfig = { 
+                primaryKey: ["laiyuan_bh"], // 主键 (可选)
+                discoloration: false, // 是否隔行换行. true 是, false 否(默认)
+                isCeilLine: true, // 是否有边线. true 是(默认), false 否
+                // width:  'auto',
+                columns: [
+                    { title: "楼盘名称", field: "lpmc",  visible: true, width: 150, mode: "textarea", height:  100},
+                    { title: "权重", field: "quanzhong", type: 'float', visible: true, width: 50, subTotal: true, digit: "2"}
+                    // { title: "楼盘名称", field: "lpmc", visible: true},
+                    // { title: "权重", field: "quanzhong", type: 'float', visible: true, subTotal: true, digit: "2"}
+                ]
+            }
+
+
+            /*+--------------------------------------------------------+*/
+            // ====配置自由列（自定义列）字段
+            var customConfig = { 
+                check:  false, // 是否有"选择"一列(可选). 默认true
+                order:  true, // 是否有"序号"一列(可选). 默认true
+                // operate:  {  // 操作一列(可选)
+                //     width:  100, // 列宽(可选),默认50
+                //     buttons:  [ // 按钮组(可选)
+                //         { title: '删除', name: 'btn-del'}, // title 列名. name 按钮class属性
+                //         { title: '保存', name: 'btn-save'}
+                //     ]
+                // }
+            }
+
+            // =====创建表格
+            neuiMobileTable.createTable(dataSource, scrollConfig, frozenConfig, customConfig);
+
+
+
+
+            // +------------------------------------------------------------------------------------------------------------------------
+            // +                                                      +系列事件+
+            // +------------------------------------------------------------------------------------------------------------------------
+            /*+--------------------------------------------------------+*/
+            // =====查询按钮
+            $('#btn-query').on('click', function(){ 
+                neui.showAnimate();
+                setTimeout(function(){ 
+                    dataSource = { 
+                        data: [
+                            { "laiyuan_bh": "1001", "laiyuan_mc": "快评2", "lpmc": "泉州浦西万达广场2", "quanzhong": "0.25"},
+                            { "laiyuan_bh": "1002", "laiyuan_mc": "贝壳挂牌2", "lpmc": "晋江宝龙城市广场2", "quanzhong": "0.35"},
+                            { "laiyuan_bh": "1003", "laiyuan_mc": "安居客挂牌2", "lpmc": "北峰万达城2", "quanzhong": "0.30"},
+                            { "laiyuan_bh": "1004", "laiyuan_mc": "近期成交案例2", "lpmc": "城东星光耀广场2", "quanzhong": "0.10"}
+                        ]
+                    }
+
+                    frozenConfig = { 
+                        width:  200,
+                        columns: [
+                            { title: "数据来源", rows: get_frozenRowArray(dataSource)}
+                        ]
+                    }
+                    neuiMobileTable.createTable(dataSource, scrollConfig, frozenConfig, customConfig);
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+
+            /*+--------------------------------------------------------+*/
+            // ====全选按钮
+            $('#btn-chooseAll').on('click', function(){ 
+                neuiMobileTable.selectAll();
+            });
+
+            /*+--------------------------------------------------------+*/
+            // ====反选按钮
+            $('#btn-chooseReverse').on('click', function(){ 
+               neuiMobileTable.selectReverse();
+            });
+
+            /*+--------------------------------------------------------+*/
+            // ====全不选按钮
+            $('#btn-chooseNone').on('click', function(){ 
+               neuiMobileTable.selectNone();
+            });
+
+
+
+            /*+--------------------------------------------------------+*/
+            // =====增加按钮
+            $('#btn-add').on('click', function(){ 
+                neui.showAnimate();
+                setTimeout(function(){ 
+                    neuiMobileTable.addOneRow();
+                    neui.destroyAnimate();
+                }, 100)
+            });
+
+        
+
+            /*+--------------------------------------------------------+*/
+            // ====批量保存按钮
+            $('#btn-save').on('click', function(){ 
+                var $this = $(this);
+                var saveArr = neuiMobileTable.getAllRowData();
+                console.log('要保存的多行数组：', saveArr);
+                // 校验完整性
+                var tips = neuiMobileTable.checkEmptyRow(saveArr, ["lpmc", "quanzhong"], ["楼盘名称", "权重"]); // 后两个数组参数分别表示某些列字段对应的英文、中文
+                if(tips != ''){ 
+                    neuiDialog.alert({ 
+                        caption:  '提示',
+                        message:  tips,
+                        buttons:  ['确定']
+                    })
+                    return;
+                }
+                // 校验重复行
+                var tips = neuiMobileTable.checkRepeatRow(saveArr, ["lpmc"], ["楼盘名称"]);
+                if(tips != ''){ 
+                    neuiDialog.alert({ 
+                        caption:  '提示',
+                        message:  tips,
+                        buttons:  ['确定']
+                    })
+                    return;
+                }
+                
+                // 开始执行
+                var flag = '', msg = '保存成功';
+                neui.showAnimate();
+                setTimeout(function(){ 
+                     // 循环
+                    for(var i= 0; i < saveArr.length; i++){ 
+                        var row = saveArr[i];
+                        var ls_laiyuan_bh = row["keyValue"],
+                            ls_quanzhong = row["quanzhong"];
+                        // console.log(ls_laiyuan_bh, '-', ls_quanzhong);
+
+                        // 后台返回
+                        var res_laiyuan_bh = '1005'; // 返回编号
+                        /*
+                        // START AJAX
+                        var isHoldOn = true;
+                        ajax({ 
+                            heading: "批量保存",
+                            debug:  false,
+                            url: "",
+                            data:  { 
+                                "action": "",
+                                "user": "<%=s_user%>",
+                                "sjk": "<%=s_sjk %>"
+                            },
+                            success: function(res){ 
+                                if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) {  isHoldOn = false; return; }
+                                var json = JSON.parse(res);
+                                flag = json.return == 'ok' ? 1 :  0;
+                                if(!flag) msg = json.data;
+                                else res_laiyuan_bh = json.data; // 返回编号
+                            },
+                            error:  function(res){ 
+                                if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) {  isHoldOn = false; return; }
+                            },
+                            beforeSend:  function(XMLHttpRequest) {  },
+                            complete:  function(XMLHttpRequest, textStatus) {  }
+                        }) 
+                        if(!isHoldOn) { 
+                            neui.destroyAnimate();
+                            return;
+                        }
+                        // END AJAX
+                        */
+                        flag = parseInt(1); // 1 成功, 0 失败
+                        if(!flag)msg = '保存失败';
+
+                        if(flag) 
+                            neuiMobileTable.givePrimaryValue2OneRow(i, res_laiyuan_bh); // 给当前行赋主键值
+                        else 
+                            break;
+                    }
+                    
+                    neuiDialog.alert({ 
+                        caption:  '提示',
+                        message:  msg,
+                        buttons:  ['确定']
+                    })
+                    neui.destroyAnimate();
+                },100)
+            });
+
+
+
+            /*+--------------------------------------------------------+*/
+            // =====批量删除按钮
+            $('#btn-del').on('click', function(){ 
+                var delArr = neuiMobileTable.getMultiRowData();
+                console.log('要删除的多行数组：', delArr);
+
+                var delLength = delArr.length;
+                if(delLength == 0){ 
+                    neuiDialog.alert({ 
+                        caption:  '提示',
+                        message:  '请至少选择一行记录',
+                        buttons:  ['确定']
+                    })
+                    return;
+                }
+                neuiDialog.alert({ 
+                    caption:  '提示',
+                    message:  '确认删除这' + delLength + '行数据？',
+                    buttons:  ['确定', '取消'],
+                    callBack:  function(ret){ 
+                        if(ret == 1){ 
+                            var flag = '', msg = '删除成功';
+                            neui.showAnimate();
+                            setTimeout(function(){ 
+                                 // 循环
+                                for(var i = 0; i < delArr.length; i++){ 
+                                    var row = delArr[i];
+                                    var ls_index = row["rowIndex"]; // 行索引
+                                    var ls_laiyuan_bh = row["keyValue"],
+                                        ls_laiyuan_mc = row["laiyuan_mc"];
+
+                                    if(ls_laiyuan_bh == ''){  // 该行为未保存的数据,可直接移除
+                                        // neuiMobileTable.delOneRow(ls_index); // 界面上移除当前行
+                                        // console.log('ls_index: ', ls_index)
+                                        flag = 1;
+                                        neui.destroyAnimate();
+
+                                    } else{ 
+
+                                        // 后台后台
+                                        /*
+                                        // START AJAX
+                                        var isHoldOn = true;
+                                        ajax({ 
+                                            heading: "批量删除",
+                                            debug:  false,
+                                            url: "",
+                                            data:  { 
+                                                "action": "",
+                                                "user": "<%=s_user%>",
+                                                "sjk": "<%=s_sjk %>"
+                                            },
+                                            success: function(res){ 
+                                                if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) {  isHoldOn = false; return; }
+                                                var json = JSON.parse(res);
+                                                flag = json.return == 'ok' ? 1 :  0;
+                                                if(!flag) msg = json.data;
+                                                
+                                            },
+                                            error:  function(res){ 
+                                                if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) {  isHoldOn = false; return; }
+                                            },
+                                            beforeSend:  function(XMLHttpRequest) {  },
+                                            complete:  function(XMLHttpRequest, textStatus) {  }
+                                        }) 
+                                        if(!isHoldOn) { 
+                                            neui.destroyAnimate();
+                                            return;
+                                        }
+                                        // END AJAX
+                                        */
+                                        flag = parseInt(1); // 1 成功, 0 失败
+                                        if(!flag) msg = '删除失败';
+
+                                        if(!flag) break;
+                                    }
+                                }
+                                neuiDialog.alert({ 
+                                    caption:  '提示',
+                                    message:  msg,
+                                    buttons:  ['确定'],
+                                    callBack:  function(){ 
+                                        if(flag){  // 成功
+                                            neuiMobileTable.delMultiRow();
+                                        }
+                                    }
+                                })
+                                neui.destroyAnimate();
+                            },100)
+                        }
+                    }
+                })
+
+            });
+
+
+
+
+            
+            /*+--------------------------------------------------------+*/
+            // =====单行删除按钮
+            $(document).on('click', '.btn-del', function(){ 
+                var $this = $(this);
+                var json = neuiMobileTable.getOneRowData($(this));
+                console.log('要删除的单行数据：', json);
+                var ls_laiyuan_bh = json["keyValue"];
+                var ls_laiyuan_mc = json["laiyuan_mc"];   
+                neuiDialog.alert({ 
+                    caption:  '提示',
+                    message:  '确认删除该行记录？',
+                    buttons:  ['确定', '取消'],
+                    callBack:  function(ret){ 
+                        if(ret == 1){ 
+                            var flag = '', msg = '删除成功';
+                            neui.showAnimate();
+                            setTimeout(function(){ 
+
+                                if(ls_laiyuan_bh == ''){  // 该行为未保存的数据,可直接移除
+                                    neuiMobileTable.delOneRow($this); // 界面上移除当前行
+                                    neui.destroyAnimate();
+                                    return;
+                                }
+
+                                // 后台返回
+                                /*
+                                // START AJAX
+                                var isHoldOn = true;
+                                ajax({ 
+                                    heading: "单行删除",
+                                    debug:  false,
+                                    url: "",
+                                    data:  { 
+                                        "action": "",
+                                        "user": "<%=s_user%>",
+                                        "sjk": "<%=s_sjk %>"
+                                    },
+                                    success: function(res){ 
+                                        if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) {  isHoldOn = false; return; }
+                                        var json = JSON.parse(res);
+                                        flag = json.return == 'ok' ? 1 :  0;
+                                        if(!flag) msg = json.data;
+                                    },
+                                    error:  function(res){ 
+                                        if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) {  isHoldOn = false; return; }
+                                    },
+                                    beforeSend:  function(XMLHttpRequest) {  },
+                                    complete:  function(XMLHttpRequest, textStatus) {  }
+                                }) 
+                                if(!isHoldOn) { 
+                                    neui.destroyAnimate();
+                                    return;
+                                }
+                                // END AJAX
+                                */
+                                flag = parseInt(1);  // 1 成功, 0 失败
+                                if(!flag) msg = '删除失败';
+
+                                neuiDialog.alert({ 
+                                    caption:  '提示',
+                                    message:  msg,
+                                    buttons:  ['确定'],
+                                    callBack:  function(){ 
+                                        if(flag){  // 成功
+                                            neuiMobileTable.delOneRow($this); // 界面上移除当前行
+                                        }
+                                    }
+                                })
+
+                                neui.destroyAnimate();
+                            },100)
+                        }
+                    }
+                })
+            });
+
+
+
+            
+            /*+--------------------------------------------------------+*/
+            // =====单行保存按钮
+            $(document).on('click', '.btn-save', function(){ 
+                var $this = $(this);
+                var rowIndex = $this.parents('tr').index(); // 行索引 
+                var json = neuiMobileTable.getOneRowData($(this));
+                // console.log('要保存的单行数据：', json);
+                var ls_laiyuan_bh = json["keyValue"];
+                var ls_laiyuan_mc = json["laiyuan_mc"];
+
+                var flag = '', msg = '保存成功';
+                neui.showAnimate();
+                setTimeout(function(){  
+                    // 后台返回
+                    var res_laiyuan_bh = '1005'; // 返回编号
+                    /*
+                    // START AJAX
+                    var isHoldOn = true;
+                    ajax({ 
+                        heading: "单行保存",
+                        debug:  false,
+                        url: "",
+                        data:  { 
+                            "action": "",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk %>"
+                        },
+                        success: function(res){ 
+                            if(toolTip.emptyTips(res, this.url, this.heading, this.debug)) {  isHoldOn = false; return; }
+                            var json = JSON.parse(res);
+                            flag = json.return == 'ok' ? 1 :  0;
+                            if(!flag) msg = json.data;
+                            else res_laiyuan_bh = json.data;
+                        },
+                        error:  function(res){ 
+                            if(toolTip.wrongTips(res, this.url, this.heading, this.debug)) {  isHoldOn = false; return; }
+                        },
+                        beforeSend:  function(XMLHttpRequest) {  },
+                        complete:  function(XMLHttpRequest, textStatus) {  }
+                    }) 
+                    if(!isHoldOn) { 
+                        neui.destroyAnimate();
+                        return;
+                    }
+                    // END AJAX
+                    */
+                    flag = parseInt(1);  // 1 成功, 0 失败
+                    if(!flag) msg = '保存失败';
+
+                    neuiDialog.alert({ 
+                        caption:  '提示',
+                        message:  msg,
+                        buttons:  ['确定'],
+                        callBack:  function(){ 
+                            if(flag){  // 成功
+                                neuiMobileTable.givePrimaryValue2OneRow(rowIndex, res_laiyuan_bh); // 给当前行赋主键值
+                            }
+                        }
+                    })
+
+                    neui.destroyAnimate();
+                },100)
+            });
+
+
+
+
+
+        }); // $(function(){ })
+    </script>
+</body>
+</html>

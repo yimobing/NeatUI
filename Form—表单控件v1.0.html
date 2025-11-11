@@ -186,7 +186,7 @@
     display     是否显示(可选)，即该行是否显示(可选), 默认true。
     align       垂直对齐方式(可选)，默认垂直居中。top 垂直居上
     icon        自定义图标名称(即className)(可选), 默认图标名称为field参数值。图标可以是font-awesome图标。eg. "fa-user-o"
-    button      自定义右侧按钮(可选)。格式：{id:"按钮ID属性(可选)", class:"按钮Class属性(可选)", text:"按钮名称(可选)", icon:"图标名(可选),如fa-pencil", appearance:"按钮样式(可选),值：3d 立体感, simple 简单的"}
+    button      自定义右侧按钮(可选)，数组或对象格式。多个按钮时写成数组格式，单个按钮时可数组也可对象格式。格式：[{id:"按钮ID属性(可选)", class:"按钮Class属性(可选)", text:"按钮名称(可选)", icon:"图标名(可选),如fa-pencil", appearance:"按钮样式(可选),值：3d 立体感, simple 简单的"}]
     press       自定义按钮样式(仅当type="按钮"时有效)(可选)。格式：{ labeled:"是否隐藏左侧的标题栏(可选), 默认false", underline:"是否有下划线(可选),默认false", align: "按钮水平对齐(可选),默认left。值 left, center", color: "按钮文字颜色,颜色值如red, green",  icon:"图标名(可选),如fa-pencil", appearance:"按钮外观(可选), 值: 3d 立体感(默认), simple 简单的, pure 纯文本(没边线)"}
     attribute   自定义属性(可选), 默认空。如：data-*属性， 多个属性之间用空格分开。eg. "data-toggle='1' data-vip='5'"
     superordination 当前栏的值改变时是否清空房号配置数据(楼盘、幢号等)(可选), 默认false
@@ -354,7 +354,12 @@
                     {title:"有隐藏值的", field:"hasHid", type:"数字", value:"15000", hid:"Z1001" },
                     {title:"自定义属性", field:"customAttr", type:"文本", value:"vip2", attribute:"data-toggle='1' data-vip='5'" },
                     {title:"有右侧单位", field:"hasUnit", type:"数字", value:"15000", unit:"元/m²" },
-                    {title:"有右侧按钮", field:"rightBtn", type:"数字", must: true, value:"1200000", unit:"元", button:{id:"btn-query-price", class:"btn-query", text:"获取价格"} },
+                    {title:"有右侧按钮", field:"rightBtn", type:"数字", must: true, value:"1200000", unit:"元", 
+                        button: [
+                            {id:"btn-query-price1", class:"btn-query", text:"获取价格1"},
+                            {id:"btn-query-price2", class:"btn-query", text:"获取价格2"},
+                        ]
+                    },
                     {title:"整行只读", field:"whole", type:"文本", value:"这里整行只读", rowRead: true },
 
                     {title:"客人1", field:"userke1", type:"文本", value:"", group:"keren", must: true },

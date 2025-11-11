@@ -7,7 +7,7 @@
  * Author: ChenMufeng
  * QQ: 1614644937
  * Date: 2021.03.06
- * Update: 2021.09.02
+ * Update: 2025.11.11
  */
 
 /*———————————————————————————————————————————————————————————————————————————————————————————————
@@ -933,19 +933,43 @@
                     _crossStyle = value.toString().replace(/([ ]+)/g, '') !== '' ? '' : ' style="display: none"';
                 var _btnStr = ''; // 右侧按钮
                 var _crossClass = '';
-                if(buttons != null){
-                    var _btnIdStr = typeof buttons.id == 'undefined' ? '' : ' id="' + buttons.id + '"',
-                        _btnIconStr = typeof buttons.icon == 'undefined' ? '' : '<i class="fa ' + buttons.icon + '"></i>'
-                        _btnAppearName = typeof buttons.appearance == 'undefined' ? '' : buttons.appearance,
-                        _btnClassName = typeof buttons.class == 'undefined' ? '' : buttons.class,
-                        _btnText = typeof buttons.text == 'undefined' ? '右侧按钮' : (buttons.text.toString().replace(/([ ]+)/g, '') === '' ? '右侧按钮' : buttons.text);     
-                    var _btnClassStr = _btnAppearName == '' && _btnClassName == '' ? '' : ' class="' + _btnClassName + ' ' + _btnAppearName + '"';
-                    _btnStr = [
+                if(buttons != null){ 
+                    // edit 20251111-1
+                    var rightBtnArr = [];
+                    if(Array.isArray(buttons)) {
+                        rightBtnArr = buttons;
+                    }
+                    else if(typeof buttons == 'object') {
+                        rightBtnArr = [ buttons ];
+                    }
+                    // 多个右侧按钮
+                    for(var q = 0; q < buttons.length; q++) {
+                        var oneBtn = buttons[q];
+                        var _btnIdStr = typeof oneBtn.id == 'undefined' ? '' : ' id="' + oneBtn.id + '"',
+                        _btnIconStr = typeof oneBtn.icon == 'undefined' ? '' : '<i class="fa ' + oneBtn.icon + '"></i>'
+                        _btnAppearName = typeof oneBtn.appearance == 'undefined' ? '' : oneBtn.appearance,
+                        _btnClassName = typeof oneBtn.class == 'undefined' ? '' : oneBtn.class,
+                        _btnText = typeof oneBtn.text == 'undefined' ? '右侧按钮' : (oneBtn.text.toString().replace(/([ ]+)/g, '') === '' ? '右侧按钮' : oneBtn.text);     
+                        var _btnClassStr = _btnAppearName == '' && _btnClassName == '' ? '' : ' class="' + _btnClassName + ' ' + _btnAppearName + '"';
+                        _btnStr += [
                         '<div class="item-cell" data-type="button">',
                             '<button type="button"' + _btnIdStr + _btnClassStr + '>' + _btnIconStr + _btnText + '</button>',
                         '</div>'
-                    ].join('\r\n');
-                    
+                        ].join('\r\n');
+                    }
+                    // 单个右侧按钮
+                    // var _btnIdStr = typeof buttons.id == 'undefined' ? '' : ' id="' + buttons.id + '"',
+                    //     _btnIconStr = typeof buttons.icon == 'undefined' ? '' : '<i class="fa ' + buttons.icon + '"></i>'
+                    //     _btnAppearName = typeof buttons.appearance == 'undefined' ? '' : buttons.appearance,
+                    //     _btnClassName = typeof buttons.class == 'undefined' ? '' : buttons.class,
+                    //     _btnText = typeof buttons.text == 'undefined' ? '右侧按钮' : (buttons.text.toString().replace(/([ ]+)/g, '') === '' ? '右侧按钮' : buttons.text);     
+                    // var _btnClassStr = _btnAppearName == '' && _btnClassName == '' ? '' : ' class="' + _btnClassName + ' ' + _btnAppearName + '"';
+                    // _btnStr = [
+                    //     '<div class="item-cell" data-type="button">',
+                    //         '<button type="button"' + _btnIdStr + _btnClassStr + '>' + _btnIconStr + _btnText + '</button>',
+                    //     '</div>'
+                    // ].join('\r\n');
+
                     _crossClass = ' has-cell-btn has-cell-btn-word-' + _btnText.length;
                 }
 

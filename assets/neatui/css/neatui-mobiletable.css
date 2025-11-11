@@ -1,0 +1,214 @@
+@charset "utf-8";
+/**
+* [neuiMobileTable] 
+* 移动端表格控件
+* author: ChenMufeng
+* Date: 2020.5.26
+* Update: 2025.11.10
+*/
+
+
+.mtable{
+    display: -webkit-box;  
+	display: -moz-box; 
+	display: -ms-flexbox; 
+	display: -webkit-flex; 
+	display: flex; 
+	display: box;
+	width: auto;
+}
+
+.mtable.child-no-empty{/*border: 1px solid #ddd;*/}
+.mtable .no-data-tips{width: 100%; margin: 15px auto; text-align: center; color: #00bfff; font-size: 16px;}
+
+.grid{/*display: inline-block\9; vertical-align: top\9;*/ float: left\9;}
+/*固定表格*/
+.grid-frozen{ width: auto; }
+/*可滚动表格*/
+.grid-regular{
+    -webkit-flex: 1;
+    -moz-flex: 1;
+    flex: 1;
+    width:100%;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    -webkit-overflow-scrolling: touch;
+    width: auto\9;
+}
+
+
+/*+--------------表格通用------------------+*/
+.table{ width:100%; border-collapse: collapse;}
+.grid-frozen{}
+.grid-regular .table{table-layout:fixed;}
+
+
+/*+--------------单元格通用------------------+*/
+.thead tr{background-color: #eee;}
+.tbody tr{}
+.thead th, .tbody td{ 
+	height:32px; 
+	border: 1px solid #ddd;
+	/*单元格内容可换行*/ 
+	overflow:hidden; 
+	text-overflow:ellipsis; 
+	white-space:pre-wrap; 
+}
+.thead th{ position: relative; padding: 5px 8px; font-size: 14px; font-weight: normal; text-align: center; color:#666; font-weight: bold;}
+.tbody td{ position: relative; padding: 0 8px; font-size: 12px; text-align: left; color: #777; }
+.tbody .td-heji{background-color: #fffbfb;font-weight:bold;}
+.thead th.left,
+.tbody td.left,
+.tbody td.left input,
+.tbody td.left textarea,
+.tbody td.left span{ text-align: left!important;}
+.thead th.center,
+.tbody td.center,
+.tbody td.center input,
+.tbody td.center textarea,
+.tbody td.center span{ text-align: center!important; }
+.thead th.right,
+.tbody td.right,
+.tbody td.right input,
+.tbody td.right textarea,
+.tbody td.right span
+{ text-align: right!important;}
+
+/*内部元素*/
+.tbody td span{display: block; padding: 8px 10px;}
+.tbody td input[type="text"],
+.tbody td input[type="number"],
+.tbody td textarea{ 
+	width: 100%; 
+	/*min-width:80px;*/
+	height: 100%;
+	border: 0;
+}
+.tbody td input[type="text"],
+.tbody td input[type="number"]{padding:0 8px;}
+.tbody td textarea{padding: 5px 8px;}
+.tbody td .r-unit{
+	position: absolute;
+	z-index: 1;
+	right: 5px;
+	top: 50%;
+	-webkit-transform:translateY(-50%);
+	-moz-transform:translateY(-50%);
+	-o-transform:translateY(-50%);
+	-ms-transform:translateY(-50%);
+	transform:translateY(-50%);
+	min-width: 18px;
+	background-color: #fff;
+	text-align: right;
+	color: #a8a2a2;
+	font-size: 10px;
+}
+
+.tbody td input:read-only,
+.tbody td input[readonly],
+.tbody td span[readonly],
+.tbody td textarea[readonly]{background-color: #fff;}
+.tbody td input:disabled,
+.tbody td input[disabled],
+.tbody td textarea:disabled,
+.tbody td textarea[disabled]{
+	color:inherit;
+	background-color:#fffbfb;
+	-webkit-text-fill-color:inherit;
+	-webkit-text-stroke:1px solid #d6e9c6;
+	-webkit-opacity:1;
+	opacity:1;
+	filter:alpha(opacity=100);
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	cursor:not-allowed!important;
+}
+.tbody td.center input[type="text"],
+.tbody td.center textarea{ text-align: center;}
+.tbody td.right input[type="text"],
+.tbody td.right textarea{ text-align: center;}
+.tbody .bg-white{ background-color: #fff!important;} /*强制背景白色*/
+
+/*边线处理*/
+.thead tr:first-child th{ border-top: 0;}
+.tbody tr:last-child td{ border-bottom: 0; }
+.thead th:first-child,
+.tbody td:first-child{ border-left: 0; }
+.grid-frozen + .grid-regular .thead th, 
+.grid-frozen + .grid-regular .tbody td{border-left: 0;}
+
+/*隔行变色*/
+.tbody.two-line-bg-color tr:nth-child(2n),
+.tbody.two-line-bg-color tr:nth-child(2n) *{background-color: #f9f8f8;}
+/*无边线*/
+.tbody.ceil-no-border td{border: 0;}
+
+/*隐藏表头*/
+.mtable.no-tb-head .thead{ display:none; }
+.mtable.no-tb-head .tbody tr:first-child td { border-top: 0; }
+.mtable.no-tb-head .grid-regular .tbody td:last-child{ border-right: 0;}
+
+
+/*固定列*/
+.grid-frozen td{ text-align: right; color: #777; }
+.grid-frozen th,
+.grid-frozen td{ /*background-color:#fffcfc;*/ }
+/*可滚动列*/
+.grid-regular .thead th{}
+.grid-regular .tbody td{ padding:0; }
+.grid-regular .thead th:last-child,
+.grid-regular .tbody td:last-child{ border-right: 0;}
+
+
+/*单元格内的按钮*/
+.tbody button[type="button"]{
+	margin:0 5px;
+	padding:3px 5px;
+	background: transparent;
+	border: 1px solid #d9ddde;
+	border-radius: 2px;
+	cursor: pointer;
+}
+.tbody button[type="button"]:first-child{}
+
+
+/*radio组*/
+.m-radio-group{height: 28px;}
+
+/*+--------------媒体查询------------------+*/
+@media screen and (min-width:640px){ /*>640px*/
+	/*大分辨率时,表格宽度自动,不占满全屏*/
+	.mtable{border: 0;}
+	.grid-frozen{
+		border-color: #ddd;
+		border-style: solid;
+		border-width: 1px 0 1px 1px;
+	}
+	.grid-regular .table{
+		width: auto;
+		table-layout:fixed;
+		border-color: #ddd;
+		border-style: solid;
+		border-width: 1px 1px 1px 0;
+	}
+}
+
+@media screen and (max-width:640px){
+	/*chrome,firefox等webkit内核浏览器滚动条样式*/
+	.grid-regular::-webkit-scrollbar{width:2px; height:5px;}/*整体样式*/
+	.grid-regular::-webkit-scrollbar-thumb{/*里面小方块*/
+		border-radius:5px;
+		-webkit-box-shadow:inset 0 0 5px rgba(0,0,0,.2);
+		background:rgba(0,0,0,.2);
+	}
+	.grid-regular::-webkit-scrollbar-track{ /*里面轨道*/
+		-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,.1);
+		border-radius:0;
+		background:rgba(0,0,0,.1);
+	}
+
+	.grid-frozen{ width: auto; max-width: 200px; }
+
+}
