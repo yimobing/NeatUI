@@ -110,17 +110,27 @@
                 hide: false, // 是否启用自动隐藏功能(可选)，默认false。值为true时，往下滚指定高度的距离就自动隐藏，滚到顶部时又自动显示出来。
                 height: 0 // 当autoHide=true时，指定页面往下滚多少距离就自动显示或隐藏控件(可选)，默认0表示一班下滚就自动隐藏。eg. 50 表示班下滚50px就自动隐藏，滚到顶部时就自动显示出来。
             },
+            
             // 回调函数
+            openBack: function(e){ // 打开时(创建控件完成后)的回调函数。返回值格式：{element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象"}
+                console.log('打开了e:', e);
+            },
+            // 指定返回哪一页
             isGoTurn: true, // 是否默认执行点击时返回上一页(可选)，默认true。当不想执行返回上一页操作时，即可把本参数值设为false,然后在回调函数里自定义操作。
-            turnBack: function(e){ // 点击返回时的回调函数。返回值格式 {element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象", device: "设备类型。 ios 苹果手机, android 安卓手机"}
+            turnBack: function(e){ // 点击返回时的回调函数(可选)。仅在 isGoTurn=false 时有效。返回值格式 {element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象", device: "设备类型。 ios 苹果手机, android 安卓手机"}
                 console.log('点返回了e：', e);
                 if(e.device == 'ios'){ // iphone设备时
                     // window.location.href = '' // 自定义跳转到哪里
                 }
             },
-            openBack: function(e){ // 打开时(创建控件完成后)的回调函数。返回值格式：{element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象"}
-                console.log('打开了e:', e);
-            }
+            // 强制返回哪一页，即当上一页不存在时指定返回哪一页
+            referEmptyBack: function(e){ // 当上一页不存在(比如直接打开本页)时，点击返回时的回调函数(可选)。优先权大于 isGoTurn 和 turnBack。返回值格式 {element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象", device: "设备类型。 ios 苹果手机, android 安卓手机"}
+                console.log('点返回了e：', e);
+                if(e.device == 'ios'){ // iphone设备时
+                    // window.location.href = '' // 自定义跳转到哪里
+                }
+                // 封装的函数里已经判断了 document.referrer == ''(空表示用户直接打开本页面)，故调用时无须再判断
+            },
         });
         
        

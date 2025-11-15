@@ -85,11 +85,14 @@
                 hide: false, // 是否启用自动隐藏功能(可选)，默认false。值为true时，往下滚指定高度的距离就自动隐藏，滚到顶部时又自动显示出来。
                 height: 0 // 当autoHide=true时，指定页面往下滚多少距离就自动显示或隐藏控件(可选)，默认0表示一班下滚就自动隐藏。eg. 50 表示班下滚50px就自动隐藏，滚到顶部时就自动显示出来。
             },
-            // 回调
-            isGoTurn: true, // 是否默认执行点击时返回上一页(可选)，默认true。当不想执行返回上一页操作时，即可把本参数值设为false,然后在回调函数里自定义操作。
-            turnBack: null, // 点击返回时的回调函数。返回值格式 {element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象", device: "设备类型。 ios 苹果手机, android 安卓手机"}
-            openBack: null // 打开时(创建控件完成后)的回调函数。返回值格式：{element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象"}
 
+            // 回调
+            openBack: null, // 打开时(创建控件完成后)的回调函数。返回值格式：{element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象"},
+            // 指定返回哪一页
+            isGoTurn: true, // 是否默认执行点击时返回上一页(可选)，默认true。当不想执行返回上一页操作时，即可把本参数值设为false,然后在回调函数里自定义操作。
+            turnBack: null, // 点击返回时的回调函数(可选)。仅在 isGoTurn=false 时有效。返回值格式 {element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象", device: "设备类型。 ios 苹果手机, android 安卓手机"}
+            // 强制返回哪一页，即当上一页不存在时指定返回哪一页 add 20251115-1
+            referEmptyBack: null, // 当上一页不存在(比如直接打开本页)时，点击返回时的回调函数(可选)。优先权大于 isGoTurn 和 turnBack。返回值格式 {element: "根节点对象", container: "容器节点对象", arrow:"箭头节点对象", text:"文本节点对象", device: "设备类型。 ios 苹果手机, android 安卓手机"}
         }
         me.$opts = net.extend(true, {}, defaults, options || {}); // 控件参数对象(深度合并)
         if(me.$opts.enable === false) return;
@@ -236,26 +239,39 @@
                 text: me.$nodeText
             });
         }
-        // 点击返回时
+        // 点击返回时 edit 20251115-1
         me.$nodePanel.onclick = function(){
-            if(me.$opts.isGoTurn){
-                window.history.go(-1);
+            var sysType = '';
+            if (tools.isAppIOS()){
+                sysType = 'ios';
             }
-            if(me.$opts.turnBack){ // 回调。返回参数为设备类型。值为 ios 或 android
-                var sysType = '';
-                if (tools.isAppIOS()){
-                    sysType = 'ios';
-                }
-                else{
-                    sysType = 'android';
-                }
-                me.$opts.turnBack({
+            else{
+                sysType = 'android';
+            }
+            
+            // 回调
+            if(me.$opts.referEmptyBack && document.referrer == '') { // document.referrer 空表示用户直接打开本页面
+                me.$opts.referEmptyBack({
                     element: me.$nodeRoot,
                     container: me.$nodePanel,
                     arrow: me.$nodeArrow,
                     text: me.$nodeText,
                     device: sysType
                 });
+            }
+            else {
+                if(me.$opts.isGoTurn) {
+                    window.history.go(-1);
+                }
+                else if(me.$opts.turnBack){ // 回调。返回参数为设备类型。值为 ios 或 android  
+                    me.$opts.turnBack({
+                        element: me.$nodeRoot,
+                        container: me.$nodePanel,
+                        arrow: me.$nodeArrow,
+                        text: me.$nodeText,
+                        device: sysType
+                    });
+                }
             }
         }
 
