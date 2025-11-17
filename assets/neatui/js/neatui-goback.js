@@ -68,7 +68,7 @@
             showText: true, // 是否显示文字(可选)，默认true
             fontSize: 12,  // 文字大小(可选)，默认12px
             fontColor: "#999", // 文字颜色(可选)，默认#999。eg. #ff0000
-            backgroundColor: "#ededed", // 背景色(可选)，默认#ededed
+            backgroundColor: "#fff", // 背景色(可选)，默认#fff
             padding: "10px 12px", // 自定义padding值(可选)，默认值'10px 12px'
             opacity: "1", // 背景透明度(可选)，默认1表示不透明。值 0到1。
             radius: "0 0 8px 0", // 四个角的圆角(可选)。
@@ -104,13 +104,13 @@
             dRight = me.$opts.right.toString().replace(/px/g, '') + 'px',
             dFontSize = me.$opts.fontSize.toString().replace(/px/g, '') + 'px',
             dFontColor = me.$opts.fontColor == '' ? '#999' : me.$opts.fontColor,
-            dBackgroundColor = me.$opts.backgroundColor == '' ? '#ededed' : me.$opts.backgroundColor,
+            dBackgroundColor = me.$opts.backgroundColor == '' ? me.defaults.backgroundColor : me.$opts.backgroundColor,
             dPadding = me.$opts.padding == '' ? '10px 12px' : me.$opts.padding,
             dRadius = me.$opts.radius == '' ? '0 0 8px 0' : me.$opts.radius,
             dOpacity = me.$opts.opacity == '' ? 1 : me.$opts.opacity;
         // IOS时
         if(tools.isAppIOS()){
-            dBackgroundColor = me.$opts.ios.backgroundColor == '' ? '#fff' : me.$opts.ios.backgroundColor;
+            dBackgroundColor = me.$opts.ios.backgroundColor == '' ? me.defaults.ios.backgroundColor : me.$opts.ios.backgroundColor;
         }
 
         // ·创建节点
