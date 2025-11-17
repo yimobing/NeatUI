@@ -7,7 +7,7 @@
  * Author: ChenMufeng
  * QQ: 1614644937
  * Date: 2021.03.06
- * Update: 2025.11.11
+ * Update: 2025.11.17
  */
 
 /*———————————————————————————————————————————————————————————————————————————————————————————————
@@ -902,17 +902,26 @@
                 if(disabled) readonly = true;
                 if(rowRead) readonly = true;
                 
-                //
-                var chooseText = placeholder != null && placeholder.toString().replace(/([ ]+)/g, '') != '' ? placeholder :  (!readonly ? '请填写' : '请选择'); //+title 
+                // edit 20251117-1
+                var chooseText = placeholder != null && placeholder.toString().replace(/([ ]+)/g, '') != '' ? placeholder :  
+                (
+                    !must ? '' : ( !readonly ? '请填写' : '请选择' )
+                ); //+title 
                     _looseFocusStr = !readonly ? '' : ';this.blur()';
                 if (enablePlaceholder !== true) {
                     chooseText = '';
                 }
                 var _classStr = className,
                     _styleStr = '',
-                    _placeholderStr = !must ? '' : ' placeholder="' + chooseText + '"',
-                    _blurStr = !must ? '' : ' onblur="this.placeholder=\'' + chooseText + '\'"';
-                    _focusStr = !must ? ( !readonly ? '' : ' onfocus="this.blur()"') : ' onfocus="this.placeholder=\'\'' + _looseFocusStr + '"',
+
+                    // edit 20251117-1
+                    // _placeholderStr = !must ? '' : ' placeholder="' + chooseText + '"',
+                    // _blurStr = !must ? '' : ' onblur="this.placeholder=\'' + chooseText + '\'"';
+                    // _focusStr = !must ? ( !readonly ? '' : ' onfocus="this.blur()"') : ' onfocus="this.placeholder=\'\'' + _looseFocusStr + '"',
+                    _placeholderStr = chooseText == '' ? '' : ' placeholder="' + chooseText + '"',
+                    _blurStr = chooseText == ''  ? '' : ' onblur="this.placeholder=\'' + chooseText + '\'"';
+                    _focusStr = chooseText == '' ? ( !readonly ? '' : ' onfocus="this.blur()"') : ' onfocus="this.placeholder=\'\'' + _looseFocusStr + '"',
+
                     _dataHideStr = hid.toString().replace(/([ ]+)/g, '') === '' ? '' : ' data-bh="' + hid + '"',
                     _dataSubBeCleaneStr = subordination ? ' data-subCleaned-value="' + subBeCleanedValue  + '"' : '', // add 20220622-1
                     _readonlyStr = !readonly ? '' : ' readonly',
