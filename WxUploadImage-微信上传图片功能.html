@@ -535,8 +535,11 @@
                         if(errors != ''){
                             reject('上传后返回的信息有误：' + errors); // 错误，使用reject返回错误信息
                         }else{
-                            var source = json.data[0];
-                            allImgJson.data.push(source);
+                            var one = json.data[0];
+                            if(typeof one.data != 'undefined' && one.data.length > 0) { // 再取一层，防止后端返回时嵌套
+                                one = one.data[0];
+                            }
+                            allImgJson.data.push(one);
                         }
                         if(allImgJson.data.length == total){
                             createImageList(allImgJson);
