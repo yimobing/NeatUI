@@ -3,7 +3,7 @@
  * 移动端下拉加载更多，上拉刷新控件
  * Author: ChenMufeng
  * Date: 2021.03.31
- * Pudate: 2025.11.21
+ * Pudate: 2023.02.08
  */
 ;(function($){
     // 【名词解释】移动端中,
@@ -30,11 +30,8 @@
 
         me.direction = 'down'; //滚动条滚动方向. down 下滚↓; up 上滚↑
         me.loading = false; // loading状态,默认false
-
-        // 注释掉下面这行代码 edit 20251121-1
-        // me.curpage = 0; // 当前页码,默认0
-
-        me.source = {} // 数据源 test3
+        me.curpage = 0; // 当前页码,默认0
+        me.source = {} // 数据源 tet2
         //me._scrollContentHeight = 0; // 文档高度
         //me._scrollWindowHeight = 0; // 可视高度
         me._scrollTop = 0; // 滚动距离,默认0
@@ -55,7 +52,7 @@
             // 注②：当 autoLoad=true, cleanUp=true 时, 则：页面一打开就会清空滑动区域已有数据,且马上加载第1页数据
             autoLoad: true, // 是否自动加载,默认true(可选). true时如果文档高度小于可视高度无须下滚就会自动加载第1页数据, false时须下滚才加载第1页数据
             cleanUp: true, // 是否先清空滑动区域已有数据,默认true(可选). true时只对第1页有效
-            beginPage: 1, // 起始页码，默认1(可选)。如果要指定加载某一页的数据，比如一开始就加载第5页数据而不是从第1页开始加载，则可把此参数值设置为5。add 20251121-1
+            
             pagesize: 20, // 每页记录数,默认20条(可选).
             threshold: 50, // 预加载距离,即提前加载距离(可选).比如到底部边缘上方50px时提前加载
             distance: 50, // 拉动距离,默认50(可选). 用于解决“由于部分Android中UC和QQ浏览器头部有地址栏，并且一开始滑动页面隐藏地址栏时，无法触发scroll和resize”的Bug
@@ -79,14 +76,6 @@
                     
         // 当前元素添加自定义的CLASS属性
         me.$element.addClass('neRoll__slide');
-
-        // 新增下面N行偌大 add and edit 20251121-1
-        // me.curpage = 0; // 当前页码,默认0
-        var begin_page = isNaN(parseInt(me.opts.beginPage)) ? defaults.beginPage : parseInt(me.opts.beginPage);
-        var zero_page = begin_page - 1 < 0 ? 0 : begin_page - 1;
-        me.opts.beginPage = begin_page;
-        me.zeroPage = zero_page;
-        me.curpage = zero_page; // 当前页码，默认为初始页码减1，比如初始页码1，则当前页码为1-1=0
 
         // 设置HTML节点
         me.opts.root = 'ne__rolling';
@@ -333,12 +322,6 @@
      // 重置加载
      MyLoadMore.prototype.resetLoad = function(){
         var me = this;
-        var begin_page = me.opts.beginPage; // 默认1
-
-        // add 20251121-2
-        var eleNode = me.$element.length > 0 ? me.$element[0] : me.$element;
-        var isElementInnerHasContent = hasNonEmptyTextContent(eleNode); // 判断节点内部是否有内容。true 有, false 无
-
         if(me.direction == 'up' && me.upInsertDOM){ //上滚时
             me.$domUp.css({'height':'0'}).on('webkitTransitionEnd mozTransitionEnd transitionend', function(){
                 me.loading = false;
@@ -352,9 +335,7 @@
                     fnRecoverContentHeight(me);
                 }else{
                     setTimeout(function(){ //给一个小延迟,以显示转圈再销毁转圈
-                        // edit 20251121-2
-                        // if(me.curpage == begin_page && me.opts.cleanUp && fnCheckZeroData(me.source, me)) //test3
-                        if(me.curpage == begin_page && !isElementInnerHasContent && fnCheckZeroData(me.source, me)) //test3
+                        if(me.curpage == 1 && me.opts.cleanUp && fnCheckZeroData(me.source, me)) //tet2
                             me.$domDown.html(me.opts.domDown.nodata);
                         else
                             me.$domDown.html(me.opts.domDown.empty);
@@ -371,9 +352,7 @@
                 // test1 下N行
                 var delays = Math.floor(me.opts.delay) > 500 ? Math.floor(me.opts.delay) : 1000;
                 setTimeout(function(){ //给一个小延迟,以显示转圈再销毁转圈
-                    // edit 20251121-2
-                    // if(me.curpage == begin_page && me.opts.cleanUp && fnCheckZeroData(me.source, me)) //test3
-                    if(me.curpage == begin_page && !isElementInnerHasContent && fnCheckZeroData(me.source, me)) //test3
+                    if(me.curpage == 1 && me.opts.cleanUp && fnCheckZeroData(me.source, me)) //tet2
                         me.$domDown.html(me.opts.domDown.nodata);
                     else
                         me.$domDown.html(me.opts.domDown.empty);
@@ -435,9 +414,8 @@
     //================================================
     // 清空绑定元素已有数据
     function fnClearHistory(me){
-        var zero_page = me.zeroPage; // 默认0 add 20251121-1
         if(me.opts.cleanUp){
-            if(me.curpage == zero_page){
+            if(me.curpage == 0){
                 //console.log('111');
                 me.$element.empty();
                 fnRecoverContentHeight(me);
@@ -498,7 +476,7 @@
 
 
         function runDown(source){
-            me.source = source; //test3
+            me.source = source; //tet2
             if(!fnCheckHasData(source, me)){
                 me.lock();
                 me.noneData(true);
@@ -609,11 +587,7 @@
     function fnToUp(me){
         //开始加载
         me.loading = true;
-
-        // edit 20251121-1
-        // me.curpage = 1; // 重置页码为1
-        me.curpage = me.opts.beginPage; // 重置页码为起始页码，一般为1
-
+        me.curpage = 1; // 重置页码为1
         me.$domUp.css({'height': me.$domUp.children().height()});
         me.$domUp.html(me.opts.domUp.load);
         me.$domDown.hide(); // 隐藏下方提示文字 tet1
@@ -630,7 +604,7 @@
             runUp(result);
         }
         function runUp(source){
-            me.source = source; //test3
+            me.source = source; //tet2
             var callback = { curpage: me.curpage, source: source } //回调参数
             if(me.opts.delay === 0 || me.opts.delay === ''){
                 fnLoadDataUp(source, me, callback);
@@ -719,18 +693,6 @@
         if(typeof ps_source.data == 'undefined') return true;
         if(ps_source.data.length == 0) return true;
         return false;
-    }
-
-
-    /**
-     * 检测元素是否至少包含一个非空文本子节点 add 20251121-2
-     * @param {HTMLDOM} element DOM节点
-     * @returns {Boolean} 返回布尔值。true 表示元素内有值，false 表示元素内是空的
-     */
-    function hasNonEmptyTextContent(element) {
-        return Array.from(element.childNodes).some(node => {
-            return node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== "";
-        });
     }
 
 
