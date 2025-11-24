@@ -345,6 +345,13 @@
                         <button type="button" id="btn-iframe-back" class="ne-btn linear">嵌入可返回</button>
                     </div><!--/.grid-module-content-->
                 </div><!--/.grid-module-block-->
+
+                <div class="grid-module-block">
+                    <div class="grid-module-caption">返回顶部</div>
+                    <div class="grid-module-content">
+                        <button type="button" id="btn-show-go2Top" class="ne-btn linear">右下角或左下角显示返回顶部</button>
+                    </div><!--/.grid-module-content-->
+                </div><!--/.grid-module-block-->
             </section>
 
         </main>
@@ -805,6 +812,23 @@
                 })
             });
 
+
+
+            /*+----------------------------+*/
+            //=====右下角或左下角显示返回顶部按钮
+            $('#btn-show-go2Top').on('click', function(){
+                neui.goToTop({
+                    enable: true, // 是否启用，默认true(可选)
+                    zIndex: 2, // 层次，默认2(可选)
+                    direction: "right", // 方向，默认right(可选)。值： right 右侧, left 左侧
+                    bottom: "5%", // 距离底部的距离，默认5%(可选)。可使用的值类型有：5或5px或5%
+                    opacity: .6, // 透明度，默认0.6(可选)。值：0到1，1表示完全不透明，0 表示完全透明
+                    title: "TOP", // 文字，默认TOP(可选)
+                    showTitle: true, // 是否显示文字，默认true(可选)。值为false时只显示一个箭头
+                    distance: 200, // 往下滚动多少距离时才显示本控件，默认200px(可选)。可使用的值类型有：5或5px
+                    alwaysShow: true // 是否一直显示本控件，默认false(可选)。值为true时，distance 参数失效。
+                });
+            });
 
             
         }); //$(function(){});

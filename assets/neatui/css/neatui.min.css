@@ -4,7 +4,7 @@
 * 小巧UI前端框架
 * Author：mufeng
 * Date: 2021.01.11
-* Update: 2025.05.15
+* Update: 2025.11.24
 *================================================*/
 
 /*+================================================================================+*/
@@ -1787,3 +1787,51 @@ pre, pre code {
 .stages__monthly{ font-size: 14px; color: #666; }
 .stages__con{ }
 .stages__con>div{ display: inline-block; vertical-align: center; margin-left: 4px; color: #999; font-size: 12px; }
+
+
+
+/*+================================================================================+*/
+/*                                 滚动到顶部
+/*+================================================================================+*/
+.ne-goToTop {
+    position: fixed;
+    z-index: 2;
+    bottom: 5%;
+    padding: 2px 4px;
+    background: #000;
+	opacity: .6;
+	filter: alpha(opacity = 60);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+    color: #fff;
+    font-size: 10px;
+    cursor: pointer;
+}
+/* .ne-goToTop:hover {
+    opacity: .5;
+    filter: alpha(opacity = 50);
+} */
+.ne-goToTop:before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    margin: 5px 0 5px 8px;
+    border-style: solid;
+    border-color: #fff;
+    border-width: 1px 1px 0 0;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+.ne-goToTop icon {
+	display: block;
+	width: 1px;
+	height: 22px;
+	margin-top: -13px;
+	margin-left: 12px;
+	background-color: #fff;
+}
+.ne-goToTop.has-no-text {
+	width: 32px;
+}
