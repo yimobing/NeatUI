@@ -52,6 +52,23 @@ var selectUi = {
 		var type = obj[0].tagName.toLocaleLowerCase(); //绑定元素的类型（即标签名称):input 、 span 、div 、 select
 		//注:$('#selector')[0].tagName.toLocaleLowerCase(); 用于获取元素名称，如input span div等
 		return type;
+	},
+
+	/*
+	* 提示对话框
+	* @param {String} str 提示信息内容
+	*/
+	dialog: function(str) {
+		if(typeof neuiDialog == 'undefined') {
+			alert(str);
+		}
+		else {
+			neuiDialog.alert({
+				animate: true,
+				message: str,
+				buttons: ['确定']
+			})
+		}
 	}
 	
 }; //END OBJECT selectUi
@@ -102,7 +119,17 @@ var neuiSelect = {
 				caption = settings.title,
 				height = settings.itemHeight,
 				amount = settings.itemShowCount;
-				
+		// 数据校验
+		if(typeof jsonData.data == 'undefined') {
+			selectUi.dialog('数据源不含data参数，请检查。<br>标准格式参考: {data: [{id: "项一隐藏值", value: "项一显示值"}, {id: "项二隐藏值", value: "项二显示值"}]}');
+			return;
+		}
+		if(jsonData.data.length == 0) {
+			var tooTip = settings.title.toString().replace(/\s+/g, '') === '' ? '数据源数组为空，即{data:[]}，请检查' : settings.title + '没有数据，请检查。<br>注：您给的数据源为{data:[]}';
+			selectUi.dialog(tooTip);
+			return;
+		}
+		//
 		var $json = this.jsonChange(jsonData.data,jsonFormat); //json标准化
 		//console.log('标准json',$json);
 		if(typeof(showCursor)=='function') showCursor(obj); //添加假光标
