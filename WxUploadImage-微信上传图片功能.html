@@ -319,8 +319,9 @@
              function fnUploadImage(ps_xqbh){
                 var allImgJson = {data:[ ] } // 这个要放外面,若放内部,则会出现undefined情况(把setTimeout去掉时)
                 return new Promise(function(resolve, reject){
-                    // · 后台实际操作
-                    // 后台返回
+                    // 后台返回 ajax({})
+                    // mock 请放开下述 “后台实际操作” 代码
+                                // · 后台实际操作
                     /*
                     // --------START 开始图片上传--------
                     var isContinue = true;
@@ -481,7 +482,8 @@
                     */
 
                     
-                    // ·前台模拟操作(生产环境下请注释掉本段代码)
+                    // mock 请删除下述 “前台模拟操作” 代码
+                    // · 前台模拟操作(生产环境下请注释掉本段代码)
                     setTimeout(function(){ // 模拟异步
                         var countPic = 3; // 总计N张图片
                         for(var i = 0; i < countPic; i++){
