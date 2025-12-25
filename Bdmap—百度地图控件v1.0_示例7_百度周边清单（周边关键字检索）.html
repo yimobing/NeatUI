@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>周边关键字检索</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!-- 前端框架 -->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!-- 对话框 -->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"> <!-- 下拉 -->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css"> <!-- 百度地图控件 -->
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan.css?v=20251224-3">
+</head>
+<body>
+    <style>
+        
+    </style>
+
+
+    <div class="bds">
+        <div class="bds__graph">
+            <div class="bds__graph_coord">
+                <div class="bds__graph_coord_row">
+                    <div class="bds__graph_coord_row_title"> 城市 </div>
+                    <div class="bds__graph_coord_row_content">
+                        <input type="text" id="c-city" placeholder="城市名称，如泉州市或者泉州市丰泽区" onblur="this.placeholder='城市名称，如泉州市或者泉州市丰泽区'" onfocus="this.placeholder=''">
+                    </div>
+                    <div class="bds__graph_coord_row_btn">
+                        <button type="button" class="ne-btn has-texture blue" id="btn-pick-locate"> 快速定位 </button>
+                    </div>
+                </div> <!--/."bds__graph_coord_row-->
+                <div class="bds__graph_coord_row">
+                    <div class="bds__graph_coord_row_title"> 坐标 </div>
+                    <div class="bds__graph_coord_row_content">
+                        <input type="text" id="c-locate" readonly>
+                    </div>
+                    <!-- <div class="bds__graph_coord_row_btn">
+                        <button type="button" class="ne-btn has-texture blue" id="btn-pick-copy"> 复制 </button>
+                    </div> -->
+                </div> <!-- /."bds__graph_coord_row-->
+                <div class="bds__graph_coord_row">
+                    <label> (在地图上任意位置点击可更改中心点坐标，也可拖拽中心点) </label>   
+                </div> <!--/.bds__graph_coord_row-->
+            </div> <!--/.bds__graph_coord-->
+
+            <div class="bds__graph_map">
+                <div class="bds__graph_map_container">
+                    <div id="area"></div>
+                </div>
+            </div> <!--/.bds__graph_map-->
+        </div> <!--/.bds__graph-->
+
+        <div class="bds__search">
+            <div class="bds__search_form">
+                <div class="bds__search_form_content">
+                    <div class="bds__search_form_box">
+                        <div class="bds__search_form_box_title"> 附近项目 </div>
+                        <div class="bds__search_form_box_content">
+                            <input type="text" id="s-near" placeholder="附近关键字，如：医院" onblur="this.placeholder='附近关键字，如：医院'" onfocus="this.placeholder=''">
+                        </div>
+                    </div>
+                    <div class="bds__search_form_box">
+                        <div class="bds__search_form_box_title"> 范围(半径) </div>
+                        <div class="bds__search_form_box_content">
+                            <input type="text" id="s-range" placeholder="半径，如：1000" onblur="this.placeholder='半径，如：1000'" onfocus="this.placeholder=''">
+                            <em> 米(m) </em>
+                        </div>
+                    </div>
+                </div> <!--/.bds__search_form_content-->
+                <div class="bds__search_form_btn">
+                    <button type="button" class="ne-btn has-texture blue" id="btn-query"> 查询 </button>    
+                </div>
+            </div> <!-- /.bds__search_form-->
+            <div class="bds__search_result">
+                <textarea id="r-result"></textarea> 
+            </div>
+        </div> <!-- /.bds__search-->
+    </div> <!--/.bds-->
+   
+
+    
+
+    <!-- ================================================================================-->
+    <!--                             JAVASCRIPT                                          -->
+    <!-- ================================================================================-->
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script> <!-- Jq库-->
+    <script src="assets/libs/jquery.chineseDistricts.js"></script> <!-- 省市区数据源 -->
+    <script src="assets/neatui/js/neatui.min.js"></script> <!-- 前端框架 -->
+    <script src="assets/neatui/js/neatui-dropdown.js"></script> <!-- 下拉 -->
+    <script src="assets/neatui/js/neatui-dialog.js"></script> <!-- 对话框-->
+    <script src="assets/neatui/js/neatui-bdmap.js"></script> <!-- 百度地图控件 -->
+    <script>
+        /*+————————————————全局变量————————————————+*/
+        // 默认值
+        var DEFAULT_NEAR = '学校'; // 附近项目默认值
+        var DEFAULT_RANGE = 1000; // 范围、半径默认值。单位米(m)
+        
+        
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                                   初始化
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        // 查询输入框默认值
+        $('#s-near').val(DEFAULT_NEAR); // 附近项目
+        $('#s-range').val(DEFAULT_RANGE); // 范围、半径
+
+
+        //——————————————————————————————————————————
+        // 初始化地图宽高
+        setDituSize();
+        
+        //——————————————————————————————————————————
+        // 检测窗口变化事件
+        // $(window).on('resize',function(){
+        //     setDituSize();
+        // });
+
+
+        //——————————————————————————————————————————
+        /**
+         * 函数：设置地图宽高
+         * (高度一定要设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
+         */
+        function setDituSize(){
+            var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
+                winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
+            // 整个区域
+            var eleAll = $('.bds'),
+                allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
+                allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
+                allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
+                allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
+                allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
+                allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
+                allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
+                allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
+            //  console.log('整个区域\nMargin左边距：',allMargLeft,'\nMargin右边距：',allMargRight,'\nPadding左边距：',allPadLeft,'\nPadding右边距：',allPadRight,'\nMargin上边距：',allMargTop,'\nMargin下边距：',allMargBot,'\nPadding上边距：',allPadTop,'\nPadding下边距：',allPadBot);
+            // 顶部区域
+            var eleTop = $('.bds__graph_coord'),
+                topHeight = eleTop.outerHeight(true);
+            // 地图区域
+            var eleTu = $('.bds__graph_map'),
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
+                tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
+                tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
+                tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
+                tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
+                tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
+            // 计算宽高
+            var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
+                allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
+                tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
+                tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
+            // console.log('bodyWidth：',$('body').width(),'\nallMargLeft:',allMargLeft,'\nallMargRight:',allMargRight,'\nallPadLeft:',allPadLeft,'\nallPadRight:',allPadRight);
+            // console.log('tuMargLeft:',tuMargLeft,'\ntuPadLeft:',tuPadLeft,'\ntuPadLeft:',tuPadLeft,'\ntuPadRight:',tuPadRight);
+            // console.log('--------------------------------');
+            // // 设置地图宽高
+            // $('.bds__graph_map_container').css({
+            //     width: tuWidth,
+            //     height: tuHeight
+            // })
+            // $('#area').css({
+            //     width: eleTu.width(),
+            //     height: eleTu.height()
+            // })
+
+             // 设置地图宽高
+             var width = eleTu.width() - 15;
+             $('.bds__graph_map_container').css({
+                width: width + 10,
+                height: width + 10
+            })
+            $('#area').css({
+                width: width,
+                height: width
+            })
+
+            // var width = 400, height = 400;
+            // $('.bds__graph_map_container').css({
+            //     width: width + 10,
+            //     height: height + 10
+            // })
+            // $('#area').css({
+            //     width: width,
+            //     height: height
+            // })
+        }
+
+
+
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                          百度地图上展示数据并进行交互操作
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        // 地图初始化参数
+        var options = {
+           // 地图大小。width/height参数值：数值型或百分比类型(如1920,1920px,90%)表示具体的大小,字符串型 auto 表示自动调整,fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
+            width: 'auto', // 宽(可选)，默认auto
+            height: 'auto', // 高(可选)，默认auto
+            autoResize: true, // 窗口变化时是否自动调整地图大小(可选)，默认true
+            setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于参数width/height/autoResize
+                setDituSize();
+            },
+            onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于参数width/height/autoResize
+                setDituSize();
+            },
+            zoom: 13, // 地图缩放级别(可选)，默认11。 值：3-19
+            // 中心点(可选)
+            center: {
+                city: "", // 城市(可选)，默认空。值：空时根据坐标定位,非空时根据城市定位。eg.'泉州市',eg.'泉州市惠安县'。
+                coordinate: "118.595776,24.916136", // 坐标(可选)，默认为首都北京天安门广场的坐标,eg."经度,纬度"。
+                caption: "", // 标题文字(可选)，默认'北京市'。支持HTML
+                describe: "", // 描述文字(可选)，默认空。
+                // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度,lat : 纬度}
+                complete: function(e){
+                    $('#c-locate').val(e.lng + ',' + e.lat);
+                },
+                enableClickCreateNew: true, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
+                // 点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度,lat : 纬度}
+                clickCallback: function(e){
+                    // console.log('click-e：', e);
+                    $('#c-locate').val(e.lng + ',' + e.lat); // 输入框赋值
+                    var titleStr = '当前坐标如下：<br>' + e.lng + ',' + e.lat;
+                    neuiBdmap.setCenterPointLabelTitle(titleStr);
+                },
+                enableDrag: true, // 是否允许拖拽(可选)，默认false
+                // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度,lat : 纬度}
+                dragEnd: function(e){
+                    // console.log('drap-e：', e);
+                    $('#c-locate').val(e.lng + ',' + e.lat);
+                    var titleStr = '当前坐标如下：<br>' + e.lng + ',' + e.lat;
+                    neuiBdmap.setCenterPointLabelTitle(titleStr);
+                },
+            },
+            // 功能与配置项(可选)
+            draft: { // 地图底图功能(可选)
+                switchType: { // 切换地图类型(可选)
+                    enable: true, // 是否开启(可选)，默认false
+                    types: ['normal','satellite','hybrid'], // 配置地图类型(可选)。数组元素可添加的值: normal 普通街道视图,satellite 卫星视图,hybrid 卫星和路网的混合视图 
+                    direction: 'topRight', // 位置(可选)，默认空右下角。值： topLeft 左上角,topRight 右上角,bottomLeft 左下角,bottomRight 右下角
+                    offset: { // 位置偏移量(可选)
+                        width: 10, // 水平方向数值(可选)，默认10
+                        height: 50 // 竖直方向数值(可选)，默认50
+                    }
+                },
+                copyright: { // 版权信息(可选)
+                    enable: false, // 是否开启(可选)，默认false
+                    direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角,topRight 右上角,bottomLeft 左下角,bottomRight 右下角
+                    content: '快评电脑端', // 版权文本信息(可选)，默认空
+                    offset: { // 位置偏移量(可选)
+                        width: 10, // 水平方向数值(可选)，默认10
+                        height: 5 // 竖直方向数值(可选)，默认5
+                    }
+                }
+            },
+        }
+
+
+        //————————————————————————————————————————————————
+        // 创建地图并初始化
+        neuiBdmap('area', options);
+        var map = neuiBdmap.getMap();
+
+
+
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                          系列事件
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        // 复制按钮、复制当前坐标
+        // $('#btn-pick-copy').on('click',function(){
+        //     console.log('bbb')
+        //     var $text = $(this).parent().siblings().find('#c-locate');
+        //     var value = $text.val();
+        //     $text[0].select();
+        //     document.execCommand("Copy"); // 执行浏览器复制命令
+        //     var tips = '已复制好，可贴粘！';
+        //     // alert(tips);
+        //     neuiDialog.notice({
+        //         message: tips,
+        //         theme: 'black',
+        //         maskOpacity: 1
+        //     })
+        // });
+
+
+        //——————————————————————————————————————————
+        // 范围半径输入事件：只允许输入正整数
+        $('#s-range').on('input', function(){
+            var value = $(this).val();
+            value = value.toString().replace(/[^\d]/g,'');
+		    $(this).val(value);
+        });
+
+
+
+        //——————————————————————————————————————————
+        // 附近项目下拉
+        $('#s-near').on('click',function(){
+            var $this = $(this);
+            var nearData = {
+                "data":[
+                    { "value": "学校" },
+                    { "value": "医院" },
+                    { "value": "公园" },
+                    { "value": "超市" },
+                    { "value": "商场" },
+                    { "value": "公交站" },
+                    { "value": "景点" },
+
+                    { "value": "体育馆" },
+                    { "value": "电影院" },
+                    { "value": "剧院" },
+                    { "value": "餐厅" },
+                    { "value": "酒店" },
+                    { "value": "便利店" },
+                    { "value": "购物中心" },
+                    { "value": "电影院" },
+                    { "value": "博物馆" }
+                ]
+            }
+            neuiDropdown({
+                caption: '',
+                json: nearData,
+                format:["value"]
+            },this) 
+        });
+
+
+        //——————————————————————————————————————————
+        // 范围下拉
+        $('#s-range').on('click',function(){
+            var $this = $(this);
+            var rangeData = {
+                "data":[
+                    { "value": "1000" },
+                    { "value": "1500" },
+                    { "value": "2000" },
+                    { "value": "2500" },
+                    { "value": "3000" },
+                    { "value": "3500" },
+                    { "value": "4000" },
+                    { "value": "4500" },
+                    { "value": "5000" },
+                    { "value": "5500" },
+                    { "value": "6000" },
+                    { "value": "6500" },
+                    { "value": "7000" },
+                    { "value": "8000" },
+                    { "value": "9000" },
+                    { "value": "9500" },
+                    { "value": "10000" }
+                ]
+            }
+            neuiDropdown({
+                caption: '',
+                json: rangeData,
+                format:["value"]
+            },this) 
+        });
+
+
+
+        //——————————————————————————————————————————
+        // 城市下拉
+        $('#c-city').on('click', function(){
+            var value = $(this).val();
+            var districtData = {
+                "data": [
+                    { "province": "福建省", "data": [
+                        { 
+                            "city": "泉州市", 
+                            "data": [
+                            {"county": "鲤城区"},
+                            {"county": "丰泽区"},
+                            {"county": "洛江区"},
+                            {"county": "泉港区"},
+                            {"county": "石狮市"},
+                            {"county": "晋江市"},
+                            {"county": "南安市"},
+                            {"county": "惠安县"},
+                            {"county": "安溪县"},
+                            {"county": "永春县"},
+                            {"county": "德化县"},
+                            {"county": "金门县"}
+                        ]},{ 
+                            "city": "宁德市", 
+                            "data": [
+                            {"county": "蕉城区"},
+                            {"county": "福安市"},
+                            {"county": "福鼎市"},
+                            {"county": "霞浦县"},
+                            {"county": "古田县"},
+                            {"county": "屏南县"},
+                            {"county": "寿宁县"},
+                            {"county": "周宁县"},
+                            {"county": "柘荣县"}
+                        ]},{ 
+                            "city": "福州市‌", 
+                            "data": [
+                            {"county": "鼓楼区"},
+                            {"county": "台江区"},
+                            {"county": "仓山区"},
+                            {"county": "马尾区"},
+                            {"county": "晋安区"},
+                            {"county": "长乐区"},
+                            {"county": "福清市"},
+                            {"county": "闽侯县"},
+                            {"county": "连江县"},
+                            {"county": "罗源县"},
+                            {"county": "闽清县"},
+                            {"county": "永泰县"},
+                            {"county": "平潭县"}
+                        ]},{ 
+                            "city": "莆田市", 
+                            "data": [
+                            {"county": "城厢区"},
+                            {"county": "涵江区"},
+                            {"county": "荔城区"},
+                            {"county": "秀屿区"},
+                            {"county": "仙游县"}
+                        ]},{ 
+                            "city": "‌厦门市‌", 
+                            "data": [
+                            {"county": "思明区"},
+                            {"county": "海沧区"},
+                            {"county": "湖里区"},
+                            {"county": "集美区"},
+                            {"county": "同安区"},
+                            {"county": "翔安区"}
+                        ]},{ 
+                            "city": "‌漳州市‌", 
+                            "data": [
+                            {"county": "芗城区"},
+                            {"county": "龙文区"},
+                            {"county": "龙海区"},
+                            {"county": "长泰区"},
+                            {"county": "漳浦县"},
+                            {"county": "云霄县"},
+                            {"county": "诏安县"},
+                            {"county": "东山县"},
+                            {"county": "南靖县"},
+                            {"county": "平和县"},
+                            {"county": "华安县"}
+                        ]},{ 
+                            "city": "‌三明市‌", 
+                            "data": [
+                            {"county": "三元区"},
+                            {"county": "沙县区"},
+                            {"county": "永安市"},
+                            {"county": "明溪县"},
+                            {"county": "清流县"},
+                            {"county": "宁化县"},
+                            {"county": "大田县"},
+                            {"county": "尤溪县"},
+                            {"county": "将乐县"},
+                            {"county": "泰宁县"},
+                            {"county": "建宁县"},
+                            {"county": "莆田市‌"}
+                        ]},{ 
+                            "city": "‌龙岩市‌", 
+                            "data": [
+                            {"county": "新罗区"},
+                            {"county": "永定区"},
+                            {"county": "漳平市"},
+                            {"county": "长汀县"},
+                            {"county": "上杭县"},
+                            {"county": "武平县"},
+                            {"county": "连城县"},
+                            {"county": "宁德市‌"}
+                        ]},{ 
+                            "city": "南平市‌", 
+                            "data": [
+                            {"county": "延平区"},
+                            {"county": "建阳区"},
+                            {"county": "邵武市"},
+                            {"county": "武夷山市"},
+                            {"county": "建瓯市"},
+                            {"county": "顺昌县"},
+                            {"county": "浦城县"},
+                            {"county": "光泽县"},
+                            {"county": "松溪县"},
+                            {"county": "政和县"}
+                        ]}
+                    ]}
+                ]
+            }
+            neuiDropdown({
+                // position: 'fixed',
+                caption: '',
+                chain: true, // 是否省市区同框联动.默认false
+                level: 3, // 省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
+                json: districtData, // 数据源不填时，将默认自动调用全国省市区数据源
+                // areaFormat: ["province", "city", "county"], // 地区显示值JSON格式(可缺省)
+                // keyFormat: ["provinceId", "cityId", '"ountyId"], // 地区隐藏值JSON格式(可缺省)
+                
+                // id: '350000-350500-350503',
+                entire:'全部',
+                isEntireRegion: 'county', // 限制默认下拉值添加在哪里(可选). all 省份、城市、区县上都加(默认), province 仅加在省份上, city 仅加在城市上, county 仅加在区县上
+                value: value,
+
+                isCnClose: true, // 当省市区同框联动,是否点了"全部"选项后就马上填充值并关闭控件(可缺省),默认true
+                isCnPartEmpty: true, // 当省市区同框联动,选中下拉值后当城市或区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省", eg3. "全部-全部-全部" 变成 "全部"
+                isCnAllEmpty:false, // 当省市区同框联动, 选中下拉值后当省份、城市、区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省"， eg3. "全部-全部-全部" 变成 ""
+                // 说明：isCnAllEmpty=true 具有 isCnPartEmpty=true 的功能，并且还能将省份值为"全部"时也替换成空
+
+                showCloseButton: true,
+                beautifyScrollBar: false, // 是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式
+                // closeButtonAppearance: 'image', // 关闭按钮的外观. text 文字（默认），image 图片.
+                callBack:function(e){
+                    // console.log('省市区同框联动下拉回调：', e);
+                }
+            }, this)
+        });
+
+
+
+        //——————————————————————————————————————————
+        // 城市快速定位按钮
+        $('#btn-pick-locate').on('click', function(){
+            var ls_city = $('#c-city').val();
+            if(ls_city == '') {
+                neuiDialog.alert({
+                    animate: true,
+                    message: '请填写：城市名称',
+                    buttons: ['确定']
+                })
+                return;
+            }
+            // 数据过滤，去掉省份自治区及短横线等字符
+            var cityName = ls_city.toString().replace(/(\-|\,|\s+)/g, '');
+            cityName = cityName.indexOf('省') >= 0 || cityName.indexOf('自治区') >= 0 ? cityName.replace(/^(.*?省|自治区)(.*)/g, '$2') : cityName;
+            // console.log("城市：", nowCityName)
+            map.clearOverlays(); // 清空所有覆盖物
+            // map.setCenter(nowCityName); // 定位到指定城市
+
+            // 获取地址坐标
+            var myGeo = new BMap.Geocoder(); // 创建地址解析器实例    
+            myGeo.getPoint(cityName, function(point){ // 将地址解析结果显示在地图上，并调整地图视野
+                // console.log('point：', point)    
+                if (point) {      
+                    map.centerAndZoom(point, 13);      
+                    map.addOverlay(new BMap.Marker(point));
+                    var lng = point.lng, lat = point.lat;
+                    $('#c-locate').val(lng + ',' + lat);
+                }      
+            }); // , "北京市"
+        });
+
+
+
+        //——————————————————————————————————————————
+        // 查询按钮：周围边关键字搜索
+        $('#btn-query').on('click', function(){
+            var zuobiao = $('#c-locate').val(), // 坐标
+                keywords = $('#s-near').val(), // 附近项目，关键字
+                radius = $('#s-range').val(); // 范围，半径
+            var coordinateArr = zuobiao.split(',');
+            radius = isNaN(parseFloat(radius)) ? DEFAULT_RANGE : radius;
+            // console.log('coordinateArr：', coordinateArr, '\nkeywords：', keywords, '\nradius:', radius);
+            var tips = '';
+            if(keywords == '') tips += '附近项目、';
+            if(radius == '') tips += '范围、';
+            if(tips != '') {
+                neuiDialog.alert({
+                    animate: true,
+                    message: '请填写：' + tips.substring(0, tips.length - 1),
+                    buttons: ['确定']
+                });
+                return;
+            }
+
+
+            map.clearOverlays(); // 清空所有覆盖物
+
+            //
+            var point = new BMap.Point(coordinateArr[0], coordinateArr[1]); // 泉州古城
+            var local = new BMap.LocalSearch(point, {
+                renderOptions: {
+                    map: map, // 展现结果的地图实例。当指定此参数后，搜索结果的标注、线路等均会自动添加到此地图上
+                    // panel: '', // String | HTMLElement 结果列表的HTML容器id或容器元素，提供此参数后，结果列表将在此容器中进行展示。此属性对LocalCity无效。驾车路线规划无效
+                    // selectFirstResult: false, // 是否选择第一个检索结果。此属性仅对LocalSearch有效
+                    autoViewport: true, // 检索结束后是否自动调整地图视野。此属性对LocalCity无效
+                },
+                // pageCapacity: 100, // 设置每页容量，取值范围：1 - 100，对于多关键字检索，容量表示每个关键字的数量，如果有2个关键字，则实际检索结果数量范围为：2 - 200
+                
+                // 检索完成后的回调函数。 参数：results: LocalResult或Array 如果是多关键字检索，回调函数参数返回一个LocalResult的数组，数组中的结果顺序和检索中多关键字数组中顺序一致
+                onSearchComplete: function(results){
+                    // console.log('周边医院返回结果：results：', results);
+                    // 判断状态是否正确
+                    // console.log('status：', local.getStatus())
+                    if (local.getStatus() == 0){
+                        var s = [];
+                        var locates = results.Rr;
+                        for (var i = 0; i < locates.length; i++){
+                            var locate = locates[i];
+                            s.push(locate.title);
+                        }
+                        // document.getElementById("r-result").innerHTML = s.join("<br/>")
+                        $('#r-result').val(s.join('\r\n'));
+                    }
+                }
+            });
+            // local.search(keywords);
+            // local.searchNearby(keyword: String | Array<String>, center: LocalResultPoi | String | Point , radius: Number, option: Object)
+            local.searchNearby(keywords, point, radius); // 设置半径. radius 表示半径
+            local.setPageCapacity(100); // 设置每页容量
+        });
+
+
+    </script>
+</body>
+</html>

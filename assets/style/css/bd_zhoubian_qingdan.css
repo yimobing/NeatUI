@@ -1,0 +1,258 @@
+@charset "utf-8";
+
+/**
+* 小工具 -> 百度周边清单
+* Date: 2025.12.21
+* Update: 2025.12.24
+*/
+/*+ --------  -------- +*/
+
+html,
+body {
+    width: 99.5%;
+    margin: 0.25% auto;
+    height: 99.5%;
+    overflow: hidden;
+}
+* {
+    margin: 0;
+    padding: 0;
+    -moz-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/*+ placeholder +*/
+::-webkit-input-placeholder{
+	/* color: #bfbfbf; */
+	color: #e2dcdc;
+	font-size: 12px;
+}
+::-moz-placeholder{
+	color: #e2dcdc;
+	font-size: 12px;
+}
+:-moz-placeholder{
+	color: #e2dcdc;
+	font-size: 12px;
+}
+:-ms-input-placeholder{
+	color: #e2dcdc;
+	font-size: 12px;
+}
+
+/*+ --------  -------- +*/
+.bds {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    zoom: 1;
+	border: 1px solid #cac9c9;
+    border-radius: 4px;
+}
+
+.bds > div {
+    display: inline-block;
+    vertical-align: top;
+}
+
+
+/*+ -------- 左侧：地图区域 -------- +*/
+.bds__graph {
+    width: 30%;
+}
+.bds__graph_coord,
+.bds__graph_map {
+    padding: 5px 8px;
+}
+/*+ 地图坐标区域 +*/
+.bds__graph_coord {
+    border-bottom: 1px solid #e7e7e7;
+}
+.bds__graph_coord_row {
+    margin-top: 5px;
+}
+.bds__graph_coord_row:first-child {
+    margin-top: 0;
+}
+.bds__graph_coord_row > div {
+    display: inline-block;
+    vertical-align: middle;
+}
+.bds__graph_coord_row label {
+    display: block;
+    margin-left: 3px;
+    color: #999;
+    font-size: 10px;
+}
+.bds__graph_coord_row_title {
+    width: 40px;
+    text-align: right;
+    color: #666;
+    font-size: 14px;
+	font-weight: 550;
+}
+.bds__graph_coord_row_content {
+    width: 65%;
+}
+.bds__graph_coord_row_content input[type="text"] {
+    width: 100%;
+    height: 32px;
+    line-height: 28px\9;
+    margin-left: 5px;
+    padding: 0 5px;
+    background-color: #fcfcfc;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+.bds__graph_coord_row_content input[type="text"][readonly],
+.bds__graph_coord_row_content input[type="text"]:read-only {
+    background-color: #fdfdfd !important;
+}
+.bds__graph_coord_row_btn {
+    margin-left: 5px;
+}
+.bds__graph_coord_row_btn button[type="button"] {
+    padding: 0 8px;
+    font-size: 13px;
+}
+
+
+/*+ 地图容器区域：外层区域：地图容器及父级节点一定要设置height高度，不然地图可能无法显示 +*/
+.bds__graph_map {
+    height: 100%;
+	margin-top: 5px;
+}
+.bds__graph_map_container {
+    position: relative;
+    width: 100%;
+   	padding: 5px;
+    border: 1px solid #e7e7e7;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/*+ -------- 右侧：查询区域 -------- +*/
+.bds__search {
+    width: 69%;
+	height: 100%;
+	margin-left: -5px;
+	border-left: 1px solid #cac9c9;
+}
+.bds__search_form {
+    
+}
+.bds__search_form > div {
+    display: inline-block;   
+    vertical-align: middle;
+}
+.bds__search_form_content {
+    padding: 10px 15px;
+}
+
+.bds__search_form_box {
+    position: relative;
+    display: inline-block;   
+    vertical-align: middle;
+    margin-left: 10px;
+}
+.bds__search_form_box:first-child {
+    margin-left: 0;
+}
+.bds__search_form_box > div {
+    display: inline-block;   
+    vertical-align: middle;
+}
+.bds__search_form_box_title {
+    color: #888;
+    font-size: 14px;
+	font-weight: bold;
+}
+.bds__search_form_box_content {
+    
+}
+.bds__search_form_box_content input[type="text"] {
+    width: 150px;
+    padding: 7px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.bds__search_form_box_content em {
+    position: absolute;
+    z-index: 1;
+    right: 5px;
+    margin-top: 8px;
+    color: #999;
+    font-size: 12px;
+}
+.bds__search_form_btn {
+    margin-left: 10px;
+}
+
+.bds__search_result {
+
+    padding: 8px 15px;
+    border-top: 1px solid #e7e7e7;
+    text-align: center;
+}
+.bds__search_result textarea {
+    width: 100%;
+    height: 500px;
+    line-height: 1.8;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: auto;
+    color: #555;
+    font-size: 13px;
+}
+
+
+/*+ -------- 媒体查询 -------- +*/
+@media screen and (max-width: 1400px) {
+    .bds__graph {
+        width: 35%;
+    }
+    .bds__search {
+        width: 63%;
+    }
+}
+@media screen and (max-width: 1200px) {
+    .bds__graph {
+        width: 40%;
+    }
+    .bds__search {
+        width: 58%;
+    }
+}
+@media screen and (max-width: 1000px) {
+    .bds__graph {
+        width: 45%;
+    }
+    .bds__search {
+        width: 53%;
+    }
+	.bds__graph_coord_row_content {
+		width: 60%;
+	}
+	.bds__search_form_box_content input[type="text"] {
+		width: 90px;
+	}
+}
+@media screen and (max-width: 800px) {
+    .bds__graph {
+        width: 58%;
+    }
+    .bds__search {
+        width: 40%;
+    }
+	.bds__graph_coord_row_content {
+		width: 58%;
+	}
+}
