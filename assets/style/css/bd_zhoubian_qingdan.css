@@ -3,7 +3,7 @@
 /**
 * 小工具 -> 百度周边清单
 * Date: 2025.12.21
-* Update: 2025.12.24
+* Update: 2025.12.27
 */
 /*+ --------  -------- +*/
 
@@ -65,7 +65,7 @@ body {
 
 /*+ -------- 左侧：地图区域 -------- +*/
 .bds__graph {
-    width: 30%;
+    width: 55%;
 }
 .bds__graph_coord,
 .bds__graph_map {
@@ -91,6 +91,18 @@ body {
     color: #999;
     font-size: 10px;
 }
+.bds__graph_coord_column {
+	width: auto;
+	margin-left: 5px;
+}
+.bds__graph_coord_column:first-child {
+	margin-left: 0;
+}
+.bds__graph_coord_row_title,
+.bds__graph_coord_row_content {
+	display: inline-block;
+	vertical-align: middle;
+}
 .bds__graph_coord_row_title {
     width: 40px;
     text-align: right;
@@ -99,7 +111,7 @@ body {
 	font-weight: 550;
 }
 .bds__graph_coord_row_content {
-    width: 65%;
+    width: 25%;
 }
 .bds__graph_coord_row_content input[type="text"] {
     width: 100%;
@@ -122,6 +134,9 @@ body {
     padding: 0 8px;
     font-size: 13px;
 }
+.bds__graph_coord_column input[type="text"] {
+	width: 200px;
+}
 
 
 /*+ 地图容器区域：外层区域：地图容器及父级节点一定要设置height高度，不然地图可能无法显示 +*/
@@ -140,20 +155,19 @@ body {
 
 /*+ -------- 右侧：查询区域 -------- +*/
 .bds__search {
-    width: 69%;
+    width: 44%;
 	height: 100%;
 	margin-left: -5px;
 	border-left: 1px solid #cac9c9;
 }
 .bds__search_form {
-    
+    padding: 5px 10px;
 }
 .bds__search_form > div {
     display: inline-block;   
     vertical-align: middle;
 }
 .bds__search_form_content {
-    padding: 10px 15px;
 }
 
 .bds__search_form_box {
@@ -175,13 +189,76 @@ body {
 	font-weight: bold;
 }
 .bds__search_form_box_content {
-    
+    position: relative;
 }
+
+.bds__search_form_box_drop {
+	position: absolute;
+	z-index: 2;
+	left: 0;
+	right: 0;
+	width: 150px;
+	
+	background-color: #fff;
+	border: 1px solid #ddd;
+	
+	box-shadow: 0 1px 2px 0px #b6b6b6;
+}
+.bds__search_form_box_drop_list {
+	height: auto;
+	max-height: 450px;
+	overflow: auto;
+}
+.bds__search_form_box_drop li {
+	padding: 5px 12px;
+	border-top: 1px solid #ddd;
+}
+.bds__search_form_box_drop li:first-child {
+	border-top: 0;
+}
+.bds__search_form_box_drop li input[type="checkbox"],
+.bds__search_form_box_drop li span {
+	display: inline-block;
+	vertical-align: middle;
+}
+.bds__search_form_box_drop li input[type="checkbox"] {
+	margin-top: -2px;
+}
+.bds__search_form_box_drop li span {
+	margin-left: 8px;
+	color: #666;
+	font-size: 12px;
+}
+.bds__search_form_box_drop_operate {
+	padding: 5px 10px;
+	background-color: #f5f5f5;
+	border-top: 1px solid #ddd;
+	text-align: center;
+	color: #999;
+	font-size: 14px;
+	cursor: pointer;
+}
+.bds__search_form_box_drop_operate:hover {
+	opacity: .8;
+	filter: alpha(opacity = 80);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+}
+
+
 .bds__search_form_box_content input[type="text"] {
-    width: 150px;
+    width: 120px;
     padding: 7px 16px;
     border: 1px solid #ddd;
     border-radius: 4px;
+}
+.bds__search_form_box_content input[type="text"].l-2x {
+	width: 200px;
+}
+.bds__search_form_box_content input[type="text"].l-3x {
+	width: 300px;
+}
+.bds__search_form_box_content input[type="text"].l-small {
+	width: 80px;
 }
 .bds__search_form_box_content em {
     position: absolute;
@@ -192,7 +269,7 @@ body {
     font-size: 12px;
 }
 .bds__search_form_btn {
-    margin-left: 10px;
+    margin-left: 5px;
 }
 
 .bds__search_result {
@@ -215,44 +292,35 @@ body {
 
 
 /*+ -------- 媒体查询 -------- +*/
+@media screen and (max-width: 1600px) {
+	.bds__search_form_content {
+		width: 88%;
+	}
+}
 @media screen and (max-width: 1400px) {
-    .bds__graph {
-        width: 35%;
-    }
-    .bds__search {
-        width: 63%;
-    }
+	.bds__search_form_content {
+		width: 85%;
+	}
 }
 @media screen and (max-width: 1200px) {
-    .bds__graph {
-        width: 40%;
-    }
-    .bds__search {
-        width: 58%;
-    }
+	.bds__graph_coord_row_content {
+	    width: 45%;
+	}
+	.bds__search_form_content {
+		width: 82%;
+	}
 }
 @media screen and (max-width: 1000px) {
-    .bds__graph {
-        width: 45%;
-    }
-    .bds__search {
-        width: 53%;
-    }
 	.bds__graph_coord_row_content {
-		width: 60%;
+	    width: 55%;
 	}
-	.bds__search_form_box_content input[type="text"] {
-		width: 90px;
+	.bds__search_form_content {
+		width: 80%;
 	}
 }
 @media screen and (max-width: 800px) {
-    .bds__graph {
-        width: 58%;
-    }
-    .bds__search {
-        width: 40%;
-    }
-	.bds__graph_coord_row_content {
-		width: 58%;
+	.bds__search_form_content {
+		width: 75%;
 	}
+	
 }
