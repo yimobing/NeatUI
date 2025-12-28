@@ -94,9 +94,8 @@
             </div>
         </div><!--/.bds__editor-->
         <div class="bds__map">
-            <div id="map">
-                <div class="infoTips">默认不显示数据，请手动查询！</div>
-            </div>
+            <div class="infoTips">默认不显示数据，请手动查询！</div>
+            <div id="map"></div>
         </div><!--/.bds__map-->
     </div><!--/.bds-->
     
@@ -351,7 +350,8 @@
                 ls_xuexiao_mc = filter.html($('#s-school').val());
             var arr = [ ls_sheng_mc, ls_shi_mc, ls_qu_mc, ls_jiedao_mc, ls_shequ_mc, ls_xuexiao_mc ]
             // console.log('数组：', arr);
-            
+
+            $('.infoTips').hide(); // 隐藏提示信息区域
             // 校验完整性（所有条件必填)
             // var tips = '';
             // $(this).parents('.eform-row').prevAll().each(function(){

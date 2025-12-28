@@ -183,6 +183,8 @@
                 title: '', // 标题(可选)，默认空。支持HTML
                 describe: '', // 描述信息(可选)，默认空。支持HTML
                 message: '', // 信息窗口短信内容(可选)，默认空
+                autoViewport: true, // 是否自动调整视野，默认true
+                zoom: 13, // 自动调整视野时地图的缩放级别，默认13。值 3-19
                 dragable: false, // 是否允许拖拽(可选)，默认false
                 finishCallback: null, // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 dragEndCallback: null // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}

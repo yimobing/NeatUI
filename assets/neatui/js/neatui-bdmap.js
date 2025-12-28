@@ -8,7 +8,7 @@
  * Author: Mufeng
  * QQ: 1614644937
  * Date: 2024.12.03
- * Update: 2025.12.22
+ * Update: 2025.12.28
  */
 
 
@@ -254,11 +254,23 @@
             me.settings.status = true;
 
             // · 地图根节点
-            var container = elem.toString().replace(/(\#|\.)/g, '');
-            var nodeRoot = document.getElementById(container); // 根节点
-            var nodeParent = nodeRoot.parentNode; // 父节点
-            var nodeBody = document.getElementsByTagName('body'); // body节点
+            var containerRoot = elem.toString().replace(/(\#|\.)/g, '');
+            var nodeRoot = document.getElementById(containerRoot); // 根节点
+            if(nodeRoot == null) {
+                utils.dialogs('地图容器节点#' + containerRoot+ '不存在，请检查！');
+                return;
+            }
             nodeRoot.classList.add('ne-bd-map-root');
+            // · 创建一个子节点用于放地图
+            var nodeChild = document.createElement('div');
+            nodeRoot.appendChild(nodeChild);
+            nodeChild.className = 'ne-bd-map-child';
+            nodeChild.id = 'allMap';
+            var containerMap = nodeChild.id;
+            
+
+            var nodeBody = document.getElementsByTagName('body'); // body节点
+        
             // · 设置地图大小 (高度一定设置,不然在服务器环境如.net地图可能不显示)
             var w = me.settings.width.toString().toLocaleLowerCase().replace(/\s+/g, ''),
                 h = me.settings.height.toString().toLocaleLowerCase().replace(/\s+/g, ''),
@@ -272,8 +284,8 @@
             var fnSetMapSize = function () {
                 var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
                     winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
-                    left = utils.getElementLeft(nodeParent),
-                    top = utils.getElementTop(nodeParent);
+                    left = utils.getElementLeft(nodeRoot),
+                    top = utils.getElementTop(nodeRoot);
                 // console.log('视窗宽：', winW, '\n视窗高：', winH);
                 var bodyW = 0, bodyH = 0; // 内容大小
                 if (nodeBody != null && nodeBody.length > 0) {
@@ -300,22 +312,56 @@
                     地图父节点高度 = winH - top - 地图父节点(垂直方向margin总和)
                     地图容器高度 = 地图父节点高度 - 地图父节点(垂直方向padding总和) - 自身(垂直方向margin总和+padding总和)
                  */
-                var selfMpbObj = helpers._getElementMarginPaddingBorder(nodeRoot),
-                    fatMpbObj = helpers._getElementMarginPaddingBorder(nodeParent);
-                var fatW = winW,
-                    fatH = winH,
-                    realW = width,
-                    realH = height;
+                var selfMpbObj = helpers._getElementMarginPaddingBorder(nodeChild),
+                    fatMpbObj = helpers._getElementMarginPaddingBorder(nodeRoot);
+
+                // test2
+                // var fatW = winW,
+                //     fatH = winH,
+                //     realW = width,
+                //     realH = height;
+                // if (w.indexOf('auto') >= 0 || w === '') {
+                //     fatW = winW - left - fatMpbObj["marginHorizontal"];
+                //     realW = fatW - fatMpbObj["paddingHorizontal"] - (selfMpbObj["marginHorizontal"] + selfMpbObj["paddingHorizontal"]);
+                // }
+                // if (h.indexOf('auto') >= 0 || h === '') {
+                //     fatH = winH - top - fatMpbObj["marginVertical"];
+                //     realH = fatH - fatMpbObj["paddingVertical"] - (selfMpbObj["marginVertical"] + selfMpbObj["paddingVertical"]);
+                // }
+
+                var minSize = 100; // 地图大小最小值
+                var fatW = utils.getElementWidth(nodeRoot), 
+                    fatH = utils.getElementHeight(nodeRoot);
+                var realW = width,
+                    realH = height; 
+                // console.log('fatW-x：', fatW, '\nfatH-y：', fatH)
+                // 地图自动大小小于指定数值时提示用户
+                if(fatW <= minSize) {
+                    console.error('地图容器节点#' + containerRoot + '宽度小于' + minSize + '，请检查是否设置正确');
+                }
+                if(fatH <= minSize) {
+                    console.error('地图容器节点#' + containerRoot + '高度小于' + minSize + '，请检查是否设置正确');
+                }
+                // 设置地图宽高
                 if (w.indexOf('auto') >= 0 || w === '') {
-                    fatW = winW - left - fatMpbObj["marginHorizontal"];
+                    if(fatW <= minSize) {
+                        fatW = winW - left;
+                    }
+                    fatW = fatW - fatMpbObj["marginHorizontal"];
                     realW = fatW - fatMpbObj["paddingHorizontal"] - (selfMpbObj["marginHorizontal"] + selfMpbObj["paddingHorizontal"]);
                 }
                 if (h.indexOf('auto') >= 0 || h === '') {
-                    fatH = winH - top - fatMpbObj["marginVertical"];
+                    if(fatH <= minSize) {
+                        fatH = winH - top;
+                    }
+                    fatH = fatH - fatMpbObj["marginVertical"];
                     realH = fatH - fatMpbObj["paddingVertical"] - (selfMpbObj["marginVertical"] + selfMpbObj["paddingVertical"]);
                 }
                 // if (realW == 0) realW = winW;
                 // if (realH == 0) realH = winH;
+                // console.log('地图宽：', fatW, '\n高：', fatH);
+
+                
 
                 // console.log('------------------------');
                 // console.log('body宽：', bodyW, '\nbody高：', bodyH);
@@ -326,11 +372,11 @@
                 // console.log('------------------------');
 
                 // 设置地图容器大小
-                nodeRoot.setAttribute('style', 'width: ' + realW + 'px; height: ' + realH + 'px');
+                nodeChild.setAttribute('style', 'width: ' + realW + 'px; height: ' + realH + 'px');
                 // 设置地图父节点大小。分开写是为了防止父节点是body时会覆盖掉body原有样式
-                // nodeParent.setAttribute('style', 'width: ' + fatW + 'px; height: ' + fatH + 'px');
-                nodeParent.style.setProperty('width', fatW + 'px'); 
-                nodeParent.style.setProperty('height', fatH + 'px');
+                // nodeRoot.setAttribute('style', 'width: ' + fatW + 'px; height: ' + fatH + 'px');
+                // nodeRoot.style.setProperty('width', fatW + 'px'); 
+                // nodeRoot.style.setProperty('height', fatH + 'px');
             }
 
             // · 初始化设置地图大小
@@ -375,7 +421,7 @@
                 return;
             }
             var platOptions = me.settings.draft.platOptions;
-            var maper = new BMap.Map(container, platOptions);
+            var maper = new BMap.Map(containerMap, platOptions);
             // 第2步 设置中心点坐标
             var centerPoint = new BMap.Point(centerLng, centerLat);
             // 第3步 地图初始化同时设置地图展示级别
@@ -488,6 +534,8 @@
                 title: '', // 标题(可选)，默认空。支持HTML
                 describe: '', // 描述信息(可选)，默认空。支持HTML
                 message: '', // 信息窗口短信内容(可选)，默认空
+                autoViewport: true, // 是否自动调整视野，默认true
+                zoom: 13, // 自动调整视野时地图的缩放级别，默认13。值 3-19
                 dragable: false, // 是否允许拖拽(可选)，默认false
                 finishCallback: null, // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
                 dragEndCallback: null // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
@@ -498,6 +546,8 @@
                 title = finals.title,
                 describe = finals.describe,
                 message = finals.message,
+                autoViewport = finals.autoViewport,
+                zoom = finals.zoom,
                 dragable = finals.dragable;
             //
             var arr = coordinate.split(',');
@@ -562,6 +612,9 @@
                     fontFamily: '微软雅黑'
                 });
                 oneMark.setLabel(label); // 绑定文本标注到点标记上
+                if(autoViewport) {
+                    maper.centerAndZoom(markPoint, zoom); // 自动调整视野
+                }
                 maper.addOverlay(label);
                 // 更改文本标注节点样式及位置
                 setTimeout(function () {
