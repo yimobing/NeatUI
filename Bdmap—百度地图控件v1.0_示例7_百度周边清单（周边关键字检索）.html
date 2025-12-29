@@ -400,6 +400,7 @@
             $dropNode.show();
         });
 
+
         //——————————————————————————————————————————
         // 选择单个项目时
         $(document).on('click', '.bds__search_form_box_drop_list li span', function(e){
@@ -410,7 +411,7 @@
         });
 
         //——————————————————————————————————————————
-        // 点击其它地方隐藏附近项目下拉
+        // 点击确定按钮时隐藏附近项目下拉
         $('.bds__search_form_box_drop_operate').on('click', function(e){
             var target = e.target.closest('.bds__search_form_box_drop');
             // console.log('len：', $(target).length)
@@ -419,12 +420,13 @@
                 fn_done_near_drop_close_event();
             }
         });
+        // 点击其它地方隐藏附近项目下拉
         $(document).on('click', function(e) {
             var target = e.target.closest('.bds__search_form_box_drop, #btn-choose-near');
             // console.log('len-x：', $(target).length)
             if($(target).length == 0) {
                 $('.bds__search_form_box_drop').hide();
-                fn_done_near_drop_close_event();
+                // fn_done_near_drop_close_event();
             }
         });
 

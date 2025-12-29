@@ -3,7 +3,7 @@
 /**
 * 小工具 -> 百度周边清单
 * Date: 2025.12.21
-* Update: 2025.12.27
+* Update: 2025.12.29
 */
 /*+ --------  -------- +*/
 
@@ -357,8 +357,8 @@ body {
 
 
 .bds__search_form_box_content input[type="text"] {
-    width: 120px;
-    padding: 7px 16px;
+    width: 100px;
+    padding: 7px 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
