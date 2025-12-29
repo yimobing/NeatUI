@@ -8,7 +8,7 @@
  * Author: Mufeng
  * QQ: 1614644937
  * Date: 2024.12.03
- * Update: 2025.12.28
+ * Update: 2025.12.29
  */
 
 
@@ -263,7 +263,8 @@
             nodeRoot.classList.add('ne-bd-map-root');
             // · 创建一个子节点用于放地图
             var nodeChild = document.createElement('div');
-            nodeRoot.appendChild(nodeChild);
+            nodeRoot.innerHTML = ''; // 先清空节点内容
+            nodeRoot.appendChild(nodeChild); // 再拼接子节点
             nodeChild.className = 'ne-bd-map-child';
             nodeChild.id = 'allMap';
             var containerMap = nodeChild.id;
