@@ -151,13 +151,15 @@
         //=====上传图片/加号按钮
         var file = document.getElementById("file");
         neuiCanvasUpload.uploadFile({
-            selector: file, // 上传图片节点Dom对象
+            selector: file, // 上传标签dom对象,一般为<input type="file" id="file">标签的dom对象。格式：dom对象或#id或#classname。注：此参数与 container 只需二选一
+            container: '', // 父容器节点，动态节点时用。当有动态增加的节点要上传时就需要把事件绑定到父容器节点上才能触发事件。注：此参数与 selector 只需二选一。
             maxWidth: 1200, // 图片最大宽度(PX). 尺寸最大可设1200px
             maxSize: 200, // 图片最大质量(KB). 质量最大200kb
             minSize: 1, // 图片最小质量(KB),默认1(可选)
             quality: 0.7, // 图片压缩系数, 0-1之间
-            callBack: function (arr) { // 回调
-                console.log('上传后的图片地址数组:',arr);
+            fileType: [], // ["png", "gif", "jpg", "jpeg", "pdf"], // 图片类型限制(必须)，默认为空，表示不限制类型
+            callBack: function (arr, el) { // 回调
+                // console.log('上传后的图片地址数组:',arr, '\n上传节点：', el);
                 //  neui.showAnimate('上传中..');
                 setTimeout(function() {
                     var tips = '';
