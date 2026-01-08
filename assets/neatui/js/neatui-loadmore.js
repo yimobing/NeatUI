@@ -728,7 +728,7 @@
      * @returns {Boolean} 返回布尔值。true 表示元素内有值，false 表示元素内是空的
      */
     function hasNonEmptyTextContent(element) {
-        return Array.from(element.childNodes).some(node => {
+        return Array.from(element.childNodes).some(function(node){
             return node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== "";
         });
     }

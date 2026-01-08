@@ -419,7 +419,7 @@
             if(this.isArray(element)){
                 for(var i = 0; i < element.length; i++){
                     var elem = element[i];
-                    for(let key in attributes){
+                    for(var key in attributes){
                         if(Object.prototype.toString.call(attributes[key]) === '[object Object]'){
                             this.setAttributes(elem[key], attributes[key]);
                         }else{
@@ -430,7 +430,7 @@
             }
             else{
                 var elem = element;
-                for(let key in attributes){
+                for(var key in attributes){
                     if(Object.prototype.toString.call(attributes[key]) === '[object Object]'){
                         this.setAttributes(elem[key], attributes[key]);
                     }else{

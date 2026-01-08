@@ -663,7 +663,7 @@ var utilities = {
         isNaN(123); //false
         isNaN(NaN); //true
     */
-    //const isNaN = (value) => value !== value; //ie不支持箭头函数
+    //var isNaN = (value) => value !== value; //ie不支持箭头函数
     isNaN:function(value){
         return value !== value;
     },
@@ -1838,8 +1838,8 @@ var calendar = {
      * @return {String} 返回比较符号。值： < 表示时间字符串1比2早(小), > 表示时间字符串1比2晚(大), = 表示两个时间一样
      */
     compareTwoDates: function(dateStr1, dateStr2) {
-        const date1 = new Date(dateStr1);
-        const date2 = new Date(dateStr2);
+        var date1 = new Date(dateStr1);
+        var date2 = new Date(dateStr2);
         if (date1.getTime() > date2.getTime()) {
             return ">";
         } else if (date1.getTime() < date2.getTime()) {
