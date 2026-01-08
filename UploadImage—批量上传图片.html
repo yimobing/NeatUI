@@ -169,9 +169,14 @@
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
+    <!-- 兼容ie9+ edge 需要引入的es6兼容库 -->
+    <script src="assets/lib/es/es6-core-js-bundle.min.js"></script> <!-- ES6+ 核心兼容库 -->
+    <script src="assets/lib/es/es6-promise.min.js"></script> <!-- 额外兼容 IE8/9 的 Promise（core-js 已包含，但单独引入更稳妥） -->
+    <script>ES6Promise.polyfill();</script>
+
     <script src="assets/libs/jquery-1.8.3.min.js"></script>
     <script src="assets/neatui/js/neatui-dialog.js"></script>
-    <script src="assets/neatui/js/neatui-uploadFile.js"></script>
+    <script src="assets/neatui/js/neatui-uploadFile.js?v=20260107-1"></script>
     <script src="highlight/11.3.1/highlight.min.js"></script> <!-- 代码高亮库 -->
     <!--模拟数据 test1-->
     <script src="assets/mock/mock-min.js"></script>
