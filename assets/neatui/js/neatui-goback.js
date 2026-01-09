@@ -9,7 +9,7 @@
  * * Author: mengZheng
  * * QQ: 1614644937
  * * Date: 2023.03.01
- * * Update: 2023.03.02
+ * * Update: 2026.01.08
  */
 
 //================================================================================================
@@ -66,6 +66,7 @@
             right: 0, // 定位右边距离(可选)，默认0px。将根据direction参数有选择性的生效。
             text: "返回", // 文字(可选)，默认返回
             showText: true, // 是否显示文字(可选)，默认true
+            showArrow: true, // 是否显示返回图标(可选)，默认true
             fontSize: 12,  // 文字大小(可选)，默认12px
             fontColor: "#999", // 文字颜色(可选)，默认#999。eg. #ff0000
             backgroundColor: "#fff", // 背景色(可选)，默认#fff
@@ -117,7 +118,9 @@
         if(document.getElementsByClassName(net.idClass).length != 0) return; // 已存在，不再创建
         var html = [
             '<div class="' + net.panelClass + '">',
-                '<div class="' + net.arrowClass + '"><i></i></div>',
+                (
+                    me.$opts.showArrow === false ? '' : '<div class="' + net.arrowClass + '"><i></i></div>'
+                ),
                 (
                     me.$opts.showText === false ? '' : '<div class="' + net.textClass + '">' + me.$opts.text + '</div>'
                 ),
@@ -169,11 +172,14 @@
         tools.insertAfter(nodeDiv, document.getElementsByTagName('body')[0]); // 拼接节点
 
         // ·取节点
+        var arrowCollection = document.getElementsByClassName(net.arrowClass);
+        var textCollection = document.getElementsByClassName(net.textClass);
+
         me.$nodeRoot = document.getElementsByClassName(net.idClass)[0]; // 根节点
         me.$nodePanel = document.getElementsByClassName(net.panelClass)[0]; // 容器节点
-        me.$nodeArrow = document.getElementsByClassName(net.arrowClass)[0]; // 箭头节点
-        me.$nodeArrowI = document.getElementsByClassName(net.arrowClass)[0].children[0]; // 箭头子节点
-        me.$nodeText = document.getElementsByClassName(net.textClass)[0]; // 文本节点
+        me.$nodeArrow = arrowCollection.length == 0 ? null : arrowCollection[0]; // 箭头节点
+        me.$nodeArrowI = arrowCollection.length == 0 ? null : arrowCollection[0].children[0]; // 箭头子节点
+        me.$nodeText = textCollection.length == 0 ? null : textCollection[0]; // 文本节点
 
         // ·各个节点属性设置
         // 容器
@@ -191,36 +197,48 @@
             }
         });
         // 箭头
-        tools.setAttributes(me.$nodeArrow, {
-            style: {
-                "display": "inline-block",
-                "vertical-align": "top"
-            }
-        });
-        tools.setAttributes(me.$nodeArrowI, {
-            style: {
-                "display": "block",
-                "width": "8px",
-                "height": "8px",
-                "margin-top": "5px",
-                "border-style": "solid",
-                "border-color": dFontColor,
-                "border-width": "1px 0 0 1px",
-                "-webkit-transform": "rotate(-45deg)",
-                "-moz-transform": "rotate(-45deg)",
-                "-o-transform": "rotate(-45deg)",
-                "-ms-transform": "rotate(-45deg)",
-                "transform": "rotate(-45deg)"
-            }
-        });
+        if(me.$nodeArrow != null) {
+            tools.setAttributes(me.$nodeArrow, {
+                style: {
+                    "display": "inline-block",
+                    "vertical-align": "top"
+                }
+            })
+        }
+        if(me.$nodeArrowI != null) {
+            tools.setAttributes(me.$nodeArrowI, {
+                style: {
+                    "display": "block",
+                    "width": "8px",
+                    "height": "8px",
+                    "margin-top": "5px",
+                    "border-style": "solid",
+                    "border-color": dFontColor,
+                    "border-width": "1px 0 0 1px",
+                    "-webkit-transform": "rotate(-45deg)",
+                    "-moz-transform": "rotate(-45deg)",
+                    "-o-transform": "rotate(-45deg)",
+                    "-ms-transform": "rotate(-45deg)",
+                    "transform": "rotate(-45deg)"
+                }
+            });
+        }
         // 文本
-        if(typeof me.$nodeText != 'undefined'){
+        if(me.$nodeText != null && typeof me.$nodeText != 'undefined'){
             tools.setAttributes(me.$nodeText, {
                 style: {
                     "display": "inline-block",
                     "vertical-align": "top",
                     "font-size": dFontSize,
                     "color": dFontColor
+                }
+            });
+        }
+        // 文字节点和箭头都不存在时
+        if(me.$nodeText == null && me.$nodeArrow == null) {
+            tools.setAttributes(me.$nodeRoot, {
+                style: {
+                    "padding": "5px 5px"
                 }
             });
         }
