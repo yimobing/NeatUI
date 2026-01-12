@@ -24,6 +24,7 @@
 <body>
     <style>
         #s-near { width: 150px; }
+        .btn-stretch{ display: none; }
     </style>
     <div class="bds">
         <div class="bds__graph">
@@ -125,6 +126,7 @@
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!-- 对话框-->
     <script src="assets/neatui/js/neatui-bdmap.js"></script> <!-- 百度地图控件 -->
     <script>
+
         /**
          * 兼容ie和旧版edge的方案
          * 替代原生closest的兼容方法
@@ -132,7 +134,7 @@
          * @param {String} selector 匹配选择器（类、id、标签都支持）
          * @returns {HTMLElement|null} 匹配到的元素或null
          */
-         function getClosest(el, selector) {
+        function getClosest(el, selector) {
             var currentEl = el;
             // 向上遍历直到根节点
             while (currentEl) {
@@ -753,84 +755,99 @@
                 $('#s-near').focus();
                 return;
             }
+   
+            // 组成后台需要的字段
+            // var finalData = { data: [] };
+            var composeStr = '区域内有';
+            var xiangmuArr = xiangmu.split(/[,:;，：；、。]/);
+            if(xiangmuArr.length > 0) {
+                for(var i = 0; i < xiangmuArr.length; i++){
+                    var ls_guanjianzi_mc = xiangmuArr[i],
+                        ls_zuobiao = zuobiao,
+                        ls_juli_fanwei_mi = banjing;
+                    console.log('关键字：', ls_guanjianzi_mc, '\n坐标：', ls_zuobiao, '\n范围：', ls_juli_fanwei_mi);
 
-            //
-            var pagesize = 100; // 每页容量
-            var coordinateArr = zuobiao.split(',');
-            var point = new BMap.Point(coordinateArr[0], coordinateArr[1]); // 中心点
-            var myKeys = xiangmu.indexOf(',') >= 0 ? xiangmu.split(',') : [xiangmu]; // 关键字。数组格式
-            var radius = isNaN(parseFloat(banjing)) ? parseFloat(DEFAULT_RANGE) : parseFloat(banjing); // 半径。数值型，不能是字符串，否则会返回空数据
-            map.clearOverlays(); // 清空所有覆盖物
-            // map.centerAndZoom(point, 13); // 调整视野
-            var local = new BMap.LocalSearch(point, {
-                renderOptions: {
-                    map: map, // 展现结果的地图实例。当指定此参数后，搜索结果的标注、线路等均会自动添加到此地图上
-                    autoViewport: true, // 检索结束后是否自动调整地图视野。此属性对LocalCity无效
-                    panel: 'panel-result', // String | HTMLElement 结果列表的HTML容器id或容器元素，提供此参数后，结果列表将在此容器中进行展示。此属性对LocalCity无效。驾车路线规划无效
-                    // selectFirstResult: false, // 是否选择第一个检索结果。此属性仅对LocalSearch有效
-                },
-                pageCapacity: pagesize, // 设置每页容量，取值范围：1 - 100，对于多关键字检索，容量表示每个关键字的数量，如果有2个关键字，则实际检索结果数量范围为：2 - 200
-                // 检索完成后的回调函数。 参数：results: LocalResult或Array 如果是多关键字检索，回调函数参数返回一个LocalResult的数组，数组中的结果顺序和检索中多关键字数组中顺序一致
-                onSearchComplete: function(results){
-                    // console.log('周边医院返回结果：results：', results);
-                    var status = local.getStatus();
-                    // console.log('local：', local, '\nstatus：', status)
-                    // 判断状态是否正确
-                    if(status != '0') {
-                        neuiDialog.alert({
-                            animate: true,
-                            message: '没有找到相应的数据，可尝试更改范围半径',
-                            buttons: ['确定']
-                        });
-                        return;
+                    // 从后台获取周边关键字清单 ajax({})
+                    var outcomeData = { }
+                    if(ls_guanjianzi_mc.indexOf('公交') >= 0) 
+                        outcomeData = {
+                            return: "ok",
+                            data: [
+                                { "name": "客运中心站南门", "zuobiao": "", "address": "1路、 4路、 11路、 11路复线、 21路、 24路、 40路、 42路、 305路、 K1路、 K201路、 K301路、 K307路、 K3路、 K501路、 K503路、 K606路、 K702路长线、 K702路短线", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
+                                { "name": "海关大楼", "zuobiao": "", "address": "4路、 6路、 15路、 19路、 21路、 23路、 24路、 28路、 33路、 35路、 49路、 60路", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
+                                { "name": "刺桐公园", "zuobiao": "", "address": "7路、 32路、 60路、 202路、 305路、 K1路、 K3路、 K604路、 K701路", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"}
+                            ]
+                        }
+                    else 
+                        outcomeData = {
+                                return: "ok",
+                                data: [
+                                    { "name": "丰泽区泉秀实验小学", "zuobiao": "118.60,24.89", "address": "", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
+                                    { "name": "泉州市丰泽区丰盛实验小学", "zuobiao": "118.61,24.90", "address": "", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
+                                    { "name": "丰泽区实验小学", "zuobiao": "118.61,24.90", "address": "", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"}
+                                ]
+                            }
+                    
+                    /*
+                    // START AJAX
+                    var outcomeData = { data: [] }
+                    $.ajax({
+                        async: false, // 取数方式. true 异步(默认), false 同步
+                        type: "POST",
+                        dataType: "html",
+                        cache: false,
+                        url: "../fwh_pub/jk_loupan_fujin.ashx",
+                        data: {
+                            "action": "wh_web_gongye_jizhun_dijia_fujin_list",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "menu_bh": "<%=s_menu_bh%>",
+                            "guanjianzi_mc": ls_guanjianzi_mc,
+                            "zuobiao": ls_zuobiao,
+                            "juli_fanwei_mi": ls_juli_fanwei_mi
+                        },
+                        success: function(res){
+                            if(!res || $.isEmptyObject(res)) return;
+                            outcomeData = JSON.parse(res);
+                        },
+                        error: function(errs){ },
+                        beforeSend: function(xhr){ },
+                        complete: function(xhr, status){ }
+                    })
+                    // END AJAX
+                    */
+
+                   
+                    // 组合成需要的字符串
+                    composeStr += '\r\n\r\n';
+                    if(ls_guanjianzi_mc.indexOf('公交') >= 0) {
+                        // composeStr += '出入可利用私家车、公交车、自行车及出租车等；周边有以下公交站点：\r\n';
+                        composeStr += '周边有以下公交站点：\r\n';
                     }
-                    else if(status == 0){
-                        $('.bds__graph_result').removeClass('stretch-in');
-                        fnNearComposeStringToUser(results);
+                    else {
+                        composeStr += ls_guanjianzi_mc + '：'; // eg. 小学：
                     }
+                    var length = outcomeData.data.length;
+                    for(var k = 0; k < length; k++){
+                        var one = outcomeData.data[k];
+                        var tmp_name = one["name"],
+                            tmp_zuobiao = one["zuobiao"],
+                            tmp_address = one["address"];
+                        if(ls_guanjianzi_mc.indexOf('公交') >= 0) {
+                            var station = tmp_address.toString().replace(/\s+/g, '') === '' ? '' : tmp_address.toString().replace(/(;|；)/g, '、') + '；';
+                            composeStr += tmp_name + '公交站：' + station + '\r\n';
+                        }
+                        else {
+                            composeStr += tmp_name + (k == length - 1 ? '；' : '、') ;
+                        }
+                    }
+                    
                 }
-            });
 
-            // local.searchNearby(myKeys, point, radius, {
-            //     poiTypes: ["教育|小学"]
-            // });
-            local.searchNearby(myKeys, point, radius);
-            local.setPageCapacity(pagesize); // 设置每页容量
+                $('#r-result').val(composeStr);
+            }
         });
 
-
-
-        //——————————————————————————————————————————
-        // 附近关键词搜索返回的结果如下 eg.
-        // var results = [
-        //     { 
-        //         keyword: "学校",
-        //         Rr: [
-        //             { title: "丰泽实验小学", keyword: "学校", address: "实验路1"},
-        //             { title: "鲤城实难小学", keyword: "学校", address: "实验路2"},
-        //             { title: "东湖小学", keyword: "学校", address: "实验路3"},
-        //             { title: "兴光小学", keyword: "学校", address: "实验路4"}
-        //         ]
-        //     }, { 
-        //         keyword: "医院",
-        //         Rr: [
-        //             { title: "东南医院", keyword: "医院", address: "医院路1"},
-        //             { title: "东湖医院", keyword: "医院", address: "医院路2"},
-        //             { title: "人民医院", keyword: "医院", address: "医院路3"},
-        //             { title: "第二医院", keyword: "医院", address: "医院路4"}
-        //         ]
-        //     },{ 
-        //         keyword: "公交",
-        //         Rr: [
-        //             { title: "幸福街口站", keyword: "公交", address: "4路; 6路; 8路"},
-        //             { title: "浦西万达广场", keyword: "公交", address: "4路; 6路; 8路"},
-        //             { title: "鲤城教育局", keyword: "公交", address: "4路; 6路; 8路"},
-        //             { title: "东南医院", keyword: "公交", address: "4路; 6路; 8路"}
-        //         ]
-        //     }
-        // ]
-
-        // fnNearComposeStringToUser(results);
 
 
 
