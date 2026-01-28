@@ -4,7 +4,7 @@
  * 兼容性：支持火狐、谷歌、360、Microsoft Edge等现代浏览器，IE仅支持IE9+(即IE10、IE11)
  * Author: ChenMufeng
  * Date: 2020.05.07、2023.05.19
- * Update: 2026.01.08
+ * Update: 2026.01.28
  */
 (function($){
 
@@ -139,8 +139,8 @@
         // console.log('elements：', elements)
 
         var pureIdClassName = container.toString().replace(/(\#|\.)/g, '');
+
         var eleParent = null;
-        
         if(container != '') { 
             // case1.事件绑定到父节点上(当有动态增加的input type="file"时需要这样)
             var idParent = document.getElementById(pureIdClassName);
@@ -171,6 +171,10 @@
                     // 找到 input type="file"节点
                     if(target && target.type === 'file') {
                         fnRunChangeEvent(target, e);
+
+                        // 关键步骤：清空值以允许重新选择相同文件 add 20260128-1
+                        // // target.value = ''; 
+                        // resetFileInput(target);
                     }
                 }, false)
             }
@@ -180,17 +184,39 @@
             // case2.事件直接绑定到 input type="file"上。有动态新增的节点时会导致无效，故有缺陷
             // 添加功能出发监听事件
             elements.forEach( function(dom, index) {
-                // console.log('dom：', dom);
                 dom.setAttribute('accept', dFileType); // 设置图片类型
                 Event.addEvents(dom, events, function(e){
                     fnRunChangeEvent(dom, e);
+                    // 关键步骤：清空值以允许重新选择相同文件 add 20260128-1
+                    // // dom.value = ''; 
+                    // resetFileInput(dom);
                 }, false);
             });
             // console.log('xxx')
         }
 
 
+        // 重置file input type file 文件输入控件（兼容所有浏览器，重点适配IE） add 20260128-1
+        function resetFileInput(fileInput) {
+            if (fileInput) {
+                // IE浏览器特殊处理
+                if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.userAgent.indexOf('Trident') !== -1) {
+                    // 方法1：通过克隆节点重置（IE有效）
+                    var newInput = fileInput.cloneNode(true);
+                    newInput.onchange = fileInput.onchange;
+                    fileInput.parentNode.replaceChild(newInput, fileInput);
+                } else {
+                    // 其他浏览器直接清空value
+                    fileInput.value = '';
+                    // 对于现代浏览器的额外处理
+                    if (fileInput.files) {
+                        fileInput.files = new DataTransfer().files;
+                    }
+                }
+            }
+        }
 
+        // input file change 事件
         function fnRunChangeEvent(dom, e){
             if(!browserCompatible){
                 var version = getInternetExplorerVersion();
@@ -329,7 +355,11 @@
                             if(index == (len - 1)){
                                 if(settings.callBack){ //回调
                                     settings.callBack(arr, dom);
-                                    that.value = ''; //加不加都行，解决无法上传重复图片的问题。
+
+                                    // 关键步骤：清空值以允许重新选择相同文件 add 20260128-1
+                                    // that.value = ''; //加不加都行，解决无法上传重复图片的问题。
+                                    // dom.value = '';
+                                    resetFileInput(dom); 
                                 }
                             }
                         }
