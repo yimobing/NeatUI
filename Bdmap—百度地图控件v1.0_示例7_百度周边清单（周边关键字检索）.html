@@ -267,7 +267,8 @@
             // 中心点(可选)
             center: {
                 city: "", // 城市(可选)，默认空。值：空时根据坐标定位,非空时根据城市定位。eg.'泉州市',eg.'泉州市惠安县'。
-                coordinate: "118.595776,24.916136", // 坐标(可选)，默认为首都北京天安门广场的坐标,eg."经度,纬度"。
+                coordinate: "118.608524,24.896863", // testing
+                // coordinate: "118.595776,24.916136", // 坐标(可选)，默认为首都北京天安门广场的坐标,eg."经度,纬度"。
                 caption: "", // 标题文字(可选)，默认'北京市'。支持HTML
                 describe: "", // 描述文字(可选)，默认空。
                 // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度,lat : 纬度}
@@ -772,11 +773,11 @@
                 pageCapacity: pagesize, // 设置每页容量，取值范围：1 - 100，对于多关键字检索，容量表示每个关键字的数量，如果有2个关键字，则实际检索结果数量范围为：2 - 200
                 // 检索完成后的回调函数。 参数：results: LocalResult或Array 如果是多关键字检索，回调函数参数返回一个LocalResult的数组，数组中的结果顺序和检索中多关键字数组中顺序一致
                 onSearchComplete: function(results){
-                    // console.log('周边医院返回结果：results：', results);
+                    // console.log('周边医院返回结果：results：', results); 
                     var status = local.getStatus();
-                    // console.log('local：', local, '\nstatus：', status)
+                    // console.log('local：', local, '\nstatus：', status);
                     // 判断状态是否正确
-                    if(status != '0') {
+                    if(status !== 0) {
                         neuiDialog.alert({
                             animate: true,
                             message: '没有找到相应的数据，可尝试更改范围半径',
@@ -801,40 +802,6 @@
 
 
         //——————————————————————————————————————————
-        // 附近关键词搜索返回的结果如下 eg.
-        // var results = [
-        //     { 
-        //         keyword: "学校",
-        //         Rr: [
-        //             { title: "丰泽实验小学", keyword: "学校", address: "实验路1"},
-        //             { title: "鲤城实难小学", keyword: "学校", address: "实验路2"},
-        //             { title: "东湖小学", keyword: "学校", address: "实验路3"},
-        //             { title: "兴光小学", keyword: "学校", address: "实验路4"}
-        //         ]
-        //     }, { 
-        //         keyword: "医院",
-        //         Rr: [
-        //             { title: "东南医院", keyword: "医院", address: "医院路1"},
-        //             { title: "东湖医院", keyword: "医院", address: "医院路2"},
-        //             { title: "人民医院", keyword: "医院", address: "医院路3"},
-        //             { title: "第二医院", keyword: "医院", address: "医院路4"}
-        //         ]
-        //     },{ 
-        //         keyword: "公交",
-        //         Rr: [
-        //             { title: "幸福街口站", keyword: "公交", address: "4路; 6路; 8路"},
-        //             { title: "浦西万达广场", keyword: "公交", address: "4路; 6路; 8路"},
-        //             { title: "鲤城教育局", keyword: "公交", address: "4路; 6路; 8路"},
-        //             { title: "东南医院", keyword: "公交", address: "4路; 6路; 8路"}
-        //         ]
-        //     }
-        // ]
-
-        // fnNearComposeStringToUser(results);
-
-
-
-        //——————————————————————————————————————————
         /**
          * 根据百度地图附近关键词搜索结果返回的值组成用户所需的字符串
          * @param {Array} results 数据源
@@ -851,8 +818,31 @@
             var outcomes = Array.isArray(results) ? results : [ results];
             for(var i = 0; i < outcomes.length; i++) {
                 var outcome = outcomes[i];
+
+                
+                // testing
+                var poiCount = outcome.getNumPois ? outcome.getNumPois() : outcome.getNumResults();
+                if (poiCount === 0) {
+                    console.log("当前结果集无POI数据");
+                    continue;
+                }
+                console.log(`第${i+1}个结果集，POI总数：${poiCount}`);
+                for (var j = 0; j < poiCount; j++) {
+                    var poi = outcome.getPoi(j);
+                    console.log('poi-x：', poi);
+                    if (poi) {
+                        // console.log(`POI[${j+1}]：${poi.title} - ${poi.address}`);
+                        // 可选：在地图上标注POI
+                        // var marker = new BMap.Marker(poi.point);
+                        // map.addOverlay(marker);
+                        // marker.setLabel(new BMap.Label(poi.title, {offset: new BMap.Size(20, -10)}));
+                    }
+                }
+
+
+                        
                 var word = outcome.keyword, locates = outcome.Rr;
-                // console.log('locates：', locates)
+                console.log('outcome:', outcome, '\nlocates：', locates); // testing
                 var oneStr = '';
                 var titleArr = [];
                 for (var k = 0; k < locates.length; k++){
@@ -890,6 +880,42 @@
             var resultStr = serviceStr + '\r\n\r\n' + busStr;
             $('#r-result').val(resultStr);
         }
+
+
+        //——————————————————————————————————————————
+        // 附近关键词搜索返回的结果如下 eg.
+        // var results = [
+        //     { 
+        //         keyword: "学校",
+        //         Rr: [
+        //             { title: "丰泽实验小学", keyword: "学校", address: "实验路1"},
+        //             { title: "鲤城实难小学", keyword: "学校", address: "实验路2"},
+        //             { title: "东湖小学", keyword: "学校", address: "实验路3"},
+        //             { title: "兴光小学", keyword: "学校", address: "实验路4"}
+        //         ]
+        //     }, { 
+        //         keyword: "医院",
+        //         Rr: [
+        //             { title: "东南医院", keyword: "医院", address: "医院路1"},
+        //             { title: "东湖医院", keyword: "医院", address: "医院路2"},
+        //             { title: "人民医院", keyword: "医院", address: "医院路3"},
+        //             { title: "第二医院", keyword: "医院", address: "医院路4"}
+        //         ]
+        //     },{ 
+        //         keyword: "公交",
+        //         Rr: [
+        //             { title: "幸福街口站", keyword: "公交", address: "4路; 6路; 8路"},
+        //             { title: "浦西万达广场", keyword: "公交", address: "4路; 6路; 8路"},
+        //             { title: "鲤城教育局", keyword: "公交", address: "4路; 6路; 8路"},
+        //             { title: "东南医院", keyword: "公交", address: "4路; 6路; 8路"}
+        //         ]
+        //     }
+        // ]
+
+        // fnNearComposeStringToUser(results);
+
+
+
 
 
         

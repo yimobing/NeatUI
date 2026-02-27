@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>百度地图v2.0 通用POI精准筛选（适配所有关键词）</title>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=你的百度地图AK"></script>
+    <style>
+        #map {width: 800px; height: 500px;}
+        .search-box {margin-bottom: 10px;}
+    </style>
+</head>
+<body>
+    <!-- 检索输入框（可输入：小学/医院/公园/银行等） -->
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="请输入检索词（如：朝阳区 小学、海淀区 医院）" value="朝阳区 小学">
+        <button onclick="searchPOI()">检索</button>
+    </div>
+    <div class="description">
+
+        你这个是已经确定了关键词：小学。如果我关键词不确定，比如关键词可能是小学、医院、公园、银行等，又怎么一一排除呢
+        你希望实现通用化的 POI 筛选逻辑—— 无论检索关键词是小学、医院、公园还是银行，都能自动过滤掉 “XX 小学蛋糕店”“XX 医院便利店” 这类衍生结果，只保留 “XX 小学”“XX 医院” 等核心 POI 本体，无需为每个关键词单独写排除规则。核心解决方案是：先提取检索关键词的核心类型，再通过 POI 的官方分类反向匹配，只保留分类与核心关键词一致的 POI。
+        一、核心思路（通用化筛选逻辑）
+        建立 “关键词→官方分类” 映射表：把常用检索关键词（小学 / 医院 / 公园 / 银行）对应到百度地图的官方 POI 分类，比如 “小学” 对应 “教育 | 小学”、“医院” 对应 “医疗 | 综合医院”；
+        动态提取检索核心关键词：从用户输入的检索词中提取核心类型（比如输入 “朝阳区附近的小学”→提取 “小学”）；
+        动态匹配 POI 分类：根据提取的核心关键词，匹配 POI 的type/tags字段，只保留分类匹配的 POI。
+        二、通用化完整解决方案（适配所有关键词）
+        以下代码无需为每个关键词单独写规则，能自动识别核心类型并精准筛选：
+
+    </div>
+    <div id="map"></div>
+
+    <script type="text/javascript">
+        // 初始化地图
+        var map = new BMap.Map("map");
+        var point = new BMap.Point(116.404, 39.915);
+        map.centerAndZoom(point, 12);
+        map.enableScrollWheelZoom(true);
+
+        // ========== 核心：建立“关键词→官方分类”映射表（可扩展） ==========
+        var typeMap = {
+            // 1.通用的
+            "道路": {
+                typeKeyword: "道路|城市道路",
+                tagKeyword: ["道路", "路", "大街", "大道", "街道"]
+            },
+            "公司": {
+                typeKeyword: "公司|公司",
+                tagKeyword: ["公司", "企业", "集团", "有限公司"]
+            },
+            "厂房": {
+                typeKeyword: "工业|工厂",
+                tagKeyword: ["厂房", "工厂", "工业园", "工业区", "产业园"]
+            },
+
+
+            // 2.【房产评估必须要的】周边环境类：有利的因素
+            "政府": {
+                typeKeyword: "政府|政府机构",
+                tagKeyword: ["政府", "机关", "办事处", "政务中心"]
+            },
+            "小区": {
+                typeKeyword: "住房|住宅小区",
+                tagKeyword: ["小区", "社区", "住宅区", "公寓"]
+            },
+            "公交": {
+                typeKeyword: "交通设施|公交车站",
+                tagKeyword: ["公交", "公交站", "公交车站", "站台"]
+            },
+            "公交站": {
+                typeKeyword: "交通设施|公交车站",
+                tagKeyword: ["公交站", "公交车站", "站台"]
+            },
+
+            "学校": {
+                typeKeyword: "教育",
+                tagKeyword: ["小学", "中学", "高中", "幼儿园", "学校"]
+            },
+            "幼儿园": {
+                typeKeyword: "教育|幼儿园",
+                tagKeyword: ["幼儿园", "托儿"]
+            },
+            "小学": {
+                typeKeyword: "教育|小学",
+                tagKeyword: ["小学", "教育"]
+            },
+            "中学": {
+                typeKeyword: "教育|中学",
+                tagKeyword: ["中学", "初中", "高中"]
+            },
+            "医院": {
+                typeKeyword: "医疗",
+                tagKeyword: ["医院", "卫生院", "诊所", "医疗"]
+            },
+            "公园": {
+                typeKeyword: "公园|公园",
+                tagKeyword: ["公园", "绿地", "广场"]
+            },
+            "银行": {
+                typeKeyword: "金融|银行",
+                tagKeyword: ["银行", "支行", "分理处"]
+            },
+            "商场": {
+                typeKeyword: "购物|购物中心",
+                tagKeyword: ["商场", "购物中心", "百货", "商城"]
+            },
+            "超市": {
+                typeKeyword: "购物|超市",
+                tagKeyword: ["超市", "便利店", "卖场", "生鲜"]
+            },
+            "酒店": {
+                typeKeyword: "酒店|酒店",
+                tagKeyword: ["酒店", "宾馆"]
+            },
+            "地铁": {
+                typeKeyword: "交通设施|地铁站",
+                tagKeyword: ["地铁", "地铁站", "轻轨"]
+            },
+            "停车场": {
+                typeKeyword: "交通设施|停车场",
+                tagKeyword: ["停车场", "停车"]
+            },
+            "加油站": {
+                typeKeyword: "交通设施|加油站",
+                tagKeyword: ["加油站"]
+            },
+            "餐饮": {
+                typeKeyword: "餐饮",
+                tagKeyword: ["餐厅", "饭店", "美食"]
+            },
+            "市场": {
+                typeKeyword: "购物|市场",
+                tagKeyword: ["市场", "农贸市场", "菜市场"]
+            },
+            "物流": {
+                typeKeyword: "交通设施|物流",
+                tagKeyword: ["物流", "快递", "货运"]
+            },
+            "文体": {
+                typeKeyword: "文化",
+                tagKeyword: ["体育馆", "文化", "图书馆", "活动中心"]
+            },
+
+
+            // 3.【房产评估必须要的】周边环境类：不利因素
+            "陵园": {
+                typeKeyword: "殡葬|陵园",
+                tagKeyword: ["陵园", "公墓", "殡仪馆"]
+            },
+            "垃圾站": {
+                typeKeyword: "市政|垃圾处理",
+                tagKeyword: ["垃圾站", "垃圾转运"]
+            },
+            "变电站": {
+                typeKeyword: "市政|变电站",
+                tagKeyword: ["变电站", "变电所"]
+            }
+        };
+
+        // ========== 步骤1：动态提取检索词中的核心类型 ==========
+        function extractCoreKeyword(searchStr) {
+            // 遍历映射表，提取核心关键词
+            for (var key in typeMap) {
+                if (searchStr.indexOf(key) !== -1) {
+                    return key; // 比如输入“朝阳区 小学”→返回“小学”
+                }
+            }
+            return null; // 未匹配到已知类型
+        }
+
+        // ========== 步骤2：通用POI过滤函数 ==========
+        function filterPOI(poi, coreKey) {
+            var targetType = typeMap[coreKey];
+            if (!targetType) return false;
+
+            // 规则1：优先匹配POI的官方type字段（最精准）
+            if (poi.type && poi.type.indexOf(targetType.typeKeyword) !== -1) {
+                return true;
+            }
+
+            // 规则2：兜底匹配tags字段（兼容老旧POI）
+            if (poi.tags) {
+                for (var i = 0; i < targetType.tagKeyword.length; i++) {
+                    if (poi.tags.indexOf(targetType.tagKeyword[i]) !== -1) {
+                        return true;
+                    }
+                }
+            }
+
+            // 未匹配到核心分类，排除
+            return false;
+        }
+
+        // ========== 步骤3：检索+通用过滤主函数 ==========
+        function searchPOI() {
+            // 获取用户输入的检索词
+            var searchStr = document.getElementById("searchInput").value.trim();
+            if (!searchStr) {
+                alert("请输入检索词！");
+                return;
+            }
+
+            // 提取核心类型（比如“小学”“医院”）
+            var coreKey = extractCoreKeyword(searchStr);
+            if (!coreKey) {
+                alert("暂不支持该类型检索！支持：小学/医院/公园/银行/超市");
+                return;
+            }
+
+            // 创建LocalSearch实例
+            var localSearch = new BMap.LocalSearch(map, {
+                onSearchComplete: function(results) {
+                    // 基础校验
+                    if (localSearch.getStatus() !== 0) {
+                        alert("检索失败：" + (localSearch.getStatus() === 1 ? "AK错误" : "无结果"));
+                        return;
+                    }
+
+                    var resultList = Array.isArray(results) ? results : [results];
+                    var validPOIs = [];
+
+                    // 遍历结果并通用过滤
+                    for (var i = 0; i < resultList.length; i++) {
+                        var localResult = resultList[i];
+                        var poiCount = localResult.getNumPois ? localResult.getNumPois() : localResult.getNumResults();
+                        
+                        for (var j = 0; j < poiCount; j++) {
+                            var poi = localResult.getPoi(j);
+                            if (!poi) continue;
+
+                            // 通用过滤：只保留分类匹配的POI
+                            if (filterPOI(poi, coreKey)) {
+                                validPOIs.push(poi);
+                            }
+                        }
+                    }
+
+                    // 展示结果
+                    renderResult(validPOIs, coreKey);
+                },
+                scope: 1,
+                pageCapacity: 30,
+                searchType: BMAP_LOCAL_SEARCH_TYPE_POI
+            });
+
+            // 执行检索
+            localSearch.search(searchStr);
+        }
+
+        // ========== 步骤4：渲染结果（标注+打印） ==========
+        function renderResult(pois, coreKey) {
+            // 清空之前的标注
+            map.clearOverlays();
+
+            console.log(`筛选出的${coreKey}数量：`, pois.length);
+            if (pois.length === 0) {
+                alert(`未检索到符合条件的${coreKey}！`);
+                return;
+            }
+
+            // 标注+打印结果
+            pois.forEach(function(poi, index) {
+                console.log(`[${index+1}] 名称：${poi.title} | 官方分类：${poi.type} | 地址：${poi.address}`);
+                var marker = new BMap.Marker(poi.point);
+                map.addOverlay(marker);
+                marker.setLabel(new BMap.Label(poi.title, {offset: new BMap.Size(20, -10)}));
+            });
+
+            // 聚焦到第一个结果
+            map.centerAndZoom(pois[0].point, 16);
+        }
+
+        // 初始化检索一次
+        searchPOI();
+    </script>
+</body>
+</html>

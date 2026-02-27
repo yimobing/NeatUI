@@ -39,7 +39,7 @@
     // 构造请求参数 116.413387,39.910924
     // $param['location'] = '24.895044,118.608494'; // 中心点坐标。注意这里的值： "纬度 lat, 经度 lng"
     // 尊邸大厦
-    $param['location'] = '24.89511,118.608514'; // 中心点坐标。注意这里的值： "纬度 lat, 经度 lng"
+    $param['location'] = '24.896863,118.608524'; // 中心点坐标。注意这里的值： "纬度 lat, 经度 lng"
     $param['query']   = '小学'; // 检索关键字
     // $param['tag']   = '小学'; // 检索分类偏好。设置不正确可能会返回结果为空数组。与query组合进行检索，多个分类以","分隔 （POI分类），如果需要严格按分类检索，请通过query参数设置
     $param['radius'] = '1000'; // 圆形区域检索半径，单位为米。
@@ -50,9 +50,34 @@
     $param['ak']   = $ak;
     // $param['coord_type'] = '3'; // 传入的坐标类型，1（wgs84ll即GPS经纬度），2（gcj02ll即国测局经纬度坐标），3（bd09ll即百度经纬度坐标），4（bd09mc即百度米制坐标）注："ll为小写LL"坐标详细说明
 
-    $res = request_get($url, $param);
+    $jsonStr = request_get($url, $param);
 
     // 将原始返回的结果打印出来
     print("请求的原始返回结果为:\n");
-    print($res . "\n");
+    print($jsonStr . "\n");
+
+
+
+    // 打印数据
+    // 2. 解码为关联数组（必须加 true）
+    $data = json_decode($jsonStr, true);
+
+    // 3. 严格校验（核心：防止报错）
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        die("JSON 解码失败：" . json_last_error_msg());
+    }
+    if (!isset($data['results']) || !is_array($data['results'])) {
+        die("目标数组 `results` 不存在或非数组");
+    }
+
+    // 4. 循环打印数组字段
+    echo "<h3>POI 列表（关联数组方式）</h3>";
+    foreach ($data['results'] as $index => $poi) {
+        // 按需打印字段，可加默认值避免未定义索引
+        $name = $poi['name'];
+        $address = $poi['address'];
+        echo "第 " . ($index + 1) . " 个：{$name} <br> 地址：{$address}<br><br>";
+    }
+
+
 ?>
