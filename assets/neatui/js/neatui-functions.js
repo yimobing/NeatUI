@@ -662,7 +662,7 @@ var utilities = {
 
 
     /**
-     * 转义函数：转义JSON特殊字符
+     * 转义函数：JSON转义特殊字符
      * 说明：兼容 JSON 特殊字符 + 单/双引号 + 可选 URL 编码
      * @param {String} str 要转义的原始字符串
      * @param {Boolean} needUrlEncode 是否需要URL编码，默认false(可选)。GET请求传参时设为true
@@ -714,7 +714,7 @@ var utilities = {
     
     
     /**
-     * 配套的反转义函数：反转义JSON特殊字符、还原转义后的字符串
+     * 配套的反转义函数：JSON反转义特殊字符、还原转义后的字符串
      * @param {String} str 转义后的字符串
      * @param {Boolean} needUrlDecode 是否需要先URL解码，默认false(可选)
      * @returns {String} 原始字符串
