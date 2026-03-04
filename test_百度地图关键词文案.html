@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>百度地图v2.0 通用POI精准筛选（适配所有关键词）</title>
-    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=你的百度地图AK"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script>
     <style>
         #map {width: 800px; height: 500px;}
         .search-box {margin-bottom: 10px;}
@@ -13,7 +13,7 @@
 <body>
     <!-- 检索输入框（可输入：小学/医院/公园/银行等） -->
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="请输入检索词（如：朝阳区 小学、海淀区 医院）" value="朝阳区 小学">
+        <input type="text" id="searchInput" placeholder="请输入检索词（如：朝阳区 小学、海淀区 医院）" value="">
         <button onclick="searchPOI()">检索</button>
     </div>
     <div class="description">
@@ -33,7 +33,7 @@
     <script type="text/javascript">
         // 初始化地图
         var map = new BMap.Map("map");
-        var point = new BMap.Point(116.404, 39.915);
+        var point = new BMap.Point(118.608524,24.896863);
         map.centerAndZoom(point, 12);
         map.enableScrollWheelZoom(true);
 
@@ -240,11 +240,14 @@
                 },
                 scope: 1,
                 pageCapacity: 30,
-                searchType: BMAP_LOCAL_SEARCH_TYPE_POI
+                // searchType: BMAP_LOCAL_SEARCH_TYPE_POI // testing
             });
 
-            // 执行检索
-            localSearch.search(searchStr);
+            // 执行检索 testing
+            // localSearch.search(searchStr);
+            var point = new BMap.Point(118.608524,24.896863); // 中心点
+            var radius = 1000;
+            localSearch.searchNearby(searchStr, point, radius);
         }
 
         // ========== 步骤4：渲染结果（标注+打印） ==========

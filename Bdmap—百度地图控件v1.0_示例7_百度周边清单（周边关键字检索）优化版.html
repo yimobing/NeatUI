@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>周边关键字检索</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!-- 前端框架 -->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!-- 对话框 -->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"> <!-- 下拉 -->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css"> <!-- 百度地图控件 -->
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan.css?v=20260112-1">
+</head>
+<body>
+    <style>
+        #s-near { width: 150px; }
+    </style>
+    <div class="bds">
+        <div class="bds__graph">
+            <div class="bds__graph_coord">
+                <div class="bds__graph_coord_row">
+                    <div class="bds__graph_coord_column">
+                        <div class="bds__graph_coord_row_title"> 坐标 </div>
+                        <div class="bds__graph_coord_row_content">
+                            <input type="text" id="c-locate" readonly>
+                        </div>
+                        <!-- <div class="bds__graph_coord_row_btn">
+                            <button type="button" class="ne-btn has-texture blue" id="btn-pick-copy"> 复制 </button>
+                        </div> -->
+                    </div> <!--/.bds__graph_coord_column-->
+                    <div class="bds__graph_coord_column">
+                        <div class="bds__graph_coord_row_title"> 城市 </div>
+                        <div class="bds__graph_coord_row_content">
+                            <input type="text" id="c-city" placeholder="如泉州市或丰泽区" onblur="this.placeholder='如泉州市或丰泽区'" onfocus="this.placeholder=''">
+                        </div> 
+                    </div> <!--/.bds__graph_coord_column-->
+                    <div class="bds__graph_coord_column bds__graph_coord_column_btn">
+                        <div class="bds__graph_coord_row_btn">
+                            <button type="button" class="ne-btn has-texture blue" id="btn-pick-locate"> 快速定位 </button>
+                        </div>
+                    </div> <!--/.bds__graph_coord_column-->
+                </div> <!--/."bds__graph_coord_row-->
+                <div class="bds__graph_coord_row">
+                   
+                </div> <!-- /."bds__graph_coord_row-->
+                <div class="bds__graph_coord_row" style="display: none">
+                    <label> (在地图上任意位置点击可更改中心点坐标，也可拖拽中心点) </label>   
+                </div> <!--/.bds__graph_coord_row-->
+            </div> <!--/.bds__graph_coord-->
+
+            <div class="bds__graph_result stretch-in">
+                <div id="panel-result"></div>
+                <button type="button" class="btn-stretch"></button>
+            </div> <!--/.bds__graph_result-->
+
+            <div class="bds__graph_map">
+                <div id="area" class="bds__graph_map_container"></div>
+            </div> <!--/.bds__graph_map-->
+        </div> <!--/.bds__graph-->
+
+        <div class="bds__search">
+            <div class="bds__search_form">
+                <div class="bds__search_form_content">
+                    <div class="bds__search_form_box">
+                        <div class="bds__search_form_box_title"> 小区</div>
+                        <div class="bds__search_form_box_content">
+                            <input type="text" id="s-community" class="l-2x" placeholder="小区或楼盘名称" onblur="this.placeholder='小区或楼盘名称'" onfocus="this.placeholder=''">
+                        </div>
+                        <!-- 关键字输入提示词条 -->
+                        <div 
+                            id="searchResultPanel" 
+                            style="border: 1px solid #c0c0c0;width: 150px; height: auto; display: none;">
+                        </div>
+                    </div>
+                    <div class="bds__search_form_box">
+                        <div class="bds__search_form_box_title"> 附近项目 </div>
+                        <div class="bds__search_form_box_content">
+                            <input type="text" id="s-near" placeholder="关键字，如学校" onblur="this.placeholder='关键字，如学校'" onfocus="this.placeholder=''">
+                            <button type="button" id="btn-choose-near">选择</button>
+                            <div class="bds__search_form_box_drop" style="display: none">
+                                <ul class="bds__search_form_box_drop_list"></ul>
+                                <div class="bds__search_form_box_drop_operate">确定</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bds__search_form_box">
+                        <div class="bds__search_form_box_title"> 半径 </div>
+                        <div class="bds__search_form_box_content">
+                            <input type="text" id="s-range" placeholder="搜索半径" onblur="this.placeholder='搜索半径'" onfocus="this.placeholder=''">
+                            <em> 米(m) </em>
+                        </div>
+                    </div>
+                </div> <!--/.bds__search_form_content-->
+                <div class="bds__search_form_btn">
+                    <button type="button" class="ne-btn has-texture blue" id="btn-query"> 查询 </button>    
+                </div>
+            </div> <!-- /.bds__search_form-->
+            <div class="bds__search_result">
+                <textarea id="r-result"></textarea> 
+            </div>
+        </div> <!-- /.bds__search-->
+    </div> <!--/.bds-->
+   
+
+    
+
+    <!-- ================================================================================-->
+    <!--                             JAVASCRIPT                                          -->
+    <!-- ================================================================================-->
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script> <!-- Jq库-->
+    <script src="assets/libs/jquery.chineseDistricts.js"></script> <!-- 省市区数据源 -->
+    <script src="assets/neatui/js/neatui.min.js"></script> <!-- 前端框架 -->
+    <script src="assets/neatui/js/neatui-dropdown.js"></script> <!-- 下拉 -->
+    <script src="assets/neatui/js/neatui-dialog.js"></script> <!-- 对话框-->
+    <script src="assets/neatui/js/neatui-bdmap.js"></script> <!-- 百度地图控件 -->
+    <script>
+        /**
+         * 兼容ie和旧版edge的方案
+         * 替代原生closest的兼容方法
+         * @param {HTMLElement} el 起始元素（如e.target）
+         * @param {String} selector 匹配选择器（类、id、标签都支持）
+         * @returns {HTMLElement|null} 匹配到的元素或null
+         */
+         function getClosest(el, selector) {
+            var currentEl = el;
+            // 向上遍历直到根节点
+            while (currentEl) {
+                // 判断当前元素是否匹配选择器
+                if (currentEl.matches ? currentEl.matches(selector) : currentEl.msMatchesSelector(selector)) {
+                 return currentEl;
+                }   
+                // 向上找父元素
+                currentEl = currentEl.parentElement;
+            }
+            return null;
+        }
+
+
+        /*+————————————————全局变量————————————————+*/
+        // 默认值
+        var DEFAULT_NEAR_ARR = []; // 附近项目默认选中值，支持多个。
+        var DEFAULT_RANGE = 1000; // 范围、半径默认值。单位米(m)
+        
+        
+        
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                                   初始化
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        // 查询输入框默认值
+        $('#s-near').val(DEFAULT_NEAR_ARR.join(',')); // 附近项目
+        $('#s-range').val(DEFAULT_RANGE); // 范围、半径
+
+
+        //——————————————————————————————————————————
+        // 初始化地图宽高
+        // setDituSize();
+        
+        //——————————————————————————————————————————
+        // 检测窗口变化事件
+        // $(window).on('resize',function(){
+        //     setDituSize();
+        // });
+
+
+        //——————————————————————————————————————————
+        /**
+         * 函数：设置地图宽高
+         * (高度一定要设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
+         */
+        function setDituSize(){
+            var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
+                winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
+            // 整个区域
+            var eleAll = $('.bds'),
+                allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
+                allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
+                allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
+                allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
+                allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
+                allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
+                allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
+                allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
+            //  console.log('整个区域\nMargin左边距：',allMargLeft,'\nMargin右边距：',allMargRight,'\nPadding左边距：',allPadLeft,'\nPadding右边距：',allPadRight,'\nMargin上边距：',allMargTop,'\nMargin下边距：',allMargBot,'\nPadding上边距：',allPadTop,'\nPadding下边距：',allPadBot);
+            // 顶部区域
+            var eleTop = $('.bds__graph_coord'),
+                topHeight = eleTop.outerHeight(true);
+            // 地图区域
+            var eleTu = $('.bds__graph_map'),
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
+                tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
+                tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
+                tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
+                tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
+                tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
+            // 计算宽高
+            var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
+                allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
+                tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
+                tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
+            // console.log('bodyWidth：',$('body').width(),'\nallMargLeft:',allMargLeft,'\nallMargRight:',allMargRight,'\nallPadLeft:',allPadLeft,'\nallPadRight:',allPadRight);
+            // console.log('tuMargLeft:',tuMargLeft,'\ntuPadLeft:',tuPadLeft,'\ntuPadLeft:',tuPadLeft,'\ntuPadRight:',tuPadRight);
+            // console.log('--------------------------------');
+            // // 设置地图宽高
+            // $('.bds__graph_map_container').css({
+            //     width: tuWidth,
+            //     height: tuHeight
+            // })
+            // $('#area').css({
+            //     width: eleTu.width(),
+            //     height: eleTu.height()
+            // })
+
+            // 设置地图宽高
+            var width = eleTu.width() - 15,
+                height = width;
+            var areaWidth = width,
+                areaHeight = height > winH ? winH : height;
+            // console.log('winH', winH, '\nheight:', height, '\nareaHeight：', areaHeight);
+            // 地图父窗口宽高
+            $('.bds__graph_map_container').css({
+                width: width + 10,
+                height: areaHeight + 10
+            });
+            // 地图宽高
+            $('#area').css({
+                width: areaWidth,
+                height: areaHeight
+            });
+        }
+
+
+
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                          百度地图上展示数据并进行交互操作
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        // 创建地图并初始化
+        neuiBdmap('area', {
+           // 地图大小。width/height参数值：数值型或百分比类型(如1920,1920px,90%)表示具体的大小,字符串型 auto 表示自动调整,fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
+            width: 'auto', // 宽(可选)，默认auto
+            height: 'auto', // 高(可选)，默认auto
+            autoResize: true, // 窗口变化时是否自动调整地图大小(可选)，默认true
+            setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于参数width/height/autoResize
+                // setDituSize();
+            },
+            onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于参数width/height/autoResize
+                // setDituSize();
+            },
+            zoom: 13, // 地图缩放级别(可选)，默认11。 值：3-19
+            // 中心点(可选)
+            center: {
+                city: "", // 城市(可选)，默认空。值：空时根据坐标定位,非空时根据城市定位。eg.'泉州市',eg.'泉州市惠安县'。
+                coordinate: "118.608524,24.896863", // testing
+                // coordinate: "118.595776,24.916136", // 坐标(可选)，默认为首都北京天安门广场的坐标,eg."经度,纬度"。
+                caption: "", // 标题文字(可选)，默认'北京市'。支持HTML
+                describe: "", // 描述文字(可选)，默认空。
+                // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度,lat : 纬度}
+                complete: function(e){
+                    $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值
+                },
+                enableClickCreateNew: true, // 是否启用点击地图时在点击位置新建中心点坐标(可选)，默认false。
+                // 点击地图时在点击位置新建中心点坐标的回调函数(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度,lat : 纬度}
+                clickCallback: function(e){
+                    // console.log('click-e：', e);
+                    $('#s-community').val(''); // 小区栏清空
+                    $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值
+                    var titleStr = '当前坐标如下：<br>' + e.lng + ',' + e.lat;
+                    neuiBdmap.setCenterPointLabelTitle(titleStr);
+                },
+                enableDrag: true, // 是否允许拖拽(可选)，默认false
+                // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度,lat : 纬度}
+                dragEnd: function(e){
+                    // console.log('drap-e：', e);
+                    $('#s-community').val(''); // 小区栏清空
+                    $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值
+                    var titleStr = '当前坐标如下：<br>' + e.lng + ',' + e.lat;
+                    neuiBdmap.setCenterPointLabelTitle(titleStr);
+                },
+            },
+            // 功能与配置项(可选)
+            draft: { // 地图底图功能(可选)
+                switchType: { // 切换地图类型(可选)
+                    enable: true, // 是否开启(可选)，默认false
+                    types: ['normal','satellite','hybrid'], // 配置地图类型(可选)。数组元素可添加的值: normal 普通街道视图,satellite 卫星视图,hybrid 卫星和路网的混合视图 
+                    direction: 'topRight', // 位置(可选)，默认空右下角。值： topLeft 左上角,topRight 右上角,bottomLeft 左下角,bottomRight 右下角
+                    offset: { // 位置偏移量(可选)
+                        width: 10, // 水平方向数值(可选)，默认10
+                        height: 50 // 竖直方向数值(可选)，默认50
+                    }
+                },
+                copyright: { // 版权信息(可选)
+                    enable: false, // 是否开启(可选)，默认false
+                    direction: '', // 位置(可选)，默认空右下角。值： topLeft 左上角,topRight 右上角,bottomLeft 左下角,bottomRight 右下角
+                    content: '快评电脑端', // 版权文本信息(可选)，默认空
+                    offset: { // 位置偏移量(可选)
+                        width: 10, // 水平方向数值(可选)，默认10
+                        height: 5 // 竖直方向数值(可选)，默认5
+                    }
+                }
+            },
+        });
+
+        var map = neuiBdmap.getMap(); // 获取地图实例化对象
+
+
+
+
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                          查询区域 事件
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        // 复制按钮、复制当前坐标
+        // $('#btn-pick-copy').on('click',function(){
+        //     console.log('bbb')
+        //     var $text = $(this).parent().siblings().find('#c-locate');
+        //     var value = $text.val();
+        //     $text[0].select();
+        //     document.execCommand("Copy"); // 执行浏览器复制命令
+        //     var tips = '已复制好，可贴粘！';
+        //     // alert(tips);
+        //     neuiDialog.notice({
+        //         message: tips,
+        //         theme: 'black',
+        //         maskOpacity: 1
+        //     })
+        // });
+
+
+        //——————————————————————————————————————————
+        // 范围半径输入事件：只允许输入正整数
+        $('#s-range').on('input', function(){
+            var value = $(this).val();
+            value = value.toString().replace(/[^\d]/g,'');
+		    $(this).val(value);
+        });
+
+
+
+        //——————————————————————————————————————————
+        // 附近项目下拉
+        $('#btn-choose-near').on('click',function(){
+            var $this = $(this);
+            // 后台返回 ajax({})
+            var nearData = {
+                "data":[
+                    { "guanjianzi_mc": "学校" },
+                    { "guanjianzi_mc": "医院" },
+                    { "guanjianzi_mc": "公园" },
+                    { "guanjianzi_mc": "超市" },
+                    { "guanjianzi_mc": "商场" },
+                    { "guanjianzi_mc": "公交站" },
+                    { "guanjianzi_mc": "景点" },
+
+                    { "guanjianzi_mc": "体育馆" },
+                    { "guanjianzi_mc": "电影院" },
+                    { "guanjianzi_mc": "剧院" },
+                    { "guanjianzi_mc": "餐厅" },
+                    { "guanjianzi_mc": "酒店" },
+                    { "guanjianzi_mc": "便利店" },
+                    { "guanjianzi_mc": "购物中心" },
+                    { "guanjianzi_mc": "电影院" },
+                    { "guanjianzi_mc": "博物馆" }
+                ]
+            }
+
+            /*
+            // START AJAX
+            var nearData = { data: [] }
+            $.ajax({
+                async: false, // 取数方式. true 异步(默认), false 同步
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_loupan_fujin.ashx",
+                data: {
+                    "action": "wh_get_guanjianzi_list",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "menu_bh": "<%=s_menu_bh%>"
+                },
+                success: function(res){
+                    if(!res || $.isEmptyObject(res)) return;
+                    nearData = JSON.parse(res);
+                },
+                error: function(errs){ },
+                beforeSend: function(xhr){ },
+                complete: function(xhr, status){ }
+            })
+            // END AJAX
+            */
+
+            var _html = '';
+            $.each(nearData.data, function(index, item){
+                _html += [
+                    '<li>',
+                        '<input type="checkbox" class="ne-checkbox square-tick">',
+                        '<span>' + item["guanjianzi_mc"] + '</span>',
+                    '</li>'
+                ].join('\r\n')
+            });
+            var $dropNode = $('.bds__search_form_box_drop');
+            if($dropNode.children('ul').find('li').length == 0) {
+                $dropNode.children('ul').empty().append(_html); 
+            }
+            $dropNode.show();
+        });
+
+
+        //——————————————————————————————————————————
+        // 选择单个项目时
+        $(document).on('click', '.bds__search_form_box_drop_list li span', function(e){
+            var value = $(this).text();
+            $('#s-near').val(value);
+            $('.bds__search_form_box_drop').hide();
+            $('.bds__search_form_box_drop_list input:checkbox').prop('checked', false);
+        });
+
+        //——————————————————————————————————————————
+        // 点击确定按钮时隐藏附近项目下拉
+        $('.bds__search_form_box_drop_operate').on('click', function(e){
+            // var target = e.target.closest('.bds__search_form_box_drop');
+            var target = getClosest(e.target, '.bds__search_form_box_drop');
+            // console.log('len：', $(target).length)
+            if($(target).length > 0) {
+                $('.bds__search_form_box_drop').hide();
+                fn_done_near_drop_close_event();
+            }
+        });
+        // 点击其它地方隐藏附近项目下拉
+        $(document).on('click', function(e) {
+            // var target = e.target.closest('.bds__search_form_box_drop, #btn-choose-near');
+            var target = getClosest(e.target, '.bds__search_form_box_drop, #btn-choose-near');
+            // console.log('len-x：', $(target).length)
+            if($(target).length == 0) {
+                $('.bds__search_form_box_drop').hide();
+                // fn_done_near_drop_close_event();
+            }
+        });
+
+        /**
+         * 附近项目下拉关闭事件
+         * 附近项目：确定按钮
+        */
+        function fn_done_near_drop_close_event(){
+            var checkedArr = [];
+            $('.bds__search_form_box_drop').children().find('li').each(function(){
+                var $checkbox = $('input:checkbox', this),
+                    $span = $('span', this);
+                if($checkbox.prop('checked')){
+                    checkedArr.push($span.text());
+                }
+            });
+            // console.log('checkedArr：', checkedArr)
+            DEFAULT_NEAR_ARR = checkedArr; // 全局赋值
+            $('#s-near').val(checkedArr.join(','));
+        }
+
+
+
+        //——————————————————————————————————————————
+        // 半径下拉
+        $('#s-range').on('click',function(){
+            var $this = $(this);
+            var rangeData = {
+                "data":[
+                    { "value": "500" },
+                    { "value": "1000" },
+                    { "value": "1500" },
+                    { "value": "2000" },
+                    { "value": "2500" },
+                    { "value": "3000" },
+                    { "value": "3500" },
+                    { "value": "4000" },
+                    { "value": "4500" },
+                    { "value": "5000" },
+                    { "value": "5500" },
+                    { "value": "6000" },
+                    { "value": "6500" },
+                    { "value": "7000" },
+                    { "value": "8000" },
+                    { "value": "9000" },
+                    { "value": "9500" },
+                    { "value": "10000" }
+                ]
+            }
+            neuiDropdown({
+                caption: '',
+                json: rangeData,
+                format:["value"]
+            },this) 
+        });
+
+
+
+        //——————————————————————————————————————————
+        // 城市下拉
+        $('#c-city').on('click', function(){
+            var value = $(this).val();
+            var districtData = {
+                "data": [
+                    { "province": "福建省", "data": [
+                        { 
+                            "city": "泉州市", 
+                            "data": [
+                            {"county": "鲤城区"},
+                            {"county": "丰泽区"},
+                            {"county": "洛江区"},
+                            {"county": "泉港区"},
+                            {"county": "石狮市"},
+                            {"county": "晋江市"},
+                            {"county": "南安市"},
+                            {"county": "惠安县"},
+                            {"county": "安溪县"},
+                            {"county": "永春县"},
+                            {"county": "德化县"},
+                            {"county": "金门县"}
+                        ]},{ 
+                            "city": "宁德市", 
+                            "data": [
+                            {"county": "蕉城区"},
+                            {"county": "福安市"},
+                            {"county": "福鼎市"},
+                            {"county": "霞浦县"},
+                            {"county": "古田县"},
+                            {"county": "屏南县"},
+                            {"county": "寿宁县"},
+                            {"county": "周宁县"},
+                            {"county": "柘荣县"}
+                        ]},{ 
+                            "city": "福州市‌", 
+                            "data": [
+                            {"county": "鼓楼区"},
+                            {"county": "台江区"},
+                            {"county": "仓山区"},
+                            {"county": "马尾区"},
+                            {"county": "晋安区"},
+                            {"county": "长乐区"},
+                            {"county": "福清市"},
+                            {"county": "闽侯县"},
+                            {"county": "连江县"},
+                            {"county": "罗源县"},
+                            {"county": "闽清县"},
+                            {"county": "永泰县"},
+                            {"county": "平潭县"}
+                        ]},{ 
+                            "city": "莆田市", 
+                            "data": [
+                            {"county": "城厢区"},
+                            {"county": "涵江区"},
+                            {"county": "荔城区"},
+                            {"county": "秀屿区"},
+                            {"county": "仙游县"}
+                        ]},{ 
+                            "city": "‌厦门市‌", 
+                            "data": [
+                            {"county": "思明区"},
+                            {"county": "海沧区"},
+                            {"county": "湖里区"},
+                            {"county": "集美区"},
+                            {"county": "同安区"},
+                            {"county": "翔安区"}
+                        ]},{ 
+                            "city": "‌漳州市‌", 
+                            "data": [
+                            {"county": "芗城区"},
+                            {"county": "龙文区"},
+                            {"county": "龙海区"},
+                            {"county": "长泰区"},
+                            {"county": "漳浦县"},
+                            {"county": "云霄县"},
+                            {"county": "诏安县"},
+                            {"county": "东山县"},
+                            {"county": "南靖县"},
+                            {"county": "平和县"},
+                            {"county": "华安县"}
+                        ]},{ 
+                            "city": "‌三明市‌", 
+                            "data": [
+                            {"county": "三元区"},
+                            {"county": "沙县区"},
+                            {"county": "永安市"},
+                            {"county": "明溪县"},
+                            {"county": "清流县"},
+                            {"county": "宁化县"},
+                            {"county": "大田县"},
+                            {"county": "尤溪县"},
+                            {"county": "将乐县"},
+                            {"county": "泰宁县"},
+                            {"county": "建宁县"},
+                            {"county": "莆田市‌"}
+                        ]},{ 
+                            "city": "‌龙岩市‌", 
+                            "data": [
+                            {"county": "新罗区"},
+                            {"county": "永定区"},
+                            {"county": "漳平市"},
+                            {"county": "长汀县"},
+                            {"county": "上杭县"},
+                            {"county": "武平县"},
+                            {"county": "连城县"},
+                            {"county": "宁德市‌"}
+                        ]},{ 
+                            "city": "南平市‌", 
+                            "data": [
+                            {"county": "延平区"},
+                            {"county": "建阳区"},
+                            {"county": "邵武市"},
+                            {"county": "武夷山市"},
+                            {"county": "建瓯市"},
+                            {"county": "顺昌县"},
+                            {"county": "浦城县"},
+                            {"county": "光泽县"},
+                            {"county": "松溪县"},
+                            {"county": "政和县"}
+                        ]}
+                    ]}
+                ]
+            }
+            neuiDropdown({
+                // position: 'fixed',
+                caption: '',
+                chain: true, // 是否省市区同框联动.默认false
+                level: 3, // 省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
+                json: districtData, // 数据源不填时，将默认自动调用全国省市区数据源
+                // areaFormat: ["province", "city", "county"], // 地区显示值JSON格式(可缺省)
+                // keyFormat: ["provinceId", "cityId", '"ountyId"], // 地区隐藏值JSON格式(可缺省)
+                
+                // id: '350000-350500-350503',
+                entire:'全部',
+                isEntireRegion: 'county', // 限制默认下拉值添加在哪里(可选). all 省份、城市、区县上都加(默认), province 仅加在省份上, city 仅加在城市上, county 仅加在区县上
+                value: value,
+
+                isCnClose: true, // 当省市区同框联动,是否点了"全部"选项后就马上填充值并关闭控件(可缺省),默认true
+                isCnPartEmpty: true, // 当省市区同框联动,选中下拉值后当城市或区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省", eg3. "全部-全部-全部" 变成 "全部"
+                isCnAllEmpty:false, // 当省市区同框联动, 选中下拉值后当省份、城市、区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省"， eg3. "全部-全部-全部" 变成 ""
+                // 说明：isCnAllEmpty=true 具有 isCnPartEmpty=true 的功能，并且还能将省份值为"全部"时也替换成空
+
+                showCloseButton: true,
+                beautifyScrollBar: false, // 是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式
+                // closeButtonAppearance: 'image', // 关闭按钮的外观. text 文字（默认），image 图片.
+                callBack:function(e){
+                    // console.log('省市区同框联动下拉回调：', e);
+                    fn_locate_city();
+                }
+            }, this)
+        });
+
+
+
+        
+
+        //——————————————————————————————————————————
+        // 城市快速定位按钮
+        $('#btn-pick-locate').on('click', function(){
+            fn_locate_city();
+        });
+
+        function fn_locate_city(){
+            var ls_city = $('#c-city').val();
+            if(ls_city == '') {
+                // neuiDialog.alert({
+                //     animate: true,
+                //     message: '请填写：城市',
+                //     buttons: ['确定']
+                // })
+                $('#c-city').focus();
+                return;
+            }
+            // 数据过滤，去掉省份自治区及短横线等字符
+            var cityName = ls_city.toString().replace(/(\-|\,|\s+)/g, '');
+            cityName = cityName.indexOf('省') >= 0 || cityName.indexOf('自治区') >= 0 ? cityName.replace(/^(.*?省|自治区)(.*)/g, '$2') : cityName;
+            // console.log("城市：", nowCityName)
+            map.clearOverlays(); // 清空所有覆盖物
+            // map.setCenter(nowCityName); // 定位到指定城市
+
+            // 获取地址坐标
+            var myGeo = new BMap.Geocoder(); // 创建地址解析器实例    
+            myGeo.getPoint(cityName, function(point){ // 将地址解析结果显示在地图上，并调整地图视野
+                // console.log('point：', point)    
+                if (point) {
+                    var lng = point.lng, lat = point.lat;
+                    neuiBdmap.createMarker({
+                        type: 'zhongxin', // 坐标类型(可选)，默认空。值： zhongxin 中心点坐标, 空 表示其它类型。
+                        coordinate: lng + ',' + lat, // 坐标经纬度字符串. eg. '经度,纬度'
+                        title: $('#c-city').val(), // 标题(可选)，默认空。支持HTML
+                        describe: '', // 描述信息(可选)，默认空。支持HTML
+                        message: '', // 信息窗口短信内容(可选)，默认空
+                        autoViewport: true, // 是否自动调整视野，默认true
+                        zoom: 13, // 自动调整视野时地图的缩放级别，默认13。值 3-19
+                        dragable: true, // 是否允许拖拽(可选)，默认false
+                        finishCallback: function(e){ // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                            $('#s-community').val(''); // 小区栏清空
+                            $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值
+                        }, 
+                        dragEndCallback: function(e){ // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                            $('#s-community').val(''); // 小区栏清空
+                            $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值  
+                        }
+                    })
+                }      
+            }); // , "北京市"
+        }
+
+
+
+        //——————————————————————————————————————————
+        // 查询结果伸缩按钮
+        $('.btn-stretch').on('click', function(){
+            if($('.bds__graph_result').hasClass('stretch-in')) {
+                $('.bds__graph_result').removeClass('stretch-in');
+            }
+            else {
+                $('.bds__graph_result').addClass('stretch-in');
+            }
+        });
+
+
+
+        //——————————————————————————————————————————
+        // 查询按钮：周围边关键字搜索
+        $('#btn-query').on('click', function(){
+            var zuobiao = $('#c-locate').val(), // 坐标
+                xiangmu = $('#s-near').val(), // 附近项目，关键字
+                banjing = $('#s-range').val(); // 范围，半径
+            
+            // test1
+            // 尊邸大厦  118.608514,24.89511
+            // var zuobiao = '118.608514,24.89511';
+            // var lng = '118.608514', lat = '24.89511';
+            // $('#c-locate').val(lng + ', ' + lat);
+
+            var tips = '';
+            if(xiangmu == '') tips += '附近项目、';
+            if(banjing == '') tips += '半径、';
+            if(tips != '') {
+                $('#s-near').focus();
+                return;
+            }
+
+            //
+            var pagesize = 100; // 每页容量
+            var coordinateArr = zuobiao.split(',');
+            var point = new BMap.Point(coordinateArr[0], coordinateArr[1]); // 中心点
+            var myKeys = xiangmu.indexOf(',') >= 0 ? xiangmu.split(',') : [xiangmu]; // 关键字。数组格式
+            var radius = isNaN(parseFloat(banjing)) ? parseFloat(DEFAULT_RANGE) : parseFloat(banjing); // 半径。数值型，不能是字符串，否则会返回空数据
+            map.clearOverlays(); // 清空所有覆盖物
+            // map.centerAndZoom(point, 13); // 调整视野
+            var local = new BMap.LocalSearch(point, {
+                renderOptions: {
+                    map: map, // 展现结果的地图实例。当指定此参数后，搜索结果的标注、线路等均会自动添加到此地图上
+                    autoViewport: true, // 检索结束后是否自动调整地图视野。此属性对LocalCity无效
+                    panel: 'panel-result', // String | HTMLElement 结果列表的HTML容器id或容器元素，提供此参数后，结果列表将在此容器中进行展示。此属性对LocalCity无效。驾车路线规划无效
+                    // selectFirstResult: false, // 是否选择第一个检索结果。此属性仅对LocalSearch有效
+                },
+                pageCapacity: pagesize, // 设置每页容量，取值范围：1 - 100，对于多关键字检索，容量表示每个关键字的数量，如果有2个关键字，则实际检索结果数量范围为：2 - 200
+                // 检索完成后的回调函数。 参数：results: LocalResult或Array 如果是多关键字检索，回调函数参数返回一个LocalResult的数组，数组中的结果顺序和检索中多关键字数组中顺序一致
+                onSearchComplete: function(results){
+                    // console.log('周边医院返回结果：results：', results); 
+                    var status = local.getStatus();
+                    // console.log('local：', local, '\nstatus：', status);
+                    // 判断状态是否正确
+                    if(status !== 0) {
+                        neuiDialog.alert({
+                            animate: true,
+                            message: '没有找到相应的数据，可尝试更改范围半径',
+                            buttons: ['确定']
+                        });
+                        return;
+                    }
+                    else if(status == 0){
+                        $('.bds__graph_result').removeClass('stretch-in');
+                        fnNearComposeStringToUser(results);
+                    }
+                }
+            });
+
+            // local.searchNearby(myKeys, point, radius, {
+            //     poiTypes: ["教育|小学"]
+            // });
+            local.searchNearby(myKeys, point, radius);
+            local.setPageCapacity(pagesize); // 设置每页容量
+        });
+
+
+
+        // ========== 核心：建立“关键词→官方分类”映射表（可扩展） add 20260302-1 ==========
+        var typeMap = {
+            // 1.通用的
+            "道路": {
+                typeKeyword: "道路|城市道路",
+                tagKeyword: ["道路", "路", "大街", "大道", "街道"]
+            },
+            "公司": {
+                typeKeyword: "公司|公司",
+                tagKeyword: ["公司", "企业", "集团", "有限公司"]
+            },
+            "厂房": {
+                typeKeyword: "工业|工厂",
+                tagKeyword: ["厂房", "工厂", "工业园", "工业区", "产业园"]
+            },
+
+
+            // 2.【房产评估必须要的】周边环境类：有利的因素
+            "政府": {
+                typeKeyword: "政府|政府机构",
+                tagKeyword: ["政府", "机关", "办事处", "政务中心"]
+            },
+            "小区": {
+                typeKeyword: "住房|住宅小区",
+                tagKeyword: ["小区", "社区", "住宅区", "公寓"]
+            },
+            "公交": {
+                typeKeyword: "交通设施|公交车站",
+                tagKeyword: ["公交", "公交站", "公交车站", "站台"]
+            },
+            "公交站": {
+                typeKeyword: "交通设施|公交车站",
+                tagKeyword: ["公交站", "公交车站", "站台"]
+            },
+
+            "学校": {
+                typeKeyword: "教育",
+                tagKeyword: ["小学", "中学", "高中", "幼儿园", "学校"]
+            },
+            "幼儿园": {
+                typeKeyword: "教育|幼儿园",
+                tagKeyword: ["幼儿园", "托儿"]
+            },
+            "小学": {
+                typeKeyword: "教育|小学",
+                tagKeyword: ["小学", "教育"]
+            },
+            "中学": {
+                typeKeyword: "教育|中学",
+                tagKeyword: ["中学", "初中", "高中"]
+            },
+            "医院": {
+                typeKeyword: "医疗",
+                tagKeyword: ["医院", "卫生院", "诊所", "医疗"]
+            },
+            "公园": {
+                typeKeyword: "公园|公园",
+                tagKeyword: ["公园", "绿地", "广场"]
+            },
+            "银行": {
+                typeKeyword: "金融|银行",
+                tagKeyword: ["银行", "支行", "分理处"]
+            },
+            "商场": {
+                typeKeyword: "购物|购物中心",
+                tagKeyword: ["商场", "购物中心", "百货", "商城"]
+            },
+            "超市": {
+                typeKeyword: "购物|超市",
+                tagKeyword: ["超市", "便利店", "卖场", "生鲜"]
+            },
+            "酒店": {
+                typeKeyword: "酒店|酒店",
+                tagKeyword: ["酒店", "宾馆"]
+            },
+            "地铁": {
+                typeKeyword: "交通设施|地铁站",
+                tagKeyword: ["地铁", "地铁站", "轻轨"]
+            },
+            "停车场": {
+                typeKeyword: "交通设施|停车场",
+                tagKeyword: ["停车场", "停车"]
+            },
+            "加油站": {
+                typeKeyword: "交通设施|加油站",
+                tagKeyword: ["加油站"]
+            },
+            "餐饮": {
+                typeKeyword: "餐饮",
+                tagKeyword: ["餐厅", "饭店", "美食"]
+            },
+            "市场": {
+                typeKeyword: "购物|市场",
+                tagKeyword: ["市场", "农贸市场", "菜市场"]
+            },
+            "物流": {
+                typeKeyword: "交通设施|物流",
+                tagKeyword: ["物流", "快递", "货运"]
+            },
+            "文体": {
+                typeKeyword: "文化",
+                tagKeyword: ["体育馆", "文化", "图书馆", "活动中心"]
+            },
+
+
+            // 3.【房产评估必须要的】周边环境类：不利因素
+            "陵园": {
+                typeKeyword: "殡葬|陵园",
+                tagKeyword: ["陵园", "公墓", "殡仪馆"]
+            },
+            "垃圾站": {
+                typeKeyword: "市政|垃圾处理",
+                tagKeyword: ["垃圾站", "垃圾转运"]
+            },
+            "变电站": {
+                typeKeyword: "市政|变电站",
+                tagKeyword: ["变电站", "变电所"]
+            }
+        };
+
+
+
+
+        // ========== 步骤1：动态提取检索词中的核心类型 add 20260302-1 ==========
+        function extractCoreKeyword(searchStr) {
+            // 遍历映射表，提取核心关键词
+            for (var key in typeMap) {
+                if (searchStr.indexOf(key) !== -1) {
+                    return key; // 比如输入“朝阳区 小学”→返回“小学”
+                }
+            }
+            return null; // 未匹配到已知类型
+        }
+
+        // ========== 步骤2：通用POI过滤函数 add 20260302-1 ==========
+        function filterPOI(poi, coreKey) {
+            var targetType = typeMap[coreKey];
+            if (!targetType) return false;
+
+            // 规则1：优先匹配POI的官方type字段（最精准）
+            if (poi.type && poi.type.indexOf(targetType.typeKeyword) !== -1) {
+                return true;
+            }
+
+            // 规则2：兜底匹配tags字段（兼容老旧POI）
+            if (poi.tags) {
+                for (var i = 0; i < targetType.tagKeyword.length; i++) {
+                    if (poi.tags.indexOf(targetType.tagKeyword[i]) !== -1) {
+                        return true;
+                    }
+                }
+            }
+
+            // 未匹配到核心分类，排除
+            return false;
+        }
+
+
+
+        //——————————————————————————————————————————
+        /**
+         * 根据百度地图附近关键词搜索结果返回的值组成用户所需的字符串
+         * @param {Array} results 数据源
+         */
+        function fnNearComposeStringToUser(results){
+            // 组成字符串显示在界面上
+            // ①关键字是除“公交”以外的显示效果
+            // 区域内有学校：丰泽实验小学、鲤城实难小学、东湖小学、兴光小学等；医院：东南医院、东湖医院、人民医院、第二医院等。
+            // ②关键字是“公交”时的显示效果
+            // 出入可利用私家车、公交车、自行车及出租车等；周边有“幸福街口”公交站点：有1路、2路等公交线路停靠。
+            var placeList = [], 
+                serviceArr = []; // 公共服务设施
+                busStr = ''; // 公交
+            var outcomes = Array.isArray(results) ? results : [ results];
+            for(var i = 0; i < outcomes.length; i++) {
+                var outcome = outcomes[i];
+
+                
+                // testing
+                var poiCount = outcome.getNumPois ? outcome.getNumPois() : outcome.getNumResults();
+                if (poiCount === 0) {
+                    console.log("当前结果集无POI数据");
+                    continue;
+                }
+                console.log(`第${i+1}个结果集，POI总数：${poiCount}`);
+                for (var j = 0; j < poiCount; j++) {
+                    var poi = outcome.getPoi(j);
+                    console.log('poi-x：', poi);
+                    if (poi) {
+                        // console.log(`POI[${j+1}]：${poi.title} - ${poi.address}`);
+                        // 可选：在地图上标注POI
+                        // var marker = new BMap.Marker(poi.point);
+                        // map.addOverlay(marker);
+                        // marker.setLabel(new BMap.Label(poi.title, {offset: new BMap.Size(20, -10)}));
+                    }
+                }
+
+
+                        
+                var word = outcome.keyword, locates = outcome.Rr;
+                console.log('outcome:', outcome, '\nlocates：', locates); // testing
+                var oneStr = '';
+                var titleArr = [];
+                for (var k = 0; k < locates.length; k++){
+                    var locate = locates[k];
+                    var title = locate.title,
+                        address = locate.address;
+                    placeList.push(locate.title);
+                    if(word.indexOf('公交') >= 0) {
+                        busStr += '\r\n“' + title + '”公交站点：';
+                        if(address != '') {
+                            busStr += '有' + address.replace(/(\;|\；)/g, '、') + '等公交线路停靠';
+                            busStr += ( k == locates.length - 1) ? '。' : '，';
+                        }
+                    }
+                    else {
+                        titleArr.push(title);
+                    }
+                }
+                oneStr += titleArr.join('、');
+                oneStr += titleArr.length == 0 ? '' : ((i == outcomes.length - 1) ? '。' : '等；\r\n\r\n'); 
+                oneStr = (word.indexOf('公交') >= 0 ? '' : (titleArr.length == 0 ? '' : word + '：')) + oneStr;
+                serviceArr.push(oneStr);
+            }
+            // console.log('serviceArr：', serviceArr)
+
+            var serviceStr = '区域内有\r\n\r\n' + serviceArr.join('');
+            busStr = busStr == '' ? '' : ('出入可利用私家车、公交车、自行车及出租车等；周边有' + busStr);
+            // 如果最后一个字符是分号则转化为句号
+            var index = serviceStr.lastIndexOf('；'), length = serviceStr.length;
+            if(index == length - 1) {
+                serviceStr = serviceStr.substring(0, index) + '。';
+            }
+
+            // 结果输入到指定位置
+            var resultStr = serviceStr + '\r\n\r\n' + busStr;
+            $('#r-result').val(resultStr);
+        }
+
+
+        //——————————————————————————————————————————
+        // 附近关键词搜索返回的结果如下 eg.
+        // var results = [
+        //     { 
+        //         keyword: "学校",
+        //         Rr: [
+        //             { title: "丰泽实验小学", keyword: "学校", address: "实验路1"},
+        //             { title: "鲤城实难小学", keyword: "学校", address: "实验路2"},
+        //             { title: "东湖小学", keyword: "学校", address: "实验路3"},
+        //             { title: "兴光小学", keyword: "学校", address: "实验路4"}
+        //         ]
+        //     }, { 
+        //         keyword: "医院",
+        //         Rr: [
+        //             { title: "东南医院", keyword: "医院", address: "医院路1"},
+        //             { title: "东湖医院", keyword: "医院", address: "医院路2"},
+        //             { title: "人民医院", keyword: "医院", address: "医院路3"},
+        //             { title: "第二医院", keyword: "医院", address: "医院路4"}
+        //         ]
+        //     },{ 
+        //         keyword: "公交",
+        //         Rr: [
+        //             { title: "幸福街口站", keyword: "公交", address: "4路; 6路; 8路"},
+        //             { title: "浦西万达广场", keyword: "公交", address: "4路; 6路; 8路"},
+        //             { title: "鲤城教育局", keyword: "公交", address: "4路; 6路; 8路"},
+        //             { title: "东南医院", keyword: "公交", address: "4路; 6路; 8路"}
+        //         ]
+        //     }
+        // ]
+
+        // fnNearComposeStringToUser(results);
+
+
+
+
+
+        
+    
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //              小区名称关键字提示输入提示词条
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        // 百度地图API功能
+        function G(id) {
+            return document.getElementById(id);
+        }
+        var ac = new BMap.Autocomplete({ // 建立一个自动完成的对象
+            input: "s-community",
+            location: map // 设定返回结果的所属范围。例如“北京市”。String | Map | Point
+        });
+        // 小区一栏聚焦时更改检索区域。小区下拉
+        document.getElementById('s-community').addEventListener('focus', function() {
+            var arr = $('#c-locate').val().split(',');
+            var lng = arr[0], lat = arr[1];
+            ac.setLocation(new BMap.Point(lng, lat));
+        });
+        ac.addEventListener("onhighlight", function (e) {
+            // console.log($('#c-locate').val().split(',')[0], $('#c-locate').val().split(',')[1])
+            // 鼠标放在下拉列表上的事件
+            var str = "";
+            var _value = e.fromitem.value;
+            var value = "";
+            if (e.fromitem.index > -1) {
+                value =
+                    _value.province +
+                    _value.city +
+                    _value.district +
+                    _value.street +
+                    _value.business;
+            }
+            str =
+                "FromItem<br />index = " +
+                e.fromitem.index +
+                "<br />value = " +
+                value;
+
+            value = "";
+            if (e.toitem.index > -1) {
+                _value = e.toitem.value;
+                value =
+                    _value.province +
+                    _value.city +
+                    _value.district +
+                    _value.street +
+                    _value.business;
+            }
+            str +=
+                "<br />ToItem<br />index = " +
+                e.toitem.index +
+                "<br />value = " +
+                value;
+            G("searchResultPanel").innerHTML = str;
+        });
+
+        var myValue;
+        ac.addEventListener("onconfirm", function (e) {
+            // 鼠标点击下拉列表后的事件
+            var _value = e.item.value;
+            // console.log('value:', _value)
+            myValue =
+                _value.province +
+                _value.city +
+                _value.district +
+                _value.street +
+                _value.business;
+            G("searchResultPanel").innerHTML =
+                "onconfirm<br />index = " +
+                e.item.index +
+                "<br />myValue = " +
+                myValue;
+
+            setPlace(_value.business);
+        });
+
+        // 小区下拉
+        function setPlace(ps_title) {
+            map.clearOverlays(); // 清除地图上所有覆盖物
+            function myFun() {
+                var pp = local.getResults().getPoi(0).point; // 获取第一个智能搜索的结果
+                // console.log('pp：', pp);
+                var lng = pp.lng, lat = pp.lat;
+                neuiBdmap.createMarker({
+                    type: 'zhongxin', // 坐标类型(可选)，默认空。值： zhongxin 中心点坐标, 空 表示其它类型。
+                    coordinate: lng + ',' + lat, // 坐标经纬度字符串. eg. '经度,纬度'
+                    title: ps_title, // 标题(可选)，默认空。支持HTML
+                    describe: '', // 描述信息(可选)，默认空。支持HTML
+                    message: '', // 信息窗口短信内容(可选)，默认空
+                    autoViewport: true, // 是否自动调整视野，默认true
+                    zoom: 13, // 自动调整视野时地图的缩放级别，默认13。值 3-19
+                    dragable: true, // 是否允许拖拽(可选)，默认false
+                    finishCallback: function(e){ // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}             
+                        var lng = e.lng, lat = e.lat;
+                        $('#c-locate').val(lng + ',' + lat); // 坐标栏赋值
+                    }, 
+                    dragEndCallback: function(e){ // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                        $('#s-community').val(''); // 小区栏清空
+                        $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值  
+                    }
+                })
+            }
+            var local = new BMap.LocalSearch(map, {
+                // 智能搜索
+                onSearchComplete: myFun,
+            });
+            local.search(myValue);
+        }
+
+    </script>
+</body>
+</html>
