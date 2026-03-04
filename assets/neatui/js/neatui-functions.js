@@ -568,6 +568,181 @@ var utilities = {
 
 
     /**
+     * HTML编码：将标签转换成字符串
+     * HTML与字符串互转义
+	 * edit 20240822-1
+     * @param {string} ps_str 含有标签的字符串
+     * @returns {string} 返回不含标签的字符串
+     * eg1.将 < 转义成 &lt; eg2.将 > 转义成 &gt;
+     */
+    htmlEncode: function(ps_str){
+		if(typeof document != 'undefined'){ // document 对象存在时
+			var temp = document.createElement("div");
+			(temp.textContent != null) ? (temp.textContent = ps_str) : (temp.innerText = ps_str);
+			// 转义替换
+			var output = temp.innerHTML.toString().replace(/\'/g, '&apos;').replace(/\"/g, '&quot;') // 单双引号转义
+			// 回车换行替换成<br>
+			output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
+			output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
+			// <br>替换成<p>
+			if(output.indexOf('<br>') > -1){
+				// 让p标签成对出现
+				output = output.replace(/\<br\>/g, '</p><p>');
+				output = output.replace(/^(?!\<.*)/g, '<p>');
+				output = output.replace(/(?!\>.*)$/g, '</p>');
+				output = output.replace(/(\<p\>\<\/p\>)/g, ''); // 替换中间没有内容的空标签. eg.<p></p>
+			}
+			// 其它替换
+			// 注：部分ios中手写输入时即使过滤掉所有空格了还会出现一个空格，如果把空格转换成&nbsp;的话数据库中会有&nbsp;导致搜索等功能匹配不了。
+			// 故解决思路是：移动端把所有空格替换成空，在pc端把所有空格替换成一个&nbsp;
+			if(typeof checker != 'undefined' && typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
+				output = output.replace(/\t/g, ''); // 制表符替换成空
+				output = output.replace(/([\s]+)/g, ' '); // 多个空格替换成成一个空格
+			}else{ // pc端时
+				output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
+				output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
+			}
+			output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');  // div标签换成p
+			// 字符串化+斜杠处理
+			output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
+			output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
+			output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
+			//
+			temp = null;
+			return output;
+		}
+		
+		else{ // document 对象不存在时
+			var output = ps_str;
+			// 字符串化+斜杠处理
+			// output = output.replace(/<[^<>]+?>/g, ''); // 过滤标签。不行，这里是要转义而非过滤
+			
+			// output = output.replace(/\r/g, ''); // 去掉换行
+			// output = output.replace(/\n/g, ''); // 去掉回车
+			// output = output.replace(/[\r\n]+?/g, ''); // 去掉换行
+			
+			output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
+			output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
+			// <br>替换成<p>
+			if(output.indexOf('<br>') > -1){
+				// 让p标签成对出现
+				output = output.replace(/\<br\>/g, '</p><p>');
+				output = output.replace(/^(?!\<.*)/g, '<p>');
+				output = output.replace(/(?!\>.*)$/g, '</p>');
+				output = output.replace(/(\<p\>\<\/p\>)/g, ''); // 替换中间没有内容的空标签. eg.<p></p>
+			}
+			output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
+			output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
+			output = output.replace(/\'/g, '&apos;'); // 单引号替换成 &apos;
+			output = output.replace(/\"/g, '&quot;'); // 双引号替换成 &quot;
+			output = output.replace(/\&/g, '&amp;'); // 连字符替换成 &amp;
+			output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
+			output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
+			output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
+		}
+    },
+
+
+
+    /**
+     * HTML解码：将字符串转换成标签
+     * 字符串与HTMl互转义
+     * @param {string} ps_str 字符串
+     * @returns {string} 返回含有标签的字符串
+     * eg1. 将 &lt; 转义成 < eg2.将 &gt; 转义成 >
+     */
+    htmlDecode: function(ps_str){
+        var temp = document.createElement('div');
+        temp.innerHTML = ps_str;
+        var output = temp.innerText ||temp.textContent;
+        temp = null;
+        return output;
+    },
+
+
+
+    /**
+     * 转义函数：转义JSON特殊字符
+     * 说明：兼容 JSON 特殊字符 + 单/双引号 + 可选 URL 编码
+     * @param {String} str 要转义的原始字符串
+     * @param {Boolean} needUrlEncode 是否需要URL编码，默认false(可选)。GET请求传参时设为true
+     * @returns {String} 转义后的安全字符串
+     * 【使用示例】
+     *  场景1：处理包含单 / 双引号的字符串（非 URL 传递）
+        // 原始字符串：同时包含单引号、双引号、反斜杠
+        const original = '张三"李四\'王五\\测试\n换行';
+        // 转义（无需 URL 编码）
+        const escaped = escapeSpecialChars(original);
+        console.log('转义后：', escaped); // 输出：张三\"李四\'王五\\测试\n换行
+        // 反转义
+        const unescaped = unescapeSpecialChars(escaped);
+        console.log('反转义后：', unescaped); // 输出：张三"李四'王五\测试（换行符）换行
+
+    *   场景 2：GET 请求 URL 参数传递（需 URL 编码）
+        // 原始字符串：包含单双引号 + & 符号（你的核心痛点）
+        const original = '张三"李四\'&gt;王五';
+        // 转义 + URL 编码（适配 GET 请求）
+        const escaped = escapeSpecialChars(original, true);
+        console.log('转义+URL编码后：', escaped); // 输出：张三%5C%22李四%5C%27%26gt%3B王五
+        // 拼接 URL（无报错风险）
+        const url = `/api/user?name=${escaped}`;
+        console.log('最终 URL：', url); // 输出：/api/user?name=张三%5C%22李四%5C%27%26gt%3B王五
+        // 后端接收后，先 URL 解码再反转义（.NET 示例）
+        // string name = System.Web.HttpUtility.UrlDecode(request.Query["name"]);
+        // string originalName = 后端反转义（对应上面的 unescapeSpecialChars 逻辑）;
+     */
+    escapeSpecialChars: function(str, needUrlEncode = false) {
+        if (typeof str !== 'string' || str === '') {
+            return '';
+        }
+        // 转义 JSON 核心特殊字符（双引号、反斜杠、换行、Tab 等）
+        let escapedStr = str
+        .replace(/\\/g, '\\\\')    // 转义反斜杠 \ → \\
+        .replace(/"/g, '\\"')      // 转义双引号 " → \"
+        .replace(/'/g, '\\\'')     // 转义单引号 ' → \'（兼容单引号场景）
+        .replace(/\n/g, '\\n')     // 转义换行符 → \n
+        .replace(/\r/g, '\\r')     // 转义回车符 → \r
+        .replace(/\t/g, '\\t')     // 转义制表符 → \t
+        .replace(/\f/g, '\\f')     // 转义换页符 → \f
+        .replace(/\b/g, '\\b');    // 转义退格符 → \b
+        // 如果需要 URL 编码（GET 请求/URL 参数），处理 &、=、% 等
+        if (needUrlEncode) {
+            escapedStr = encodeURIComponent(escapedStr);
+        }
+        return escapedStr;
+    },
+    
+    
+    /**
+     * 配套的反转义函数：反转义JSON特殊字符、还原转义后的字符串
+     * @param {String} str 转义后的字符串
+     * @param {Boolean} needUrlDecode 是否需要先URL解码，默认false(可选)
+     * @returns {String} 原始字符串
+     */
+    unescapeSpecialChars: function(str, needUrlDecode = false) {
+        if (typeof str !== 'string' || str === '') {
+            return '';
+        }
+        // 如果是 URL 编码的，先解码
+        let unescapedStr = str;
+        if (needUrlDecode) {
+            unescapedStr = decodeURIComponent(unescapedStr);
+        }
+        // 反转义 JSON 特殊字符和单/双引号
+        unescapedStr = unescapedStr
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '\r')
+        .replace(/\\t/g, '\t')
+        .replace(/\\f/g, '\f')
+        .replace(/\\b/g, '\b')
+        .replace(/\\"/g, '"')
+        .replace(/\\'/g, "'")
+        .replace(/\\\\/g, '\\');
+        return unescapedStr;
+    },
+
+
+    /**
      * 阅读更多，点击更多
      * 常用于只显示部分内容，当点击“更多”时则显示全部内容
      * @param {string|object} ps_selector 选择器节点或jq对象
@@ -639,6 +814,26 @@ var utilities = {
 		return ps_arr.filter(function(element, index, self){
 			return self.indexOf(element) === index;
 		})
+    },
+
+     /**
+     * 数组排序
+     * @param {Array} arr 原数组
+     * @param {string} method 排序方式(可选)，默认asc。值： asc 升序， desc 降序
+     * @returns {Array} 返回排序后的新数组
+     */
+    arraySort: function(arr, method){
+        var sorting = typeof method == 'undefined' ? 'asc' : (method == 'desc' ? 'desc' : 'asc');
+        var upArr = sortingAlgorithm.quickSort(arr, method);
+        if(sorting == 'desc'){
+            var downArr = [];
+            for(var i = upArr.length - 1; i >=0; i--){
+                downArr.push(upArr[i]);
+            }
+            return downArr;
+        }else{
+            return upArr;
+        }
     },
 
 
@@ -753,101 +948,6 @@ var utilities = {
 			}
 		}
     },
-
-
-
-    /**
-     * 将标签转换成字符串（即HTML编码）
-     * HTML与字符串互转义
-	 * edit 20240822-1
-     * @param {string} ps_str 含有标签的字符串
-     * @returns {string} 返回不含标签的字符串
-     * eg1.将 < 转义成 &lt; eg2.将 > 转义成 &gt;
-     */
-    htmlEncode: function(ps_str){
-		if(typeof document != 'undefined'){ // document 对象存在时
-			var temp = document.createElement("div");
-			(temp.textContent != null) ? (temp.textContent = ps_str) : (temp.innerText = ps_str);
-			// 转义替换
-			var output = temp.innerHTML.toString().replace(/\'/g, '&apos;').replace(/\"/g, '&quot;') // 单双引号转义
-			// 回车换行替换成<br>
-			output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
-			output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
-			// <br>替换成<p>
-			if(output.indexOf('<br>') > -1){
-				// 让p标签成对出现
-				output = output.replace(/\<br\>/g, '</p><p>');
-				output = output.replace(/^(?!\<.*)/g, '<p>');
-				output = output.replace(/(?!\>.*)$/g, '</p>');
-				output = output.replace(/(\<p\>\<\/p\>)/g, ''); // 替换中间没有内容的空标签. eg.<p></p>
-			}
-			// 其它替换
-			// 注：部分ios中手写输入时即使过滤掉所有空格了还会出现一个空格，如果把空格转换成&nbsp;的话数据库中会有&nbsp;导致搜索等功能匹配不了。
-			// 故解决思路是：移动端把所有空格替换成空，在pc端把所有空格替换成一个&nbsp;
-			if(typeof checker != 'undefined' && typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
-				output = output.replace(/\t/g, ''); // 制表符替换成空
-				output = output.replace(/([\s]+)/g, ' '); // 多个空格替换成成一个空格
-			}else{ // pc端时
-				output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
-				output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
-			}
-			output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');  // div标签换成p
-			// 字符串化+斜杠处理
-			output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
-			output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
-			output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
-			//
-			temp = null;
-			return output;
-		}
-		
-		else{ // document 对象不存在时
-			var output = ps_str;
-			// 字符串化+斜杠处理
-			// output = output.replace(/<[^<>]+?>/g, ''); // 过滤标签。不行，这里是要转义而非过滤
-			
-			// output = output.replace(/\r/g, ''); // 去掉换行
-			// output = output.replace(/\n/g, ''); // 去掉回车
-			// output = output.replace(/[\r\n]+?/g, ''); // 去掉换行
-			
-			output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
-			output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
-			// <br>替换成<p>
-			if(output.indexOf('<br>') > -1){
-				// 让p标签成对出现
-				output = output.replace(/\<br\>/g, '</p><p>');
-				output = output.replace(/^(?!\<.*)/g, '<p>');
-				output = output.replace(/(?!\>.*)$/g, '</p>');
-				output = output.replace(/(\<p\>\<\/p\>)/g, ''); // 替换中间没有内容的空标签. eg.<p></p>
-			}
-			output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
-			output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
-			output = output.replace(/\'/g, '&apos;'); // 单引号替换成 &apos;
-			output = output.replace(/\"/g, '&quot;'); // 双引号替换成 &quot;
-			output = output.replace(/\&/g, '&amp;'); // 连字符替换成 &amp;
-			output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
-			output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
-			output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
-		}
-    },
-
-
-
-    /**
-     * 将字符串转换成标签（即HTML解码）
-     * 字符串与HTMl互转义
-     * @param {string} ps_str 字符串
-     * @returns {string} 返回含有标签的字符串
-     * eg1. 将 &lt; 转义成 < eg2.将 &gt; 转义成 >
-     */
-    htmlDecode: function(ps_str){
-        var temp = document.createElement('div');
-        temp.innerHTML = ps_str;
-        var output = temp.innerText ||temp.textContent;
-        temp = null;
-        return output;
-    },
-
 
 
     /**
@@ -1712,30 +1812,8 @@ var utilities = {
             }
         }
         element.addEventListener("scroll", running, false)
-    },
-
-
-
-    /**
-     * 数组排序
-     * @param {Array} arr 原数组
-     * @param {string} method 排序方式(可选)，默认asc。值： asc 升序， desc 降序
-     * @returns {Array} 返回排序后的新数组
-     */
-    arraySort: function(arr, method){
-        var sorting = typeof method == 'undefined' ? 'asc' : (method == 'desc' ? 'desc' : 'asc');
-        var upArr = sortingAlgorithm.quickSort(arr, method);
-        if(sorting == 'desc'){
-            var downArr = [];
-            for(var i = upArr.length - 1; i >=0; i--){
-                downArr.push(upArr[i]);
-            }
-            return downArr;
-        }else{
-            return upArr;
-        }
     }
-    
+
 }; // END UTILITIES对象
 
 
