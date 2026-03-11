@@ -152,12 +152,38 @@
         var file = document.getElementById("file");
         neuiCanvasUpload.uploadFile({
             selector: file, // 上传标签dom对象,一般为<input type="file" id="file">标签的dom对象。格式：dom对象或#id或#classname。注：此参数与 container 只需二选一
-            container: '', // 父容器节点，动态节点时用。当有动态增加的节点要上传时就需要把事件绑定到父容器节点上才能触发事件。注：此参数与 selector 只需二选一。
-            maxWidth: 1200, // 图片最大宽度(PX). 尺寸最大可设1200px
+            container: '', // 父容器节点，委托事件到父节点而非当前input file节点。动态节点时用。当有动态增加的节点要上传时就需要把事件绑定到父容器节点上才能触发事件。注：此参数与 selector 只需二选一。
+            maxWidth: 1200, // 希望图片压缩到的最大宽度值，即图片宽度最大缩放目标值（像素），默认1200
             maxSize: 200, // 图片最大质量(KB). 质量最大200kb
             minSize: 1, // 图片最小质量(KB),默认1(可选)
             quality: 0.7, // 图片压缩系数, 0-1之间
             fileType: [], // ["png", "gif", "jpg", "jpeg", "pdf"], // 图片类型限制(必须)，默认为空，表示不限制类型
+            
+            // 图片压缩功能 add 20260311-1
+            autoCompressWhenOverLimit: true, // 是否开启自动压缩
+            forceConvertFormat: true, // 开启格式强制转换
+            targetFormat: 'image/jpeg', // 目标压缩格式，默认'image/jpeg'
+            maxTotalPixels: 8192 * 8192, // 强制所有浏览器处理图片的像素不超过多少
+            browserPixelLimits: { // 自定义浏览器处理图片像素的阈值（仅未配置maxTotalPixels时生效）
+                ie: 8192 * 8192,
+                edge_legacy: 8192 * 8192,
+                chrome: 16384 * 16384,
+                default: 8192 * 8192
+            },
+            decodeTimeout: 10000, // 解码超时延长时间，单位毫秒
+
+            // 加载状态回调(加载LOADING动画)
+            loadingCallback: function(isLoading) {
+                if(isLoading) {
+                        // console.log('图片处理中..')
+                    neui.showAnimate('图片处理中..');
+                } else {
+                    // console.log('图片处理结束..')
+                    neui.destroyAnimate();
+                }
+            },
+
+
             callBack: function (arr, el) { // 回调
                 // console.log('上传后的图片地址数组:',arr, '\n上传节点：', el);
                 //  neui.showAnimate('上传中..');
