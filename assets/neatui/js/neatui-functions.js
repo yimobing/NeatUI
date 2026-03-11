@@ -703,14 +703,15 @@ var utilities = {
         .replace(/\n/g, '\\n')     // 转义换行符 → \n
         .replace(/\r/g, '\\r')     // 转义回车符 → \r
         .replace(/\t/g, '\\t')     // 转义制表符 → \t
-        .replace(/\f/g, '\\f')     // 转义换页符 → \f
-        .replace(/\b/g, '\\b');    // 转义退格符 → \b
+        .replace(/\f/g, '\\f');     // 转义换页符 → \f
+        // .replace(/\b/g, '\\b');    // 转义退格符 → \b （!!!退格符这个不要，否则会变 \\b内容\\b）
         // 如果需要 URL 编码（GET 请求/URL 参数），处理 &、=、% 等
         if (needUrlEncode) {
             escapedStr = encodeURIComponent(escapedStr);
         }
         return escapedStr;
     },
+        
     
     
     /**
