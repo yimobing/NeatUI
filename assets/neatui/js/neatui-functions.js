@@ -670,33 +670,34 @@ var utilities = {
      * 【使用示例】
      *  场景1：处理包含单 / 双引号的字符串（非 URL 传递）
         // 原始字符串：同时包含单引号、双引号、反斜杠
-        const original = '张三"李四\'王五\\测试\n换行';
+        var original = '张三"李四\'王五\\测试\n换行';
         // 转义（无需 URL 编码）
-        const escaped = escapeSpecialChars(original);
+        var escaped = escapeSpecialChars(original);
         console.log('转义后：', escaped); // 输出：张三\"李四\'王五\\测试\n换行
         // 反转义
-        const unescaped = unescapeSpecialChars(escaped);
+        var unescaped = unescapeSpecialChars(escaped);
         console.log('反转义后：', unescaped); // 输出：张三"李四'王五\测试（换行符）换行
 
     *   场景 2：GET 请求 URL 参数传递（需 URL 编码）
         // 原始字符串：包含单双引号 + & 符号（你的核心痛点）
-        const original = '张三"李四\'&gt;王五';
+        var original = '张三"李四\'&gt;王五';
         // 转义 + URL 编码（适配 GET 请求）
-        const escaped = escapeSpecialChars(original, true);
+        var escaped = escapeSpecialChars(original, true);
         console.log('转义+URL编码后：', escaped); // 输出：张三%5C%22李四%5C%27%26gt%3B王五
         // 拼接 URL（无报错风险）
-        const url = `/api/user?name=${escaped}`;
+        var url = `/api/user?name=${escaped}`;
         console.log('最终 URL：', url); // 输出：/api/user?name=张三%5C%22李四%5C%27%26gt%3B王五
         // 后端接收后，先 URL 解码再反转义（.NET 示例）
         // string name = System.Web.HttpUtility.UrlDecode(request.Query["name"]);
         // string originalName = 后端反转义（对应上面的 unescapeSpecialChars 逻辑）;
      */
-    escapeSpecialChars: function(str, needUrlEncode = false) {
+    escapeSpecialChars: function(str, needUrlEncode) {
+        if(typeof needUrlEncode == 'undefined' || needUrlEncode == null) needUrlEncode = false;
         if (typeof str !== 'string' || str === '') {
             return '';
         }
         // 转义 JSON 核心特殊字符（双引号、反斜杠、换行、Tab 等）
-        let escapedStr = str
+        var escapedStr = str
         .replace(/\\/g, '\\\\')    // 转义反斜杠 \ → \\
         .replace(/"/g, '\\"')      // 转义双引号 " → \"
         .replace(/'/g, '\\\'')     // 转义单引号 ' → \'（兼容单引号场景）
@@ -720,12 +721,13 @@ var utilities = {
      * @param {Boolean} needUrlDecode 是否需要先URL解码，默认false(可选)
      * @returns {String} 原始字符串
      */
-    unescapeSpecialChars: function(str, needUrlDecode = false) {
+    unescapeSpecialChars: function(str, needUrlDecode) {
+        if(typeof needUrlDecode == 'undefined' || needUrlDecode == null) needUrlDecode = false;
         if (typeof str !== 'string' || str === '') {
             return '';
         }
         // 如果是 URL 编码的，先解码
-        let unescapedStr = str;
+        var unescapedStr = str;
         if (needUrlDecode) {
             unescapedStr = decodeURIComponent(unescapedStr);
         }
