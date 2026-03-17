@@ -2,7 +2,7 @@
  * [neatUiCanvas]
  * pc端利用canvas上传图片、并实现图片压缩
  * 兼容性：支持火狐、谷歌、360、Microsoft Edge等现代浏览器，IE仅支持IE9+(即IE10、IE11)
- * Version: v.1.0.0
+ * Version: v.1.0.0 - original 原始版
  * Author: ChenMufeng
  * Date: 2020.05.07、2023.05.19
  * Update: 2026.01.28
