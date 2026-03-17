@@ -1,10 +1,19 @@
 /**
  * 图片压缩上传插件 neuiCanvasUpload
- * Version: v2.2.2
+ * Version: v2.2.3
  * Author: Mufeng
  * Date: 2020.05.07 (初始)、2023.05.19 (迭代)
- * pubdate: 2026.03.11 (v2.2.2 IE10 drawImage 彻底修复)
+ * pubdate: 2026.03.17 (v2.2.3 恢复原始回调参数)
  * 兼容性：IE10+、Chrome、Firefox、Edge；依赖 jQuery 1.8+
+ * 
+ * v2.2.3 更新说明：
+ * 1. 恢复原始回调参数结构，兼容旧版调用方式
+ *    - index: 当前文件索引值
+ *    - url: 当前图片的 base64 地址
+ *    - files: 当前文件的 file 对象
+ *    - oldFiles: 压缩前的原始 file 对象（压缩场景有值，拦截模式为 null）
+ * 2. 保留 v2.2.x 新增的扩展参数（originSize, compressedSize 等）
+ * 3. IE10 兼容：base64 使用 FileReader/FileReader 或 canvas.toDataURL 生成
  * 
  * v2.2.2 更新说明：
  * 1. 彻底修复 IE10 中 drawImage 的 w/h undefined 问题
@@ -42,7 +51,7 @@
  * container     {String/''}    上传节点父容器选择器，优先级高于selector，默认''
  * events        {String}       触发上传的事件类型，默认'change'
  * ---------------- 限制配置 ----------------
- * maxWidth      {Number}       【仅压缩场景生效】希望图片压缩到的最大宽度值，即图片宽度最大缩放目标值（像素），默认1200
+ * maxWidth      {Number}       【仅压缩场景生效】图片宽度最大缩放目标值（像素），默认1200
  * maxSize       {Number}       【拦截/压缩场景均生效】图片最大体积（KB），默认2048
  * maxCount      {Number}       单次最大上传数量，默认9
  * maxTotalPixels{Number}       【全局强制限制】图片最大总像素数（宽×高），默认8192*8192
@@ -58,6 +67,14 @@
  * alertShowTime {Number}       压缩场景提示弹窗自动关闭时间（秒），默认3
  * ---------------- 回调配置 ----------------
  * callBack      {Function}     上传完成回调，参数：(文件数组, 当前上传节点DOM)
+ *                              文件数组中每个对象包含：
+ *                              - index: 当前文件索引值
+ *                              - url: 当前图片的 base64 地址
+ *                              - files: 当前文件的 file 对象
+ *                              - oldFiles: 压缩前的原始 file 对象（压缩场景有值，拦截模式为 null）
+ *                              - originSize/compressedSize: 原始/压缩后体积
+ *                              - originWidth/compressedWidth: 原始/压缩后宽度
+ *                              - originHeight/compressedHeight: 原始/压缩后高度
  * onProgress    {Function}     压缩进度回调，参数：(进度百分比)
  * onFileComplete{Function}     单个文件处理完成回调
  * loadingCallback {Function}   加载状态回调，参数：(是否加载中)
@@ -827,6 +844,9 @@
                         callback({
                             file: file,
                             index: index,
+                            url: e.target.result,     // base64 地址
+                            files: file,              // 当前文件对象
+                            oldFiles: null,           // 拦截模式无压缩，原始文件为 null
                             originSize: file.size,
                             originWidth: realWidth,
                             originHeight: realHeight,
@@ -841,6 +861,9 @@
                             callback({
                                 file: file,
                                 index: index,
+                                url: e.target.result,     // base64 地址
+                                files: file,              // 当前文件对象
+                                oldFiles: null,           // 未超限无需压缩，原始文件为 null
                                 originSize: file.size,
                                 originWidth: realWidth,
                                 originHeight: realHeight,
@@ -903,10 +926,7 @@
                             try {
                                 ctx.drawImage(img, 0, 0);
                             } catch (e) {
-                                // tip = '图片绘制失败，请重试';
-                                tip = '图片绘制失败！<br>可能图片体积或尺寸太大。图片体积' + fileSize.value + fileSize.unit + '超过限制' + maxSize.value + maxSize.unit + '，像素' + realPixelWH + 'px超过限制' + limitPixelWH + 'px';
-                                
-                                me.instanceAlert(failMsg, false);
+                                me.instanceAlert('图片绘制失败，请重试', false);
                                 callback(null);
                                 return;
                             }
@@ -938,9 +958,15 @@
                                 me.appendThumb(thumbDataURL);
                             }
                             
+                            // 生成压缩后的 base64 地址（IE10 兼容）
+                            var compressedDataURL = canvas.toDataURL(me.opt.targetFormat, me.opt.quality);
+                            
                             callback({
                                 file: compressedFile,
                                 index: index,
+                                url: compressedDataURL,       // 压缩后的 base64 地址
+                                files: compressedFile,        // 压缩后的文件对象
+                                oldFiles: file,               // 压缩前的原始文件对象
                                 originSize: file.size,
                                 compressedSize: blob.size,
                                 originWidth: srcWidth,
@@ -957,13 +983,9 @@
                 // processImage 函数结束
 
                 img.onerror = function() {
-                    // var tip = '图片加载失败，请检查文件是否损坏';
-                    var tip = '图片加载失败！<br>可能图片体积或尺寸太大。当前图片体积' + fileSize.value + fileSize.unit + '，超过限制' + maxSize.value + maxSize.unit;
-                    // console.log('tip:', tip);
-                    me.instanceAlert(tip, false);
+                    me.instanceAlert('图片加载失败，请检查文件是否损坏', false);
                     callback(null);
                 };
-                
 
                 // 图片加载超时
                 var timeoutId = setTimeout(function() {
@@ -971,9 +993,7 @@
                         img.src = '';
                         img.onload = null;
                         img.onerror = null;
-                        // var tip = '图片加载超时';
-                        var tip = '图片加载超时！<br>可能图片体积或尺寸太大。当前图片体积' + fileSize.value + fileSize.unit + '，超过限制' + maxSize.value + maxSize.unit;
-                        me.instanceAlert(tip, false);
+                        me.instanceAlert('图片加载超时', false);
                         callback(null);
                     }
                 }, me.opt.decodeTimeout);

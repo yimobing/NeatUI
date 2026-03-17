@@ -479,6 +479,7 @@
             //方法2：先将base64转换成blob对象，再将blob对象转换成file对象。
             var files = blobToFile(dataURLtoBlob(base64), fileObj.name);
             
+            // testing1
             if(settings.callBack){ //回调,返回图片URL(base64)、图片信息
                 settings.callBack({
                     "index": index,
