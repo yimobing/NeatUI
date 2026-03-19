@@ -935,6 +935,7 @@
         // 小区一栏聚焦时更改检索区域。小区下拉
         document.getElementById('s-community').addEventListener('focus', function() {
             var arr = $('#c-locate').val().split(',');
+            // console.log('arr：', arr)
             var lng = arr[0], lat = arr[1];
             ac.setLocation(new BMap.Point(lng, lat));
         });

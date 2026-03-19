@@ -160,7 +160,7 @@ $('#id').NeDate(opts); // opts是一个对象
 //========================================================================================================================
 
 //————————————————————————————————————————————————————————————————————————————————————
-//            封装方法：通用
+//            封装方法1： 暴露独立函数
 //————————————————————————————————————————————————————————————————————————————————————
 ; (function (root, factory) {
     if (typeof define === 'function' && define.amd) {        // AMD
@@ -168,7 +168,7 @@ $('#id').NeDate(opts); // opts是一个对象
     } else if (typeof exports === 'object') {        // Node, CommonJS之类的
         module.exports = factory(require('jquery'), require('underscore'));
     } else { // 浏览器全局变量(root 即 window)
-        root.returnExports = factory(root.jQuery, root._); // returnExports 是函数名称
+        root.NeMapExample = factory(root.jQuery, root._); // returnExports 是函数名称
     }
 })(this, function ($, _) { // 方法
     function a() { };   // 私有方法，因为它没被返回 (见下面)
@@ -183,6 +183,179 @@ $('#id').NeDate(opts); // opts是一个对象
 (function () { }());
 // 格式2
 (function () { })();
+
+
+// 前端调用方式：
+NeMapExample.b();
+NeMapExample.c();
+
+
+
+
+//————————————————————————————————————————————————————————————————————————————————————
+//            封装方法2：暴露构造函数 (调用原型链)
+//————————————————————————————————————————————————————————————————————————————————————
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['jquery', 'underscore'], factory);
+    } else if (typeof exports === 'object') {
+        module.exports = factory(require('jquery'), require('underscore'));
+    } else {
+        root.NeMapExample = factory(root.jQuery, root._);
+    }
+})(this, function ($, _) {
+    // 1. 定义构造函数（核心：原型链的基础）
+    function NeMapExample(options) {
+        // 构造函数初始化逻辑（比如接收配置参数）
+        this.options = options || {};
+        this.init(); // 初始化方法
+    }
+
+    // 2. 私有函数（仅插件内部可访问）
+    function a() {
+        console.log('私有函数a，外部无法调用');
+    }
+
+    // 3. 原型链方法（核心：挂载到构造函数的 prototype 上）
+    NeMapExample.prototype = {
+        // 重置构造函数指向（避免原型重写后 constructor 丢失）
+        constructor: NeMapExample,
+        
+        // 初始化方法（原型方法）
+        init: function () {
+            a(); // 内部可调用私有函数
+            console.log('初始化完成，配置：', this.options);
+        },
+        
+        // 原型方法 b（对应原插件的 b 函数）
+        b: function () {
+            console.log('原型方法b执行');
+            return this; // 支持链式调用
+        },
+        
+        // 原型方法 c（对应原插件的 c 函数）
+        c: function () {
+            console.log('原型方法c执行，依赖jQuery：', $);
+            console.log('依赖underscore：', _);
+            return this;
+        }
+    };
+
+    // 4. 暴露构造函数（而非普通对象）
+    return NeMapExample;
+});
+
+
+// 前端调用方式：
+// 1. 实例化插件（可传配置参数）
+var example = new NeMapExample({
+    key: '百度地图key',
+    zoom: 10
+});
+// 2. 调用原型链方法（支持链式调用）
+example.b(); // 输出：原型方法b执行
+example.c(); // 输出：原型方法c执行，依赖jQuery/underscore
+example.b().c(); // 链式调用
+
+
+
+
+//————————————————————————————————————————————————————————————————————————————————————
+//            封装方法3： 公用函数 + 露构造函数
+//————————————————————————————————————————————————————————————————————————————————————
+;(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['jquery', 'underscore'], factory);
+    } else if (typeof exports === 'object') {
+        module.exports = factory(require('jquery'), require('underscore'));
+    } else {
+        // 全局环境下，挂载到 root（window）上
+        root.NeMapExample = factory(root.jQuery, root._);
+    }
+})(this, function ($, _) {
+    // --------------------------
+    // 1. 私有函数（仅内部可访问）
+    // --------------------------
+    function a() {
+        console.log('私有函数a，仅内部调用');
+        return '私有逻辑执行';
+    }
+
+    // --------------------------
+    // 2. 构造函数（用于实例化，挂载原型方法）
+    // --------------------------
+    function Widget(options) {
+        // 实例初始化配置
+        this.options = options || { zoom: 10, key: '' };
+        // 初始化逻辑
+        this.init();
+    }
+
+    // 给构造函数挂载原型方法
+    Widget.prototype = {
+        constructor: Widget, // 修复原型链指向
+        // 原型方法：初始化
+        init: function () {
+            a(); // 内部调用私有函数
+            console.log('实例初始化，配置：', this.options);
+        },
+        // 原型方法：业务逻辑1
+        protoB: function () {
+            console.log('原型方法protoB执行，依赖jQuery：', $.fn.jquery);
+            return this; // 支持链式调用
+        },
+        // 原型方法：业务逻辑2
+        protoC: function () {
+            console.log('原型方法protoC执行，依赖underscore：', _.VERSION);
+            return this;
+        }
+    };
+
+    // --------------------------
+    // 3. 独立函数（直接暴露，无需实例化）
+    // --------------------------
+    function b() {
+        console.log('独立函数b执行（无实例）');
+        // 可调用私有函数/依赖
+        a();
+        return 'b的返回值';
+    }
+
+    function c() {
+        console.log('独立函数c执行（无实例）');
+        // 可直接使用依赖
+        console.log('c函数中使用underscore：', _.isEmpty({}));
+        return 'c的返回值';
+    }
+
+    // --------------------------
+    // 4. 混合暴露：构造函数 + 独立函数
+    // --------------------------
+    return {
+        MapPlugin: Widget, // 暴露构造函数（支持实例化）
+        b: b,                     // 暴露独立函数b
+        c: c                      // 暴露独立函数c
+    };
+});
+
+
+// 前端调用方式
+// ------------- 方式1：直接调用独立函数（无需实例化）-------------
+NeMapExample.b(); // 输出：独立函数b执行（无实例）
+NeMapExample.c(); // 输出：独立函数c执行（无实例）
+
+// ------------- 方式2：实例化构造函数，调用原型方法 -------------
+// 1. 创建实例（传配置）
+var example = new NeMapExample.MapPlugin({
+    key: '百度地图key',
+    zoom: 15
+});
+// 2. 调用原型方法（支持链式调用）
+example.protoB(); // 输出：原型方法protoB执行
+example.protoC(); // 输出：原型方法protoC执行
+example.protoB().protoC(); // 链式调用
+
+
 
 
 
