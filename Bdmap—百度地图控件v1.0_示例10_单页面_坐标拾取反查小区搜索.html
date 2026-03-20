@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title> 百度地图坐标拾取反查小区搜索(单页面)  </title>
+    <title> 坐标小区查询  </title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <!-- <link type="text/css" rel="stylesheet" href="test/css/test_bmap_single.css?v=20260319-1"> -->
@@ -51,6 +51,13 @@
         .graph__search_box_btn button[type="button"]:hover {
             opacity: .7; filter: alpha(opacity=70); filter: Progid:DXImageTransform.Microsoft.Alpha(opacity=70); }
 
+        /*+ 文本标注 +*/
+        .BMapLabel.ne__bd_lb { border: 0 !important; background: transparent !important; }
+        .ne__bd_lb_text { position: relative; background-color: #fff; padding: 12px 25px; border-width: 1px; border-style: solid; border-color: #19b6f8; border-radius: 3px; box-shadow: 0 1px 3px 0px #3291b9; color: #0c88e8; font-size: 15px; font-weight: bold; }
+        .ne__bd_lb_text.blue { border-color: #1296db; color: #1296db; }
+        .ne__bd_lb_text:before { content: ''; position: absolute; bottom: -8px; left: 0; right: 0; margin: 0 auto; display: block; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 15px solid #fff; }
+
+        /*+ 媒体查询 +*/
         @media screen and (max-width: 1280px) {
             .graph__search { padding: 10px 5px; }
             .graph__search_box_text input[type="text"] { width: 180px!important; font-size: 12px; }
@@ -65,7 +72,7 @@
             <div class="graph__search_box">
                 <div class="graph__search_box_text">
                     <span> 当前坐标点 </span>
-                    <input type="text" id="c-coordinate" readonly>
+                    <input type="text" id="c-coordinate" readonly disabled>
                     <button type="button" id="btn-copy"> 复制 </button>
                 </div>
             </div> <!--/.graph__search_box-->
@@ -105,9 +112,13 @@
         //                          一、默认参数设置
         //========================================================================================
         //————————————————————————————————————————————————
-        // 全局变量 ajax({})
-        var g_moren_city = '泉州市'; // 默认城市。查询小区时如果没具体哪个城市可能会定位到北京市
-        var g_moren_zuobiao = '118.602828,24.897513'; // 默认中心点坐标、默认楼盘坐标
+        // 全局变量
+        // 设置默认中心点 ajax({})
+        var g_default_coordinate = '118.602828,24.897513'; // 中心点坐标，即楼盘坐标
+        var g_default_title = '泉州古城'; // 中心点名称，即楼盘名称
+
+
+
 
 
 
@@ -142,9 +153,10 @@
             function Widget(options){
                 var me = this;
                 var defaults = {
-                    container: '', // 地图容器节点ID选择器，默认空(必须)。eg. '#container'。注：值为空时不执行
+                    container: "", // 地图容器节点ID选择器，默认空(必须)。eg. '#container'。注：值为空时不执行
                     centerPoint: "118.59, 24.91", // 地图中心点坐标(可选)
-                    centerCity: "泉州市", // 中心点城市(可选)
+                    centerCity: "", // 中心点城市，默认空(可选)
+                    centerTitle: "", // 中心点显示文本，默认空(可选)
                     zoom: 13, // 默认缩放级别，默认13(可选)。值：3-19
                     picker: {
                         enable: true, // 是否开启坐标拾取功能，默认true(可选)
@@ -166,7 +178,6 @@
                         enableWheelZoom: true // 是否开启鼠标滚轮缩放功能，仅对PC上有效，默认true(可选)
                     }
                 }
-
                 var settings = utils.deepMergeOptions(defaults, options);
                 // 全局赋值
                 me.defaults = defaults;
@@ -225,6 +236,7 @@
                  */
                 createMap: function(ps_container_id){
                     var me = this;
+                    var title = me.settings.centerTitle;
                     var coordinates = me.settings.centerPoint || me.defaults.centerPoint;
                     var pObj = _helpers.getPoint(coordinates);
                     var point = pObj.point, lng = pObj.lng, lat = pObj.lat;
@@ -238,7 +250,10 @@
                     // 全局赋值
                     me.$map = map; // 地图实例化对象
 
-                    me.createMarkerPoint(point); // 创建中心点标注
+                    // 创建中心点标注
+                    me.createMarkerPoint(point, {
+                        title: title
+                    }); 
                     // 初始化后回调
                     if(me.settings.createBack) {
                         me.settings.createBack({
@@ -284,7 +299,8 @@
                         autoViewport: false, // 是否自动调整视野到指定坐标点，默认false(可选)
                         zoom: -1, // 设置地图缩放级别，默认-1表示自动调整(可选)。值3-19之间时将强制调整到指定缩放级别
                         clearAllOverlay: false, // 是否清除所有覆盖物，默认false(可选)
-                        clearPointOverlay: false // 是否清除点标注覆盖物，默认false(可选)
+                        clearPointOverlay: false, // 是否清除点标注覆盖物，默认false(可选)
+                        title: '' // 点标注的文本，默认空(可选)
                     }
                     var finals = utils.deepMergeOptions(originals, opts);
 
@@ -298,8 +314,9 @@
                     
                     var pObj = _helpers.getPoint(ps_coordinate_str);
                     var point = pObj.point, lng = pObj.lng, lat = pObj.lat;
-                    var marker = new BMap.Marker(point); // 创建标注    
-                    map.addOverlay(marker); // 将标注添加到地图中
+                    var pointMarker = new BMap.Marker(point); // 创建标注    
+                    map.addOverlay(pointMarker); // 将点标注添加到地图中
+                    me.createMarkerLabel(pointMarker, point, finals.title); // 给点标注添加显示文本
 
                     // 调整地图视野
                     if(finals.autoViewport) {
@@ -318,7 +335,7 @@
 
                     me.openPicker(lng, lat); // 开启坐标拾取功能
                     // 监听标注事件
-                    marker.addEventListener("click", function(e){    
+                    pointMarker.addEventListener("click", function(e){    
                         // console.log('您点击了标注：', e);
                         if(me.settings.pointOverLay.clickBack) me.settings.pointOverLay.clickBack({
                             lng: e.point.lng,
@@ -327,9 +344,9 @@
                         }); 
                     });
                     if(me.settings.pointOverLay.enableDrag) {
-                        marker.enableDragging(); // 允许拖拽标注
+                        pointMarker.enableDragging(); // 允许拖拽标注
                         // 可拖拽的标注
-                        marker.addEventListener("dragend", function(e){
+                        pointMarker.addEventListener("dragend", function(e){
                             var point = e.point;
                             var lng = point.lng, lat = point.lat;
                             // console.log('当前位置：', lng, ',', lat);
@@ -340,6 +357,68 @@
                             });
                             me.openPicker(lng, lat); // 开启坐标拾取功能
                         });
+                    }
+                },
+
+
+
+                /**
+                 * 创建一个文本标注覆盖物
+                 * @param {PointMarker} point_marker 点标注覆盖物对象
+                 * @param {Point} 点标注覆盖物的地理坐标点
+                 * @param {String} 文本标注的显示文本名称，即标题
+                 */
+                createMarkerLabel: function(point_marker, point_coordinate, ps_title){
+                    var me = this;
+                    var map = me.$map;
+                    if(ps_title.toString().replace(/(\s+)/g, '') !== '') {
+                        var lb_father_class_name = 'ne__bd_lb', // 父节点样式名
+                            lb_class_name = 'ne__bd_lb_text'; // 文本节点样式名
+                        var lb_text = '<div class="' + lb_class_name + '">' + ps_title + '</div>';
+                        var lb_options = {
+                            position: point_coordinate, // 指定文本标注所在的地理位置
+                            // offset: new BMap.Size(30, -30) // 设置文本偏移量
+                            width: 0,     // 宽度(220-730) 0 自动调整
+                            maxWidth: 500,  // 最大宽度(220-730)
+                            height: 0,     // 高度(60-650) 0 自动调整
+                            offset: { // 位置偏移
+                                width: -40,
+                                height: -75
+                            }
+                        }
+                        // 创建文本标注覆盖物
+                        var lbMark = new BMap.Label(lb_text, lb_options);
+                        map.addOverlay(lbMark); // 将文本标注添加到地图中
+                        lbMark.enableMassClear(); // 允许覆盖物被清除
+                        lbMark.name = 'tag_bd_label'; // 标记覆盖物类型，方便清除指定覆盖物时用
+                        lbMark.setStyle({
+                            padding: '10px',
+                            height: '30px',
+                            lineHeight: '30px',
+                            // backgroundColor: "#fff",
+                            borderRadius: '5px',
+                            borderColor: '#ccc',
+                            color: 'blue',
+                            fontSize: '16px',
+                            fontFamily: '微软雅黑'
+                        });
+
+                        // 将文本标注绑定到点标注上
+                        point_marker.setLabel(lbMark);
+
+                        // 重置文本标注外观
+                        setTimeout(function() {
+                            var lbNodes = utils.getMultipleNodesByIdClassName(lb_class_name);
+                            if(lbNodes.length > 0) {
+                                for(var i = 0; i < lbNodes.length; i++) {
+                                    var currentNode = lbNodes[i];
+                                    var parentNode = currentNode.parentNode;
+                                    if(parentNode != null) {
+                                        parentNode.classList.add(lb_father_class_name); // 给文本标注父节点添加一个样式名
+                                    }
+                                }
+                            }
+                        }, 100);
                     }
                 },
 
@@ -542,36 +621,92 @@
 
                 /**
                  * 地点查询
-                 * @param {String} placeName 地点名称。优先POI名称。eg.'丰盛假日城堡', eg. '丰盛假日城堡泉秀街道'
-                 * @param {String} ps_city 所在城市
+                 * @param {String} address 地点名称。优先POI名称。eg.'丰盛假日城堡', eg. '丰盛假日城堡泉秀街道'
                  * @param {Function} callback 回调函数
+                 * @param {String} ps_city 所在城市，默认全国范围内查找(可选)
                  */
-                placeSearch: function(placeName, ps_city, callback) {
-                    var city = ps_city.toString().replace(/(\s+)/g, '') === '' || typeof ps_city == 'undefined' ? me.settings.centerCity : ps_city
-                    var geocoder = new BMap.Geocoder(); // 地理编码
-                    geocoder.getPoint(placeName, function(point) {
-                        // console.log('地理编码：', point);
-                        var lng = point.lng, lat = point.lat;
-                        if (point) { 
-                            if(callback) {
-                                callback({
-                                    lng: lng,
-                                    lat: lat
-                                })
+                 searchPlace: function(address, callback, ps_city) {
+                    var me = this;
+                    var map = me.$map;
+                    var city = typeof ps_city == 'undefined' || ps_city.toString().replace(/(\s+)/g, '') === '' ? me.settings.centerCity : ps_city;
+                    if(city == '') city = '全国';
+
+                    // 方案1：使用Geocoder 地理编码
+                    // bug：无论你输入什么，它都一定会返回一个合法坐标 + 完整省市区街道，没有任何字段可以用来判断无效！
+                    // var myGeo = new BMap.Geocoder(); // 地理编码。
+                    // myGeo.getPoint(address, function(point) {
+                    //     console.log('地理编码：', point);
+                    //     if (point) {
+                    //         var lng = point.lng, lat = point.lat; 
+                    //         if(callback) {
+                    //             callback({
+                    //                 lng: lng,
+                    //                 lat: lat
+                    //             })
+                    //         }
+                    //         // 通过 getLocation 反查详细信息，避免输入任何地址都会返回坐标
+                    //         // myGeo.getLocation(point, function (res) {
+                    //         //     console.log("地址详情：", res);
+                    //         // });
+                    //     }
+                    //     else {
+                    //         var tip = '抱歉，未解析到坐标，地址可能不完整';
+                    //         console.warn(tip);
+                    //         utils.dialog(tip);
+                    //         if(callback) {
+                    //             callback({
+                    //                 lng: "",
+                    //                 lat: ""
+                    //             })
+                    //         }
+                    //     }
+                    // }, city)
+
+                    // 方案2：使用地点检索
+                    var local = new BMap.LocalSearch(map, {
+                        onSearchComplete: function (res) {
+                            // console.log('res：', res)
+                            // 无效地址 → 返回 0 条结果，有效地址 → ≥1 条结果
+                            if (res && res.getNumPois() > 0) {
+                                // 获取第一个智能搜索的结果
+                                // var results = local.getResults();
+                                // console.log('result：', results);
+                                // var result = results.getPoi(0); // 方法1
+                                // var point = result.point;
+                                var result = res.getPoi(0); // 方法2
+                                var point = result.point; 
+                                // console.log('result：', result);
+                                var lng = point.lng, lat = point.lat;
+                                if(callback) {
+                                    callback({  
+                                        placeName: address, // 用户输入的地点名称
+                                        
+                                        title: result.title, // 结果的名称标题
+                                        lng: lng, // 结果的经度
+                                        lat: lat, // 结果的纬度
+                                        point: result.point, // 结果的坐标点
+                                        province: result.province, // 所在省份
+                                        city: result.city, // 所在城市
+                                        phoneNumber: result.phoneNumber, // 电话
+                                        postcode: result.postcode, // 邮政编码
+                                        address: result.address, // 地址（根据数据部分提供）。注：当结果点类型为公交站或地铁站时，地址信息为经过该站点的所有车次
+                                        tags: result.tags // POI的标签，如商务大厦、餐馆等
+                                    })
+                                }
+                            } else {
+                                var tip = '抱歉，未解析到坐标，地址可能不完整';
+                                console.warn(tip);
+                                utils.dialog(tip);
+                                if(callback) {
+                                    callback({
+                                        lng: "",
+                                        lat: ""
+                                    })
+                                }
                             }
                         }
-                        else {
-                            var tip = '抱歉，未解析到坐标，地址可能不完整';
-                            console.warn(tip);
-                            utils.dialog(tip);
-                            if(callback) {
-                                callback({
-                                    lng: "",
-                                    lat: ""
-                                })
-                            }
-                        }
-                    }, city)
+                    });
+                    local.search(address); // 执行检索
                 },
 
 
@@ -788,8 +923,9 @@
         //————————————————————————————————————————————————
         var bdExample = new NeMapExample.MapPlugin({
             container: '#container', // 地图容器节点ID选择器，默认空(必须)。eg. '#container'。注：值为空时不执行
-            centerPoint: g_moren_zuobiao, // 地图中心点坐标(可选)
-            centerCity: "泉州市", // 中心点城市(可选)
+            centerPoint: g_default_coordinate, // 地图中心点坐标(可选)
+            centerCity: "", // 中心点城市，默认空(可选)
+            centerTitle: g_default_title, // 中心点显示文本，默认空(可选)
             zoom: 16, // 默认缩放级别，默认13(可选)。值：3-19
             picker: {
                 enable: true, // 是否开启坐标拾取功能，默认true(可选)
@@ -803,9 +939,12 @@
                 enable: true, // 是否启用该功能，默认true
                 trigger: 'c-community', // 绑定触发自动完成检索的输入框ID属性，默认空
                 callBack: function(e) {
-                    // console.log('e：', e);
-                    var lng = e.lng, lat = e.lat;
-                    fnQueryCommunity(lng, lat);
+                    // console.log('e1：', e);
+                    var placeName = e.placeName,
+                        title = e.title,
+                        lng = e.lng, 
+                        lat = e.lat;
+                    fnQueryCommunity(title, lng, lat);
                 }
             },
             pointOverLay: { // 点标注(可选)
@@ -826,25 +965,32 @@
                 NeMapExample.ToolTip(tip);
                 return;
             }
-            bdExample.placeSearch(placeName, g_moren_city, function(e) {
-                var lng = e.lng, 
+            bdExample.searchPlace(placeName, function(e) {
+                // console.log('e2：', e)
+                var placeName = e.placeName,
+                    title = e.title,
+                    lng = e.lng, 
                     lat = e.lat;
-                fnQueryCommunity(lng, lat);
+                fnQueryCommunity(title, lng, lat);
             });
         }
 
         //————————————————————————————————————————————————
         /**
          * 函数：查询小区
+         * @param {String} ps_title 小区名称
+         * @param {String} ps_longitude 小区经度坐标
+         * @param {String} ps_latitude 小区纬度坐标
          */
-        function fnQueryCommunity(ps_longitude, ps_latitude) {
+        function fnQueryCommunity(ps_title, ps_longitude, ps_latitude) {
             if(ps_longitude != '' && ps_latitude != '')  {
                 var coordinate = ps_longitude + ',' + ps_latitude;
                 // 创建指定坐标的点标注
                 bdExample.createMarkerPoint(coordinate, {
                     autoViewport: true,
                     clearPointOverlay: true,
-                    zoom: 16
+                    zoom: 16,
+                    title: ps_title
                 });
                 document.getElementById('c-coordinate').value = coordinate; // 更新当前坐标点的值
             }
@@ -866,7 +1012,8 @@
             // 创建指定坐标的点标注
             bdExample.createMarkerPoint(coordinate, {
                 autoViewport: true,
-                clearPointOverlay: true
+                clearPointOverlay: true,
+                zoom: 18
             });
         }
 
