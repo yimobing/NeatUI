@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock.js 使用方法</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-size: 32px;
+            color: #1a1a1a;
+            border-bottom: 3px solid #42b983;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 24px;
+            color: #1a1a1a;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 4px solid #42b983;
+        }
+        h3 {
+            font-size: 18px;
+            color: #333;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        h4 {
+            font-size: 16px;
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        code {
+            font-family: "Fira Code", "Source Code Pro", Consolas, Monaco, monospace;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+        }
+        .inline-code {
+            background: #f0f0f0;
+            color: #e96900;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background: #f9f9f9;
+        }
+        blockquote {
+            background: #f8f8f8;
+            border-left: 4px solid #42b983;
+            padding: 15px 20px;
+            margin: 15px 0;
+            color: #666;
+        }
+        blockquote strong {
+            color: #333;
+        }
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .nav {
+            background: #fff;
+            padding: 20px 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .nav h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .nav ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .nav li {
+            margin-bottom: 8px;
+        }
+        .nav a {
+            color: #42b983;
+            text-decoration: none;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .diagram {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #495057;
+            overflow-x: auto;
+        }
+        .diagram .arrow {
+            color: #42b983;
+        }
+        .diagram .block {
+            color: #dc3545;
+        }
+        .diagram .success {
+            color: #28a745;
+        }
+        .tip {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .warning {
+            background: #fff3e0;
+            border: 1px solid #ffe0b2;
+            color: #e65100;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .error {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mock.js 使用方法</h1>
+        
+        <div class="nav">
+            <h3>目录</h3>
+            <ul>
+                <li><a href="#intro">一、Mock.js 简介</a></li>
+                <li><a href="#basic">二、基本使用方法</a></li>
+                <li><a href="#faq">三、常见问题</a></li>
+                <li><a href="#test-network">四、如何测试网络断线</a></li>
+                <li><a href="#example">五、完整示例代码</a></li>
+            </ul>
+        </div>
+
+        <!-- 一、Mock.js 简介 -->
+        <div class="section" id="intro">
+            <h2>一、Mock.js 简介</h2>
+            <p>Mock.js 是一款模拟数据生成器，可以帮助前端开发者在后端接口未完成时，模拟接口数据，实现前后端并行开发。</p>
+            
+            <h3>主要功能</h3>
+            <ul>
+                <li><strong>拦截 Ajax 请求</strong>：拦截前端发起的请求，返回模拟数据</li>
+                <li><strong>生成随机数据</strong>：通过数据模板生成各种类型的随机数据</li>
+                <li><strong>无需修改代码</strong>：侵入性小，只需在项目中引入即可</li>
+            </ul>
+
+            <h3>安装方式</h3>
+            <pre><code>// npm 安装
+npm install mockjs
+
+// 或直接引入 CDN
+&lt;script src="https://cdn.bootcdn.net/ajax/libs/Mock.js/1.0.1-beta3/mock-min.js"&gt;&lt;/script&gt;</code></pre>
+
+            <h3>工作原理</h3>
+            <p>Mock.js 通过重写（覆盖）原生的 <code>XMLHttpRequest</code> 对象，拦截所有 Ajax 请求。当请求 URL 匹配到已定义的 mock 规则时，直接返回模拟数据，不再发送真实请求。</p>
+        </div>
+
+        <!-- 二、基本使用方法 -->
+        <div class="section" id="basic">
+            <h2>二、基本使用方法</h2>
+
+            <h3>2.1 基本语法</h3>
+            <pre><code>Mock.mock(url, method, template|function)</code></pre>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>参数</th>
+                        <th>类型</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>url</code></td>
+                        <td>String | RegExp</td>
+                        <td>需要拦截的 URL，支持正则匹配</td>
+                    </tr>
+                    <tr>
+                        <td><code>method</code></td>
+                        <td>String</td>
+                        <td>请求方法：<code>get</code>、<code>post</code>、<code>put</code>、<code>delete</code> 等</td>
+                    </tr>
+                    <tr>
+                        <td><code>template</code></td>
+                        <td>Object | String</td>
+                        <td>数据模板，用于生成模拟数据</td>
+                    </tr>
+                    <tr>
+                        <td><code>function</code></td>
+                        <td>Function</td>
+                        <td>自定义函数，返回模拟数据</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>2.2 简单示例</h3>
+            <pre><code>import Mock from 'mockjs';
+
+// 定义 mock 数据
+Mock.mock('/api/user', 'get', {
+    code: 200,
+    message: 'success',
+    data: {
+        'id|1-100': 1,
+        'name': '@cname',
+        'age|18-60': 1,
+        'email': '@email'
+    }
+});
+
+// 发起请求时会被拦截
+fetch('/api/user')
+    .then(res => res.json())
+    .then(data => console.log(data));
+
+// 输出示例：
+// {
+//     code: 200,
+//     message: 'success',
+//     data: { id: 42, name: '张三', age: 28, email: 'zhangsan@example.com' }
+// }</code></pre>
+
+            <h3>2.3 使用函数返回数据</h3>
+            <pre><code>Mock.mock('/api/user', 'post', (options) => {
+    // options.body 为 POST 请求的数据
+    let body = JSON.parse(options.body);
+    
+    return {
+        code: 200,
+        message: 'success',
+        data: {
+            id: body.id || 1,
+            name: '测试用户'
+        }
+    };
+});</code></pre>
+
+            <h3>2.4 数据模板语法</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>语法</th>
+                        <th>说明</th>
+                        <th>示例</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>'name|min-max': value</code></td>
+                        <td>生成 min 到 max 个 value</td>
+                        <td><code>'list|1-10': [{}]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>'name|count': value</code></td>
+                        <td>生成 count 个 value</td>
+                        <td><code>'list|3': [{}]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>'name|+1': value</code></td>
+                        <td>属性值自动加 1</td>
+                        <td><code>'id|+1': 1</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>2.5 常用占位符</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>占位符</th>
+                        <th>说明</th>
+                        <th>示例</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>@cname</code></td>
+                        <td>中文名</td>
+                        <td>张三</td>
+                    </tr>
+                    <tr>
+                        <td><code>@name</code></td>
+                        <td>英文名</td>
+                        <td>John Smith</td>
+                    </tr>
+                    <tr>
+                        <td><code>@email</code></td>
+                        <td>邮箱</td>
+                        <td>test@example.com</td>
+                    </tr>
+                    <tr>
+                        <td><code>@phone</code></td>
+                        <td>手机号</td>
+                        <td>13800138000</td>
+                    </tr>
+                    <tr>
+                        <td><code>@id</code></td>
+                        <td>身份证号</td>
+                        <td>110101199001011234</td>
+                    </tr>
+                    <tr>
+                        <td><code>@city</code></td>
+                        <td>城市</td>
+                        <td>北京市</td>
+                    </tr>
+                    <tr>
+                        <td><code>@date('yyyy-MM-dd')</code></td>
+                        <td>日期</td>
+                        <td>2026-04-03</td>
+                    </tr>
+                    <tr>
+                        <td><code>@datetime</code></td>
+                        <td>日期时间</td>
+                        <td>2026-04-03 10:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><code>@image('200x100')</code></td>
+                        <td>图片 URL</td>
+                        <td>随机生成的图片地址</td>
+                    </tr>
+                    <tr>
+                        <td><code>@paragraph</code></td>
+                        <td>段落文本</td>
+                        <td>随机生成一段中文</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 三、常见问题 -->
+        <div class="section" id="faq">
+            <h2>三、常见问题</h2>
+
+            <h3>3.1 为什么断网还能返回数据？</h3>
+            <div class="error">
+                <strong>问题描述：</strong>使用 mock.js 模拟数据后，断开网络，接口依然能返回数据，无法测试网络断线场景。
+            </div>
+
+            <h4>问题原因</h4>
+            <p>Mock.js 在浏览器端拦截了 <code>XMLHttpRequest</code>，请求根本没有发送到网络层。当 URL 匹配到 mock 规则时，直接返回模拟数据，不会发送真实的网络请求。</p>
+
+            <h4>工作原理图解</h4>
+            <div class="diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│                          浏览器                                  │
+│                                                                 │
+│   代码发起请求 ──→ Mock.js 拦截 ✋ ──→ 直接返回模拟数据          │
+│                         │                                       │
+│                         │ ❌ 请求被拦截，没有真正发出！           │
+│                         ▼                                       │
+│                    网络层（根本没走到这里）                       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+            </div>
+
+            <div class="warning">
+                <strong>重要提示：</strong>Mock.js 拦截的是整个网络请求，所以无论是否有网络，只要匹配到 mock 规则，都会返回模拟数据。这也是无法测试网络断线的原因。
+            </div>
+
+            <h4>对比：有无 Mock.js 的请求流程</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>场景</th>
+                        <th>无 Mock.js</th>
+                        <th>有 Mock.js</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>网络正常</td>
+                        <td>发送真实请求 → 返回后端数据</td>
+                        <td>拦截请求 → 返回模拟数据</td>
+                    </tr>
+                    <tr>
+                        <td>网络断开</td>
+                        <td>发送请求 → 报错（可测试断线）</td>
+                        <td>拦截请求 → 返回模拟数据（无法测试断线）</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 四、如何测试网络断线 -->
+        <div class="section" id="test-network">
+            <h2>四、如何测试网络断线</h2>
+
+            <h3>4.1 方案一：条件性启用 Mock（推荐）</h3>
+            <p>通过 URL 参数控制是否启用 mock，需要测试网络断线时，在 URL 中添加参数禁用 mock。</p>
+
+            <pre><code>// mock.js
+
+import Mock from 'mockjs';
+
+const baseURL = 'http://your-api.com';
+
+// 通过 URL 参数控制是否启用 mock
+const isTestNetwork = new URLSearchParams(window.location.search).has('testNetwork');
+
+// 测试网络时禁用 mock
+if (!isTestNetwork) {
+    Mock.mock(baseURL + "/api/getData.ashx?params=1", "post", (options) => {
+        return Mock.mock({
+            "code": "200",
+            "return": "ok",
+            "data|3": [{
+                "id|+1": 1001,
+                "name|+1": ["选项一", "选项二", "选项三"]
+            }]
+        });
+    });
+}</code></pre>
+
+            <h4>使用方式</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>访问地址</th>
+                        <th>效果</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>http://localhost:5000</code></td>
+                        <td>Mock 生效，返回模拟数据</td>
+                    </tr>
+                    <tr>
+                        <td><code>http://localhost:5000?testNetwork</code></td>
+                        <td>Mock 禁用，发送真实请求，可测试断线</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tip">
+                <strong>测试步骤：</strong><br>
+                1. 访问 <code>http://localhost:5000?testNetwork</code><br>
+                2. 打开 Chrome DevTools (F12) → Network → 选择 Offline （默认是throttling，在Disable Cache右边)<br>
+                3. 发起请求，即可测试网络断线场景
+            </div>
+
+            <h3>4.2 方案二：用 Mock 模拟错误响应</h3>
+            <p>不需要真正断网，使用 Mock.js 模拟各种错误状态。</p>
+
+            <pre><code>import Mock from 'mockjs';
+
+// 模拟正常响应
+Mock.mock('/api/user', 'post', (options) => {
+    return {
+        code: 200,
+        return: 'ok',
+        data: { name: '测试用户' }
+    };
+});
+
+// 模拟超时
+Mock.mock('/api/user?params=testTimeout', 'post', (options) => {
+    const error = new Error('timeout of 5000ms exceeded');
+    error.code = 'ECONNABORTED';
+    throw error;  // 抛出错误，axios 会捕获
+});
+
+// 模拟网络断开
+Mock.mock('/api/user?params=testOffline', 'post', (options) => {
+    const error = new Error('Network Error');
+    error.code = 'ERR_NETWORK';
+    throw error;
+});
+
+// 模拟服务器错误（500）
+Mock.mock('/api/user?params=testServerError', 'post', (options) => {
+    return {
+        status: 500,
+        message: '服务器内部错误'
+    };
+});
+
+// 模拟业务失败
+Mock.mock('/api/user?params=testFail', 'post', (options) => {
+    return {
+        code: 200,
+        return: 'fail',
+        data: '操作失败，请重试'
+    };
+});</code></pre>
+
+            <h4>调用测试</h4>
+            <pre><code>// 测试超时
+$axios.post('/api/user?params=testTimeout', {})
+    .catch(err => console.log('超时测试:', err.message));
+
+// 测试断网
+$axios.post('/api/user?params=testOffline', {})
+    .catch(err => console.log('断网测试:', err.message));</code></pre>
+
+            <h3>4.3 方案三：临时禁用 Mock</h3>
+            <p>最简单的方式，直接注释掉 mock 相关代码。</p>
+
+            <pre><code>// import './mock';  // 注释掉 mock 引入
+
+// 然后用 Chrome DevTools → Network → Offline 测试</code></pre>
+
+            <h3>4.4 方案四：请求不存在的域名</h3>
+            <p>请求一个不存在的域名，会立即触发网络错误。</p>
+
+            <pre><code>// 请求不存在的域名，无需断网即可测试网络错误
+$axios.post('https://this-domain-does-not-exist-12345.com/api/test', {})
+    .then(res => console.log('成功:', res))
+    .catch(err => console.log('网络错误:', err.message));</code></pre>
+
+            <h3>方案对比</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>方案</th>
+                        <th>优点</th>
+                        <th>缺点</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>方案一</strong><br>条件性启用</td>
+                        <td>灵活切换，不影响正常开发</td>
+                        <td>需要修改 mock 代码</td>
+                    </tr>
+                    <tr>
+                        <td><strong>方案二</strong><br>模拟错误</td>
+                        <td>无需真正断网</td>
+                        <td>只能模拟已知错误类型</td>
+                    </tr>
+                    <tr>
+                        <td><strong>方案三</strong><br>临时禁用</td>
+                        <td>最简单直接</td>
+                        <td>需要频繁注释/取消注释</td>
+                    </tr>
+                    <tr>
+                        <td><strong>方案四</strong><br>不存在的域名</td>
+                        <td>快速测试，无需额外配置</td>
+                        <td>只能测试网络错误，无法测试超时等场景</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 五、完整示例代码 -->
+        <div class="section" id="example">
+            <h2>五、完整示例代码</h2>
+
+            <h3>项目结构</h3>
+            <pre><code>project/
+├── mock/
+│   └── index.js          # Mock 配置文件
+├── api/
+│   └── public.js         # 接口文件
+├── utils/
+│   └── neatui-axios.js   # axios 封装
+└── main.js               # 入口文件</code></pre>
+
+            <h3>mock/index.js</h3>
+            <pre><code>import Mock from 'mockjs';
+
+const baseURL = 'http://your-api.com';
+
+// 通过 URL 参数控制是否启用 mock
+const isTestNetwork = new URLSearchParams(window.location.search).has('testNetwork');
+
+if (!isTestNetwork) {
+    console.log('Mock 已启用');
+    
+    // 获取辅导方式列表
+    Mock.mock(baseURL + "/jk/jk_sj/jk_fudao_fangshi.ashx?params=1", "post", (options) => {
+        let body = JSON.parse(options.body);
+        console.log('请求参数：', body);
+        
+        return Mock.mock({
+            "code": "200",
+            "return": "ok",
+            "data|3": [{
+                "fudao_fangshi_bh|+1": 1001,
+                "fudao_fangshi_mc|+1": ["上门辅导", "在线辅导", "住家家教"]
+            }]
+        });
+    });
+
+    // 用户登录
+    Mock.mock(baseURL + "/api/login.ashx", "post", (options) => {
+        let body = JSON.parse(options.body);
+        
+        if (body.username === 'admin' && body.password === '123456') {
+            return {
+                code: 200,
+                return: 'ok',
+                data: {
+                    token: 'mock-token-12345',
+                    userInfo: {
+                        id: 1,
+                        name: '管理员',
+                        role: 'admin'
+                    }
+                }
+            };
+        } else {
+            return {
+                code: 200,
+                return: 'fail',
+                data: '用户名或密码错误'
+            };
+        }
+    });
+
+    // 获取用户信息
+    Mock.mock(baseURL + "/api/userinfo.ashx", "get", {
+        code: 200,
+        return: 'ok',
+        data: {
+            'id|1-100': 1,
+            'name': '@cname',
+            'age|18-60': 1,
+            'email': '@email',
+            'phone': /^1[3-9]\d{9}$/
+        }
+    });
+
+} else {
+    console.log('Mock 已禁用，发送真实请求');
+}</code></pre>
+
+            <h3>api/public.js</h3>
+            <pre><code>import request from '@/utils/neatui-axios.js';
+
+const baseURL = 'http://your-api.com';
+const debug = true;
+const method = 'post';
+
+/**
+ * 获取辅导方式列表
+ */
+export function getFudaoFangshi(vm, data) {
+    return request({
+        debug: debug,
+        vue: vm,
+        original: false,
+        method: method,
+        baseURL: baseURL,
+        url: "/jk/jk_sj/jk_fudao_fangshi.ashx?params=1",
+        data: data
+    });
+}
+
+/**
+ * 用户登录
+ */
+export function login(vm, data) {
+    return request({
+        debug: debug,
+        vue: vm,
+        original: false,
+        method: method,
+        baseURL: baseURL,
+        url: "/api/login.ashx",
+        data: data
+    });
+}</code></pre>
+
+            <h3>main.js（入口文件）</h3>
+            <pre><code>// 引入 mock（必须在接口调用之前引入）
+import './mock/index.js';
+
+// 引入其他模块
+import { createApp } from 'vue';
+import App from './App.vue';
+
+createApp(App).mount('#app');</code></pre>
+
+            <h3>页面调用示例</h3>
+            <pre><code>import { getFudaoFangshi, login } from '@/api/public.js';
+
+export default {
+    methods: {
+        // 获取数据
+        async fetchData() {
+            try {
+                const res = await getFudaoFangshi(this, { action: 'list' });
+                console.log('数据:', res);
+            } catch (err) {
+                console.log('错误:', err.message);
+            }
+        },
+        
+        // 登录
+        async handleLogin() {
+            try {
+                const res = await login(this, {
+                    username: 'admin',
+                    password: '123456'
+                });
+                console.log('登录成功:', res);
+            } catch (err) {
+                console.log('登录失败:', err.message);
+            }
+        }
+    }
+};</code></pre>
+        </div>
+    </div>
+</body>
+</html>

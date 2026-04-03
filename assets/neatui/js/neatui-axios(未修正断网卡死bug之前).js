@@ -1,23 +1,15 @@
+
 /**
- * [neatui-axios]
+ * [$axios]
  * axios 自定义封装接口
  * Author: Mufeng
  * Date: 2023.06.15
- * Pubdate: 2026.04.03
- * Version: v1.0.1
+ * Update: 2025.10.31
  *  [调用方法]
     $axios(options).then().catch(); // 自定义请求方式，即通过配置options配置项的参数method='post'或'get'来设置请求方式
     $axios.post(url, data, config).then().catch(); // POST 请求
     $axios.get(url, params, config).then().catch(); // GET 请求
     $axios.all([promise1, promise1, ...]).then().catch(); // 并发请求。 promise1, promise2等实例是一个 POST 或 GET 请求
-    
- * [更新日志]
-    v1.0.1 (2026.04.03)
-    - 修复：拦截器内部报错导致 Promise 悬空、页面假死的问题
-    - 修复：网络断开时 config.data 为 undefined 导致 JSON.parse 报错的问题
-    - 优化：错误处理逻辑增加 try-catch 兜底
-    - 优化：增加 error.code 判断，更精准识别网络错误/超时
-    - 优化：安全解析请求参数，避免解析报错
 */
 
 //———————————————————————————————————————————————————————————————————
@@ -41,15 +33,15 @@
         this.defaults = {
 
             // · 自定义参数
-            debug: false, // 是否启用调试功能(可选)，默认false。false时接口有问题将显示"友好提示信息"，true时接口有问题将显示"直接提示信息"
+            debug: false, // 是否启用调试功能(可选)，默认false。false时接口有问题将显示“友好提示信息”，true时接口有问题将显示“直接提示信息”
             vue: null, // vue实例化对象，用于弹窗(可选)。如不传则为null，表示默认使用alert弹窗。
             original: true, // 接口返回值是否为axios原生数据(可选)，默认true。值：true 是(原生数据), false 否(后端接口数据，即response.data原生数据再取data) add 20250403-1
             popup: true, // 报错机制。出现错误时是否使用弹窗弹出错误信息，默认true。某些特殊情况下比如for循环时多次错误不想多次弹出错误信息时，可将本参数置为false，再在前台中使用自定义弹出错误信息。 add 20250610
             loginTimeoutRedirectPage: '', // 登录超时的时候跳转的页面(可选)，默认空 add 20251031-1
 
-            // · 原生参数，即 Axios API 里的"请求配置项"，控件里默认只写出部分，您可根据需要进行添加
+            // · 原生参数，即 Axios API 里的“请求配置项”，控件里默认只写出部分，您可根据需要进行添加
             // 即将被发送的自定义请求头。即发送给后台的数据格式，不同的数据格式后台接收方法也不同。
-            // GET 请求时，默认使用的是"查询格式的字符串"，前端即使指定"JSON格式的字符串"也不起作用，请知悉！
+            // GET 请求时，默认使用的是“查询格式的字符串”，前端即使指定“JSON格式的字符串”也不起作用，请知悉！
             // headers: { "Content-Type": "application/x-www-form-urlencoded" },// 查询格式的字符串格。eg. "?a=3&b=5"
             headers: { "Content-Type": "application/json" }, // JSON格式字符串。eg. "{a:3, b:5}"
             method: "get",  // 请求方法(可选)，默认 get
@@ -65,6 +57,7 @@
             // 其它参数见Axios官网
             //..
         }
+        
     };
 
 
@@ -143,7 +136,7 @@
 
 
 
-    //———————————————————————————————————————————————————————————————————
+    //———————————————————————————————————————————————————
     /**
      * !!! 拦截器函数
      * @param {object} _this 控件对象
@@ -203,299 +196,179 @@
             (response) => {
                 // console.log('响应正常：', response);
                 // console.log('dataX：', response.config.data);
-                
-                // ========================================
-                // ⚠️ 容易出错点1：整个响应处理逻辑要用 try-catch 包裹
-                //    防止内部报错导致 Promise 悬空
-                // ========================================
-                try {
-                    var config = response.config;
-                    // 先将URL格式的字符串转化成JSON格式的字符串
-                    if (typeof config.data != 'undefined' && !utils.isJsonString(config.data)) {
-                        config.data = JSON.stringify(utils.convertUrl2Object(config.data));
-                    }
-                    // var datas = JSON.parse(config.data);
-                    
-                    // ⚠️ 容易出错点2：安全获取请求数据，避免 config.data 为 undefined 报错
-                    var datas = {};
-                    try {
-                        datas = config.method.toLocaleLowerCase() == 'post' 
-                            ? (config.data ? JSON.parse(config.data) : {}) 
-                            : (config.params || {});
-                    } catch (parseErr) {
-                        console.warn('解析请求数据失败:', parseErr);
-                        datas = {};
-                    }
-                    var action = datas.action || '';
-                    
-                    // 如果返回的状态码为 200，说明接口请求成功，可以正常拿到数据，否则抛出错误
-                    if (response.status == 200) {
-                        var result = response.data;
-                        // console.log('result：', result);
-                        // 接口返回值不是标准格式 {return: "ok", data: ""}
-                        if (typeof result["return"] == 'undefined') {
-                            var abnormalMsg = '';
-                            if (!config.debug) { // 友好提示信息
-                                abnormalMsg = '数据异常，请联系管理员';
-                            }
-                            else { // 报错提示信息
-                                abnormalMsg += '接口返回值格式有误！';
-                                abnormalMsg += '<br>接口名称：' + action;
-                                abnormalMsg += '<br>接口返回值：<br>' + JSON.stringify(result);
-                            }
-                            if(config.popup){
-                                utils.toast(config.vue, abnormalMsg, {type: 'warning', title: '提示'});
-                            }
-                            return Promise.reject({
-                                message: abnormalMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
-                                error: result, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
-                                data: datas // 用户请求的数据
-                            });
-                        }
-                        // 接口操作失败时
-                        else if (result["return"] != 'ok') {
-                            var failMsg = typeof result["data"] == 'undefined' || result["data"] == '' ? '未知错误，请稍后再试' : result["data"];
-
-                            // edit and add 20251031-1
-                            var isLoginOverTime = ["登录超时", "登陆超时"].includes(failMsg) ? true : false; // 是否登录超时，未实现 
-                            var redirect_page = isLoginOverTime ? config.loginTimeoutRedirectPage : ''; 
-                            if(config.popup){
-                                utils.toast(config.vue, failMsg, {
-                                    logout: isLoginOverTime,
-                                    type: 'warning',
-                                    title: '操作失败',
-                                    logoutPageUrl: redirect_page
-                                });
-                            }
-
-                            return Promise.reject({
-                                message: failMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
-                                error: result, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
-                                data: datas // 用户请求的数据
-                            });
-                        }
-                    }
-
-                    else {
-                        var unknownMsg = '';
+                var config = response.config;
+                // 先将URL格式的字符串转化成JSON格式的字符串
+                if (typeof config.data != 'undefined' && !utils.isJsonString(config.data)) {
+                    config.data = JSON.stringify(utils.convertUrl2Object(config.data));
+                }
+                // var datas = JSON.parse(config.data);
+                var datas = config.method.toLocaleLowerCase() == 'post' ? JSON.parse(config.data) : JSON.parse(JSON.stringify(config.params));
+                var action = datas.action;
+                // 如果返回的状态码为 200，说明接口请求成功，可以正常拿到数据，否则抛出错误
+                if (response.status == 200) {
+                    var result = response.data;
+                    // console.log('result：', result);
+                    // 接口返回值不是标准格式 {return: "ok", data: ""}
+                    if (typeof result["return"] == 'undefined') {
+                        var abnormalMsg = '';
                         if (!config.debug) { // 友好提示信息
-                            unknownMsg = '请求失败，请稍后再试';
+                            abnormalMsg = '数据异常，请联系管理员';
                         }
                         else { // 报错提示信息
-                            unknownMsg += '接口请求失败！';
-                            unknownMsg += '<br>接口名称：' + action;
+                            abnormalMsg += '接口返回值格式有误！';
+                            abnormalMsg += '<br>接口名称：' + action;
+                            abnormalMsg += '<br>接口返回值：<br>' + JSON.stringify(result);
                         }
                         if(config.popup){
-                            utils.toast(config.vue, unknownMsg, {type: 'error'});
+                            utils.toast(config.vue, abnormalMsg, {type: 'warning', title: '提示'});
                         }
                         return Promise.reject({
-                            message: unknownMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
-                            error: response.data || response, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
+                            message: abnormalMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
+                            error: result, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
                             data: datas // 用户请求的数据
-                        });
+                        })
                     }
+                    // 接口操作失败时
+                    else if (result["return"] != 'ok') {
+                        var failMsg = typeof result["data"] == 'undefined' || result["data"] == '' ? '未知错误，请稍后再试' : result["data"];
 
-                    return config.original ? response : response.data; // 响应正常的返回值
-                    
-                } catch (e) {
-                    // ⚠️ 兜底：确保即使内部报错也要 reject，避免 Promise 悬空
-                    console.error('响应拦截器内部异常:', e);
-                    return Promise.reject({
-                        message: '数据处理异常',
-                        error: e,
-                        data: {}
-                    });
+                        // edit and add 20251031-1
+                        var isLoginOverTime = ["登录超时", "登陆超时"].includes(failMsg) ? true : false; // 是否登录超时，未实现 
+                        var redirect_page = isLoginOverTime ? config.loginTimeoutRedirectPage : ''; 
+                        if(config.popup){
+                            utils.toast(config.vue, failMsg, {
+                                logout: isLoginOverTime,
+                                type: 'warning',
+                                title: '操作失败',
+                                logoutPageUrl: redirect_page
+                            })
+                        }
+
+                        return Promise.reject({
+                            message: failMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
+                            error: result, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
+                            data: datas // 用户请求的数据
+                        })
+                    }
                 }
-            },
-            
-            // 2-2. 响应错误时做些什么。状态码超出 2xx 范围的状态码都会触发该函数
-            (error) => {
-                // console.log('响应异常：', error);
-                
-                // ========================================
-                // ⚠️ 容易出错点3：错误处理逻辑必须用 try-catch 包裹！
-                //    这是导致页面假死的根本原因：
-                //    - 拦截器内部报错不会传播到外部的 .catch()
-                //    - Promise 没有 reject，永远处于 pending 状态
-                //    - 页面表现为"假死"
-                // ========================================
-                try {
-                    // ========================================
-                    // ⚠️ 容易出错点4：安全获取 config
-                    //    断网时 error.config 可能存在，但 config.data 可能是 undefined
-                    // ========================================
-                    var config = error.config || {};
-                    var errorCode = error.code || '';
-                    
-                    // ========================================
-                    // ⚠️ 容易出错点5：更健壮的错误类型判断
-                    //    网络断开时 error.response 不存在
-                    //    需要通过 error.code 或 error.message 判断
-                    // ========================================
-                    var isNetworkError = false;
-                    var isTimeout = false;
-                    
-                    if (error && error.response) {
-                        // 根据响应码具体处理。把错误信息加到 error 对象里
-                        switch (error.response.status) {
-                            case 400:
-                                error.message = '请求错误';
-                                break;
-                            case 401:
-                                error.message = '未授权，请重新登录'; // 未登录，跳转登录页
-                                break;
-                            case 403:
-                                error.message = '拒绝访问'; // 没有权限访问
-                                break;
-                            case 404:
-                                error.message = '请求地址错误，未找到该资源'; // API接口并不存在
-                                // window.location.href = "/NotFound";
-                                break;
-                            case 405:
-                                error.message = '请求方法未允许';
-                                break;
-                            case 408:
-                                error.message = '请求超时，请稍后重试';
-                                break;
-                            case 500:
-                                error.message = '服务器端出错'; // 服务器出现了内部错误
-                                break;
-                            case 501:
-                                error.message = '网络未实现';
-                                break;
-                            case 502:
-                                error.message = '网络错误';
-                                break;
-                            case 503:
-                                error.message = '服务不可用';
-                                break;
-                            case 504:
-                                // error.message = '网络超时';
-                                error.message = '网络已断开，请检查网络设置'; // 没有网络时
-                                break;
-                            case 505:
-                                error.message = 'http版本不支持该请求';
-                                break;
-                            default:
-                                error.message = `连接错误${error.response.status}`;
-                        }
 
-                    } else {
-                        // ========================================
-                        // ⚠️ 容易出错点6：没有响应的情况（网络断开、超时等）
-                        //    需要通过 error.code 精准判断
-                        //    常见错误码：
-                        //    - ECONNABORTED: 请求超时
-                        //    - ERR_NETWORK: 网络错误
-                        //    - ERR_INTERNET_DISCONNECTED: 网络断开
-                        // ========================================
-                        
-                        // 超时处理
-                        if (errorCode === 'ECONNABORTED' || 
-                            (error.message && error.message.includes('timeout'))) { // 判断没有timeout这个字符串，有就是超时了。
-                            isTimeout = true;
-                            error.message = '服务器响应超时，请刷新当前页';
-                        }
-                        // 网络断开
-                        else if (errorCode === 'ERR_NETWORK' || 
-                                 errorCode === 'ERR_INTERNET_DISCONNECTED' ||
-                                 (error.message && (
-                                     error.message.includes('Network Error') ||
-                                     error.message.includes('network') ||
-                                     error.message.includes('ENOTFOUND') ||
-                                     error.message.includes('ECONNREFUSED')
-                                 ))) {
-                            isNetworkError = true;
-                            error.message = '网络连接失败，请检查网络设置';
-                        }
-                        // 使用浏览器 API 检测网络状态
-                        else if (typeof window !== 'undefined' && !window.navigator.onLine) {
-                            isNetworkError = true;
-                            error.message = '网络已断开，请检查网络连接';
-                        }
-                        else {
-                            error.message = error.message || '未知错误，建议稍后再试';
-                        }
-
-                        /* 处理断网的情况
-                            eg: 请求超时或断网时，更新 state 的 network 状态
-                            network 状态在 app.vue 中控制着一个全局的断网提示组件的显示隐藏
-                            关于断网组件中的刷新重新获取数据，会在断网组件中说明 
-                        */
-                        if (!window.navigator.onLine) {
-                            // 如果断网....
-                            // store.commit('changeNetwork', false);
-                            error.message = '网络出现问题，建议检查网络连接'; // 没有网络时
-                        }
-                    }
-                    
-                    var errMsg = '';
-                    // ========================================
-                    // ⚠️ 容易出错点7：安全解析请求数据
-                    //    config.data 可能是 undefined、字符串或对象
-                    //    直接 JSON.parse(undefined) 会报错！
-                    // ========================================
-                    var datas = {};
-                    var action = '';
-                    
-                    try {
-                        // 先将URL格式的字符串转化成JSON格式的字符串
-                        if (typeof config.data != 'undefined' && !utils.isJsonString(config.data)) {
-                            config.data = JSON.stringify(utils.convertUrl2Object(config.data));
-                        }
-                        // var datas = JSON.parse(config.data);
-                        if (config.method && config.method.toLocaleLowerCase() === 'post') {
-                            if (config.data) {
-                                datas = typeof config.data === 'string' 
-                                    ? JSON.parse(config.data) 
-                                    : config.data;
-                            }
-                        } else if (config.params) {
-                            datas = config.params;
-                        }
-                        action = datas.action || '';
-                    } catch (parseErr) {
-                        console.warn('解析请求数据失败:', parseErr);
-                    }
-                    
+                else {
+                    var unknownMsg = '';
                     if (!config.debug) { // 友好提示信息
-                        errMsg += error.message;
+                        unknownMsg = '请求失败，请稍后再试';
                     }
                     else { // 报错提示信息
-                        errMsg += error.message;
-                        if (action) {
-                            errMsg += '<br>接口名称：' + action;
-                        }
+                        unknownMsg += '接口请求失败！';
+                        unknownMsg += '<br>接口名称：' + action;
                     }
-                    
-                    // ⚠️ 容易出错点8：popup 判断要用 !== false
-                    //    因为 config.popup 可能是 undefined，要默认弹出
-                    if (config.popup !== false) {
-                        utils.toast(config.vue, errMsg, {type: 'error', title: '出错了Error'}); // 弹出错误信息
+                    if(config.popup){
+                        utils.toast(config.vue, unknownMsg, {type: 'error'});
                     }
-                    
-                    // ========================================
-                    // ⚠️ 容易出错点9：必须返回 Promise.reject
-                    //    否则外部的 .catch() 永远不会被触发
-                    // ========================================
                     return Promise.reject({
-                        message: errMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
-                        error: error, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
-                        data: datas, // 用户请求的数据
-                        isNetworkError: isNetworkError,  // 新增：标识是否为网络错误
-                        isTimeout: isTimeout             // 新增：标识是否为超时
-                    });
-                    
-                } catch (e) {
-                    // ⚠️ 兜底：确保即使内部报错也要 reject，避免 Promise 悬空导致页面假死
-                    console.error('错误拦截器内部异常:', e);
-                    return Promise.reject({
-                        message: '请求处理异常',
-                        error: e,
-                        data: {},
-                        isInternalError: true
-                    });
+                        message: unknownMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
+                        error: response.data || response, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
+                        data: datas // 用户请求的数据
+                    })
                 }
+
+                return config.original ? response : response.data; // 响应正常的返回值
+            },
+            
+            // 2-2. 响应错误时做些什么。状态态码超出 2xx 范围的状态码都会触发该函数
+            (error) => {
+                // console.log('响应异常：', error);
+                if (error && error.response) {
+                    // 根据响应码具体处理。把错误信息加到 error 对象里
+                    switch (error.response.status) {
+                        case 400:
+                            error.message = '请求错误';
+                            break;
+                        case 401:
+                            error.message = '未授权，请重新登录'; // 未登录，跳转登录页
+                            break;
+                        case 403:
+                            error.message = '拒绝访问'; // 没有权限访问
+                            break;
+                        case 404:
+                            error.message = '请求地址错误，未找到该资源'; // API接口并不存在
+                            // window.location.href = "/NotFound";
+                            break;
+                        case 405:
+                            error.message = '请求方法未允许';
+                            break;
+                        case 408:
+                            error.message = '请求超时，请稍后重试';
+                            break;
+                        case 500:
+                            error.message = '服务器端出错'; // 服务器出现了内部错误
+                            break;
+                        case 501:
+                            error.message = '网络未实现';
+                            break;
+                        case 502:
+                            error.message = '网络错误';
+                            break;
+                        case 503:
+                            error.message = '服务不可用';
+                            break;
+                        case 504:
+                            // error.message = '网络超时';
+                            error.message = '网络已断开，请检查网络设置'; // 没有网络时
+                            break;
+                        case 505:
+                            error.message = 'http版本不支持该请求';
+                            break;
+                        default:
+                            error.message = `连接错误${error.response.status}`;
+                    }
+
+                } else {
+                    // 超时处理
+                    if (JSON.stringify(error).includes('timeout')) { // 判断没有timeout这个字符串，有就是超时了。
+                        error.message = '服务器响应超时，请刷新当前页';
+                    }
+                    else { // 没有的话我们就默认给他抛出一个自定义的错误信息
+                        error.message = '连接服务器失败';
+                    }
+
+                    /* 处理断网的情况
+                        eg: 请求超时或断网时，更新 state 的 network 状态
+                        network 状态在 app.vue 中控制着一个全局的断网提示组件的显示隐藏
+                        关于断网组件中的刷新重新获取数据，会在断网组件中说明 
+                    */
+                    if (!window.navigator.onLine) {
+                        // 如果断网....
+                        // store.commit('changeNetwork', false);
+                        error.message = '网络出现问题，建议检查网络连接'; // 没有网络时
+                    } else {
+                        error.message = '未知错误，建议稍后再试';
+                    }
+                }
+                
+                var errMsg = '';
+                var config = error.config;
+                // 先将URL格式的字符串转化成JSON格式的字符串
+                if (typeof config.data != 'undefined' && !utils.isJsonString(config.data)) {
+                    config.data = JSON.stringify(utils.convertUrl2Object(config.data));
+                }
+                // var datas = JSON.parse(config.data);
+                var datas = config.method.toLocaleLowerCase() == 'post' ? JSON.parse(config.data) : JSON.parse(JSON.stringify(config.params));
+                var action = datas.action;
+                if (!config.debug) { // 友好提示信息
+                    errMsg += error.message;
+                }
+                else { // 报错提示信息
+                    errMsg += error.message;
+                    errMsg += '<br>接口名称：' + action;
+                } 
+                if(config.popup){
+                    utils.toast(config.vue, errMsg, {type: 'error', title: '出错了Error'}); // 弹出错误信息
+                }
+                return Promise.reject({
+                    message: errMsg, // 具体错误信息。"后端返回的或封装时自定义的"错误信息
+                    error: error, // 详细错误信息。响应错误时返回的原始错误信息，或响应正常时后端返回的信息
+                    data: datas // 用户请求的数据
+                })
             }
         );
 
@@ -524,7 +397,7 @@
                 logout: false, // 是否登录超时(可选)，默认false
                 logoutPageUrl: '', // 登录超时的时候跳转的页面(可选)，默认false add 20251031-1
                 type: 'error' // 弹窗类型(可选)。info 消息提示(默认), warning 警告提示, error 错误提示，success 成功提示
-            };
+            }
             var settings = this.extend(true, {}, defaults, opts || {});
             var title = settings.title,
                 logout = settings.logout,
@@ -555,7 +428,7 @@
                     if(logout_page_url != '') {
                         window.location.href = logout_page_url;
                     }
-                });
+                })
             }
             else if (_this != null && typeof _this.$dialog == 'function') { // vant ui
                 // _this.$toast.loading({
@@ -726,7 +599,7 @@
                             main[key] = minor[key];
                         }
                     }
-                };
+                }
                 mergeObj(opts, target);
                 return target;
             }
@@ -755,7 +628,7 @@
 
 
 //———————————————————————————————————————————————————————————————————
-// 二、创建"既是函数又是对象"的实例
+// 二、创建“既是函数又是对象”的实例
 //———————————————————————————————————————————————————————————————————
 function createNewInstace(config){
     // 说明：bind()就是将函数绑定到某个对象上。 例如：f.bind(obj)，实际上可以理解为 obj.f()
@@ -771,7 +644,7 @@ function createNewInstace(config){
     // 为 instance 函数对象添加属性
     Object.keys(context).forEach(function (item) {
         instance[item] = context[item];
-    });
+    })
     return instance;
 }
 var $axios = createNewInstace();
