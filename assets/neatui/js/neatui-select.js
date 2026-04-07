@@ -4,7 +4,7 @@
  * 本控件是基于iosSelect下拉控件进行封装，依赖于iosSelect提供的IosSelect()方法
  * Author: mufeng
  * Date: 2018.12.1
- * Update: 2021.03.08
+ * Update: 2026.04.07
  */
 
 
@@ -261,7 +261,7 @@ var neuiSelect = {
 			$iosCountysJson = this.jsonConvert(jsonData,  jsonFormat, keyFormat, 'county'),
 			iosArray = [$iosProvincesJson.data,$iosCitysJson.data,$iosCountysJson.data];
 		}
-		//console.log('province:',$iosProvincesJson,'\ncity:',$iosCitysJson,'\ncounty:',$iosCountysJson);
+		// console.log('province:',$iosProvincesJson,'\ncity:',$iosCitysJson,'\ncounty:',$iosCountysJson, '\niosArray：', iosArray);
 			
 			
 		if(typeof(showCursor)=='function') showCursor(obj); //添加假光标
@@ -272,7 +272,7 @@ var neuiSelect = {
 		
 			
 		//默认下拉选中值
-		this.provinceCityCountInit(obj,oldValue,jsonData);
+		this.provinceCityCountInit(obj,oldValue,jsonData, jsonFormat);
 		
 		var oneLevelId = obj.attr('data-province'),
 			twoLevelId = obj.attr('data-city'),
@@ -330,8 +330,9 @@ var neuiSelect = {
 	* @param element 所点击的元素
 	* @param value 所点击元素初始值
 	* @param json 省市区三级联动json
+	* @param ps_format 省市区名称字段组成的数组。eg. ['provine', 'city', 'county']
 	*/
-	provinceCityCountInit:function(element,value,json){
+	provinceCityCountInit:function(element,value,json, ps_format){
 		var arr = value.split('-');
 		var provinceName = arr[0];
 		var cityName = arr[1];
@@ -352,17 +353,21 @@ var neuiSelect = {
 			}
 			//console.log('provinceId:',provinceId,'\ncityId:',cityId,'\ncountyId:',countyId);
 		}else{ //json为json时
+			var field_province_mc = ps_format.length > 0 ? ps_format[0] : 'province',
+				field_city_mc = ps_format.length > 1 ? ps_format[1] : 'city',
+				field_county_mc = ps_format.length > 2 ? ps_format[2] : 'county';
+
 			$.each(json.data,function(i,items1){
 					provinceCount ++;
-					if(items1.province==provinceName) 
+					if(items1[field_province_mc] == provinceName) 
 							provinceId = provinceCount - 1;
 					$.each(items1.data,function(j,items2){
 							cityCount++;
-							if(items2.city==cityName) 
+							if(items2[field_city_mc] == cityName) 
 									cityId = cityCount - 1;
 							$.each(items2.data,function(k,items3){
 									countyCount ++;
-									if(items3.county==countyName) 
+									if(items3[field_county_mc] == countyName) 
 											countyId = countyCount - 1;
 							})
 					})
