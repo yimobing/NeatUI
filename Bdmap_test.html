@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百度地图周边配套检索 - v2.0.0</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Promise polyfill for IE11 -->
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
+    <link rel="stylesheet" href="/test/css/demo-baidu-map.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ 百度地图周边配套检索</h1>
+            <p>输入小区名称、关键词和半径，自动生成配套情况报告</p>
+            <p style="font-size: 0.9em; opacity: 0.8;">
+                版本：v2.0.0
+                <a href="#" onclick="showVersionHistory(); return false;" style="color: #667eea; text-decoration: none; margin-left: 10px;">[查看版本历史]</a>
+            </p>
+        </div>
+
+        <!-- 配置说明 -->
+        <div class="card config-card">
+            <h3>⚙️ 使用前配置</h3>
+            <p>请先配置百度地图API密钥（AK）。在代码中找到 <code>BAIDU_MAP_AK</code> 变量，填入你的AK。</p>
+            <p style="margin-top: 8px;">获取AK：访问 <a href="http://lbsyun.baidu.com/" target="_blank" style="color: #667eea;">百度地图开放平台</a>（注意：需要申请浏览器端AK）</p>
+        </div>
+
+        <!-- 搜索表单 -->
+        <div class="card">
+            <div class="form-group">
+                <label for="city">🏙️ 城市</label>
+                <input type="text" id="city" value="泉州市" placeholder="例如：北京市">
+            </div>
+
+            <div class="form-group">
+                <label for="communityName">📍 小区名称</label>
+                <input type="text" id="communityName" value="泉州浦西万达广场" placeholder="例如：泉州浦西万达广场">
+            </div>
+
+            <div class="form-group">
+                <label for="keyword">🔍 附近项目</label>
+                <div class="keyword-input-wrapper">
+                    <input type="text" id="keyword" value="学校" placeholder="例如：学校、医院、银行">
+                    <button class="btn-filter" id="filterBtn" style="display: none;">筛选</button>
+                </div>
+            </div>
+
+            <!-- 快速选择 -->
+            <div class="quick-select-section">
+                <button class="quick-btn" data-category="school">学校</button>
+                <button class="quick-btn" data-category="hospital">医院</button>
+                <button class="quick-btn" data-category="bank">银行</button>
+                <button class="quick-btn" data-category="market">超市</button>
+                <button class="quick-btn" data-category="restaurant">餐饮</button>
+                <button class="quick-btn" data-category="gas_station">加油</button>
+                <button class="quick-btn" data-category="park">公园</button>
+                <button class="quick-btn" data-category="express">快递</button>
+                <button class="quick-btn-more" id="moreBtn">更多 ↓</button>
+            </div>
+
+            <!-- 更多分类（默认隐藏） -->
+            <div class="quick-select-section" id="moreSection" style="display: none;">
+                <button class="quick-btn" data-category="government">政府</button>
+                <button class="quick-btn" data-category="community">小区</button>
+                <button class="quick-btn" data-category="bus">公交</button>
+                <button class="quick-btn" data-category="subway">地铁</button>
+                <button class="quick-btn" data-category="parking">停车场</button>
+                <button class="quick-btn" data-category="shopping_mall">商场</button>
+                <button class="quick-btn" data-category="hotel">酒店</button>
+                <button class="quick-btn" data-category="market_farm">市场</button>
+                <button class="quick-btn" data-category="culture">文体</button>
+                <button class="quick-btn" data-category="cemetery">陵园</button>
+                <button class="quick-btn" data-category="garbage_station">垃圾站</button>
+                <button class="quick-btn" data-category="substation">变电站</button>
+            </div>
+
+            <div class="form-group">
+                <label for="radius">📏 搜索半径</label>
+                <div class="radius-input-wrapper">
+                    <input type="number" id="radius" value="1000" min="100" max="10000">
+                    <span class="radius-unit">米</span>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="alert alert-error" style="display: none;"></div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" id="searchBtn">开始搜索</button>
+                <button class="btn btn-secondary" id="clearBtn">清空</button>
+            </div>
+        </div>
+
+        <!-- 筛选下拉框（弹出式） -->
+        <div class="filter-dropdown" id="filterDropdown" style="display: none;">
+            <div class="filter-header">
+                <span>📂 选择分类</span>
+                <button class="btn-close" id="closeFilter">×</button>
+            </div>
+            <div class="filter-body">
+                <div class="form-group">
+                    <label for="categorySelect">分类</label>
+                    <select id="categorySelect">
+                        <option value="">-- 请选择分类 --</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="subcategoryGroup" style="display: none;">
+                    <label for="subcategorySelect">子分类</label>
+                    <select id="subcategorySelect">
+                        <option value="全部">全部</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-footer">
+                <button class="btn btn-secondary" id="cancelFilter">取消</button>
+                <button class="btn btn-primary" id="applyFilter">确定</button>
+            </div>
+        </div>
+
+        <!-- 结果区域 -->
+        <div class="card result-card" id="resultCard">
+            <div class="result-header">
+                <h2>📊 搜索结果</h2>
+                <div>
+                    <span style="color: #666; margin-right: 15px;" id="resultInfo"></span>
+                    <span class="badge" id="resultCount"></span>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="report">📄 配套报告</button>
+                <button class="tab" data-tab="list">📋 详细列表</button>
+            </div>
+
+            <div class="tab-content active" id="reportTab">
+                <textarea class="report-textarea" id="reportText" readonly></textarea>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-secondary" onclick="copyReport()">📋 复制报告</button>
+                    <button class="btn btn-secondary" onclick="downloadReport()">💾 下载文件</button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="listTab">
+                <div class="poi-list" id="poiList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/test/js/demo-baidu-map.js"></script>
+</body>
+</html>

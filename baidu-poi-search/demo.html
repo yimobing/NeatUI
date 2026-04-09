@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百度地图POI搜索插件 - 示例</title>
+
+    <!-- 插件样式 -->
+    <link rel="stylesheet" href="baidu-poi-search.css">
+</head>
+<body>
+    <!-- 主容器 -->
+    <div class="poi-search-app layout-split">
+        
+        <!-- 地图容器（预留） -->
+        <div id="baidu-map-container" class="baidu-map-container">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666; text-align: center;">
+                <div>
+                    <p style="font-size: 24px;">🗺️ 百度地图容器</p>
+                    <p style="margin-top: 10px;">（地图功能将在后续版本中实现）</p>
+                    <p style="margin-top: 10px; color: #999;">当前版本：v3.1.2</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 搜索面板 -->
+        <div id="poi-search-panel" class="poi-search-panel">
+            <!-- 插件将在这里生成UI -->
+        </div>
+        
+    </div>
+    
+    <!-- 插件脚本 -->
+    <script src="baidu-poi-search.js"></script>
+    
+    <!-- 示例脚本 -->
+    <script>
+        // 创建插件实例
+        var poiSearch = new BaiduPoiSearch({
+            // 百度地图API密钥（请替换为你的AK）
+            // 注意：插件会自动加载百度地图API，无需在页面中单独引入
+            apiKey: 'KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X',
+            
+            // 每日API调用限制
+            dailyLimit: 100,
+            
+            // 默认城市
+            defaultCity: '泉州市',
+            
+            // 默认布局：'split'（左右）或 'fullscreen'（全屏）
+            layoutMode: 'split',
+            
+            // 左右布局配置
+            splitLayout: {
+                mapWidth: '70%',
+                searchWidth: '30%',
+                mapPosition: 'left',
+                resizable: true,
+                minWidth: 300,
+                maxWidth: 600
+            },
+            
+            // 全屏布局配置
+            fullscreenLayout: {
+                searchPosition: 'top-right',
+                searchWidth: 400,
+                maxHeight: 600,
+                draggable: true,
+                collapsible: true,
+                collapsed: false
+            },
+            
+            // 多选配置
+            enableMultiSelect: true,
+            selectionLimit: 5,
+            selectionLimitWarning: 3,
+            
+            // 是否显示API使用情况
+            showApiUsage: true,
+            
+            // 默认搜索半径
+            defaultRadius: 1000,
+            
+            // 回调函数
+            onInit: function() {
+                console.log('插件初始化完成');
+            },
+            
+            onLayoutChange: function(mode) {
+                console.log('布局切换:', mode);
+            },
+            
+            onSearchStart: function(params) {
+                console.log('搜索开始:', params);
+            },
+            
+            onSearchProgress: function(progress) {
+                console.log('搜索进度:', progress.completed + '/' + progress.total);
+            },
+            
+            onSearchComplete: function(results) {
+                console.log('搜索完成:', results);
+                
+                // TODO: 这里可以调用地图插件显示结果
+                // 例如：mapPlugin.displayPois(results);
+            },
+            
+            onResultClick: function(poi) {
+                console.log('点击POI:', poi);
+                
+                // TODO: 这里可以调用地图插件定位到POI
+                // 例如：mapPlugin.centerOnPoi(poi);
+            },
+            
+            onError: function(error) {
+                console.error('搜索错误:', error);
+            }
+        });
+        
+        // 初始化插件
+        poiSearch.init();
+        
+        // ============================================
+        // 示例：外部API调用
+        // ============================================
+        
+        // 获取API使用情况
+        function getApiUsage() {
+            var usage = poiSearch.getApiUsage();
+            console.log('API使用情况:', usage);
+            return usage;
+        }
+        
+        // 获取搜索结果
+        function getResults(categoryKey) {
+            var results = poiSearch.getResults(categoryKey);
+            console.log('搜索结果:', results);
+            return results;
+        }
+        
+        // 切换布局
+        function switchLayout(mode) {
+            poiSearch.setLayoutMode(mode);
+        }
+        
+        // 重置API使用统计（仅用于测试）
+        function resetApiUsage() {
+            if (confirm('确定要重置API使用统计吗？')) {
+                poiSearch.resetApiUsage();
+                alert('API使用统计已重置');
+            }
+        }
+        
+        // 设置每日限制
+        function setDailyLimit(limit) {
+            poiSearch.setDailyLimit(limit);
+            alert('每日限制已设置为: ' + limit + '次');
+        }
+        
+        // 获取所有分类
+        function getAllCategories() {
+            var categories = poiSearch.getCategories();
+            console.log('所有分类:', categories);
+            return categories;
+        }
+        
+        // 事件监听示例
+        poiSearch.on('searchComplete', function(results) {
+            console.log('监听到搜索完成事件');
+            // 可以在这里添加自定义逻辑
+        });
+        
+        // ============================================
+        // 开发工具（仅在开发环境中使用）
+        // ============================================
+        
+        // 暴露到全局，方便控制台调试
+        window.poiSearch = poiSearch;
+        window.getApiUsage = getApiUsage;
+        window.getResults = getResults;
+        window.switchLayout = switchLayout;
+        window.resetApiUsage = resetApiUsage;
+        window.setDailyLimit = setDailyLimit;
+        window.getAllCategories = getAllCategories;
+        
+        console.log('========================================');
+        console.log('BaiduPoiSearch 插件示例页面');
+        console.log('版本：v3.1.2');
+        console.log('========================================');
+        console.log('可用方法（在控制台中调用）：');
+        console.log('- poiSearch: 插件实例');
+        console.log('- getApiUsage(): 获取API使用情况');
+        console.log('- getResults(categoryKey): 获取搜索结果');
+        console.log('- switchLayout(mode): 切换布局（split/fullscreen）');
+        console.log('- resetApiUsage(): 重置API使用统计');
+        console.log('- setDailyLimit(limit): 设置每日限制');
+        console.log('- getAllCategories(): 获取所有分类');
+        console.log('========================================');
+    </script>
+</body>
+</html>
