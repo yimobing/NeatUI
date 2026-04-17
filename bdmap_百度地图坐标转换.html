@@ -1,0 +1,68 @@
+
+//————————————————————————————————————————————————
+// 方法1：使用百度地图api的进行转换 (有问题，getScript.js 有问题，无法返回正常值 )
+//————————————————————————————————————————————————
+<script src="http://api.map.baidu.com/api?v=2.0&ak=这里填写百度地图api的AK"></script> <!-- 百度地图api文件  -->
+
+// 百度地图坐标转换： GCJ02 → BD09
+var gcjLng = 116.397470; 
+var gcjLat = 39.908823;
+var gcjPoint = new BMap.Point(gcjLng, gcjLat); // GCJ02 坐标点
+// 参数1：待转换的点；参数2：原坐标系类型；参数3：目标坐标系类型；参数4 回调函数
+var from = 3; // from (原坐标) 1 = WGS84 (GPS), 3 = GCJ02 (火星坐标，微信、高德、高德地图), 2 = 旧版 API 里的 GCJ02(已废弃)
+var to = 5; // to (目标坐标) 5 = BD09 (百度经纬度), 6 = BD09 墨卡托
+var convertor = new BMap.Convertor();
+convertor.translate(gcjPoint, 3, 5, function(bdPoint){
+    // 转换成功的回调函数
+    console.log("BD09 经度：", bdPoint.lng);
+    console.log("BD09 纬度：", bdPoint.lat);
+    // 后续可基于 bdPoint 创建百度地图标注等操作
+    var marker = new BMap.Marker(bdPoint);
+    var map = new BMap.Map("mapContainer"); // 需提前有 id 为 mapContainer 的 DOM 元素
+    map.centerAndZoom(bdPoint, 15);
+    map.addOverlay(marker);
+});
+
+
+
+//————————————————————————————————————————————————
+//      方法2：使用离线版的算法
+离线转换算法出现轻微偏差是正常的，因为它是基于公开的近似公式实现的，和百度官方的加密逻辑存在细微差异
+//————————————————————————————————————————————————
+
+/**
+* 离线版百度地图坐标转换： GCJ02 → BD09
+* 几种坐标系：WGS84 : GPS 坐标，GCJ02 国测局火星坐标，微信、高德、高德地图), BD09 百度经纬度坐标
+* @param {String} lng 经度 (GCJ02火星坐标)
+* @param {String} lat 纬度 (GCJ02火星坐标)
+*/
+function gcj02ToBd09Optimize(lng, lat) {
+    // 调整前的公式
+    // var x_pi = 3.14159265358979324 * 3000.0 / 180.0;
+    // var z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * x_pi);
+    // var theta = Math.atan2(lat, lng) + 0.000003 * Math.cos(lng * x_pi);
+    // var bdLng = z * Math.cos(theta) + 0.0065;
+    // var bdLat = z * Math.sin(theta) + 0.006;
+    // return { lng: bdLng, lat: bdLat };
+    // 调整后的公式
+    var x_pi = Math.PI * 3000.0 / 180.0;
+    // 保留原逻辑基础上增加微小修正系数
+    var z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * x_pi);
+    var theta = Math.atan2(lat, lng) + 0.00000301 * Math.cos(lng * x_pi); // 微调系数
+    var bd_lng = z * Math.cos(theta) + 0.006501; // 微调偏移量
+    var bd_lat = z * Math.sin(theta) + 0.00599;  // 微调偏移量
+    return { longitude: bd_lng, latitude: bd_lat };
+}
+
+
+示例：
+// 腾讯地图坐标拾取器： https://lbs.qq.com/getPoint/
+// 百度地图坐标拾取器： https://lbs.baidu.com/maptool/getpoint
+// 微信默认的坐标是调用腾讯地图 GCJ02 坐标
+var gcjCoordinate = "118.608913, 24.909946"; // 原坐标。 GCJ02 坐标
+var gcjArr = gcjCoordinate.split(',');
+var gcjLng = gcjArr[0], gcjLat = gcjArr[1]; // 经纬度
+var bdCoordinate = gcj02ToBd09Optimize(gcjLng, gcjLat); // 百度地图坐标转换： GCJ02 → BD09
+console.log('bdCoordinate：', bdCoordinate);
+var lng = bdCoordinate.longitude, lat = bdCoordinate.latitude;
+console.log(lng + ',' + lat); // 结果： 118.6154669570383,24.915635427383805
