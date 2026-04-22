@@ -6,21 +6,14 @@
     <title>百度地图POI搜索插件 - 示例</title>
 
     <!-- 插件样式 -->
-    <link rel="stylesheet" href="baidu-poi-search.css">
+    <link rel="stylesheet" href="baidu-poi-search/neatui-bmap.css">
 </head>
 <body>
     <!-- 主容器 -->
     <div class="poi-search-app layout-split">
         
-        <!-- 地图容器（预留） -->
+        <!-- 地图容器 -->
         <div id="baidu-map-container" class="baidu-map-container">
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666; text-align: center;">
-                <div>
-                    <p style="font-size: 24px;">🗺️ 百度地图容器</p>
-                    <p style="margin-top: 10px;">（地图功能将在后续版本中实现）</p>
-                    <p style="margin-top: 10px; color: #999;">当前版本：v3.1.2</p>
-                </div>
-            </div>
         </div>
         
         <!-- 搜索面板 -->
@@ -31,7 +24,7 @@
     </div>
     
     <!-- 插件脚本 -->
-    <script src="baidu-poi-search.js"></script>
+    <script src="baidu-poi-search/neatui-bmap.js"></script>
     
     <!-- 示例脚本 -->
     <script>
@@ -185,7 +178,7 @@
         
         console.log('========================================');
         console.log('BaiduPoiSearch 插件示例页面');
-        console.log('版本：v3.1.2');
+        console.log('版本：v3.3.1');
         console.log('========================================');
         console.log('可用方法（在控制台中调用）：');
         console.log('- poiSearch: 插件实例');
@@ -197,5 +190,8 @@
         console.log('- getAllCategories(): 获取所有分类');
         console.log('========================================');
     </script>
+    
+    <!-- 共享地图容器（供SDK内部使用，必须隐藏） -->
+    <div id="baidu_poi_search_map" style="display: none;"></div>
 </body>
 </html>

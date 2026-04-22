@@ -1,6 +1,5 @@
 /**
  * BaiduPoiSearch - 百度地图POI搜索插件
- * 版本：v3.1.2
  * 作者：Vibe Coding Agent
  * 功能：多分类POI搜索、智能过滤、API使用统计、双布局支持
  * 兼容：IE11+（ES5语法）
@@ -10,7 +9,7 @@
     'use strict';
 
     // 插件版本号
-    var VERSION = 'v3.1.2';
+    var VERSION = 'v3.5.0';
 
     /**
      * BaiduPoiSearch 构造函数
@@ -24,7 +23,8 @@
         this.cache = {
             results: null,
             categories: this.getPOICategories(),
-            poiCache: {}  // POI缓存，避免重复搜索
+            poiCache: {},  // POI缓存，避免重复搜索
+            categoryColors: {}  // 分类颜色缓存，同分类固定颜色
         };
         
         // 状态管理
@@ -43,8 +43,17 @@
         // 事件注册表
         this.events = {};
         
-        // 地图实例（预留）
+        // 地图实例（用于搜索的共享实例）
         this.mapInstance = null;
+        
+        // 地图渲染实例（用于显示地图和标注）
+        this.mapRenderer = null;
+        
+        // 标注数组（用于清除旧标注）
+        this.markers = [];
+        
+        // 存储的中心点（用于地图初始显示）
+        this.currentCenter = null;
     }
 
     /**
@@ -109,7 +118,27 @@
         onSearchProgress: null,       // 搜索进度
         onSearchComplete: null,       // 搜索完成
         onResultClick: null,          // 点击结果
-        onError: null                 // 错误处理
+        onError: null,                // 错误处理
+
+        // === 地图配置 ===
+        map: {
+            enabled: true,             // 是否启用地图
+            zoom: 14,                 // 默认缩放级别（3-19）
+            enableWheelZoom: true,    // 是否启用鼠标滚轮缩放
+            autoViewPort: true,       // 是否自动调整视野显示所有标注
+            maxPointsPerCategory: 5, // 每个分类最多显示几个标注
+            maxTotalPoints: 15,      // 所有分类最多显示几个标注
+            // 高亮颜色
+            highlightColor: '#E60000',
+            // 切换分类时是否提示（默认不提示）
+            switchCategoryConfirm: false
+        },
+        
+        // === 并发控制配置 ===
+        // 超过指定并发量时的延迟（毫秒）
+        defaultDelay: 400,           // 默认延迟（毫秒）
+        concurrentLimit: 3,          // 指定并发量阈值
+        overLimitDelay: 1000         // 超过并发量时的延迟（毫秒）
     };
 
     /**
@@ -117,6 +146,7 @@
      */
     BaiduPoiSearch.prototype.getPOICategories = function() {
         return {
+            // POI 分类匹配规则配置
             // ==================== 快速选择分类（8个）====================
             'school': {
                 name: '学校',
@@ -171,36 +201,6 @@
                     { name: '信用社', value: '信用社' }
                 ]
             },
-            'market': {
-                name: '超市',
-                icon: '🏪',
-                typeKeyword: '购物',
-                matchKeywords: ['超市', '商场', '百货', '购物中心'],
-                excludeKeywords: ['便利店', '水果店', '菜店',
-                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
-                                 '入口', '出口'],
-                subcategories: [
-                    { name: '全部', value: '' },
-                    { name: '大型超市', value: '大型超市' },
-                    { name: '便利店', value: '便利店' },
-                    { name: '购物中心', value: '购物中心' }
-                ]
-            },
-            'restaurant': {
-                name: '餐饮',
-                icon: '🍽️',
-                typeKeyword: '餐饮',
-                matchKeywords: ['餐厅', '饭店', '美食', '小吃', '快餐', '火锅'],
-                excludeKeywords: ['咖啡', '奶茶', '饮品',
-                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
-                                 '入口', '出口'],
-                subcategories: [
-                    { name: '全部', value: '' },
-                    { name: '中餐', value: '中餐' },
-                    { name: '西餐', value: '西餐' },
-                    { name: '快餐', value: '快餐' }
-                ]
-            },
             'gas_station': {
                 name: '加油站',
                 icon: '⛽',
@@ -229,22 +229,6 @@
                     { name: '社区公园', value: '社区公园' }
                 ]
             },
-            'express': {
-                name: '快递',
-                icon: '📦',
-                typeKeyword: '物流',
-                matchKeywords: ['快递', '物流', '驿站'],
-                excludeKeywords: ['便利店',
-                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
-                                 '入口', '出口'],
-                subcategories: [
-                    { name: '全部', value: '' },
-                    { name: '快递网点', value: '快递网点' },
-                    { name: '物流中心', value: '物流中心' }
-                ]
-            },
-
-            // ==================== 更多分类（17个）====================
             'government': {
                 name: '政府',
                 icon: '🏛️',
@@ -284,18 +268,54 @@
                     { name: '公交枢纽', value: '公交枢纽' }
                 ]
             },
-            'subway': {
-                name: '地铁',
-                icon: '🚇',
-                typeKeyword: '交通设施',
-                matchKeywords: ['地铁', '地铁站', '轻轨'],
-                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+
+            // testing
+            //  高速公路、国道、省道、县道、乡道、城市快速路、城市主干道、城市次干道、城市支路、车渡线、路口
+            'road': {
+                name: '道路',
+                icon: '🛣️',
+                typeKeyword: '道路',
+                matchKeywords: [
+                    '路', '大道', '大街', '街', '公路', '快速路', '高速',
+                    '高架', '大桥', '桥', '隧道', '匝道', '环路', '干线',
+                    '支路', '巷', '弄', '国道', '省道', '县道'
+                ],
+                // 只排除【真正不是公共道路】的词
+                excludeKeywords: [
+                    '小区', '园区', '厂区', '校区', '院区', '商城', '商场',
+                    '广场', '公馆', '金街', '步行街', '内部路', '园区路',
+                    '便道', '步道', '通道', '消防通道', '步行街', '地下通道'
+                ],
+                subcategories: [
+                    { name: '全部', value: '' },
+                    { name: '城市主路', value: '城市主路' },
+                    { name: '快速路/高架', value: '快速路' },
+                    { name: '高速公路', value: '高速公路' },
+                    { name: '桥梁/隧道', value: '桥梁隧道' },
+                    { name: '街巷/支路', value: '街巷支路' }
+                ]
+            },
+
+            'market': {
+                name: '超市',
+                icon: '🏪',
+                typeKeyword: '购物',
+                matchKeywords: ['超市', '商场', '百货', '购物中心'],
+                excludeKeywords: ['便利店', '水果店', '菜店',
+                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
                                  '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
-                    { name: '地铁站', value: '地铁站' }
+                    { name: '大型超市', value: '大型超市' },
+                    { name: '便利店', value: '便利店' },
+                    { name: '购物中心', value: '购物中心' }
                 ]
             },
+            
+
+            
+
+            // ==================== 更多分类（17个）====================
             'parking': {
                 name: '停车场',
                 icon: '🅿️',
@@ -307,6 +327,47 @@
                     { name: '全部', value: '' },
                     { name: '地面停车场', value: '地面停车场' },
                     { name: '地下车库', value: '地下车库' }
+                ]
+            },
+            'restaurant': {
+                name: '餐饮',
+                icon: '🍽️',
+                typeKeyword: '餐饮',
+                matchKeywords: ['餐厅', '饭店', '美食', '小吃', '快餐', '火锅'],
+                excludeKeywords: ['咖啡', '奶茶', '饮品',
+                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
+                subcategories: [
+                    { name: '全部', value: '' },
+                    { name: '中餐', value: '中餐' },
+                    { name: '西餐', value: '西餐' },
+                    { name: '快餐', value: '快餐' }
+                ]
+            },
+            'express': {
+                name: '快递',
+                icon: '📦',
+                typeKeyword: '物流',
+                matchKeywords: ['快递', '物流', '驿站'],
+                excludeKeywords: ['便利店',
+                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
+                subcategories: [
+                    { name: '全部', value: '' },
+                    { name: '快递网点', value: '快递网点' },
+                    { name: '物流中心', value: '物流中心' }
+                ]
+            },
+            'subway': {
+                name: '地铁',
+                icon: '🚇',
+                typeKeyword: '交通设施',
+                matchKeywords: ['地铁', '地铁站', '轻轨'],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
+                subcategories: [
+                    { name: '全部', value: '' },
+                    { name: '地铁站', value: '地铁站' }
                 ]
             },
             'shopping_mall': {
@@ -465,8 +526,16 @@
                 return;
             }
 
+            // 创建共享的Map实例（避免多个实例占用并发连接）
+            if (!self.mapInstance) {
+                self.mapInstance = new BMap.Map("baidu_poi_search_map");
+            }
+
             // 创建UI
             self.createUI();
+            
+            // 初始化地图
+            self.initMap();
 
             // 绑定事件
             self.bindEvents();
@@ -542,16 +611,10 @@
             '</div>' +
             '</div>';
         
-        // 单选/多选模式切换
-        if (this.options.enableMultiSelect) {
-            html += '<div class="multi-select-section">' +
-                '<div class="select-mode-toggle">' +
-                '<button class="mode-btn active" data-mode="single" id="btnSingleMode">🔘 单选</button>' +
-                '<button class="mode-btn" data-mode="multiple" id="btnMultipleMode">☑️ 多选</button>' +
-                '</div>' +
-                '<span id="selectedCount" style="display: none;">已选 0 个</span>' +
-                '</div>';
-        }
+        // 已选分类计数（始终显示）
+        html += '<div class="multi-select-section">' +
+            '<span id="selectedCount" style="display: none;">已选 0 个</span>' +
+            '</div>';
         
         // 快速选择
         html += '<div class="quick-select-section">' +
@@ -583,14 +646,12 @@
         html += '</div>';
         
         // 已选分类标签区
-        if (this.options.enableMultiSelect) {
-            html += '<div class="selected-categories" id="selectedCategories" style="display: none;">' +
-                '<div class="selected-title">已选分类：</div>' +
-                '<div class="selected-tags" id="selectedTags"></div>' +
-                '<button class="btn-clear-all" id="clearAllBtn">清空所有</button>' +
-                '<button class="btn-filter-categories" id="filterCategoriesBtn" style="display: none;">筛选子分类</button>' +
-                '</div>';
-        }
+        html += '<div class="selected-categories" id="selectedCategories" style="display: none;">' +
+            '<div class="selected-title">已选分类：</div>' +
+            '<div class="selected-tags" id="selectedTags"></div>' +
+            '<button class="btn-clear-all" id="clearAllBtn">清空所有</button>' +
+            '<button class="btn-filter-categories" id="filterCategoriesBtn" style="display: none;">筛选子分类</button>' +
+            '</div>';
 
         // 子分类筛选下拉框
         html += '<div class="filter-dropdown" id="filterDropdown" style="display: none;">' +
@@ -614,6 +675,9 @@
             '<div class="results-header">' +
             '<h3>📊 搜索结果</h3>' +
             '<span id="resultsCount"></span>' +
+            '</div>' +
+            '<div id="showAllMarkersBtnContainer" style="display: none; margin-bottom: 10px;">' +
+            '<button class="btn btn-secondary" id="showAllMarkersBtn">🔙 显示全部标注</button>' +
             '</div>' +
             '<div class="tabs">' +
             '<button class="tab active" data-tab="report">📄 配套报告</button>' +
@@ -687,36 +751,31 @@
             });
         }
         
-        // 单选/多选模式切换
-        if (this.options.enableMultiSelect) {
-            var btnSingleMode = document.getElementById('btnSingleMode');
-            var btnMultipleMode = document.getElementById('btnMultipleMode');
+        // 更多分类区域也需要绑定事件（使用 querySelectorAll 修复）
+        var moreSection = document.getElementById('moreSection');
+        if (moreSection) {
+            moreSection.addEventListener('click', function(e) {
+                if (e.target.classList.contains('quick-btn')) {
+                    var category = e.target.getAttribute('data-category');
+                    self.handleQuickSelect(category, e.target);
+                }
+            });
+        }
+        
+        // 清空所有按钮
+        var clearAllBtn = document.getElementById('clearAllBtn');
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener('click', function() {
+                self.clearAllCategories();
+            });
+        }
 
-            if (btnSingleMode && btnMultipleMode) {
-                btnSingleMode.addEventListener('click', function() {
-                    self.setMultiSelectMode(false);
-                });
-
-                btnMultipleMode.addEventListener('click', function() {
-                    self.setMultiSelectMode(true);
-                });
-            }
-
-            // 清空所有按钮
-            var clearAllBtn = document.getElementById('clearAllBtn');
-            if (clearAllBtn) {
-                clearAllBtn.addEventListener('click', function() {
-                    self.clearAllCategories();
-                });
-            }
-
-            // 筛选子分类按钮
-            var filterCategoriesBtn = document.getElementById('filterCategoriesBtn');
-            if (filterCategoriesBtn) {
-                filterCategoriesBtn.addEventListener('click', function() {
-                    self.showFilterDropdown();
-                });
-            }
+        // 筛选子分类按钮
+        var filterCategoriesBtn = document.getElementById('filterCategoriesBtn');
+        if (filterCategoriesBtn) {
+            filterCategoriesBtn.addEventListener('click', function() {
+                self.showFilterDropdown();
+            });
         }
 
         // 筛选下拉框事件
@@ -767,6 +826,14 @@
                 self.downloadReport();
             });
         }
+        
+        // 显示全部标注按钮
+        var showAllMarkersBtn = document.getElementById('showAllMarkersBtn');
+        if (showAllMarkersBtn) {
+            showAllMarkersBtn.addEventListener('click', function() {
+                self.showAllCategoryMarkers();
+            });
+        }
     };
 
     /**
@@ -798,17 +865,45 @@
                 if (kw) {
                     var catKey = this.findCategoryByKeyword(kw);
                     if (catKey) {
-                        categories.push(catKey);
+                        // 记录原始关键词，用于精确搜索
+                        categories.push({
+                            key: catKey,
+                            searchKeyword: kw  // 使用用户输入的原始关键词
+                        });
                     }
                 }
             }
         }
         
-        // 添加已选分类
-        categories = categories.concat(this.state.selectedCategories);
+        // 添加已选分类（点击按钮选择的分类使用分类名称搜索）
+        for (var j = 0; j < this.state.selectedCategories.length; j++) {
+            var selectedKey = this.state.selectedCategories[j];
+            // 检查是否已存在
+            var exists = false;
+            for (var k = 0; k < categories.length; k++) {
+                if (categories[k].key === selectedKey) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                categories.push({
+                    key: selectedKey,
+                    searchKeyword: null  // 使用分类名称
+                });
+            }
+        }
         
         // 去重
-        categories = this.unique(categories);
+        var uniqueKeys = [];
+        var uniqueCategories = [];
+        for (var m = 0; m < categories.length; m++) {
+            if (uniqueKeys.indexOf(categories[m].key) === -1) {
+                uniqueKeys.push(categories[m].key);
+                uniqueCategories.push(categories[m]);
+            }
+        }
+        categories = uniqueCategories;
         
         if (categories.length === 0) {
             this.showError('未找到匹配的分类');
@@ -886,29 +981,38 @@
      * @param {Function} callback - 回调函数
      */
     BaiduPoiSearch.prototype.getLocationCoordinate = function(city, location, callback) {
-        var geocoder = new BMap.Geocoder();
-
-        // 使用完整的地址格式：城市 + 位置
-        var fullAddress = city + location;
-
-        geocoder.getPoint(fullAddress, function(point) {
-            if (point) {
-                console.log('位置坐标获取成功:', location, point);
-                callback({
-                    lat: point.lat,
-                    lng: point.lng,
-                    name: location,
-                    address: ''
-                });
-            } else {
-                callback(null, '无法找到该位置，请检查名称是否正确');
+        // 使用共享的Map实例，避免创建多个实例占用并发连接
+        var local = new BMap.LocalSearch(this.mapInstance, {
+            onSearchComplete: function(results) {
+                if (local.getStatus() == BMAP_STATUS_SUCCESS) {
+                    if (results.getCurrentNumPois() > 0) {
+                        var poi = results.getPoi(0);
+                        console.log('位置坐标获取成功:', location, '坐标:', poi.point.lng, poi.point.lat);
+                        callback({
+                            lat: poi.point.lat,
+                            lng: poi.point.lng,
+                            name: location,
+                            address: poi.address || ''
+                        });
+                    } else {
+                        callback(null, '无法找到该位置，请检查名称是否正确');
+                    }
+                } else {
+                    callback(null, '无法找到该位置，请检查名称是否正确');
+                }
             }
         });
+
+        // 在城市范围内搜索位置
+        local.searchInBounds(location, new BMap.Bounds(
+            new BMap.Point(117.5, 24.5),
+            new BMap.Point(119.5, 25.5)
+        ));
     };
 
     /**
      * 搜索多个分类
-     * @param {Array} categories - 分类列表
+     * @param {Array} categories - 分类列表，每个元素是 {key, searchKeyword}
      * @param {String} city - 城市
      * @param {Object} center - 中心点坐标
      * @param {Number} radius - 搜索半径
@@ -952,6 +1056,12 @@
 
                 // 显示结果
                 self.displayResults();
+                
+                // 在地图上添加标注
+                self.addMarkersToMap(center);
+
+                // 控制台打印JSON结果（方便调试）
+                console.log('[BaiduPoiSearch] 搜索结果:', self.cache.results);
 
                 // 触发搜索完成事件
                 self.trigger('onSearchComplete', self.cache.results);
@@ -962,10 +1072,12 @@
                 return;
             }
 
-            var categoryKey = categories[searchIndex];
+            var categoryItem = categories[searchIndex];
+            var categoryKey = categoryItem.key;
+            var searchKeyword = categoryItem.searchKeyword;  // 原始关键词
             searchIndex++;
 
-            self.searchPoiByCategory(categoryKey, city, center, radius, function(pois, error) {
+            self.searchPoiByCategory(categoryKey, city, center, radius, searchKeyword, function(pois, error) {
                 if (error) {
                     console.error('搜索失败:', categoryKey, error);
                     hasError = true;
@@ -982,8 +1094,20 @@
                     category: categoryKey
                 });
 
+                // 根据分类数量决定延迟时间
+                var delay;
+                if (total <= self.options.concurrentLimit) {
+                    // 分类数量在限制内，使用默认延迟
+                    delay = self.options.defaultDelay;
+                } else {
+                    // 分类数量超过限制，使用超限延迟
+                    delay = self.options.overLimitDelay;
+                }
+                
                 // 搜索下一个分类
-                searchNext();
+                setTimeout(function() {
+                    searchNext();
+                }, delay);
             });
         }
 
@@ -997,9 +1121,10 @@
      * @param {String} city - 城市
      * @param {Object} center - 中心点坐标
      * @param {Number} radius - 搜索半径
+     * @param {String} searchKeyword - 原始搜索关键词（可选，用于精确搜索）
      * @param {Function} callback - 回调函数
      */
-    BaiduPoiSearch.prototype.searchPoiByCategory = function(categoryKey, city, center, radius, callback) {
+    BaiduPoiSearch.prototype.searchPoiByCategory = function(categoryKey, city, center, radius, searchKeyword, callback) {
         var self = this;
 
         var category = this.cache.categories[categoryKey];
@@ -1007,12 +1132,12 @@
             callback(null, '分类不存在');
             return;
         }
+        
+        // 如果提供了原始关键词（如"小学"），使用它搜索；否则使用分类名称（如"学校"）
+        var keyword = searchKeyword || category.name;
 
-        // 创建一个临时的 map 实例用于 LocalSearch
-        var map = new BMap.Map("temp_map_" + categoryKey);
-
-        // 使用百度地图SDK搜索
-        var local = new BMap.LocalSearch(map, {
+        // 使用共享的Map实例，避免创建多个实例占用并发连接
+        var local = new BMap.LocalSearch(this.mapInstance, {
             onSearchComplete: function(results) {
                 if (local.getStatus() == BMAP_STATUS_SUCCESS) {
                     // 转换结果格式
@@ -1023,8 +1148,8 @@
                         // 检查是否在排除列表中
                         var excluded = false;
                         for (var j = 0; j < category.excludeKeywords.length; j++) {
-                            var keyword = category.excludeKeywords[j];
-                            if (poi.title.indexOf(keyword) !== -1) {
+                            var excludeKeyword = category.excludeKeywords[j];
+                            if (poi.title.indexOf(excludeKeyword) !== -1) {
                                 excluded = true;
                                 break;
                             }
@@ -1063,9 +1188,9 @@
             }
         });
 
-        // 搜索周边，使用中心点坐标
+        // 搜索周边，使用中心点坐标，关键词优先使用原始输入
         var centerPoint = new BMap.Point(center.lng, center.lat);
-        local.searchNearby(category.name, centerPoint, radius);
+        local.searchNearby(keyword, centerPoint, radius);
     };
 
     /**
@@ -1327,6 +1452,7 @@
      * 生成POI详细列表
      */
     BaiduPoiSearch.prototype.generatePoiList = function() {
+        var self = this;
         if (!this.cache.results) {
             return;
         }
@@ -1379,15 +1505,158 @@
      * @param {String} poiId - POI ID
      */
     BaiduPoiSearch.prototype.handlePoiClick = function(poiId) {
+        var self = this;
         var poi = this.findPoiById(poiId);
-        if (poi) {
-            // 触发点击事件
-            this.trigger('onResultClick', poi);
+        if (!poi) {
+            return;
+        }
+        
+        // 先尝试高亮标注（如果标注存在）
+        var highlighted = this.highlightMarker(poi);
+        
+        if (!highlighted) {
+            // 标注不在当前显示列表中（被 maxTotalPoints 过滤了）
+            var mapConfig = this.options.map;
+            
+            if (mapConfig.switchCategoryConfirm) {
+                // 需要确认
+                var category = this.cache.categories[poi.category];
+                var confirmed = confirm('该POI已被过滤（不在当前显示范围内）。\n\n是否切换到只显示「' + category.name + '」分类？');
+                
+                if (confirmed) {
+                    // 切换到只显示该分类的模式，并高亮点
+                    this.showCategoryMarkersOnly(poi.category, poi);
+                }
+            } else {
+                // 直接切换，不提示
+                this.showCategoryMarkersOnly(poi.category, poi);
+            }
+        }
+        
+        // 触发点击事件
+        this.trigger('onResultClick', poi);
+    };
+
+    /**
+     * 只显示指定分类的标注
+     * @param {String} categoryKey - 分类键
+     * @param {Object} highlightPoi - 需要高亮的POI（可选）
+     */
+    BaiduPoiSearch.prototype.showCategoryMarkersOnly = function(categoryKey, highlightPoi) {
+        var results = this.cache.results;
+        if (!results || !results.results) {
+            return;
+        }
+        
+        var pois = results.results[categoryKey] || [];
+        if (pois.length === 0) {
+            return;
+        }
+        
+        // 清除当前标注
+        this.clearMarkers();
+        
+        // 记录当前是否处于分类切换模式
+        this.state.categoryFilterMode = categoryKey;
+        
+        // 只添加该分类的标注
+        var points = [];
+        var mapConfig = this.options.map;
+        
+        for (var i = 0; i < pois.length; i++) {
+            var poi = pois[i];
+            var point = new BMap.Point(poi.location.lng, poi.location.lat);
+            points.push(point);
+            
+            // 获取分类颜色
+            var categoryColor = this.getCategoryColor(poi.category);
+            
+            // 创建标注
+            var marker = new BMap.Marker(point);
+            
+            // 处理名称（公交站保留"站"后缀）
+            var displayName = this.formatPoiName(poi);
+            
+            // 创建标签（Label在标注点上方，白色背景+彩色边框）
+            var label = new BMap.Label(displayName, {
+                offset: new BMap.Size(-25, -35)  // 调整到标注点上方
+            });
+            label.setStyle({
+                border: '2px solid ' + categoryColor,
+                borderRadius: '6px',
+                padding: '3px 8px',
+                backgroundColor: 'white',
+                fontSize: '12px',
+                color: categoryColor,
+                fontWeight: 'bold',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                whiteSpace: 'nowrap'
+            });
+            
+            marker.setLabel(label);
+            marker.poiData = poi;
+            
+            // 点击标注显示详情
+            var self = this;
+            marker.addEventListener('click', (function(p) {
+                return function() {
+                    self.showPoiInfoWindow(p);
+                };
+            })(poi));
+            
+            // 添加到地图
+            this.mapRenderer.addOverlay(marker);
+            this.markers.push(marker);
+        }
+        
+        console.log('已切换到只显示「' + categoryKey + '」分类，共 ' + pois.length + ' 个标注');
+        
+        // 自动调整视野
+        if (mapConfig.autoViewPort && points.length > 0) {
+            this.fitViewPort(points);
+        }
+        
+        // 如果指定了需要高亮的POI，高亮它
+        if (highlightPoi) {
+            var self = this;
+            setTimeout(function() {
+                self.highlightMarker(highlightPoi);
+            }, 100);
+        }
+        
+        // 显示"显示全部"按钮
+        var showAllBtnContainer = document.getElementById('showAllMarkersBtnContainer');
+        if (showAllBtnContainer) {
+            var category = this.cache.categories[categoryKey];
+            showAllBtnContainer.innerHTML = '<button class="btn btn-secondary" id="showAllMarkersBtn">🔙 显示全部标注（当前：' + category.name + '）</button>';
+            showAllBtnContainer.style.display = 'block';
+            // 重新绑定点击事件
+            document.getElementById('showAllMarkersBtn').addEventListener('click', function() {
+                self.showAllCategoryMarkers();
+            });
         }
     };
 
     /**
-     * 根据ID查找POI
+     * 显示所有分类的标注
+     */
+    BaiduPoiSearch.prototype.showAllCategoryMarkers = function() {
+        if (!this.cache.results || !this.currentCenter) {
+            return;
+        }
+        
+        // 清除当前标注
+        this.clearMarkers();
+        
+        // 清除分类过滤模式
+        this.state.categoryFilterMode = null;
+        
+        // 重新添加所有分类的标注
+        this.addMarkersToMap(this.currentCenter);
+        
+        console.log('已切换回显示全部分类');
+    };
+    /**     * 根据ID查找POI
      * @param {String} poiId - POI ID
      * @returns {Object|null} POI对象
      */
@@ -1417,27 +1686,11 @@
      * @param {HTMLElement} btn - 按钮元素
      */
     /**
-     * 处理快速选择
+     * 处理快速选择（始终为多选模式）
      * @param {String} categoryKey - 分类键
      * @param {HTMLElement} btn - 按钮元素
      */
     BaiduPoiSearch.prototype.handleQuickSelect = function(categoryKey, btn) {
-        // 判断运行时状态，不是配置项
-        if (!this.state.multiSelectMode) {
-            // 单选模式
-            this.state.selectedCategories = [categoryKey];
-
-            // 清除其他按钮的高亮
-            this.clearSelectedButtons();
-            btn.classList.add('selected');
-
-            // 更新关键词输入框
-            this.updateKeywordInput();
-
-            return;
-        }
-
-        // 多选模式
         var index = this.state.selectedCategories.indexOf(categoryKey);
 
         if (index === -1) {
@@ -1450,7 +1703,7 @@
             btn.classList.remove('selected');
         }
 
-        // 更新关键词输入框（多选模式也更新）
+        // 更新关键词输入框
         this.updateKeywordInput();
 
         // 更新已选分类UI
@@ -1600,10 +1853,6 @@
      * 更新已选分类UI
      */
     BaiduPoiSearch.prototype.updateSelectedCategoriesUI = function() {
-        if (!this.options.enableMultiSelect) {
-            return;
-        }
-
         var selectedCount = document.getElementById('selectedCount');
         var selectedCategories = document.getElementById('selectedCategories');
         var selectedTags = document.getElementById('selectedTags');
@@ -1613,7 +1862,7 @@
 
         // 更新计数
         if (selectedCount) {
-            if (count > 0 && this.state.multiSelectMode) {
+            if (count > 0) {
                 selectedCount.style.display = 'inline';
                 selectedCount.textContent = '已选 ' + count + ' 个';
             } else {
@@ -1623,7 +1872,7 @@
 
         // 更新标签区
         if (selectedCategories && selectedTags) {
-            if (count > 0 && this.state.multiSelectMode) {
+            if (count > 0) {
                 selectedCategories.style.display = 'block';
 
                 var html = '';
@@ -2115,11 +2364,372 @@
     };
 
     /**
-     * 初始化地图（预留接口）
+     * 初始化地图
      */
     BaiduPoiSearch.prototype.initMap = function() {
-        // 地图初始化逻辑将在后续实现
-        console.log('地图初始化接口预留');
+        var self = this;
+        var mapConfig = this.options.map;
+        
+        // 如果未启用地图，直接返回
+        if (!mapConfig.enabled) {
+            console.log('地图功能未启用');
+            return;
+        }
+        
+        var containerId = this.options.mapContainer.id;
+        var container = document.getElementById(containerId);
+        
+        if (!container) {
+            console.error('地图容器不存在:', containerId);
+            return;
+        }
+        
+        // 创建地图渲染实例
+        this.mapRenderer = new BMap.Map(containerId);
+        
+        // 设置缩放级别
+        var zoom = mapConfig.zoom || 14;
+        
+        // 默认显示位置（使用默认城市）
+        var defaultCity = this.options.defaultCity;
+        var cityCenter = new BMap.Point(118.6, 24.9); // 泉州默认坐标
+        
+        // 初始化地图中心点
+        this.mapRenderer.centerAndZoom(cityCenter, zoom);
+        
+        // 设置鼠标滚轮缩放
+        if (mapConfig.enableWheelZoom) {
+            this.mapRenderer.enableScrollWheelZoom();
+        } else {
+            this.mapRenderer.disableScrollWheelZoom();
+        }
+        
+        // 添加地图类型控件
+        this.mapRenderer.addControl(new BMap.MapTypeControl());
+        
+        // 添加缩放控件
+        this.mapRenderer.addControl(new BMap.NavigationControl());
+        
+        console.log('地图初始化完成');
+        
+        // 触发地图初始化完成事件
+        this.trigger('onMapInit', this.mapRenderer);
+    };
+
+    /**
+     * 在地图上添加标注
+     * @param {Object} center - 中心点坐标
+     */
+    BaiduPoiSearch.prototype.addMarkersToMap = function(center) {
+        var self = this;
+        var mapConfig = this.options.map;
+        
+        // 如果未启用地图或地图未初始化，直接返回
+        if (!mapConfig.enabled || !this.mapRenderer) {
+            return;
+        }
+        
+        // 保存中心点
+        this.currentCenter = center;
+        
+        // 清除旧标注
+        this.clearMarkers();
+        
+        // 获取搜索结果
+        var results = this.cache.results;
+        if (!results || !results.results) {
+            return;
+        }
+        
+        // 获取配置参数
+        var maxPerCategory = mapConfig.maxPointsPerCategory || 5;
+        var maxTotal = mapConfig.maxTotalPoints || 15;
+        
+        // 第一阶段：每个分类取前N个
+        var filteredByCategory = {};
+        var categoryKeys = Object.keys(results.results);
+        
+        for (var i = 0; i < categoryKeys.length; i++) {
+            var key = categoryKeys[i];
+            var pois = results.results[key] || [];
+            // 每个分类取前maxPerCategory个（已按距离排序）
+            filteredByCategory[key] = pois.slice(0, maxPerCategory);
+        }
+        
+        // 第二阶段：所有分类合并，取前maxTotal个
+        var allPois = [];
+        for (var j = 0; j < categoryKeys.length; j++) {
+            var catKey = categoryKeys[j];
+            var catPois = filteredByCategory[catKey];
+            for (var k = 0; k < catPois.length; k++) {
+                allPois.push(catPois[k]);
+            }
+        }
+        
+        // 按距离排序（已排好，只需取前maxTotal个）
+        allPois.sort(function(a, b) {
+            return a.distance - b.distance;
+        });
+        
+        // 取前maxTotal个
+        var finalPois = allPois.slice(0, maxTotal);
+        
+        // 如果没有标注点，直接返回
+        if (finalPois.length === 0) {
+            console.log('没有可显示的标注点');
+            return;
+        }
+        
+        // 添加标注点
+        var points = [];
+        for (var m = 0; m < finalPois.length; m++) {
+            var poi = finalPois[m];
+            var point = new BMap.Point(poi.location.lng, poi.location.lat);
+            points.push(point);
+            
+            // 获取分类颜色
+            var categoryColor = this.getCategoryColor(poi.category);
+            
+            // 创建标注
+            var marker = new BMap.Marker(point);
+            
+            // 处理名称（公交站保留"站"后缀）
+            var displayName = this.formatPoiName(poi);
+            
+            // 创建标签，使用分类颜色，Label在标注点上方，白色背景+彩色边框
+            var label = new BMap.Label(displayName, {
+                offset: new BMap.Size(-25, -35)  // 调整到标注点上方
+            });
+            label.setStyle({
+                border: '2px solid ' + categoryColor,
+                borderRadius: '6px',
+                padding: '3px 8px',
+                backgroundColor: 'white',
+                fontSize: '12px',
+                color: categoryColor,
+                fontWeight: 'bold',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                whiteSpace: 'nowrap'
+            });
+            
+            marker.setLabel(label);
+            
+            // 保存POI数据到marker，用于点击事件
+            marker.poiData = poi;
+            
+            // 点击标注显示详情
+            marker.addEventListener('click', (function(p) {
+                return function() {
+                    self.showPoiInfoWindow(p);
+                };
+            })(poi));
+            
+            // 添加到地图
+            this.mapRenderer.addOverlay(marker);
+            
+            // 保存标注引用
+            this.markers.push(marker);
+        }
+        
+        console.log('已添加 ' + finalPois.length + ' 个标注点');
+        
+        // 自动调整视野
+        if (mapConfig.autoViewPort && points.length > 0) {
+            this.fitViewPort(points);
+        }
+    };
+
+    /**
+     * 获取分类对应的颜色（随机颜色，同分类固定）
+     * @param {String} categoryKey - 分类键
+     * @returns {String} 颜色值
+     */
+    BaiduPoiSearch.prototype.getCategoryColor = function(categoryKey) {
+        // 如果已有缓存的颜色，直接返回
+        if (this.cache.categoryColors[categoryKey]) {
+            return this.cache.categoryColors[categoryKey];
+        }
+        
+        // 生成随机颜色
+        var h = Math.floor(Math.random() * 360);
+        var s = 65 + Math.floor(Math.random() * 25); // 65-90%
+        var l = 45 + Math.floor(Math.random() * 15); // 45-60%
+        
+        var color = 'hsl(' + h + ',' + s + '%,' + l + '%)';
+        
+        // 缓存颜色
+        this.cache.categoryColors[categoryKey] = color;
+        
+        return color;
+    };
+
+    /**
+     * 格式化POI名称（用于标注显示）
+     * @param {Object} poi - POI对象
+     * @returns {String} 格式化后的名称
+     */
+    BaiduPoiSearch.prototype.formatPoiName = function(poi) {
+        var name = poi.name || '';
+        
+        // 公交站：确保显示"站"后缀
+        if (poi.category === 'bus' || poi.category === 'subway') {
+            // 如果名称不以"站"结尾，加上"站"字
+            if (!name.endsWith('站')) {
+                name = name + '站';
+            }
+        }
+        
+        return name;
+    };
+
+    /**
+     * 清除所有标注
+     */
+    BaiduPoiSearch.prototype.clearMarkers = function() {
+        if (!this.mapRenderer) {
+            return;
+        }
+        
+        for (var i = 0; i < this.markers.length; i++) {
+            this.mapRenderer.removeOverlay(this.markers[i]);
+        }
+        this.markers = [];
+    };
+
+    /**
+     * 自动调整视野
+     * @param {Array} points - 标注点数组
+     */
+    BaiduPoiSearch.prototype.fitViewPort = function(points) {
+        if (!this.mapRenderer || points.length === 0) {
+            return;
+        }
+        
+        // 如果只有一个点，设置固定视野
+        if (points.length === 1) {
+            this.mapRenderer.centerAndZoom(points[0], this.options.map.zoom || 14);
+            return;
+        }
+        
+        // 使用setViewport自动调整视野
+        this.mapRenderer.setViewport(points, {
+            margins: [50, 50, 50, 50]
+        });
+    };
+
+    /**
+     * 高亮指定标注点
+     * @param {Object} poi - POI数据
+     */
+    BaiduPoiSearch.prototype.highlightMarker = function(poi) {
+        var self = this;
+        var mapConfig = this.options.map;
+        var highlightColor = mapConfig.highlightColor || '#E60000';
+        
+        // 取消其他标注的高亮
+        this.unhighlightAllMarkers();
+        
+        // 查找对应的标注
+        for (var i = 0; i < this.markers.length; i++) {
+            var marker = this.markers[i];
+            if (marker.poiData && marker.poiData.id === poi.id) {
+                // 找到目标标注
+                var point = new BMap.Point(poi.location.lng, poi.location.lat);
+                
+                // 移动地图中心到该点
+                this.mapRenderer.panTo(point);
+                
+                // 高亮Label样式（白色背景，彩色边框）
+                var label = marker.getLabel();
+                if (label) {
+                    label.setStyle({
+                        border: '3px solid ' + highlightColor,
+                        borderRadius: '6px',
+                        padding: '4px 10px',
+                        backgroundColor: 'white',
+                        fontSize: '13px',
+                        color: highlightColor,
+                        fontWeight: 'bold',
+                        boxShadow: '0 3px 10px rgba(0,0,0,0.4)',
+                        whiteSpace: 'nowrap',
+                        transform: 'scale(1.1)'
+                    });
+                }
+                
+                // 打开信息窗口
+                this.showPoiInfoWindow(poi);
+                
+                // 触发点击事件
+                this.trigger('onResultClick', poi);
+                
+                return true;
+            }
+        }
+        
+        // 如果没找到，返回false
+        return false;
+    };
+
+    /**
+     * 取消所有标注的高亮
+     */
+    BaiduPoiSearch.prototype.unhighlightAllMarkers = function() {
+        for (var i = 0; i < this.markers.length; i++) {
+            var marker = this.markers[i];
+            var poi = marker.poiData;
+            
+            if (poi) {
+                // 恢复原始分类颜色
+                var originalColor = this.getCategoryColor(poi.category);
+                var label = marker.getLabel();
+                
+                if (label) {
+                    label.setStyle({
+                        border: '2px solid ' + originalColor,
+                        borderRadius: '6px',
+                        padding: '3px 8px',
+                        backgroundColor: 'white',
+                        fontSize: '12px',
+                        color: originalColor,
+                        fontWeight: 'bold',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                        whiteSpace: 'nowrap',
+                        transform: 'scale(1)'
+                    });
+                }
+            }
+        }
+    };
+
+    /**
+     * 显示POI信息窗口
+     * @param {Object} poi - POI数据
+     */
+    BaiduPoiSearch.prototype.showPoiInfoWindow = function(poi) {
+        if (!this.mapRenderer) {
+            return;
+        }
+        
+        var point = new BMap.Point(poi.location.lng, poi.location.lat);
+        var infoWindow = new BMap.InfoWindow(
+            '<div style="padding: 10px;">' +
+            '<h4 style="margin: 0 0 8px 0;">' + poi.name + '</h4>' +
+            '<p style="margin: 4px 0; color: #666;">分类: ' + poi.categoryName + '</p>' +
+            '<p style="margin: 4px 0; color: #666;">地址: ' + (poi.address || '暂无') + '</p>' +
+            '<p style="margin: 4px 0; color: #999;">距离: ' + poi.distance + '米</p>' +
+            '</div>',
+            {
+                width: 250,
+                height: 0,
+                enableAutoPan: true,
+                enableCloseOnClick: true
+            }
+        );
+        
+        this.mapRenderer.openInfoWindow(infoWindow, point);
+        
+        // 触发点击事件
+        this.trigger('onResultClick', poi);
     };
 
     /**

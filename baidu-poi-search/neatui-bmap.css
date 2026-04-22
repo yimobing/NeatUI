@@ -1,6 +1,5 @@
 /**
  * BaiduPoiSearch - 百度地图POI搜索插件样式
- * 版本：v3.1.2
  * 支持左右布局和全屏布局
  */
 
@@ -34,6 +33,7 @@ body {
 .poi-search-app.layout-split .baidu-map-container {
     flex: 1;
     height: 100%;
+    min-height: 400px;
     position: relative;
     background: #e0e0e0;
 }
