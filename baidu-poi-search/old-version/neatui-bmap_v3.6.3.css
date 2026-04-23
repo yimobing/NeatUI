@@ -3,8 +3,6 @@
  * 支持左右布局和全屏布局
  */
 
- @charset "utf-8";
-
 /* ==================== 基础样式 ==================== */
 * {
     box-sizing: border-box;
@@ -32,7 +30,7 @@ body {
     display: flex;
 }
 
-.poi-search-app.layout-split .bd-container {
+.poi-search-app.layout-split .baidu-map-container {
     flex: 1;
     height: 100%;
     min-height: 400px;
@@ -59,7 +57,7 @@ body {
     height: 100vh;
 }
 
-.poi-search-app.layout-fullscreen .bd-container {
+.poi-search-app.layout-fullscreen .baidu-map-container {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -72,57 +70,47 @@ body {
     top: 20px;
     right: 20px;
     width: 400px;
-    height: calc(100vh - 40px);
+    max-height: 600px;
+    max-height: calc(100vh - 40px);
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     z-index: 1000;
-    display: flex;
-    flex-direction: column;
 }
 
 /* ==================== 搜索面板 ==================== */
 .poi-search-panel {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    overflow-y: auto;
+    min-height: 600px;
 }
 
 /* 面板头部 */
 .panel-header {
-    padding: 4px 15px;
+    padding: 20px;
     border-bottom: 1px solid #e0e0e0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-}
-.panel-header:after {
-    content: '';
-    display: block;
-    clear: both;
-}
-.panel-title,
-.layout-toggle {
-    display: inline-block;
-    vertical-align: middle;
+    flex-shrink: 0; /* 防止被压缩 */
 }
 
 .panel-title {
-    margin-right: 10px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
-.panel-title h2,
-.panel-title plugin-version {
-    display: inline-block;
-    vertical-align: middle;
-}
-.panel-title h2 {
+.panel-header h2 {
     margin: 0;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
 }
 
 .plugin-version {
-    font-size: 10px;
+    font-size: 12px;
     opacity: 0.8;
     background: rgba(255, 255, 255, 0.2);
     padding: 2px 8px;
@@ -131,24 +119,22 @@ body {
 }
 
 .layout-toggle {
-    float: right;
+    display: flex;
+    gap: 10px;
 }
 
 .layout-toggle button {
     flex: 1;
-    margin-left: 3px;
-    padding: 5px 5px;
+    padding: 8px 12px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.1);
     color: white;
-    border-radius: 2px;
+    border-radius: 4px;
     cursor: pointer;
     font-size: 13px;
     transition: all 0.3s;
 }
-.layout-toggle button:first-child {
-    margin-left: 0;
-}
+
 .layout-toggle button:hover {
     background: rgba(255, 255, 255, 0.2);
 }
@@ -162,24 +148,24 @@ body {
 
 /* API使用情况 */
 .api-usage {
-    padding: 5px 15px;
+    padding: 15px 20px;
     background: #f8f9fa;
     border-bottom: 1px solid #e0e0e0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 12px;
-    flex-shrink: 0;
+    font-size: 13px;
+    flex-shrink: 0; /* 防止被压缩 */
 }
 
 .api-stats {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .api-usage span {
-    padding: 3px 10px;
-    /* background: white; */
+    padding: 4px 12px;
+    background: white;
     border-radius: 12px;
     border: 1px solid #e0e0e0;
 }
@@ -198,61 +184,31 @@ body {
 
 /* 搜索表单 */
 .search-form {
-    padding: 10px 15px;
+    padding: 20px;
     border-bottom: 1px solid #e0e0e0;
-    flex-shrink: 0;
-}
-
-.form-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 8px;
-    align-items: center;
+    flex-shrink: 0; /* 防止被压缩 */
 }
 
 .form-group {
-    flex: 1;
-    display: flex;
-    align-items: center;
+    margin-bottom: 15px;
 }
 
 .form-group label {
-    min-width: 45px;
-    flex-shrink: 0;
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
     color: #555;
-    text-align: right;
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 13px;
 }
 
 .form-group input[type="text"],
 .form-group input[type="number"] {
-    flex: 1;
-    min-width: 0;
-    margin-left: 5px;
-    padding: 8px 6px;
+    width: 100%;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 14px;
     transition: border-color 0.3s;
-}
-
-.radius-input-wrapper {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    min-width: 0;
-}
-
-.radius-input-wrapper input {
-    width: 60px;
-    flex: none;
-}
-
-.radius-unit {
-    font-size: 12px;
-    color: #666;
-    margin-left: 3px;
 }
 
 .form-group input:focus {
@@ -271,12 +227,13 @@ body {
 }
 
 .radius-unit {
-    padding: 5px 8px;
-    background: #f8f8f8;
+    padding: 10px 15px;
+    background: #f5f5f5;
     border: 1px solid #ddd;
+    border-left: none;
     border-radius: 0 4px 4px 0;
-    color: #888;
-    font-size: 12px;
+    color: #666;
+    font-size: 13px;
 }
 
 .keyword-input-wrapper {
@@ -320,17 +277,17 @@ body {
 /* 按钮组 */
 .button-group {
     display: flex;
-    gap: 8px;
-    margin-top: 10px;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .btn {
     flex: 1;
-    padding: 8px;
+    padding: 12px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     transition: all 0.3s;
 }
@@ -357,13 +314,6 @@ body {
     color: #666;
     border: 1px solid #ddd;
 }
-.btn-auto {
-    -webkit-flex: .1;
-    -moz-flex: .1;
-    -o-flex: .1;
-    flex: .1;
-    width: auto;
-}
 
 .btn-secondary:hover {
     background: #e0e0e0;
@@ -371,7 +321,7 @@ body {
 
 /* ==================== 多选区域 ==================== */
 .multi-select-section {
-    padding: 5px 15px;
+    padding: 15px 20px;
     background: #f8f9fa;
     border-bottom: 1px solid #e0e0e0;
     display: flex;
@@ -379,29 +329,80 @@ body {
     justify-content: space-between;
 }
 
+/* 单选/多选模式切换按钮 */
+.select-mode-toggle {
+    display: flex;
+    background: white;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #666;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s;
+}
+
+.mode-btn:hover {
+    background: #f5f5f5;
+}
+
+.mode-btn.active {
+    background: #667eea;
+    color: white;
+    font-weight: 600;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+#selectedCount {
+    color: #667eea;
+    font-weight: 600;
+    font-size: 13px;
+}
+
 /* ==================== 快速选择 ==================== */
 .quick-select-section {
-    padding: 5px 15px;
+    padding: 20px;
     border-bottom: 1px solid #e0e0e0;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 防止被压缩 */
 }
 
 .quick-select-title {
-    margin-bottom: 6px;
+    margin-bottom: 12px;
     font-weight: 600;
     color: #555;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .quick-btn {
     display: inline-block;
-    padding: 4px 8px;
-    margin: 2px;
+    padding: 8px 16px;
+    margin: 5px;
     border: 1px solid #e0e0e0;
     background: white;
-    border-radius: 15px;
+    border-radius: 20px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 13px;
     transition: all 0.3s;
 }
 
@@ -421,7 +422,7 @@ body {
     display: block;
     width: 100%;
     margin: 10px 0 0 0;
-    padding: 6px 8px;
+    padding: 8px;
     background: #f5f5f5;
     border: none;
     border-radius: 4px;
@@ -437,41 +438,41 @@ body {
 
 /* ==================== 已选分类 ==================== */
 .selected-categories {
-    padding: 8px 15px;
+    padding: 15px 20px;
     background: #f0f7ff;
     border-bottom: 1px solid #e0e0e0;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 防止被压缩 */
 }
 
 .selected-title {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     color: #667eea;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
 }
 
 .selected-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 6px;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .selected-tag {
     display: inline-flex;
     align-items: center;
-    padding: 3px 8px;
+    padding: 4px 10px;
     background: #667eea;
     color: white;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 12px;
 }
 
 .tag-close {
-    margin-left: 4px;
+    margin-left: 6px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1;
     opacity: 0.8;
     transition: opacity 0.3s;
@@ -498,7 +499,6 @@ body {
 }
 
 .btn-filter-categories {
-    margin-left: 5px;
     padding: 6px 12px;
     background: #667eea;
     color: white;
@@ -609,64 +609,59 @@ body {
 .search-results {
     flex: 1;
     flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    flex-shrink: 0;
+    overflow-y: auto;
     background: white;
-    min-height: 0;
+    min-height: 400px; /* 增加最小高度 */
+    max-height: none; /* 移除最大高度限制 */
 }
 
 .results-header {
-    padding: 8px 15px;
+    padding: 20px;
     border-bottom: 1px solid #e0e0e0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    flex-shrink: 0;
 }
 
 .results-header h3 {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 600;
     color: #333;
     margin: 0;
 }
-.results-header span {
-    color: #8BC34A;
+
+#resultsCount {
+    padding: 4px 12px;
+    background: #667eea;
+    color: white;
+    border-radius: 12px;
     font-size: 12px;
-}
-.results-header span em {
-    margin: 0 3px;
-    font-weight: bold;
 }
 
 /* Tab切换 */
 .tabs {
     display: flex;
     border-bottom: 1px solid #e0e0e0;
-    flex-shrink: 0;
 }
 
 .tab {
     flex: 1;
-    padding: 8px 6px;
+    padding: 12px;
     background: #f5f5f5;
     border: none;
     border-bottom: 2px solid transparent;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 13px;
     transition: all 0.3s;
-    color: #666;
 }
 
 .tab:hover {
-    background: #e8e8e8;
+    background: #e0e0e0;
 }
 
 .tab.active {
-    background: #fff;
+    background: white;
     border-bottom-color: #667eea;
     color: #667eea;
     font-weight: 600;
@@ -675,69 +670,60 @@ body {
 /* Tab内容 */
 .tab-content {
     display: none;
-    padding: 10px 15px;
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
+    padding: 20px;
 }
 
 .tab-content.active {
-    display: flex;
-    flex-direction: column;
+    display: block;
 }
 
 /* 报告文本区 */
 .report-textarea {
     width: 100%;
-    min-height: 500px;
-    height: 500px;
-    padding: 10px;
+    min-height: 300px;
+    padding: 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    resize: none;
+    resize: vertical;
     font-family: 'Courier New', monospace;
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: 13px;
+    line-height: 1.6;
     background: #f9f9f9;
 }
 
 .report-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 8px;
-    flex-shrink: 0;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 .report-actions .btn {
     flex: none;
-    min-width: 70px;
-    padding: 5px 10px;
-    font-size: 12px;
+    min-width: 100px;
 }
 
 /* POI列表 */
 .poi-list {
-    flex: 1;
+    max-height: 500px;
     overflow-y: auto;
-    min-height: 0;
 }
 
 .poi-category-group {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .category-title {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: #333;
-    margin-bottom: 6px;
-    padding-bottom: 4px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
     border-bottom: 2px solid #667eea;
 }
 
 .poi-item {
-    padding: 6px 8px;
-    margin-bottom: 4px;
+    padding: 12px;
+    margin-bottom: 8px;
     background: #f9f9f9;
     border: 1px solid #e0e0e0;
     border-radius: 4px;
@@ -788,7 +774,7 @@ body {
         order: 2;
     }
     
-    .poi-search-app.layout-split .bd-container {
+    .poi-search-app.layout-split .baidu-map-container {
         height: 40vh;
         order: 1;
     }

@@ -13,8 +13,7 @@
     <div class="poi-search-app layout-split">
         
         <!-- 地图容器 -->
-        <div id="baidu-map-container" class="baidu-map-container">
-        </div>
+        <div id="bd-container" class="bd-container"> </div>
         
         <!-- 搜索面板 -->
         <div id="poi-search-panel" class="poi-search-panel">
@@ -32,7 +31,7 @@
         var poiSearch = new BaiduPoiSearch({
             // 百度地图API密钥（请替换为你的AK）
             // 注意：插件会自动加载百度地图API，无需在页面中单独引入
-            apiKey: 'KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X',
+            apiKey: 'KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X', // your_baidu_map_ak_here
             
             // 每日API调用限制
             dailyLimit: 100,
@@ -43,25 +42,6 @@
             // 默认布局：'split'（左右）或 'fullscreen'（全屏）
             layoutMode: 'split',
             
-            // 左右布局配置
-            splitLayout: {
-                mapWidth: '70%',
-                searchWidth: '30%',
-                mapPosition: 'left',
-                resizable: true,
-                minWidth: 300,
-                maxWidth: 600
-            },
-            
-            // 全屏布局配置
-            fullscreenLayout: {
-                searchPosition: 'top-right',
-                searchWidth: 400,
-                maxHeight: 600,
-                draggable: true,
-                collapsible: true,
-                collapsed: false
-            },
             
             // 多选配置
             enableMultiSelect: true,
@@ -76,37 +56,37 @@
             
             // 回调函数
             onInit: function() {
-                console.log('插件初始化完成');
+                // console.log('插件初始化完成');
             },
             
             onLayoutChange: function(mode) {
-                console.log('布局切换:', mode);
+                // console.log('布局切换:', mode);
             },
             
             onSearchStart: function(params) {
-                console.log('搜索开始:', params);
+                // console.log('搜索开始:', params);
             },
             
             onSearchProgress: function(progress) {
-                console.log('搜索进度:', progress.completed + '/' + progress.total);
+                // console.log('搜索进度:', progress.completed + '/' + progress.total);
             },
             
             onSearchComplete: function(results) {
-                console.log('搜索完成:', results);
+                // console.log('搜索完成:', results);
                 
                 // TODO: 这里可以调用地图插件显示结果
                 // 例如：mapPlugin.displayPois(results);
             },
             
             onResultClick: function(poi) {
-                console.log('点击POI:', poi);
+                // console.log('点击POI:', poi);
                 
                 // TODO: 这里可以调用地图插件定位到POI
                 // 例如：mapPlugin.centerOnPoi(poi);
             },
             
             onError: function(error) {
-                console.error('搜索错误:', error);
+                // console.error('搜索错误:', error);
             }
         });
         
@@ -120,14 +100,14 @@
         // 获取API使用情况
         function getApiUsage() {
             var usage = poiSearch.getApiUsage();
-            console.log('API使用情况:', usage);
+            // console.log('API使用情况:', usage);
             return usage;
         }
         
         // 获取搜索结果
         function getResults(categoryKey) {
             var results = poiSearch.getResults(categoryKey);
-            console.log('搜索结果:', results);
+            // console.log('搜索结果:', results);
             return results;
         }
         
@@ -153,13 +133,13 @@
         // 获取所有分类
         function getAllCategories() {
             var categories = poiSearch.getCategories();
-            console.log('所有分类:', categories);
+            // console.log('所有分类:', categories);
             return categories;
         }
         
         // 事件监听示例
         poiSearch.on('searchComplete', function(results) {
-            console.log('监听到搜索完成事件');
+            // console.log('监听到搜索完成事件');
             // 可以在这里添加自定义逻辑
         });
         
@@ -176,19 +156,19 @@
         window.setDailyLimit = setDailyLimit;
         window.getAllCategories = getAllCategories;
         
-        console.log('========================================');
-        console.log('BaiduPoiSearch 插件示例页面');
-        console.log('版本：v3.3.1');
-        console.log('========================================');
-        console.log('可用方法（在控制台中调用）：');
-        console.log('- poiSearch: 插件实例');
-        console.log('- getApiUsage(): 获取API使用情况');
-        console.log('- getResults(categoryKey): 获取搜索结果');
-        console.log('- switchLayout(mode): 切换布局（split/fullscreen）');
-        console.log('- resetApiUsage(): 重置API使用统计');
-        console.log('- setDailyLimit(limit): 设置每日限制');
-        console.log('- getAllCategories(): 获取所有分类');
-        console.log('========================================');
+        // console.log('========================================');
+        // console.log('BaiduPoiSearch 插件示例页面');
+        // console.log('版本：v3.6.3');
+        // console.log('========================================');
+        // console.log('可用方法（在控制台中调用）：');
+        // console.log('- poiSearch: 插件实例');
+        // console.log('- getApiUsage(): 获取API使用情况');
+        // console.log('- getResults(categoryKey): 获取搜索结果');
+        // console.log('- switchLayout(mode): 切换布局（split/fullscreen）');
+        // console.log('- resetApiUsage(): 重置API使用统计');
+        // console.log('- setDailyLimit(limit): 设置每日限制');
+        // console.log('- getAllCategories(): 获取所有分类');
+        // console.log('========================================');
     </script>
     
     <!-- 共享地图容器（供SDK内部使用，必须隐藏） -->

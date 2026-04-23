@@ -9,7 +9,7 @@
     'use strict';
 
     // 插件版本号
-    var VERSION = 'v3.6.3-beta4';
+    var VERSION = 'v3.6.3';
 
     /**
      * BaiduPoiSearch 构造函数
@@ -31,7 +31,7 @@
         this.state = {
             selectedCategories: [],  // 已选分类
             selectedSubcategories: {},  // 已选子分类 {categoryKey: subcategoryValue}
-            isSearching: false, // 是否正在搜索
+            isSearching: false,      // 是否正在搜索
             currentLayout: 'split',  // 当前布局模式
             multiSelectMode: false,  // 多选模式
             callbackCounter: 0       // JSONP回调函数计数器
@@ -61,83 +61,83 @@
      */
     BaiduPoiSearch.prototype.defaults = {
         // === 百度地图配置 ===
-        apiKey: '', // 百度地图API密钥
-        defaultCity: '泉州市', // 默认城市
-
-        // === API使用量配置 ===
-        // 百度api对个人用户流量及并发量皆有限制，每日限制请求次数100或5000，不可同时发起3个以上请求
-        // API使用量流量及并发量控制配置
-        dailyLimit: 100, // 每日API调用限制次数
-        defaultDelay: 400, // 默认延迟（毫秒）
-        concurrentLimit: 3, // 指定并发量阈值
-        overLimitDelay: 1000, // 超过并发量时的延迟（毫秒）
-
-        // === 地图配置 ===
-        draft: {
-            id: 'bd-container', // 地图容器根节点Id
-            // autoResize: true // 此参数没用，作废
-            enabled: true, // 是否启用地图
-            zoom: 14, // 默认缩放级别（3-19）
-            enableWheelZoom: true, // 是否启用鼠标滚轮缩放
-            autoViewPort: true, // 是否自动调整视野显示所有标注
-            maxPointsPerCategory: 5, // 每个分类最多显示几个标注
-            maxTotalPoints: 15, // 所有分类最多显示几个标注
-            highlightColor: '#E60000', // 高亮颜色
-            switchCategoryConfirm: false // 切换分类时是否提示（默认不提示）
-        },
- 
-        // === 搜索配置 ===
-        defaultLocation: '泉州浦西万达广场', // 默认位置名称
-        defaultKeyword: '学校', // 默认关键词。可多个，中间用顿号或逗号分隔：如：学校、医院、银行
-        defaultRadius: 1000, // 默认搜索半径（米）
-
-        // === 多选配置 ===
-        enableMultiSelect: true, // 启用多选模式
-        selectionLimit: 5, // 单次选择数量限制
-        selectionLimitWarning: 3, // 显示警告的选择数量阈值
-        defaultCategoryCount: 8, // 快速按钮默认显示的分类数量
-
+        apiKey: '',              // 百度地图API密钥
+        dailyLimit: 100,         // 每日API调用限制次数
+        defaultCity: '泉州市',   // 默认城市
+        
         // === 布局配置 ===
-        layoutMode: 'split', // 'split'（左右）或 'fullscreen'（全屏）
-
-        // // 下面的2个参数不起作用，都是写死在css里了
-        // splitLayout: {
-        //     mapWidth: '70%', // 地图容器宽度
-        //     searchWidth: '30%', // 搜索面板宽度
-        //     mapPosition: 'left',  // 地图位置：'left' 或 'right'
-        //     resizable: true, // 是否可拖动调整宽度
-        //     minWidth: 300, // 搜索面板最小宽度
-        //     maxWidth: 600 // 搜索面板最大宽度
-        // },
-        // fullscreenLayout: {
-        //     searchPosition: 'top-right',  // 搜索面板位置
-        //     searchWidth: 400, // 搜索面板宽度
-        //     maxHeight: 600, // 搜索面板最大高度
-        //     draggable: true, // 是否可拖动位置
-        //     collapsible: true, // 是否可折叠
-        //     collapsed: false, // 默认是否折叠
-        //     autoCollapse: false // 地图操作时自动折叠
-        // },
-
-        // API使用情况提示
-        showApiUsage: true, // 是否显示API使用情况
-        apiUsageStorageKey: 'baidu_poi_api_usage',  // localStorage键名
-
-        // 搜索面板
+        layoutMode: 'split',     // 'split'（左右）或 'fullscreen'（全屏）
+        
+        splitLayout: {
+            mapWidth: '70%',      // 地图容器宽度
+            searchWidth: '30%',   // 搜索面板宽度
+            mapPosition: 'left',  // 地图位置：'left' 或 'right'
+            resizable: true,      // 是否可拖动调整宽度
+            minWidth: 300,        // 搜索面板最小宽度
+            maxWidth: 600         // 搜索面板最大宽度
+        },
+        
+        fullscreenLayout: {
+            searchPosition: 'top-right',  // 搜索面板位置
+            searchWidth: 400,             // 搜索面板宽度
+            maxHeight: 600,               // 搜索面板最大高度
+            draggable: true,              // 是否可拖动位置
+            collapsible: true,            // 是否可折叠
+            collapsed: false,             // 默认是否折叠
+            autoCollapse: false           // 地图操作时自动折叠
+        },
+        
         searchPanel: {
             id: 'poi-search-panel',
             className: 'poi-search-panel'
         },
         
+        mapContainer: {
+            id: 'baidu-map-container',
+            className: 'baidu-map-container',
+            autoResize: true
+        },
+        
+        // === 多选配置 ===
+        enableMultiSelect: true,      // 启用多选模式
+        selectionLimit: 5,            // 单次选择数量限制
+        selectionLimitWarning: 3,     // 显示警告的选择数量阈值
+        defaultCategoryCount: 8,     // 快速按钮默认显示的分类数量
+        
+        // === API使用配置 ===
+        showApiUsage: true,           // 显示API使用情况
+        apiUsageStorageKey: 'baidu_poi_api_usage',  // localStorage键名
+        // === API并发控制配置 ===
+        defaultDelay: 400,           // 默认延迟（毫秒）
+        concurrentLimit: 3,          // 指定并发量阈值
+        overLimitDelay: 1000,        // 超过并发量时的延迟（毫秒）
+        
+        // === 搜索配置 ===
+        defaultRadius: 1000,          // 默认搜索半径（米）
+        
         // === 回调函数 ===
-        onInit: null, // 初始化完成
-        onLayoutChange: null, // 布局切换
-        onMapInit: null, // 地图初始化
-        onSearchStart: null, // 搜索开始
-        onSearchProgress: null, // 搜索进度
-        onSearchComplete: null, // 搜索完成
-        onResultClick: null, // 点击结果
-        onError: null, // 错误处理
+        onInit: null,                 // 初始化完成
+        onLayoutChange: null,         // 布局切换
+        onMapInit: null,              // 地图初始化
+        onSearchStart: null,          // 搜索开始
+        onSearchProgress: null,       // 搜索进度
+        onSearchComplete: null,       // 搜索完成
+        onResultClick: null,          // 点击结果
+        onError: null,                // 错误处理
+
+        // === 地图配置 ===
+        map: {
+            enabled: true,             // 是否启用地图
+            zoom: 14,                 // 默认缩放级别（3-19）
+            enableWheelZoom: true,    // 是否启用鼠标滚轮缩放
+            autoViewPort: true,       // 是否自动调整视野显示所有标注
+            maxPointsPerCategory: 5, // 每个分类最多显示几个标注
+            maxTotalPoints: 15,      // 所有分类最多显示几个标注
+            // 高亮颜色
+            highlightColor: '#E60000',
+            // 切换分类时是否提示（默认不提示）
+            switchCategoryConfirm: false
+        },
         
         
         // === 报告模板生成规则配置 ===
@@ -148,17 +148,17 @@
 
         // 距离阈值（米）
         distanceThreshold: {
-            near: 3000, // < 3000米 = 近
+            near: 3000,    // < 3000米 = 近
             medium: 5000  // < 5000米 = 一般，>= 5000米 = 较远
         },
         // 数量阈值（个）
         countThreshold: {
-            high: 5, // >= 5个 = 较高
+            high: 5,      // >= 5个 = 较高
             medium: 2     // >= 2个 = 一般，< 2个 = 较低
         },
         // 评语配置、判断类型配置
         commentRules: {
-            // 按距离判断
+            //  按距离判断
             '与重要场所(设施)的距离': {
                 type: 'distance',
                 categories: ['school', 'hospital', 'bank', 'subway', 'park', 'government'],
@@ -201,23 +201,21 @@
 
     /**
      * POI分类配置数据（25个完整分类）
-     * 参考百度地图文档： https://lbs.baidu.com/index.php?title=open/poitags
      */
     BaiduPoiSearch.prototype.getPOICategories = function() {
         return {
-            // POI 分类匹配规则配置
-            // ==================== 快速选择分类 ====================
+            // ==================== 快速选择分类（10个）====================
             'school': {
-                name: '学校', // 名称
-                icon: '🏫', // 图标
-                typeKeyword: '教育', // 类别
-                matchKeywords: ['学校', '中学', '小学', '高中', '大学', '幼儿园', '职校', '技校', '学院'], // 包含的关键词
+                name: '学校',
+                icon: '🏫',
+                typeKeyword: '教育',
+                matchKeywords: ['学校', '中学', '小学', '高中', '大学', '幼儿园', '职校', '技校', '学院'],
                 excludeKeywords: ['书店', '食堂', '商店', '小卖部', '停车场',
                                  '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
                                  '入口', '出口', '东2门', '西2门', '南2门', '北2门',
                                  '驾校', '驾驶培训', '培训中心', '训练营', '考训中心',
-                                 '托儿所', '托管班', '补习班', '培训学校'], // 过滤、不包含或排除的关键词
-                subcategories: [ // 子分类
+                                 '托儿所', '托管班', '补习班', '培训学校'],
+                subcategories: [
                     { name: '全部', value: '' },
                     { name: '小学', value: '小学' },
                     { name: '中学', value: '中学' },
@@ -294,7 +292,7 @@
                     '支路', '巷', '弄', '国道', '省道', '县道'],
                 excludeKeywords: ['小区', '园区', '厂区', '校区', '院区', '商城', '商场',
                     '广场', '公馆', '金街', '步行街', '内部路', '园区路',
-                    '便道', '步道', '通道', '消防通道', '步行街', '地下通道', '路口', '交叉口', '辅路', '辅道'],
+                    '便道', '步道', '通道', '消防通道', '步行街', '地下通道'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '城市主路', value: '城市主路' },
@@ -499,7 +497,7 @@
 
         // 定义全局回调函数
         window.baiduMapInit = function() {
-            // console.log('百度地图API初始化完成，BMap 对象已创建');
+            console.log('百度地图API初始化完成，BMap 对象已创建');
             callback && callback(true);
         };
 
@@ -552,7 +550,7 @@
             // 创建UI
             self.createUI();
             
-            // 初始化地图、百度地图初始化
+            // 初始化地图
             self.initMap();
 
             // 绑定事件
@@ -567,7 +565,7 @@
             // 触发初始化完成事件
             self.trigger('onInit', self);
 
-            // console.log('BaiduPoiSearch 插件初始化完成');
+            console.log('BaiduPoiSearch 插件初始化完成');
         });
     };
 
@@ -583,52 +581,49 @@
             '<span class="plugin-version">' + VERSION + '</span>' +
             '</div>' +
             '<div class="layout-toggle">' +
-            '<button type="button" id="btn-split-layout" class="active" data-layout="split">左右布局</button>' +
-            '<button type="button" id="btn-fullscreen-layout" data-layout="fullscreen">全屏布局</button>' +
+            '<button id="btn-split-layout" class="active" data-layout="split">左右布局</button>' +
+            '<button id="btn-fullscreen-layout" data-layout="fullscreen">全屏布局</button>' +
             '</div>' +
             '</div>';
         
         // API使用情况
         if (this.options.showApiUsage) {
             html += '<div class="api-usage">' +
-                        '<span class="api-version">百度地图api v3.0 每日流量限制</span>' +
-                        '<div class="api-stats">' +
-                            '<span>已用：<strong id="api-used">0</strong>次</span>' +
-                            '<span>剩余：<strong id="api-remaining">100</strong>次</span>' +
-                            '<span>限制：<strong id="api-limit">100</strong>次</span>' +
-                        '</div>' +
+                '<div class="api-stats">' +
+                '<span>已用：<strong id="api-used">0</strong>次</span>' +
+                '<span>剩余：<strong id="api-remaining">100</strong>次</span>' +
+                '<span>限制：<strong id="api-limit">100</strong>次</span>' +
+                '</div>' +
+                '<span class="api-version">插件版本：' + VERSION + '</span>' +
                 '</div>';
         }
         
         // 搜索表单
         html += '<div class="search-form">' +
-            '<div class="form-row">' +
             '<div class="form-group">' +
-            '<label for="city">城市</label>' +
-            '<input type="text" id="city" value="' + this.options.defaultCity + '" placeholder="北京市">' +
+            '<label for="city">🏙️ 城市</label>' +
+            '<input type="text" id="city" value="' + this.options.defaultCity + '" placeholder="例如：北京市">' +
             '</div>' +
             '<div class="form-group">' +
-            '<label for="location">位置名称</label>' +
-            '<input type="text" id="location" value="' + this.options.defaultLocation + '" placeholder="小区或楼盘名称">' +
-            '</div>' +
-            '</div>' +
-            '<div class="form-row">' +
-            '<div class="form-group">' +
-            '<label for="keyword">关键词</label>' +
-            '<input type="text" id="keyword" value="' + this.options.defaultKeyword + '" placeholder="如：学校、医院、银行">' +
+            '<label for="location">📍 位置名称</label>' +
+            '<input type="text" id="location" value="泉州浦西万达广场" placeholder="例如：泉州浦西万达广场">' +
             '</div>' +
             '<div class="form-group">' +
-            '<label for="radius">半径</label>' +
+            '<label for="keyword">🔍 关键词</label>' +
+            '<input type="text" id="keyword" value="学校" placeholder="例如：学校、医院、银行">' +
+            '<button class="btn-filter" id="filterBtn" style="display: none;">筛选</button>' +
+            '</div>' +
+            '<div class="form-group">' +
+            '<label for="radius">📏 搜索半径</label>' +
             '<div class="radius-input-wrapper">' +
             '<input type="number" id="radius" value="' + this.options.defaultRadius + '" min="100" max="10000">' +
             '<span class="radius-unit">米</span>' +
             '</div>' +
             '</div>' +
-            '</div>' +
             '<div id="errorMessage" class="alert alert-error" style="display: none;"></div>' +
             '<div class="button-group">' +
-            '<button type="button" class="btn btn-primary" id="btn-search">开始搜索</button>' +
-            '<button type="button" class="btn btn-secondary btn-auto" id="btn-clear">清空</button>' +
+            '<button class="btn btn-primary" id="searchBtn">开始搜索</button>' +
+            '<button class="btn btn-secondary" id="clearBtn">清空</button>' +
             '</div>' +
             '</div>';
         
@@ -648,10 +643,10 @@
         for (var i = 0; i < categoryKeys.length; i++) {
             var key = categoryKeys[i];
             var cat = categories[key];
-            html += '<button type="button" class="quick-btn" data-category="' + key + '">' + cat.icon + ' ' + cat.name + '</button>';
+            html += '<button class="quick-btn" data-category="' + key + '">' + cat.icon + ' ' + cat.name + '</button>';
         }
         
-        html += '<button type="button" class="quick-btn-more" id="moreBtn">更多 ↓</button>' +
+        html += '<button class="quick-btn-more" id="moreBtn">更多 ↓</button>' +
             '</div>';
         
         // 更多分类
@@ -662,7 +657,7 @@
         for (var i = 0; i < moreCategoryKeys.length; i++) {
             var key = moreCategoryKeys[i];
             var cat = categories[key];
-            html += '<button type="button" class="quick-btn" data-category="' + key + '">' + cat.icon + ' ' + cat.name + '</button>';
+            html += '<button class="quick-btn" data-category="' + key + '">' + cat.icon + ' ' + cat.name + '</button>';
         }
         
         html += '</div>';
@@ -671,15 +666,15 @@
         html += '<div class="selected-categories" id="selectedCategories" style="display: none;">' +
             '<div class="selected-title">已选分类：</div>' +
             '<div class="selected-tags" id="selectedTags"></div>' +
-            '<button type="button" class="btn-clear-all" id="clearAllBtn">清空所有</button>' +
-            // '<button type="button" class="btn-filter-categories" id="filterCategoriesBtn" style="display: none;">筛选子分类</button>' +
+            '<button class="btn-clear-all" id="clearAllBtn">清空所有</button>' +
+            '<button class="btn-filter-categories" id="filterCategoriesBtn" style="display: none;">筛选子分类</button>' +
             '</div>';
 
         // 子分类筛选下拉框
         html += '<div class="filter-dropdown" id="filterDropdown" style="display: none;">' +
             '<div class="filter-header">' +
             '<span>📂 选择分类和子分类</span>' +
-            '<button type="button" class="btn-close" id="closeFilter">×</button>' +
+            '<button class="btn-close" id="closeFilter">×</button>' +
             '</div>' +
             '<div class="filter-body">' +
             '<div id="filterCategoriesContainer">' +
@@ -687,8 +682,8 @@
             '</div>' +
             '</div>' +
             '<div class="filter-footer">' +
-            '<button type="button" class="btn btn-secondary" id="cancelFilter">取消</button>' +
-            '<button type="button" class="btn btn-primary" id="applyFilter">确定</button>' +
+            '<button class="btn btn-secondary" id="cancelFilter">取消</button>' +
+            '<button class="btn btn-primary" id="applyFilter">确定</button>' +
             '</div>' +
             '</div>';
         
@@ -698,30 +693,27 @@
             '<h3>📊 搜索结果</h3>' +
             '<span id="resultsCount"></span>' +
             '</div>' +
-            '<div id="showAllMarkersBtnContainer" style="display: none; margin-bottom: 8px;">' +
+            '<div id="showAllMarkersBtnContainer" style="display: none; margin-bottom: 10px;">' +
             '<button class="btn btn-secondary" id="showAllMarkersBtn">🔙 显示全部标注</button>' +
             '</div>' +
             '<div class="tabs">' +
-            '<button type="button" class="tab active" data-tab="brief">📝 报告描述</button>' +
-            '<button type="button" class="tab" data-tab="template">📄 报告模板</button>' +
-            '<button type="button" class="tab" data-tab="report">📋 位置分析</button>' +
-            '<button type="button" class="tab" data-tab="list">📊 详细列表</button>' +
+            '<button class="tab active" data-tab="report">📄 配套描述</button>' +
+            '<button class="tab" data-tab="template">📝 报告模板</button>' +
+            '<button class="tab" data-tab="list">📋 详细列表</button>' +
             '</div>' +
-            '<div class="tab-content active" id="briefTab">' +
-            '<textarea class="report-textarea" id="briefText"></textarea>' +
+            '<div class="tab-content active" id="reportTab">' +
+            '<textarea class="report-textarea" id="reportText" readonly></textarea>' +
+            '<div class="report-actions">' +
+            '<button class="btn btn-secondary" id="copyReportBtn">📋 复制报告</button>' +
+            '<button class="btn btn-secondary" id="downloadReportBtn">💾 下载文件</button>' +
+            '</div>' +
             '</div>' +
             '<div class="tab-content" id="templateTab">' +
-            '<textarea class="report-textarea" id="templateText"></textarea>' +
+            '<textarea class="report-textarea" id="templateText" placeholder="报告模板区域，生成后将显示完整报告"></textarea>' +
             '<div class="report-actions">' +
-            '<button type="button" class="btn btn-secondary" id="btn-copy-template">📋 复制</button>' +
-            '<button type="button" class="btn btn-secondary" id="btn-down-template">💾 下载</button>' +
-            '</div>' +
-            '</div>' +
-            '<div class="tab-content" id="reportTab">' +
-            '<textarea class="report-textarea" id="reportText"></textarea>' +
-            '<div class="report-actions">' +
-            '<button type="button" class="btn btn-secondary" id="btn-copy-position">📋 复制</button>' +
-            '<button type="button" class="btn btn-secondary" id="btn-down-position">💾 下载</button>' +
+            '<button class="btn btn-primary" id="generateTemplateBtn">🔄 生成报告</button>' +
+            '<button class="btn btn-secondary" id="copyTemplateBtn">📋 复制报告</button>' +
+            '<button class="btn btn-secondary" id="downloadTemplateBtn">💾 下载文件</button>' +
             '</div>' +
             '</div>' +
             '<div class="tab-content" id="listTab">' +
@@ -747,13 +739,13 @@
             self.setLayoutMode('fullscreen');
         });
         
-        // 开始搜索按钮
-        document.getElementById('btn-search').addEventListener('click', function() {
+        // 搜索按钮
+        document.getElementById('searchBtn').addEventListener('click', function() {
             self.handleSearch();
         });
         
         // 清空按钮
-        document.getElementById('btn-clear').addEventListener('click', function() {
+        document.getElementById('clearBtn').addEventListener('click', function() {
             self.handleClear();
         });
         
@@ -845,40 +837,46 @@
             });
         }
         
-
-        // 报告模板复制按钮：复制报告
-        var eleBtnTemplateCopy = document.getElementById('btn-copy-template');
-        if (eleBtnTemplateCopy) {
-            eleBtnTemplateCopy.addEventListener('click', function() {
+        // 复制报告
+        var copyReportBtn = document.getElementById('copyReportBtn');
+        if (copyReportBtn) {
+            copyReportBtn.addEventListener('click', function() {
+                self.copyReport();
+            });
+        }
+        
+        // 下载报告
+        var downloadReportBtn = document.getElementById('downloadReportBtn');
+        if (downloadReportBtn) {
+            downloadReportBtn.addEventListener('click', function() {
+                self.downloadReport();
+            });
+        }
+        
+        // 报告模板 - 生成报告
+        var generateTemplateBtn = document.getElementById('generateTemplateBtn');
+        if (generateTemplateBtn) {
+            generateTemplateBtn.addEventListener('click', function() {
+                self.generateTemplateReport();
+            });
+        }
+        
+        // 报告模板 - 复制报告
+        var copyTemplateBtn = document.getElementById('copyTemplateBtn');
+        if (copyTemplateBtn) {
+            copyTemplateBtn.addEventListener('click', function() {
                 self.copyTemplateReport();
             });
         }
-
-        // 报告模板下载按钮：下载报告
-        var eleBtnTemplateDown = document.getElementById('btn-down-template');
-        if (eleBtnTemplateDown) {
-            eleBtnTemplateDown.addEventListener('click', function() {
+        
+        // 报告模板 - 下载报告
+        var downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
+        if (downloadTemplateBtn) {
+            downloadTemplateBtn.addEventListener('click', function() {
                 self.downloadTemplateReport();
             });
         }
-
-        // 位置分析复制按钮：复制位置信息
-        var eleBtnPositionCopy = document.getElementById('btn-copy-position');
-        if (eleBtnPositionCopy) {
-            eleBtnPositionCopy.addEventListener('click', function() {
-                self.copyPosition();
-            });
-        }
-
-        // 位置分析下载按钮：下载位置信息
-        var eleBtnPositionDown = document.getElementById('btn-down-position');
-        if (eleBtnPositionDown) {
-             eleBtnPositionDown.addEventListener('click', function() {
-                 self.downloadPosition();
-             });
-        }
-
-
+        
         // 显示全部标注按钮
         var showAllMarkersBtn = document.getElementById('showAllMarkersBtn');
         if (showAllMarkersBtn) {
@@ -897,8 +895,6 @@
         var keyword = document.getElementById('keyword').value.trim();
         var radius = parseInt(document.getElementById('radius').value) || this.options.defaultRadius;
         
-        this.hideError(); // 先隐藏错误信息
-
         if (!location) {
             this.showError('请输入位置名称');
             return;
@@ -1003,10 +999,10 @@
         this.trigger('onSearchStart', params);
         
         // 更新UI
-        var eleBtnSearch = document.getElementById('btn-search');
-        if (eleBtnSearch) {
-            eleBtnSearch.disabled = true;
-            eleBtnSearch.textContent = '搜索中...';
+        var searchBtn = document.getElementById('searchBtn');
+        if (searchBtn) {
+            searchBtn.disabled = true;
+            searchBtn.textContent = '搜索中...';
         }
         
         // 获取位置坐标
@@ -1016,9 +1012,9 @@
                 self.showError(error);
                 self.trigger('onError', error);
                 
-                if (eleBtnSearch) {
-                    eleBtnSearch.disabled = false;
-                    eleBtnSearch.textContent = '开始搜索';
+                if (searchBtn) {
+                    searchBtn.disabled = false;
+                    searchBtn.textContent = '开始搜索';
                 }
                 return;
             }
@@ -1041,7 +1037,7 @@
                 if (local.getStatus() == BMAP_STATUS_SUCCESS) {
                     if (results.getCurrentNumPois() > 0) {
                         var poi = results.getPoi(0);
-                        // console.log('位置坐标获取成功:', location, '坐标:', poi.point.lng, poi.point.lat);
+                        console.log('位置坐标获取成功:', location, '坐标:', poi.point.lng, poi.point.lat);
                         callback({
                             lat: poi.point.lat,
                             lng: poi.point.lng,
@@ -1049,10 +1045,10 @@
                             address: poi.address || ''
                         });
                     } else {
-                        callback(null, '无法找到该位置，请检查名称是否正确，也有可能是流量超限被百度限制1');
+                        callback(null, '无法找到该位置，请检查名称是否正确');
                     }
                 } else {
-                    callback(null, '无法找到该位置，请检查名称是否正确，也有可能是流量超限被百度限制2');
+                    callback(null, '无法找到该位置，请检查名称是否正确');
                 }
             }
         });
@@ -1090,10 +1086,10 @@
                 self.updateApiUsage(total);
 
                 // 恢复搜索按钮
-                var eleBtnSearch = document.getElementById('btn-search');
-                if (eleBtnSearch) {
-                    eleBtnSearch.disabled = false;
-                    eleBtnSearch.textContent = '开始搜索';
+                var searchBtn = document.getElementById('searchBtn');
+                if (searchBtn) {
+                    searchBtn.disabled = false;
+                    searchBtn.textContent = '开始搜索';
                 }
 
                 // 保存结果
@@ -1115,7 +1111,7 @@
                 self.addMarkersToMap(center);
 
                 // 控制台打印JSON结果（方便调试）
-                // console.log('搜索按钮-打印搜索结果:', self.cache.results);
+                console.log('[BaiduPoiSearch] 搜索结果:', self.cache.results);
 
                 // 触发搜索完成事件
                 self.trigger('onSearchComplete', self.cache.results);
@@ -1380,10 +1376,6 @@
         };
     };
 
-
-
-
-    //————————————————————————————————————————————————
     /**
      * 显示搜索结果
      */
@@ -1395,375 +1387,22 @@
         var resultsDiv = document.getElementById('searchResults');
         resultsDiv.style.display = 'block';
         
+        // 更新结果数量
         var stats = this.cache.results.stats;
-        var searchParams = this.cache.results.searchParams;
-        
-        // 更新结果数量 - 显示关键词
-        var eleResultCount = document.getElementById('resultsCount');
-        if (eleResultCount) {
-            // 获取搜索关键词
-            var keywords = [];
-            var categories = this.cache.categories;
-            for (var key in searchParams.categories) {
-                var cat = searchParams.categories[key];
-                if (cat.searchKeyword) {
-                    keywords.push(cat.searchKeyword);
-                } else if (categories[cat.key]) {
-                    keywords.push(categories[cat.key].name);
-                }
-            }
-            var keywordText = keywords.length > 0 ? '关键词：' + keywords.join('、') + '；' : '';
-            eleResultCount.innerHTML = keywordText + '共找到<em>' + stats.total + '</em>个设施';
+        var resultsCount = document.getElementById('resultsCount');
+        if (resultsCount) {
+            resultsCount.textContent = '共找到 ' + stats.total + ' 个设施';
         }
         
-        // 生成报告描述（brief）
-        this.generateBriefReport();
-        
-        // 生成位置分析报告
+        // 生成报告
         this.generateReport();
-        
-        // 生成报告模板
-        this.generateTemplateReport();
         
         // 生成详细列表
         this.generatePoiList();
     };
 
-
-    //————————————————————————————————————————————————
     /**
-     * 生成报告模板：估价报告模板
-     */
-     BaiduPoiSearch.prototype.generateTemplateReport = function() {
-        var templateTextarea = document.getElementById('templateText');
-        if (!templateTextarea) return;
-        
-        var results = this.cache.results;
-        if (!results || !results.results) {
-            templateTextarea.value = '请先进行POI搜索，再生成报告模板。';
-            return;
-        }
-        
-        var report = '';
-        
-        report += '估价技术报告\n';
-        report += '一、估价对象描述与分析\n';
-        report += 'I.区位状态描述与分析\n\n';
-
-        // 1，位置状况
-        report += '1、位置状况\n\n';
-        
-        // (1)坐落
-        report += '(1)坐落：\n';
-        
-        // (2)方位
-        report += '(2)方位：\n';
-        
-        // (3)与重要场所(设施)的距离：【动态生成】
-        report += '(3)与重要场所(设施)的距离：';
-        var distanceInfo = this.generateDistanceReport(results.results);
-        if (distanceInfo) {
-            report += distanceInfo.desc + '，' + distanceInfo.comment + '。\n';
-        } else {
-            report += '\n';
-        }
-        
-        // (5)楼幢位置
-        report += '(5)楼幢位置：\n';
-        
-        // (6)朝向
-        report += '(6)朝向：\n';
-        
-        // (7)楼层
-        report += '(7)楼层：\n';
-        
-        // (8)住宅聚集度：【动态生成】
-        report += '(8)住宅聚集度：';
-        var communityInfo = this.generateCommunityReport(results.results);
-        if (communityInfo) {
-            report += communityInfo.desc + '，' + communityInfo.comment + '。\n';
-        } else {
-            report += '\n';
-        }
-        
-        report += '\n';
-        
-        // 2，交通状况
-        report += '2、交通状况\n\n';
-        
-        // (1)道路状况：【动态生成】
-        report += '(1)道路状况：';
-        var roadInfo = this.generateRoadReport(results.results);
-        if (roadInfo) {
-            report += roadInfo.desc + '，' + roadInfo.comment + '。\n';
-        } else {
-            report += '\n';
-        }
-        
-        // (2)出入可利用交通工具：【动态生成公交部分】
-        report += '(2)出入可利用交通工具：出入可利用私家车，自行车、出租车及公交车等；';
-        var busInfo = this.generateBusReport(results.results);
-        if (busInfo) {
-            report += busInfo + '。\n';
-        } else {
-            report += '\n';
-        }
-        
-        // (3)交通管制情况
-        report += '(3)交通管制情况：\n';
-        
-        // (4)停车方便程度：【动态生成】
-        report += '(4)停车方便程度：';
-        var parkingInfo = this.generateParkingReport(results.results);
-        if (parkingInfo) {
-            report += parkingInfo.comment + '。\n';
-        } else {
-            report += '\n';
-        }
-        
-        // report += '综上，交通状况较优。\n'; // 这里要改 testing
-        
-        templateTextarea.value = report;
-    };
-
-    /**
-     * 生成距离描述
-     */
-    BaiduPoiSearch.prototype.generateDistanceReport = function(results) {
-        var allPois = [];
-        var excludeCategories = ['road', 'community', 'bus', 'parking']; // 排除掉：道路、小区、公交、停车场
-        for (var key in results) {
-            if (excludeCategories.indexOf(key) === -1 && results[key]) {
-                allPois = allPois.concat(results[key]);
-            }
-        }
-        
-        if (allPois.length === 0) return '';
-        
-        allPois.sort(function(a, b) { return a.distance - b.distance; });
-        var top3 = allPois.slice(0, 3);
-        
-        var desc = '';
-        for (var i = 0; i < top3.length; i++) {
-            desc += '距离' + top3[i].name + '约' + top3[i].distance + '米';
-            if (i < top3.length - 1) {
-                desc += '、';
-            }
-        }
-        
-        var nearest = top3[0].distance;
-        var nearThreshold = this.options.distanceThreshold.near;
-        var mediumThreshold = this.options.distanceThreshold.medium;
-        var comment;
-        if (nearest < nearThreshold) {
-            comment = this.options.commentRules['与重要场所(设施)的距离'].keywords.near;
-        } else if (nearest < mediumThreshold) {
-            comment = this.options.commentRules['与重要场所(设施)的距离'].keywords.medium;
-        } else {
-            comment = this.options.commentRules['与重要场所(设施)的距离'].keywords.far;
-        }
-        
-        return { desc: desc, comment: comment };
-    };
-
-    /**
-     * 生成住宅聚集度描述
-     */
-    BaiduPoiSearch.prototype.generateCommunityReport = function(results) {
-        var pois = results['community'];
-        if (!pois || pois.length === 0) return '';
-        
-        var count = pois.length;
-        var names = pois.slice(0, 5).map(function(p) { return p.name; }).join('，');
-        
-        var desc = '区域内有' + names + '等';
-        var highThreshold = this.options.countThreshold.high;
-        var mediumThreshold = this.options.countThreshold.medium;
-        var comment;
-        if (count >= highThreshold) {
-            comment = this.options.commentRules['住宅聚集度'].keywords.high;
-        } else if (count >= mediumThreshold) {
-            comment = this.options.commentRules['住宅聚集度'].keywords.medium;
-        } else {
-            comment = this.options.commentRules['住宅聚集度'].keywords.low;
-        }
-        
-        return { desc: desc, comment: comment };
-    };
-
-    /**
-     * 生成道路状况描述
-     */
-    BaiduPoiSearch.prototype.generateRoadReport = function(results) {
-        var pois = results['road'];
-        if (!pois || pois.length === 0) return '';
-        
-        var count = pois.length;
-        var roads = pois.slice(0, 8).map(function(p) {
-            return p.name.replace(/\(.*\)/, '').replace(/（.*）/, '');
-        });
-        
-        var desc = '周边有' + roads.join('，') + '等';
-        var highThreshold = this.options.countThreshold.high;
-        var mediumThreshold = this.options.countThreshold.medium;
-        var comment;
-        if (count >= highThreshold) {
-            comment = this.options.commentRules['道路状况'].keywords.high;
-        } else if (count >= mediumThreshold) {
-            comment = this.options.commentRules['道路状况'].keywords.medium;
-        } else {
-            comment = this.options.commentRules['道路状况'].keywords.low;
-        }
-        
-        return { desc: desc, comment: comment };
-    };
-
-    /**
-     * 生成公交描述
-     */
-    BaiduPoiSearch.prototype.generateBusReport = function(results) {
-        var placeMaxLen = 5; // 超过N个，用等结尾，比如"地点1,地点2等"
-        var pois = results['bus'];
-        if (!pois || pois.length === 0) return '';
-        
-        // var stationName = pois[0].name;
-        var address = pois[0].address.toString().replace(/\s+/g, '').replace(/(;)/g, '、'); // 公交线路
-        var busMaxPois = pois.slice(0, placeMaxLen).map(function(p) { return p.name; });
-        var busNameStr = '"' + busMaxPois.join('、') + (pois.length <= placeMaxLen ? '"' : '"等');
-
-
-        var report = '周边有' + busNameStr + pois.length + '个公交站点，';
-        
-        if (pois.length >= 3) {
-            report += '有' + address + '等公交线路，公交班次较多，辐射范围较广，公共交通便捷度较好';
-        } else if (pois.length >= 1) {
-            report += '有' + address + '等公交线路，公交班次一般，辐射范围普通，公共交通便捷度一般';
-        } else {
-            report += '公共交通便捷度一般';
-        }
-        
-        return report;
-    };
-
-    /**
-     * 生成停车方便程度描述
-     */
-    BaiduPoiSearch.prototype.generateParkingReport = function(results) {
-        var pois = results['parking'];
-        if (!pois || pois.length === 0) return '';
-        
-        var count = pois.length;
-        var highThreshold = this.options.countThreshold.high;
-        var mediumThreshold = this.options.countThreshold.medium;
-        var comment;
-        if (count >= highThreshold) {
-            comment = this.options.commentRules['停车方便程度'].keywords.easy;
-        } else if (count >= mediumThreshold) {
-            comment = this.options.commentRules['停车方便程度'].keywords.normal;
-        } else {
-            comment = this.options.commentRules['停车方便程度'].keywords.difficult;
-        }
-        
-        return { comment: comment };
-    };
-
-
-
-
-    //————————————————————————————————————————————————
-    /**
-     * 生成报告描述（brief）
-     */
-    BaiduPoiSearch.prototype.generateBriefReport = function() {
-        var briefTextarea = document.getElementById('briefText');
-        if (!briefTextarea) return;
-        
-        var results = this.cache.results;
-        if (!results || !results.results) {
-            briefTextarea.value = '';
-            return;
-        }
-        
-        var report = '';
-        var searchParams = results.searchParams;
-        var poiResults = results.results;
-        // console.log('报告描述-打印搜索结果poiresult：', poiResults)
-        
-        // 获取搜索时使用的关键词
-        var searchKeywords = [];
-        if (searchParams.categories) {
-            for (var key in searchParams.categories) {
-                var cat = searchParams.categories[key];
-                if (cat.searchKeyword) {
-                    searchKeywords.push(cat.searchKeyword);
-                }
-            }
-        }
-
-        // 关键词不是公交时，显示eg：区域内有 公园：北滨江安全文化公园、北滨江公园·浦西园、泉州北滨江公园田安园、北滨江公园沉洲园；医院：东南医院、东湖医院、人民医院、第二医院等。
-        var placeMaxLen = 5; // 超过N个，用等结尾，比如"地点1,地点2等"
-        var composeStr = '';
-        for(var v in poiResults) {
-            var one = poiResults[v];
-            // console.log('one：', one)
-            if(v != 'bus') { // 关键词不是公交时
-                var placeMaxPois = one.slice(0, placeMaxLen).map(function(p) { return p.name; });
-                // console.log('placePois：', placePois)
-                if(one.length > 0) {
-                    var category = one[0].categoryName;
-                    composeStr += category + '：' + placeMaxPois.join('、');
-                    if(one.length > placeMaxLen) composeStr += '等';
-                    composeStr += '；\n\n';
-                }
-            }
-        }
-        composeStr = composeStr.replace(/(;|；|;\n|；\n)$/, '。'); // 最后一个符号是分号时，替换成句号
-        if(composeStr != '') report += '区域内有\n' + composeStr;
-
-        // 关键词是“公交”时，显示“出入可利用交通工具...”
-        var keywordIncludesBus = false; // 检查用户输入的关键词是否包含"公交"
-        if (searchParams.categories) {
-            for (var key in searchParams.categories) {
-                var cat = searchParams.categories[key];
-                if (cat.searchKeyword && cat.searchKeyword.indexOf('公交') !== -1) {
-                    keywordIncludesBus = true;
-                    break;
-                }
-            }
-        }
-        // 公交时 显示eg. 出入可利用私家车、公交车、自行车及出租车等；周边有“aa,bb”等公交站点，有1路、2路等10条公交线路停靠。
-        if (keywordIncludesBus) {
-            var busPois = poiResults['bus'];
-            report += report == '' ? '' : '\n';
-            report += '出入可利用交通工具\n';
-            report += '出入可利用私家车、公交车、自行车及出租车等；';
-            
-            if (busPois && busPois.length > 0) {
-                // var stationName = busPois[0].name;
-                var address = busPois[0].address.toString().replace(/\s+/g, '').replace(/(;)/g, '、'); // 公交线路
-                var busMaxPois = busPois.slice(0, placeMaxLen).map(function(p) { return p.name; });
-                var busNameStr = '"' + busMaxPois.join('、') + (busPois.length <= placeMaxLen ? '"' : '"等');
-                report += '周边有' + busNameStr + busPois.length + '个公交站点';
-                
-                var busLines = [];
-                for (var i = 0; i < Math.min(busPois.length, 5); i++) {
-                    busLines.push(busPois[i].name.replace('站', ''));
-                }
-                if (busLines.length > 0) {
-                    report += '，有' +  address + '等公交线路停靠。'; 
-                }
-            }
-        }
-
-        briefTextarea.value = report;
-    };
-
-
-
-
-    //————————————————————————————————————————————————
-    /**
-     * 生成位置分析
+     * 生成配套报告
      */
     BaiduPoiSearch.prototype.generateReport = function() {
         if (!this.cache.results) {
@@ -1859,9 +1498,6 @@
         }
     };
 
-
-
-    //————————————————————————————————————————————————
     /**
      * 生成POI详细列表
      */
@@ -1877,21 +1513,18 @@
         
         var html = '';
         
-        // 分类序号
-        var catIndex = 1;
-        
         for (var key in results) {
             if (results.hasOwnProperty(key) && results[key].length > 0) {
                 var category = categories[key];
                 var pois = results[key];
                 
                 html += '<div class="poi-category-group">' +
-                    '<h4 class="category-title">' + catIndex + '. ' + category.icon + ' ' + category.name + '（' + pois.length + '个）</h4>';
+                    '<h4 class="category-title">' + category.icon + ' ' + category.name + '（' + pois.length + '个）</h4>';
                 
                 for (var i = 0; i < pois.length; i++) {
                     var poi = pois[i];
                     html += '<div class="poi-item" data-poi-id="' + poi.id + '">' +
-                        '<div class="poi-name">(' + (i + 1) + ')' + poi.name + '</div>' +
+                        '<div class="poi-name">' + poi.name + '</div>' +
                         '<div class="poi-info">' +
                         '<span class="poi-distance">距离：' + poi.distance + '米</span>' +
                         '<span class="poi-address">' + poi.address + '</span>' +
@@ -1900,7 +1533,6 @@
                 }
                 
                 html += '</div>';
-                catIndex++;
             }
         }
         
@@ -1918,10 +1550,6 @@
         }
     };
 
-
-
-
-    //————————————————————————————————————————————————
     /**
      * 处理POI点击
      * @param {String} poiId - POI ID
@@ -1938,9 +1566,9 @@
         
         if (!highlighted) {
             // 标注不在当前显示列表中（被 maxTotalPoints 过滤了）
-            var config = this.options.draft;
+            var mapConfig = this.options.map;
             
-            if (config.switchCategoryConfirm) {
+            if (mapConfig.switchCategoryConfirm) {
                 // 需要确认
                 var category = this.cache.categories[poi.category];
                 var confirmed = confirm('该POI已被过滤（不在当前显示范围内）。\n\n是否切换到只显示「' + category.name + '」分类？');
@@ -1983,7 +1611,7 @@
         
         // 只添加该分类的标注
         var points = [];
-        var config = this.options.draft;
+        var mapConfig = this.options.map;
         
         for (var i = 0; i < pois.length; i++) {
             var poi = pois[i];
@@ -2031,10 +1659,10 @@
             this.markers.push(marker);
         }
         
-        // console.log('已切换到只显示「' + categoryKey + '」分类，共 ' + pois.length + ' 个标注');
+        console.log('已切换到只显示「' + categoryKey + '」分类，共 ' + pois.length + ' 个标注');
         
         // 自动调整视野
-        if (config.autoViewPort && points.length > 0) {
+        if (mapConfig.autoViewPort && points.length > 0) {
             this.fitViewPort(points);
         }
         
@@ -2050,7 +1678,7 @@
         var showAllBtnContainer = document.getElementById('showAllMarkersBtnContainer');
         if (showAllBtnContainer) {
             var category = this.cache.categories[categoryKey];
-            showAllBtnContainer.innerHTML = '<button type="button" class="btn btn-secondary" id="showAllMarkersBtn">🔙 显示全部标注（当前：' + category.name + '）</button>';
+            showAllBtnContainer.innerHTML = '<button class="btn btn-secondary" id="showAllMarkersBtn">🔙 显示全部标注（当前：' + category.name + '）</button>';
             showAllBtnContainer.style.display = 'block';
             // 重新绑定点击事件
             document.getElementById('showAllMarkersBtn').addEventListener('click', function() {
@@ -2076,7 +1704,7 @@
         // 重新添加所有分类的标注
         this.addMarkersToMap(this.currentCenter);
         
-        // console.log('已切换回显示全部分类');
+        console.log('已切换回显示全部分类');
     };
     /**     * 根据ID查找POI
      * @param {String} poiId - POI ID
@@ -2102,110 +1730,6 @@
         return null;
     };
 
-
-
-    //————————————————————————————————————————————————
-    /**
-     * 报告模板复制按钮：复制报告
-     */
-    BaiduPoiSearch.prototype.copyTemplateReport = function() {
-        var templateTextarea = document.getElementById('templateText');
-        if (templateTextarea) {
-            var text = templateTextarea.value;
-            if (!text) {
-                alert('报告模板内容为空');
-                return;
-            }
-            
-            // 尝试使用现代API
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(function() {
-                    alert('报告已复制到剪贴板');
-                }).catch(function() {
-                    // fallback: 使用传统方法
-                    self.fallbackCopyText(text);
-                });
-            } else {
-                // fallback: 使用传统方法
-                this.fallbackCopyText(text);
-            }
-        }
-    };
-
-    /**
-     * 报告模板下载按钮：下载报告
-     */
-    BaiduPoiSearch.prototype.downloadTemplateReport = function() {
-        var templateTextarea = document.getElementById('templateText');
-        var locationName = document.getElementById('location').value || '配套报告';
-        
-        if (templateTextarea) {
-            var blob = new Blob([templateTextarea.value], { type: 'text/plain;charset=utf-8' });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = locationName + '_报告模板.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-    };
-
-    /**
-     * 位置分析复制按钮：复制位置信息
-     */
-    BaiduPoiSearch.prototype.copyPosition = function() {
-        var reportTextarea = document.getElementById('reportText');
-        if (reportTextarea) {
-            this.fallbackCopyText(reportTextarea.value);
-        }
-    };
-
-    /**
-     * 位置分析下载按钮：下载位置分析信息
-     */
-     BaiduPoiSearch.prototype.downloadPosition = function() {
-        var reportTextarea = document.getElementById('reportText');
-        var locationName = document.getElementById('location').value || '配套报告';
-        
-        if (reportTextarea) {
-            var blob = new Blob([reportTextarea.value], { type: 'text/plain;charset=utf-8' });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = locationName + '_配套报告.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-    };
-
-    /**
-     * 备用复制方法
-     */
-    BaiduPoiSearch.prototype.fallbackCopyText = function(text) {
-        var textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        try {
-            document.execCommand('copy');
-            alert('报告已复制到剪贴板');
-        } catch (e) {
-            alert('复制失败，请手动复制');
-        }
-        document.body.removeChild(textarea);
-    };
-
-
- 
-
-    
-
-
-
-
-    //————————————————————————————————————————————————
     /**
      * 处理快速选择
      * @param {String} categoryKey - 分类键
@@ -2372,7 +1896,7 @@
             this.state.selectedSubcategories[categoryKey] = subcategoryValue;
         }
 
-        // console.log('子分类筛选已应用:', this.state.selectedSubcategories);
+        console.log('子分类筛选已应用:', this.state.selectedSubcategories);
     };
 
     /**
@@ -2522,26 +2046,23 @@
         }
         tab.classList.add('active');
         
-        // 隐藏所有Tab内容
-        var briefTab = document.getElementById('briefTab');
+        // 切换内容
         var reportTab = document.getElementById('reportTab');
         var listTab = document.getElementById('listTab');
         var templateTab = document.getElementById('templateTab');
         
-        if (briefTab) briefTab.classList.remove('active');
-        if (reportTab) reportTab.classList.remove('active');
-        if (listTab) listTab.classList.remove('active');
-        if (templateTab) templateTab.classList.remove('active');
-        
-        // 显示对应的Tab内容
-        if (tabName === 'brief' && briefTab) {
-            briefTab.classList.add('active');
-        } else if (tabName === 'template' && templateTab) {
-            templateTab.classList.add('active');
-        } else if (tabName === 'report' && reportTab) {
+        if (tabName === 'report') {
             reportTab.classList.add('active');
-        } else if (tabName === 'list' && listTab) {
+            listTab.classList.remove('active');
+            if (templateTab) templateTab.classList.remove('active');
+        } else if (tabName === 'template') {
+            reportTab.classList.remove('active');
+            listTab.classList.remove('active');
+            if (templateTab) templateTab.classList.add('active');
+        } else {
+            reportTab.classList.remove('active');
             listTab.classList.add('active');
+            if (templateTab) templateTab.classList.remove('active');
         }
     };
 
@@ -2589,9 +2110,297 @@
         }
     };
 
+    /**
+     * 复制报告
+     */
+    BaiduPoiSearch.prototype.copyReport = function() {
+        var reportTextarea = document.getElementById('reportText');
+        if (reportTextarea) {
+            reportTextarea.select();
+            try {
+                document.execCommand('copy');
+                alert('报告已复制到剪贴板');
+            } catch (e) {
+                alert('复制失败，请手动复制');
+            }
+        }
+    };
 
+    /**
+     * 下载报告
+     */
+    BaiduPoiSearch.prototype.downloadReport = function() {
+        var reportTextarea = document.getElementById('reportText');
+        var locationName = document.getElementById('location').value || '配套报告';
+        
+        if (reportTextarea) {
+            var blob = new Blob([reportTextarea.value], { type: 'text/plain;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = locationName + '_配套报告.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    };
 
-    //————————————————————————————————————————————————
+    /**
+     * 生成报告模板
+     */
+    BaiduPoiSearch.prototype.generateTemplateReport = function() {
+        var templateTextarea = document.getElementById('templateText');
+        if (!templateTextarea) return;
+        
+        var results = this.cache.results;
+        if (!results || !results.results) {
+            templateTextarea.value = '请先进行POI搜索，再生成报告模板。';
+            return;
+        }
+        
+        var report = '';
+        
+        // 1，位置状况
+        report += '1、位置状况\n\n';
+        
+        // (1)坐落
+        report += '(1)坐落：\n';
+        
+        // (2)方位
+        report += '(2)方位：\n';
+        
+        // (3)与重要场所(设施)的距离：【动态生成】
+        report += '(3)与重要场所(设施)的距离：';
+        var distanceInfo = this.generateDistanceReport(results.results);
+        if (distanceInfo) {
+            report += distanceInfo.desc + '，' + distanceInfo.comment + '。\n';
+        } else {
+            report += '\n';
+        }
+        
+        // (5)楼幢位置
+        report += '(5)楼幢位置：\n';
+        
+        // (6)朝向
+        report += '(6)朝向：\n';
+        
+        // (7)楼层
+        report += '(7)楼层：\n';
+        
+        // (8)住宅聚集度：【动态生成】
+        report += '(8)住宅聚集度：';
+        var communityInfo = this.generateCommunityReport(results.results);
+        if (communityInfo) {
+            report += communityInfo.desc + '，' + communityInfo.comment + '。\n';
+        } else {
+            report += '\n';
+        }
+        
+        report += '\n';
+        
+        // 2，交通状况
+        report += '2、交通状况\n\n';
+        
+        // (1)道路状况：【动态生成】
+        report += '(1)道路状况：';
+        var roadInfo = this.generateRoadReport(results.results);
+        if (roadInfo) {
+            report += roadInfo.desc + '，' + roadInfo.comment + '。\n';
+        } else {
+            report += '\n';
+        }
+        
+        // (2)出入可利用交通工具：【动态生成公交部分】
+        report += '(2)出入可利用交通工具：出入可利用私家车，自行车、出租车及公交车等；乘坐的士方便度较好；';
+        var busInfo = this.generateBusReport(results.results);
+        if (busInfo) {
+            report += busInfo + '。\n';
+        } else {
+            report += '\n';
+        }
+        
+        // (3)交通管制情况
+        report += '(3)交通管制情况：\n';
+        
+        // (4)停车方便程度：【动态生成】
+        report += '(4)停车方便程度：';
+        var parkingInfo = this.generateParkingReport(results.results);
+        if (parkingInfo) {
+            report += parkingInfo.comment + '。\n';
+        } else {
+            report += '\n';
+        }
+        
+        report += '综上，交通状况较优。\n'; // 这里要改 testing
+        
+        templateTextarea.value = report;
+    };
+
+    /**
+     * 生成距离描述
+     */
+    BaiduPoiSearch.prototype.generateDistanceReport = function(results) {
+        var allPois = [];
+        var excludeCategories = ['road', 'community', 'bus', 'parking'];
+        for (var key in results) {
+            if (excludeCategories.indexOf(key) === -1 && results[key]) {
+                allPois = allPois.concat(results[key]);
+            }
+        }
+        
+        if (allPois.length === 0) return '';
+        
+        allPois.sort(function(a, b) { return a.distance - b.distance; });
+        var top3 = allPois.slice(0, 3);
+        
+        var desc = '';
+        for (var i = 0; i < top3.length; i++) {
+            desc += '距离' + top3[i].name + '约' + top3[i].distance + '米';
+            if (i < top3.length - 1) {
+                desc += '、';
+            }
+        }
+        
+        var nearest = top3[0].distance;
+        var nearThreshold = this.options.distanceThreshold.near;
+        var mediumThreshold = this.options.distanceThreshold.medium;
+        var comment;
+        if (nearest < nearThreshold) {
+            comment = this.options.commentRules['与重要场所(设施)的距离'].keywords.near;
+        } else if (nearest < mediumThreshold) {
+            comment = this.options.commentRules['与重要场所(设施)的距离'].keywords.medium;
+        } else {
+            comment = this.options.commentRules['与重要场所(设施)的距离'].keywords.far;
+        }
+        
+        return { desc: desc, comment: comment };
+    };
+
+    /**
+     * 生成住宅聚集度描述
+     */
+    BaiduPoiSearch.prototype.generateCommunityReport = function(results) {
+        var pois = results['community'];
+        if (!pois || pois.length === 0) return '';
+        
+        var count = pois.length;
+        var names = pois.slice(0, 5).map(function(p) { return p.name; }).join('，');
+        
+        var desc = '区域内有' + names + '等';
+        var highThreshold = this.options.countThreshold.high;
+        var mediumThreshold = this.options.countThreshold.medium;
+        var comment;
+        if (count >= highThreshold) {
+            comment = this.options.commentRules['住宅聚集度'].keywords.high;
+        } else if (count >= mediumThreshold) {
+            comment = this.options.commentRules['住宅聚集度'].keywords.medium;
+        } else {
+            comment = this.options.commentRules['住宅聚集度'].keywords.low;
+        }
+        
+        return { desc: desc, comment: comment };
+    };
+
+    /**
+     * 生成道路状况描述
+     */
+    BaiduPoiSearch.prototype.generateRoadReport = function(results) {
+        var pois = results['road'];
+        if (!pois || pois.length === 0) return '';
+        
+        var count = pois.length;
+        var roads = pois.slice(0, 8).map(function(p) {
+            return p.name.replace(/\(.*\)/, '').replace(/（.*）/, '');
+        });
+        
+        var desc = '周边有' + roads.join('，') + '等';
+        var highThreshold = this.options.countThreshold.high;
+        var mediumThreshold = this.options.countThreshold.medium;
+        var comment;
+        if (count >= highThreshold) {
+            comment = this.options.commentRules['道路状况'].keywords.high;
+        } else if (count >= mediumThreshold) {
+            comment = this.options.commentRules['道路状况'].keywords.medium;
+        } else {
+            comment = this.options.commentRules['道路状况'].keywords.low;
+        }
+        
+        return { desc: desc, comment: comment };
+    };
+
+    /**
+     * 生成公交描述
+     */
+    BaiduPoiSearch.prototype.generateBusReport = function(results) {
+        var pois = results['bus'];
+        if (!pois || pois.length === 0) return '';
+        
+        var stationName = pois[0].name;
+        var report = '乘坐的士方便度较好；周边有"' + stationName + '"公交站点，';
+        
+        if (pois.length >= 3) {
+            report += '有' + pois.length + '条公交线路，公交班次较多，辐射范围较广，公共交通便捷度较好';
+        } else if (pois.length >= 1) {
+            report += '有' + pois.length + '条公交线路，公交班次一般，辐射范围普通，公共交通便捷度一般';
+        } else {
+            report += '公共交通便捷度一般';
+        }
+        
+        return report;
+    };
+
+    /**
+     * 生成停车方便程度描述
+     */
+    BaiduPoiSearch.prototype.generateParkingReport = function(results) {
+        var pois = results['parking'];
+        if (!pois || pois.length === 0) return '';
+        
+        var count = pois.length;
+        var highThreshold = this.options.countThreshold.high;
+        var mediumThreshold = this.options.countThreshold.medium;
+        var comment;
+        if (count >= highThreshold) {
+            comment = this.options.commentRules['停车方便程度'].keywords.easy;
+        } else if (count >= mediumThreshold) {
+            comment = this.options.commentRules['停车方便程度'].keywords.normal;
+        } else {
+            comment = this.options.commentRules['停车方便程度'].keywords.difficult;
+        }
+        
+        return { comment: comment };
+    };
+    /**
+     * 复制报告模板
+     */
+    BaiduPoiSearch.prototype.copyTemplateReport = function() {
+        var templateTextarea = document.getElementById('templateText');
+        if (templateTextarea && templateTextarea.value) {
+            navigator.clipboard.writeText(templateTextarea.value).then(function() {
+                alert('报告已复制到剪贴板');
+            }).catch(function(err) {
+                console.error('复制失败:', err);
+            });
+        }
+    };
+
+    /**
+     * 下载报告模板
+     */
+    BaiduPoiSearch.prototype.downloadTemplateReport = function() {
+        var templateTextarea = document.getElementById('templateText');
+        var locationName = document.getElementById('location').value || '配套报告';
+        
+        if (templateTextarea) {
+            var blob = new Blob([templateTextarea.value], { type: 'text/plain;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = locationName + '_报告模板.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    };
+
     /**
      * 设置布局模式
      * @param {String} mode - 布局模式：'split' 或 'fullscreen'
@@ -2869,25 +2678,23 @@
     };
 
     /**
-     * 初始化地图、百度地图初始化
+     * 初始化地图
      */
     BaiduPoiSearch.prototype.initMap = function() {
         var self = this;
-        var config = this.options.draft;
+        var mapConfig = this.options.map;
         
         // 如果未启用地图，直接返回
-        if (!config.enabled) {
+        if (!mapConfig.enabled) {
             console.log('地图功能未启用');
             return;
         }
         
-        var containerId = this.options.draft.id;
+        var containerId = this.options.mapContainer.id;
         var container = document.getElementById(containerId);
         
         if (!container) {
-            var tip = '地图容器不存在:' + containerId;
-            console.error(tip);
-            alert(tip);
+            console.error('地图容器不存在:', containerId);
             return;
         }
         
@@ -2895,7 +2702,7 @@
         this.mapRenderer = new BMap.Map(containerId);
         
         // 设置缩放级别
-        var zoom = config.zoom || 14;
+        var zoom = mapConfig.zoom || 14;
         
         // 默认显示位置（使用默认城市）
         var defaultCity = this.options.defaultCity;
@@ -2905,7 +2712,7 @@
         this.mapRenderer.centerAndZoom(cityCenter, zoom);
         
         // 设置鼠标滚轮缩放
-        if (config.enableWheelZoom) {
+        if (mapConfig.enableWheelZoom) {
             this.mapRenderer.enableScrollWheelZoom();
         } else {
             this.mapRenderer.disableScrollWheelZoom();
@@ -2917,7 +2724,7 @@
         // 添加缩放控件
         this.mapRenderer.addControl(new BMap.NavigationControl());
         
-        // console.log('地图初始化完成');
+        console.log('地图初始化完成');
         
         // 触发地图初始化完成事件
         this.trigger('onMapInit', this.mapRenderer);
@@ -2929,10 +2736,10 @@
      */
     BaiduPoiSearch.prototype.addMarkersToMap = function(center) {
         var self = this;
-        var config = this.options.draft;
+        var mapConfig = this.options.map;
         
         // 如果未启用地图或地图未初始化，直接返回
-        if (!config.enabled || !this.mapRenderer) {
+        if (!mapConfig.enabled || !this.mapRenderer) {
             return;
         }
         
@@ -2949,8 +2756,8 @@
         }
         
         // 获取配置参数
-        var maxPerCategory = config.maxPointsPerCategory || 5;
-        var maxTotal = config.maxTotalPoints || 15;
+        var maxPerCategory = mapConfig.maxPointsPerCategory || 5;
+        var maxTotal = mapConfig.maxTotalPoints || 15;
         
         // 第一阶段：每个分类取前N个
         var filteredByCategory = {};
@@ -3038,10 +2845,10 @@
             this.markers.push(marker);
         }
         
-        // console.log('已添加 ' + finalPois.length + ' 个标注点');
+        console.log('已添加 ' + finalPois.length + ' 个标注点');
         
         // 自动调整视野
-        if (config.autoViewPort && points.length > 0) {
+        if (mapConfig.autoViewPort && points.length > 0) {
             this.fitViewPort(points);
         }
     };
@@ -3114,7 +2921,7 @@
         
         // 如果只有一个点，设置固定视野
         if (points.length === 1) {
-            this.mapRenderer.centerAndZoom(points[0], this.options.draft.zoom || 14);
+            this.mapRenderer.centerAndZoom(points[0], this.options.map.zoom || 14);
             return;
         }
         
@@ -3130,8 +2937,8 @@
      */
     BaiduPoiSearch.prototype.highlightMarker = function(poi) {
         var self = this;
-        var config = this.options.draft;
-        var highlightColor = config.highlightColor || '#E60000';
+        var mapConfig = this.options.map;
+        var highlightColor = mapConfig.highlightColor || '#E60000';
         
         // 取消其他标注的高亮
         this.unhighlightAllMarkers();
