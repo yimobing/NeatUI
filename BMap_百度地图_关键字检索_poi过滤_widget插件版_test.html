@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style type="text/css">
+		body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+		#allmap{width:100%;height:500px;}
+		p{margin-left:5px; font-size:14px;}
+	</style>
+	<script type="text/javascript" src="//api.map.baidu.com/api?v=2.0&ak=您的密钥"></script>
+	<title>圆形区域搜索</title>
+</head>
+<body>
+  测试地址：
+  https://lbsyun.baidu.com/jsdemo3.0.htm#js3_28
+  <br>
+  <br>
+	<div id="allmap"></div>
+	<p>返回北京市地图上圆形覆盖范围内的“餐馆”检索结果，并展示在地图上</p>
+  <div id="result"></div>
+</body>
+</html>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("allmap");            // 创建Map实例
+	var mPoint = new BMap.Point(118.60508877766857,24.887662077088635);  
+	map.enableScrollWheelZoom();
+	map.centerAndZoom(mPoint,15);
+
+  var keyword = '超市';
+  var centerPoint = mPoint;
+  var radius = 2000;
+  
+	var circle = new BMap.Circle(mPoint,1000,{fillColor:"blue", strokeWeight: 1 ,fillOpacity: 0.3, strokeOpacity: 0.3});
+    map.addOverlay(circle);
+    var local =  new BMap.LocalSearch(map, 		
+    {
+      renderOptions: {map: map, autoViewport: false
+    },
+      
+      onSearchComplete: function(results) {
+                
+        var pois = results.getCurrentNumPois();
+        console.log('results：', results.Vr);
+                if (local.getStatus() == BMAP_STATUS_SUCCESS) {
+                   var html = '';
+                   for (var i = 0; i < results.getCurrentNumPois(); i++) {
+                        var poi = results.getPoi(i);
+                     console.log('poi：', poi);
+                     var title = poi.title;
+                     html += '<p>' + title + '</p>';
+                   }
+                  var elePanel  = document.getElementById('result');
+                  elePanel.innerHTML = html;
+                 
+                }
+      }
+                                             
+    });  
+  
+  console.log('keyword：', keyword, '\nenterPoint：', centerPoint, '\nradius：', radius); // testing2
+    local.searchNearby(keyword, centerPoint, radius);
+</script>

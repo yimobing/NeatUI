@@ -9,7 +9,7 @@
     'use strict';
 
     // 插件版本号
-    var VERSION = 'v3.6.4'; // 注：3.6.3 的beta4和beta4-final可用, beta5-7是垃圾版本不可用
+    var VERSION = 'v3.6.3-beta4-final'; // 最终可用的 v3.6.3-beta4 版本。beta5-beta7皆不可用，是垃圾失败版本。
 
     /**
      * BaiduPoiSearch 构造函数
@@ -43,7 +43,10 @@
         // 事件注册表
         this.events = {};
         
-        // 地图实例（搜索和标注共用）
+        // 地图实例（用于搜索的共享实例）
+        this.mapInstance = null;
+        
+        // 地图渲染实例（用于显示地图和标注）
         this.mapRenderer = null;
         
         // 标注数组（用于清除旧标注）
@@ -60,7 +63,6 @@
         // === 百度地图配置 ===
         apiKey: '', // 百度地图API密钥
         defaultCity: '泉州市', // 默认城市
-        defaultCoordinate: '118.6, 24.9', // 默认中心点坐标
 
         // === API使用量配置 ===
         // 百度api对个人用户流量及并发量皆有限制，每日限制请求次数100或5000，不可同时发起3个以上请求
@@ -78,8 +80,8 @@
             zoom: 14, // 默认缩放级别（3-19）
             enableWheelZoom: true, // 是否启用鼠标滚轮缩放
             autoViewPort: true, // 是否自动调整视野显示所有标注
-            maxPointsPerCategory: 10, // 每个分类最多显示几个标注
-            maxTotalPoints: 30, // 所有分类最多显示几个标注
+            maxPointsPerCategory: 5, // 每个分类最多显示几个标注
+            maxTotalPoints: 15, // 所有分类最多显示几个标注
             highlightColor: '#E60000', // 高亮颜色
             switchCategoryConfirm: false // 切换分类时是否提示（默认不提示）
         },
@@ -208,13 +210,13 @@
             'government': {
                 name: '政府', // 名称
                 icon: '🏢', // emoji图标
-                typeKeyword: '政府机构', // 百度地图 POI 主类型。目前此参数没用，只是预留
+                typeKeyword: '政府机构', // 百度地图 POI 主类型
                 matchKeywords: [ // 包含的关键词 
                     '政府', '行政', '办事处', '服务中心', '政务', '管委会', '街道办', '镇政府', '乡政府'
                 ],
                 excludeKeywords: [ // 不包含的、过滤或排除的关键词
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '停车场', '车库', '公厕', '卫生间', '大门'
+                    '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                    '入口', '出口', '停车场', '车库', '公厕', '卫生间', '大门'
                 ],
                 subcategories: [ // 子分类
                     { name: '全部', value: '' },
@@ -231,10 +233,8 @@
                     '体育馆', '体育中心', '运动场', '体育场', '全民健身中心', '文体中心', '公共运动场'
                 ],
                 excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口', 
-                    '停车场', '商铺',
-                    '私教', '会所', '搏击', '瑜伽', 
-                    '俱乐部', '健身', '健身房', '健身馆',
+                    '东门', '西门', '南门', '北门', '后门', '正门', '侧门', '入口', '出口', '停车场', '商铺',
+                    '健身房', '健身馆', '私教', '会所', '搏击', '瑜伽', 
                     '游泳馆', '运动馆', '游泳馆(私人)', '运动馆(商业)'
                 ],
                 subcategories: [
@@ -249,12 +249,11 @@
                 icon: '🏫',
                 typeKeyword: '教育',
                 matchKeywords: ['学校', '中学', '小学', '高中', '大学', '幼儿园', '职校', '技校', '学院'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '警务室', '保安室', '停车', '宿舍', 
-                    '食堂', '商店', '小卖部', '便利店', '分店', '小吃', '奶茶', '饮料',
-                    '培训学校', '培训中心', '训练营', '考训中心', '补习班', '托儿所', '托管班', '书店', '驾校', '驾驶培训'
-                ],
+                excludeKeywords: ['书店', '食堂', '商店', '小卖部', '停车场',
+                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口', '东2门', '西2门', '南2门', '北2门',
+                                 '驾校', '驾驶培训', '培训中心', '训练营', '考训中心',
+                                 '托儿所', '托管班', '补习班', '培训学校'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '小学', value: '小学' },
@@ -269,15 +268,12 @@
                 icon: '🏥',
                 typeKeyword: '医疗',
                 matchKeywords: ['医院', '卫生院', '诊所', '门诊部', '卫生站', '急救中心'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '警务室', '保安室', '停车', '宿舍', 
-                    '食堂', '商店', '小卖部', '便利店', '分店', '小吃', '奶茶', '饮料',
-                    '口腔', '牙科',
-                    '美容', '整形', '康复', '体检', '药房',
-                    '检验', '影像', '血透', '名医馆',
-                    '健康管理中心', '疾控中心'
-                ],
+                excludeKeywords: ['口腔', '牙科',
+                                 '美容', '整形', '康复', '体检', '药房',
+                                 '检验', '影像', '血透', '名医馆',
+                                 '健康管理中心', '疾控中心',
+                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口', '东2门', '西2门', '南2门', '北2门'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '综合医院', value: '综合医院' },
@@ -291,11 +287,8 @@
                 icon: '🏠',
                 typeKeyword: '住宅',
                 matchKeywords: ['小区', '公寓', '住宅区'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '警务室', '保安室', '停车', '宿舍', 
-                    '食堂', '商店', '小卖部', '便利店', '分店', '小吃', '奶茶', '饮料'
-                ],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '商品房', value: '商品房' },
@@ -308,8 +301,8 @@
                 typeKeyword: '金融',
                 matchKeywords: ['银行', '信用社', '农商行', '邮储'],
                 excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    'ATM', '自助', '24小时', '取款'
+                    'ATM', '自助', '24小时', '取款', 
+                    '东门', '西门', '南门', '北门', '后门', '正门', '侧门', '入口', '出口'
                 ],
                 subcategories: [
                     { name: '全部', value: '' },
@@ -324,10 +317,9 @@
                 icon: '🌿',
                 typeKeyword: '休闲娱乐',
                 matchKeywords: ['公园', '广场', '绿地'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '游乐场', '动物园', '植物园'
-               ],
+                excludeKeywords: ['游乐场', '动物园', '植物园',
+                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '城市公园', value: '城市公园' },
@@ -339,9 +331,8 @@
                 icon: '🚌',
                 typeKeyword: '交通设施',
                 matchKeywords: ['公交', '公交站', '公交枢纽'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口'
-               ],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '公交站', value: '公交站' },
@@ -353,9 +344,8 @@
                 icon: '🅿️',
                 typeKeyword: '交通设施',
                 matchKeywords: ['停车场', '停车库', '车位'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口'
-               ],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '地面停车场', value: '地面停车场' },
@@ -369,11 +359,9 @@
                 matchKeywords: ['路', '大道', '大街', '街', '公路', '快速路', '高速',
                     '高架', '大桥', '桥', '隧道', '匝道', '环路', '干线',
                     '支路', '巷', '弄', '国道', '省道', '县道'],
-                excludeKeywords: [
-                    '小区', '园区', '厂区', '校区', '院区', '商城', '商场',
+                excludeKeywords: ['小区', '园区', '厂区', '校区', '院区', '商城', '商场',
                     '广场', '公馆', '金街', '步行街', '内部路', '园区路',
-                    '便道', '步道', '通道', '消防通道', '步行街', '地下通道', '路口', '交叉口', '辅路', '辅道'
-                ],
+                    '便道', '步道', '通道', '消防通道', '步行街', '地下通道', '路口', '交叉口', '辅路', '辅道'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '城市主路', value: '城市主路' },
@@ -389,10 +377,9 @@
                 icon: '🏪',
                 typeKeyword: '购物',
                 matchKeywords: ['超市', '商场', '百货', '购物中心'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '便利店', '水果店', '菜店'
-                ],
+                excludeKeywords: ['便利店', '水果店', '菜店',
+                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '大型超市', value: '大型超市' },
@@ -405,10 +392,9 @@
                 icon: '🏬',
                 typeKeyword: '购物',
                 matchKeywords: ['商场', '购物中心', '百货大楼'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '便利店'
-                ],
+                excludeKeywords: ['便利店',
+                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '大型商场', value: '大型商场' },
@@ -420,9 +406,8 @@
                 icon: '🏨',
                 typeKeyword: '住宿服务',
                 matchKeywords: ['酒店', '宾馆', '旅馆', '招待所'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口'
-                ],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '星级酒店', value: '星级酒店' },
@@ -434,10 +419,9 @@
                 icon: '⛽',
                 typeKeyword: '交通',
                 matchKeywords: ['加油站', '加气站', '充电站'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '便利店', '洗车'
-                ],
+                excludeKeywords: ['便利店', '洗车',
+                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '中石油', value: '中石油' },
@@ -450,10 +434,9 @@
                 icon: '🏬',
                 typeKeyword: '购物',
                 matchKeywords: ['菜市场', '农贸市场', '海鲜市场'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '便利店', '超市'
-                ],
+                excludeKeywords: ['便利店', '超市',
+                                 '东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '菜市场', value: '菜市场' },
@@ -461,22 +444,17 @@
                 ]
             },
 
-            // test1
+            // testing
             'culture': {
                 name: '文体',
                 icon: '📚',
                 typeKeyword: '休闲娱乐',
-                matchKeywords: [
-                    '图书馆', '文化馆', '文化宫', '展览馆', '博物馆', '美术馆', '艺术馆',
-                    '影剧院', '剧院', '剧场', '木偶剧院', '大剧院', '青少年宫',
-                    '文体中心', '文化中心', '陈列馆', '会展中心', '体育馆', '体育场', 
-                    '全民健身中心'
-                ],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    'KTV', '酒吧', '网咖', '密室',
-                    '私人影院', '健身会所', '商业娱乐', '电玩城'
-                ],
+                matchKeywords: ['图书馆', '文化馆', '文化宫', '展览馆', '博物馆', '美术馆', '艺术馆',
+                                '影剧院', '剧院', '剧场', '木偶剧院', '大剧院', '青少年宫',
+                                '文体中心', '文化中心', '陈列馆', '会展中心', '体育馆', '体育场', '全民健身中心'],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口', 'KTV', '酒吧', '网咖', '密室',
+                                 '私人影院', '健身会所', '商业娱乐', '电玩城'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '文博展馆', value: '博物馆,美术馆,展览馆,艺术馆' },
@@ -491,9 +469,8 @@
                 icon: '🚇',
                 typeKeyword: '交通设施',
                 matchKeywords: ['地铁', '地铁站', '轻轨'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口'
-                ],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '地铁站', value: '地铁站' }
@@ -504,10 +481,8 @@
                 icon: '📊',
                 typeKeyword: '企业办公',
                 matchKeywords: ['公司', '企业', '集团', '总部', '办公楼', '商务中心', '科创园', '企业园区'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '商铺', '门店', '超市', '餐饮', '小店', '营业点'
-                ],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                '入口', '出口', '商铺', '门店', '超市', '餐饮', '小店', '营业点'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '企业公司', value: '企业' },
@@ -520,10 +495,8 @@
                 icon: '🏭',
                 typeKeyword: '工业厂区',
                 matchKeywords: ['厂房', '工厂', '工业区', '工业园', '生产车间', '制造厂区', '加工基地'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口',
-                    '商铺', '写字楼', '商住', '商场', '门店'
-                ],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                '入口', '出口', '商铺', '写字楼', '商住', '商场', '门店'],
                 subcategories: [
                     { name: '全部', value: '' },
                     { name: '工业厂房', value: '厂房' },
@@ -538,9 +511,8 @@
                 icon: '⛪',
                 typeKeyword: '殡葬服务',
                 matchKeywords: ['陵园', '公墓', '墓地'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口'
-                ],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' }
                 ]
@@ -550,9 +522,8 @@
                 icon: '♻️',
                 typeKeyword: '公共服务',
                 matchKeywords: ['垃圾站', '垃圾转运站'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口'
-                ],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' }
                 ]
@@ -562,9 +533,8 @@
                 icon: '⚡',
                 typeKeyword: '基础设施',
                 matchKeywords: ['变电站', '变电所'],
-                excludeKeywords: [
-                    '门', '正门', '后门', '侧门', '东门', '西门', '南门', '北门', '入口', '出口'
-                ],
+                excludeKeywords: ['东门', '西门', '南门', '北门', '后门', '正门', '侧门',
+                                 '入口', '出口'],
                 subcategories: [
                     { name: '全部', value: '' }
                 ]
@@ -636,6 +606,11 @@
             if (!container) {
                 console.error('搜索面板容器不存在:', self.options.searchPanel.id);
                 return;
+            }
+
+            // 创建共享的Map实例（避免多个实例占用并发连接）
+            if (!self.mapInstance) {
+                self.mapInstance = new BMap.Map("baidu_poi_search_map");
             }
 
             // 创建UI
@@ -826,6 +801,7 @@
      */
     BaiduPoiSearch.prototype.bindEvents = function() {
         var self = this;
+        
         // 布局切换
         document.getElementById('btn-split-layout').addEventListener('click', function() {
             self.setLayoutMode('split');
@@ -835,99 +811,6 @@
             self.setLayoutMode('fullscreen');
         });
         
-        // 百度地图输入下拉功能 test1
-        var mapInstance = this.mapRenderer;
-        var suggestId = 'location'; // 绑定关键词输入框的id
-        var domSuggestDropHideArea = document.createElement('div');
-        domSuggestDropHideArea.id = 'searchResultPanel';
-        domSuggestDropHideArea.style.display = 'none';
-        document.body.appendChild(domSuggestDropHideArea);
-        if(document.getElementById(suggestId) != null) {
-            function G(id) {
-                return document.getElementById(id);
-            }
-            var ac = new BMap.Autocomplete({ // 建立一个自动完成的对象
-                input: suggestId,
-                location: this.mapRenderer
-            });
-            ac.addEventListener("onhighlight", function (e) {
-                // 鼠标放在下拉列表上的事件
-                var str = "";
-                var _value = e.fromitem.value;
-                var value = "";
-                if (e.fromitem.index > -1) {
-                    value =
-                        _value.province +
-                        _value.city +
-                        _value.district +
-                        _value.street +
-                        _value.business;
-                }
-                str =
-                    "FromItem<br />index = " +
-                    e.fromitem.index +
-                    "<br />value = " +
-                    value;
-
-                value = "";
-                if (e.toitem.index > -1) {
-                    _value = e.toitem.value;
-                    value =
-                        _value.province +
-                        _value.city +
-                        _value.district +
-                        _value.street +
-                        _value.business;
-                }
-                str +=
-                    "<br />ToItem<br />index = " +
-                    e.toitem.index +
-                    "<br />value = " +
-                    value;
-                G("searchResultPanel").innerHTML = str;
-            });
-            var myValue;
-            ac.addEventListener("onconfirm", function (e) {
-                // 鼠标点击下拉列表后的事件
-                var _value = e.item.value;
-                myValue =
-                    _value.province +
-                    _value.city +
-                    _value.district +
-                    _value.street +
-                    _value.business;
-                G("searchResultPanel").innerHTML =
-                    "onconfirm<br />index = " +
-                    e.item.index +
-                    "<br />myValue = " +
-                    myValue;
-                // var results = ac.getResults(); // 这里是所有下拉项的信息，也没有坐桃城
-                // console.log('results：', results)
-                setPlace(); // 地点定位并取到坐标
-            });
-        }
-        // 获取下拉选中项的坐标
-        function setPlace() {
-            mapInstance.clearOverlays(); // 清除地图上所有覆盖物
-            function myFun() {
-                var result = local.getResults();
-                var total = result.getNumPois(); // 结果总数
-                console.log('total：', total);
-                if(total > 0) {
-                    var pp = result.getPoi(0).point; // 获取第一个智能搜索的结果
-                    // var lng = pp.lng, lat = pp.lat; // 下拉选项的坐标信息
-                    // 创建标注点
-                    // map.centerAndZoom(pp, 18);
-                    // map.addOverlay(new BMap.Marker(pp)); // 添加标注
-                }
-            }
-            var local = new BMap.LocalSearch(mapInstance, {
-                onSearchComplete: myFun // 智能搜索
-            });
-            local.search(myValue);
-        }
-
-
         // 开始搜索按钮
         document.getElementById('btn-search').addEventListener('click', function() {
             self.handleSearch();
@@ -1217,7 +1100,7 @@
      */
     BaiduPoiSearch.prototype.getLocationCoordinate = function(city, location, callback) {
         // 使用共享的Map实例，避免创建多个实例占用并发连接
-        var local = new BMap.LocalSearch(this.mapRenderer, {
+        var local = new BMap.LocalSearch(this.mapInstance, {
             onSearchComplete: function(results) {
                 if (local.getStatus() == BMAP_STATUS_SUCCESS) {
                     if (results.getCurrentNumPois() > 0) {
@@ -1352,7 +1235,7 @@
     };
 
     /**
-     * 搜索单个分类的POI test1
+     * 搜索单个分类的POI testing
      * @param {String} categoryKey - 分类键
      * @param {String} city - 城市
      * @param {Object} center - 中心点坐标
@@ -1361,7 +1244,7 @@
      * @param {Function} callback - 回调函数
      */
     BaiduPoiSearch.prototype.searchPoiByCategory = function(categoryKey, city, center, radius, searchKeyword, callback) {
-        // console.log('searchKeyword：', searchKeyword); // test3
+        // console.log('searchKeyword：', searchKeyword);
         var self = this;
 
         var category = this.cache.categories[categoryKey];
@@ -1374,13 +1257,7 @@
         var keyword = searchKeyword || category.name;
 
         // 使用共享的Map实例，避免创建多个实例占用并发连接
-        var local = new BMap.LocalSearch(this.mapRenderer, {
-            // test1
-            // renderOptions: {
-            //     map: this.mapRenderer, 
-            //     autoViewport: false
-            // },
-            
+        var local = new BMap.LocalSearch(this.mapInstance, {
             onSearchComplete: function(results) {
                 // console.log('results：', results);
                 if (local.getStatus() == BMAP_STATUS_SUCCESS) {
@@ -1434,7 +1311,6 @@
 
         // 搜索周边，使用中心点坐标，关键词优先使用原始输入
         var centerPoint = new BMap.Point(center.lng, center.lat);
-        // console.log('keyword：', keyword, '\nenterPoint：', centerPoint, '\nradius：', radius); // test3
         local.searchNearby(keyword, centerPoint, radius);
     };
 
@@ -1712,7 +1588,7 @@
             report += '\n';
         }
         
-        // report += '综上，交通状况较优。\n'; // 这里要改 test1
+        // report += '综上，交通状况较优。\n'; // 这里要改 testing
         
         templateTextarea.value = report;
     };
@@ -1813,7 +1689,7 @@
      * 生成公交描述
      */
     BaiduPoiSearch.prototype.generateBusReport = function(results) {
-        var placeMaxLen = 10; // 超过N个，用等结尾，比如"地点1,地点2等"
+        var placeMaxLen = 5; // 超过N个，用等结尾，比如"地点1,地点2等"
         var pois = results['bus'];
         if (!pois || pois.length === 0) return '';
         
@@ -1892,7 +1768,7 @@
         }
 
         // 关键词不是公交时，显示eg：区域内有 公园：北滨江安全文化公园、北滨江公园·浦西园、泉州北滨江公园田安园、北滨江公园沉洲园；医院：东南医院、东湖医院、人民医院、第二医院等。
-        var placeMaxLen = 10; // 超过N个，用等结尾，比如"地点1,地点2等"
+        var placeMaxLen = 5; // 超过N个，用等结尾，比如"地点1,地点2等"
         var composeStr = '';
         for(var v in poiResults) {
             var one = poiResults[v];
@@ -3056,7 +2932,7 @@
      * @returns {Object|null} 地图实例
      */
     BaiduPoiSearch.prototype.getMap = function() {
-        return this.mapRenderer;
+        return this.mapInstance;
     };
 
     /**
@@ -3090,22 +2966,10 @@
         
         // 默认显示位置（使用默认城市）
         var defaultCity = this.options.defaultCity;
-        var defaultCoordinate = this.options.defaultCoordinate;
-
-        var coordArr = defaultCoordinate.split(',');
-        var mmLng = coordArr.length > 0 ? coordArr[0] : '', 
-            mmLat = coordArr.length > 1 ? coordArr[1] : '';
-        var cityCenter = new BMap.Point(mmLng, mmLat); // 泉州默认坐标
+        var cityCenter = new BMap.Point(118.6, 24.9); // 泉州默认坐标
         
         // 初始化地图中心点
         this.mapRenderer.centerAndZoom(cityCenter, zoom);
-        // this.mapRenderer.centerAndZoom(defaultCity, zoom); // 这个要使用到检索服务
-
-        // 创建地图中心点标注
-        // if(coordArr.length > 1) {
-        //     var mmMarker = new BMap.Marker(cityCenter);
-        //     this.mapRenderer.addOverlay(mmMarker);
-        // }
         
         // 设置鼠标滚轮缩放
         if (config.enableWheelZoom) {
@@ -3481,7 +3345,7 @@
         this.cache = null;
         this.state = null;
         this.events = null;
-        this.mapRenderer = null;
+        this.mapInstance = null;
         
         var container = document.getElementById(this.options.searchPanel.id);
         if (container) {

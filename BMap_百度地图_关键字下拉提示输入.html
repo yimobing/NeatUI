@@ -36,25 +36,15 @@
         </style>
 
         <div id="l-map"></div>
+        
+        <!-- 关键字输入框 -->
         <div id="r-result">
             请输入:
-            <input
-                type="text"
-                id="suggestId"
-                size="20"
-                value="百度"
-                style="width: 150px"
-            />
+            <input type="text" id="suggestId" size="20" value="百度" style="width: 150px">
         </div>
-        <div
-            id="searchResultPanel"
-            style="
-                border: 1px solid #c0c0c0;
-                width: 150px;
-                height: auto;
-                display: none;
-            "
-        ></div>
+
+        <!-- 鼠标移动到下拉选项时的临时词条信息 -->
+        <div id="searchResultPanel" style=" border: 1px solid #c0c0c0; width: 150px; height: auto; display: none; " ></div>
 
         <!-- ================================================================================-->
         <!--                             JAVASCRIPT                                          -->
@@ -66,7 +56,8 @@
 
 
             //——————————————————————————————————————————
-            // 百度地图API功能
+            // 百度地图输入下拉功能
+            var mapInstance = map;
             function G(id) {
                 return document.getElementById(id);
             }
@@ -115,6 +106,7 @@
             ac.addEventListener("onconfirm", function (e) {
                 // 鼠标点击下拉列表后的事件
                 var _value = e.item.value;
+                // console.log('_value：', _value); // 下拉选中的名称、所在城市、区县。但没有坐标信息
                 myValue =
                     _value.province +
                     _value.city +
@@ -126,25 +118,31 @@
                     e.item.index +
                     "<br />myValue = " +
                     myValue;
-
-                setPlace();
+                // var results = ac.getResults(); // 这里是所有下拉项的信息，也没有坐桃城
+                // console.log('results：', results)
+                setPlace(); // 地点定位并取到坐标
             });
 
-            function setPlace() {
-                map.clearOverlays(); // 清除地图上所有覆盖物
-                function myFun() {
-                    var pp = local.getResults().getPoi(0).point; // 获取第一个智能搜索的结果
-                    console.log('pp：', pp);
-                    map.centerAndZoom(pp, 18);
-                    map.addOverlay(new BMap.Marker(pp)); // 添加标注
+           // 获取下拉选中项的坐标
+           function setPlace() {
+            mapInstance.clearOverlays(); // 清除地图上所有覆盖物
+            function myFun() {
+                var result = local.getResults();
+                var total = result.getNumPois(); // 结果总数
+                console.log('total：', total);
+                if(total > 0) {
+                    var pp = result.getPoi(0).point; // 获取第一个智能搜索的结果
+                    // var lng = pp.lng, lat = pp.lat; // 下拉选项的坐标信息
+                    // 创建标注点
+                    // map.centerAndZoom(pp, 18);
+                    // map.addOverlay(new BMap.Marker(pp)); // 添加标注
                 }
-                var local = new BMap.LocalSearch(map, {
-                    // 智能搜索
-                    onSearchComplete: myFun,
-                });
-                local.search(myValue);
             }
-
+            var local = new BMap.LocalSearch(mapInstance, {
+                onSearchComplete: myFun // 智能搜索
+            });
+            local.search(myValue);
+        }
             
         </script>
     </body>
