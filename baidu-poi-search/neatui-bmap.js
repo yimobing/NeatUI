@@ -209,7 +209,7 @@
                 name: '政府', // 名称
                 icon: '🏢', // emoji图标
                 typeKeyword: '政府机构', // 百度地图 POI 主类型。目前此参数没用，只是预留
-                matchKeywords: [ // 包含的关键词 
+                matchKeywords: [ // 包含的关键词。目前没有用于搜索，即不会参与搜索，只参与过滤
                     '政府', '行政', '办事处', '服务中心', '政务', '管委会', '街道办', '镇政府', '乡政府'
                 ],
                 excludeKeywords: [ // 不包含的、过滤或排除的关键词
@@ -1094,7 +1094,7 @@
         var categories = [];
         if (keyword) {
             // 支持逗号、顿号、空格分隔
-            var keywords = keyword.split(/[,，、\s]+/);
+            var keywords = keyword.split(/[,，、\s]+/); // 关键词分隔符支持中英文逗号、顿号
             for (var i = 0; i < keywords.length; i++) {
                 var kw = keywords[i].trim();
                 if (kw) {
@@ -1343,7 +1343,7 @@
                 // 搜索下一个分类
                 setTimeout(function() {
                     searchNext();
-                }, delay);
+                }, delay); // 延时，防止并发受限
             });
         }
 
@@ -1352,7 +1352,8 @@
     };
 
     /**
-     * 搜索单个分类的POI test1
+     * 搜索单个分类的POI：根据关键词搜索数据 test1
+     * 百度地图api周边搜索
      * @param {String} categoryKey - 分类键
      * @param {String} city - 城市
      * @param {Object} center - 中心点坐标
@@ -1361,6 +1362,7 @@
      * @param {Function} callback - 回调函数
      */
     BaiduPoiSearch.prototype.searchPoiByCategory = function(categoryKey, city, center, radius, searchKeyword, callback) {
+        console.log('categoryKey：', categoryKey)
         // console.log('searchKeyword：', searchKeyword); // test3
         var self = this;
 
