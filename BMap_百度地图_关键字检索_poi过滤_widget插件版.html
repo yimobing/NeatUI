@@ -64,22 +64,22 @@
             },
             
             onSearchStart: function(params) {
-                // console.log('搜索开始:', params);
+                console.log('搜索开始:', params);
             },
             
             onSearchProgress: function(progress) {
                 // console.log('搜索进度:', progress.completed + '/' + progress.total);
             },
             
-            onSearchComplete: function(results) {
-                // console.log('搜索完成:', results);
+            onSearchOvered: function(results) {
+                console.log('搜索完成:', results);
                 
                 // TODO: 这里可以调用地图插件显示结果
                 // 例如：mapPlugin.displayPois(results);
             },
             
             onResultClick: function(poi) {
-                // console.log('点击POI:', poi);
+                console.log('点击POI:', poi);
                 
                 // TODO: 这里可以调用地图插件定位到POI
                 // 例如：mapPlugin.centerOnPoi(poi);

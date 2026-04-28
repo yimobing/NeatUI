@@ -133,7 +133,7 @@
         onMapInit: null, // 地图初始化
         onSearchStart: null, // 搜索开始
         onSearchProgress: null, // 搜索进度
-        onSearchComplete: null, // 搜索完成
+        onSearchOvered: null, // 搜索完成
         onResultClick: null, // 点击结果
         onError: null, // 错误处理
         
@@ -572,6 +572,8 @@
         };
     };
 
+
+
     /**
      * 加载百度地图API脚本
      * @param {String} ak - 百度地图API密钥
@@ -654,7 +656,7 @@
             self.setLayoutMode(self.options.layoutMode);
 
             // 触发初始化完成事件
-            self.trigger('onInit', self);
+            self.triggerX('onInit', self);
 
             // console.log('BaiduPoiSearch 插件初始化完成');
         });
@@ -912,7 +914,7 @@
             function myFun() {
                 var result = local.getResults();
                 var total = result.getNumPois(); // 结果总数
-                console.log('total：', total);
+                // console.log('total：', total);
                 if(total > 0) {
                     var pp = result.getPoi(0).point; // 获取第一个智能搜索的结果
                     // var lng = pp.lng, lat = pp.lat; // 下拉选项的坐标信息
@@ -1181,8 +1183,9 @@
         this.state.isSearching = true;
         
         // 触发搜索开始事件
-        this.trigger('onSearchStart', params);
-        
+        this.triggerX('onSearchStart', params);
+
+
         // 更新UI
         var eleBtnSearch = document.getElementById('btn-search');
         if (eleBtnSearch) {
@@ -1195,7 +1198,7 @@
             if (error) {
                 self.state.isSearching = false;
                 self.showError(error);
-                self.trigger('onError', error);
+                self.triggerX('onError', error);
                 
                 if (eleBtnSearch) {
                     eleBtnSearch.disabled = false;
@@ -1290,6 +1293,8 @@
                     stats: self.calculateStats(results)
                 };
 
+                console.log('cache：', self.cache); // testing1
+
                 // 显示结果
                 self.displayResults();
                 
@@ -1300,7 +1305,7 @@
                 // console.log('搜索按钮-打印搜索结果:', self.cache.results);
 
                 // 触发搜索完成事件
-                self.trigger('onSearchComplete', self.cache.results);
+                self.triggerX('onSearchOvered', self.cache.results);
 
                 if (hasError) {
                     self.showError('部分搜索失败，请查看控制台');
@@ -1324,7 +1329,7 @@
                 completed++;
 
                 // 触发进度事件
-                self.trigger('onSearchProgress', {
+                self.triggerX('onSearchProgress', {
                     completed: completed,
                     total: total,
                     category: categoryKey
@@ -1362,7 +1367,7 @@
      * @param {Function} callback - 回调函数
      */
     BaiduPoiSearch.prototype.searchPoiByCategory = function(categoryKey, city, center, radius, searchKeyword, callback) {
-        console.log('categoryKey：', categoryKey)
+        // console.log('categoryKey：', categoryKey)
         // console.log('searchKeyword：', searchKeyword); // test3
         var self = this;
 
@@ -1420,12 +1425,15 @@
                             category: categoryKey,
                             categoryName: category.name
                         });
-                    }
 
+                        
+                    }
+                    console.log('pois-1：', pois); // testing1
                     // 按距离排序
                     pois.sort(function(a, b) {
                         return a.distance - b.distance;
                     });
+                    console.log('pois-2：', pois); // testing1
 
                     callback(pois);
                 } else {
@@ -2149,7 +2157,7 @@
         }
         
         // 触发点击事件
-        this.trigger('onResultClick', poi);
+        this.triggerX('onResultClick', poi);
     };
 
     /**
@@ -2819,7 +2827,7 @@
         this.state.currentLayout = mode;
         
         // 触发布局切换事件
-        this.trigger('onLayoutChange', mode);
+        this.triggerX('onLayoutChange', mode);
     };
 
     /**
@@ -3030,28 +3038,35 @@
     };
 
     /**
-     * 事件触发
+     * 自定义事件触发
      * @param {String} event - 事件名
      * @param {*} data - 事件数据
      * @returns {Object} this
      */
-    BaiduPoiSearch.prototype.trigger = function(event, data) {
-        if (!this.events[event]) {
-            return this;
-        }
-        
+    BaiduPoiSearch.prototype.triggerX = function(event, data) {
+        // this.events 压根不存在，不能直接调用！
+        // if (!this.events[event]) {
+        //     console.log('bbb');
+        //     return this;
+        // }
         // 支持onXXX回调函数
         if (typeof this.options[event] === 'function') {
             this.options[event].call(this, data);
         }
         
         // 触发事件监听器
-        for (var i = 0; i < this.events[event].length; i++) {
-            this.events[event][i].call(this, data);
+        // for (var i = 0; i < this.events[event].length; i++) {
+        //     this.events[event][i].call(this, data);
+        // }
+
+        // 触发配置项的回调函数
+        if (this.options[event]) {
+            this.options[event](data);
         }
         
         return this;
     };
+
 
     /**
      * 获取地图实例（预留接口）
@@ -3125,7 +3140,7 @@
         // console.log('地图初始化完成');
         
         // 触发地图初始化完成事件
-        this.trigger('onMapInit', this.mapRenderer);
+        this.triggerX('onMapInit', this.mapRenderer);
     };
 
     /**
@@ -3372,7 +3387,7 @@
                 this.showPoiInfoWindow(poi);
                 
                 // 触发点击事件
-                this.trigger('onResultClick', poi);
+                this.triggerX('onResultClick', poi);
                 
                 return true;
             }
@@ -3441,7 +3456,7 @@
         this.mapRenderer.openInfoWindow(infoWindow, point);
         
         // 触发点击事件
-        this.trigger('onResultClick', poi);
+        this.triggerX('onResultClick', poi);
     };
 
     /**
