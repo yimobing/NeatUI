@@ -45,7 +45,7 @@
             
             // 多选配置
             enableMultiSelect: true,
-            selectionLimit: 5,
+            selectionLimit: 10,
             selectionLimitWarning: 3,
             
             // 是否显示API使用情况
@@ -57,6 +57,7 @@
             // 回调函数
             onInit: function() {
                 // console.log('插件初始化完成');
+                poiSearch.setDefaultCategories(['school', 'bus']);  // init() 之后才能调用！
             },
             
             onLayoutChange: function(mode) {
@@ -64,7 +65,7 @@
             },
             
             onSearchStart: function(params) {
-                console.log('搜索开始:', params);
+                // console.log('搜索开始:', params);
             },
             
             onSearchProgress: function(progress) {
@@ -72,14 +73,14 @@
             },
             
             onSearchOvered: function(results) {
-                console.log('搜索完成:', results);
+                // console.log('搜索完成:', results);
                 
                 // TODO: 这里可以调用地图插件显示结果
                 // 例如：mapPlugin.displayPois(results);
             },
             
             onResultClick: function(poi) {
-                console.log('点击POI:', poi);
+                // console.log('点击POI:', poi);
                 
                 // TODO: 这里可以调用地图插件定位到POI
                 // 例如：mapPlugin.centerOnPoi(poi);
@@ -92,6 +93,7 @@
         
         // 初始化插件
         poiSearch.init();
+        // poiSearch.setDefaultCategories(['school', 'bus']);  // init() 之后才能调用！
         
         // ============================================
         // 示例：外部API调用
