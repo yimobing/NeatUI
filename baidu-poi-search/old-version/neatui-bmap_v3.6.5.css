@@ -1,6 +1,8 @@
 /**
  * BaiduPoiSearch - 百度地图POI搜索插件样式
  * 支持左右布局和全屏布局
+ * Date: 2026.04.18
+ * PubDate: 2026.04.30
  */
 
  @charset "utf-8";
@@ -397,7 +399,20 @@ body {
     color: #555;
     font-size: 12px;
 }
-
+.quick-select-title button[type="button"] {
+    float: right;
+    padding: 4px 6px;
+    background-color: transparent;
+    border: 1px solid #8BC34A;
+    border-radius: 2px;
+    color: #8BC34A;
+    font-size: 12px;
+    cursor: pointer;
+}
+.quick-select-title button[type="button"]:hover {
+    background-color: #8BC34A;
+    color: #fff;
+}
 .quick-btn {
     display: inline-block;
     padding: 4px 8px;

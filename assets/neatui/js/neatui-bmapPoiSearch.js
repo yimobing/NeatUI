@@ -1,21 +1,23 @@
 /**
- * BaiduPoiSearch - 百度地图POI搜索插件
+ * NeBdPoiSearch - 百度地图POI搜索插件
  * 作者：Vibe Coding Agent
  * 功能：多分类POI搜索、智能过滤、API使用统计、双布局支持
- * 兼容：IE11+（ES5语法）
+ * 兼容：IE11+（ES5语法），不支持IE9及以下版本
+ * Date: 2026.04.18
+ * PubDate: 2026.04.30
  */
 
  (function(window) {
     'use strict';
 
     // 插件版本号
-    var VERSION = 'v3.6.4'; // 注：3.6.3 的beta4和beta4-final可用, beta5-7是垃圾版本不可用
+    var VERSION = 'v3.6.7'; // 注：3.6.3 的beta4和beta4-final可用, beta5-7是垃圾版本不可用
 
     /**
-     * BaiduPoiSearch 构造函数
+     * NeBdPoiSearch 构造函数
      * @param {Object} options - 配置选项
      */
-    function BaiduPoiSearch(options) {
+    function NeBdPoiSearch(options) {
         // 合并配置选项
         this.options = this.extend({}, this.defaults, options);
         
@@ -56,10 +58,10 @@
     /**
      * 默认配置选项
      */
-    BaiduPoiSearch.prototype.defaults = {
+    NeBdPoiSearch.prototype.defaults = {
         // === 百度地图配置 ===
         apiKey: '', // 百度地图API密钥
-        defaultCity: '泉州市', // 默认城市
+        defaultCity: '福建省-泉州市-丰泽区', // 默认城市
         defaultCoordinate: '118.6, 24.9', // 默认中心点坐标
 
         // === API使用量配置 ===
@@ -98,24 +100,25 @@
         // === 布局配置 ===
         layoutMode: 'split', // 'split'（左右）或 'fullscreen'（全屏）
 
-        // // 下面的2个参数不起作用，都是写死在css里了
-        // splitLayout: {
-        //     mapWidth: '70%', // 地图容器宽度
-        //     searchWidth: '30%', // 搜索面板宽度
-        //     mapPosition: 'left',  // 地图位置：'left' 或 'right'
-        //     resizable: true, // 是否可拖动调整宽度
-        //     minWidth: 300, // 搜索面板最小宽度
-        //     maxWidth: 600 // 搜索面板最大宽度
-        // },
-        // fullscreenLayout: {
-        //     searchPosition: 'top-right',  // 搜索面板位置
-        //     searchWidth: 400, // 搜索面板宽度
-        //     maxHeight: 600, // 搜索面板最大高度
-        //     draggable: true, // 是否可拖动位置
-        //     collapsible: true, // 是否可折叠
-        //     collapsed: false, // 默认是否折叠
-        //     autoCollapse: false // 地图操作时自动折叠
-        // },
+        // splitLayout 配置
+        splitLayout: {
+            mapWidth: '70%',      // 地图容器宽度
+            searchWidth: '30%',   // 搜索面板宽度
+            mapPosition: 'left',  // 地图位置：'left' 或 'right'
+            resizable: true,      // 是否可拖动调整宽度
+            minWidth: 300,       // 搜索面板最小宽度
+            maxWidth: 600        // 搜索面板最大宽度
+        },
+        // fullscreenLayout 配置
+        fullscreenLayout: {
+            searchPosition: 'top-right',  // 搜索面板位置：'top-right', 'top-left', 'bottom-right', 'bottom-left'
+            searchWidth: 400,              // 搜索面板宽度
+            searchHeight: 600,            // 搜索面板最大高度
+            draggable: true,              // 是否可拖动位置
+            collapsible: true,           // 是否可折叠
+            collapsed: false,             // 默认是否折叠
+            autoCollapse: false          // 地图操作时自动折叠
+        },
 
         // API使用情况提示
         showApiUsage: true, // 是否显示API使用情况
@@ -138,102 +141,29 @@
         onError: null, // 错误处理
         
         
-        // === 报告模板生成规则配置 ===
-        // 判断类型	适用因素	判断依据
-        // 按距离	与重要场所 (设施) 的距离	最近设施的距离
-        // 按数量	住宅聚集度、停车方便程度	设施数量
-        // 按种类 + 数量	道路状况、公交线路	种类和数量
-
-        // 距离阈值（米）
-        distanceThreshold: {
-            near: 3000, // < 3000米 = 近
-            medium: 5000  // < 5000米 = 一般，>= 5000米 = 较远
-        },
-        // 数量阈值（个）
-        countThreshold: {
-            high: 3, // >= 3个 较高
-            medium: 1     // <= 0 个 差, >= 1个 一般
-        },
-        // 评语配置、判断类型配置
-        commentRules: {
-            // 按距离判断
-            '与重要场所(设施)的距离': {
-                type: 'distance',
-                categories: ['school', 'hospital', 'bank', 'subway', 'park', 'government'],
-                keywords: {
-                    near: '与重要场所(设施)的距离均近', // 最近<500m
-                    medium: '与重要场所(设施)的距离一般', // 最近<1000m
-                    far: '与重要场所(设施)的距离较远' // 最近>=1000m
-                }
-            },
-            // 按数量判断
-            '住宅聚集度': {
-                type: 'count',
-                categories: ['community'],
-                keywords: {
-                    high: '住宅聚集度较高', // >=5个
-                    medium: '住宅聚集度一般', // 3-4个
-                    low: '住宅聚集度较低' // <3个
-                }
-            },
-            '道路状况': {
-                type: 'count',
-                categories: ['road'],
-                keywords: {
-                    high: '道路通达度较高',
-                    medium: '道路通达度一般',
-                    low: '道路通达度较低'
-                }
-            },
-            '停车方便程度': {
-                type: 'count',
-                categories: ['parking'],
-                keywords: {
-                    easy: '停车位较多，停车方便',
-                    normal: '停车位一般',
-                    difficult: '停车位较少，停车不便'
-                }
-            },
-
-            // testing2
-            '景观环境': {
-                type:'count',
-                categories: ['park'],
-                keywords: {
-                    easy: '环境景观较好',
-                    normal: '环境景观一般',
-                    difficult: '环境景观普通'
-                }
-            },
-            '公用服务设施': {
-                type:'count',
-                categories: ['service'],
-                keywords: {
-                    easy: '公共服务设施完善',
-                    normal: '公共服务设施一般',
-                    difficult: '公共服务设施较差'
-                }
-            },
-            '教育配套设施': {
-                type:'count',
-                categories: ['education'],
-                keywords: {
-                    easy: '教育配套设施较好',
-                    normal: '教育配套设施一般',
-                    difficult: '教育配套设施较差'
-                }
-            }
-        }
-    };
-
-    /**
-     * POI分类配置数据（25个完整分类）
-     * 参考百度地图文档： https://lbs.baidu.com/index.php?title=open/poitags
-     */
-    BaiduPoiSearch.prototype.getPOICategories = function() {
-        return {
-            // ==================== POI 分类匹配规则配置 ====================
-            // ======== 快速选择分类：有利因素 ========
+        // === 快速选择关键词 ===
+        // 自定义报告模板必选关键词(哪些属于生成报告必备的)
+        reportMustCategories: [
+            'school', // 学校
+            'community', // 小区
+            'park', // 公园
+            'bus', // 公交
+            'parking', // 停车场
+            'road' // 道路
+        ], 
+        // 自定义重要场所必选关键词(哪些属于重要场所)
+        majorPlaceCategories: [
+            'government', // 政府
+            'school', // 学校
+            'stadium', // 体育馆
+            'hospital', // 医院
+            'park', // 公园
+            'bank' // 银行
+        ],
+        // POI分类匹配规则配置、POI分类配置数据（25+个完整分类）
+        quickChooseCategories: {
+            // 参考百度地图文档： https://lbs.baidu.com/index.php?title=open/poitags
+            // 快速选择分类：有利因素
             'government': {
                 name: '政府', // 名称
                 icon: '🏢', // emoji图标
@@ -564,7 +494,7 @@
                 ]
             },
 
-            // ======== 快速选择分类：不利因素 ========
+            // 快速选择分类：不利因素
             'cemetery': {
                 name: '陵园',
                 icon: '⛪',
@@ -601,7 +531,101 @@
                     { name: '全部', value: '' }
                 ]
             }
-        };
+        },
+
+        // === 报告模板生成规则配置 ===
+        // 判断类型	适用因素	判断依据
+        // 按距离	与重要场所 (设施) 的距离	最近设施的距离
+        // 按数量	住宅聚集度、停车方便程度	设施数量
+        // 按种类 + 数量	道路状况、公交线路	种类和数量
+        // 距离阈值（米）
+        distanceThreshold: {
+            near: 3000, // < 3000米 = 近
+            medium: 5000  // < 5000米 = 一般，>= 5000米 = 较远
+        },
+        // 数量阈值（个）
+        countThreshold: {
+            high: 3, // >= 3个 较高
+            medium: 1     // <= 0 个 差, >= 1个 一般
+        },
+        // 自定义评语配置、判断类型配置
+        commentRules: {
+            // 按距离判断
+            '与重要场所(设施)的距离': {
+                type: 'distance',
+                categories: ['school', 'hospital', 'bank', 'subway', 'park', 'government'],
+                keywords: {
+                    near: '与重要场所(设施)的距离均近', // 最近<500m
+                    medium: '与重要场所(设施)的距离一般', // 最近<1000m
+                    far: '与重要场所(设施)的距离较远' // 最近>=1000m
+                }
+            },
+            // 按数量判断
+            '住宅聚集度': {
+                type: 'count',
+                categories: ['community'],
+                keywords: {
+                    high: '住宅聚集度较高', // >=5个
+                    medium: '住宅聚集度一般', // 3-4个
+                    low: '住宅聚集度较低' // <3个
+                }
+            },
+            '道路状况': {
+                type: 'count',
+                categories: ['road'],
+                keywords: {
+                    high: '道路通达度较高',
+                    medium: '道路通达度一般',
+                    low: '道路通达度较低'
+                }
+            },
+            '停车方便程度': {
+                type: 'count',
+                categories: ['parking'],
+                keywords: {
+                    easy: '停车位较多，停车方便',
+                    normal: '停车位一般',
+                    difficult: '停车位较少，停车不便'
+                }
+            },
+
+            // test2
+            '景观环境': {
+                type:'count',
+                categories: ['park'],
+                keywords: {
+                    easy: '环境景观较好',
+                    normal: '环境景观一般',
+                    difficult: '环境景观普通'
+                }
+            },
+            '公用服务设施': {
+                type:'count',
+                categories: ['service'],
+                keywords: {
+                    easy: '公共服务设施完善',
+                    normal: '公共服务设施一般',
+                    difficult: '公共服务设施较差'
+                }
+            },
+            '教育配套设施': {
+                type:'count',
+                categories: ['education'],
+                keywords: {
+                    easy: '教育配套设施较好',
+                    normal: '教育配套设施一般',
+                    difficult: '教育配套设施较差'
+                }
+            }
+        }
+    };
+
+    /**
+     * POI分类配置数据（25个完整分类）
+     * 参考百度地图文档： https://lbs.baidu.com/index.php?title=open/poitags
+     */
+    NeBdPoiSearch.prototype.getPOICategories = function() {
+        return this.options.quickChooseCategories;
     };
 
 
@@ -611,7 +635,7 @@
      * @param {String} ak - 百度地图API密钥
      * @param {Function} callback - 加载完成后的回调函数
      */
-    BaiduPoiSearch.prototype.loadBaiduMapScript = function(ak, callback) {
+    NeBdPoiSearch.prototype.loadBaiduMapScript = function(ak, callback) {
         if (!ak) {
             console.error('百度地图API密钥（apiKey）未配置，请设置 options.apiKey');
             callback && callback(false);
@@ -648,8 +672,20 @@
     /**
      * 初始化插件
      */
-    BaiduPoiSearch.prototype.init = function() {
+    NeBdPoiSearch.prototype.init = function() {
         var self = this;
+
+        // IE兼容性检测
+        var ua = navigator.userAgent;
+        var isOldIE = ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1;
+        if (isOldIE) {
+            var match = ua.match(/(MSIE\s+(\d+))|Trident\/(\d+)/);
+            var ieVersion = match ? (match[2] || (parseInt(match[3]) + 4)) : 0;
+            if (ieVersion < 11) {
+                alert('当前插件不支持IE10、IE9、IE8等老掉牙的IE浏览器，请使用IE11、Edge或谷歌Chrome、360等现代浏览器打开');
+                return;
+            }
+        }
 
         // 加载百度地图API
         this.loadBaiduMapScript(this.options.apiKey, function(success) {
@@ -697,10 +733,10 @@
 
 
     /**
-     * 设置默认分类 testing2
+     * 设置默认分类 test2
      * @param {Array} categoryKeys 分类key数组
      */
-     BaiduPoiSearch.prototype.setDefaultCategories = function(categoryKeys) {
+     NeBdPoiSearch.prototype.setDefaultCategories = function(categoryKeys) {
         var keys = categoryKeys || [];
         
         // 更新状态
@@ -745,7 +781,7 @@
     /**
      * 创建UI界面、生成表单HTML
      */
-    BaiduPoiSearch.prototype.createUI = function() {
+    NeBdPoiSearch.prototype.createUI = function() {
         var container = document.getElementById(this.options.searchPanel.id);
         
         var html = '<div class="panel-header">' +
@@ -776,7 +812,7 @@
             '<div class="form-row">' +
             '<div class="form-group">' +
             '<label for="city">城市</label>' +
-            '<input type="text" id="city" value="' + this.options.defaultCity + '" placeholder="北京市">' +
+            '<input type="text" id="city" value="' + this.options.defaultCity + '" placeholder="如：北京市">' +
             '</div>' +
             '<div class="form-group">' +
             '<label for="location">位置名称</label>' +
@@ -809,8 +845,12 @@
             '</div>';
         
         // 快速选择
-        html += '<div class="quick-select-section">' +
-            '<div class="quick-select-title">快速选择</div>';
+        html += ['<div class="quick-select-section">',
+            '<div class="quick-select-title">',
+                '<span> 关键词分类(快速选择) </span>',
+                '<button type="button" id="btn-must-choose"> 报告模板必选关键词</button>',
+            '</div>'
+        ].join('\r\n')
         
         var categories = this.cache.categories;
         var categoryCount = this.options.defaultCategoryCount || this.defaults.defaultCategoryCount;
@@ -912,7 +952,7 @@
     /**
      * 绑定事件
      */
-    BaiduPoiSearch.prototype.bindEvents = function() {
+    NeBdPoiSearch.prototype.bindEvents = function() {
         var self = this;
         // 布局切换
         document.getElementById('btn-split-layout').addEventListener('click', function() {
@@ -922,99 +962,9 @@
         document.getElementById('btn-fullscreen-layout').addEventListener('click', function() {
             self.setLayoutMode('fullscreen');
         });
-        
+
         // 百度地图输入下拉功能 test1
-        var mapInstance = this.mapRenderer;
-        var suggestId = 'location'; // 绑定关键词输入框的id
-        var domSuggestDropHideArea = document.createElement('div');
-        domSuggestDropHideArea.id = 'searchResultPanel';
-        domSuggestDropHideArea.style.display = 'none';
-        document.body.appendChild(domSuggestDropHideArea);
-        if(document.getElementById(suggestId) != null) {
-            function G(id) {
-                return document.getElementById(id);
-            }
-            var ac = new BMap.Autocomplete({ // 建立一个自动完成的对象
-                input: suggestId,
-                location: this.mapRenderer
-            });
-            ac.addEventListener("onhighlight", function (e) {
-                // 鼠标放在下拉列表上的事件
-                var str = "";
-                var _value = e.fromitem.value;
-                var value = "";
-                if (e.fromitem.index > -1) {
-                    value =
-                        _value.province +
-                        _value.city +
-                        _value.district +
-                        _value.street +
-                        _value.business;
-                }
-                str =
-                    "FromItem<br />index = " +
-                    e.fromitem.index +
-                    "<br />value = " +
-                    value;
-
-                value = "";
-                if (e.toitem.index > -1) {
-                    _value = e.toitem.value;
-                    value =
-                        _value.province +
-                        _value.city +
-                        _value.district +
-                        _value.street +
-                        _value.business;
-                }
-                str +=
-                    "<br />ToItem<br />index = " +
-                    e.toitem.index +
-                    "<br />value = " +
-                    value;
-                G("searchResultPanel").innerHTML = str;
-            });
-            var myValue;
-            ac.addEventListener("onconfirm", function (e) {
-                // 鼠标点击下拉列表后的事件
-                var _value = e.item.value;
-                myValue =
-                    _value.province +
-                    _value.city +
-                    _value.district +
-                    _value.street +
-                    _value.business;
-                G("searchResultPanel").innerHTML =
-                    "onconfirm<br />index = " +
-                    e.item.index +
-                    "<br />myValue = " +
-                    myValue;
-                // var results = ac.getResults(); // 这里是所有下拉项的信息，也没有坐桃城
-                // console.log('results：', results)
-                setPlace(); // 地点定位并取到坐标
-            });
-        }
-        // 获取下拉选中项的坐标
-        function setPlace() {
-            mapInstance.clearOverlays(); // 清除地图上所有覆盖物
-            function myFun() {
-                var result = local.getResults();
-                var total = result.getNumPois(); // 结果总数
-                // console.log('total：', total);
-                if(total > 0) {
-                    var pp = result.getPoi(0).point; // 获取第一个智能搜索的结果
-                    // var lng = pp.lng, lat = pp.lat; // 下拉选项的坐标信息
-                    // 创建标注点
-                    // map.centerAndZoom(pp, 18);
-                    // map.addOverlay(new BMap.Marker(pp)); // 添加标注
-                }
-            }
-            var local = new BMap.LocalSearch(mapInstance, {
-                onSearchComplete: myFun // 智能搜索
-            });
-            local.search(myValue);
-        }
-
+        self.handleInputDropWord('location', this.options.defaultLocation);
 
         // 开始搜索按钮
         document.getElementById('btn-search').addEventListener('click', function() {
@@ -1032,6 +982,16 @@
             self.handleKeywordInput(this.value);
         });
         
+        // 报告模板必选关键词
+        var mustChooseBtn = document.getElementById('btn-must-choose');
+        if (mustChooseBtn) {
+            mustChooseBtn.addEventListener('click', function(e) {
+                // 自定义报告模板必选关键词(哪些属于生成报告必备的)
+                var mustCategories = self.options.reportMustCategories;
+                self.setDefaultCategories(mustCategories);  // init() 之后才能调用！
+            });
+        }
+
         // 快速选择按钮（事件委托）
         var quickSelectSection = document.querySelector('.quick-select-section');
         if (quickSelectSection) {
@@ -1174,10 +1134,141 @@
         }
     };
 
+
+
+    /**
+     * 度地图输入下拉功能
+     * @param {String} ps_selector_id 输入框id属性名
+     */
+    NeBdPoiSearch.prototype.handleInputDropWord = function(ps_selector_id, ps_selecttor_value) {
+        var self = this;
+        var mapInstance = this.mapRenderer;
+        var suggestId = ps_selector_id; // 绑定关键词输入框的id
+        var domSuggestDropHideArea = document.createElement('div');
+        domSuggestDropHideArea.id = 'searchResultPanel';
+        domSuggestDropHideArea.style.display = 'none';
+        document.body.appendChild(domSuggestDropHideArea);
+        if(document.getElementById(suggestId) == null) return;
+
+        function G(id) {
+            return document.getElementById(id);
+        }
+        var ac = new BMap.Autocomplete({ // 建立一个自动完成的对象
+            input: suggestId,
+            location: this.mapRenderer
+        });
+        ac.setInputValue(ps_selecttor_value); // 设置输入框默认值
+        // 位置名称聚焦时更改检索区域
+        document.getElementById('location').addEventListener('focus', function() {
+            var city = document.getElementById('city').value.toString().replace(/\s+/g, '');
+            city = WidgetTools.getCityName(city); // 提取城市名
+            if(city !== '') {
+                ac.setLocation(city); // 更改检索区域
+            }
+        });
+
+
+        ac.addEventListener("onhighlight", function (e) {
+            // 鼠标放在下拉列表上的事件
+            var str = "";
+            var _value = e.fromitem.value;
+            var value = "";
+            if (e.fromitem.index > -1) {
+                value =
+                    _value.province +
+                    _value.city +
+                    _value.district +
+                    _value.street +
+                    _value.business;
+            }
+            str =
+                "FromItem<br />index = " +
+                e.fromitem.index +
+                "<br />value = " +
+                value;
+
+            value = "";
+            if (e.toitem.index > -1) {
+                _value = e.toitem.value;
+                value =
+                    _value.province +
+                    _value.city +
+                    _value.district +
+                    _value.street +
+                    _value.business;
+            }
+            str +=
+                "<br />ToItem<br />index = " +
+                e.toitem.index +
+                "<br />value = " +
+                value;
+            G("searchResultPanel").innerHTML = str;
+        });
+        var myValue;
+        ac.addEventListener("onconfirm", function (e) {
+            // 鼠标点击下拉列表后的事件
+            var _value = e.item.value;
+            myValue =
+                _value.province +
+                _value.city +
+                _value.district +
+                _value.street +
+                _value.business;
+            G("searchResultPanel").innerHTML =
+                "onconfirm<br />index = " +
+                e.item.index +
+                "<br />myValue = " +
+                myValue;
+            // var results = ac.getResults(); // 这里是所有下拉项的信息，也没有坐桃城
+            // console.log('results：', results)
+            setPlace(); // 地点定位并取到坐标
+        });
+        
+        
+        // 获取下拉选中项的坐标
+        function setPlace() {
+            mapInstance.clearOverlays(); // 清除地图上所有覆盖物
+
+            // // 方法1：使用地点检索。配额不够，1天最多100次。超过配额度时检索不出来
+            // function myFun() {
+            //     var result = local.getResults();
+            //     var total = result.getNumPois(); // 结果总数
+            //     // console.log('total：', total);
+            //     if(total > 0) {
+            //         var pp = result.getPoi(0).point; // 获取第一个智能搜索的结果
+            //         // var lng = pp.lng, lat = pp.lat; // 下拉选项的坐标信息
+            //         // 创建标注点
+            //         mapInstance.centerAndZoom(pp, 16);
+            //         mapInstance.addOverlay(new BMap.Marker(pp)); // 添加标注
+            //     }
+            // }
+            // var local = new BMap.LocalSearch(mapInstance, {
+            //     onSearchComplete: myFun // 智能搜索
+            // });
+            // // console.log('myValue：', myValue);
+            // local.search(myValue);
+
+            // 方法2：使用地理编码。配额足够，1天最多5000次
+            var address = myValue;
+            var city = document.getElementById('city').value.toString().replace(/\s+/g, '');
+            city = WidgetTools.getCityName(city); // 提取城市名
+            // console.log('city-x：', city,'\nmyValue-x：', myValue);
+            self.getAddressCoordinateByGeoCoder(address, city, function(point) {
+                // console.log('point：', point)
+                if(point) {
+                    // 创建标注点
+                    mapInstance.centerAndZoom(point, 16);
+                    mapInstance.addOverlay(new BMap.Marker(point)); // 添加标注
+                }
+            });
+        }
+    },
+
+
     /**
      * 处理搜索
      */
-    BaiduPoiSearch.prototype.handleSearch = function() {
+    NeBdPoiSearch.prototype.handleSearch = function() {
         var city = document.getElementById('city').value.trim();
         var location = document.getElementById('location').value.trim();
         var keyword = document.getElementById('keyword').value.trim();
@@ -1186,12 +1277,12 @@
         this.hideError(); // 先隐藏错误信息
 
         if (!location) {
-            this.showError('请输入位置名称');
+            this.showError('请输入：位置名称');
             return;
         }
         
         if (!keyword && this.state.selectedCategories.length === 0) {
-            this.showError('请输入关键词或选择分类');
+            this.showError('请输入：关键词或选择分类');
             return;
         }
         
@@ -1275,7 +1366,7 @@
      * 执行搜索
      * @param {Object} params - 搜索参数
      */
-    BaiduPoiSearch.prototype.search = function(params) {
+    NeBdPoiSearch.prototype.search = function(params) {
         var self = this;
         
         if (this.state.isSearching) {
@@ -1297,7 +1388,7 @@
         }
         
         // 获取位置坐标
-        this.getLocationCoordinate(params.city, params.location, function(center, error) {
+        this.getAddressCoordinateByLocaleSearch(params.location, params.city, function(center, error) {
             if (error) {
                 self.state.isSearching = false;
                 self.showError(error);
@@ -1309,30 +1400,35 @@
                 }
                 return;
             }
-            
+            // console.log('center-x：', center);
             // 搜索所有分类
             self.searchMultipleCategories(params.categories, params.city, center, params.radius);
         });
     };
 
     /**
-     * 获取位置坐标
+     * 获取位置坐标：使用地点检索服务
+     * 说明：
+     * 1、返回值除了坐标、还有地址、电话、邮编等信息
+     * 2、配额不够，1天最多100次。超过配额度时检索不出来
+     * @param {String} address - 位置名称、地点名称
      * @param {String} city - 城市
-     * @param {String} location - 位置名称
      * @param {Function} callback - 回调函数
      */
-    BaiduPoiSearch.prototype.getLocationCoordinate = function(city, location, callback) {
+    NeBdPoiSearch.prototype.getAddressCoordinateByLocaleSearch = function(address, city, callback) {
         // 使用共享的Map实例，避免创建多个实例占用并发连接
         var local = new BMap.LocalSearch(this.mapRenderer, {
             onSearchComplete: function(results) {
+                // console.log('results-x：', results);
                 if (local.getStatus() == BMAP_STATUS_SUCCESS) {
                     if (results.getCurrentNumPois() > 0) {
                         var poi = results.getPoi(0);
+                        // console.log('poi-x：', poi); 
                         // console.log('位置坐标获取成功:', location, '坐标:', poi.point.lng, poi.point.lat);
                         callback({
                             lat: poi.point.lat,
                             lng: poi.point.lng,
-                            name: location,
+                            name: address,
                             address: poi.address || ''
                         });
                     } else {
@@ -1344,12 +1440,44 @@
             }
         });
 
-        // 在城市范围内搜索位置
-        local.searchInBounds(location, new BMap.Bounds(
-            new BMap.Point(117.5, 24.5),
-            new BMap.Point(119.5, 25.5)
-        ));
+        // 在指定城市范围内搜索位置 !!! 不要使用这个，不然切换到其它城市就没法搜索数据了
+        // local.searchInBounds(location, new BMap.Bounds(
+        //     new BMap.Point(117.5, 24.5), // 泉州的西南角
+        //     new BMap.Point(119.5, 25.5) //  泉州的东北角
+        // ));
+
+        // 在全网搜索，不限定某个城市
+        local.search(address, {
+            forceLocal: true // 仅限当前城市
+        });
     };
+
+
+
+    /**
+     * 获取位置坐标：使用地理编码服务
+     * 说明：
+     * 1、返回值只有坐标、没有地址、电话、邮编等信息
+     * 2、配额足够，1天最多5000次
+     * @param {String} address 位置名称、地点名称
+     * @param {String} city 指定城市
+     * @param {Function} callback 回调函数。参数格式：{"point类型的坐标"}
+     */
+    NeBdPoiSearch.prototype.getAddressCoordinateByGeoCoder = function(address, city, callback){
+        var geo = new BMap.Geocoder(); // 创建地理编码实例
+        // 对指定的地址进行解析
+        geo.getPoint(address, function(point) {
+            if (point) {
+                // 解析成功：返回坐标
+                callback(point);
+            } else {
+                // 解析失败
+                callback(null);
+            }
+        }, city);
+    };
+
+
 
     /**
      * 搜索多个分类
@@ -1358,7 +1486,7 @@
      * @param {Object} center - 中心点坐标
      * @param {Number} radius - 搜索半径
      */
-    BaiduPoiSearch.prototype.searchMultipleCategories = function(categories, city, center, radius) {
+    NeBdPoiSearch.prototype.searchMultipleCategories = function(categories, city, center, radius) {
         // console.log('categories：', categories); // eg. {key: 'culture', searchKeyword: '文体'}
         var self = this;
         var total = categories.length;
@@ -1396,7 +1524,7 @@
                     stats: self.calculateStats(results)
                 };
 
-                // console.log('cache：', self.cache); // testing1
+                // console.log('cache：', self.cache); // test-print
 
                 // 显示结果
                 self.displayResults();
@@ -1405,7 +1533,7 @@
                 self.addMarkersToMap(center);
 
                 // 控制台打印JSON结果（方便调试）
-                console.log('搜索按钮-打印搜索结果:', self.cache.results); // testing2
+                // console.log('搜索按钮-打印搜索结果:', self.cache.results); // test-print
 
                 // 触发搜索完成事件
                 self.triggerX('onSearchOvered', self.cache.results);
@@ -1423,7 +1551,7 @@
 
             self.searchPoiByCategory(categoryKey, city, center, radius, searchKeyword, function(pois, error) {
                 if (error) {
-                    console.error('搜索失败:', categoryKey, error);
+                    console.error('搜索失败:', categoryKey + '(' + searchKeyword + ')', error);
                     hasError = true;
                 } else {
                     results[categoryKey] = pois;
@@ -1469,7 +1597,7 @@
      * @param {String} searchKeyword - 原始搜索关键词（可选，用于精确搜索）
      * @param {Function} callback - 回调函数
      */
-    BaiduPoiSearch.prototype.searchPoiByCategory = function(categoryKey, city, center, radius, searchKeyword, callback) {
+    NeBdPoiSearch.prototype.searchPoiByCategory = function(categoryKey, city, center, radius, searchKeyword, callback) {
         // console.log('categoryKey：', categoryKey)
         // console.log('searchKeyword：', searchKeyword); // test3
         var self = this;
@@ -1531,12 +1659,12 @@
 
                         
                     }
-                    // console.log('pois-1：', pois); // testing1
+                    // console.log('pois-1：', pois); // test-print
                     // 按距离排序
                     pois.sort(function(a, b) {
                         return a.distance - b.distance;
                     });
-                    // console.log('pois-2：', pois); // testing1
+                    // console.log('pois-2：', pois); // test-print
 
                     callback(pois);
                 } else {
@@ -1558,7 +1686,7 @@
      * @param {Object} center - 中心点坐标
      * @returns {Array} 过滤后的POI列表
      */
-    BaiduPoiSearch.prototype.filterPois = function(pois, category, center) {
+    NeBdPoiSearch.prototype.filterPois = function(pois, category, center) {
         var filtered = [];
         
         for (var i = 0; i < pois.length; i++) {
@@ -1612,7 +1740,7 @@
      * @param {Number} lng2 - 点2经度
      * @returns {Number} 距离（米）
      */
-    BaiduPoiSearch.prototype.calculateDistance = function(lat1, lng1, lat2, lng2) {
+    NeBdPoiSearch.prototype.calculateDistance = function(lat1, lng1, lat2, lng2) {
         var R = 6371000; // 地球半径（米）
         var dLat = this.toRad(lat2 - lat1);
         var dLng = this.toRad(lng2 - lng1);
@@ -1628,7 +1756,7 @@
      * @param {Number} degrees - 角度
      * @returns {Number} 弧度
      */
-    BaiduPoiSearch.prototype.toRad = function(degrees) {
+    NeBdPoiSearch.prototype.toRad = function(degrees) {
         return degrees * Math.PI / 180;
     };
 
@@ -1637,19 +1765,23 @@
      * @param {String} keyword - 关键词
      * @returns {String|null} 分类键
      */
-    BaiduPoiSearch.prototype.findCategoryByKeyword = function(keyword) {
+    NeBdPoiSearch.prototype.findCategoryByKeyword = function(keyword) {
         var categories = this.cache.categories;
         
+        // 第一遍：只检查分类名称（精确匹配）
         for (var key in categories) {
             if (categories.hasOwnProperty(key)) {
                 var category = categories[key];
-                
-                // 检查分类名称
                 if (category.name === keyword) {
-                    return key;
+                    return key;  // 精确匹配，立即返回
                 }
-                
-                // 检查匹配关键词
+            }
+        }
+        
+        // 第二遍：只检查 matchKeywords（模糊匹配）
+        for (var key in categories) {
+            if (categories.hasOwnProperty(key)) {
+                var category = categories[key];
                 for (var i = 0; i < category.matchKeywords.length; i++) {
                     if (category.matchKeywords[i] === keyword) {
                         return key;
@@ -1666,7 +1798,7 @@
      * @param {Object} results 数据源
      * @returns {Object} 统计信息
      */
-    BaiduPoiSearch.prototype.calculateStats = function(results) {
+    NeBdPoiSearch.prototype.calculateStats = function(results) {
         var total = 0;
         var byCategory = {};
         
@@ -1691,7 +1823,7 @@
     /**
      * 显示搜索结果
      */
-    BaiduPoiSearch.prototype.displayResults = function() {
+    NeBdPoiSearch.prototype.displayResults = function() {
         if (!this.cache.results) {
             return;
         }
@@ -1738,7 +1870,7 @@
     /**
      * 生成报告模板：估价报告模板
      */
-     BaiduPoiSearch.prototype.generateTemplateReport = function() {
+     NeBdPoiSearch.prototype.generateTemplateReport = function() {
         var templateTextarea = document.getElementById('templateText');
         if (!templateTextarea) return;
         
@@ -1808,7 +1940,7 @@
         // report += '综上，交通状况较优。\n'; // 这里要改 test1
         report += '\n\n';
 
-        // 3、环境状况 testing2
+        // 3、环境状况 test2
         report += '3、环境状况\n';
         report += '(1)自然环境：\n'; // eg. 周边道路清洁，噪音较小，无明显污染源，环境治理和空气质量良好。';
         report += '(2)人文环境：\n'; // eg. 该区域人员素质较高，治安状况良好，人文环境较好。';
@@ -1852,7 +1984,7 @@
     /**
      * 生成距离描述、生成与重要场所的距离
      */
-    BaiduPoiSearch.prototype.generateDistanceReport = function(results) {
+    NeBdPoiSearch.prototype.generateDistanceReport = function(results) {
         var allPois = [];
         // 排除掉的分类
         // var excludeCategories = [
@@ -1879,15 +2011,8 @@
         //     }
         // }
 
-        // 自定义哪些属于重要场所
-        var includeCategories = [
-            'government', // 政府
-            'school', // 学校
-            'stadium', // 体育馆
-            'hospital', // 医院
-            'park', // 公园
-            'bank' // 银行
-        ];
+        // 自定义重要场所必选关键词(哪些属于重要场所)
+        var includeCategories = this.options.majorPlaceCategories;
         for (var key in results) {
             if (includeCategories.indexOf(key) >=0 && results[key]) {
                 allPois = allPois.concat(results[key]);
@@ -1925,7 +2050,7 @@
     /**
      * 生成住宅聚集度描述
      */
-    BaiduPoiSearch.prototype.generateCommunityReport = function(results) {
+    NeBdPoiSearch.prototype.generateCommunityReport = function(results) {
         var pois = results['community'];
         if (!pois || pois.length === 0) return '';
         
@@ -1950,7 +2075,7 @@
     /**
      * 生成道路状况描述
      */
-    BaiduPoiSearch.prototype.generateRoadReport = function(results) {
+    NeBdPoiSearch.prototype.generateRoadReport = function(results) {
         var pois = results['road'];
         if (!pois || pois.length === 0) return '';
         
@@ -1977,7 +2102,7 @@
     /**
      * 生成公交描述
      */
-    BaiduPoiSearch.prototype.generateBusReport = function(results) {
+    NeBdPoiSearch.prototype.generateBusReport = function(results) {
         var placeMaxLen = 10; // 超过N个，用等结尾，比如"地点1,地点2等"
         var pois = results['bus'];
         if (!pois || pois.length === 0) return '';
@@ -2004,7 +2129,7 @@
     /**
      * 生成停车方便程度描述
      */
-    BaiduPoiSearch.prototype.generateParkingReport = function(results) {
+    NeBdPoiSearch.prototype.generateParkingReport = function(results) {
         var pois = results['parking'];
         if (!pois || pois.length === 0) return '';
         
@@ -2030,10 +2155,10 @@
     };
 
     /**
-     * 生成景观环境(环境状况->景观) testing2
+     * 生成景观环境(环境状况->景观) test2
      * @param {*} results 
      */
-    BaiduPoiSearch.prototype.generateEnvironmentReport = function(results) {
+    NeBdPoiSearch.prototype.generateEnvironmentReport = function(results) {
         var pois = results['park'];
         if (!pois || pois.length === 0) return '';
         
@@ -2061,7 +2186,7 @@
      * 生成教育配套设施
      * @param {*} results 
      */
-     BaiduPoiSearch.prototype.generateEducationReport = function(results) {
+     NeBdPoiSearch.prototype.generateEducationReport = function(results) {
         var pois = results['school'];
         if (!pois || pois.length === 0) return '';
         
@@ -2088,7 +2213,7 @@
     /**
      * 生成公共服务设施
      */
-     BaiduPoiSearch.prototype.generateServiceReport = function(results) {
+     NeBdPoiSearch.prototype.generateServiceReport = function(results) {
         // console.log('results：', results)
         var includeCategories = ['government', 'school', 'hospital', 'bank', 'stadium', 'gas_station']; // 包括：政府、学校、医院、银行、体育馆、加油站
         
@@ -2156,7 +2281,7 @@
     /**
      * 生成报告描述（brief）
      */
-    BaiduPoiSearch.prototype.generateBriefReport = function() {
+    NeBdPoiSearch.prototype.generateBriefReport = function() {
         var briefTextarea = document.getElementById('briefText');
         if (!briefTextarea) return;
         var results = this.cache.results;
@@ -2246,7 +2371,7 @@
     /**
      * 生成位置分析
      */
-    BaiduPoiSearch.prototype.generateReport = function() {
+    NeBdPoiSearch.prototype.generateReport = function() {
         if (!this.cache.results) {
             return;
         }
@@ -2346,7 +2471,7 @@
     /**
      * 生成POI详细列表
      */
-    BaiduPoiSearch.prototype.generatePoiList = function() {
+    NeBdPoiSearch.prototype.generatePoiList = function() {
         var self = this;
         if (!this.cache.results) {
             return;
@@ -2404,10 +2529,10 @@
 
     //————————————————————————————————————————————————
     /**
-     * 处理POI点击
+     * 处理POI点击、点击POI、点击详细列表
      * @param {String} poiId - POI ID
      */
-    BaiduPoiSearch.prototype.handlePoiClick = function(poiId) {
+    NeBdPoiSearch.prototype.handlePoiClick = function(poiId) {
         var self = this;
         var poi = this.findPoiById(poiId);
         if (!poi) {
@@ -2445,7 +2570,7 @@
      * @param {String} categoryKey - 分类键
      * @param {Object} highlightPoi - 需要高亮的POI（可选）
      */
-    BaiduPoiSearch.prototype.showCategoryMarkersOnly = function(categoryKey, highlightPoi) {
+    NeBdPoiSearch.prototype.showCategoryMarkersOnly = function(categoryKey, highlightPoi) {
         var results = this.cache.results;
         if (!results || !results.results) {
             return;
@@ -2543,7 +2668,7 @@
     /**
      * 显示所有分类的标注
      */
-    BaiduPoiSearch.prototype.showAllCategoryMarkers = function() {
+    NeBdPoiSearch.prototype.showAllCategoryMarkers = function() {
         if (!this.cache.results || !this.currentCenter) {
             return;
         }
@@ -2563,7 +2688,7 @@
      * @param {String} poiId - POI ID
      * @returns {Object|null} POI对象
      */
-    BaiduPoiSearch.prototype.findPoiById = function(poiId) {
+    NeBdPoiSearch.prototype.findPoiById = function(poiId) {
         if (!this.cache.results) {
             return null;
         }
@@ -2590,7 +2715,7 @@
      * 复制按钮：复制内容
      * @param {String} ps_selector_id 要下载的内容输入框选择器id
      */
-    BaiduPoiSearch.prototype.copyContent = function(ps_selector_id) {
+    NeBdPoiSearch.prototype.copyContent = function(ps_selector_id) {
         var templateTextarea = document.getElementById(ps_selector_id);
         if (templateTextarea) {
             var text = templateTextarea.value;
@@ -2621,7 +2746,7 @@
      * @param {String} ps_selector_id 要下载的内容输入框选择器id
      * @param {String} ps_type 下载类型。比如：报告描述、报告模板, 位置分析等
      */
-    BaiduPoiSearch.prototype.downloadContent = function(ps_selector_id, ps_type) {
+    NeBdPoiSearch.prototype.downloadContent = function(ps_selector_id, ps_type) {
         var templateTextarea = document.getElementById(ps_selector_id);
         var locationName = document.getElementById('location').value || '某小区';
         
@@ -2641,7 +2766,7 @@
     /**
      * 备用复制方法
      */
-    BaiduPoiSearch.prototype.fallbackCopyText = function(text) {
+    NeBdPoiSearch.prototype.fallbackCopyText = function(text) {
         var textarea = document.createElement('textarea');
         textarea.value = text;
         textarea.style.position = 'fixed';
@@ -2676,7 +2801,7 @@
      * @param {String} categoryKey - 分类键
      * @param {HTMLElement} btn - 按钮元素
      */
-    BaiduPoiSearch.prototype.handleQuickSelect = function(categoryKey, btn) {
+    NeBdPoiSearch.prototype.handleQuickSelect = function(categoryKey, btn) {
         var index = this.state.selectedCategories.indexOf(categoryKey);
         if (index === -1) {
             // 选中
@@ -2697,7 +2822,7 @@
      * 处理关键词输入
      * @param {String} value - 输入值
      */
-    BaiduPoiSearch.prototype.handleKeywordInput = function(value) {
+    NeBdPoiSearch.prototype.handleKeywordInput = function(value) {
         // 清除已选分类（当用户开始手动输入时）
         if (value && this.state.selectedCategories.length > 0) {
             this.state.selectedCategories = [];
@@ -2713,7 +2838,7 @@
      * 单选模式：显示单个分类名
      * 多选模式：显示分类列表（用顿号分隔）
      */
-    BaiduPoiSearch.prototype.updateKeywordInput = function() {
+    NeBdPoiSearch.prototype.updateKeywordInput = function() {
         var keywordInput = document.getElementById('keyword');
         if (!keywordInput) return;
 
@@ -2736,7 +2861,7 @@
      * 设置多选模式
      * @param {Boolean} isMultiSelect - 是否多选模式
      */
-    BaiduPoiSearch.prototype.setMultiSelectMode = function(isMultiSelect) {
+    NeBdPoiSearch.prototype.setMultiSelectMode = function(isMultiSelect) {
         this.state.multiSelectMode = isMultiSelect;
 
         // 更新按钮状态
@@ -2769,7 +2894,7 @@
     /**
      * 显示筛选下拉框
      */
-    BaiduPoiSearch.prototype.showFilterDropdown = function() {
+    NeBdPoiSearch.prototype.showFilterDropdown = function() {
         var filterDropdown = document.getElementById('filterDropdown');
         var filterCategoriesContainer = document.getElementById('filterCategoriesContainer');
 
@@ -2815,7 +2940,7 @@
     /**
      * 应用筛选
      */
-    BaiduPoiSearch.prototype.applyFilter = function() {
+    NeBdPoiSearch.prototype.applyFilter = function() {
         var subcategorySelects = document.querySelectorAll('.subcategory-select');
 
         // 清空之前的子分类选择
@@ -2835,7 +2960,7 @@
     /**
      * 更新已选分类UI
      */
-    BaiduPoiSearch.prototype.updateSelectedCategoriesUI = function() {
+    NeBdPoiSearch.prototype.updateSelectedCategoriesUI = function() {
         var selectedCount = document.getElementById('selectedCount');
         var selectedCategories = document.getElementById('selectedCategories');
         var selectedTags = document.getElementById('selectedTags');
@@ -2911,7 +3036,7 @@
      * 移除已选分类
      * @param {String} categoryKey - 分类键
      */
-    BaiduPoiSearch.prototype.removeSelectedCategory = function(categoryKey) {
+    NeBdPoiSearch.prototype.removeSelectedCategory = function(categoryKey) {
         var index = this.state.selectedCategories.indexOf(categoryKey);
         if (index !== -1) {
             this.state.selectedCategories.splice(index, 1);
@@ -2931,7 +3056,7 @@
     /**
      * 清空所有分类
      */
-    BaiduPoiSearch.prototype.clearAllCategories = function() {
+    NeBdPoiSearch.prototype.clearAllCategories = function() {
         this.state.selectedCategories = [];
         this.state.selectedSubcategories = {}; // 清空子分类选择
         this.clearSelectedButtons();
@@ -2942,7 +3067,7 @@
     /**
      * 清除所有按钮的高亮
      */
-    BaiduPoiSearch.prototype.clearSelectedButtons = function() {
+    NeBdPoiSearch.prototype.clearSelectedButtons = function() {
         var selectedButtons = document.querySelectorAll('.quick-btn.selected');
         for (var i = 0; i < selectedButtons.length; i++) {
             selectedButtons[i].classList.remove('selected');
@@ -2954,7 +3079,7 @@
      * @param {String} categoryKey - 分类键
      * @param {HTMLElement} btn - 按钮元素
      */
-    BaiduPoiSearch.prototype.highlightSelectedButton = function(categoryKey, btn) {
+    NeBdPoiSearch.prototype.highlightSelectedButton = function(categoryKey, btn) {
         var allButtons = document.querySelectorAll('.quick-btn');
         for (var i = 0; i < allButtons.length; i++) {
             allButtons[i].classList.remove('selected');
@@ -2969,7 +3094,7 @@
      * 处理Tab切换
      * @param {HTMLElement} tab - Tab元素
      */
-    BaiduPoiSearch.prototype.handleTabClick = function(tab) {
+    NeBdPoiSearch.prototype.handleTabClick = function(tab) {
         var tabName = tab.getAttribute('data-tab');
         
         // 更新Tab样式
@@ -3005,7 +3130,7 @@
     /**
      * 处理清空
      */
-    BaiduPoiSearch.prototype.handleClear = function() {
+    NeBdPoiSearch.prototype.handleClear = function() {
         document.getElementById('city').value = this.options.defaultCity;
         document.getElementById('location').value = '';
         document.getElementById('keyword').value = '';
@@ -3028,7 +3153,7 @@
      * 显示错误信息
      * @param {String} message - 错误信息
      */
-    BaiduPoiSearch.prototype.showError = function(message) {
+    NeBdPoiSearch.prototype.showError = function(message) {
         var errorDiv = document.getElementById('errorMessage');
         if (errorDiv) {
             errorDiv.textContent = message;
@@ -3039,7 +3164,7 @@
     /**
      * 隐藏错误信息
      */
-    BaiduPoiSearch.prototype.hideError = function() {
+    NeBdPoiSearch.prototype.hideError = function() {
         var errorDiv = document.getElementById('errorMessage');
         if (errorDiv) {
             errorDiv.style.display = 'none';
@@ -3053,7 +3178,7 @@
      * 设置布局模式
      * @param {String} mode - 布局模式：'split' 或 'fullscreen'
      */
-    BaiduPoiSearch.prototype.setLayoutMode = function(mode) {
+    NeBdPoiSearch.prototype.setLayoutMode = function(mode) {
         if (mode !== 'split' && mode !== 'fullscreen') {
             console.error('无效的布局模式:', mode);
             return;
@@ -3067,6 +3192,16 @@
         
         // 移除旧布局类
         container.classList.remove('layout-split', 'layout-fullscreen');
+        
+        // 清除旧布局样式
+        this._clearLayoutStyles();
+        
+        // 应用新布局
+        if (mode === 'split') {
+            this._applySplitLayout();
+        } else {
+            this._applyFullscreenLayout();
+        }
         
         // 添加新布局类
         container.classList.add('layout-' + mode);
@@ -3085,12 +3220,284 @@
         // 触发布局切换事件
         this.triggerX('onLayoutChange', mode);
     };
+    
+    /**
+     * 清除布局样式
+     * @private
+     */
+    NeBdPoiSearch.prototype._clearLayoutStyles = function() {
+        var container = document.querySelector('.poi-search-app');
+        var mapContainer = document.getElementById('bd-container');
+        var searchPanel = document.getElementById('poi-search-panel');
+        var resizer = document.getElementById('layout-resizer');
+        var collapseBtn = document.getElementById('collapse-toggle-btn');
+        
+        if (container) {
+            container.style.display = '';
+            container.style.flexDirection = '';
+        }
+        
+        if (mapContainer) {
+            mapContainer.style.width = '';
+            mapContainer.style.height = '';
+            mapContainer.style.position = '';
+            mapContainer.style.top = '';
+            mapContainer.style.left = '';
+            mapContainer.style.right = '';
+            mapContainer.style.bottom = '';
+            mapContainer.style.order = '';
+        }
+        
+        if (searchPanel) {
+            searchPanel.style.width = '';
+            searchPanel.style.height = '';
+            searchPanel.style.maxWidth = '';
+            searchPanel.style.minWidth = '';
+            searchPanel.style.maxHeight = '';
+            searchPanel.style.position = '';
+            searchPanel.style.top = '';
+            searchPanel.style.left = '';
+            searchPanel.style.right = '';
+            searchPanel.style.bottom = '';
+            searchPanel.style.order = '';
+            searchPanel.style.zIndex = '';
+            searchPanel.style.display = '';
+        }
+        
+        if (resizer && resizer.parentNode) {
+            resizer.parentNode.removeChild(resizer);
+        }
+        
+        if (collapseBtn && collapseBtn.parentNode) {
+            collapseBtn.parentNode.removeChild(collapseBtn);
+        }
+    };
+    
+    /**
+     * 应用左右布局
+     * @private
+     */
+    NeBdPoiSearch.prototype._applySplitLayout = function() {
+        var config = this.options.splitLayout;
+        var container = document.querySelector('.poi-search-app');
+        var mapContainer = document.getElementById('bd-container');
+        var searchPanel = document.getElementById('poi-search-panel');
+        
+        container.style.display = 'flex';
+        // 使用 order 属性控制顺序，不用 row-reverse
+        var mapPosition = config.mapPosition || 'left';
+        
+        mapContainer.style.width = config.mapWidth;
+        mapContainer.style.height = '100%';
+        mapContainer.style.order = mapPosition === 'right' ? '3' : '1';  // right模式地图排最后
+        
+        searchPanel.style.width = config.searchWidth;
+        searchPanel.style.maxWidth = config.maxWidth + 'px';
+        searchPanel.style.minWidth = config.minWidth + 'px';
+        searchPanel.style.height = '100%';
+        searchPanel.style.overflow = 'auto';
+        searchPanel.style.order = mapPosition === 'right' ? '1' : '3';  // right模式搜索面板排第一
+        
+        if (config.resizable) {
+            this._createResizer();
+        }
+    };
+    
+    /**
+     * 应用全屏布局
+     * @private
+     */
+    NeBdPoiSearch.prototype._applyFullscreenLayout = function() {
+        var config = this.options.fullscreenLayout;
+        var container = document.querySelector('.poi-search-app');
+        var mapContainer = document.getElementById('bd-container');
+        var searchPanel = document.getElementById('poi-search-panel');
+        
+        mapContainer.style.width = '100%';
+        mapContainer.style.height = '100%';
+        
+        searchPanel.style.position = 'absolute';
+        searchPanel.style.width = config.searchWidth + 'px';
+        searchPanel.style.maxHeight = config.searchHeight + 'px';
+        searchPanel.style.zIndex = '999';
+        searchPanel.style.backgroundColor = '#fff';
+        searchPanel.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+        
+        var positions = {
+            'top-right': { top: '10px', right: '10px' },
+            'top-left': { top: '10px', left: '10px' },
+            'bottom-right': { bottom: '10px', right: '10px' },
+            'bottom-left': { bottom: '10px', left: '10px' }
+        };
+        
+        var pos = positions[config.searchPosition] || positions['top-right'];
+        searchPanel.style.top = pos.top;
+        searchPanel.style.right = pos.right;
+        searchPanel.style.bottom = pos.bottom;
+        searchPanel.style.left = pos.left;
+        
+        if (config.collapsible) {
+            this._createCollapsibleButton();
+            if (config.collapsed) {
+                this._collapsePanel();
+            }
+        }
+        
+        if (config.draggable) {
+            this._makePanelDraggable(searchPanel);
+        }
+    };
+    
+    /**
+     * 创建调整条
+     * @private
+     */
+    NeBdPoiSearch.prototype._createResizer = function() {
+        var config = this.options.splitLayout;
+        var container = document.querySelector('.poi-search-app');
+        var searchPanel = document.getElementById('poi-search-panel');
+        var mapPosition = config.mapPosition || 'left';
+        
+        var resizer = document.createElement('div');
+        resizer.id = 'layout-resizer';
+        resizer.style.width = '5px';
+        resizer.style.cursor = 'ew-resize';
+        resizer.style.backgroundColor = '#ddd';
+        resizer.style.flexShrink = '0';
+        resizer.style.order = '2';  // 设置 order 确保分割线在中间
+        
+        // mapPosition 为 left 时，分割线在搜索面板左边
+        // mapPosition 为 right 时，分割线在搜索面板右边
+        if (mapPosition === 'right') {
+            var mapContainer = document.getElementById('bd-container');
+            container.insertBefore(resizer, mapContainer);
+        } else {
+            container.insertBefore(resizer, searchPanel);
+        }
+        
+        var isResizing = false;
+        var startX, startWidth;
+        
+        resizer.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            startX = e.clientX;
+            startWidth = searchPanel.offsetWidth;
+            document.body.style.cursor = 'ew-resize';
+            document.body.style.userSelect = 'none';
+        });
+        
+        document.addEventListener('mousemove', function(e) {
+            if (!isResizing) return;
+            var diff = e.clientX - startX;
+            // mapPosition 为 left 时，拖动方向相反
+            if (mapPosition === 'left') {
+                diff = -diff;
+            }
+            var newWidth = startWidth + diff;
+            if (newWidth >= config.minWidth && newWidth <= config.maxWidth) {
+                searchPanel.style.width = newWidth + 'px';
+            }
+        });
+        
+        document.addEventListener('mouseup', function() {
+            if (isResizing) {
+                isResizing = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        });
+    };
+    
+    /**
+     * 创建折叠按钮
+     * @private
+     */
+    NeBdPoiSearch.prototype._createCollapsibleButton = function() {
+        var searchPanel = document.getElementById('poi-search-panel');
+        var config = this.options.fullscreenLayout;
+        
+        var existingBtn = document.getElementById('collapse-toggle-btn');
+        if (existingBtn && existingBtn.parentNode) {
+            existingBtn.parentNode.removeChild(existingBtn);
+        }
+        
+        var btn = document.createElement('button');
+        btn.id = 'collapse-toggle-btn';
+        btn.innerHTML = config.collapsed ? '▶' : '◀';
+        btn.style.cssText = 'position:absolute;z-index:1000;padding:5px 10px;cursor:pointer;';
+        
+        var pos = config.searchPosition;
+        if (pos === 'top-right' || pos === 'bottom-right') {
+            btn.style.right = config.searchWidth + 'px';
+        } else {
+            btn.style.left = config.searchWidth + 'px';
+        }
+        btn.style.top = '10px';
+        btn.style.transform = 'translateY(0)';
+        
+        btn.addEventListener('click', function() {
+            if (searchPanel.style.display === 'none') {
+                searchPanel.style.display = '';
+                btn.innerHTML = '◀';
+                config.collapsed = false;
+            } else {
+                searchPanel.style.display = 'none';
+                btn.innerHTML = '▶';
+                config.collapsed = true;
+            }
+        });
+        
+        document.body.appendChild(btn);
+    };
+    
+    /**
+     * 折叠面板
+     * @private
+     */
+    NeBdPoiSearch.prototype._collapsePanel = function() {
+        var searchPanel = document.getElementById('poi-search-panel');
+        if (searchPanel) {
+            searchPanel.style.display = 'none';
+        }
+    };
+    
+    /**
+     * 使面板可拖动
+     * @private
+     */
+    NeBdPoiSearch.prototype._makePanelDraggable = function(panel) {
+        var isDragging = false;
+        var startX, startY, startLeft, startTop;
+        
+        panel.addEventListener('mousedown', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = panel.offsetLeft;
+            startTop = panel.offsetTop;
+            panel.style.cursor = 'move';
+        });
+        
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            panel.style.left = (e.clientX - startX + startLeft) + 'px';
+            panel.style.top = (e.clientY - startY + startTop) + 'px';
+            panel.style.right = 'auto';
+            panel.style.bottom = 'auto';
+        });
+        
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+            panel.style.cursor = '';
+        });
+    };
 
     /**
      * 获取当前布局模式
      * @returns {String} 布局模式
      */
-    BaiduPoiSearch.prototype.getLayoutMode = function() {
+    NeBdPoiSearch.prototype.getLayoutMode = function() {
         return this.state.currentLayout;
     };
 
@@ -3098,7 +3505,7 @@
      * 加载API使用统计
      * @returns {Object} API使用统计
      */
-    BaiduPoiSearch.prototype.loadApiUsage = function() {
+    NeBdPoiSearch.prototype.loadApiUsage = function() {
         var today = new Date().toISOString().split('T')[0];
         var stored = null;
         
@@ -3130,7 +3537,7 @@
     /**
      * 保存API使用统计
      */
-    BaiduPoiSearch.prototype.saveApiUsage = function() {
+    NeBdPoiSearch.prototype.saveApiUsage = function() {
         try {
             localStorage.setItem(this.options.apiUsageStorageKey, JSON.stringify(this.apiUsage));
         } catch (e) {
@@ -3142,7 +3549,7 @@
      * 更新API使用统计
      * @param {Number} count - 使用的次数
      */
-    BaiduPoiSearch.prototype.updateApiUsage = function(count) {
+    NeBdPoiSearch.prototype.updateApiUsage = function(count) {
         this.apiUsage.used += count;
         this.saveApiUsage();
         this.updateApiUsageUI();
@@ -3151,7 +3558,7 @@
     /**
      * 更新API使用情况UI
      */
-    BaiduPoiSearch.prototype.updateApiUsageUI = function() {
+    NeBdPoiSearch.prototype.updateApiUsageUI = function() {
         if (!this.options.showApiUsage) {
             return;
         }
@@ -3175,7 +3582,7 @@
      * 获取API使用情况
      * @returns {Object} API使用统计
      */
-    BaiduPoiSearch.prototype.getApiUsage = function() {
+    NeBdPoiSearch.prototype.getApiUsage = function() {
         return {
             used: this.apiUsage.used,
             remaining: this.apiUsage.limit - this.apiUsage.used,
@@ -3187,7 +3594,7 @@
     /**
      * 重置API使用统计
      */
-    BaiduPoiSearch.prototype.resetApiUsage = function() {
+    NeBdPoiSearch.prototype.resetApiUsage = function() {
         var today = new Date().toISOString().split('T')[0];
         this.apiUsage = {
             date: today,
@@ -3202,7 +3609,7 @@
      * 设置每日限制
      * @param {Number} limit - 限制次数
      */
-    BaiduPoiSearch.prototype.setDailyLimit = function(limit) {
+    NeBdPoiSearch.prototype.setDailyLimit = function(limit) {
         if (typeof limit === 'number' && limit > 0) {
             this.options.dailyLimit = limit;
             this.apiUsage.limit = limit;
@@ -3215,7 +3622,7 @@
      * 获取所有分类
      * @returns {Object} 分类配置
      */
-    BaiduPoiSearch.prototype.getCategories = function() {
+    NeBdPoiSearch.prototype.getCategories = function() {
         return this.cache.categories;
     };
 
@@ -3224,7 +3631,7 @@
      * @param {String} key - 分类键
      * @returns {Object|null} 分类配置
      */
-    BaiduPoiSearch.prototype.getCategory = function(key) {
+    NeBdPoiSearch.prototype.getCategory = function(key) {
         return this.cache.categories[key] || null;
     };
 
@@ -3233,7 +3640,7 @@
      * @param {String} categoryKey - 分类键（可选）
      * @returns {Object|null} 返回对象
      */
-    BaiduPoiSearch.prototype.getResults = function(categoryKey) {
+    NeBdPoiSearch.prototype.getResults = function(categoryKey) {
         if (!this.cache.results) {
             return null;
         }
@@ -3249,7 +3656,7 @@
      * 获取搜索统计
      * @returns {Object|null} 统计信息
      */
-    BaiduPoiSearch.prototype.getSearchStats = function() {
+    NeBdPoiSearch.prototype.getSearchStats = function() {
         if (!this.cache.results) {
             return null;
         }
@@ -3263,7 +3670,7 @@
      * @param {Function} callback - 回调函数
      * @returns {Object} this
      */
-    BaiduPoiSearch.prototype.on = function(event, callback) {
+    NeBdPoiSearch.prototype.on = function(event, callback) {
         if (!this.events[event]) {
             this.events[event] = [];
         }
@@ -3277,7 +3684,7 @@
      * @param {Function} callback - 回调函数（可选）
      * @returns {Object} this
      */
-    BaiduPoiSearch.prototype.off = function(event, callback) {
+    NeBdPoiSearch.prototype.off = function(event, callback) {
         if (!this.events[event]) {
             return this;
         }
@@ -3299,7 +3706,7 @@
      * @param {*} data - 事件数据
      * @returns {Object} this
      */
-    BaiduPoiSearch.prototype.triggerX = function(event, data) {
+    NeBdPoiSearch.prototype.triggerX = function(event, data) {
         // this.events 压根不存在，不能直接调用！
         // if (!this.events[event]) {
         //     console.log('bbb');
@@ -3328,14 +3735,14 @@
      * 获取地图实例（预留接口）
      * @returns {Object|null} 地图实例
      */
-    BaiduPoiSearch.prototype.getMap = function() {
+    NeBdPoiSearch.prototype.getMap = function() {
         return this.mapRenderer;
     };
 
     /**
      * 初始化地图、百度地图初始化
      */
-    BaiduPoiSearch.prototype.initMap = function() {
+    NeBdPoiSearch.prototype.initMap = function() {
         var self = this;
         var config = this.options.draft;
         
@@ -3362,7 +3769,7 @@
         var zoom = config.zoom || 14;
         
         // 默认显示位置（使用默认城市）
-        var defaultCity = this.options.defaultCity;
+        // var defaultCity = this.options.defaultCity;
         var defaultCoordinate = this.options.defaultCoordinate;
 
         var coordArr = defaultCoordinate.split(',');
@@ -3403,7 +3810,7 @@
      * 在地图上添加标注
      * @param {Object} center - 中心点坐标
      */
-    BaiduPoiSearch.prototype.addMarkersToMap = function(center) {
+    NeBdPoiSearch.prototype.addMarkersToMap = function(center) {
         var self = this;
         var config = this.options.draft;
         
@@ -3527,7 +3934,7 @@
      * @param {String} categoryKey - 分类键
      * @returns {String} 颜色值
      */
-    BaiduPoiSearch.prototype.getCategoryColor = function(categoryKey) {
+    NeBdPoiSearch.prototype.getCategoryColor = function(categoryKey) {
         // 如果已有缓存的颜色，直接返回
         if (this.cache.categoryColors[categoryKey]) {
             return this.cache.categoryColors[categoryKey];
@@ -3551,7 +3958,7 @@
      * @param {Object} poi - POI对象
      * @returns {String} 格式化后的名称
      */
-    BaiduPoiSearch.prototype.formatPoiName = function(poi) {
+    NeBdPoiSearch.prototype.formatPoiName = function(poi) {
         var name = poi.name || '';
         
         // 公交站：确保显示"站"后缀
@@ -3568,7 +3975,7 @@
     /**
      * 清除所有标注
      */
-    BaiduPoiSearch.prototype.clearMarkers = function() {
+    NeBdPoiSearch.prototype.clearMarkers = function() {
         if (!this.mapRenderer) {
             return;
         }
@@ -3583,7 +3990,7 @@
      * 自动调整视野
      * @param {Array} points - 标注点数组
      */
-    BaiduPoiSearch.prototype.fitViewPort = function(points) {
+    NeBdPoiSearch.prototype.fitViewPort = function(points) {
         if (!this.mapRenderer || points.length === 0) {
             return;
         }
@@ -3604,7 +4011,7 @@
      * 高亮指定标注点
      * @param {Object} poi - POI数据
      */
-    BaiduPoiSearch.prototype.highlightMarker = function(poi) {
+    NeBdPoiSearch.prototype.highlightMarker = function(poi) {
         var self = this;
         var config = this.options.draft;
         var highlightColor = config.highlightColor || '#E60000';
@@ -3640,7 +4047,7 @@
                 }
                 
                 // 打开信息窗口
-                this.showPoiInfoWindow(poi);
+                // this.showPoiInfoWindow(poi);
                 
                 // 触发点击事件
                 this.triggerX('onResultClick', poi);
@@ -3656,7 +4063,7 @@
     /**
      * 取消所有标注的高亮
      */
-    BaiduPoiSearch.prototype.unhighlightAllMarkers = function() {
+    NeBdPoiSearch.prototype.unhighlightAllMarkers = function() {
         for (var i = 0; i < this.markers.length; i++) {
             var marker = this.markers[i];
             var poi = marker.poiData;
@@ -3688,7 +4095,7 @@
      * 显示POI信息窗口
      * @param {Object} poi - POI数据
      */
-    BaiduPoiSearch.prototype.showPoiInfoWindow = function(poi) {
+    NeBdPoiSearch.prototype.showPoiInfoWindow = function(poi) {
         if (!this.mapRenderer) {
             return;
         }
@@ -3720,7 +4127,7 @@
      * @param {Object} target - 目标对象
      * @returns {Object} 扩展后的对象
      */
-    BaiduPoiSearch.prototype.extend = function(target) {
+    NeBdPoiSearch.prototype.extend = function(target) {
         for (var i = 1; i < arguments.length; i++) {
             var source = arguments[i];
             for (var prop in source) {
@@ -3737,7 +4144,7 @@
      * @param {Array} arr - 数组
      * @returns {Array} 去重后的数组
      */
-    BaiduPoiSearch.prototype.unique = function(arr) {
+    NeBdPoiSearch.prototype.unique = function(arr) {
         var result = [];
         for (var i = 0; i < arr.length; i++) {
             if (result.indexOf(arr[i]) === -1) {
@@ -3750,7 +4157,7 @@
     /**
      * 销毁插件
      */
-    BaiduPoiSearch.prototype.destroy = function() {
+    NeBdPoiSearch.prototype.destroy = function() {
         this.cache = null;
         this.state = null;
         this.events = null;
@@ -3762,7 +4169,26 @@
         }
     };
 
+
+    // ========================================
+    //          工具库
+    // ========================================
+    var WidgetTools = {
+
+        /**
+         * 从地点字符串中提取城市名称
+         * 说明：支持：省-市-区/单独市/城
+         * @param {String} 地点字符串。eg. '福建省-泉州市-丰泽区', '福建省-泉州市', '福建省-泉州', '泉州市', '泉州'
+         * @returns {String} 返回城市名。eg. 泉州市, 泉州
+         */
+        getCityName: function (str) {
+            var reg = /^(?:.+?-)?([^-]+?市?)(?:-.+)?$/;
+            var result = str.match(reg);
+            return result ? result[1] : '';
+        }
+    }
+
     // 暴露到全局
-    window.BaiduPoiSearch = BaiduPoiSearch;
+    window.NeBdPoiSearch = NeBdPoiSearch;
 
 })(window);

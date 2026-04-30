@@ -40,7 +40,7 @@
         <!-- 关键字输入框 -->
         <div id="r-result">
             请输入:
-            <input type="text" id="suggestId" size="20" value="百度" style="width: 150px">
+            <input type="text" id="suggestId" size="20" value="" style="width: 150px">
         </div>
 
         <!-- 鼠标移动到下拉选项时的临时词条信息 -->
@@ -65,6 +65,8 @@
                 input: "suggestId",
                 location: map,
             });
+            // ac.setInputValue('泉州浦西万达广场'); // 设置输入框默认值
+            // ac.setLocation('福州市'); // 更改检索区域
             ac.addEventListener("onhighlight", function (e) {
                 // 鼠标放在下拉列表上的事件
                 var str = "";
@@ -125,24 +127,82 @@
 
            // 获取下拉选中项的坐标
            function setPlace() {
-            mapInstance.clearOverlays(); // 清除地图上所有覆盖物
-            function myFun() {
-                var result = local.getResults();
-                var total = result.getNumPois(); // 结果总数
-                console.log('total：', total);
-                if(total > 0) {
-                    var pp = result.getPoi(0).point; // 获取第一个智能搜索的结果
-                    // var lng = pp.lng, lat = pp.lat; // 下拉选项的坐标信息
-                    // 创建标注点
-                    // map.centerAndZoom(pp, 18);
-                    // map.addOverlay(new BMap.Marker(pp)); // 添加标注
-                }
+                mapInstance.clearOverlays(); // 清除地图上所有覆盖物
+
+                // // 方法1：使用地点检索。配额不够，1天最多100次。超过配额度时检索不出来
+                // function myFun() {
+                //     var result = local.getResults();
+                //     var total = result.getNumPois(); // 结果总数
+                //     console.log('total：', total);
+                //     if(total > 0) {
+                //         var pp = result.getPoi(0).point; // 获取第一个智能搜索的结果
+                //         // var lng = pp.lng, lat = pp.lat; // 下拉选项的坐标信息
+                //         // 创建标注点
+                //         // map.centerAndZoom(pp, 18);
+                //         // map.addOverlay(new BMap.Marker(pp)); // 添加标注
+                //     }
+                // }
+                // var local = new BMap.LocalSearch(mapInstance, {
+                //     onSearchComplete: myFun // 智能搜索
+                // });
+                // local.search(myValue);
+
+
+                // 方法2：使用地理编码。配额足够，1天最多5000次
+                var address = myValue;
+                var city = '泉州市';
+                city = getCityName(city);
+                // console.log('city-x：', city,'\nmyValue-x：', myValue);
+                getAddressCoordinateByGeoCoder(address, city, function(point) {
+                    // console.log('point：', point)
+                    if(point) {
+                        // 创建标注点
+                        mapInstance.centerAndZoom(point, 16);
+                        mapInstance.addOverlay(new BMap.Marker(point)); // 添加标注
+                    }
+                });
+
+
             }
-            var local = new BMap.LocalSearch(mapInstance, {
-                onSearchComplete: myFun // 智能搜索
-            });
-            local.search(myValue);
-        }
+
+
+
+            /**
+             * 获取位置坐标：使用地理编码服务
+             * 说明：
+             * 1、返回值只有坐标、没有地址、电话、邮编等信息
+             * 2、配额足够，1天最多5000次
+             * @param {String} address 位置名称、地点名称
+             * @param {String} city 指定城市
+             * @param {Function} callback 回调函数。参数格式：{"point类型的坐标"}
+             */
+            function getAddressCoordinateByGeoCoder(address, city, callback){
+                var geo = new BMap.Geocoder(); // 创建地理编码实例
+                // 对指定的地址进行解析
+                geo.getPoint(address, function(point) {
+                    if (point) {
+                        // 解析成功：返回坐标
+                        callback(point);
+                    } else {
+                        // 解析失败
+                        callback(null);
+                    }
+                }, city);
+            }
+
+
+
+            /**
+             * 从地点字符串中提取城市名称
+             * @param {String} 地点字符串。eg. '福建省-泉州市-丰泽区', '福建省-泉州市', '福建省-泉州', '泉州市', '泉州'
+             * @returns {String} 返回城市名。eg. 泉州市, 泉州
+             */
+            function getCityName (str) {
+                // 提取城市名(支持：省-市-区/单独市/城)
+                var reg = /^(?:.+?-)?([^-]+?市?)(?:-.+)?$/;
+                var result = str.match(reg);
+                return result ? result[1] : '';
+            }
             
         </script>
     </body>

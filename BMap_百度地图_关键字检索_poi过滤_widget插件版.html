@@ -1,37 +1,47 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-cmn-Hans">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>百度地图POI搜索插件 - 示例</title>
-
-    <!-- 插件样式 -->
-    <link rel="stylesheet" href="baidu-poi-search/neatui-bmap.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title> 百度地图POI搜索插件 - 示例 </title>
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"> <!-- 下拉控件 -->
+    <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bmapPoiSearch.css"> <!-- 百度地图控件 -->
 </head>
+
 <body>
     <!-- 主容器 -->
     <div class="poi-search-app layout-split">
-        
         <!-- 地图容器 -->
         <div id="bd-container" class="bd-container"> </div>
-        
         <!-- 搜索面板 -->
         <div id="poi-search-panel" class="poi-search-panel">
             <!-- 插件将在这里生成UI -->
         </div>
-        
+        <!-- 共享地图容器（供SDK内部使用，必须隐藏） -->
+        <div id="baidu_poi_search_map" style="display: none;"></div>
     </div>
-    
-    <!-- 插件脚本 -->
-    <script src="baidu-poi-search/neatui-bmap.js"></script>
-    
-    <!-- 示例脚本 -->
+
+    <!-- ================================================================================-->
+    <!--                             JAVASCRIPT                                          -->
+    <!-- ================================================================================-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script>
+    <script src="assets/libs/jquery.chineseDistricts.js"></script> <!-- 省市区数据源 -->
+    <script src="assets/neatui/js/neatui-dropdown.js"></script> <!-- 下拉控件 -->
+    <script src="assets/neatui/js/neatui-bmapPoiSearch.js"></script> <!-- 百度地图控件 -->
     <script>
         // 创建插件实例
-        var poiSearch = new BaiduPoiSearch({
-            // 百度地图API密钥（请替换为你的AK）
-            // 注意：插件会自动加载百度地图API，无需在页面中单独引入
-            apiKey: 'KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X', // your_baidu_map_ak_here
+        var bdInstance = new NeBdPoiSearch({
+            // 百度地图API密钥（请替换为你的AK）。注意：插件会自动加载百度地图API，无需在页面中单独引入
+            apiKey: 'KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X', // 百度地图AK密钥。your_baidu_map_ak_here
             
             // 每日API调用限制
             dailyLimit: 100,
@@ -57,7 +67,7 @@
             // 回调函数
             onInit: function() {
                 // console.log('插件初始化完成');
-                poiSearch.setDefaultCategories(['school', 'bus']);  // init() 之后才能调用！
+                // bdInstance.setDefaultCategories(['school', 'bus']);  // init() 之后才能调用！
             },
             
             onLayoutChange: function(mode) {
@@ -74,14 +84,12 @@
             
             onSearchOvered: function(results) {
                 // console.log('搜索完成:', results);
-                
                 // TODO: 这里可以调用地图插件显示结果
                 // 例如：mapPlugin.displayPois(results);
             },
             
             onResultClick: function(poi) {
                 // console.log('点击POI:', poi);
-                
                 // TODO: 这里可以调用地图插件定位到POI
                 // 例如：mapPlugin.centerOnPoi(poi);
             },
@@ -91,56 +99,59 @@
             }
         });
         
+
+        //————————————————————————————————————————————————
         // 初始化插件
-        poiSearch.init();
-        // poiSearch.setDefaultCategories(['school', 'bus']);  // init() 之后才能调用！
-        
+        bdInstance.init();
+        // bdInstance.setDefaultCategories(['school', 'bus']);  // init() 之后才能调用！
+
+
+        //————————————————————————————————————————————————
         // ============================================
         // 示例：外部API调用
         // ============================================
-        
         // 获取API使用情况
         function getApiUsage() {
-            var usage = poiSearch.getApiUsage();
+            var usage = bdInstance.getApiUsage();
             // console.log('API使用情况:', usage);
             return usage;
         }
         
         // 获取搜索结果
         function getResults(categoryKey) {
-            var results = poiSearch.getResults(categoryKey);
+            var results = bdInstance.getResults(categoryKey);
             // console.log('搜索结果:', results);
             return results;
         }
         
         // 切换布局
         function switchLayout(mode) {
-            poiSearch.setLayoutMode(mode);
+            bdInstance.setLayoutMode(mode);
         }
         
         // 重置API使用统计（仅用于测试）
         function resetApiUsage() {
             if (confirm('确定要重置API使用统计吗？')) {
-                poiSearch.resetApiUsage();
+                bdInstance.resetApiUsage();
                 alert('API使用统计已重置');
             }
         }
         
         // 设置每日限制
         function setDailyLimit(limit) {
-            poiSearch.setDailyLimit(limit);
+            bdInstance.setDailyLimit(limit);
             alert('每日限制已设置为: ' + limit + '次');
         }
         
         // 获取所有分类
         function getAllCategories() {
-            var categories = poiSearch.getCategories();
+            var categories = bdInstance.getCategories();
             // console.log('所有分类:', categories);
             return categories;
         }
         
         // 事件监听示例
-        poiSearch.on('searchComplete', function(results) {
+        bdInstance.on('searchComplete', function(results) {
             // console.log('监听到搜索完成事件');
             // 可以在这里添加自定义逻辑
         });
@@ -148,9 +159,8 @@
         // ============================================
         // 开发工具（仅在开发环境中使用）
         // ============================================
-        
         // 暴露到全局，方便控制台调试
-        window.poiSearch = poiSearch;
+        window.bdInstance = bdInstance;
         window.getApiUsage = getApiUsage;
         window.getResults = getResults;
         window.switchLayout = switchLayout;
@@ -159,11 +169,11 @@
         window.getAllCategories = getAllCategories;
         
         // console.log('========================================');
-        // console.log('BaiduPoiSearch 插件示例页面');
+        // console.log('插件示例页面');
         // console.log('版本：v3.6.3');
         // console.log('========================================');
         // console.log('可用方法（在控制台中调用）：');
-        // console.log('- poiSearch: 插件实例');
+        // console.log('- 插件实例');
         // console.log('- getApiUsage(): 获取API使用情况');
         // console.log('- getResults(categoryKey): 获取搜索结果');
         // console.log('- switchLayout(mode): 切换布局（split/fullscreen）');
@@ -171,9 +181,189 @@
         // console.log('- setDailyLimit(limit): 设置每日限制');
         // console.log('- getAllCategories(): 获取所有分类');
         // console.log('========================================');
+
+
+        //————————————————————————————————————————————————
+        // 城市下拉
+        $(document).on('click', '#city', function() {
+            var value = $(this).val();
+            var districtData = {
+                "data": [
+                    { "province": "福建省", "data": [
+                        { 
+                            "city": "泉州市", 
+                            "data": [
+                            {"county": "鲤城区"},
+                            {"county": "丰泽区"},
+                            {"county": "洛江区"},
+                            {"county": "泉港区"},
+                            {"county": "石狮市"},
+                            {"county": "晋江市"},
+                            {"county": "南安市"},
+                            {"county": "惠安县"},
+                            {"county": "安溪县"},
+                            {"county": "永春县"},
+                            {"county": "德化县"},
+                            {"county": "金门县"}
+                        ]},{ 
+                            "city": "宁德市", 
+                            "data": [
+                            {"county": "蕉城区"},
+                            {"county": "福安市"},
+                            {"county": "福鼎市"},
+                            {"county": "霞浦县"},
+                            {"county": "古田县"},
+                            {"county": "屏南县"},
+                            {"county": "寿宁县"},
+                            {"county": "周宁县"},
+                            {"county": "柘荣县"}
+                        ]},{ 
+                            "city": "福州市‌", 
+                            "data": [
+                            {"county": "鼓楼区"},
+                            {"county": "台江区"},
+                            {"county": "仓山区"},
+                            {"county": "马尾区"},
+                            {"county": "晋安区"},
+                            {"county": "长乐区"},
+                            {"county": "福清市"},
+                            {"county": "闽侯县"},
+                            {"county": "连江县"},
+                            {"county": "罗源县"},
+                            {"county": "闽清县"},
+                            {"county": "永泰县"},
+                            {"county": "平潭县"}
+                        ]},{ 
+                            "city": "莆田市", 
+                            "data": [
+                            {"county": "城厢区"},
+                            {"county": "涵江区"},
+                            {"county": "荔城区"},
+                            {"county": "秀屿区"},
+                            {"county": "仙游县"}
+                        ]},{ 
+                            "city": "‌厦门市‌", 
+                            "data": [
+                            {"county": "思明区"},
+                            {"county": "海沧区"},
+                            {"county": "湖里区"},
+                            {"county": "集美区"},
+                            {"county": "同安区"},
+                            {"county": "翔安区"}
+                        ]},{ 
+                            "city": "‌漳州市‌", 
+                            "data": [
+                            {"county": "芗城区"},
+                            {"county": "龙文区"},
+                            {"county": "龙海区"},
+                            {"county": "长泰区"},
+                            {"county": "漳浦县"},
+                            {"county": "云霄县"},
+                            {"county": "诏安县"},
+                            {"county": "东山县"},
+                            {"county": "南靖县"},
+                            {"county": "平和县"},
+                            {"county": "华安县"}
+                        ]},{ 
+                            "city": "‌三明市‌", 
+                            "data": [
+                            {"county": "三元区"},
+                            {"county": "沙县区"},
+                            {"county": "永安市"},
+                            {"county": "明溪县"},
+                            {"county": "清流县"},
+                            {"county": "宁化县"},
+                            {"county": "大田县"},
+                            {"county": "尤溪县"},
+                            {"county": "将乐县"},
+                            {"county": "泰宁县"},
+                            {"county": "建宁县"},
+                            {"county": "莆田市‌"}
+                        ]},{ 
+                            "city": "‌龙岩市‌", 
+                            "data": [
+                            {"county": "新罗区"},
+                            {"county": "永定区"},
+                            {"county": "漳平市"},
+                            {"county": "长汀县"},
+                            {"county": "上杭县"},
+                            {"county": "武平县"},
+                            {"county": "连城县"},
+                            {"county": "宁德市‌"}
+                        ]},{ 
+                            "city": "南平市‌", 
+                            "data": [
+                            {"county": "延平区"},
+                            {"county": "建阳区"},
+                            {"county": "邵武市"},
+                            {"county": "武夷山市"},
+                            {"county": "建瓯市"},
+                            {"county": "顺昌县"},
+                            {"county": "浦城县"},
+                            {"county": "光泽县"},
+                            {"county": "松溪县"},
+                            {"county": "政和县"}
+                        ]}
+                    ]}
+                ]
+            }
+            neuiDropdown({
+                // position: 'fixed',
+                caption: '',
+                chain: true, // 是否省市区同框联动.默认false
+                level: 3, // 省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
+                json: districtData, // 数据源不填时，将默认自动调用全国省市区数据源
+                // areaFormat: ["province", "city", "county"], // 地区显示值JSON格式(可缺省)
+                // keyFormat: ["provinceId", "cityId", '"ountyId"], // 地区隐藏值JSON格式(可缺省)
+                
+                // id: '350000-350500-350503',
+                entire:'全部',
+                isEntireRegion: 'county', // 限制默认下拉值添加在哪里(可选). all 省份、城市、区县上都加(默认), province 仅加在省份上, city 仅加在城市上, county 仅加在区县上
+                value: value,
+
+                isCnClose: true, // 当省市区同框联动,是否点了"全部"选项后就马上填充值并关闭控件(可缺省),默认true
+                isCnPartEmpty: true, // 当省市区同框联动,选中下拉值后当城市或区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省", eg3. "全部-全部-全部" 变成 "全部"
+                isCnAllEmpty:false, // 当省市区同框联动, 选中下拉值后当省份、城市、区县值为"全部"时,是否把"全部"空(可缺省),默认false. 本参数值为true时：eg1. "福建省-泉州市-全部" 变成 "福建省-泉州市" eg2. "福建省-全部-全部" 变成: "福建省"， eg3. "全部-全部-全部" 变成 ""
+                // 说明：isCnAllEmpty=true 具有 isCnPartEmpty=true 的功能，并且还能将省份值为"全部"时也替换成空
+
+                showCloseButton: true,
+                beautifyScrollBar: false, // 是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式
+                // closeButtonAppearance: 'image', // 关闭按钮的外观. text 文字（默认），image 图片.
+                callBack:function(e){
+                    // console.log('省市区同框联动下拉回调：', e);
+                    var value = e.value;
+                    // console.log('e：', e);
+                    // 提取城市名(支持：省-市-区/单独市/城)
+                    var reg = /^(?:.+?-)?([^-]+?市?)(?:-.+)?$/;
+                    var result = value.match(reg);
+                    var city = result ? result[1] : '';
+                    // console.log('city：', city);
+                    var address = value.toString().replace(/\-/g, '').replace(/\s+/g, '');
+                    // console.log('city：', city, '\naddress：', address);
+                    // ✅ 直接定位到某个城市
+                    if(city != '') {
+                        // 直接定位到某个城市城市
+                        var mapInstance = bdInstance.getMap();
+                        var zoom = 12; // 缩放级别。3-19
+                        // 方法1：使用地点检索服务。配额不够，1天最多100次。超过限额时会会触发 qt=s检索服务已经超配额
+                        // mapInstance.centerAndZoom(city, zoom); 
+                        // 方法2：使用地理编码服务，配额足够，1天最多5000次
+                        bdInstance.getAddressCoordinateByGeoCoder(address, city, function(point){
+                            // console.log('point：', point)
+                            if(point) {
+                                mapInstance.centerAndZoom(point, zoom); // 城市名或地址字符串；缩放级别3-19
+                            }
+                            else {
+                                alert('无法定位到城市！可能是百度地图API地理编码超配额，请手动输入城市名称');
+                            }
+                        })
+                    }
+                }
+            }, this)
+        });
+
+
+
     </script>
-    
-    <!-- 共享地图容器（供SDK内部使用，必须隐藏） -->
-    <div id="baidu_poi_search_map" style="display: none;"></div>
 </body>
 </html>
