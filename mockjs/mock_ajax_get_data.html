@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title> Mock Ajax 可使用 GET + Data </title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+<body>
+    <div class="wrap">
+        <h5>
+            让Mock支持 $.ajax GET 请求使用data参数传递数据
+        </h5>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <!-- 模拟数据 -->
+    <script src="mock/mock-min.js"></script>
+    <script src="config/mock-ajax-get.js"></script>
+    <script src="api/public.js"></script>
+    <script>
+        //——————————————————————————————————————————
+        // ==========================
+        // 你的 GET 接口
+        // ==========================
+        Mock.mock("/api/test?param=1", "get", {
+            code: 200,
+            msg: "GET 成功！",
+            data: { id: 1, name: "测试数据" }
+        });
+
+        $.ajax({
+            url: "/api/test?param=1",
+            type: "GET",
+            data: { id: 123, name: "Zhang San" }, // 你要的 data
+            // dataType: "html",
+            success: function (res) {
+                console.log("✅ 成功：", res);
+                console.log('object：', typeof res)
+                // alert("成功：" + res.msg);
+            },
+            error: function (xhr) {
+                console.log("❌ 错误：", xhr);
+            }
+        });
+
+
+
+
+         // ==========================
+        // 你的 POST 接口（不影响）
+        // ==========================
+        Mock.mock("/api/post", "post", {
+            code: 200,
+            msg: "POST 成功！"
+        });
+
+        $.ajax({
+            url: "/api/post",
+            type: "post",
+            data: { id: 456, name: "Li Si" }, // 你要的 data
+            // dataType: "html",
+            success: function (res) {
+                console.log("✅ 成功：", res);
+                // alert("成功：" + res.msg);
+            },
+            error: function (xhr) {
+                console.log("❌ 错误：", xhr);
+            }
+        });
+
+
+    </script>
+
+
+</body>
+</html>
