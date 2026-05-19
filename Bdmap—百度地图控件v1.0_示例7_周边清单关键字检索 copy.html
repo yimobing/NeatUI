@@ -86,11 +86,10 @@
                         <div class="bds__search_form_box_title"> 附近项目 </div>
                         <div class="bds__search_form_box_content">
                             <input type="text" id="s-near" placeholder="关键字，如学校" onblur="this.placeholder='关键字，如学校'" onfocus="this.placeholder=''">
-                            <button type="button" id="btn-choose-near"> 按关键字选择 </button>
-                            <button type="button" id="btn-choose-near"> 按分组选择 </button>
-                            <div class="bds__search_form_box_drop block__keyword" style="display: none">
-                                <ul class="bds__search_form_box_drop_list block__keyword_list"></ul>
-                                <button type="button" id="btn-word-confirm"> 确定 </button>
+                            <button type="button" id="btn-choose-near">选择</button>
+                            <div class="bds__search_form_box_drop" style="display: none">
+                                <ul class="bds__search_form_box_drop_list"></ul>
+                                <div class="bds__search_form_box_drop_operate">确定</div>
                             </div>
                         </div>
                     </div>
@@ -160,7 +159,7 @@
 
         //——————————————————————————————————————————
         // test: 搜索结果数据获取方式 mock 
-        USE_WEB_API = false;
+        USE_WEB_API = true;
         
         
 
@@ -439,7 +438,7 @@
 
 
         //——————————————————————————————————————————
-        // 附近项目下拉：按关键词选择按钮
+        // 附近项目下拉
         $('#btn-choose-near').on('click',function(){
             var $this = $(this);
             // 后台返回 ajax({})
@@ -476,7 +475,7 @@
                     '</li>'
                 ].join('\r\n')
             });
-            var $dropNode = $('.block__keyword');
+            var $dropNode = $('.bds__search_form_box_drop');
             if($dropNode.children('ul').find('li').length == 0) {
                 $dropNode.children('ul').empty().append(_html); 
             }
@@ -485,33 +484,30 @@
 
 
         //——————————————————————————————————————————
-        // 点击关键词
-        $(document).on('click', '.bds__search_form_box_drop li span', function(e){
+        // 选择单个项目时
+        $(document).on('click', '.bds__search_form_box_drop_list li span', function(e){
             var value = $(this).text();
             $('#s-near').val(value);
-            $(this).parents('.bds__search_form_box_drop').hide();
-            $(this).siblings('input:checkbox').prop('checked', true);
-            $(this).parent().siblings().find('input:checkbox').prop('checked', false);
+            $('.bds__search_form_box_drop').hide();
+            $('.bds__search_form_box_drop_list input:checkbox').prop('checked', false);
         });
 
-
         //——————————————————————————————————————————
-        // 点击确定按钮
-        $('#btn-word-confirm').on('click', function(e){
-            // 隐藏附近项目下拉
+        // 点击确定按钮时隐藏附近项目下拉
+        $('.bds__search_form_box_drop_operate').on('click', function(e){
+            // var target = e.target.closest('.bds__search_form_box_drop');
             var target = getClosest(e.target, '.bds__search_form_box_drop');
-            console.log('len：', $(target).length)
-            console.log('target：', target);
+            // console.log('len：', $(target).length)
             if($(target).length > 0) {
-                $(target).hide();
+                $('.bds__search_form_box_drop').hide();
                 fn_done_near_drop_close_event();
             }
         });
         // 点击其它地方隐藏附近项目下拉
         $(document).on('click', function(e) {
+            // var target = e.target.closest('.bds__search_form_box_drop, #btn-choose-near');
             var target = getClosest(e.target, '.bds__search_form_box_drop, #btn-choose-near');
-            console.log('len-x：', $(target).length)
-            console.log('target：', target)
+            // console.log('len-x：', $(target).length)
             if($(target).length == 0) {
                 $('.bds__search_form_box_drop').hide();
                 fn_done_near_drop_close_event();
@@ -898,7 +894,7 @@
                     pageCapacity: pagesize, // 设置每页容量，取值范围：1 - 100，对于多关键字检索，容量表示每个关键字的数量，如果有2个关键字，则实际检索结果数量范围为：2 - 200
                     // 检索完成后的回调函数。 参数：results: LocalResult或Array 如果是多关键字检索，回调函数参数返回一个LocalResult的数组，数组中的结果顺序和检索中多关键字数组中顺序一致
                     onSearchComplete: function(results){
-                        // console.log('周边返回结果-results：', results); 
+                        console.log('周边返回结果-results：', results); 
                         var status = local.getStatus();
                         // console.log('local：', local, '\nstatus：', status);
                         // 判断状态是否正确
@@ -973,28 +969,24 @@
                 var word = one.keyword,
                     pois = one.data;
                 var oneStr = '', titleArr = [];
-                // console.log('pois:', pois)
-                // console.log('len:', pois.length)
                 for(var k = 0; k < pois.length; k++) {
-                    var poi = pois[k]; // 不知为何，有些情况下poi会是undefined
+                    var poi = pois[k];
                     // console.log('poi：', poi);
-                    if(typeof poi != 'undefined') {
-                        // 可选：在地图上标注POI
-                        // var marker = new BMap.Marker(poi.point);
-                        // map.addOverlay(marker);
-                        // marker.setLabel(new BMap.Label(poi.title, {offset: new BMap.Size(20, -10)}));
-                        var title = poi.title, address = poi.address;
-                        placeList.push(title);
-                        if(word.indexOf('公交') >= 0) {
-                            busStr += '\r\n“' + title + '”公交站点：';
-                            if(address != '') {
-                                busStr += '有' + address.replace(/(\;|\；)/g, '、') + '等公交线路停靠';
-                                busStr += ( k == pois.length - 1) ? '。' : '，';
-                            }
+                    // 可选：在地图上标注POI
+                    // var marker = new BMap.Marker(poi.point);
+                    // map.addOverlay(marker);
+                    // marker.setLabel(new BMap.Label(poi.title, {offset: new BMap.Size(20, -10)}));
+                    var title = poi.title, address = poi.address;
+                    placeList.push(title);
+                    if(word.indexOf('公交') >= 0) {
+                        busStr += '\r\n“' + title + '”公交站点：';
+                        if(address != '') {
+                            busStr += '有' + address.replace(/(\;|\；)/g, '、') + '等公交线路停靠';
+                            busStr += ( k == pois.length - 1) ? '。' : '，';
                         }
-                        else {
-                            titleArr.push(title);
-                        }
+                    }
+                    else {
+                        titleArr.push(title);
                     }
                 }
                 oneStr += titleArr.join('、');

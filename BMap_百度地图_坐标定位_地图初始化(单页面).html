@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title> 百度地图坐标定位初始化  </title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+<body>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        ::-webkit-input-placeholder{ /* color: #bfbfbf; */ color: #e2dcdc; font-size: 12px; } ::-moz-placeholder{ color: #e2dcdc; font-size: 12px; } 
+        :-moz-placeholder{ color: #e2dcdc; font-size: 12px; } 
+        :-ms-input-placeholder{ color: #e2dcdc; font-size: 12px; }
+        html, body { font-size: 14px; height: 100%; }
+        body { padding: 10px 15px; overflow: hidden; height: 100%; }
+        .graph { position: relative; border: 1px solid #ddd; border-radius: 4px; height: 100%; }
+        .graph__container { height:100%; }    
+
+
+        /*+ 文本标注 +*/
+        .BMapLabel.ne__bd_lb { border: 0 !important; background: transparent !important; }
+        .ne__bd_lb_text { position: relative; background-color: #fff; padding: 12px 25px; border-width: 1px; border-style: solid; border-color: #19b6f8; border-radius: 3px; box-shadow: 0 1px 3px 0px #3291b9; color: #0c88e8; font-size: 15px; font-weight: bold; }
+        .ne__bd_lb_text.blue { border-color: #1296db; color: #1296db; }
+        .ne__bd_lb_text:before { content: ''; position: absolute; bottom: -8px; left: 0; right: 0; margin: 0 auto; display: block; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 15px solid #fff; }
+    </style>
+
+
+    <div class="graph">
+        <div class="graph__container" id="container"> </div> <!--/.graph__container-->
+    </div> <!--/.graph-->
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
+    <script>
+        //========================================================================================
+        //                          一、默认参数设置
+        //========================================================================================
+        //————————————————————————————————————————————————
+        // 全局变量：设置默认中心点 ajax({})
+        var g_default_coordinate = '118.602828, 24.897513'; // 中心点坐标，即楼盘坐标。格式：'经度,维度'
+        var g_default_zoom = 18; // 地图缩放级别。值：3-19
+        var g_default_title = ''; // 中心点名称，如楼盘名称等，默认空(可选)
+
+
+
+
+
+
+        //========================================================================================
+        //                          二、创建百度地图
+        //========================================================================================
+        //————————————————————————————————————————————————
+        // 取经纬度坐标
+        var pointArr = g_default_coordinate.split(',');
+        var lng = pointArr.length > 0 ? pointArr[0] : '',
+            lat = pointArr.length > 1 ? pointArr[1] : '';
+        // console.log('lng：', lng, '\nlat：', lat)
+
+        //————————————————————————————————————————————————
+        // 第1步，百度地图初始化
+        var map = new BMap.Map('container');  // 创建地图实例
+        var point = new BMap.Point(lng, lat); // 设置中心点坐标
+        map.centerAndZoom(point, g_default_zoom); // 地图初始化，同时设置地图展示级别
+        map.enableScrollWheelZoom(); // 开启滚轮缩放
+        // var viewportOptions = {
+        //     margins: [50, 50, 50, 50] // 地图边缘与坐标点的边距（防止点贴边）
+        // };
+        // map.setViewport(point, viewportOptions); // 根据坐标点自动调整地图视野
+        
+
+        // 第2步，创建点标注覆盖物
+        var marker = new BMap.Marker(point); // 创建标注
+        map.addOverlay(marker); // 将点标注添加到地图中
+        // 可拖拽的标注点
+        marker.enableDragging();    
+        marker.addEventListener("dragend", function(e){    
+            // console.log(e.point.lng + ", " + e.point.lat);  
+        })
+
+        // 第3步，创建文本标注覆盖物
+        if(g_default_title.replace(/\s+/g, '') !== '') {
+            var lb_father_class_name = 'ne__bd_lb', // 父节点样式名
+                lb_class_name = 'ne__bd_lb_text'; // 文本节点样式名
+            var lb_text = '<div class="' + lb_class_name + '">' + g_default_title + '</div>';
+            var lb_options = {
+                position: point, // 指定文本标注所在的地理位置
+                // offset: new BMap.Size(30, -30) // 设置文本偏移量
+                width: 0,     // 宽度(220-730) 0 自动调整
+                maxWidth: 500,  // 最大宽度(220-730)
+                height: 0,     // 高度(60-650) 0 自动调整
+                offset: { // 位置偏移
+                    width: -40,
+                    height: -75
+                }
+            }
+            var lbMark = new BMap.Label(lb_text, lb_options);
+            map.addOverlay(lbMark); // 将文本标注添加到地图中
+            lbMark.enableMassClear(); // 允许覆盖物被清除
+            lbMark.name = 'tag_bd_label'; // 标记覆盖物类型，方便清除指定覆盖物时用
+            lbMark.setStyle({
+                padding: '10px',
+                height: '30px',
+                lineHeight: '30px',
+                // backgroundColor: "#fff",
+                borderRadius: '5px',
+                borderColor: '#ccc',
+                color: 'blue',
+                fontSize: '16px',
+                fontFamily: '微软雅黑'
+            });
+
+            // 将文本标注绑定到点标注上
+            marker.setLabel(lbMark);
+            setTimeout(function() {
+                // 重置文本标注外观
+                var lbNodes = utils.getMultipleNodesByIdClassName(lb_class_name);
+                if(lbNodes.length > 0) {
+                    for(var i = 0; i < lbNodes.length; i++) {
+                        var currentNode = lbNodes[i];
+                        var parentNode = currentNode.parentNode;
+                        if(parentNode != null) {
+                            parentNode.classList.add(lb_father_class_name); // 给文本标注父节点添加一个样式名
+                        }
+                    }
+                }
+            }, 100);
+        }
+
+
+
+
+        //————————————————————————————————————————————————
+        // 工具库
+        var utils = {
+            /**
+             * 获取节点集合
+             * @param {String} ps_classNameId id或class名称的节点（注意：id传字符串，class无需带.）
+             * @returns {NodeList} 返回节点集合
+             */
+                getMultipleNodesByIdClassName: function(ps_classNameId) {
+                var elInputClassId = ps_classNameId.toString().replace(/(\#|\.)/g, '');
+                // 1. 先尝试通过id获取单个节点
+                var elInputNode = document.getElementById(elInputClassId);
+                var nodes = [];
+
+                // 2. 处理节点集合：id不存在则通过class获取（querySelectorAll返回NodeList）
+                if (elInputNode) {
+                    // id存在，转为数组（统一格式）
+                    nodes = [elInputNode];
+                } else {
+                    // id不存在，通过class获取所有匹配节点
+                    // 兼容IE8+：querySelectorAll，IE6-7需用getElementsByClassName（下文补充）
+                    var nodeList = document.querySelectorAll('.' + elInputClassId);
+                    // 将NodeList转为数组（方便循环，兼容IE）
+                    for (var i = 0; i < nodeList.length; i++) {
+                        nodes.push(nodeList[i]);
+                    }
+                }
+                return nodes;
+            }
+        };
+
+
+    </script>
+</body>
+</html>
