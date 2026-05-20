@@ -7,7 +7,7 @@
  * Author: ChenMufeng
  * QQ: 1614644937
  * Date: 2021.03.06
- * Update: 2025.11.17
+ * Update: 2026.05.20
  */
 
 /*———————————————————————————————————————————————————————————————————————————————————————————————
@@ -2766,12 +2766,15 @@ var neFormTools = {
 
     /**
      * 过滤HTML代码
+     * edit 20260520-1
      * @param {string} str 原字符串
-     * @param {boolean} isHTML 是否要过滤标签、css、js、换行、空格等多余内容, 默认true(可选). false时虽然不过滤但会将标签转义成字符
+     * @param {boolean} ps_isHtmlFilter 是否要过滤标签、css、js、换行、空格等多余内容, 默认true(可选). false时虽然不过滤但会将标签转义成字符
+     * @param {Boolean} ps_isHtmlEncode 是否要将标签转化成字符串，默认false(可选)
      * @returns {string} 返回新字符串
      */
-    filterHtmlCode: function(ps_str, isHTML){
-        var flag = typeof isHTML == 'undefined' ? true : (isHTML === false ? false : true);
+    filterHtmlCode: function(ps_str, ps_isHtmlFilter, ps_isHtmlEncode){
+        var flag = typeof ps_isHtmlFilter == 'undefined' ? true : (ps_isHtmlFilter === false ? false : true);
+        var marks = typeof ps_isHtmlEncode == 'undefined' ? false : (ps_isHtmlEncode === true ? true : false);
         if(flag){
             if(typeof ps_str == 'undefined' || ps_str == null) return '';
             var ps_str = ps_str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); //过滤css
@@ -2780,14 +2783,16 @@ var neFormTools = {
             // ps_str = ps_str.replace(/\ +/g, ''); //去掉空格
             ps_str = ps_str.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); //去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格
             ps_str = ps_str.replace(/[\r\n]+?/g, ' '); //去掉换行(变成一个空格)
+            
+            ps_str = ps_str.replace(/\(/g, '（'); // 英文的括号替换成中文，防止改变SQL执行逻辑
+            ps_str = ps_str.replace(/\)/g, '）'); // 英文的括号替换成中文，防止改变SQL执行逻辑
         }
-        if(typeof this.encodeHtml == 'function') ps_str = this.encodeHtml(ps_str); //标签转化成字符串
+        if(marks && typeof this.encodeHtml == 'function') ps_str = this.encodeHtml(ps_str); //标签转化成字符串
         return ps_str;
     },
 
 
-
-        /**
+    /**
      * 将标签转换成字符串（即HTML编码）
      * HTML与字符串互转义
      * @param {string} ps_str 含有标签的字符串
