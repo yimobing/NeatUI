@@ -3,7 +3,7 @@
  * NeatUI 函数库
  * Author: ChenMufeng
  * Date: 2021.02.05
- * Update: 2024.11.22
+ * Update: 2026.05.20
  */
 
 
@@ -2555,6 +2555,97 @@ var calendar = {
 //                                                  checker对象, 用于校验
 //=====================================================================================================================
 var checker = {
+    
+    /**
+     * 校验字符串是否包含非法危险字符：危险字符、不安全字符、SQL危险字符
+     * add 20260520-1
+     * 说明：这些字符可能是 SQL注入风险字符 + 数据库语法冲突字符
+     * @param {String} ps_str 原字符串
+     * @param {Boolean} ps_tips 有危险字符时是否弹出提示信息，默认tue。值：true 是, false 否。
+     * @returns {Boolean} 返回布尔值。true = 包含非法字符，false = 安全
+     * 【要校验的字符如下】
+        ;  分号，语句结束符，可执行恶意SQL
+        '  单引号（字符串边界，最危险的注入字符）
+        "  双引号
+        --  两个短横线，注释符，会注释掉后续SQL
+        / * * /  多行注释符
+        ( )  括号，改变执行逻辑
+        OR/AND  非字符，但拼接时会失效，特别是前后有空格时
+        \   反斜杠，转义符，数据库语法冲突
+        `   反引号，原本是用来标记字段名或表名的符号
+        ?   问号，参数占位符冲突
+    */
+    checkHasDangerousChars: function(ps_str, ps_opts) {
+        // var isPopup = typeof ps_tips == 'undefined' ? true : (ps_tips == false ? false : true);
+        if (ps_str === null || ps_str === undefined || ps_str === '') {
+            return false;
+        }
+        var defaults = {
+            popup: true, // 有危险字符时是否弹出提示信息，默认tue。值：true 是, false 否。
+            additionalTip: '' // 补充提示信息，默认空。值为非空时，将拼接到原有提示信息的后面
+        }
+        var finals = merge.extend(true, {}, defaults, ps_opts);
+        var isPopup = finals.popup,
+            addTip = finals.additionalTip;
+        var str = ps_str.toString();
+        var charMap = {
+            ';': '分号',
+            '\'': '单引号',
+            '"': '双引号',
+            '--': '两个短横线',
+            '(': '左括号',
+            ')': '右括号',
+            '\\': '反斜杠',
+            '`': '反引号',
+            '?': '问号',
+            '&': '和号',
+            '/*': '左多行注释符',
+            '*/': '右多行注释符',
+            ' AND ': '关键字 AND',
+            ' OR ': '关键字 OR'
+        };
+
+        // 自动生成正则，不需要手动写！兼容IE
+        var regParts = [];
+        for (var key in charMap) {
+            if (charMap.hasOwnProperty(key)) {
+                var k = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                regParts.push(k);
+            }
+        }
+        var dangerousReg = new RegExp(regParts.join('|'), 'gi');
+        var matchArr = str.match(dangerousReg); // 匹配危险字符
+        if (matchArr && matchArr.length > 0) {
+            var uniqueArr = [];
+            for (var i = 0; i < matchArr.length; i++) {
+                if (uniqueArr.indexOf(matchArr[i]) === -1) {
+                    uniqueArr.push(matchArr[i]);
+                }
+            }
+            // 自动匹配中文名称
+            var showArr = [];
+            for (var j = 0; j < uniqueArr.length; j++) {
+                var val = uniqueArr[j];
+                showArr.push(charMap[val] || val);
+            }
+
+            if(isPopup) {
+                var tip = '内容包含非法危险字符：' + uniqueArr.join(' ') + '<br>（对应中文：' + showArr.join('、') + '）<br>请删除这些字符或修改成其它字符';
+                if(addTip.toString().replace(/\s+/g, '') !== '') {
+                    tip += '<br>（' + addTip + '）';
+                }
+                neuiDialog.alert({
+                    animate: true,
+                    message: tip,
+                    buttons: ['知道了，马上修改']
+                })
+            }
+            return true;
+        }
+        return false;
+    },
+
+
     /**
      * 判断是否为JQ对象
      * @param {object} ps_obj 目标对象
@@ -2933,6 +3024,7 @@ var filter = {
      */
     html: function(ps_str, isHTML){
         var flag = typeof isHTML == 'undefined' ? true : (isHTML === false ? false : true);
+        ps_str = this.filterDangerousChars(ps_str); // 先过滤危险字符 add 20260520-1
         if(flag){
             if(typeof ps_str == 'undefined' || ps_str == null) return '';
             var ps_str = ps_str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); // 过滤css
@@ -2947,6 +3039,56 @@ var filter = {
         return ps_str;
     },
 
+
+    /**
+     * 过滤非法危险字符、过滤不安全字符、SQL危险字符过滤
+     * add 20260520-1
+     * 说明：这些字符可能是 SQL注入风险字符 + 数据库语法冲突字符
+     * @param {String} ps_str 原字符串
+     * @param {String} ps_method 替换方式，默认loose。值：loose 宽松模式(仅一小部分字符替换成空,大部分字符会替换成对应的中文字符或全角字符)，strict 严格模式(所有字符皆替换成空)
+     * @returns {String} 返回过滤后的新字符串
+     * 【要过滤的字符如下】
+        ;  分号，语句结束符，可执行恶意SQL
+        '  单引号（字符串边界，最危险的注入字符）
+        "  双引号
+        --  两个短横线，注释符，会注释掉后续SQL
+        / * * /  多行注释符
+        ( )  括号，改变执行逻辑
+        OR/AND  非字符，但拼接时会失效，特别是前后有空格时
+        \   反斜杠，转义符，数据库语法冲突
+        `   反引号，原本是用来标记字段名或表名的符号
+        ?   问号，参数占位符冲突
+    */
+    filterDangerousChars: function(ps_str, ps_method) {
+        if(typeof ps_str == 'undefined' || ps_str == null) return '';
+        var method = typeof ps_method == 'undefined' ? 'loose' : (ps_method == 'strict' ? 'strict' : 'loose');
+        var str = ps_str.toString();
+        console.log('method：', method)
+        if(method == 'strict') { // 严格模式
+            str = str.replace(/(&|--|\\|\;|\"|\'|\`|\?|\(|\))/g, '');
+        }
+        else if(method == 'loose') { // 宽松模式
+            // 统一替换成空
+            str = str.replace(/(\\|\`)/g, '');
+            // 半角替换成全角(权宜之计)
+            str = str.replace(/\&/g, '＆');
+            // 英文的符号替换成中文
+            str = str.replace(/(\?)/g, '？');
+            str = str.replace(/(\;)/g, '；');
+            str = str.replace(/\(/g, '（');
+            str = str.replace(/\)/g, '）');
+            str = str.replace(/"([^"]*)"/g, '“$1”'); // 匹配成对的双引号："xxx" → “xxx”
+            str = str.replace(/'([^']*)'/g, '‘$1’'); // 匹配成对的单引号：'xxx' → ‘xxx’
+            str = str.replace(/\"/g, '“');
+            str = str.replace(/\'/g, '“');
+            // 多个字符只保留一个
+            str = str.replace(/(--)/g, '-');
+        }
+        // 其它处理
+        str = str.replace('/*', '/ *').replace('*/', '* /'); // 多行注释符
+        str = str.replace(/(\s+)(and|or)(\s+)/gi, '$2'); // and 或 or 前后有空格的，去掉空格。gi 表示忽略大小写
+        return str;
+    },
 
 
     /**
