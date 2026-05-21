@@ -90,89 +90,8 @@
                             <button type="button" id="btn-choose-near"> 按分组选择 </button>
                             <div class="bds__search_form_box_drop block__keyword" style="display: none">
                                 <ul class="bds__search_form_box_drop_list block__keyword_list"></ul>
-                                <button type="button" id="btn-confirm-word"> 确定 </button>
+                                <button type="button" id="btn-word-confirm"> 确定 </button>
                             </div>
-
-                            <div class="bds__words" style="display: none">
-                                <div class="bds__words_caption"> 附近项目(关键字) </div>
-                                <div class="bds__words_method">
-                                    <div class="bds__words_method_option">
-                                        <input type="radio" id="radio-option-by-word" class="ne-checkbox circle-tick radio-option-method" value="0" checked>
-                                        <span> 显示全部关键字 </span>
-                                    </div>
-                                    <div class="bds__words_method_option">
-                                        <input type="radio" id="radio-option-by-group" class="ne-checkbox circle-tick radio-option-method" value="1">
-                                        <span> 按分组显示关键字 </span>
-                                    </div>
-                                </div>
-                                <div class="bds__words_record_keyword_distance">
-                                    <div class="bds__words_record_keyword_distance_box">
-                                        <input type="checkbox" class="ne-checkbox ne-checkbox square-tick">
-                                        <span> 统一半径 </span>
-                                    </div>
-                                    <div class="bds__words_record_keyword_distance_box">
-                                        <input type="text" id="c-distance" value="1000">
-                                        <em> 米(m) </em>
-                                    </div>
-                                    <div class="bds__words_record_keyword_distance_box">
-                                        <button type="button" id="btn-set-distance"> 确定 </button>
-                                    </div>
-                                </div>
-                                <div class="bds__words_record">
-                                    <div class="bds__words_record_group" style="display: none">
-                                        <div class="bds__words_record_group_title">关键字分组</div>
-                                        <div class="bds__words_record_group_list">
-                                            <ul>
-                                                <li><input type="radio" class="ne-checkbox circle-tick"><span>住宅组</span></li>
-                                                <li><input type="radio" class="ne-checkbox circle-tick"><span>住宅组</span></li>
-                                                <li><input type="radio" class="ne-checkbox circle-tick"><span>住宅组</span></li>
-                                                <li><input type="radio" class="ne-checkbox circle-tick"><span>住宅组</span></li>
-                                                <li><input type="radio" class="ne-checkbox circle-tick"><span>住宅组</span></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="bds__words_record_keyword">
-                                        <div class="bds__words_record_keyword_title"> 关键字清单 </div>
-                                        <div class="bds__words_record_keyword_list">
-                                            <ul>
-                                                <li>
-                                                    <div class="bds__words_record_keyword_list_item_word">
-                                                        <input type="checkbox" class="ne-checkbox ne-checkbox square-tick">
-                                                        <span>学校</span>
-                                                    </div>
-                                                    <div class="bds__words_record_keyword_list_item_distance">
-                                                        <input type="text">
-                                                        <em>米(m)</em>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="bds__words_record_keyword_list_item_word">
-                                                        <input type="checkbox" class="ne-checkbox ne-checkbox square-tick">
-                                                        <span>学校</span>
-                                                    </div>
-                                                    <div class="bds__words_record_keyword_list_item_distance">
-                                                        <input type="text">
-                                                        <em>米(m)</em>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="bds__words_record_keyword_list_item_word">
-                                                        <input type="checkbox" class="ne-checkbox ne-checkbox square-tick">
-                                                        <span>学校</span>
-                                                    </div>
-                                                    <div class="bds__words_record_keyword_list_item_distance">
-                                                        <input type="text">
-                                                        <em>米(m)</em>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="bds__words_operate">
-                                    <button type="button" id="btn-close-word"> 确定 </button>
-                                </div>
-                            </div> <!--/.bds__words-->
                         </div>
                     </div>
                     <div class="bds__search_form_box">
@@ -211,8 +130,6 @@
     <script src="assets/lib/mock/mock-min.js"></script>
 
     <script>
-
-        //——————————————————————————————————————————
         /**
          * 兼容ie和旧版edge的方案
          * 替代原生closest的兼容方法
@@ -220,7 +137,7 @@
          * @param {String} selector 匹配选择器（类、id、标签都支持）
          * @returns {HTMLElement|null} 匹配到的元素或null
          */
-        function getClosest(el, selector) {
+         function getClosest(el, selector) {
             var currentEl = el;
             // 向上遍历直到根节点
             while (currentEl) {
@@ -235,7 +152,7 @@
         }
 
 
-        /*+———————————————— 全局变量 ————————————————+*/
+        /*+————————————————全局变量————————————————+*/
         // 默认值
         var DEFAULT_NEAR_ARR = []; // 附近项目默认选中值，支持多个。
         var DEFAULT_RANGE = 1000; // 范围、半径默认值。单位米(m)
@@ -248,164 +165,7 @@
         
 
 
-        /*+———————————————— FUNCTION ————————————————+*/
-        //——————————————————————————————————————————
-        /**
-         * 获取关键字分组下拉数据
-         * @returns {Object} 返回数组对象
-         */
-         function get_data_word_group(){
-            var dataSource = { data: [] }
-            // START AJAX
-            $.ajax({
-                async: false, // 取数方式. true 异步(默认), false 同步
-                type: "POST",
-                dataType: "html",
-                cache: false,
-                url: "../fwh_pub/jk_loupan_fujin.ashx?param=1001",
-                data: {
-                    "action": "wh_get_loupan_fujin_fenzu_list",
-                    "user": "<%=s_user%>",
-                    "sjk": "<%=s_sjk%>",
-                    "menu_bh": "<%=s_menu_bh%>"
-                },
-                success: function(res){
-                    if(!res || $.isEmptyObject(res)) return;
-                    dataSource = JSON.parse(res);
-                },
-                error: function(errs){ },
-                beforeSend: function(xhr){ },
-                complete: function(xhr, status){ }
-            })
-            // END AJAX
-            return dataSource;
-        }
-
-
-
-        /**
-         * 获取全部关键字下拉数据
-         * @returns {Object} 返回数组对象
-         */
-         function get_data_keywords_of_all(){
-            var dataSource = { data: [] }
-            // START AJAX
-            $.ajax({
-                async: false, // 取数方式. true 异步(默认), false 同步
-                type: "POST",
-                dataType: "html",
-                cache: false,
-                url: "../fwh_pub/jk_loupan_fujin.ashx?param=1002",
-                data: {
-                    "action": "wh_get_guanjianzi_list",
-                    "user": "<%=s_user%>",
-                    "sjk": "<%=s_sjk%>",
-                    "menu_bh": "<%=s_menu_bh%>"
-                },
-                success: function(res){
-                    if(!res || $.isEmptyObject(res)) return;
-                    dataSource = JSON.parse(res);
-                },
-                error: function(errs){ },
-                beforeSend: function(xhr){ },
-                complete: function(xhr, status){ }
-            })
-            // END AJAX
-            return dataSource;
-        }
-
-
-
-        /**
-         * 获取关键字分组对应的关键字下拉数据
-         * @param {String} ps_fenzu_bh 分组编号
-         * @returns {Object} 返回数组对象
-         */
-        function get_data_keywords_of_group(ps_fenzu_bh){
-            var dataSource = { data: [] }
-            // START AJAX
-            $.ajax({
-                async: false, // 取数方式. true 异步(默认), false 同步
-                type: "POST",
-                dataType: "html",
-                cache: false,
-                url: "../fwh_pub/jk_loupan_fujin.ashx?param=1003",
-                data: {
-                    "action": "wh_get_loupan_fujin_fenzu_guanjainzi_list",
-                    "user": "<%=s_user%>",
-                    "sjk": "<%=s_sjk%>",
-                    "menu_bh": "<%=s_menu_bh%>",
-                    "fenzu_bh": ps_fenzu_bh
-                },
-                success: function(res){
-                    if(!res || $.isEmptyObject(res)) return;
-                    dataSource = JSON.parse(res);
-                },
-                error: function(errs){ },
-                beforeSend: function(xhr){ },
-                complete: function(xhr, status){ }
-            })
-            // END AJAX
-            return dataSource;
-        }
-
-
-
-        //——————————————————————————————————————————
-        /**
-         * 获取关键字分组下拉HTML
-         * @param {Object} ps_dataSource 数据源对象
-         */
-        function get_html_list_of_group(ps_dataSource) {
-            var _html = '';
-            $.each(ps_dataSource.data, function(index, item){
-                _html += [
-                   '<li data-bh="' + item["fenzu_bh"] + '">',
-                        '<input type="radio" class="ne-checkbox circle-tick">',
-                        '<span>' + item["fenzu_mc"] + '</span>',
-                    '</li>'
-                ].join('\r\n')
-            });
-            return _html;
-        }
-
-
-
-        /**
-         * 获取关键字下拉HTML
-         * @param {Object} ps_dataSource 数据源对象
-         */
-        function get_html_list_of_word(ps_dataSource) {
-            var _html = '';
-            $.each(ps_dataSource.data, function(index, item){
-                _html += [
-                    '<li data-bh="' + item["guanjianzi_bh"] + '">',
-                        '<div class="bds__words_record_keyword_list_item_word">',
-                            '<input type="checkbox" class="ne-checkbox ne-checkbox square-tick">',
-                            '<span>' + item["guanjianzi_mc"] + '</span>',
-                        '</div>',
-                        '<div class="bds__words_record_keyword_list_item_distance">',
-                            '<input type="text" value="' + DEFAULT_RANGE + '">',
-                            '<em>米(m)</em>',
-                        '</div>',
-                    '</li>'
-                ].join('\r\n')
-            });
-            return _html;
-        }
-
-
-
         
-        
-
-        
-
-
-
-
-
-        /*+———————————————— 模拟数据 ————————————————+*/   
         //——————————————————————————————————————————
         // mock 模拟数据 从后台获取搜索结果数据
         // 设置延时时长，模拟后端处理或返回数据的时间。
@@ -413,52 +173,36 @@
             timeout: 1000, // 延时n毫秒返回
         });
 
-        //——————————————————————————————————————————
-        // 获取关键字分组下拉数据
+        // 模拟获取附件项目下拉数据
         Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1001", "post", function(v){
             // console.log('后台传过来的参数：', v);
             return Mock.mock({
                 "return": "ok",
-                "data|3-5":[{ 
-                    "fenzu_bh": "F@id()", 
-                    "fenzu_mc|1": ["住宅组", "店铺组", "厂房组", "二手房组", "拆迁组"]
-                }]
+                "data":[
+                    { "guanjianzi_mc": "学校" },
+                    { "guanjianzi_mc": "医院" },
+                    { "guanjianzi_mc": "公园" },
+                    { "guanjianzi_mc": "超市" },
+                    { "guanjianzi_mc": "商场" },
+                    { "guanjianzi_mc": "公交站" },
+                    { "guanjianzi_mc": "景点" },
+
+                    { "guanjianzi_mc": "体育馆" },
+                    { "guanjianzi_mc": "电影院" },
+                    { "guanjianzi_mc": "剧院" },
+                    { "guanjianzi_mc": "餐厅" },
+                    { "guanjianzi_mc": "酒店" },
+                    { "guanjianzi_mc": "便利店" },
+                    { "guanjianzi_mc": "购物中心" },
+                    { "guanjianzi_mc": "电影院" },
+                    { "guanjianzi_mc": "博物馆" }
+                ]
             });
         });
-
-
-        //——————————————————————————————————————————
-        // 模拟获取全部关键字下拉数据
-        Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1002", "post", function(v){
-            // console.log('后台传过来的参数：', v);
-            return Mock.mock({
-                "return": "ok",
-                "data|3-16":[{ 
-                    "guanjianzi_bh": "@id()", 
-                    "guanjianzi_mc|+1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"]
-                }]
-            });
-        });
-
-
-        //——————————————————————————————————————————
-        // 获取关键字分组对应的关键字下拉数据
-        Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1003", "post", function(v){
-            // console.log('后台传过来的参数：', v);
-            return Mock.mock({
-                "return": "ok",
-                "data|5-16":[{ 
-                    "guanjianzi_bh": "@id()", 
-                    "guanjianzi_mc|+1": ["学校1", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"]
-                }]
-            });
-        });
-
-
 
 
         // 模拟获取搜索结果数据
-        Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2002", "post", function(v){
+        Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1002", "post", function(v){
             // console.log('后台传过来的参数：', v);
             var body = v.body;
             var arr = body.split('&');
@@ -494,9 +238,6 @@
 
 
         
-
-
-
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //                                                   初始化
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -699,25 +440,48 @@
 
         //——————————————————————————————————————————
         // 按关键字选择按钮：附近项目下拉
-        // $('#btn-choose-near').on('click',function(){
-        //     var $this = $(this);
-        //     var nearData = get_data_keywords_of_all();
-        //     var _html = '';
-        //     $.each(nearData.data, function(index, item){
-        //         _html += [
-        //             '<li data-bh="' + item["guanjianzi_bh"] + '">',
-        //                 '<input type="checkbox" class="ne-checkbox square-tick">',
-        //                 '<span>' + item["guanjianzi_mc"] + '</span>',
-        //             '</li>'
-        //         ].join('\r\n')
-        //     });
-        //     var $dropNode = $('.block__keyword');
-        //     if($dropNode.children('ul').find('li').length == 0) {
-        //         $dropNode.children('ul').empty().append(_html); 
-        //     }
-        //     $dropNode.show();
-        // });
-        
+        $('#btn-choose-near').on('click',function(){
+            var $this = $(this);
+            // 后台返回 ajax({})
+            var nearData = { data: [] }
+            // START AJAX
+            $.ajax({
+                async: false, // 取数方式. true 异步(默认), false 同步
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_loupan_fujin.ashx?param=1001",
+                data: {
+                    "action": "wh_get_guanjianzi_list",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "menu_bh": "<%=s_menu_bh%>"
+                },
+                success: function(res){
+                    if(!res || $.isEmptyObject(res)) return;
+                    nearData = JSON.parse(res);
+                },
+                error: function(errs){ },
+                beforeSend: function(xhr){ },
+                complete: function(xhr, status){ }
+            })
+            // END AJAX
+
+            var _html = '';
+            $.each(nearData.data, function(index, item){
+                _html += [
+                    '<li>',
+                        '<input type="checkbox" class="ne-checkbox square-tick">',
+                        '<span>' + item["guanjianzi_mc"] + '</span>',
+                    '</li>'
+                ].join('\r\n')
+            });
+            var $dropNode = $('.block__keyword');
+            if($dropNode.children('ul').find('li').length == 0) {
+                $dropNode.children('ul').empty().append(_html); 
+            }
+            $dropNode.show();
+        });
 
 
         //——————————————————————————————————————————
@@ -733,7 +497,7 @@
 
         //——————————————————————————————————————————
         // 点击确定按钮
-        $('#btn-confirm-word').on('click', function(e){
+        $('#btn-word-confirm').on('click', function(e){
             // 隐藏附近项目下拉
             var target = getClosest(e.target, '.bds__search_form_box_drop');
             // console.log('len：', $(target).length)
@@ -771,93 +535,6 @@
             $('#s-near').val(checkedArr.join(','));
         }
 
-
-
-
-
-        //——————————————————————————————————————————
-        //          附近项目下拉 testing
-        //——————————————————————————————————————————
-        //——————————————————————————————————————————
-        // 点击选择按钮：附近项目下拉
-        $('#btn-choose-near').on('click',function(){
-            var $this = $(this);
-            var wordData = get_data_keywords_of_all();
-            var _html = get_html_list_of_word(wordData);
-            $('.bds__words_record_keyword_list').children().empty().append(_html);
-            // 显示附近项目下拉区域
-            $('.bds__words').show();
-        });
-
-     
-
-        //——————————————————————————————————————————
-        // 点击选择关键字显示方式
-        $('.radio-option-method').on('click', function() {
-            var value = $(this).val();
-            $(this).parent().siblings().find('input:radio').prop('checked', false);
-            // console.log('value：', value)
-            if(parseFloat(value) == 1) { // 按分组显示关键字
-                // 获取分组数据
-                var groupData = get_data_word_group();
-                console.log('groupdata：', groupData)
-                var _html = get_html_list_of_group(groupData);
-                $('.bds__words_record_group_list').children().empty().append(_html);
-                $('.bds__words_record_group').show();
-            }
-            else {
-                var wordData = get_data_keywords_of_all();
-                var _html = get_html_list_of_word(wordData);
-                $('.bds__words_record_keyword_list').children().empty().append(_html);
-                $('.bds__words_record_group').hide();
-            }
-        });
-
-        // 点击某个关键字分组时
-        $(document).on('click', '.bds__words_record_group_list li', function() {
-            $(this).addClass('active').find('input:radio').prop('checked', true).parent().siblings().removeClass('active').find('input:radio').prop('checked', false);
-            // 获取分组对应的关键字下拉数据
-            var ls_fenzu_bh = $(this).attr('data-id');
-            var wordData = get_data_keywords_of_group(ls_fenzu_bh);
-            var _html = get_html_list_of_word(wordData);
-            $('.bds__words_record_keyword_list').children().empty().append(_html);
-        });
-
-
-        // 统一半径确定按钮
-        $('#btn-set-distance').on('click', function() {
-            var ls_juli = $('#c-distance').val();
-            var reg = /^\d+$/;
-            if(reg.test(ls_juli) == false) ls_juli = 0; // 非数字时转成0
-            if(ls_juli.toString().replace(/\s+/g, '') !== '') {
-                $('.bds__words_record_keyword_list').find('input:text').val(ls_juli);
-            }
-        });
-
-        // 点击关键词
-        $('.bds__words_record_keyword_list').on('click', 'li', function(e){
-            var target = e.target;
-            var tagName = target.tagName.toLocaleLowerCase(),
-                tagType = typeof target.type == 'undefined' ? '' : target.type.toLocaleLowerCase();
-            if(tagName == 'input' && tagType == 'text') { // 输入框时阻止
-                return;
-            }
-            $(this).find('input:checkbox').prop('checked') ? 
-                $(this).find('input:checkbox').prop('checked', false) : 
-                $(this).find('input:checkbox').prop('checked', true);
-        });
-
-        // 点击下拉区域以外的地方
-        $(document).on('click', function(e){
-            var target = getClosest(e.target, '.bds__words, #btn-choose-near');
-            if($(target).length > 0) return;
-            $('.bds__words').hide();
-        });
-
-        // 点击下拉框确定按钮
-        $('#btn-close-word').on('click', function(e) {
-            $('.bds__words').hide();
-        });
 
 
         //——————————————————————————————————————————
@@ -1159,7 +836,7 @@
                             type: "POST",
                             dataType: "html",
                             cache: false,
-                            url: "../fwh_pub/jk_loupan_fujin.ashx?param=2002",
+                            url: "../fwh_pub/jk_loupan_fujin.ashx?param=1002",
                             data: {
                                 "action": "wh_web_gongye_jizhun_dijia_fujin_list",
                                 "user": "<%=s_user%>",
