@@ -307,13 +307,12 @@ body {
 }
 
 .bds__search_form_box_content input[type="text"] {
-    width: 100%;
+	width: 100%;
     padding: 5px 5px 5px 10px;
     border-style: solid;
     border-color: #aeaeae;
-    border-color: #ececec;
-    border-width: 1px;
-    border-radius: 2px;
+    border-width: 0 0 1px 0;
+    border-radius: 0;
 }
 .bds__search_form_box_content input[type="text"].l-2x {
 	width: 200px;
@@ -818,11 +817,13 @@ body {
 }
 .bds__words_record_keyword_list_item_distance input[type="text"] {
 	width: 100%;
+	border: 1px solid #ececec;
+	border-radius: 1px;
 }
 .bds__words_record_keyword_list_item_distance em {
 	position: absolute;
 	z-index: 1;
-	right: 5px;
+	right: 10px;
 	color: #999;
 	font-size: 12px;
 }
