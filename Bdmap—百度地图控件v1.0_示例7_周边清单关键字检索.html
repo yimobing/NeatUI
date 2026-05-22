@@ -23,7 +23,8 @@
 </head>
 <body>
     <style>
-        #s-near { width: 150px; }
+        #s-near { width: 300px; }
+        #s-range { width: 100px!important; }
     </style>
     <div class="bds">
         <div class="bds__graph">
@@ -85,100 +86,67 @@
                     <div class="bds__search_form_box">
                         <div class="bds__search_form_box_title"> 附近项目 </div>
                         <div class="bds__search_form_box_content">
-                            <input type="text" id="s-near" placeholder="关键字，如学校" onblur="this.placeholder='关键字，如学校'" onfocus="this.placeholder=''">
-                            <button type="button" id="btn-choose-near"> 按关键字选择 </button>
-                            <button type="button" id="btn-choose-near"> 按分组选择 </button>
+                            <div class="bds__search_form_box_content_form">
+                                <input type="text" id="s-near" placeholder="关键字，如学校" onblur="this.placeholder='关键字，如学校'" onfocus="this.placeholder=''">
+                                <button type="button" id="btn-choose-near"> 选择 </button>
+                            </div>
                             <div class="bds__search_form_box_drop block__keyword" style="display: none">
                                 <ul class="bds__search_form_box_drop_list block__keyword_list"></ul>
-                                <button type="button" id="btn-confirm-word"> 确定 </button>
+                                <button type="button" id="btn-confirm-word-x"> 确定 </button>
                             </div>
 
                             <div class="bds__words" style="display: none">
                                 <div class="bds__words_caption"> 附近项目(关键字) </div>
                                 <div class="bds__words_method">
                                     <div class="bds__words_method_option">
-                                        <input type="radio" id="radio-option-by-word" class="ne-checkbox circle-tick radio-option-method" value="0" checked>
-                                        <span> 显示全部关键字 </span>
-                                    </div>
-                                    <div class="bds__words_method_option">
                                         <input type="radio" id="radio-option-by-group" class="ne-checkbox circle-tick radio-option-method" value="1">
                                         <span> 按分组显示关键字 </span>
                                     </div>
+                                    <div class="bds__words_method_option on">
+                                        <input type="radio" id="radio-option-by-word" class="ne-checkbox circle-tick radio-option-method" value="0" checked>
+                                        <span> 显示全部关键字 </span>
+                                    </div>
                                 </div>
                                 <div class="bds__words_record_keyword_distance">
-                                    <div class="bds__words_record_keyword_distance_box">
-                                        <input type="checkbox" class="ne-checkbox ne-checkbox square-tick">
-                                        <span> 统一半径 </span>
+                                    <div class="bds__words_record_keyword_distance_box"> 
+                                        <span> 半径：</span> 
                                     </div>
                                     <div class="bds__words_record_keyword_distance_box">
                                         <input type="text" id="c-distance" value="1000">
                                         <em> 米(m) </em>
                                     </div>
                                     <div class="bds__words_record_keyword_distance_box">
-                                        <button type="button" id="btn-set-distance"> 确定 </button>
+                                        <button type="button" id="btn-set-distance" class="ne-btn has-3d brown"> 统一半径 </button>
                                     </div>
                                 </div>
                                 <div class="bds__words_record">
                                     <div class="bds__words_record_group" style="display: none">
-                                        <div class="bds__words_record_group_title">关键字分组</div>
-                                        <div class="bds__words_record_group_list">
-                                            <ul>
-                                                <li><input type="radio" class="ne-checkbox circle-tick"><span>住宅组</span></li>
-                                                <li><input type="radio" class="ne-checkbox circle-tick"><span>住宅组</span></li>
-                                                <li><input type="radio" class="ne-checkbox circle-tick"><span>住宅组</span></li>
-                                                <li><input type="radio" class="ne-checkbox circle-tick"><span>住宅组</span></li>
-                                                <li><input type="radio" class="ne-checkbox circle-tick"><span>住宅组</span></li>
-                                            </ul>
-                                        </div>
+                                        <div class="bds__words_record_group_title">分组</div>
+                                        <div class="bds__words_record_group_list"></div>
                                     </div>
-                                    <div class="bds__words_record_keyword">
-                                        <div class="bds__words_record_keyword_title"> 关键字清单 </div>
-                                        <div class="bds__words_record_keyword_list">
-                                            <ul>
-                                                <li>
-                                                    <div class="bds__words_record_keyword_list_item_word">
-                                                        <input type="checkbox" class="ne-checkbox ne-checkbox square-tick">
-                                                        <span>学校</span>
-                                                    </div>
-                                                    <div class="bds__words_record_keyword_list_item_distance">
-                                                        <input type="text">
-                                                        <em>米(m)</em>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="bds__words_record_keyword_list_item_word">
-                                                        <input type="checkbox" class="ne-checkbox ne-checkbox square-tick">
-                                                        <span>学校</span>
-                                                    </div>
-                                                    <div class="bds__words_record_keyword_list_item_distance">
-                                                        <input type="text">
-                                                        <em>米(m)</em>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="bds__words_record_keyword_list_item_word">
-                                                        <input type="checkbox" class="ne-checkbox ne-checkbox square-tick">
-                                                        <span>学校</span>
-                                                    </div>
-                                                    <div class="bds__words_record_keyword_list_item_distance">
-                                                        <input type="text">
-                                                        <em>米(m)</em>
-                                                    </div>
-                                                </li>
-                                            </ul>
+                                    <div class="bds__words_record_keyword has-100">
+                                        <div class="bds__words_record_keyword_title"> 
+                                            <div class="bds__words_record_keyword_title_choose"> 
+                                                <input type="checkbox" class="ne-checkbox square-tick green">
+                                            </div>
+                                            <div class="bds__words_record_keyword_title_text"> 关键字 </div>
                                         </div>
+                                        <div class="bds__words_record_keyword_list"></div>
                                     </div>
                                 </div>
                                 <div class="bds__words_operate">
-                                    <button type="button" id="btn-close-word"> 确定 </button>
+                                    <button type="button" id="btn-confirm-word"> 确定 </button>
                                 </div>
                             </div> <!--/.bds__words-->
                         </div>
                     </div>
                     <div class="bds__search_form_box">
+                        <div class="bds__search_form_box_set">
+                            <input type="checkbox" id="r-radius-check" class="ne-checkbox square-tick green" checked>
+                        </div>
                         <div class="bds__search_form_box_title"> 半径 </div>
                         <div class="bds__search_form_box_content">
-                            <input type="text" id="s-range" placeholder="搜索半径" onblur="this.placeholder='搜索半径'" onfocus="this.placeholder=''">
+                            <input type="text" id="s-range" data-type="integer[positive]" placeholder="搜索半径" onblur="this.placeholder='搜索半径'" onfocus="this.placeholder=''">
                             <em> 米(m) </em>
                         </div>
                     </div>
@@ -188,8 +156,62 @@
                 </div>
             </div> <!-- /.bds__search_form-->
             <div class="bds__search_result">
-                <textarea id="r-result"></textarea> 
-            </div>
+                <div class="bds__search_result_tab">
+                    <div class="bds__search_result_tab_one on"> 结果展示 </div>
+                    <div class="bds__search_result_tab_one"> 结果保存 </div>
+                </div> 
+                <!--  -->
+                <div class="bds__search_result_outcome">
+                    <div class="bds__search_result_outcome_switch">
+                        <div class="bds__search_result_outcome_switch_content">
+                            <textarea id="r-result"></textarea>
+                        </div>
+                    </div>
+                    <div class="bds__search_result_outcome_switch" style="display: none">
+                        <div class="bds__search_result_outcome_switch_operate">
+                            <button type="button" id="btn-save" class="ne-btn has-3d green">保存</button>
+                        </div>
+                        <div class="bds__search_result_outcome_switch_display">
+                            <div class="bds__search_result_outcome_switch_display_one">
+                                <div class="bds__search_result_outcome_switch_display_one_item">
+                                   <div class="bds__search_result_outcome_switch_display_one_item_title"> 学校 </div>
+                                   <div class="bds__search_result_outcome_switch_display_one_item_form">
+                                        <input type="text">
+                                   </div>
+                                </div>
+                                <div class="bds__search_result_outcome_switch_display_one_list">
+                                    <ul>
+                                        <li> 刺桐公园 </li>
+                                        <li> 东湖公园 </li>
+                                        <li> 西湖公园 </li>
+                                        <li> 北湖公园 </li>
+                                        <li> 南湖公园 </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="bds__search_result_outcome_switch_display_one">
+                                <div class="bds__search_result_outcome_switch_display_one_item">
+                                   <div class="bds__search_result_outcome_switch_display_one_item_title"> 医院 </div>
+                                   <div class="bds__search_result_outcome_switch_display_one_item_form">
+                                        <input type="text">
+                                   </div>
+                                </div>
+                                <div class="bds__search_result_outcome_switch_display_one_list">
+                                    <ul>
+                                        <li>泉州第一医院</li>
+                                        <li>泉州第一医院x</li>
+                                        <li>泉州第一医院y</li>
+                                        <li>泉州第二医院</li>
+                                        <li>泉州第三医院</li>
+                                        <li>泉州第四医院</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!--/.bds__search_result_outcome -->
+
+            </div> <!--/.bds__search_result-->
         </div> <!-- /.bds__search-->
     </div> <!--/.bds-->
    
@@ -237,7 +259,7 @@
 
         /*+———————————————— 全局变量 ————————————————+*/
         // 默认值
-        var DEFAULT_NEAR_ARR = []; // 附近项目默认选中值，支持多个。
+        var DEFAULT_NEAR_ARR = []; // 附近项目默认选中值，支持多个。 testing 
         var DEFAULT_RANGE = 1000; // 范围、半径默认值。单位米(m)
         var USE_WEB_API = true; // 搜索结果数据获取方式。值：true 是, false 否。值为false时使用JS API直接搜索数据，值为true时使用Web API从后台获取数据。
 
@@ -353,45 +375,47 @@
 
         //——————————————————————————————————————————
         /**
-         * 获取关键字分组下拉HTML
+         * 创建关键字分组下拉结构HTML
          * @param {Object} ps_dataSource 数据源对象
          */
-        function get_html_list_of_group(ps_dataSource) {
-            var _html = '';
+        function create_html_list_of_group(ps_dataSource) {
+            var _html = '<ul>';
             $.each(ps_dataSource.data, function(index, item){
                 _html += [
                    '<li data-bh="' + item["fenzu_bh"] + '">',
-                        '<input type="radio" class="ne-checkbox circle-tick">',
+                        // '<input type="radio" class="ne-checkbox circle-tick">',
                         '<span>' + item["fenzu_mc"] + '</span>',
                     '</li>'
                 ].join('\r\n')
             });
-            return _html;
+            _html += '</ul>';
+            $('.bds__words_record_group_list').empty().append(_html);
         }
 
 
 
         /**
-         * 获取关键字下拉HTML
+         * 创建关键字下拉结构HTML
          * @param {Object} ps_dataSource 数据源对象
          */
-        function get_html_list_of_word(ps_dataSource) {
-            var _html = '';
+        function create_html_list_of_word(ps_dataSource) {
+            var _html = '<ul>';
             $.each(ps_dataSource.data, function(index, item){
                 _html += [
                     '<li data-bh="' + item["guanjianzi_bh"] + '">',
                         '<div class="bds__words_record_keyword_list_item_word">',
-                            '<input type="checkbox" class="ne-checkbox ne-checkbox square-tick">',
+                            '<input type="checkbox" class="ne-checkbox ne-checkbox square-tick green">',
                             '<span>' + item["guanjianzi_mc"] + '</span>',
                         '</div>',
                         '<div class="bds__words_record_keyword_list_item_distance">',
-                            '<input type="text" value="' + DEFAULT_RANGE + '">',
+                            '<input type="text" data-type="integer[positive]" value="' + DEFAULT_RANGE + '">',
                             '<em>米(m)</em>',
                         '</div>',
                     '</li>'
                 ].join('\r\n')
             });
-            return _html;
+            _html += '</ul>';
+            $('.bds__words_record_keyword_list').empty().append(_html);
         }
 
 
@@ -665,10 +689,12 @@
 
 
 
-
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-        //                                          查询区域 事件
+        //                                          系列事件
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        //          定位区域事件
+        //——————————————————————————————————————————
         //——————————————————————————————————————————
         // 复制按钮、复制当前坐标
         // $('#btn-pick-copy').on('click',function(){
@@ -685,181 +711,93 @@
         //         maskOpacity: 1
         //     })
         // });
-
-
-        //——————————————————————————————————————————
-        // 范围半径输入事件：只允许输入正整数
-        $('#s-range').on('input', function(){
-            var value = $(this).val();
-            value = value.toString().replace(/[^\d]/g,'');
-		    $(this).val(value);
-        });
-
-
-
-        //——————————————————————————————————————————
-        // 按关键字选择按钮：附近项目下拉
-        // $('#btn-choose-near').on('click',function(){
-        //     var $this = $(this);
-        //     var nearData = get_data_keywords_of_all();
-        //     var _html = '';
-        //     $.each(nearData.data, function(index, item){
-        //         _html += [
-        //             '<li data-bh="' + item["guanjianzi_bh"] + '">',
-        //                 '<input type="checkbox" class="ne-checkbox square-tick">',
-        //                 '<span>' + item["guanjianzi_mc"] + '</span>',
-        //             '</li>'
-        //         ].join('\r\n')
-        //     });
-        //     var $dropNode = $('.block__keyword');
-        //     if($dropNode.children('ul').find('li').length == 0) {
-        //         $dropNode.children('ul').empty().append(_html); 
-        //     }
-        //     $dropNode.show();
-        // });
         
 
-
         //——————————————————————————————————————————
-        // 点击下拉项：选择某个关键字下拉项
-        $(document).on('click', '.bds__search_form_box_drop li span', function(e){
-            var value = $(this).text();
-            $('#s-near').val(value);
-            $(this).parents('.bds__search_form_box_drop').hide();
-            $(this).siblings('input:checkbox').prop('checked', true);
-            $(this).parent().siblings().find('input:checkbox').prop('checked', false);
-        });
-
-
-        //——————————————————————————————————————————
-        // 点击确定按钮
-        $('#btn-confirm-word').on('click', function(e){
-            // 隐藏附近项目下拉
-            var target = getClosest(e.target, '.bds__search_form_box_drop');
-            // console.log('len：', $(target).length)
-            // console.log('target：', target);
-            if($(target).length > 0) {
-                $(target).hide();
-                fn_done_near_drop_close_event();
+        // 查询结果伸缩按钮
+        $('.btn-stretch').on('click', function(){
+            if($('.bds__graph_result').hasClass('stretch-in')) {
+                $('.bds__graph_result').removeClass('stretch-in');
             }
-        });
-        // 点击其它地方隐藏下拉
-        $(document).on('click', function(e) {
-            var target = getClosest(e.target, '.bds__search_form_box_drop, #btn-choose-near');
-            // console.log('len-x：', $(target).length)
-            // console.log('target：', target)
-            if($(target).length == 0) {
-                $('.bds__search_form_box_drop').hide();
-                fn_done_near_drop_close_event();
+            else {
+                $('.bds__graph_result').addClass('stretch-in');
             }
         });
 
-        /**
-         * 附近项目下拉关闭事件
-        */
-        function fn_done_near_drop_close_event(){
-            var checkedArr = [];
-            $('.bds__search_form_box_drop').children().find('li').each(function(){
-                var $checkbox = $('input:checkbox', this),
-                    $span = $('span', this);
-                if($checkbox.prop('checked')){
-                    checkedArr.push($span.text());
-                }
-            });
-            // console.log('checkedArr：', checkedArr)
-            DEFAULT_NEAR_ARR = checkedArr; // 全局赋值
-            $('#s-near').val(checkedArr.join(','));
+
+
+        //——————————————————————————————————————————
+        // 城市快速定位按钮
+        $('#btn-pick-locate').on('click', function(){
+            fn_locate_city();
+        });
+
+        function fn_locate_city(){
+            var ls_city = $('#c-city').val();
+            if(ls_city == '') {
+                // neuiDialog.alert({
+                //     animate: true,
+                //     message: '请填写：城市',
+                //     buttons: ['确定']
+                // })
+                $('#c-city').focus();
+                return;
+            }
+            // 数据过滤，去掉省份自治区及短横线等字符
+            var cityName = ls_city.toString().replace(/(\-|\,|\s+)/g, '');
+            cityName = cityName.indexOf('省') >= 0 || cityName.indexOf('自治区') >= 0 ? cityName.replace(/^(.*?省|自治区)(.*)/g, '$2') : cityName;
+            // console.log("城市：", nowCityName)
+            map.clearOverlays(); // 清空所有覆盖物
+            // map.setCenter(nowCityName); // 定位到指定城市
+
+            // 获取地址坐标
+            var myGeo = new BMap.Geocoder(); // 创建地址解析器实例    
+            myGeo.getPoint(cityName, function(point){ // 将地址解析结果显示在地图上，并调整地图视野
+                // console.log('point：', point)    
+                if (point) {
+                    var lng = point.lng, lat = point.lat;
+                    neuiBdmap.createMarker({
+                        type: 'zhongxin', // 坐标类型(可选)，默认空。值： zhongxin 中心点坐标, 空 表示其它类型。
+                        coordinate: lng + ',' + lat, // 坐标经纬度字符串. eg. '经度,纬度'
+                        title: $('#c-city').val(), // 标题(可选)，默认空。支持HTML
+                        describe: '', // 描述信息(可选)，默认空。支持HTML
+                        message: '', // 信息窗口短信内容(可选)，默认空
+                        autoViewport: true, // 是否自动调整视野，默认true
+                        zoom: 13, // 自动调整视野时地图的缩放级别，默认13。值 3-19
+                        dragable: true, // 是否允许拖拽(可选)，默认false
+                        finishCallback: function(e){ // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                            $('#s-community').val(''); // 小区栏清空
+                            $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值
+                        }, 
+                        dragEndCallback: function(e){ // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                            $('#s-community').val(''); // 小区栏清空
+                            $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值  
+                        }
+                    })
+                }      
+            }); // , "北京市"
         }
 
 
 
 
 
-        //——————————————————————————————————————————
-        //          附近项目下拉 testing
-        //——————————————————————————————————————————
-        //——————————————————————————————————————————
-        // 点击选择按钮：附近项目下拉
-        $('#btn-choose-near').on('click',function(){
-            var $this = $(this);
-            var wordData = get_data_keywords_of_all();
-            var _html = get_html_list_of_word(wordData);
-            $('.bds__words_record_keyword_list').children().empty().append(_html);
-            // 显示附近项目下拉区域
-            $('.bds__words').show();
-        });
 
-     
 
         //——————————————————————————————————————————
-        // 点击选择关键字显示方式
-        $('.radio-option-method').on('click', function() {
+        //          查询区域表单事件
+        //——————————————————————————————————————————
+        //——————————————————————————————————————————
+        // 范围半径输入事件：限制半径输入的数据类型
+        $(document).on('input', '[data-type="integer[positive]"]', function(){
+            // 只允许输入正整数
             var value = $(this).val();
-            $(this).parent().siblings().find('input:radio').prop('checked', false);
-            // console.log('value：', value)
-            if(parseFloat(value) == 1) { // 按分组显示关键字
-                // 获取分组数据
-                var groupData = get_data_word_group();
-                console.log('groupdata：', groupData)
-                var _html = get_html_list_of_group(groupData);
-                $('.bds__words_record_group_list').children().empty().append(_html);
-                $('.bds__words_record_group').show();
-            }
-            else {
-                var wordData = get_data_keywords_of_all();
-                var _html = get_html_list_of_word(wordData);
-                $('.bds__words_record_keyword_list').children().empty().append(_html);
-                $('.bds__words_record_group').hide();
-            }
-        });
-
-        // 点击某个关键字分组时
-        $(document).on('click', '.bds__words_record_group_list li', function() {
-            $(this).addClass('active').find('input:radio').prop('checked', true).parent().siblings().removeClass('active').find('input:radio').prop('checked', false);
-            // 获取分组对应的关键字下拉数据
-            var ls_fenzu_bh = $(this).attr('data-id');
-            var wordData = get_data_keywords_of_group(ls_fenzu_bh);
-            var _html = get_html_list_of_word(wordData);
-            $('.bds__words_record_keyword_list').children().empty().append(_html);
+            value = value.toString().replace(/[^\d]/g,'');
+		    $(this).val(value);
         });
 
 
-        // 统一半径确定按钮
-        $('#btn-set-distance').on('click', function() {
-            var ls_juli = $('#c-distance').val();
-            var reg = /^\d+$/;
-            if(reg.test(ls_juli) == false) ls_juli = 0; // 非数字时转成0
-            if(ls_juli.toString().replace(/\s+/g, '') !== '') {
-                $('.bds__words_record_keyword_list').find('input:text').val(ls_juli);
-            }
-        });
-
-        // 点击关键词
-        $('.bds__words_record_keyword_list').on('click', 'li', function(e){
-            var target = e.target;
-            var tagName = target.tagName.toLocaleLowerCase(),
-                tagType = typeof target.type == 'undefined' ? '' : target.type.toLocaleLowerCase();
-            if(tagName == 'input' && tagType == 'text') { // 输入框时阻止
-                return;
-            }
-            $(this).find('input:checkbox').prop('checked') ? 
-                $(this).find('input:checkbox').prop('checked', false) : 
-                $(this).find('input:checkbox').prop('checked', true);
-        });
-
-        // 点击下拉区域以外的地方
-        $(document).on('click', function(e){
-            var target = getClosest(e.target, '.bds__words, #btn-choose-near');
-            if($(target).length > 0) return;
-            $('.bds__words').hide();
-        });
-
-        // 点击下拉框确定按钮
-        $('#btn-close-word').on('click', function(e) {
-            $('.bds__words').hide();
-        });
-
-
+        
         //——————————————————————————————————————————
         // 半径下拉
         $('#s-range').on('click',function(){
@@ -1050,75 +988,258 @@
 
 
 
-        
+
+
+
 
         //——————————————————————————————————————————
-        // 城市快速定位按钮
-        $('#btn-pick-locate').on('click', function(){
-            fn_locate_city();
-        });
-
-        function fn_locate_city(){
-            var ls_city = $('#c-city').val();
-            if(ls_city == '') {
-                // neuiDialog.alert({
-                //     animate: true,
-                //     message: '请填写：城市',
-                //     buttons: ['确定']
-                // })
-                $('#c-city').focus();
+        //          附近项目下拉区域 testing
+        //——————————————————————————————————————————
+        //——————————————————————————————————————————
+        // 点击选择按钮、选择关键字：附近项目下拉框
+        $('#btn-choose-near').on('click',function(){
+            var $nodeWordRoot = $('.bds__words');
+            var $nodeWordList = $('.bds__words_record_keyword_list');
+            if($nodeWordRoot.is(':visible')) {
+                $nodeWordRoot.hide();
                 return;
             }
-            // 数据过滤，去掉省份自治区及短横线等字符
-            var cityName = ls_city.toString().replace(/(\-|\,|\s+)/g, '');
-            cityName = cityName.indexOf('省') >= 0 || cityName.indexOf('自治区') >= 0 ? cityName.replace(/^(.*?省|自治区)(.*)/g, '$2') : cityName;
-            // console.log("城市：", nowCityName)
-            map.clearOverlays(); // 清空所有覆盖物
-            // map.setCenter(nowCityName); // 定位到指定城市
+            // 如果列表还没创建，避免重复创建，已勾选的再打开时依然可选中
+            if($nodeWordList.children().find('li').length == 0) {
+                var wordData = get_data_keywords_of_all();
+                create_html_list_of_word(wordData);
+            }
+            $nodeWordRoot.show(); // 显示附近项目下拉区域
+        });
 
-            // 获取地址坐标
-            var myGeo = new BMap.Geocoder(); // 创建地址解析器实例    
-            myGeo.getPoint(cityName, function(point){ // 将地址解析结果显示在地图上，并调整地图视野
-                // console.log('point：', point)    
-                if (point) {
-                    var lng = point.lng, lat = point.lat;
-                    neuiBdmap.createMarker({
-                        type: 'zhongxin', // 坐标类型(可选)，默认空。值： zhongxin 中心点坐标, 空 表示其它类型。
-                        coordinate: lng + ',' + lat, // 坐标经纬度字符串. eg. '经度,纬度'
-                        title: $('#c-city').val(), // 标题(可选)，默认空。支持HTML
-                        describe: '', // 描述信息(可选)，默认空。支持HTML
-                        message: '', // 信息窗口短信内容(可选)，默认空
-                        autoViewport: true, // 是否自动调整视野，默认true
-                        zoom: 13, // 自动调整视野时地图的缩放级别，默认13。值 3-19
-                        dragable: true, // 是否允许拖拽(可选)，默认false
-                        finishCallback: function(e){ // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
-                            $('#s-community').val(''); // 小区栏清空
-                            $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值
-                        }, 
-                        dragEndCallback: function(e){ // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
-                            $('#s-community').val(''); // 小区栏清空
-                            $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值  
-                        }
+
+
+        //——————————————————————————————————————————
+        // 点击显示方式、切换显示方式
+        // 这里要使用 mousedown 才能真实判断radio状态
+        $('.bds__words_method_option').on('mousedown', function(e) {
+            var $radio = $(this).find('input:radio');
+            var value = $radio.val(),
+                isChecked = $radio.prop('checked');
+            // console.log(isChecked)
+            if(isChecked == false) {
+                $radio.prop('checked', true);
+                $(this).addClass('on').siblings().removeClass('on').find('input:radio').prop('checked', false);
+                if(parseFloat(value) == 1) { // 按分组显示关键字
+                    var groupData = get_data_word_group();
+                    var _html = create_html_list_of_group(groupData);
+                    $('.bds__words_record_group_title').hide(); // 隐藏标题栏
+                    $('.bds__words_record_keyword_distance').hide(); // 隐藏统一半径区域
+                    $('.bds__words_record_group').show().addClass('has-100').siblings().hide();
+                }
+                else { // 显示全部关键字
+                    var wordData = get_data_keywords_of_all();
+                    create_html_list_of_word(wordData);
+                    $('.bds__words_record_keyword_distance').show(); // 显示统一半径区域
+                    $('.bds__words_record_group').hide().siblings().show().addClass('has-100');
+                    $('.bds__words_record_keyword_title').find('input:checkbox').prop('checked', false); // 标题左边的复选框取消打勾
+                }
+            }
+        });
+
+        // 点击关键字分组
+        $(document).on('click', '.bds__words_record_group_list li', function() {
+            var ls_fenzu_bh = $(this).attr('data-bh');
+            var wordData = get_data_keywords_of_group(ls_fenzu_bh);
+            create_html_list_of_word(wordData);
+
+            // 切换显示状态
+            $('.bds__words_record_group_title').show(); // 显示标题栏
+            $(this).addClass('active').siblings().removeClass('active');
+            $(this).find('input:radio').prop('checked', true).parent().siblings().find('input:radio').prop('checked', false); // 高亮切换
+
+            $('.bds__words_record_keyword_distance').show(); // 显示统一半径区域
+
+            $('.bds__words_record_group').removeClass('has-100').siblings().show().removeClass('has-100'); // 切换分组和关键字显示与隐藏
+            $('.bds__words_record_keyword_list').find('input:checkbox').prop('checked', true); // 所有关键字打勾
+            $('.bds__words_record_keyword_title').find('input:checkbox').prop('checked', true); // 标题左边的复选框打勾
+        });
+
+        // 设置统一半径按钮
+        $('#btn-set-distance').on('click', function() {
+            neui.showAnimate();
+            setTimeout(function(){
+                var ls_juli = $('#c-distance').val();
+                var reg = /^\d+$/;
+                if(reg.test(ls_juli) == false) ls_juli = 0; // 非数字时转成0
+                if(ls_juli.toString().replace(/\s+/g, '') !== '') {
+                    $('.bds__words_record_keyword_list').find('input:text').val(ls_juli);
+                }
+                neui.destroyAnimate();
+            }, 100)
+        });
+
+        // 点击关键字项
+        $('.bds__words_record_keyword_list').on('click', 'li', function(e){
+            var target = e.target;
+            var tagName = target.tagName.toLocaleLowerCase(),
+                tagType = typeof target.type == 'undefined' ? '' : target.type.toLocaleLowerCase();
+            if(tagName == 'input' && tagType == 'text') { // 输入框时阻止
+                return;
+            }
+            var $checkbox = (tagName == 'input' && tagType == 'checkbox') ? 
+                $(this) : $(this).find('input:checkbox');
+            $checkbox.prop('checked', $checkbox.prop('checked') ? false : true);
+        });
+
+        // 标题左边的复选框打勾和取消打勾时
+        $('.bds__words_record_keyword_title').find('input:checkbox').on('change', function(){
+            var isChecked = $(this).prop('checked');
+            $('.bds__words_record_keyword_list').find('input:checkbox').prop('checked', isChecked); // 切换关键字复选框打勾状态
+        });
+
+
+
+        //——————————————————————————————————————————
+        // 点击下拉框确定按钮
+        $('#btn-confirm-word').on('click', function(e) {
+            $('.bds__words').hide(); // 隐藏下拉框
+            fn_done_word_confirm_event(true);
+        });
+
+        // 点击页面其它地方，点击下拉区域以外的地方
+        $(document).on('click', function(e){
+            var target = getClosest(e.target, '.bds__words, #btn-choose-near');
+            if($(target).length > 0) return;
+            var isVisible = $('.bds__words').is(':visible'); // 先判断下下拉框状态
+            $('.bds__words').hide(); // 隐藏下拉框
+            fn_done_word_confirm_event(isVisible);
+        });
+
+        /**
+         * 关键字勾选确定事件
+         * @param {Boolean} ps_is_when_close_drop 是否为关闭下拉框操作，默认false(可选)
+         */
+        function fn_done_word_confirm_event(ps_is_when_close_drop) {
+            var checkedSingleArr = [];
+            var checkedMultipleArr = []
+            $('.bds__words_record_keyword_list').children().find('li').each(function(){
+                var $checkbox = $('input:checkbox', this),
+                    $span = $('span', this),
+                    $input = $('input:text', this);
+                if($checkbox.prop('checked')){
+                    var keyword = $span.text().toString().replace(/\s+/g, ''), // 关键字
+                        distance = $input.val(); // 距离
+                    if(isNaN(parseFloat(distance))) distance = 0;
+                    checkedSingleArr.push(keyword);
+                    checkedMultipleArr.push({
+                        "keyword": keyword,
+                        "distance": distance
                     })
-                }      
-            }); // , "北京市"
+                }
+            });
+            // console.log('checkedArr：', checkedArr)
+            DEFAULT_NEAR_ARR = checkedSingleArr; // 全局赋值
+            // 当当前操作是关闭下拉框时。防止点击页面其它地方时误触
+            if(ps_is_when_close_drop) {
+                if(checkedSingleArr.length > 0) {
+                    $('#s-near').val(checkedSingleArr.join(',')).attr('data-word', JSON.stringify(checkedMultipleArr));  // 附近项目输入框赋值
+                }
+                // 半径复选框禁止或允许手动输入
+                if( checkedSingleArr.length > 0)
+                    $('#s-range').attr('disabled', true).parent().siblings().find('input:checkbox').prop('checked', false); // 半径复选框禁止手动输入
+                else 
+                    $('#s-range').attr('disabled', false).parent().siblings().find('input:checkbox').prop('checked', true); // 半径复选框允许手动输入
+            }
+        }
+
+        //——————————————————————————————————————————
+        // 勾选半径复选框状态变化
+        $('#r-radius-check').on('change', function(){
+            var isChecked = $(this).prop('checked');
+            // console.log(isChecked)
+            if(isChecked) {
+                $('#s-range').attr('disabled', false); // 半径复选框允许手动输入
+            }
+            else {
+                $('#s-range').attr('disabled', true); // 半径复选框禁止手动输入
+            }
+        });
+
+       
+
+        
+        //——————————————————————————————————————————
+        //          查询结果区域
+        //——————————————————————————————————————————
+        //——————————————————————————————————————————
+        // 结果切片切换
+        $('.bds__search_result_tab').children().on('click', function() {
+            var index = $(this).index();
+            $(this).addClass('on').siblings().removeClass('on');
+            $('.bds__search_result_outcome').children().eq(index).show().siblings().hide();
+        });
+
+        // [结果保存] 点击某项
+        $('.bds__search_result_outcome_switch_display').on('click', 'li', function(e){
+            var $input = $(this).parents('.bds__search_result_outcome_switch_display_one').find('input:text, textarea');
+            var now_value = $(this).text().toString().replace(/\s+/g, '').replace(/(,)/g, ' '), // 去掉空格，去掉逗号
+                old_value = $input.val().toString().replace(/\s+/g, '').replace(/(,){2,}/g, ','); // 去掉空格，多个符号替换成1个逗号
+            var isHighLight = $(this).hasClass('on') ? true : false;
+            var new_value = '';
+            if(isHighLight == false) {
+                $(this).addClass('on');
+                new_value = old_value + ',' + now_value; // 加上当前项
+            }
+            else {
+                $(this).removeClass('on');
+                new_value = removeMatchWord(old_value, now_value, true); // 减去当前项，精准整词匹配
+            }
+            new_value = new_value.replace(/(,){2,}/g, ',').replace(/(.*),$/g, '$1').replace(/^,(.*)/g, '$1'); // 掉多个逗号，去掉结尾开头的逗号
+            $input.val(new_value);
+        });
+
+
+
+        /**
+         * 字符串匹配删除（兼容 IE9+）
+         * 支持“精准整词匹配、模糊匹配”两种模式
+         * @param {String} oldStr 原始字符串
+         * @param {String} keyword 要删除的关键词
+         * @param {Boolean} isExact 是否精准匹配。true=精准匹配（只删完整词），false=模糊匹配（删所有包含的）
+         * @returns {String} 删除后的新字符串
+         * @example
+            原字符串："泉州第一医院x,泉州第一医院,泉州第一医院y"
+            精准匹配：removeMatchWord(str,"泉州第一医院",true) → "泉州第一医院x,泉州第一医院y"
+            模糊匹配：removeMatchWord(str,"泉州第一医院",false) → "x,,y"
+         */
+        function removeMatchWord(oldStr, keyword, isExact) {
+            // 处理空值，避免报错
+            if (!oldStr || !keyword) return oldStr;
+            // 转义正则特殊字符，防止正则解析异常
+            function escapeReg(str) {
+                return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            }
+            var key = escapeReg(keyword);
+            var reg;
+            if (isExact === true) {
+                reg = new RegExp(
+                    "(^|[^\\u4e00-\\u9fa5a-zA-Z0-9])" + 
+                    key + 
+                    "(?=$|[^\\u4e00-\\u9fa5a-zA-Z0-9])",
+                    "g"
+                );
+                return oldStr.replace(reg, "$1");
+            } else {
+                reg = new RegExp(key, "g");
+                return oldStr.replace(reg, "");
+            }
         }
 
 
 
+
+
+
+
         //——————————————————————————————————————————
-        // 查询结果伸缩按钮
-        $('.btn-stretch').on('click', function(){
-            if($('.bds__graph_result').hasClass('stretch-in')) {
-                $('.bds__graph_result').removeClass('stretch-in');
-            }
-            else {
-                $('.bds__graph_result').addClass('stretch-in');
-            }
-        });
-
-
-
+        //          查询按钮区域 testing
+        //——————————————————————————————————————————
         //——————————————————————————————————————————
         // 查询按钮
         $('#btn-query').on('click', function(){
@@ -1140,129 +1261,136 @@
                 return;
             }
 
-            if(USE_WEB_API) {
-                // 方案1：使用 Web API 从后台获取结果
-                var xiangmuArr = xiangmu.split(/[,:;，：；、。]/);
-                if(xiangmuArr.length > 0) {
-                    var pois = [];
-                    for(var i = 0; i < xiangmuArr.length; i++){
-                        var ls_guanjianzi_mc = xiangmuArr[i],
-                            ls_zuobiao = zuobiao,
-                            ls_juli_fanwei_mi = banjing;
-                        // console.log('ls_guanjianzi_mc：', ls_guanjianzi_mc, '\n坐标：', ls_zuobiao, '\n范围：', ls_juli_fanwei_mi);
+            neui.showAnimate();
+            setTimeout(function(){
+               
+                    
+                if(USE_WEB_API) {
+                    // 方案1：使用 Web API 从后台获取结果
+                    var xiangmuArr = xiangmu.split(/[,:;，：；、。]/);
+                    if(xiangmuArr.length > 0) {
+                        var pois = [];
+                        for(var i = 0; i < xiangmuArr.length; i++){
+                            var ls_guanjianzi_mc = xiangmuArr[i],
+                                ls_zuobiao = zuobiao,
+                                ls_juli_fanwei_mi = banjing;
+                            // console.log('ls_guanjianzi_mc：', ls_guanjianzi_mc, '\n坐标：', ls_zuobiao, '\n范围：', ls_juli_fanwei_mi);
 
-                        // 后台返回 ajax({})
-                        var outcomeData = { data: [] }
-                        // START AJAX
-                        $.ajax({
-                            async: false, // 取数方式. true 异步(默认), false 同步
-                            type: "POST",
-                            dataType: "html",
-                            cache: false,
-                            url: "../fwh_pub/jk_loupan_fujin.ashx?param=2002",
-                            data: {
-                                "action": "wh_web_gongye_jizhun_dijia_fujin_list",
-                                "user": "<%=s_user%>",
-                                "sjk": "<%=s_sjk%>",
-                                "menu_bh": "<%=s_menu_bh%>",
-                                "guanjianzi_mc": ls_guanjianzi_mc,
-                                "zuobiao": ls_zuobiao,
-                                "juli_fanwei_mi": ls_juli_fanwei_mi
-                            },
-                            success: function(res){
-                                if(!res || $.isEmptyObject(res)) return;
-                                outcomeData = JSON.parse(res);
-                            },
-                            error: function(errs){ },
-                            beforeSend: function(xhr){ },
-                            complete: function(xhr, status){ }
-                        })
-                        // END AJAX
-                        // console.log('outcomeData：', outcomeData)
-
-                        // [{keyword: "关键词", data: [{title: "名称", "address": "地址", "province": "所在省份", "city": "所在城市", "point": "坐标点对象, lng, lat", ... }]}]
-                        var one = { keyword: ls_guanjianzi_mc, data: []}
-                        outcomeData.data.forEach(function(item){
-                            var arr = item.zuobiao.split(','),
-                                lng = arr.length > 0 ? arr[0] : '',
-                                lat = arr.length > 1 ? arr[1] : '';
-                            one.data.push({
-                                title: item.name,
-                                address: item.address,
-                                province: item.sheng,
-                                city: item.shi,
-                                point: new BMap.Point(lng, lat)
+                            // 后台返回 ajax({})
+                            var outcomeData = { data: [] }
+                            // START AJAX
+                            $.ajax({
+                                async: false, // 取数方式. true 异步(默认), false 同步
+                                type: "POST",
+                                dataType: "html",
+                                cache: false,
+                                url: "../fwh_pub/jk_loupan_fujin.ashx?param=2002",
+                                data: {
+                                    "action": "wh_web_gongye_jizhun_dijia_fujin_list",
+                                    "user": "<%=s_user%>",
+                                    "sjk": "<%=s_sjk%>",
+                                    "menu_bh": "<%=s_menu_bh%>",
+                                    "guanjianzi_mc": ls_guanjianzi_mc,
+                                    "zuobiao": ls_zuobiao,
+                                    "juli_fanwei_mi": ls_juli_fanwei_mi
+                                },
+                                success: function(res){
+                                    if(!res || $.isEmptyObject(res)) return;
+                                    outcomeData = JSON.parse(res);
+                                },
+                                error: function(errs){ },
+                                beforeSend: function(xhr){ },
+                                complete: function(xhr, status){ }
                             })
-                        })
+                            // END AJAX
+                            // console.log('outcomeData：', outcomeData)
 
-                        pois.push(one);
-                        // console.log('pois：', pois)
-                        fnNearComposeStringToUser(pois);
-                    }
-                }
-            }
+                            // [{keyword: "关键词", data: [{title: "名称", "address": "地址", "province": "所在省份", "city": "所在城市", "point": "坐标点对象, lng, lat", ... }]}]
+                            var one = { keyword: ls_guanjianzi_mc, data: []}
+                            outcomeData.data.forEach(function(item){
+                                var arr = item.zuobiao.split(','),
+                                    lng = arr.length > 0 ? arr[0] : '',
+                                    lat = arr.length > 1 ? arr[1] : '';
+                                one.data.push({
+                                    title: item.name,
+                                    address: item.address,
+                                    province: item.sheng,
+                                    city: item.shi,
+                                    point: new BMap.Point(lng, lat)
+                                })
+                            })
 
-            else {
-                
-                // 方案2：使用 JS API 直接搜索结果
-                var pagesize = 100; // 每页容量
-                var coordinateArr = zuobiao.split(',');
-                var point = new BMap.Point(coordinateArr[0], coordinateArr[1]); // 中心点
-                var myKeys = xiangmu.indexOf(',') >= 0 ? xiangmu.split(',') : [ xiangmu ]; // 关键词。数组格式
-                var radius = isNaN(parseFloat(banjing)) ? parseFloat(DEFAULT_RANGE) : parseFloat(banjing); // 半径。数值型，不能是字符串，否则会返回空数据
-                var local = new BMap.LocalSearch(point, {
-                    renderOptions: {
-                        map: map, // 展现结果的地图实例。当指定此参数后，搜索结果的标注、线路等均会自动添加到此地图上
-                        autoViewport: true, // 检索结束后是否自动调整地图视野。此属性对LocalCity无效
-                        panel: 'panel-result', // String | HTMLElement 结果列表的HTML容器id或容器元素，提供此参数后，结果列表将在此容器中进行展示。此属性对LocalCity无效。驾车路线规划无效
-                        // selectFirstResult: false, // 是否选择第一个检索结果。此属性仅对LocalSearch有效
-                    },
-                    pageCapacity: pagesize, // 设置每页容量，取值范围：1 - 100，对于多关键词检索，容量表示每个关键词的数量，如果有2个关键词，则实际检索结果数量范围为：2 - 200
-                    // 检索完成后的回调函数。 参数：results: LocalResult或Array 如果是多关键词检索，回调函数参数返回一个LocalResult的数组，数组中的结果顺序和检索中多关键词数组中顺序一致
-                    onSearchComplete: function(results){
-                        // console.log('周边返回结果-results：', results); 
-                        var status = local.getStatus();
-                        // console.log('local：', local, '\nstatus：', status);
-                        // 判断状态是否正确
-                        if(status !== 0) {
-                            neuiDialog.alert({
-                                animate: true,
-                                message: '没有找到相应的数据，可尝试更改范围半径',
-                                buttons: ['确定']
-                            });
-                            return;
-                        }
-                        else if(status == 0){
-                            $('.bds__graph_result').removeClass('stretch-in');
-
-                            // 组成自定义的数据源格式，方便前后台可同时使用
-                            var outcomes = Array.isArray(results) ? results : [ results ];
-                            var pois = [];
-                            for(var i = 0; i < outcomes.length; i++) {
-                                var poi = outcomes[i];
-                                // console.log('poi：', poi)
-                                var keyword = poi.keyword,
-                                    total = poi.getNumPois();
-                                var one = { keyword: keyword, data: []}
-                                if (total === 0) {
-                                    var tip = '抱歉，没有关键词【' + xiangmu + '】对应的结果'; // 当前结果集无POI数据
-                                    console.log(tip);
-                                }
-                                for (var j = 0; j < total; j++) {
-                                    var outcome = poi.getPoi(j);
-                                    one.data.push(outcome);
-                                }
-                                pois.push(one);
-                            }
+                            pois.push(one);
+                            // console.log('pois：', pois)
                             fnNearComposeStringToUser(pois);
                         }
                     }
-                });
-                // local.searchNearby(myKeys, point, radius, {poiTypes: ["教育|小学"] });
-                local.searchNearby(myKeys, point, radius);
-                local.setPageCapacity(pagesize); // 设置每页容量
-            }
+                }
 
+                else {
+                    
+                    // 方案2：使用 JS API 直接搜索结果
+                    var pagesize = 100; // 每页容量
+                    var coordinateArr = zuobiao.split(',');
+                    var point = new BMap.Point(coordinateArr[0], coordinateArr[1]); // 中心点
+                    var myKeys = xiangmu.indexOf(',') >= 0 ? xiangmu.split(',') : [ xiangmu ]; // 关键词。数组格式
+                    var radius = isNaN(parseFloat(banjing)) ? parseFloat(DEFAULT_RANGE) : parseFloat(banjing); // 半径。数值型，不能是字符串，否则会返回空数据
+                    var local = new BMap.LocalSearch(point, {
+                        renderOptions: {
+                            map: map, // 展现结果的地图实例。当指定此参数后，搜索结果的标注、线路等均会自动添加到此地图上
+                            autoViewport: true, // 检索结束后是否自动调整地图视野。此属性对LocalCity无效
+                            panel: 'panel-result', // String | HTMLElement 结果列表的HTML容器id或容器元素，提供此参数后，结果列表将在此容器中进行展示。此属性对LocalCity无效。驾车路线规划无效
+                            // selectFirstResult: false, // 是否选择第一个检索结果。此属性仅对LocalSearch有效
+                        },
+                        pageCapacity: pagesize, // 设置每页容量，取值范围：1 - 100，对于多关键词检索，容量表示每个关键词的数量，如果有2个关键词，则实际检索结果数量范围为：2 - 200
+                        // 检索完成后的回调函数。 参数：results: LocalResult或Array 如果是多关键词检索，回调函数参数返回一个LocalResult的数组，数组中的结果顺序和检索中多关键词数组中顺序一致
+                        onSearchComplete: function(results){
+                            // console.log('周边返回结果-results：', results); 
+                            var status = local.getStatus();
+                            // console.log('local：', local, '\nstatus：', status);
+                            // 判断状态是否正确
+                            if(status !== 0) {
+                                neuiDialog.alert({
+                                    animate: true,
+                                    message: '没有找到相应的数据，可尝试更改范围半径',
+                                    buttons: ['确定']
+                                });
+                                return;
+                            }
+                            else if(status == 0){
+                                $('.bds__graph_result').removeClass('stretch-in');
+
+                                // 组成自定义的数据源格式，方便前后台可同时使用
+                                var outcomes = Array.isArray(results) ? results : [ results ];
+                                var pois = [];
+                                for(var i = 0; i < outcomes.length; i++) {
+                                    var poi = outcomes[i];
+                                    // console.log('poi：', poi)
+                                    var keyword = poi.keyword,
+                                        total = poi.getNumPois();
+                                    var one = { keyword: keyword, data: []}
+                                    if (total === 0) {
+                                        var tip = '抱歉，没有关键词【' + xiangmu + '】对应的结果'; // 当前结果集无POI数据
+                                        console.log(tip);
+                                    }
+                                    for (var j = 0; j < total; j++) {
+                                        var outcome = poi.getPoi(j);
+                                        one.data.push(outcome);
+                                    }
+                                    pois.push(one);
+                                }
+                                fnNearComposeStringToUser(pois);
+                            }
+                        }
+                    });
+                    // local.searchNearby(myKeys, point, radius, {poiTypes: ["教育|小学"] });
+                    local.searchNearby(myKeys, point, radius);
+                    local.setPageCapacity(pagesize); // 设置每页容量
+                }
+
+
+                neui.destroyAnimate();
+            }, 100)
         });
 
 

@@ -86,8 +86,7 @@
                         <div class="bds__search_form_box_title"> 附近项目 </div>
                         <div class="bds__search_form_box_content">
                             <input type="text" id="s-near" placeholder="关键字，如学校" onblur="this.placeholder='关键字，如学校'" onfocus="this.placeholder=''">
-                            <button type="button" id="btn-choose-near"> 按关键字选择 </button>
-                            <button type="button" id="btn-choose-near"> 按分组选择 </button>
+                            <button type="button" id="btn-choose-near"> 选择 </button>
                             <div class="bds__search_form_box_drop block__keyword" style="display: none">
                                 <ul class="bds__search_form_box_drop_list block__keyword_list"></ul>
                                 <button type="button" id="btn-word-confirm"> 确定 </button>
@@ -477,6 +476,7 @@
                 ].join('\r\n')
             });
             var $dropNode = $('.block__keyword');
+            // 如果列表还没创建，避免重复创建，已勾选的再打开时依然可选中
             if($dropNode.children('ul').find('li').length == 0) {
                 $dropNode.children('ul').empty().append(_html); 
             }
