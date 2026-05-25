@@ -3063,7 +3063,7 @@ var filter = {
         if(typeof ps_str == 'undefined' || ps_str == null) return '';
         var method = typeof ps_method == 'undefined' ? 'loose' : (ps_method == 'strict' ? 'strict' : 'loose');
         var str = ps_str.toString();
-        console.log('method：', method)
+        // console.log('method：', method)
         if(method == 'strict') { // 严格模式
             str = str.replace(/(&|--|\\|\;|\"|\'|\`|\?|\(|\))/g, '');
         }
