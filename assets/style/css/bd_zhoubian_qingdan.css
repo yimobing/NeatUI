@@ -166,8 +166,8 @@ body {
 	position: absolute;
 	z-index: 2;
 	right: 10px;
-	top: 200px;
-	width: 350px;
+	top: 100px;
+	width: 300px;
 	height: 400px;
 	background-color: #fff;
 	border-style: solid;
@@ -187,6 +187,7 @@ body {
 	border: 1px solid #8491d2;
 	border-radius: 4px 0 0 4px;
 	cursor: pointer;
+	display: none;
 }
 
 .btn-stretch:before {
@@ -224,19 +225,62 @@ body {
 	transform: rotate(-45deg);
 }
 
-
-#panel-result {
+.panel__result {
+	
+}
+#panel-result1 {
 	width: 100%;
 	height: 100%;
-	padding: 10px;
-	overflow: auto;
+	padding: 5px 10px;
 	text-align: left;
 	color: #1296db;
+	overflow-y: auto;
 }
-
-#panel-result > div {
+.panel__result > div {
 	border: 0!important;
 }
+.result__caption{
+	padding: 5px;
+	text-align: center;
+	color: #1296db;
+	font-size: 16px;
+	display: none;
+}
+.panel__result ul {
+	height: 100%;
+	padding: 0;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	list-style: none;
+	
+}
+.panel__result ul li {
+	padding: 8px 12px;
+	border-top: 1px solid #eee;
+	text-align: left;
+	cursor: pointer;
+}
+.panel__result li:first-child {
+	border: 0;
+}
+.panel__result li:hover {
+	background-color: #fafafa;
+}
+.result__title {
+	color: #00c;
+	font-size: 13px;
+}
+.result__detail {
+	margin-top: 3px;
+	font-size: 12px;
+}
+.result__detail span {
+	color: #708c90;
+}
+.result__detail em {
+	color: #777;
+}
+
 
 /*+ 地图容器区域：外层区域：地图容器及父级节点一定要设置height高度，不然地图可能无法显示 +*/
 .bds__graph_map {
@@ -375,7 +419,8 @@ body {
 	font-weight: 550;
 }
 .bds__search_result_outcome {
-	/* margin-top: 15px; */
+	height: auto;
+	overflow-y: auto;
 }
 .bds__search_result_outcome_switch {
 	border: 1px solid #ddd;
@@ -852,7 +897,57 @@ body {
 
 
 
+/*+ -------- 百度地图自定义标签样式  -------- +*/
+/* 外层容器：让气泡在地图Label里居中 */
+.ne__bd_label_wrap {
+    width: auto;
+	margin-left: -25px;
+}
 
+/* 你的气泡样式 */
+.ne__bd_lb_text {
+    position: relative;
+    background-color: #fff;
+    padding: 12px 25px;
+    border: 1px solid #19b6f8;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px 0px #3291b9;
+    color: #0c88e8;
+    font-size: 15px;
+    font-weight: bold;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* 外层箭头：画边框，实现和气泡一致的蓝色边框 */
+.ne__bd_lb_text:before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 15%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 8px solid #19b6f8;
+    z-index: 2;
+}
+
+/* 内层箭头：白色背景，盖住外层箭头的上半部分，露出蓝色边框 */
+.ne__bd_lb_text:after {
+    content: '';
+    position: absolute;
+    bottom: -7px; /* 向上偏移1px，盖住外层箭头的蓝色边框 */
+    left: 15%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 7px solid #fff;
+    z-index: 3;
+}
 
 
 /*+ -------- 媒体查询 -------- +*/
