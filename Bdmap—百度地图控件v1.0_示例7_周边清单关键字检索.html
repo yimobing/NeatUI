@@ -502,7 +502,7 @@
                 var result = {
                     return: "ok",
                     data: [
-                        { "name": "客运中心站南门", "zuobiao": "", "address": "1路、 4路、 11路、 11路复线、 21路、 24路、 40路、 42路、 305路、 K1路、 K201路、 K301路、 K307路、 K3路、 K501路、 K503路、 K606路、 K702路长线、 K702路短线", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
+                        { "name": "客运中心站南门", "zuobiao": "118.617007,24.890789", "address": "1路、 4路、 11路、 11路复线、 21路、 24路、 40路、 42路、 305路、 K1路、 K201路、 K301路、 K307路、 K3路、 K501路、 K503路、 K606路、 K702路长线、 K702路短线", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
                         { "name": "海关大楼", "zuobiao": "", "address": "4路、 6路、 15路、 19路、 21路、 23路、 24路、 28路、 33路、 35路、 49路、 60路", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
                         { "name": "刺桐公园", "zuobiao": "", "address": "7路、 32路、 60路、 202路、 305路、 K1路、 K3路、 K604路、 K701路", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"}
                     ]
@@ -1092,17 +1092,71 @@
         });
 
         // 点击关键字项
-        $('.bds__words_record_keyword_list').on('click', 'li', function(e){
+        $('.bds__words_record_keyword_list')
+        .on('mousedown', 'li', function(e) {
+            // 记录：鼠标按下时，是不是在输入框里
+            var elInput = this.querySelector('input[type="text"]');
+            if(elInput && elInput.contains(e.target)) $(elInput).attr('data-isInputClick', true);
+        })
+        .on('click', 'li', function(e){
             var target = e.target;
             var tagName = target.tagName.toLocaleLowerCase(),
                 tagType = typeof target.type == 'undefined' ? '' : target.type.toLocaleLowerCase();
-            if(tagName == 'input' && tagType == 'text') { // 输入框时阻止
+            console.log('aaa')
+            // if(tagName == 'input' && tagType == 'text') return; // 输入框时阻止
+            var elInput = this.querySelector('input[type="text"]');
+            // if(elInput && elInput.contains(e.target)) return;
+
+            // 如果刚才按下时是在输入框 → 直接取消这次点击
+            if ($(elInput).attr('data-isInputClick') == 'true') {
+                e.preventDefault();
+                e.stopPropagation();
+                $(elInput).attr('data-isInputClick', false);
                 return;
             }
+
+            console.log('bbb')
+
             var $checkbox = (tagName == 'input' && tagType == 'checkbox') ? 
                 $(this) : $(this).find('input:checkbox');
             $checkbox.prop('checked', $checkbox.prop('checked') ? false : true);
+        })
+        
+        .on('mousedown click',  'input:text', function(e){
+            console.log('ccc');
+            $(this).attr('data-isInputClick', true);
+            e.stopPropagation(); // 阻止冒泡
         });
+
+
+        // $('.bds__words_record_keyword_list').on('each', 'li', function() {
+        //     console.log('aaa')
+        //     this.addEventListener('click', function(){
+                
+        //         var target = e.target;
+        //         var tagName = target.tagName.toLocaleLowerCase(),
+        //             tagType = typeof target.type == 'undefined' ? '' : target.type.toLocaleLowerCase();
+        //         // if(tagName == 'input' && tagType == 'text') { // 输入框时阻止
+        //         //     return;
+        //         // }
+        //         console.log('aaa')
+        //         var elInput = this.querySelector('input[type="text"]');
+        //         if(elInput && elInput.contains(e.target)) return;
+        //         console.log('bbb')
+        //         var $checkbox = (tagName == 'input' && tagType == 'checkbox') ? 
+        //             $(this) : $(this).find('input:checkbox');
+        //         $checkbox.prop('checked', $checkbox.prop('checked') ? false : true);
+        //     });
+        //     var elInput = this.querySelector('input[type="text"]');
+        //     elInput.addEventListener('mousedown', function(e) {
+        //         e.stopPropagation(); // 阻止冒泡
+        //     })
+        //     elInput.addEventListener('click', function(e) {
+        //         e.stopPropagation(); // 阻止冒泡
+        //     })
+        // });
+
+
 
         // 标题左边的复选框打勾和取消打勾时
         $('.bds__words_record_keyword_title').find('input:checkbox').on('change', function(){
@@ -1331,6 +1385,9 @@
             var resultId_2 = 'panel-result2'; // 详细列表拼接根节点
             var allPois = []; // 所有POI点
             var allBdPoints = []; // 所有坐标点
+            // 先在地图上手动打点
+            map.clearOverlays(); // 清空所有覆盖物
+            document.getElementById(resultId_2).innerHTML = '';
 
             neui.showAnimate();
             setTimeout(function(){
@@ -1388,7 +1445,7 @@
                                 var arr = zuobiao.split(','),
                                     lng = arr.length > 0 ? arr[0] : '',
                                     lat = arr.length > 1 ? arr[1] : '';
-                                var point =  new BMap.Point(lng, lat);
+                                var point = new BMap.Point(lng, lat);
                                 one.data.push({
                                     title: title,
                                     point: point,
@@ -1465,10 +1522,6 @@
                     // 多个关键词，每个关键词配自己的半径
                     var finishCount = 0;
                     var totalCount = projectArr.length;
-
-                    // 在地图上手动打点
-                    map.clearOverlays(); // 清空所有覆盖物
-                    document.getElementById(resultId_2).innerHTML = '';
 
                     for(var i = 0; i < projectArr.length; i++){ // 循环逐个检索
                         // 因为 BMap.LocalSearch 是异步，故要创建闭包，锁定当前循环的 item，不然循环会乱套
@@ -1625,8 +1678,11 @@
             map.clearOverlays = function () { };
 
             // 添加标注点 + 自定义样式的文字标签
+            // console.log('groupPoint：', groupPoint)
             for (var p = 0; p < groupPoint.length; p++) {
-                var mk = new BMap.Marker(groupPoint[p]);
+                var point = groupPoint[p];
+                if(point instanceof BMap.Point == false) return;
+                var mk = new BMap.Marker(point);
                 map.addOverlay(mk);
                 tempMarkers.push(mk);
 
@@ -1689,11 +1745,14 @@
                     }
                     // 地图移动到点
                     if (tempMarkers[idx]) {
-                        map.panTo(tempMarkers[idx].getPosition());
-                        map.setZoom(18); // 强行缩放级别。值 3-19
-                        // 显示信息窗
-                        // var infoWindow = new BMap.InfoWindow(titles[idx]);
-                        // map.openInfoWindow(infoWindow, tempMarkers[idx].getPosition());
+                        var point = tempMarkers[idx].point;
+                        if(point.lng.toString() != '0' && point.lat.toString() != '0') {
+                            map.panTo(tempMarkers[idx].getPosition());
+                            map.setZoom(18); // 强行缩放级别。值 3-19
+                            // 显示信息窗
+                            // var infoWindow = new BMap.InfoWindow(titles[idx]);
+                            // map.openInfoWindow(infoWindow, tempMarkers[idx].getPosition());
+                        }
                     }
                 };
             }
