@@ -24,7 +24,6 @@
 <body>
     <style>
         #s-near { width: 300px; }
-        #s-range { width: 100px!important; }
     </style>
     <div class="bds">
         <div class="bds__graph">
@@ -99,12 +98,12 @@
                                 <div class="bds__words_caption"> 附近项目(关键字) </div>
                                 <div class="bds__words_method">
                                     <div class="bds__words_method_option">
-                                        <input type="radio" id="radio-option-by-group" class="ne-checkbox circle-tick radio-option-method" value="1">
-                                        <span> 按分组显示关键字 </span>
+                                        <input type="radio" id="radio-option-by-group" class="ne-checkbox circle-tick radio-option-method" value="1" style="display: none">
+                                        <span> 按分组选关键字 </span>
                                     </div>
                                     <div class="bds__words_method_option on">
                                         <input type="radio" id="radio-option-by-word" class="ne-checkbox circle-tick radio-option-method" value="0" checked>
-                                        <span> 显示全部关键字 </span>
+                                        <span> 全部关键字 </span>
                                     </div>
                                 </div>
                                 <div class="bds__words_record_keyword_distance">
@@ -113,10 +112,10 @@
                                     </div>
                                     <div class="bds__words_record_keyword_distance_box">
                                         <input type="text" id="c-distance" value="1000">
-                                        <em> 米(m) </em>
+                                        <em> 米</em>
                                     </div>
                                     <div class="bds__words_record_keyword_distance_box">
-                                        <button type="button" id="btn-set-distance" class="ne-btn has-3d brown"> 统一半径 </button>
+                                        <button type="button" id="btn-set-distance" class="ne-btn has-3d brown"> 一键设置半径 </button>
                                     </div>
                                 </div>
                                 <div class="bds__words_record">
@@ -144,10 +143,10 @@
                         <div class="bds__search_form_box_set">
                             <input type="checkbox" id="r-radius-check" class="ne-checkbox square-tick green" checked>
                         </div>
-                        <div class="bds__search_form_box_title"> 半径 </div>
+                        <div class="bds__search_form_box_title"> 统一半径为 </div>
                         <div class="bds__search_form_box_content">
                             <input type="text" id="s-range" data-type="integer[positive]" placeholder="搜索半径" onblur="this.placeholder='搜索半径'" onfocus="this.placeholder=''">
-                            <em> 米(m) </em>
+                            <em> 米 </em>
                         </div>
                     </div>
                 </div> <!--/.bds__search_form_content-->
@@ -159,7 +158,7 @@
                 <div class="bds__search_result_tab">
                     <div class="bds__search_result_tab_one on"> 查询结果 </div>
                     <div class="bds__search_result_tab_one"> 详细列表 </div>
-                    <div class="bds__search_result_tab_one"> 保存数据 </div>
+                    <div class="bds__search_result_tab_one"> 保存结果 </div>
                 </div>
                 <!--  -->
                 <div class="bds__search_result_outcome">
@@ -174,45 +173,9 @@
                     </div>
                     <div class="bds__search_result_outcome_switch" style="display: none">
                         <div class="bds__search_result_outcome_switch_operate">
-                            <button type="button" id="btn-save" class="ne-btn has-3d green">保存</button>
+                            <button type="button" id="btn-save" class="ne-btn has-3d green"  style="display: none">保存</button>
                         </div>
-                        <div class="bds__search_result_outcome_switch_display">
-                            <div class="bds__search_result_outcome_switch_display_one">
-                                <div class="bds__search_result_outcome_switch_display_one_item">
-                                   <div class="bds__search_result_outcome_switch_display_one_item_title"> 学校 </div>
-                                   <div class="bds__search_result_outcome_switch_display_one_item_form">
-                                        <input type="text">
-                                   </div>
-                                </div>
-                                <div class="bds__search_result_outcome_switch_display_one_list">
-                                    <ul>
-                                        <li> 刺桐公园 </li>
-                                        <li> 东湖公园 </li>
-                                        <li> 西湖公园 </li>
-                                        <li> 北湖公园 </li>
-                                        <li> 南湖公园 </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="bds__search_result_outcome_switch_display_one">
-                                <div class="bds__search_result_outcome_switch_display_one_item">
-                                   <div class="bds__search_result_outcome_switch_display_one_item_title"> 医院 </div>
-                                   <div class="bds__search_result_outcome_switch_display_one_item_form">
-                                        <input type="text">
-                                   </div>
-                                </div>
-                                <div class="bds__search_result_outcome_switch_display_one_list">
-                                    <ul>
-                                        <li>泉州第一医院</li>
-                                        <li>泉州第一医院x</li>
-                                        <li>泉州第一医院y</li>
-                                        <li>泉州第二医院</li>
-                                        <li>泉州第三医院</li>
-                                        <li>泉州第四医院</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="bds__search_result_outcome_switch_display"></div>
                     </div>
                 </div> <!--/.bds__search_result_outcome -->
 
@@ -233,11 +196,31 @@
     <script src="assets/neatui/js/neatui-dropdown.js"></script> <!-- 下拉 -->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!-- 对话框-->
     <script src="assets/neatui/js/neatui-bdmap.js"></script> <!-- 百度地图控件 -->
+    <script src="assets/neatui/js/neatui-functions.js?v20260517-1"></script> <!-- 函数库 -->
 
     <!-- mock 模拟数据 -->
     <script src="assets/lib/mock/mock-min.js"></script>
-
+    <script src="assets/style/mockdata/mock_bd_zhoubian_qingdan.js"></script>
     <script>
+        /*+———————————————— 全局变量 ————————————————+*/
+        //——————————————————————————————————————————
+        // 默认值
+        var DEFAULT_NEAR_ARR = []; // 附近项目默认选中值，支持多个。 testing 
+        var DEFAULT_RANGE = 1000; // 半径默认值。单位米(m)
+        var DEFAULT_CITY = '泉州市'; // 默认中心点城市
+        var DEFAULT_COORDINATE = '118.608524,24.896863'; // 默认中心点坐桃城
+        var DEFAULT_ZOOM = 13; // 地图默认缩放级别。值：3-19
+
+        //——————————————————————————————————————————
+        // 数据请求方式
+        var IS_USE_WEB_API = true; // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api); false 从前端直接取数据(使用百度地图浏览器版api,即js api)
+
+
+        //——————————————————————————————————————————
+        // test: 搜索结果数据请求方式 mock 
+        IS_USE_WEB_API = false;
+        
+        
 
         //——————————————————————————————————————————
         /**
@@ -247,7 +230,7 @@
          * @param {String} selector 匹配选择器（类、id、标签都支持）
          * @returns {HTMLElement|null} 匹配到的元素或null
          */
-        function getClosest(el, selector) {
+         function getClosest(el, selector) {
             var currentEl = el;
             // 向上遍历直到根节点
             while (currentEl) {
@@ -260,19 +243,6 @@
             }
             return null;
         }
-
-
-        /*+———————————————— 全局变量 ————————————————+*/
-        // 默认值
-        var DEFAULT_NEAR_ARR = []; // 附近项目默认选中值，支持多个。 testing 
-        var DEFAULT_RANGE = 1000; // 半径默认值。单位米(m)
-        var IS_USE_WEB_API = true; // 搜索结果数据获取方式。值：true 从后台取数据(使用百度地图服务端版api); false 从前端直接取数据(使用百度地图浏览器版api,即js api)
-
-        //——————————————————————————————————————————
-        // test: 搜索结果数据获取方式 mock 
-        IS_USE_WEB_API = true;
-        
-        
 
 
         /*+———————————————— FUNCTION ————————————————+*/
@@ -414,7 +384,7 @@
                         '</div>',
                         '<div class="bds__words_record_keyword_list_item_distance">',
                             '<input type="text" data-type="integer[positive]" value="' + DEFAULT_RANGE + '">',
-                            '<em>米(m)</em>',
+                            '<em>米</em>',
                         '</div>',
                     '</li>'
                 ].join('\r\n')
@@ -425,103 +395,41 @@
 
 
 
-        
-        
-
-        
-
-
-
-
-
-        /*+———————————————— 模拟数据 ————————————————+*/   
-        //——————————————————————————————————————————
-        // mock 模拟数据 从后台获取搜索结果数据
-        // 设置延时时长，模拟后端处理或返回数据的时间。
-        Mock.setup({
-            timeout: 1000, // 延时n毫秒返回
-        });
-
-        //——————————————————————————————————————————
-        // 获取关键字分组下拉数据
-        Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1001", "post", function(v){
-            // console.log('后台传过来的参数：', v);
-            return Mock.mock({
-                "return": "ok",
-                "data|3-5":[{ 
-                    "fenzu_bh": "F@id()", 
-                    "fenzu_mc|1": ["住宅组", "店铺组", "厂房组", "二手房组", "拆迁组"]
-                }]
-            });
-        });
-
-
-        //——————————————————————————————————————————
-        // 模拟获取全部关键字下拉数据
-        Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1002", "post", function(v){
-            // console.log('后台传过来的参数：', v);
-            return Mock.mock({
-                "return": "ok",
-                "data|3-16":[{ 
-                    "guanjianzi_bh": "@id()", 
-                    "guanjianzi_mc|+1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"]
-                }]
-            });
-        });
-
-
-        //——————————————————————————————————————————
-        // 获取关键字分组对应的关键字下拉数据
-        Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1003", "post", function(v){
-            // console.log('后台传过来的参数：', v);
-            return Mock.mock({
-                "return": "ok",
-                "data|5-16":[{ 
-                    "guanjianzi_bh": "@id()", 
-                    "guanjianzi_mc|+1": ["学校1", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"]
-                }]
-            });
-        });
-
-
-
-
-        // 模拟获取搜索结果数据
-        Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2002", "post", function(v){
-            // console.log('后台传过来的参数：', v);
-            var body = v.body;
-            var arr = body.split('&');
-            var field = 'guanjianzi_mc=';
-            var value = arr.filter(function(item, index, self) {
-                return item.indexOf(field) === 0;
+        /**
+         * 创建保存结果下拉结构HTML
+         * @param {Array} ps_dataSource 数据源数组
+         */
+        function create_html_list_of_saved(ps_dataSource) {
+            var _html = '';
+            $.each(ps_dataSource, function(index, item) {
+                var data = item.data;
+                _html += [
+                    '<div class="bds__search_result_outcome_switch_display_one">',
+                        '<div class="bds__search_result_outcome_switch_display_one_item">',
+                            // '<div class="bds__search_result_outcome_switch_display_one_item_title">' + item.title + '</div>',
+                            // '<div class="bds__search_result_outcome_switch_display_one_item_form">',
+                            //     '<input type="text" data-title="' + item.title + '">',
+                            // '</div>',
+                            item.title,
+                        '</div>',
+                        '<div class="bds__search_result_outcome_switch_display_one_list">',
+                            '<input type="text" data-title="' + item.title + '">',
+                            '<ul>',
+                                (function() {
+                                    var _tmpHtml = '';
+                                    $.each(item.data, function(idx, row) {
+                                        _tmpHtml += '<li>' + row + '</li>';
+                                    })
+                                    return _tmpHtml;
+                                })(),
+                            '</div>',
+                        '</div>'
+                ].join('\r\n')
             })
-            // console.log('value', value)
-            var keyword = decodeURIComponent(value).split('=')[1];
-
-            if(keyword.indexOf('公交') >= 0)
-                var result = {
-                    return: "ok",
-                    data: [
-                        { "name": "客运中心站南门", "zuobiao": "118.617007,24.890789", "address": "1路、 4路、 11路、 11路复线、 21路、 24路、 40路、 42路、 305路、 K1路、 K201路、 K301路、 K307路、 K3路、 K501路、 K503路、 K606路、 K702路长线、 K702路短线", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
-                        { "name": "海关大楼", "zuobiao": "", "address": "4路、 6路、 15路、 19路、 21路、 23路、 24路、 28路、 33路、 35路、 49路、 60路", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
-                        { "name": "刺桐公园", "zuobiao": "", "address": "7路、 32路、 60路、 202路、 305路、 K1路、 K3路、 K604路、 K701路", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"}
-                    ]
-                }
-            else 
-                var result = {
-                    return: "ok",
-                    data: [
-                        { "name": "丰泽区泉秀实验小学", "zuobiao": "118.60499,24.891375", "address": "福建省泉州市丰泽区泉秀街道浦西路18号x1", "telephone": "0595-230458103111", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
-                        { "name": "泉州现代中学", "zuobiao": "118.602556,24.894243", "address": "泉州市丰泽区田安南路371号x2", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"}
-                    ]
-                }
-
-            return Mock.mock(result);
-        });
+            $('.bds__search_result_outcome_switch_display').empty().append(_html);
+        }
 
 
-
-        
 
 
 
@@ -634,11 +542,11 @@
             onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于参数width/height/autoResize
                 // setDituSize();
             },
-            zoom: 13, // 地图缩放级别(可选)，默认11。 值：3-19
+            zoom: DEFAULT_ZOOM, // 地图缩放级别(可选)，默认11。 值：3-19
             // 中心点(可选)
             center: {
                 city: "", // 城市(可选)，默认空。值：空时根据坐标定位,非空时根据城市定位。eg.'泉州市',eg.'泉州市惠安县'。
-                coordinate: "118.608524,24.896863",
+                coordinate: DEFAULT_COORDINATE, // "118.608524,24.896863",
                 // coordinate: "118.595776,24.916136", // 坐标(可选)，默认为首都北京天安门广场的坐标,eg."经度,纬度"。
                 caption: "", // 标题文字(可选)，默认'北京市'。支持HTML
                 describe: "", // 描述文字(可选)，默认空。
@@ -1013,7 +921,7 @@
         //          附近项目下拉区域 testing
         //——————————————————————————————————————————
         //——————————————————————————————————————————
-        // 点击选择按钮、选择关键字：附近项目下拉框
+        // 选择附件项目：点击选择按钮、选择关键字、附近项目下拉框
         $('#btn-choose-near').on('click',function(){
             var $nodeWordRoot = $('.bds__words');
             var $nodeWordList = $('.bds__words_record_keyword_list');
@@ -1032,7 +940,7 @@
 
 
         //——————————————————————————————————————————
-        // 点击显示方式、切换显示方式
+        // 附近项目下拉切换显示方式
         // 这里要使用 mousedown 才能真实判断radio状态
         $('.bds__words_method_option').on('mousedown', function(e) {
             var $radio = $(this).find('input:radio');
@@ -1041,18 +949,18 @@
             // console.log(isChecked)
             if(isChecked == false) {
                 $radio.prop('checked', true);
-                $(this).addClass('on').siblings().removeClass('on').find('input:radio').prop('checked', false);
-                if(parseFloat(value) == 1) { // 按分组显示关键字
+                $(this).addClass('on').find('input:radio').show().parent().siblings().removeClass('on').find('input:radio').prop('checked', false).hide();
+                if(parseFloat(value) == 1) { // 按分组选关键字
                     var groupData = get_data_word_group();
                     var _html = create_html_list_of_group(groupData);
                     $('.bds__words_record_group_title').hide(); // 隐藏标题栏
-                    $('.bds__words_record_keyword_distance').hide(); // 隐藏统一半径区域
+                    $('.bds__words_record_keyword_distance').hide(); // 隐藏一键设置半径区域
                     $('.bds__words_record_group').show().addClass('has-100').siblings().hide();
                 }
-                else { // 显示全部关键字
+                else { // 全部关键字
                     var wordData = get_data_keywords_of_all();
                     create_html_list_of_word(wordData);
-                    $('.bds__words_record_keyword_distance').show(); // 显示统一半径区域
+                    $('.bds__words_record_keyword_distance').show(); // 显示一键设置半径区域
                     $('.bds__words_record_group').hide().siblings().show().addClass('has-100');
                     $('.bds__words_record_keyword_title').find('input:checkbox').prop('checked', false); // 标题左边的复选框取消打勾
                 }
@@ -1070,14 +978,14 @@
             $(this).addClass('active').siblings().removeClass('active');
             $(this).find('input:radio').prop('checked', true).parent().siblings().find('input:radio').prop('checked', false); // 高亮切换
 
-            $('.bds__words_record_keyword_distance').show(); // 显示统一半径区域
+            $('.bds__words_record_keyword_distance').show(); // 显示一键设置半径区域
 
             $('.bds__words_record_group').removeClass('has-100').siblings().show().removeClass('has-100'); // 切换分组和关键字显示与隐藏
             $('.bds__words_record_keyword_list').find('input:checkbox').prop('checked', true); // 所有关键字打勾
             $('.bds__words_record_keyword_title').find('input:checkbox').prop('checked', true); // 标题左边的复选框打勾
         });
 
-        // 设置统一半径按钮
+        // 一键设置半径按钮
         $('#btn-set-distance').on('click', function() {
             neui.showAnimate();
             setTimeout(function(){
@@ -1092,6 +1000,7 @@
         });
 
         // 点击关键字项
+        // 解决长按鼠标点击输入框并拖到输入框处放手时已选中的复选框会变取消选中的bug
         $('.bds__words_record_keyword_list')
         .on('mousedown', 'li', function(e) {
             // 记录：鼠标按下时，是不是在输入框里
@@ -1102,7 +1011,6 @@
             var target = e.target;
             var tagName = target.tagName.toLocaleLowerCase(),
                 tagType = typeof target.type == 'undefined' ? '' : target.type.toLocaleLowerCase();
-            console.log('aaa')
             // if(tagName == 'input' && tagType == 'text') return; // 输入框时阻止
             var elInput = this.querySelector('input[type="text"]');
             // if(elInput && elInput.contains(e.target)) return;
@@ -1115,47 +1023,14 @@
                 return;
             }
 
-            console.log('bbb')
-
             var $checkbox = (tagName == 'input' && tagType == 'checkbox') ? 
                 $(this) : $(this).find('input:checkbox');
             $checkbox.prop('checked', $checkbox.prop('checked') ? false : true);
         })
-        
         .on('mousedown click',  'input:text', function(e){
-            console.log('ccc');
             $(this).attr('data-isInputClick', true);
             e.stopPropagation(); // 阻止冒泡
         });
-
-
-        // $('.bds__words_record_keyword_list').on('each', 'li', function() {
-        //     console.log('aaa')
-        //     this.addEventListener('click', function(){
-                
-        //         var target = e.target;
-        //         var tagName = target.tagName.toLocaleLowerCase(),
-        //             tagType = typeof target.type == 'undefined' ? '' : target.type.toLocaleLowerCase();
-        //         // if(tagName == 'input' && tagType == 'text') { // 输入框时阻止
-        //         //     return;
-        //         // }
-        //         console.log('aaa')
-        //         var elInput = this.querySelector('input[type="text"]');
-        //         if(elInput && elInput.contains(e.target)) return;
-        //         console.log('bbb')
-        //         var $checkbox = (tagName == 'input' && tagType == 'checkbox') ? 
-        //             $(this) : $(this).find('input:checkbox');
-        //         $checkbox.prop('checked', $checkbox.prop('checked') ? false : true);
-        //     });
-        //     var elInput = this.querySelector('input[type="text"]');
-        //     elInput.addEventListener('mousedown', function(e) {
-        //         e.stopPropagation(); // 阻止冒泡
-        //     })
-        //     elInput.addEventListener('click', function(e) {
-        //         e.stopPropagation(); // 阻止冒泡
-        //     })
-        // });
-
 
 
         // 标题左边的复选框打勾和取消打勾时
@@ -1213,11 +1088,11 @@
                     // 更新 data-word 属性值
                     $('#s-near').val(checkedSingleArr.join(',')).attr('data-word', JSON.stringify(checkedMultipleArr));  // 附近项目输入框赋值
                 }
-                // 半径复选框禁止或允许手动输入
+                // 统一半径复选框禁止或允许手动输入
                 if( checkedSingleArr.length > 0)
-                    $('#s-range').attr('disabled', true).parent().siblings().find('input:checkbox').prop('checked', false); // 半径复选框禁止手动输入
+                    $('#s-range').attr('disabled', true).parent().siblings().find('input:checkbox').prop('checked', false); // 禁止手动输入
                 else 
-                    $('#s-range').attr('disabled', false).parent().siblings().find('input:checkbox').prop('checked', true); // 半径复选框允许手动输入
+                    $('#s-range').attr('disabled', false).parent().siblings().find('input:checkbox').prop('checked', true); // 允许手动输入
             }
         }
 
@@ -1226,8 +1101,8 @@
         //——————————————————————————————————————————
         // 附近项目输入框输入事件
         $('#s-near').on('input', function(){
-            var newStr = $(this).val().toString().replace(/\s+/g, '').replace(/[,:;，：；、。]$/g, ''), // 去掉空格、最后面的逗号等字符
-                newArr = newStr.split(/[,:;，：；、。]/);
+            var newStr = $(this).val().toString().replace(/\s+/g, '').replace(/[,:;!，：；!、。]$/g, ''), // 去掉空格、最后面的逗号等字符
+                newArr = newStr.split(/[,:;!，：；！、。]/);
             var oldStr = $(this).attr('data-word'); // 取 data-word 属性值
             if(typeof oldStr == 'undefined') oldStr = '';
             var oldArr = oldStr.toString().replace(/\s+/g, '') == '' ? [] : JSON.parse(oldStr);
@@ -1262,15 +1137,15 @@
 
 
         //——————————————————————————————————————————
-        // 勾选半径复选框状态变化
+        // 勾选统一半径复选框状态变化
         $('#r-radius-check').on('change', function(){
             var isChecked = $(this).prop('checked');
             // console.log(isChecked)
             if(isChecked) {
-                $('#s-range').attr('disabled', false); // 半径复选框允许手动输入
+                $('#s-range').attr('disabled', false); // 允许手动输入
             }
             else {
-                $('#s-range').attr('disabled', true); // 半径复选框禁止手动输入
+                $('#s-range').attr('disabled', true); // 禁止手动输入
             }
         });
 
@@ -1278,17 +1153,17 @@
 
         
         //——————————————————————————————————————————
-        //          查询结果区域
+        //          保存结果区域
         //——————————————————————————————————————————
         //——————————————————————————————————————————
-        // 结果切片切换
+        // [保存结果切片] 切片切换
         $('.bds__search_result_tab').children().on('click', function() {
             var index = $(this).index();
             $(this).addClass('on').siblings().removeClass('on');
             $('.bds__search_result_outcome').children().eq(index).show().siblings().hide();
         });
 
-        // [结果保存] 点击某项
+        // [保存结果切片] 点击某项
         $('.bds__search_result_outcome_switch_display').on('click', 'li', function(e){
             var $input = $(this).parents('.bds__search_result_outcome_switch_display_one').find('input:text, textarea');
             var now_value = $(this).text().toString().replace(/\s+/g, '').replace(/(,)/g, ' '), // 去掉空格，去掉逗号
@@ -1303,7 +1178,12 @@
                 $(this).removeClass('on');
                 new_value = removeMatchWord(old_value, now_value, true); // 减去当前项，精准整词匹配
             }
-            new_value = new_value.replace(/(,){2,}/g, ',').replace(/(.*),$/g, '$1').replace(/^,(.*)/g, '$1'); // 掉多个逗号，去掉结尾开头的逗号
+
+            new_value = new_value.replace(/\s+/g, ' '); // 多个空格替换成1个
+            new_value = new_value.replace(/\s/g, ','); // 空格替换成逗号
+            new_value = new_value.replace(/(;|!|\.|，|；|！|。|、)/g, ','); // 分号等字符转成逗号
+
+            new_value = new_value.replace(/(,){2,}/g, ',').replace(/(.*),$/g, '$1').replace(/^,(.*)/g, '$1'); // 去掉多个逗号等符号，去掉结尾开头的逗号
             $input.val(new_value);
         });
 
@@ -1357,18 +1237,20 @@
         // 查询按钮
         $('#btn-query').on('click', function(){
             var zuobiao = $('#c-locate').val(), // 坐标
-                projectList = $('#s-near').val(), // 附近项目
+                xiaoqu_mingcheng = filter.dangerousChars($('#s-community').val()),
+                projectList = filter.dangerousChars($('#s-near').val()), // 附近项目
                 banjing = $('#s-range').val(); // 范围，半径
-            var isTickRadius = $('#r-radius-check').prop('checked'); // 半径复选框是否勾选
+            var isTickRadius = $('#r-radius-check').prop('checked'); // 统一半径复选框是否勾选
             var unifyRadius = $('#s-range').val(); // 统一的半径
             if(isNaN(parseFloat(unifyRadius))) unifyRadius = DEFAULT_RANGE; // 非数值型时
 
-            // eg. 尊邸大厦  118.608514,24.89511
             // 校验数据完整性
             var tips = '';
-            if(projectList == '') tips += '附近项目、';
-            if(banjing == '') tips += '半径、';
-            if(tips != '') {
+            if(xiaoqu_mingcheng == '') {
+                $('#s-community').focus();
+                return;
+            }
+            if(projectList == '') {
                 $('#s-near').focus();
                 return;
             }
@@ -1376,7 +1258,6 @@
             // 取值
             var projectStr = $('#s-near').attr('data-word'); // 取 data-word 属性值
             var projectArr = projectStr.toString().replace(/\s+/g, '') === '' ? [] : JSON.parse(projectStr);
-            // var projectArr = projectList.toString().replace(/\s+/g, '').replace(/[,:;，：；、。]$/g, '').split(/[,:;，：；、。]/); 
             var isMoreThanOneKey = projectArr.length > 0 ? true : false; // 关键是否>=1个
             var myKeys = isMoreThanOneKey ? projectArr : [projectList]; // 关键词。数组格式
             // console.log('projectArr：', projectArr);
@@ -1399,10 +1280,21 @@
                             var ls_zuobiao = zuobiao;
                             var ls_guanjianzi_mc = row["keyword"],
                                 ls_juli_fanwei_mi = row["distance"];
-                            if(isTickRadius) { // 有勾选半径复选框时，距离统一为指定的半径
+                            if(isTickRadius) { // 有勾选统一半径复选框时，统一为指定的半径
                                 ls_juli_fanwei_mi = unifyRadius;
                             }
                             // console.log('ls_guanjianzi_mc：', ls_guanjianzi_mc, '\n坐标：', ls_zuobiao, '\n距离范围：', ls_juli_fanwei_mi);
+
+                            var ls_data = {
+                                "action": "wh_web_gongye_jizhun_dijia_fujin_list",
+                                "user": "<%=s_user%>",
+                                "sjk": "<%=s_sjk%>",
+                                "menu_bh": "<%=s_menu_bh%>",
+                                "guanjianzi_mc": ls_guanjianzi_mc,
+                                "zuobiao": ls_zuobiao,
+                                "juli_fanwei_mi": ls_juli_fanwei_mi
+                            }
+                            // console.log('ls_data：', ls_data);
 
                             // 后台返回 ajax({})
                             var outcomeData = { data: [] }
@@ -1412,16 +1304,8 @@
                                 type: "POST",
                                 dataType: "html",
                                 cache: false,
-                                url: "../fwh_pub/jk_loupan_fujin.ashx?param=2002",
-                                data: {
-                                    "action": "wh_web_gongye_jizhun_dijia_fujin_list",
-                                    "user": "<%=s_user%>",
-                                    "sjk": "<%=s_sjk%>",
-                                    "menu_bh": "<%=s_menu_bh%>",
-                                    "guanjianzi_mc": ls_guanjianzi_mc,
-                                    "zuobiao": ls_zuobiao,
-                                    "juli_fanwei_mi": ls_juli_fanwei_mi
-                                },
+                                url: "../fwh_pub/jk_loupan_fujin.ashx?param=2001",
+                                data: ls_data,
                                 success: function(res){
                                     if(!res || $.isEmptyObject(res)) return;
                                     outcomeData = JSON.parse(res);
@@ -1436,9 +1320,11 @@
                             var one = { keyword: ls_guanjianzi_mc, data: []}
                             var listHtml = ''; // 在地图上手动打点 -> 拼接列表1
                             outcomeData.data.forEach(function(item){
+                                // console.log('item：', item)
                                 var zuobiao = item.zuobiao,
                                     title = item.name,
                                     address = typeof item.address == 'undefined' ? '' : item.address,
+                                    distance = typeof item.juli_mi == 'undefined' ? '' : item.juli_mi,
                                     phoneNumber = typeof item.telephone == 'undefined' ? '' : item.telephone,
                                     sheng = item.sheng,
                                     shi = item.shi;
@@ -1450,6 +1336,7 @@
                                     title: title,
                                     point: point,
                                     address: address,
+                                    distance: distance,
                                     phoneNumber: phoneNumber,
                                     province: sheng,
                                     city: shi
@@ -1466,6 +1353,18 @@
                                                     '<div class="result__detail_one">',
                                                         '<span> 地址：</span>',
                                                         '<em>' + address + '</em>',
+                                                    '</div>',
+                                                '</div>'
+                                            ].join('\r\n');
+                                            return _tmpHtml;
+                                        })(),
+                                        (function(){
+                                            var _tmpHtml = distance == '' ? '' : 
+                                            [
+                                                '<div class="result__detail">',
+                                                    '<div class="result__detail_one">',
+                                                        '<span> 地址：</span>',
+                                                        '<em>' + distance + '米</em>',
                                                     '</div>',
                                                 '</div>'
                                             ].join('\r\n');
@@ -1517,16 +1416,20 @@
                     // 方案2：从前端直接取数据(使用百度地图浏览器版api,即js api)
                     var pagesize = 100; // 每页容量
                     var coordinateArr = zuobiao.split(',');
-                    var point = new BMap.Point(coordinateArr[0], coordinateArr[1]); // 中心点
+                    var coordinateLng = coordinateArr[0],
+                        coordinateLat = coordinateArr[1];
+                    var point = new BMap.Point(coordinateLng, coordinateLat); // 中心点
 
                     // 多个关键词，每个关键词配自己的半径
                     var finishCount = 0;
                     var totalCount = projectArr.length;
+                    var zeroCount = 0; // 没有找到结果的关键词数量统计
 
                     for(var i = 0; i < projectArr.length; i++){ // 循环逐个检索
                         // 因为 BMap.LocalSearch 是异步，故要创建闭包，锁定当前循环的 item，不然循环会乱套
                         (function(currentItem){
                             // var item = projectArr[i];
+                            // console.log('currentItem：', currentItem)
                             var keys = currentItem["keyword"], // 关键词
                                 radius = currentItem["distance"]; // 半径
                             // console.log('关键词-x：', keys, '\n半径-x：', radius);
@@ -1546,12 +1449,13 @@
                                 onSearchComplete: function(results){
                                     var status = local.getStatus();
                                     // console.log('关键词-y：', keys, '\n半径-y：', radius, '\nlocal：', local, '\nstatus：', status);
-                                    console.log('周边返回结果-results：', results); 
+                                    // console.log('周边返回结果-results：', results); 
                                     if(status !== 0) {
-                                        var tips = '【' + keys + '】没有找到相应的数据，可尝试更改半径';
-                                        console.log(tips);
+                                        // var tips = '【' + keys + '】没有找到相应的数据，可尝试更改半径';
+                                        // console.log(tips);
+                                        zeroCount++;
                                     }
-                                    else if(status == 0) {
+                                    // else if(status == 0) { 
                                         // 组成自定义的数据源格式，方便前后台可同时使用
                                         var outcomes = Array.isArray(results) ? results : [ results ];
                                         for(var i = 0; i < outcomes.length; i++) {
@@ -1560,10 +1464,6 @@
                                             var keyword = poi.keyword,
                                                 total = poi.getNumPois();
                                             var one = { keyword: keyword, data: []}
-                                            if (total === 0) {
-                                                var tip = '抱歉，没有关键词【' + projectList + '】对应的结果'; // 当前结果集无POI数据
-                                                console.log(tip);
-                                            }
                                             var listHtml = ''; // 在地图上手动打点 -> 拼接列表1
                                             for (var j = 0; j < total; j++) {
                                                 var outcome = poi.getPoi(j);
@@ -1574,18 +1474,36 @@
                                                     title = outcome.title,
                                                     address = typeof outcome.address == 'undefined' ? '' : outcome.address,
                                                     phoneNumber = typeof outcome.phoneNumber == 'undefined' ? '' : outcome.phoneNumber;
+                                                var distance = fnCalculateDistance(coordinateLng, coordinateLat, point.lng, point.lat);
                                                 
                                                 allBdPoints.push(point);
+                                                var title_str = title, address_str = address;
+                                                if(keyword.indexOf('公交') >= 0) {
+                                                    title_str = title + '站';
+                                                    address_str = '公交线路';
+                                                }
                                                 listHtml += [
                                                     '<li>',
-                                                        '<div class="result__title">' + title + '</div>',
+                                                        '<div class="result__title">' + title_str + '</div>',
                                                         (function(){
                                                             var _tmpHtml = address == '' ? '' : 
                                                             [
                                                                 '<div class="result__detail">',
                                                                     '<div class="result__detail_one">',
-                                                                        '<span> 地址：</span>',
+                                                                        '<span> ' + address_str + '：</span>', // 地址、公交线路等
                                                                         '<em>' + address + '</em>',
+                                                                    '</div>',
+                                                                '</div>'
+                                                            ].join('\r\n');
+                                                            return _tmpHtml;
+                                                        })(),
+                                                        (function(){
+                                                            var _tmpHtml = distance == '' ? '' : 
+                                                            [
+                                                                '<div class="result__detail">',
+                                                                    '<div class="result__detail_one">',
+                                                                        '<span> 距离：</span>',
+                                                                        '<em>' + distance + '米</em>',
                                                                     '</div>',
                                                                 '</div>'
                                                             ].join('\r\n');
@@ -1622,7 +1540,7 @@
                                                 document.getElementById(resultId_2).innerHTML += allHtml;
                                             }
                                         }
-                                    }
+                                    // }
 
                                     finishCount++;
                                     // console.log('finishCount：', finishCount, ',totalCount:', totalCount);
@@ -1631,6 +1549,10 @@
                                     if(finishCount === totalCount){
                                         // console.log('所有POI点：', allPois)
                                         // console.log('所有坐标点：', allBdPoints)
+                                        if(zeroCount == totalCount) {
+                                            var tip = '抱歉，没有到有找到关键词【' + projectList + '】对应的结果'; // 当前结果集无POI数据
+                                            console.log(tip);
+                                        }
                                         // 在地图上手动打点
                                         fnAddMarker(allBdPoints);
                                         // 统一处理最终结果
@@ -1649,6 +1571,39 @@
                 neui.destroyAnimate();
             }, 100)
         });
+
+
+
+
+        //——————————————————————————————————————————
+        /**
+         * 计算两点之间的距离（Haversine公式）
+         * @param {Number} lat1 - 点1纬度
+         * @param {Number} lng1 - 点1经度
+         * @param {Number} lat2 - 点2纬度
+         * @param {Number} lng2 - 点2经度
+         * @returns {Number} 返回距离（米）
+         */
+        function fnCalculateDistance(lat1, lng1, lat2, lng2) {
+            var R = 6371000; // 地球半径（米）
+            var dLat = toRad(lat2 - lat1);
+            var dLng = toRad(lng2 - lng1);
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var val = R * c;
+            return Math.round(val);
+        };
+
+        /**
+         * 角度转弧度
+         * @param {Number} degrees - 角度
+         * @returns {Number} 弧度
+         */
+        function toRad(degrees) {
+            return degrees * Math.PI / 180;
+        };
 
 
 
@@ -1764,7 +1719,8 @@
 
         //——————————————————————————————————————————
         /**
-         * 根据百度地图附近关键词搜索结果返回的值组成用户所需的字符串
+         * 创建切片数据
+         * 即：根据百度地图附近关键词搜索结果返回的值组成用户所需的字符串
           【说明】
           组成字符串显示在界面上：
             ①关键词是除“公交”以外的显示效果
@@ -1774,17 +1730,20 @@
          * @param {Array} ps_dataSource 数据源数组。数据格式：[{keyword: "关键词", data: [{title: "名称", "address": "地址", "province": "所在省份", "city": "所在城市", "point": "坐标点对象, lng, lat", ... }]}]
          */
         function fnNearComposeStringToUser(ps_dataSource){
-            // console.log('results：', results);
+            // console.log('ps_dataSource：', ps_dataSource)
             map.clearOverlays(); // 清空所有覆盖物
             // map.centerAndZoom(point, 13); // 调整视野
-            var placeList = [], 
-                serviceArr = []; // 公共服务设施
-                busStr = ''; // 公交
+            var placeList = [], // 搜索到的地点名称组成的数组。eg. ['a小学', 'b小学', 'a医院', 'b医院']
+                composeArr = [], // 关键词+搜索到的地点名称组合在一起的语句组成数组。eg. ['学校：a小学、b小学等', '医院：a医院、b医院等']
+                savedArr = [], // 用于保存的数组。eg. [{'title': '学校', data: ['a小学', 'b小学']}, {'title': '医院', data: ['a医院', 'b医院']}]
+                busArr = [], // 公交站点数组
+                busStr = ''; // 公交组成的字符串
             for(var i = 0; i < ps_dataSource.length; i++) {
                 var one = ps_dataSource[i];
                 var word = one.keyword,
                     pois = one.data;
-                var oneStr = '', titleArr = [];
+                // console.log('word：', word)
+                var oneStr = '', titleArr = [], oneSaveObj = { title: word, data: []};
                 // console.log('pois:', pois)
                 // console.log('len:', pois.length)
                 for(var k = 0; k < pois.length; k++) {
@@ -1797,11 +1756,13 @@
                         // marker.setLabel(new BMap.Label(poi.title, {offset: new BMap.Size(20, -10)}));
                         var title = poi.title, address = poi.address;
                         placeList.push(title);
+                        oneSaveObj.data.push(word.indexOf('公交') >= 0 ? title + '站' : title);
                         if(word.indexOf('公交') >= 0) {
+                            busArr.push(title);
                             busStr += '\r\n“' + title + '”公交站点：';
                             if(address != '') {
                                 busStr += '有' + address.replace(/(\;|\；)/g, '、') + '等公交线路停靠';
-                                busStr += ( k == pois.length - 1) ? '。' : '，';
+                                busStr += ( k == pois.length - 1) ? '。' : '；';
                             }
                         }
                         else {
@@ -1809,29 +1770,128 @@
                         }
                     }
                 }
+               
                 oneStr += titleArr.join('、');
                 oneStr += titleArr.length == 0 ? '' : ((i == ps_dataSource.length - 1) ? '。' : '等；\r\n\r\n'); 
-                oneStr = (word.indexOf('公交') >= 0 ? '' : (titleArr.length == 0 ? '' : word + '：')) + oneStr;
-                serviceArr.push(oneStr);
+                oneStr = (word.indexOf('公交') >= 0 ? '' : (titleArr.length == 0 ? word + '：\r\n\r\n' : word + '：')) + oneStr;
+                composeArr.push(oneStr);
+                savedArr.push(oneSaveObj);
             }
-            // console.log('serviceArr：', serviceArr);
-            var serviceStr = '区域内有\r\n\r\n' + serviceArr.join('');
-            busStr = busStr == '' ? '' : ('出入可利用私家车、公交车、自行车及出租车等；周边有' + busStr);
+            // console.log('地点名称数组：', placeList, '\n结果组合数组：', composeArr, '\n要保存的数组：', savedArr);
+            var serviceStr = '区域内有\r\n\r\n' + composeArr.join('');
+            busStr = busStr == '' ? '' : ('\r\n出入可利用交通工具：\r\n出入可利用私家车、公交车、自行车及出租车等；周边有“' + busArr.join('、') + '”' + busArr.length + '个公交站点，公交线路如下：\r\n' + busStr);
             // 如果最后一个字符是分号则转化为句号
             var index = serviceStr.lastIndexOf('；'), length = serviceStr.length;
             if(index == length - 1) {
                 serviceStr = serviceStr.substring(0, index) + '。';
             }
 
-            // 结果输入到指定位置
-            var resultStr = serviceStr + '\r\n\r\n' + busStr;
+            // 结果输入到“查询结果”切片指定位置
+            var resultStr = serviceStr + '\r\n' + busStr;
             $('#r-result').val(resultStr);
+
+            // 创建“保存结果”切片数据
+            create_html_list_of_saved(savedArr);
+            $('#btn-save').show(); // 显示保存按钮
         }
 
 
 
-        
-    
+
+        //——————————————————————————————————————————
+        // 保存按钮：保存结果数据
+        $('#btn-save').on('click', function(){
+            var $elNode = $('.bds__search_result_outcome_switch_display');
+            if($elNode.children().length == 0) {
+                neuiDialog.alert({
+                    message: '无数据，无需保存',
+                    buttons: ['确定']
+                })
+                return;
+            }
+            var ls_xiaoqu_mingcheng = $('#s-community').val(); // 小区名称
+            var ls_suiji_bh = utilities.getRandomString(18); // N位随机字符。
+
+            neui.showAnimate();
+            setTimeout(function() {
+                var dataArr = [];
+                var isContinue = true;
+                $elNode.children().each(function (){
+                    var $input = $('input:text', this);
+                    var title = $input.attr('data-title'),
+                        value = $input.val();
+                    value = value.replace(/\s+/g, ' '); // 多个空格替换成1个
+                    value = value.replace(/\s/g, ','); // 空格替换成逗号
+                    value = value.replace(/[,:;!，：；！、。]/g, ','); // 分号等字符转成逗号
+                    value = value.replace(/(,){2,}/g, ',').replace(/(.*),$/g, '$1').replace(/^,(.*)/g, '$1'); // 去掉多个逗号等符号，去掉结尾开头的逗号
+                    // console.log('title：', title, '\nvalue：', value);
+
+                    var ls_guanjianzi_ziduan = title,
+                        ls_neirong = value;
+                    var ls_data = {
+                        "action": "wh_loupan_fujin_guanjianzi_sousuo_ins",
+                        "user": "<%=s_user%>",
+                        "sjk": "<%=s_sjk%>",
+                        "menu_bh": "<%=s_menu_bh%>",
+                        "suiji_bh": ls_suiji_bh,
+                        "guanjianzi_ziduan": ls_guanjianzi_ziduan,
+                        "neirong": ls_neirong,
+                        "xiaoqu_mingcheng": ls_xiaoqu_mingcheng
+                    }
+                    // console.log('ls_data：', ls_data);
+                    
+                    var flag = '',  // 是否成功。值： 空值表示未知, 1 是, false 否
+                        msg = ''; // 失败时的信息
+                    // START AJAX
+                    $.ajax({
+                        async: false, // 取数方式. true 异步(默认), false 同步
+                        type: "POST",
+                        dataType: "html",
+                        cache: false,
+                        url: "../fwh_pub/jk_loupan_fujin.ashx?param=2002",
+                        data: ls_data,
+                        success: function(res){
+                            // console.log('res：', res)
+                            if(!res || $.isEmptyObject(res)) return;
+                            var result = JSON.parse(res);
+                            if(result.return != 'ok') {
+                                flag = '0';
+                                msg = result.data;
+                            }
+                        },
+                        error: function(errs){ 
+                            neui.destroyAnimate();
+                        },
+                        beforeSend: function(xhr){ },
+                        complete: function(xhr, status){ }
+                    })
+                    // END AJAX
+                    if(flag == '0') {
+                        isContinue = false;
+                        neuiDialog.alert({
+                            message: msg,
+                            buttons: ['确定']
+                        })
+                        neui.destroyAnimate();
+                        return false;
+                    }
+                });
+
+                if(isContinue) {
+                    neuiDialog.alert({
+                        message: '保存成功',
+                        buttons: ['确定']
+                    })
+                }
+
+                neui.destroyAnimate();
+            }, 100);
+        });
+
+
+
+
+
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //              小区名称关键字提示输入提示词条
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -1945,7 +2005,8 @@
 
             // 方法2：使用地理编码。配额足够，1天最多5000次
             var address = myValue;
-            var city = '泉州市';
+            var city = $('#c-city').val();
+            if(city.toString().replace(/\s+/g, '') === '') city = DEFAULT_CITY;
             city = getCityName(city);
             // console.log('city-x：', city,'\nmyValue-x：', myValue);
             getAddressCoordinateByGeoCoder(address, city, function(point) {
@@ -1954,6 +2015,7 @@
                     // 创建标注点
                     map.centerAndZoom(point, 16);
                     map.addOverlay(new BMap.Marker(point)); // 添加标注
+                    $('#c-locate').val(point.lng + ',' + point.lat); // 坐标栏赋值
                 }
             });
         }

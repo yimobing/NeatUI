@@ -1139,14 +1139,46 @@ var utilities = {
         return randomNumber; 
     },
     
+    
+    /**
+     * 生成固定长度随机字符串（大小写字母+数字）
+     * 兼容性：兼容 IE6-IE11
+     * add 20260527-1
+     * @param {Number} ps_len 随机字符的长度，默认8(可选)
+     * @param {Object} ps_opts 参数对象(可选)。参考函数内配置
+     * @returns {String} 返回生成的随机字符串
+     */
+    getRandomString: function(ps_len, ps_opts) {
+        var len = (typeof ps_len === 'number' && ps_len > 0) ? Math.floor(ps_len) : 8; // 长度安全校验（确保是正整数，否则默认8）
+        var original = {
+            pureType: '', // 纯数字或纯字母方式。值：空 表示不限(默认), number 纯数字， letter 纯字母。值为非空时时如果要纯数字或纯字母，则必须把 upperCase 设为false
+            upperCase: true // 是否包含大写字母，默认true
+        };
+        var config = merge.extend(true, {}, original, ps_opts || {});
+        var newStr = '';
+        var upperStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            lowerStr = 'abcdefghijklmnopqrstuvwxyz',
+            numberStr = '0123456789';
+        var chars = numberStr + lowerStr;
+        if (config.pureType == 'number') chars = numberStr;
+        else if(config.pureType == 'letter') {
+            chars = lowerStr
+        }
+        if (config.upperCase) chars += upperStr;
+        for (var i = 0; i < len; i++) {
+            newStr += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return newStr;
+    },
+
 
     /*
-    * 生成N位随机数(字母+数字组成)
+    * 生成不固定或固定长度的N位随机字符串(字母+数字组成)
     * @param {number} min 最小位数(固定位数)
     * @param {number} max 最大位数(可选), 默认max=min
     * @param {boolean} isRandomed 是否任意长度(可选). true 是(默认), false 否. 值为false时,生成的字符长度为min指定的位数
     */
-     getRandomWord: function(min, max, isRandomed) {
+    getRandomWord: function(min, max, isRandomed) {
         max = typeof max == 'undefined' ? min : max;
         isRandomed = typeof isRandomed == 'undefined' ? true : (isRandomed === false ? false : true);
         var str = ''
@@ -1165,7 +1197,7 @@ var utilities = {
 
     
     /**
-     * 生成N位随机数(字母+数字组成)
+     * 生成不固定长度的N位随机字符串(字母+数字组成)
      * @returns {string} 返回字符串
     */
     getRandomChar: function(){
@@ -3059,7 +3091,7 @@ var filter = {
         `   反引号，原本是用来标记字段名或表名的符号
         ?   问号，参数占位符冲突
     */
-    filterDangerousChars: function(ps_str, ps_method) {
+    dangerousChars: function(ps_str, ps_method) {
         if(typeof ps_str == 'undefined' || ps_str == null) return '';
         var method = typeof ps_method == 'undefined' ? 'loose' : (ps_method == 'strict' ? 'strict' : 'loose');
         var str = ps_str.toString();
@@ -3662,8 +3694,55 @@ var convert = {
 //=====================================================================================================================
 
 var merge = {
+
     /**
-     * 原生JS合并对象1
+     * 原生JS合并对象 - 完全等价于 jQuery $.extend()
+     * add 20260527-1
+     * 说明：兼容 IE6~IE11，无任何新语法、无依赖，支持深合并(哪怕是N层嵌套深合并)或浅合并
+     * 用法：extend([deep], target, object1, object2,...)
+     * eg. 
+        var config = extend(true, {}, defaults, options || {}); 1. 深合并（推荐，嵌套对象不丢失）
+        var config = extend({}, defaults, options || {}); 2. 浅合并（只合并第一层，嵌套对象会被整个替换）
+        * @param {deep} 可选，布尔值，是否深合并（true=深合并，false/不写=浅合并）
+        * @param {target} 必选，目标对象，合并结果会赋值到这里
+        * @param {objects} 可选，一个或多个被合并的对象
+        * @return {Object} 返回合并后的目标对象
+        */
+    extend: function() {
+        var deep = false; // 是否深合并，默认 false
+        var i = 1; // 源对象起始索引
+        var target = arguments[0] || {}; // 目标对象，默认取第一个参数
+        // 如果第一个参数是布尔值，代表深合并开关
+        if (typeof target === 'boolean') {
+            deep = target; // 赋值深合并状态
+            target = arguments[i] || {}; // 目标对象切换为第二个参数
+            i++; // 索引后移一位
+        }
+        // 遍历所有需要合并的源对象
+        for (; i < arguments.length; i++) {
+            var source = arguments[i]; // 当前源对象
+            if (!source) continue; // 空值直接跳过
+            // 遍历对象自身可枚举属性
+            for (var key in source) {
+                if (source.hasOwnProperty(key)) { // 只处理自身属性，不遍历原型链
+                    var targetValue = target[key]; // 目标对象当前属性值
+                    var sourceValue = source[key]; // 源对象待覆盖属性值
+
+                    // 深合并：两边都是对象且开启 deep，则递归合并
+                    if (deep && targetValue && typeof targetValue === 'object' && sourceValue && typeof sourceValue === 'object') {
+                    extend(deep, targetValue, sourceValue); // 递归执行深合并
+                    } else {
+                    target[key] = sourceValue; // 浅合并：直接覆盖赋值
+                    }
+                }
+            }
+        }
+        return target; // 返回合并完成的目标对象
+    },
+
+
+    /**
+     * 原生JS合并对象1(旧版)
      * 即用一个或多个对象来扩展一个对象，返回被拓展的对象
      * 注：本函数很好的模拟了JQ extend合并对象
      * BUG说明：某些情况下很多层次的深合并时本函数有存在一些BUG
@@ -3682,7 +3761,7 @@ var merge = {
     * [jq合并对象的方法]
         $.extend(deep, target, obj1, obj2, ..., objN);
     */
-    extend: function(){
+    extend2: function(){
         var options, name, src, copy, deep = false, target = arguments[0], i = 1, length = arguments.length;
         if (typeof (target) === "boolean") deep = target, target = arguments[1] || {}, i = 2; // eg. extend(true, {}, defs, opts || {});
         if (typeof (target) !== "object" && typeof (target) !== "function") target = {}; // eg.

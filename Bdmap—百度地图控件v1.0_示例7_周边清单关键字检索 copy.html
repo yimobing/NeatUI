@@ -1125,7 +1125,8 @@
 
             // 方法2：使用地理编码。配额足够，1天最多5000次
             var address = myValue;
-            var city = '泉州市';
+            var city = $('#c-city').val();
+            if(city.toString().replace(/\s+/g, '') === '') city = '泉州市';
             city = getCityName(city);
             // console.log('city-x：', city,'\nmyValue-x：', myValue);
             getAddressCoordinateByGeoCoder(address, city, function(point) {
@@ -1134,6 +1135,7 @@
                     // 创建标注点
                     map.centerAndZoom(point, 16);
                     map.addOverlay(new BMap.Marker(point)); // 添加标注
+                    $('#c-locate').val(point.lng + ',' + point.lat); // 坐标栏赋值
                 }
             });
         }
