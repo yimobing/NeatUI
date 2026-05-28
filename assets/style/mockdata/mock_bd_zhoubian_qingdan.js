@@ -12,8 +12,46 @@ Mock.setup({
     timeout: 1000, // 延时n毫秒返回
 });
 
+
 //——————————————————————————————————————————
-// 模拟获取关键字分组下拉数据
+// 获取默认搜索组(取所有默认搜索组及对应的默认搜索关键字)
+Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9001", "post", function(v){
+    // console.log('后台传过来的参数：', v);
+    return Mock.mock({
+        "return": "ok",
+        "data|1-5":[{ 
+            "fenzu_bh": "F@id()", 
+            "fenzu_mc|+1": ["住宅组", "店铺组", "厂房组", "二手房组", "拆迁组"],
+            "data|1-3": [{
+                "guanjianzi_bh": "G@id()", 
+                "guanjianzi_mc|1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
+                "juli|+1": [1000, 2000, 3000, 4000, 5000] // 距离，单位：米
+            }]
+        }]
+    });
+});
+
+
+
+//——————————————————————————————————————————
+// 获取默认搜索关键字(取所有默认搜索组下的所有默认搜索关键字，并去重)
+Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9002", "post", function(v){
+    // console.log('后台传过来的参数：', v);
+    return Mock.mock({
+        "return": "ok",
+        "data|1-3":[{ 
+            "guanjianzi_bh": "G@id()", 
+            "guanjianzi_mc|1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
+            "juli|+1": [1000, 2000, 3000, 4000, 5000] // 距离，单位：米
+        }]
+    });
+});
+
+
+
+
+//——————————————————————————————————————————
+// 获取关键字分组下拉数据
 Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1001", "post", function(v){
     // console.log('后台传过来的参数：', v);
     return Mock.mock({
@@ -27,28 +65,32 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1001", "post", function(v){
 
 
 //——————————————————————————————————————————
-// 模拟获取全部关键字下拉数据
+// 获取全部关键字下拉数据
 Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1002", "post", function(v){
     // console.log('后台传过来的参数：', v);
     return Mock.mock({
         "return": "ok",
         "data|3-16":[{ 
-            "guanjianzi_bh": "@id()", 
-            "guanjianzi_mc|+1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"]
+            "guanjianzi_bh": "G@id()", 
+            "guanjianzi_mc|+1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
+            "juli|+1": [1000, 2000, 3000, 4000, 5000], // 距离，单位：米
         }]
     });
 });
 
 
 //——————————————————————————————————————————
-// 模拟获取关键字分组对应的关键字下拉数据
+// 获取关键字分组对应的关键字下拉数据
 Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1003", "post", function(v){
     // console.log('后台传过来的参数：', v);
     return Mock.mock({
         "return": "ok",
         "data|5-16":[{ 
-            "guanjianzi_bh": "@id()", 
-            "guanjianzi_mc|+1": ["学校1", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"]
+            "guanjianzi_bh": "G@id()", 
+            "guanjianzi_mc|+1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
+            // 待后台给字段 testing
+            "juli|+1": [1000, 2000, 3000, 4000, 5000], // 距离，单位：米
+            "check_moren|0-1": 0 // 是否默认搜索关键字
         }]
     });
 });
@@ -56,7 +98,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1003", "post", function(v){
 
 
 //——————————————————————————————————————————
-// 模拟获取搜索结果数据
+// 获取搜索结果数据
 Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2001", "post", function(v){
     // console.log('后台传过来的参数：', v);
     var body = v.body;
@@ -92,7 +134,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2001", "post", function(v){
 
 
 //——————————————————————————————————————————
-// 模拟保存数据
+// 保存数据
 var nCount = 0;
 Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2002", "post", function(v){
     // console.log('后台传过来的参数：', v);

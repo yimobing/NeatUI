@@ -141,11 +141,11 @@
                     </div>
                     <div class="bds__search_form_box">
                         <div class="bds__search_form_box_set">
-                            <input type="checkbox" id="r-radius-check" class="ne-checkbox square-tick green" checked>
+                            <input type="checkbox" id="r-radius-check" class="ne-checkbox square-tick green">
                         </div>
                         <div class="bds__search_form_box_title"> 统一半径为 </div>
                         <div class="bds__search_form_box_content">
-                            <input type="text" id="s-range" data-type="integer[positive]" placeholder="搜索半径" onblur="this.placeholder='搜索半径'" onfocus="this.placeholder=''">
+                            <input type="text" id="s-range" data-type="integer[positive]" placeholder="搜索半径" onblur="this.placeholder='搜索半径'" onfocus="this.placeholder=''" disabled>
                             <em> 米 </em>
                         </div>
                     </div>
@@ -163,7 +163,12 @@
                 <!--  -->
                 <div class="bds__search_result_outcome">
                     <div class="bds__search_result_outcome_switch">
+                        <div class="bds__search_result_outcome_switch_record">
+                            <div class="bds__search_result_outcome_switch_record_title"> 当前查询关键字 </div>
+                            <div class="bds__search_result_outcome_switch_record_list"></div>
+                        </div>
                         <div class="bds__search_result_outcome_switch_content">
+                            <div class="bds__search_result_outcome_switch_content_title"> 查询结果 </div>
                             <textarea id="r-result"></textarea>
                         </div>
                     </div>
@@ -205,7 +210,6 @@
         /*+———————————————— 全局变量 ————————————————+*/
         //——————————————————————————————————————————
         // 默认值
-        var DEFAULT_NEAR_ARR = []; // 附近项目默认选中值，支持多个。 testing 
         var DEFAULT_RANGE = 1000; // 半径默认值。单位米(m)
         var DEFAULT_CITY = '泉州市'; // 默认中心点城市
         var DEFAULT_COORDINATE = '118.608524,24.896863'; // 默认中心点坐桃城
@@ -213,8 +217,8 @@
 
         //——————————————————————————————————————————
         // 数据请求方式
+        var IS_ENABLE_DEFAULT_SEARCH_WORD = true; // 是否启用默认搜索组或默认搜索关键字功能
         var IS_USE_WEB_API = true; // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api); false 从前端直接取数据(使用百度地图浏览器版api,即js api)
-
 
         //——————————————————————————————————————————
         // test: 搜索结果数据请求方式 mock 
@@ -230,7 +234,7 @@
          * @param {String} selector 匹配选择器（类、id、标签都支持）
          * @returns {HTMLElement|null} 匹配到的元素或null
          */
-         function getClosest(el, selector) {
+        function getClosest(el, selector) {
             var currentEl = el;
             // 向上遍历直到根节点
             while (currentEl) {
@@ -248,10 +252,76 @@
         /*+———————————————— FUNCTION ————————————————+*/
         //——————————————————————————————————————————
         /**
+         * 获取默认搜索组(取所有默认搜索组及对应的默认搜索关键字)
+         * @returns {Object} 返回数组对象
+         */
+         function get_data_default_search_of_group(){
+            var dataSource = { data: [] }
+            // START AJAX
+            $.ajax({
+                async: false, // 取数方式. true 异步(默认), false 同步
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_loupan_fujin.ashx?param=9001",
+                data: {
+                    "action": "wh_get_loupan_fujin_fenzu_guanjianzi_moren_fenzu_list",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "menu_bh": "<%=s_menu_bh%>"
+                },
+                success: function(res){
+                    if(!res || $.isEmptyObject(res)) return;
+                    dataSource = JSON.parse(res);
+                },
+                error: function(errs){ },
+                beforeSend: function(xhr){ },
+                complete: function(xhr, status){ }
+            })
+            // END AJAX
+            return dataSource;
+        }
+
+
+
+        /**
+         * 获取默认搜索关键字(取所有默认搜索组下的所有默认搜索关键字，并去重)
+         * @returns {Object} 返回数组对象
+         */
+         function get_data_default_search_of_keywords(){
+            var dataSource = { data: [] }
+            // START AJAX
+            $.ajax({
+                async: false, // 取数方式. true 异步(默认), false 同步
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_loupan_fujin.ashx?param=9002",
+                data: {
+                    "action": "wh_get_loupan_fujin_fenzu_guanjianzi_moren_guanjianzi_list",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "menu_bh": "<%=s_menu_bh%>"
+                },
+                success: function(res){
+                    if(!res || $.isEmptyObject(res)) return;
+                    dataSource = JSON.parse(res);
+                },
+                error: function(errs){ },
+                beforeSend: function(xhr){ },
+                complete: function(xhr, status){ }
+            })
+            // END AJAX
+            return dataSource;
+        }
+
+
+
+        /**
          * 获取关键字分组下拉数据
          * @returns {Object} 返回数组对象
          */
-         function get_data_word_group(){
+        function get_data_word_group(){
             var dataSource = { data: [] }
             // START AJAX
             $.ajax({
@@ -328,7 +398,7 @@
                 cache: false,
                 url: "../fwh_pub/jk_loupan_fujin.ashx?param=1003",
                 data: {
-                    "action": "wh_get_loupan_fujin_fenzu_guanjainzi_list",
+                    "action": "wh_get_loupan_fujin_fenzu_guanjianzi_list",
                     "user": "<%=s_user%>",
                     "sjk": "<%=s_sjk%>",
                     "menu_bh": "<%=s_menu_bh%>",
@@ -372,18 +442,31 @@
         /**
          * 创建关键字下拉结构HTML
          * @param {Object} ps_dataSource 数据源对象
+         * @param {Object} ps_opts 参数对象
          */
-        function create_html_list_of_word(ps_dataSource) {
+        function create_html_list_of_word(ps_dataSource, ps_opts) {
+            var config = {
+                kind: 'all', // 数据类型，默认all。值： all 所有关键字数据, group 关键字分组对应的关键字数据(可选)
+                defaultWordData: [] // 默认搜索关键字数据源。仅当 kind 值为 all 时需要用此数据源让所有默认字下拉数据有默认选中项(可选)
+            }
+            var settings = $.extend(true, {}, config, ps_opts || {});
+            // console.log('ps_dataSource：', ps_dataSource)
             var _html = '<ul>';
             $.each(ps_dataSource.data, function(index, item){
+                var tmp_juli_mi = item["juli"]; // 待后台给字段 testing2
+                var isCheckboxChecked = false;
+                if(settings.kind == 'group') {
+                    isCheckboxChecked = item["check_moren"].toString() == '1' ? true : false; // 待后台给字段 testing2
+                }
+                var _checkboxCheckedStr = !isCheckboxChecked ? '' : ' checked';
                 _html += [
                     '<li data-bh="' + item["guanjianzi_bh"] + '">',
                         '<div class="bds__words_record_keyword_list_item_word">',
-                            '<input type="checkbox" class="ne-checkbox ne-checkbox square-tick green">',
+                            '<input type="checkbox" class="ne-checkbox ne-checkbox square-tick green"' + _checkboxCheckedStr + '>',
                             '<span>' + item["guanjianzi_mc"] + '</span>',
                         '</div>',
                         '<div class="bds__words_record_keyword_list_item_distance">',
-                            '<input type="text" data-type="integer[positive]" value="' + DEFAULT_RANGE + '">',
+                            '<input type="text" data-type="integer[positive]" value="' + tmp_juli_mi + '">',
                             '<em>米</em>',
                         '</div>',
                     '</li>'
@@ -396,12 +479,42 @@
 
 
         /**
+         * 创建当前查询关键字列表结构HTML
+         * @param {Array} ps_data_arr 数据源数组
+         */
+        function create_html_list_of_search_word(ps_data_arr) {
+            var _html = '<ul>';
+            $.each(ps_data_arr, function(index, item) {
+                // console.log('item：', item)
+                var tmp_group_mc = item["team"];
+                if(tmp_group_mc.toString().replace(/\s+/g, '') !== '') tmp_group_mc += '：';
+                var tmp_str = '';
+                $.each(item.data, function(idx, row) {
+                    var tmp_guanjianzi_mc = row["keyword"],
+                        tmp_juli_mi = row["distance"];
+                    tmp_str += tmp_guanjianzi_mc + '(' + tmp_juli_mi + 'm)';
+                    if(idx < item.data.length - 1) tmp_str += '、';
+                })
+                _html += [
+                    '<li>',
+                        '<span>' + tmp_group_mc + '</span>',
+                        '<em>' + tmp_str + '</em>',
+                    '</li>'
+                ].join('\r\n')
+            })
+            _html += '</ul>';
+            $('.bds__search_result_outcome_switch_record_list').empty().append(_html);
+        }
+
+
+
+        /**
          * 创建保存结果下拉结构HTML
-         * @param {Array} ps_dataSource 数据源数组
+         * @param {Object} ps_dataSource 数据源对象
          */
         function create_html_list_of_saved(ps_dataSource) {
             var _html = '';
-            $.each(ps_dataSource, function(index, item) {
+            $.each(ps_dataSource.data, function(index, item) {
                 var data = item.data;
                 _html += [
                     '<div class="bds__search_result_outcome_switch_display_one">',
@@ -438,8 +551,50 @@
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //——————————————————————————————————————————
         // 查询输入框默认值
-        $('#s-near').val(DEFAULT_NEAR_ARR.join(',')); // 附近项目
         $('#s-range').val(DEFAULT_RANGE); // 范围、半径
+
+        //——————————————————————————————————————————
+        // 根据“是否启用默认搜索组或默认搜索关键字功能”进行初始化
+        if(IS_ENABLE_DEFAULT_SEARCH_WORD) { // 启用时
+            var initWordData = [];
+            var targetWordListData = []; // 格式eg. [{"team": "", data: [{"keyword": "", "distance": ""}]}]
+            // var defaultWordData = get_data_default_search_of_keywords(); // 获取默认搜索关键字数据
+            var defaultGroupData = get_data_default_search_of_group(); // 获取默认搜索组数据
+            defaultGroupData.data.forEach(function(item){
+                var tmp_fenzu_mc = item["fenzu_mc"];
+                var one = { "team": tmp_fenzu_mc, data: []}
+                item.data.forEach(function(row) {
+                    var tmp_guanjianzi_mc = row["guanjianzi_mc"],
+                        tmp_juli_mi = row["juli"];
+                    if(isNaN(parseFloat(tmp_juli_mi))) tmp_juli_mi = DEFAULT_RANGE;
+                    initWordData.push(tmp_guanjianzi_mc);
+                    one.data.push({
+                        "keyword": tmp_guanjianzi_mc, "distance": tmp_juli_mi
+                    })
+                })
+                targetWordListData.push(one);
+            })
+            // console.log('targetWordListData：', targetWordListData)
+            initWordData = utilities.uniqueArray(initWordData); // 数组去重
+
+            // 更新 data-word 属性值
+            $('#s-near').val(initWordData.join(',')).attr('data-word', JSON.stringify(targetWordListData)); // 设 data-word 属性值。附近项目输入框赋值
+            // 创建当前查询关键字列表
+            create_html_list_of_search_word(targetWordListData);    
+           
+        }
+        else { // 不启用
+            // 统一半径复选框禁止或允许手动输入
+            $('#r-radius-check').prop('checked', true); // 勾选统一半径复选框
+            $('#s-range').attr('disabled', false); // 半径允许手动输入
+        }
+
+       
+
+
+
+
+
 
 
         //——————————————————————————————————————————
@@ -921,7 +1076,7 @@
         //          附近项目下拉区域 testing
         //——————————————————————————————————————————
         //——————————————————————————————————————————
-        // 选择附件项目：点击选择按钮、选择关键字、附近项目下拉框
+        // 选择附近项目：点击选择按钮、选择关键字、附近项目下拉框
         $('#btn-choose-near').on('click',function(){
             var $nodeWordRoot = $('.bds__words');
             var $nodeWordList = $('.bds__words_record_keyword_list');
@@ -932,7 +1087,7 @@
             // 如果列表还没创建，避免重复创建，已勾选的再打开时依然可选中
             if($nodeWordList.children().find('li').length == 0) {
                 var wordData = get_data_keywords_of_all();
-                create_html_list_of_word(wordData);
+                create_html_list_of_word(wordData, { kind: 'all' });
             }
             $nodeWordRoot.show(); // 显示附近项目下拉区域
         });
@@ -959,7 +1114,7 @@
                 }
                 else { // 全部关键字
                     var wordData = get_data_keywords_of_all();
-                    create_html_list_of_word(wordData);
+                    create_html_list_of_word(wordData, { kind: 'all' });
                     $('.bds__words_record_keyword_distance').show(); // 显示一键设置半径区域
                     $('.bds__words_record_group').hide().siblings().show().addClass('has-100');
                     $('.bds__words_record_keyword_title').find('input:checkbox').prop('checked', false); // 标题左边的复选框取消打勾
@@ -969,9 +1124,10 @@
 
         // 点击关键字分组
         $(document).on('click', '.bds__words_record_group_list li', function() {
-            var ls_fenzu_bh = $(this).attr('data-bh');
+            var ls_fenzu_bh = $(this).attr('data-bh'),
+                ls_fenzu_mc = $('span', this).text();
             var wordData = get_data_keywords_of_group(ls_fenzu_bh);
-            create_html_list_of_word(wordData);
+            create_html_list_of_word(wordData, { kind: 'group' });
 
             // 切换显示状态
             $('.bds__words_record_group_title').show(); // 显示标题栏
@@ -980,9 +1136,9 @@
 
             $('.bds__words_record_keyword_distance').show(); // 显示一键设置半径区域
 
-            $('.bds__words_record_group').removeClass('has-100').siblings().show().removeClass('has-100'); // 切换分组和关键字显示与隐藏
-            $('.bds__words_record_keyword_list').find('input:checkbox').prop('checked', true); // 所有关键字打勾
-            $('.bds__words_record_keyword_title').find('input:checkbox').prop('checked', true); // 标题左边的复选框打勾
+            $('.bds__words_record_group').removeClass('has-100').siblings().show().removeClass('has-100').attr('data-group', ls_fenzu_mc); // 切换分组和关键字显示与隐藏
+            // $('.bds__words_record_keyword_title').find('input:checkbox').prop('checked', true); // 标题左边的复选框打勾
+            // $('.bds__words_record_keyword_list').find('input:checkbox').prop('checked', true); // 所有关键字打勾
         });
 
         // 一键设置半径按钮
@@ -1063,30 +1219,35 @@
          */
         function fn_done_word_confirm_event(ps_is_when_close_drop) {
             var checkedSingleArr = [];
-            var checkedMultipleArr = []
-            $('.bds__words_record_keyword_list').children().find('li').each(function(){
+            var checkedMultipleArr = [];
+            var $elNode = $('.bds__words_record_keyword_list');
+            var tmp_group_mc = $elNode.parent().attr('data-group');
+            if(typeof tmp_group_mc == 'undefined') tmp_group_mc = '';
+            var groupObj = { "team": tmp_group_mc, data: []}
+            $elNode.children().find('li').each(function(){
                 var $checkbox = $('input:checkbox', this),
                     $span = $('span', this),
                     $input = $('input:text', this);
                 if($checkbox.prop('checked')){
                     var keyword = $span.text().toString().replace(/\s+/g, ''), // 关键字
                         distance = $input.val(); // 距离
-                    if(isNaN(parseFloat(distance))) distance = 0;
+                    if(isNaN(parseFloat(distance))) distance = DEFAULT_RANGE;
                     checkedSingleArr.push(keyword);
-                    var obj = {
+                    groupObj.data.push({
                         "keyword": keyword.toString(),
                         "distance": distance.toString()
-                    }
-                    checkedMultipleArr.push(obj);
+                    });
                 }
             });
-            // console.log('checkedArr：', checkedArr)
-            DEFAULT_NEAR_ARR = checkedSingleArr; // 全局赋值
+            if(groupObj.data.length > 0) {
+                checkedMultipleArr.push(groupObj);
+            }
+            // console.log('checkedMultipleArr：', checkedMultipleArr, '\ncheckedSingleArr：', checkedSingleArr)
             // 当当前操作是关闭下拉框时。防止点击页面其它地方时误触
             if(ps_is_when_close_drop) {
                 if(checkedSingleArr.length > 0) {
                     // 更新 data-word 属性值
-                    $('#s-near').val(checkedSingleArr.join(',')).attr('data-word', JSON.stringify(checkedMultipleArr));  // 附近项目输入框赋值
+                    $('#s-near').val(checkedSingleArr.join(',')).attr('data-word', JSON.stringify(checkedMultipleArr));  // 设 data-word 属性值。附近项目输入框赋值 
                 }
                 // 统一半径复选框禁止或允许手动输入
                 if( checkedSingleArr.length > 0)
@@ -1103,35 +1264,71 @@
         $('#s-near').on('input', function(){
             var newStr = $(this).val().toString().replace(/\s+/g, '').replace(/[,:;!，：；!、。]$/g, ''), // 去掉空格、最后面的逗号等字符
                 newArr = newStr.split(/[,:;!，：；！、。]/);
-            var oldStr = $(this).attr('data-word'); // 取 data-word 属性值
+            var oldStr = $(this).attr('data-word'); // 取 data-word 属性值。附近项目输入框取值
             if(typeof oldStr == 'undefined') oldStr = '';
             var oldArr = oldStr.toString().replace(/\s+/g, '') == '' ? [] : JSON.parse(oldStr);
-            var wordArr = [];
-            for(var i = 0; i < newArr.length; i++) {
-                var new_val = newArr[i].toString();
-                var new_dis = DEFAULT_RANGE; // 半径
-                var isNewInOld = false; // 是否在旧词里，默认false
-                if(new_val != '') {
-                    for(var k = 0; k < oldArr.length; k++){
-                        var one = oldArr[k];
-                        var old_val = one["keyword"].toString().replace(/\s+/g, ''),
-                            old_dis = one["distance"];
-                        if(new_val == old_val) {
-                            isNewInOld = true;
-                            new_dis = old_dis;
-                            break;
-                        }
+            // console.log('oldStr：', oldStr, '\noldArr：', oldArr, '\nnewArr：', newArr);
+
+            // 实现目标：
+            // 1.删除 oldArr 中 keyword 不在 newArr 的项
+            // 2.跳过原始数据中已有的空分组，避免重复
+            // 3.newArr 中如果关键词不存在，则补充到同一个空team里
+            var resultArr = [];
+            // 复制 oldArr 并过滤掉不在 newArr 里的 keyword
+            for (var i = 0; i < oldArr.length; i++) {
+                var oldTeam = oldArr[i];
+                // 跳过原始数据中自带的空team分组，防止重复生成
+                if (oldTeam.team === "") {
+                    continue;
+                }
+                var newTeam = {
+                    team: oldTeam.team,
+                    data: []
+                };
+                for (var j = 0; j < oldTeam.data.length; j++) {
+                    var item = oldTeam.data[j];
+                    if (newArr.indexOf(item.keyword) !== -1) {
+                        newTeam.data.push(item);
                     }
-                    var obj = {
-                        "keyword": new_val.toString(),
-                        "distance": new_dis.toString()
-                    }
-                    wordArr.push(obj);
+                }
+                // 只保留有数据的分组
+                if (newTeam.data.length > 0) {
+                    resultArr.push(newTeam);
                 }
             }
-            // console.log('wordArr：', wordArr)
+            // 收集 resultArr 里已有的 keyword
+            var existKeywords = [];
+            for (var i = 0; i < resultArr.length; i++) {
+                var team = resultArr[i];
+                for (var j = 0; j < team.data.length; j++) {
+                    var kw = team.data[j].keyword;
+                    if (existKeywords.indexOf(kw) === -1) {
+                        existKeywords.push(kw);
+                    }
+                }
+            }
+            // 收集所有缺失的关键词
+            var missData = [];
+            for (var i = 0; i < newArr.length; i++) {
+                var key = newArr[i];
+                // 过滤掉空字符串关键词，避免生成 {keyword: ""}
+                if (key && existKeywords.indexOf(key) === -1) {
+                    missData.push({ keyword: key, distance: DEFAULT_RANGE });
+                }
+            }
+            // 统一将缺失项放入同一个空分组
+            if (missData.length > 0) {
+                resultArr.push({
+                    team: "",
+                    data: missData
+                });
+            }
+            // console.log("新数据 newArr：", newArr);
+            // console.log("原数组 oldArr（未改动）：", oldArr);
+            // console.log("处理后 resultArr：", resultArr);
+
             // 更新 data-word 属性值
-            $(this).attr('data-word', JSON.stringify(wordArr));
+            $(this).attr('data-word', JSON.stringify(resultArr)); // 设 data-word 属性值。附近项目输入框赋值 
         });
 
 
@@ -1238,8 +1435,7 @@
         $('#btn-query').on('click', function(){
             var zuobiao = $('#c-locate').val(), // 坐标
                 xiaoqu_mingcheng = filter.dangerousChars($('#s-community').val()),
-                projectList = filter.dangerousChars($('#s-near').val()), // 附近项目
-                banjing = $('#s-range').val(); // 范围，半径
+                projectList = filter.dangerousChars($('#s-near').val()); // 附近项目
             var isTickRadius = $('#r-radius-check').prop('checked'); // 统一半径复选框是否勾选
             var unifyRadius = $('#s-range').val(); // 统一的半径
             if(isNaN(parseFloat(unifyRadius))) unifyRadius = DEFAULT_RANGE; // 非数值型时
@@ -1255,9 +1451,36 @@
                 return;
             }
 
+            // 有勾选统一半径复选框时
+            if(isTickRadius) {
+                var oldStr = $('#s-near').attr('data-word'); // 取 data-word 属性值。附近项目输入框取值
+                if(typeof oldStr == 'undefined') oldStr = '';
+                var oldArr = oldStr.toString().replace(/\s+/g, '') == '' ? [] : JSON.parse(oldStr);
+                // console.log('oldStr：', oldStr, '\noldArr：', oldArr);
+                for (var i = 0; i < oldArr.length; i++) {
+                    var item = oldArr[i];
+                    for (var j = 0; j < item.data.length; j++) {
+                        item.data[j].distance = unifyRadius;
+                    }
+                }
+                // console.log('oldArr：', oldArr)
+                // 更新 data-word 属性值
+                $('#s-near').attr('data-word', JSON.stringify(oldArr));  // 设 data-word 属性值。附近项目输入框赋值 
+            }
+
+
             // 取值
-            var projectStr = $('#s-near').attr('data-word'); // 取 data-word 属性值
-            var projectArr = projectStr.toString().replace(/\s+/g, '') === '' ? [] : JSON.parse(projectStr);
+            var wordStr = $('#s-near').attr('data-word'); // 取 data-word 属性值。附近项目输入框取值
+            var wordArr = wordStr.toString().replace(/\s+/g, '') === '' ? [] : JSON.parse(wordStr);
+            var projectArr = [];
+            for (var i = 0; i < wordArr.length; i++) {
+                var item = wordArr[i];
+                for (var j = 0; j < item.data.length; j++) {
+                    projectArr.push(item.data[j]);
+                }
+            }
+            // console.log('wordArr：', wordArr, '\nprojectArr：', projectArr);
+
             var isMoreThanOneKey = projectArr.length > 0 ? true : false; // 关键是否>=1个
             var myKeys = isMoreThanOneKey ? projectArr : [projectList]; // 关键词。数组格式
             // console.log('projectArr：', projectArr);
@@ -1406,7 +1629,7 @@
                             // console.log('所有坐标点：', allBdPoints)
                             fnAddMarker(allBdPoints);
                             // 统一处理最终结果
-                            fnNearComposeStringToUser(allPois);
+                            fnNearComposeStringToUser(allPois, wordArr);
                         }
                     }
                 }
@@ -1469,60 +1692,62 @@
                                                 var outcome = poi.getPoi(j);
                                                 // console.log('outcome：', outcome)
                                                 one.data.push(outcome);
-                                                // 在地图上手动打点 -> 拼接列表2
-                                                var point = outcome.point, 
-                                                    title = outcome.title,
-                                                    address = typeof outcome.address == 'undefined' ? '' : outcome.address,
-                                                    phoneNumber = typeof outcome.phoneNumber == 'undefined' ? '' : outcome.phoneNumber;
-                                                var distance = fnCalculateDistance(coordinateLng, coordinateLat, point.lng, point.lat);
-                                                
-                                                allBdPoints.push(point);
-                                                var title_str = title, address_str = address;
-                                                if(keyword.indexOf('公交') >= 0) {
-                                                    title_str = title + '站';
-                                                    address_str = '公交线路';
+                                                if(typeof outcome != 'undefined') {
+                                                    // 在地图上手动打点 -> 拼接列表2
+                                                    var point = outcome.point, 
+                                                        title = outcome.title,
+                                                        address = typeof outcome.address == 'undefined' ? '' : outcome.address,
+                                                        phoneNumber = typeof outcome.phoneNumber == 'undefined' ? '' : outcome.phoneNumber;
+                                                    var distance = fnCalculateDistance(coordinateLng, coordinateLat, point.lng, point.lat);
+                                                    
+                                                    allBdPoints.push(point);
+                                                    var title_str = title, address_str = address;
+                                                    if(keyword.indexOf('公交') >= 0) {
+                                                        title_str = title + '站';
+                                                        address_str = '公交线路';
+                                                    }
+                                                    listHtml += [
+                                                        '<li>',
+                                                            '<div class="result__title">' + title_str + '</div>',
+                                                            (function(){
+                                                                var _tmpHtml = address == '' ? '' : 
+                                                                [
+                                                                    '<div class="result__detail">',
+                                                                        '<div class="result__detail_one">',
+                                                                            '<span> ' + address_str + '：</span>', // 地址、公交线路等
+                                                                            '<em>' + address + '</em>',
+                                                                        '</div>',
+                                                                    '</div>'
+                                                                ].join('\r\n');
+                                                                return _tmpHtml;
+                                                            })(),
+                                                            (function(){
+                                                                var _tmpHtml = distance == '' ? '' : 
+                                                                [
+                                                                    '<div class="result__detail">',
+                                                                        '<div class="result__detail_one">',
+                                                                            '<span> 距离：</span>',
+                                                                            '<em>' + distance + '米</em>',
+                                                                        '</div>',
+                                                                    '</div>'
+                                                                ].join('\r\n');
+                                                                return _tmpHtml;
+                                                            })(),
+                                                            (function(){
+                                                                var _tmpHtml = phoneNumber == '' ? '' : 
+                                                                [
+                                                                    '<div class="result__detail">',
+                                                                        '<div class="result__detail_one">',
+                                                                            '<span> 电话：</span>',
+                                                                            '<em>' + phoneNumber + '</em>',
+                                                                        '</div>',
+                                                                    '</div>'
+                                                                ].join('\r\n');
+                                                                return _tmpHtml;
+                                                            })(),
+                                                        '</li>'
+                                                    ].join('\r\n')
                                                 }
-                                                listHtml += [
-                                                    '<li>',
-                                                        '<div class="result__title">' + title_str + '</div>',
-                                                        (function(){
-                                                            var _tmpHtml = address == '' ? '' : 
-                                                            [
-                                                                '<div class="result__detail">',
-                                                                    '<div class="result__detail_one">',
-                                                                        '<span> ' + address_str + '：</span>', // 地址、公交线路等
-                                                                        '<em>' + address + '</em>',
-                                                                    '</div>',
-                                                                '</div>'
-                                                            ].join('\r\n');
-                                                            return _tmpHtml;
-                                                        })(),
-                                                        (function(){
-                                                            var _tmpHtml = distance == '' ? '' : 
-                                                            [
-                                                                '<div class="result__detail">',
-                                                                    '<div class="result__detail_one">',
-                                                                        '<span> 距离：</span>',
-                                                                        '<em>' + distance + '米</em>',
-                                                                    '</div>',
-                                                                '</div>'
-                                                            ].join('\r\n');
-                                                            return _tmpHtml;
-                                                        })(),
-                                                        (function(){
-                                                            var _tmpHtml = phoneNumber == '' ? '' : 
-                                                            [
-                                                                '<div class="result__detail">',
-                                                                    '<div class="result__detail_one">',
-                                                                        '<span> 电话：</span>',
-                                                                        '<em>' + phoneNumber + '</em>',
-                                                                    '</div>',
-                                                                '</div>'
-                                                            ].join('\r\n');
-                                                            return _tmpHtml;
-                                                        })(),
-                                                    '</li>'
-                                                ].join('\r\n')
                                             }
 
                                             allPois.push(one);
@@ -1556,7 +1781,7 @@
                                         // 在地图上手动打点
                                         fnAddMarker(allBdPoints);
                                         // 统一处理最终结果
-                                        fnNearComposeStringToUser(allPois); 
+                                        fnNearComposeStringToUser(allPois, wordArr); 
                                     }
                                 }
                             });
@@ -1664,12 +1889,12 @@
                 map.addOverlay(label);
                 tempLabels.push(label);
                 // 点击点打开弹窗（你保留，自己注释）
-                // mk.addEventListener("click", function (idx) {
-                //     return function () {
-                //         var infoWindow = new BMap.InfoWindow(titles[idx]);
-                //         map.openInfoWindow(infoWindow, tempMarkers[idx].getPosition());
-                //     };
-                // }(p));
+                mk.addEventListener("click", function (idx) {
+                    return function () {
+                        var infoWindow = new BMap.InfoWindow(titles[idx]);
+                        map.openInfoWindow(infoWindow, tempMarkers[idx].getPosition());
+                    };
+                }(p));
             }
 
             // 恢复地图清空功能
@@ -1728,8 +1953,9 @@
             ②关键词是“公交”时的显示效果
             出入可利用私家车、公交车、自行车及出租车等；周边有“幸福街口”公交站点：有1路、2路等公交线路停靠。
          * @param {Array} ps_dataSource 数据源数组。数据格式：[{keyword: "关键词", data: [{title: "名称", "address": "地址", "province": "所在省份", "city": "所在城市", "point": "坐标点对象, lng, lat", ... }]}]
+         * @param {Array} 查询关键字列表的数据源数组
          */
-        function fnNearComposeStringToUser(ps_dataSource){
+        function fnNearComposeStringToUser(ps_dataSource, ps_targetWordDataSource){
             // console.log('ps_dataSource：', ps_dataSource)
             map.clearOverlays(); // 清空所有覆盖物
             // map.centerAndZoom(point, 13); // 调整视野
@@ -1790,8 +2016,11 @@
             var resultStr = serviceStr + '\r\n' + busStr;
             $('#r-result').val(resultStr);
 
+            // 创建当前查询关键字列表
+            create_html_list_of_search_word(ps_targetWordDataSource);
+
             // 创建“保存结果”切片数据
-            create_html_list_of_saved(savedArr);
+            create_html_list_of_saved({data: savedArr});
             $('#btn-save').show(); // 显示保存按钮
         }
 
