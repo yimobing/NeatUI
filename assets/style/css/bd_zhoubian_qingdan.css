@@ -66,6 +66,8 @@ body {
 /*+ -------- 地区区域 -------- +*/
 .bds__graph,
 .bds__search {
+	display: inline-block\9;
+    vertical-align: top\9;
 	display: inline-block\9\0;
     vertical-align: top\9\0;
 }
@@ -81,7 +83,8 @@ body {
 	-o-flex: 1;
 	flex: 1;
 	width: 100%;
-    width: 53%\9\0;
+    width: 53%\9;
+	width: 53%\9\0;
 	height: 100%;
 	border-left: 1px solid #cac9c9;
 }
@@ -408,8 +411,13 @@ body {
 	width: 100%;
 }
 .bds__search_result_tab_one {
+	display: inline-block\9;
+	vertical-align: middle\9;
+	display: inline-block\9\0;
+	vertical-align: middle\9\0;
 	width: 100%;
-	width: 49%\9\0;
+	width: 32%\9;
+	width: 32%\9\0;
 	padding: 5px 8px;
 	background-color: #f5f5f5;
 	border-style: solid;
@@ -519,6 +527,8 @@ body {
 }
 .bds__search_result_outcome_switch_display_one_item,
 .bds__search_result_outcome_switch_display_one_list {
+	display: inline-block\9;
+	vertical-align: top\9;
 	display: inline-block\9\0;
 	vertical-align: top\9\0;
 }
@@ -534,6 +544,7 @@ body {
 	-o-flex: 1;
 	flex: 1;
 	width: 100%;
+	width: 87%\9;
 	width: 87%\9\0;
 	margin-left: 10px;
 	margin-top: 2px;
@@ -666,6 +677,7 @@ body {
 	display: -webkit-box;
 	display: -moz-box;
 	display: -webkit-flex;
+	display: flex;
 	display: box;
 	align-items: center;
 	text-align: center;
@@ -675,6 +687,7 @@ body {
 	display: inline-block;
 	vertical-align: middle;
 	width: 100%;
+	width: 47%\9;
 	width: 47%\9\0;
 	padding: 5px 8px;
 	background-color: #fafafa;
@@ -713,6 +726,8 @@ body {
 }
 .bds__words_record_group,
 .bds__words_record_keyword {
+	display: inline-block\9;
+	vertical-align: top\9;
 	display: inline-block\9\0;
 	vertical-align: top\9\0;
 	border-style: solid;
@@ -731,10 +746,12 @@ body {
 	-o-flex: 1;
 	flex: 1;
 	width: 100%;
+	width: 57.5%\9;
 	width: 57.5%\9\0;
 	border-width: 0 1px 0 1px;
 }
 .bds__words_record_keyword.has-100 {
+	width: 100%\9;
 	width: 100%\9\0;
 }
 .bds__words_record_keyword.has-100 .bds__words_record_keyword_title {
@@ -781,6 +798,7 @@ body {
 	z-index: 1;
 	right: 8px;
 	top: 50%;
+	top: 45%\9;
 	top: 45%\9\0;
 	display: inline-block;
 	vertical-align: middle;
@@ -867,11 +885,14 @@ body {
 }
 .bds__words_record_keyword_list_item_word,
 .bds__words_record_keyword_list_item_distance {
+	display: inline-block\9;
+	vertical-align: middle\9;
 	display: inline-block\9\0;
 	vertical-align: middle\9\0;
 }
 .bds__words_record_keyword_list_item_word {
 	width: 100%;
+	width: 48%\9;
 	width: 48%\9\0;
 	color: #666;
 }
@@ -881,7 +902,8 @@ body {
 .bds__words_record_keyword_list_item_distance {
 	position: relative;
 	width: 150px;
-	width: 100px\9\0;
+	width: 90px\9;
+	width: 90px\9\0;
 	margin-left: 5px;
 }
 
@@ -1036,9 +1058,11 @@ body {
 
 @media screen and (max-width: 1367px) {
 	.bds__graph {
+		width: 55%\9;
 		width: 55%\9\0;
 	}
 	.bds__search {
+		width: 44%\9;
 		width: 44%\9\0;
 	}
 	.bds__search_form_box {

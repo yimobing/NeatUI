@@ -19,7 +19,7 @@
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!-- 对话框 -->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"> <!-- 下拉 -->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css"> <!-- 百度地图控件 -->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan.css?v=20260112-1">
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan.css?v=20260529-1">
 </head>
 <body>
     <style>
@@ -163,8 +163,8 @@
                 <!--  -->
                 <div class="bds__search_result_outcome">
                     <div class="bds__search_result_outcome_switch">
-                        <div class="bds__search_result_outcome_switch_record">
-                            <div class="bds__search_result_outcome_switch_record_title"> 当前查询关键字 </div>
+                        <div class="bds__search_result_outcome_switch_record" style="display: none">
+                            <div class="bds__search_result_outcome_switch_record_title"> 当前查询的关键字 </div>
                             <div class="bds__search_result_outcome_switch_record_list"></div>
                         </div>
                         <div class="bds__search_result_outcome_switch_content">
@@ -201,7 +201,7 @@
     <script src="assets/neatui/js/neatui-dropdown.js"></script> <!-- 下拉 -->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!-- 对话框-->
     <script src="assets/neatui/js/neatui-bdmap.js"></script> <!-- 百度地图控件 -->
-    <script src="assets/neatui/js/neatui-functions.js?v20260517-1"></script> <!-- 函数库 -->
+    <script src="assets/neatui/js/neatui-functions.js?v=20260529-1"></script> <!-- 函数库 -->
 
     <!-- mock 模拟数据 -->
     <script src="assets/lib/mock/mock-min.js"></script>
@@ -217,12 +217,13 @@
 
         //——————————————————————————————————————————
         // 数据请求方式
-        var IS_ENABLE_DEFAULT_SEARCH_WORD = true; // 是否启用默认搜索组或默认搜索关键字功能
+        var IS_ENABLE_DEFAULT_SEARCH_WORD = true; // 是否启用默认搜索组或默认搜索关键字功能，默认true
         var IS_USE_WEB_API = true; // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api); false 从前端直接取数据(使用百度地图浏览器版api,即js api)
 
         //——————————————————————————————————————————
         // test: 搜索结果数据请求方式 mock 
-        IS_USE_WEB_API = false;
+        IS_ENABLE_DEFAULT_SEARCH_WORD = true; // 是否启用默认搜索组或默认搜索关键字功能，默认true
+        IS_USE_WEB_API = true;  // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api); false 从前端直接取数据(使用百度地图浏览器版api,即js api)
         
         
 
@@ -288,7 +289,7 @@
          * 获取默认搜索关键字(取所有默认搜索组下的所有默认搜索关键字，并去重)
          * @returns {Object} 返回数组对象
          */
-         function get_data_default_search_of_keywords(){
+        function get_data_default_search_of_keywords(){
             var dataSource = { data: [] }
             // START AJAX
             $.ajax({
@@ -453,10 +454,10 @@
             // console.log('ps_dataSource：', ps_dataSource)
             var _html = '<ul>';
             $.each(ps_dataSource.data, function(index, item){
-                var tmp_juli_mi = item["juli"]; // 待后台给字段 testing2
+                var tmp_juli_mi = item["juli"];
                 var isCheckboxChecked = false;
                 if(settings.kind == 'group') {
-                    isCheckboxChecked = item["check_moren"].toString() == '1' ? true : false; // 待后台给字段 testing2
+                    isCheckboxChecked = item["check_moren"].toString() == '1' ? true : false;
                 }
                 var _checkboxCheckedStr = !isCheckboxChecked ? '' : ' checked';
                 _html += [
@@ -479,7 +480,7 @@
 
 
         /**
-         * 创建当前查询关键字列表结构HTML
+         * 创建当前查询的关键字列表结构HTML (预备查询的关键字列表结构HTML)
          * @param {Array} ps_data_arr 数据源数组
          */
         function create_html_list_of_search_word(ps_data_arr) {
@@ -503,7 +504,7 @@
                 ].join('\r\n')
             })
             _html += '</ul>';
-            $('.bds__search_result_outcome_switch_record_list').empty().append(_html);
+            $('.bds__search_result_outcome_switch_record_list').empty().append(_html)
         }
 
 
@@ -579,9 +580,10 @@
 
             // 更新 data-word 属性值
             $('#s-near').val(initWordData.join(',')).attr('data-word', JSON.stringify(targetWordListData)); // 设 data-word 属性值。附近项目输入框赋值
-            // 创建当前查询关键字列表
-            create_html_list_of_search_word(targetWordListData);    
-           
+            // 创建当前查询的关键字列表
+            create_html_list_of_search_word(targetWordListData);
+            $('.bds__search_result_outcome_switch_record').show(); // 显示列表
+            $('.bds__search_result_outcome_switch_record_title').text('预备要查询的关键字'); // 更改文字
         }
         else { // 不启用
             // 统一半径复选框禁止或允许手动输入
@@ -1073,7 +1075,7 @@
 
 
         //——————————————————————————————————————————
-        //          附近项目下拉区域 testing
+        //          附近项目下拉区域 test1
         //——————————————————————————————————————————
         //——————————————————————————————————————————
         // 选择附近项目：点击选择按钮、选择关键字、附近项目下拉框
@@ -1086,8 +1088,8 @@
             }
             // 如果列表还没创建，避免重复创建，已勾选的再打开时依然可选中
             if($nodeWordList.children().find('li').length == 0) {
-                var wordData = get_data_keywords_of_all();
-                create_html_list_of_word(wordData, { kind: 'all' });
+                var allWordData = get_data_keywords_of_all();
+                create_html_list_of_word(allWordData, { kind: 'all' });
             }
             $nodeWordRoot.show(); // 显示附近项目下拉区域
         });
@@ -1113,8 +1115,8 @@
                     $('.bds__words_record_group').show().addClass('has-100').siblings().hide();
                 }
                 else { // 全部关键字
-                    var wordData = get_data_keywords_of_all();
-                    create_html_list_of_word(wordData, { kind: 'all' });
+                    var allWordData = get_data_keywords_of_all();
+                    create_html_list_of_word(allWordData, { kind: 'all' });
                     $('.bds__words_record_keyword_distance').show(); // 显示一键设置半径区域
                     $('.bds__words_record_group').hide().siblings().show().addClass('has-100');
                     $('.bds__words_record_keyword_title').find('input:checkbox').prop('checked', false); // 标题左边的复选框取消打勾
@@ -1126,8 +1128,8 @@
         $(document).on('click', '.bds__words_record_group_list li', function() {
             var ls_fenzu_bh = $(this).attr('data-bh'),
                 ls_fenzu_mc = $('span', this).text();
-            var wordData = get_data_keywords_of_group(ls_fenzu_bh);
-            create_html_list_of_word(wordData, { kind: 'group' });
+            var groupWordData = get_data_keywords_of_group(ls_fenzu_bh);
+            create_html_list_of_word(groupWordData, { kind: 'group' });
 
             // 切换显示状态
             $('.bds__words_record_group_title').show(); // 显示标题栏
@@ -1248,6 +1250,11 @@
                 if(checkedSingleArr.length > 0) {
                     // 更新 data-word 属性值
                     $('#s-near').val(checkedSingleArr.join(',')).attr('data-word', JSON.stringify(checkedMultipleArr));  // 设 data-word 属性值。附近项目输入框赋值 
+
+                    // 创建当前查询的关键字列表
+                    create_html_list_of_search_word(checkedMultipleArr);
+                    $('.bds__search_result_outcome_switch_record').show(); // 显示当前查询的关键字列表
+                    $('.bds__search_result_outcome_switch_record_title').text('预备要查询的关键字'); // 更改文字
                 }
                 // 统一半径复选框禁止或允许手动输入
                 if( checkedSingleArr.length > 0)
@@ -1428,7 +1435,7 @@
 
 
         //——————————————————————————————————————————
-        //          查询按钮区域 testing
+        //          查询按钮区域 test1
         //——————————————————————————————————————————
         //——————————————————————————————————————————
         // 查询按钮
@@ -1453,6 +1460,7 @@
 
             // 有勾选统一半径复选框时
             if(isTickRadius) {
+                // 更新查询关键字
                 var oldStr = $('#s-near').attr('data-word'); // 取 data-word 属性值。附近项目输入框取值
                 if(typeof oldStr == 'undefined') oldStr = '';
                 var oldArr = oldStr.toString().replace(/\s+/g, '') == '' ? [] : JSON.parse(oldStr);
@@ -2016,9 +2024,10 @@
             var resultStr = serviceStr + '\r\n' + busStr;
             $('#r-result').val(resultStr);
 
-            // 创建当前查询关键字列表
+            // 创建当前查询的关键字列表
             create_html_list_of_search_word(ps_targetWordDataSource);
-
+            $('.bds__search_result_outcome_switch_record').show(); // 显示列表
+            $('.bds__search_result_outcome_switch_record_title').text('当前查询的关键字'); // 更改文字
             // 创建“保存结果”切片数据
             create_html_list_of_saved({data: savedArr});
             $('#btn-save').show(); // 显示保存按钮
