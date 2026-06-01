@@ -2052,7 +2052,26 @@
 
             neui.showAnimate();
             setTimeout(function() {
-                var dataArr = [];
+
+                // 数据校验
+                var isPassed = true;
+                $elNode.children().each(function (){
+                    var $input = $('input:text', this);
+                    var ls_guanjianzi_ziduan = $input.attr('data-title'),
+                        ls_neirong = $input.val();
+                    if(ls_neirong.toString().replace(/\s+/g, '') == '') {
+                        isPassed = false;
+                        neui.destroyAnimate();
+                        neuiDialog.alert({
+                            message: ls_guanjianzi_ziduan + '：请输入内容或至少选择一项',
+                            buttons: ['确定']
+                        })
+                        return false;
+                    }
+                });
+                if(isPassed == false) return;
+
+                // 开始执行
                 var isContinue = true;
                 $elNode.children().each(function (){
                     var $input = $('input:text', this);

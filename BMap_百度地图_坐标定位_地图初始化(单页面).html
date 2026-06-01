@@ -61,8 +61,8 @@
         //————————————————————————————————————————————————
         // 全局变量：设置默认中心点 ajax({})
         var g_default_coordinate = '118.602828, 24.897513'; // 中心点坐标，即楼盘坐标。格式：'经度,维度'
-        var g_default_zoom = 18; // 地图缩放级别。值：3-19
         var g_default_title = ''; // 中心点名称，如楼盘名称等，默认空(可选)
+        var g_default_zoom = 18; // 地图缩放级别。值：3-19 
 
 
 
@@ -78,6 +78,9 @@
         var lng = pointArr.length > 0 ? pointArr[0] : '',
             lat = pointArr.length > 1 ? pointArr[1] : '';
         // console.log('lng：', lng, '\nlat：', lat)
+        if(lng == '' || lat == '') {
+            alert('经纬度坐标为空，请联系管理员检查！');
+        }
 
         //————————————————————————————————————————————————
         // 第1步，百度地图初始化
