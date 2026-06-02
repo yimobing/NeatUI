@@ -19,7 +19,7 @@
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!-- 对话框 -->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"> <!-- 下拉 -->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css"> <!-- 百度地图控件 -->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan_latest.css?v=20260529-1">
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan_latest.css?v=20260602-1">
 </head>
 <body>
     <style>
@@ -201,7 +201,7 @@
     <script src="assets/neatui/js/neatui-dropdown.js"></script> <!-- 下拉 -->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!-- 对话框-->
     <script src="assets/neatui/js/neatui-bdmap.js"></script> <!-- 百度地图控件 -->
-    <script src="assets/neatui/js/neatui-functions.js?v=20260529-1"></script> <!-- 函数库 -->
+    <script src="assets/neatui/js/neatui-functions.js?v=20260602-1"></script> <!-- 函数库 -->
 
     <!-- mock 模拟数据 -->
     <script src="assets/lib/mock/mock-min.js"></script>
@@ -256,7 +256,7 @@
          * 获取默认搜索组(取所有默认搜索组及对应的默认搜索关键字)
          * @returns {Object} 返回数组对象
          */
-         function get_data_default_search_of_group(){
+        function get_data_default_search_of_group(){
             var dataSource = { data: [] }
             // START AJAX
             $.ajax({
@@ -264,7 +264,7 @@
                 type: "POST",
                 dataType: "html",
                 cache: false,
-                url: "../fwh_pub/jk_loupan_fujin.ashx?param=9001",
+                url: "../fwh_pub/jk_loupan_fujin.ashx?param=9001", // mock 项目正式上线时请去掉所有接口URL后辍 ?param=数字，可使用正则 \?param=(\d+)
                 data: {
                     "action": "wh_get_loupan_fujin_fenzu_guanjianzi_moren_fenzu_list",
                     "user": "<%=s_user%>",
@@ -355,7 +355,7 @@
          * 获取全部关键字下拉数据
          * @returns {Object} 返回数组对象
          */
-         function get_data_keywords_of_all(){
+        function get_data_keywords_of_all(){
             var dataSource = { data: [] }
             // START AJAX
             $.ajax({
@@ -426,7 +426,12 @@
          */
         function create_html_list_of_group(ps_dataSource) {
             var _html = '<ul>';
-            $.each(ps_dataSource.data, function(index, item){
+            var listData = ps_dataSource.data;
+            if(!Array.isArray(listData)) {
+                console.error('后端JSON结构异常，已兜底\n', ps_dataSource);
+                return;
+            }
+            $.each(listData, function(index, item){
                 _html += [
                    '<li data-bh="' + item["fenzu_bh"] + '">',
                         // '<input type="radio" class="ne-checkbox circle-tick">',
@@ -435,7 +440,13 @@
                 ].join('\r\n')
             });
             _html += '</ul>';
-            $('.bds__words_record_group_list').empty().append(_html);
+            if(listData.length == 0) {
+                var noDataHtml = '<div class="noData_tips"> 暂无数据，请先在快评电脑端维护楼盘附近关键字分组。<br>菜单：【楼盘区域附近 -> 附近关键字分类分组】</div>';
+                $('.bds__words_record_group_list').empty().append(noDataHtml);
+            }
+            else {
+                $('.bds__words_record_group_list').empty().append(_html);
+            }
         }
 
 
@@ -452,9 +463,14 @@
             }
             var settings = $.extend(true, {}, config, ps_opts || {});
             // console.log('ps_dataSource：', ps_dataSource)
+            var listData = ps_dataSource.data;
+            if(!Array.isArray(listData)) {
+                console.error('后端JSON结构异常，已兜底\n', ps_dataSource);
+                return;
+            }
             var _html = '<ul>';
-            $.each(ps_dataSource.data, function(index, item){
-                var tmp_juli_mi = item["juli"];
+            $.each(listData, function(index, item){
+                var tmp_juli_mi = item["juli"] || DEFAULT_RANGE;
                 var isCheckboxChecked = false;
                 if(settings.kind == 'group') {
                     isCheckboxChecked = item["check_moren"].toString() == '1' ? true : false;
@@ -474,7 +490,13 @@
                 ].join('\r\n')
             });
             _html += '</ul>';
-            $('.bds__words_record_keyword_list').empty().append(_html);
+            if(listData.length == 0) {
+                var noDataHtml = '<div class="noData_tips"> 暂无数据，请先在快评电脑端维护楼盘附近关键字。<br>菜单：【楼盘区域附近 -> 附近关键字维护】</div>';
+                $('.bds__words_record_keyword_list').empty().append(noDataHtml);
+            }
+            else {
+                $('.bds__words_record_keyword_list').empty().append(_html);
+            }
         }
 
 
@@ -561,29 +583,34 @@
             var targetWordListData = []; // 格式eg. [{"team": "", data: [{"keyword": "", "distance": ""}]}]
             // var defaultWordData = get_data_default_search_of_keywords(); // 获取默认搜索关键字数据
             var defaultGroupData = get_data_default_search_of_group(); // 获取默认搜索组数据
-            defaultGroupData.data.forEach(function(item){
-                var tmp_fenzu_mc = item["fenzu_mc"];
-                var one = { "team": tmp_fenzu_mc, data: []}
-                item.data.forEach(function(row) {
-                    var tmp_guanjianzi_mc = row["guanjianzi_mc"],
-                        tmp_juli_mi = row["juli"];
-                    if(isNaN(parseFloat(tmp_juli_mi))) tmp_juli_mi = DEFAULT_RANGE;
-                    initWordData.push(tmp_guanjianzi_mc);
-                    one.data.push({
-                        "keyword": tmp_guanjianzi_mc, "distance": tmp_juli_mi
+            if(typeof defaultGroupData.data == 'undefined') {
+                console.error('后端JSON结构异常，已兜底\n', defaultGroupData);
+            }
+            else {
+                defaultGroupData.data.forEach(function(item){
+                    var tmp_fenzu_mc = item["fenzu_mc"];
+                    var one = { "team": tmp_fenzu_mc, data: []}
+                    item.data.forEach(function(row) {
+                        var tmp_guanjianzi_mc = row["guanjianzi_mc"],
+                            tmp_juli_mi = row["juli"];
+                        if(isNaN(parseFloat(tmp_juli_mi))) tmp_juli_mi = DEFAULT_RANGE;
+                        initWordData.push(tmp_guanjianzi_mc);
+                        one.data.push({
+                            "keyword": tmp_guanjianzi_mc, "distance": tmp_juli_mi
+                        })
                     })
+                    targetWordListData.push(one);
                 })
-                targetWordListData.push(one);
-            })
-            // console.log('targetWordListData：', targetWordListData)
-            initWordData = utilities.uniqueArray(initWordData); // 数组去重
+                // console.log('targetWordListData：', targetWordListData)
+                initWordData = utilities.uniqueArray(initWordData); // 数组去重
 
-            // 更新 data-word 属性值
-            $('#s-near').val(initWordData.join(',')).attr('data-word', JSON.stringify(targetWordListData)); // 设 data-word 属性值。附近项目输入框赋值
-            // 创建当前查询的关键字列表
-            create_html_list_of_search_word(targetWordListData);
-            $('.bds__search_result_outcome_switch_record').show(); // 显示列表
-            $('.bds__search_result_outcome_switch_record_title').text('预备要查询的关键字'); // 更改文字
+                // 更新 data-word 属性值
+                $('#s-near').val(initWordData.join(',')).attr('data-word', JSON.stringify(targetWordListData)); // 设 data-word 属性值。附近项目输入框赋值
+                // 创建当前查询的关键字列表
+                create_html_list_of_search_word(targetWordListData);
+                $('.bds__search_result_outcome_switch_record').show(); // 显示列表
+                $('.bds__search_result_outcome_switch_record_title').text('预备要查询的关键字'); // 更改文字
+            }
         }
         else { // 不启用
             // 统一半径复选框禁止或允许手动输入
@@ -2053,23 +2080,23 @@
             neui.showAnimate();
             setTimeout(function() {
 
-                // 数据校验
-                var isPassed = true;
-                $elNode.children().each(function (){
-                    var $input = $('input:text', this);
-                    var ls_guanjianzi_ziduan = $input.attr('data-title'),
-                        ls_neirong = $input.val();
-                    if(ls_neirong.toString().replace(/\s+/g, '') == '') {
-                        isPassed = false;
-                        neui.destroyAnimate();
-                        neuiDialog.alert({
-                            message: ls_guanjianzi_ziduan + '：请输入内容或至少选择一项',
-                            buttons: ['确定']
-                        })
-                        return false;
-                    }
-                });
-                if(isPassed == false) return;
+                // 数据校验。改成：在循环内只提交内容不为空的数据
+                // var isPassed = true;
+                // $elNode.children().each(function (){
+                //     var $input = $('input:text', this);
+                //     var ls_guanjianzi_ziduan = $input.attr('data-title'),
+                //         ls_neirong = $input.val();
+                //     if(ls_neirong.toString().replace(/\s+/g, '') == '') {
+                //         isPassed = false;
+                //         neui.destroyAnimate();
+                //         neuiDialog.alert({
+                //             message: ls_guanjianzi_ziduan + '：请输入内容或至少选择一项',
+                //             buttons: ['确定']
+                //         })
+                //         return false;
+                //     }
+                // });
+                // if(isPassed == false) return;
 
                 // 开始执行
                 var isContinue = true;
@@ -2081,56 +2108,58 @@
                     value = value.replace(/\s/g, ','); // 空格替换成逗号
                     value = value.replace(/[,:;!，：；！、。]/g, ','); // 分号等字符转成逗号
                     value = value.replace(/(,){2,}/g, ',').replace(/(.*),$/g, '$1').replace(/^,(.*)/g, '$1'); // 去掉多个逗号等符号，去掉结尾开头的逗号
+                    var ls_guanjianzi_ziduan = filter.dangerousChars(title), ls_neirong = filter.dangerousChars(value);
                     // console.log('title：', title, '\nvalue：', value);
-
-                    var ls_guanjianzi_ziduan = title,
-                        ls_neirong = value;
-                    var ls_data = {
-                        "action": "wh_loupan_fujin_guanjianzi_sousuo_ins",
-                        "user": "<%=s_user%>",
-                        "sjk": "<%=s_sjk%>",
-                        "menu_bh": "<%=s_menu_bh%>",
-                        "suiji_bh": ls_suiji_bh,
-                        "guanjianzi_ziduan": ls_guanjianzi_ziduan,
-                        "neirong": ls_neirong,
-                        "xiaoqu_mingcheng": ls_xiaoqu_mingcheng
-                    }
-                    // console.log('ls_data：', ls_data);
-                    
-                    var flag = '',  // 是否成功。值： 空值表示未知, 1 是, false 否
-                        msg = ''; // 失败时的信息
-                    // START AJAX
-                    $.ajax({
-                        async: false, // 取数方式. true 异步(默认), false 同步
-                        type: "POST",
-                        dataType: "html",
-                        cache: false,
-                        url: "../fwh_pub/jk_loupan_fujin.ashx?param=2002",
-                        data: ls_data,
-                        success: function(res){
-                            // console.log('res：', res)
-                            if(!res || $.isEmptyObject(res)) return;
-                            var result = JSON.parse(res);
-                            if(result.return != 'ok') {
-                                flag = '0';
-                                msg = result.data;
-                            }
-                        },
-                        error: function(errs){ 
-                            neui.destroyAnimate();
-                        },
-                        beforeSend: function(xhr){ },
-                        complete: function(xhr, status){ }
-                    })
-                    // END AJAX
-                    if(flag == '0') {
-                        isContinue = false;
-                        neuiDialog.alert({
-                            message: msg,
-                            buttons: ['确定']
+                  
+                    // 只提交内容不为空的数据
+                    if(ls_neirong.toString().replace(/\s+/g, '') !== '') {
+                        var ls_data = {
+                            "action": "wh_loupan_fujin_guanjianzi_sousuo_ins",
+                            "user": "<%=s_user%>",
+                            "sjk": "<%=s_sjk%>",
+                            "menu_bh": "<%=s_menu_bh%>",
+                            "suiji_bh": ls_suiji_bh,
+                            "guanjianzi_ziduan": ls_guanjianzi_ziduan,
+                            "neirong": ls_neirong,
+                            "xiaoqu_mingcheng": ls_xiaoqu_mingcheng
+                        }
+                        // console.log('ls_data：', ls_data);
+                        
+                        var flag = '',  // 是否成功。值： 空值表示未知, 1 是, false 否
+                            msg = ''; // 失败时的信息
+                        // START AJAX
+                        $.ajax({
+                            async: false, // 取数方式. true 异步(默认), false 同步
+                            type: "POST",
+                            dataType: "html",
+                            cache: false,
+                            url: "../fwh_pub/jk_loupan_fujin.ashx?param=2002",
+                            data: ls_data,
+                            success: function(res){
+                                // console.log('res：', res)
+                                if(!res || $.isEmptyObject(res)) return;
+                                var result = JSON.parse(res);
+                                if(result.return != 'ok') {
+                                    flag = '0';
+                                    msg = result.data;
+                                }
+                            },
+                            error: function(errs){ 
+                                neui.destroyAnimate();
+                            },
+                            beforeSend: function(xhr){ },
+                            complete: function(xhr, status){ }
                         })
-                        neui.destroyAnimate();
-                        return false;
+                        // END AJAX
+                        if(flag == '0') {
+                            isContinue = false;
+                            neuiDialog.alert({
+                                message: msg,
+                                buttons: ['确定']
+                            })
+                            neui.destroyAnimate();
+                            return false;
+                        }
                     }
                 });
 

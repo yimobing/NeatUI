@@ -3,7 +3,7 @@
 /**
 * 小工具 -> 百度周边清单
 * Date: 2025.12.21
-* Update: 2026.05.29
+* Update: 2026.06.01
 */
 /*+ --------  -------- +*/
 
@@ -60,6 +60,11 @@ body {
     zoom: 1;
 	border: 1px solid #cac9c9;
     border-radius: 4px;
+}
+.noData_tips {
+	padding: 15px 10px;
+	color: #afa8b0;
+	font-size: 14px;
 }
 
 
