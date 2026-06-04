@@ -15,7 +15,6 @@
     <title> 坐标小区查询  </title>
     <meta name="keywords" content="">
     <meta name="description" content="">
-    <!-- <link type="text/css" rel="stylesheet" href="test/css/test_bmap_single.css?v=20260319-1"> -->
 </head>
 <body>
 
@@ -37,7 +36,7 @@
         body { padding: 10px 15px; overflow: hidden; }
         .graph { position: relative; border: 1px solid #ddd; border-radius: 4px; }
         .graph__search { position: absolute; z-index: 1; top: 1px; left: 0; right: 0; width: 100%; margin: 0 auto; padding: 20px 15px; background-color: #fff; border: 1px solid #ededed; border-radius: 4px; box-shadow: 0 1px 2px #c7c7c7; }
-        .graph__search_box { display: inline-block; vertical-align: top; margin-left: 15px; }
+        .graph__search_box { display: inline-block; vertical-align: middle; margin-left: 15px; }
         .graph__search_box > div { display: inline-block; vertical-align: top; }
         .graph__search_box:first-child { margin-left: 0; }
         .graph__search_box_text { color: #666; }
@@ -55,7 +54,7 @@
         .BMapLabel.ne__bd_lb { border: 0 !important; background: transparent !important; }
         .ne__bd_lb_text { position: relative; background-color: #fff; padding: 12px 25px; border-width: 1px; border-style: solid; border-color: #19b6f8; border-radius: 3px; box-shadow: 0 1px 3px 0px #3291b9; color: #0c88e8; font-size: 15px; font-weight: bold; }
         .ne__bd_lb_text.blue { border-color: #1296db; color: #1296db; }
-        .ne__bd_lb_text:before { content: ''; position: absolute; bottom: -8px; left: 0; right: 0; margin: 0 auto; display: block; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 15px solid #fff; }
+        .ne__bd_lb_text:before { content: ''; position: absolute; bottom: -8px; left: 15px; margin: 0 auto; display: block; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 15px solid #fff; }
 
         /*+ 媒体查询 +*/
         @media screen and (max-width: 1280px) {
@@ -96,6 +95,13 @@
                     <button type="button" id="btn-query"> 查询小区 </button>
                 </div>
             </div> <!--/.graph__search_box-->
+
+            <div class="graph__search_box">
+                <div class="graph__search_box_text">
+                    <input type="checkbox" id="c-use-place" checked>
+                    <span> 显示地点名称 </span>
+                </div>
+            </div> <!--/.graph__search_box-->
         </div> <!--/.graph__search-->
 
         <div class="graph__container" id="container">
@@ -116,7 +122,6 @@
         // 设置默认中心点 ajax({})
         var g_default_coordinate = '118.602828,24.897513'; // 中心点坐标，即楼盘坐标
         var g_default_title = '泉州古城'; // 中心点名称，即楼盘名称
-
 
 
 
@@ -163,7 +168,7 @@
                         trigger: '', // 绑定坐标拾取输入框的id或className属性，默认空(可选)。绑定后点击地图或点击点标注，或者拖拽点标注时将把当前坐标显示在输入框上
                     },
                     clickCenterCreateNew: true, // 点击地图时是否重建中心点，默认true(可选)
-                    createBack: null, // 初始化后回调(可选)。参数：lng: "经度", lat: "纬度", instance: "地图实例化对象"
+                    createBack: null, // 地图创建完成后回调(可选)。参数：lng: "经度", lat: "纬度", instance: "地图实例化对象"
                     autoComplete: { // 关键字自动完成检索功能
                         enable: true, // 是否启用该功能，默认true
                         trigger: '', // 绑定触发自动完成检索的输入框ID属性，默认空
@@ -174,6 +179,9 @@
                         clickBack: null, // 点击回调(可选)。参数： lng: "经度", lat: "纬度"
                         dragendBack: null, // 拖拽回调(可选)。参数： lng: "经度", lat: "纬度, e: "对象"
                     },
+                    labelOverLay: {
+                        enable: true // 是否启用文本标注，默认true(可选)。若只想要点标注，不想要显示文本，则置为false
+                    },
                     draft: { // 地图底图功能(可选)
                         enableWheelZoom: true // 是否开启鼠标滚轮缩放功能，仅对PC上有效，默认true(可选)
                     }
@@ -182,7 +190,7 @@
                 // 全局赋值
                 me.defaults = defaults;
                 me.settings = settings;
-                // 地图初始化
+                // 创建地图
                 this.init();
             }
 
@@ -191,7 +199,7 @@
                 constructor: Widget, // 修复原型链指向
 
                 /**
-                 * 初始化
+                 * 创建地图
                  */
                 init: function(){
                     var me = this;
@@ -199,7 +207,7 @@
                     var nodeRoot = document.getElementById(selector);
                     if(nodeRoot == null || typeof nodeRoot == 'undefined') {
                         var tip = '地图根节点不存在，请检查参数[container]';
-                        console.warn(tip);
+                        // console.warn(tip); // 不使用 console 打印信息，防止winform嵌入页面时不显示页面
                         utils.dialog(tip);
                         return;
                     }
@@ -240,7 +248,7 @@
                     var coordinates = me.settings.centerPoint || me.defaults.centerPoint;
                     var pObj = _helpers.getPoint(coordinates);
                     var point = pObj.point, lng = pObj.lng, lat = pObj.lat;
-                    // 地图初始化并设置地图展示级别
+                    // 创建地图并设置地图展示级别
                     var map = new BMap.Map(ps_container_id); 
                     map.centerAndZoom(point, me.settings.zoom); // 设置地图展示级别、自动调整视野
                     if (me.settings.draft.enableWheelZoom) {
@@ -252,9 +260,10 @@
 
                     // 创建中心点标注
                     me.createMarkerPoint(point, {
-                        title: title
+                        title: title,
+                        zoom: me.settings.zoom
                     }); 
-                    // 初始化后回调
+                    // 创建后回调
                     if(me.settings.createBack) {
                         me.settings.createBack({
                             lng: lng,
@@ -316,7 +325,10 @@
                     var point = pObj.point, lng = pObj.lng, lat = pObj.lat;
                     var pointMarker = new BMap.Marker(point); // 创建标注    
                     map.addOverlay(pointMarker); // 将点标注添加到地图中
-                    me.createMarkerLabel(pointMarker, point, finals.title); // 给点标注添加显示文本
+
+                    if(me.settings.labelOverLay.enable) {
+                        me.createMarkerLabel(pointMarker, point, finals.title); // 给点标注添加显示文本
+                    }
 
                     // 调整地图视野
                     if(finals.autoViewport) {
@@ -414,7 +426,10 @@
                                     var currentNode = lbNodes[i];
                                     var parentNode = currentNode.parentNode;
                                     if(parentNode != null) {
-                                        parentNode.classList.add(lb_father_class_name); // 给文本标注父节点添加一个样式名
+                                        // 给文本标注父节点添加一个样式名
+                                        // parentNode.classList.add(lb_father_class_name); // classList 不兼容ie9及以下版本
+                                        utils.addClass(parentNode, lb_father_class_name); 
+
                                     }
                                 }
                             }
@@ -432,7 +447,7 @@
                 keywordAutoComplete: function(opts) {
                     var me = this;
                     var originals = {
-                        trigger: '', // 绑定触发自动完成检索的输入框ID属性，默认空
+                        trigger: '' // 绑定触发自动完成检索的输入框ID属性，默认空
                     }
                     var finals = utils.deepMergeOptions(originals, opts);
 
@@ -440,7 +455,7 @@
                     var nodes = utils.getMultipleNodesByIdClassName(_inputClassId);
                     if(nodes.length == 0) {
                         var tip = '您绑定的关键字自动完成检索节点不存在，请检查' + _inputClassId;
-                        console.warn(tip);
+                        // console.warn(tip); // 不使用 console 打印信息，防止winform嵌入页面时不显示页面
                         utils.dialog(tip);
                         return;
                     }
@@ -550,9 +565,10 @@
                             district = _value.district, 
                             street = _value.street,
                             business = _value.business; // 名称
-                        var placeName = business || street; // 优先POI名称。eg. '丰盛假日城堡'
+                        var placeName = business || street, // 优先POI名称。eg. '丰盛假日城堡'
+                            address = myValue; // 这里要使用 myValue 而不是 placeName，否则定位会偏差很大。比如：搜索万达广场
                         var geocoder = new BMap.Geocoder(); // 地理编码
-                        geocoder.getPoint(placeName, function(point) {
+                        geocoder.getPoint(address, function(point) {
                             // console.log('地理编码：', point);
                             var lng = point.lng, lat = point.lat;
                             if (point) {
@@ -570,7 +586,7 @@
                             }
                             else {
                                 var tip = '抱歉，未解析到坐标，地址可能不完整';
-                                console.warn(tip);
+                                // console.warn(tip); // 不使用 console 打印信息，防止winform嵌入页面时不显示页面
                                 utils.dialog(tip);
                                 if(me.settings.autoComplete.callBack) {
                                     me.settings.autoComplete.callBack({
@@ -695,7 +711,7 @@
                                 }
                             } else {
                                 var tip = '抱歉，未解析到坐标，地址可能不完整';
-                                console.warn(tip);
+                                // console.warn(tip); // 不使用 console 打印信息，防止winform嵌入页面时不显示页面
                                 utils.dialog(tip);
                                 if(callback) {
                                     callback({
@@ -729,7 +745,7 @@
                         var nodes = utils.getMultipleNodesByIdClassName(elInput);
                         if(nodes.length == 0) {
                             var tip = '未找到匹配的节点：' + elInput;
-                            console.warn(tip);
+                            // console.warn(tip); // 不使用 console 打印信息，防止winform嵌入页面时不显示页面
                             utils.dialog(tip);
                             return;
                         }
@@ -893,6 +909,52 @@
 
                     return result;
                 },
+
+
+                /**
+                 * 给元素添加类名，兼容IE6~IE9+所有浏览器
+                 * @param {HTMLElement} el DOM元素
+                 * @param {String} cls 单个样式类名，不能带空格
+                 */
+                addClass: function(el, cls) {
+                    if (!el || !cls) return;
+                    // 已有该class直接返回
+                    if (this.hasClass(el, cls)) return;
+                    // 原有className非空加空格分隔
+                    el.className = el.className ? el.className + ' ' + cls : cls;
+                },
+
+
+                /**
+                 * 移除元素的单个样式类名，兼容IE6~IE9+所有浏览器
+                 * @param {HTMLElement} el DOM元素
+                 * @param {String} cls 单个样式类名，不能带空格
+                 */
+                removeClass: function(el, cls) {
+                    // 元素或类名不存在，直接返回
+                    if (!el || !cls) return;
+                    // 没有这个 class，直接返回
+                    if (!this.hasClass(el, cls)) return;
+
+                    // 拼接前后空格，精准匹配完整类名，避免部分匹配
+                    var originClass = ' ' + el.className + ' ';
+                    // 替换掉目标类名（保留前后空格结构）
+                    var newClass = originClass.replace(' ' + cls + ' ', ' ');
+                    // 去除首尾多余空格，赋值回元素
+                    el.className = newClass.replace(/^\s+|\s+$/g, '');
+                },
+
+
+                /**
+                 * 判断某个节点是否已有class
+                 * @param {HTMLElement} el DOM元素
+                 * @param {String} cls 单个样式类名，不能带空格
+                 */
+                hasClass: function(el, cls) {
+                    if (!el.className) return false;
+                    // 前后空格避免匹配部分字符，比如active匹配active1
+                    return (' ' + el.className + ' ').indexOf(' ' + cls + ' ') > -1;
+                }
             };
 
 
@@ -921,19 +983,20 @@
         //                          三、创建地图并调用
         //========================================================================================
         //————————————————————————————————————————————————
+        // 创建地图并初始化
         var bdExample = new NeMapExample.MapPlugin({
             container: '#container', // 地图容器节点ID选择器，默认空(必须)。eg. '#container'。注：值为空时不执行
             centerPoint: g_default_coordinate, // 地图中心点坐标(可选)
             centerCity: "", // 中心点城市，默认空(可选)
             centerTitle: g_default_title, // 中心点显示文本，默认空(可选)
-            zoom: 16, // 默认缩放级别，默认13(可选)。值：3-19
+            zoom: 15, // 默认缩放级别，默认13(可选)。值：3-19
             picker: {
                 enable: true, // 是否开启坐标拾取功能，默认true(可选)
                 trigger: 'c-coordinate', // 绑定坐标拾取输入框的id或className属性，默认空(可选)。绑定后点击地图或点击点标注，或者拖拽点标注时将把当前坐标显示在输入框上
             },
             clickCenterCreateNew: true, // 点击地图时是否重建中心点，默认true(可选)
-            createBack: function(e) { // 初始化后回调(可选)，参数对象：lng: "", lat: "", instance: "地图实例化对象"
-                // console.log('初始化e:', e)
+            createBack: function(e) { // 地图创建后回调(可选)，参数对象：lng: "", lat: "", instance: "地图实例化对象"
+                // console.log('地图创建后e:', e)
             }, 
             autoComplete: { // 关键字自动完成检索功能
                 enable: true, // 是否启用该功能，默认true
@@ -951,9 +1014,34 @@
                 enableDrag: true, // 是否允许拖拽，默认true(可选)
                 clickBack: null, // 点击回调(可选)。参数{lng: "", lat: "", e: ""}
                 dragendBack: null, // 拖拽回调(可选)。参数{lng: "", lat: "", e: ""}
-            },
-
+            }
         });
+
+
+
+        //————————————————————————————————————————————————
+        // 点击显示地点名称、显示地点名称复选框选中状态
+        document.getElementById('c-use-place').onclick = function() {
+            fnSetMarkerShowLabel();
+        }
+
+        /**
+         * 设置标注点显示或隐藏文本名称
+         */
+        function fnSetMarkerShowLabel() {
+            var isCheckedPlace = document.getElementById('c-use-place').checked ? true : false; // 是否显示地点名称
+            var className = 'ne__bd_lb_text';
+            var labelNodeList = document.getElementsByClassName(className);
+            // console.log('labelNodeList：', labelNodeList)
+            for(var k = 0; k < labelNodeList.length; k++) {
+                var elNode = labelNodeList[k];
+                // console.log('elNode：', elNode)
+                if(isCheckedPlace) 
+                    elNode.setAttribute('style', 'display: block');
+                else 
+                    elNode.setAttribute('style', 'display: none');
+            }
+        }
 
 
         //————————————————————————————————————————————————
@@ -993,6 +1081,7 @@
                     title: ps_title
                 });
                 document.getElementById('c-coordinate').value = coordinate; // 更新当前坐标点的值
+                fnSetMarkerShowLabel(); // 设置标注点显示或隐藏文本名称
             }
         }
 
@@ -1005,7 +1094,7 @@
             var coordinate = elLocate.value;
             // console.log('coordinate：', coordinate);
             if(coordinate.toString().replace(/(\s+)/g, '') === '') {
-                var message= '请输入：要定位的坐标';
+                var message= '请输入：要定位的经纬度坐标';
                 NeMapExample.ToolTip(message);
                 return;
             }

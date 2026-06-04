@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title> 百度地图坐标定位初始化  </title>
+    <title> 百度地图坐标定位初始化_业务分配现场查看坐标(现场位置定位)  </title>
     <meta name="keywords" content="">
     <meta name="description" content="">
 </head>
@@ -36,37 +36,113 @@
         body { width: 100%; height: 100%; padding: 10px 15px; overflow: hidden;  }
         form { width: 100%; height: 100%; }
         .graph { position: relative; border: 1px solid #ddd; border-radius: 4px; width: 100%; height: 100%; }
-        .graph__container { width: 100%; height: 100%;}    
+        .graph__container { width: 100%; height: 100%; }
+        .graph__tips { padding: 35px; line-height: 1.75; text-align: center; }
+        .graph__tips .title { color: #1296db; font-size: 24px; font-weight: 550; }
+        .graph__tips .description { margin-top: 20px; color: #444; font-size: 16px; }
 
 
         /*+ 文本标注 +*/
         .BMapLabel.ne__bd_lb { border: 0 !important; background: transparent !important; }
         .ne__bd_lb_text { position: relative; background-color: #fff; padding: 12px 25px; border-width: 1px; border-style: solid; border-color: #19b6f8; border-radius: 3px; box-shadow: 0 1px 3px 0px #3291b9; color: #0c88e8; font-size: 15px; font-weight: bold; }
         .ne__bd_lb_text.blue { border-color: #1296db; color: #1296db; }
-        .ne__bd_lb_text:before { content: ''; position: absolute; bottom: -8px; left: 0; right: 0; margin: 0 auto; display: block; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 15px solid #fff; }
+        .ne__bd_lb_text:before { content: ''; position: absolute; bottom: -8px; left: 16px; margin: 0 auto; display: block; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 15px solid #fff; }
+        
     </style>
 
 
     <div class="graph">
         <div class="graph__container" id="container"> </div> <!--/.graph__container-->
+        <div class="graph__tips" style="display: none"> </div> <!--/.graph__tips-->
     </div> <!--/.graph-->
 
     <!--================================================================================-->
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
+    <script src="assets/libs/jquery-1.8.3.min.js"></script>
     <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
+    <!-- mock 模拟数据 -->
+    <script src="assets/lib/mock/mock-min.js"></script>
+
     <script>
         //========================================================================================
         //                          一、默认参数设置
         //========================================================================================
         //————————————————————————————————————————————————
-        // 全局变量：设置默认中心点 ajax({})
-        var g_default_coordinate = '118.602828, 24.897513'; // 中心点坐标，即楼盘坐标。格式：'经度,维度'
-        var g_default_title = ''; // 中心点名称，如楼盘名称等，默认空(可选)
-        var g_default_zoom = 18; // 地图缩放级别。值：3-19 
+        // 默认值
+        // var DEFAULT_COORDINATE = '118.682426,24.880845'; // 默认坐标。格式：'经度,维度'.eg。这里默认是泉州市政府的坐标
+        var DEFAULT_ZOOM = 18; // 地图缩放级别。值：3-19 
+        var ENABLE_TITLE = false; // 要不要展示显示坐标点的文本，默认false
+
+
+        
+        //————————————————————————————————————————————————
+        // test 更改默认值 mock
+        ENABLE_TITLE = true; // 要不要展示显示坐标点的文本，默认false
 
 
 
+        /*+———————————————— mock 模拟数据 ————————————————+*/
+        //——————————————————————————————————————————
+        // 设置延时时长，模拟后端处理或返回数据的时间。
+        Mock.setup({
+            timeout: 1000, // 延时n毫秒返回
+        });
+        // 获取默认搜索组(取所有默认搜索组及对应的默认搜索关键字)
+        Mock.mock("../yewu_fenpei/jk/fwh_pub/jk_yewu_fenpei.ashx", "post", function(v){
+            // console.log('后台传过来的参数：', v);
+            return Mock.mock({
+                "return": "ok",
+                // "zuobiao": "",
+                "zuobiao": "118.602531,24.888294", // "118.602531,24.888294"
+                "pgdx": "福建省泉州市丰泽区浦西万达广场住宅A幢1205室"
+            });
+        });
+
+
+
+        //————————————————————————————————————————————————
+        // 获取中心点坐标：通过业务分配流水号获取房屋坐标和现场查看坐标位置(定位位置) 
+        var dataSource = {};
+        $.ajax({
+            async: false, // 取数方式. true 异步(默认), false 同步
+            type: "POST", // mock 项目正式上线时，请将 POST 改为 GET
+            dataType: "html",
+            cache: false,
+            url: "../yewu_fenpei/jk/fwh_pub/jk_yewu_fenpei.ashx",
+            data: {
+                "action": "sel_yewu_fenpei_one",
+                "user": "<%=s_user%>",
+                "sjk": "<%=s_sjk%>",
+                "yewu_fenpei_lsh_id": "<%=s_yewu_fenpei_lsh_id%>"
+            },
+            success: function(res){
+                if(!res || $.isEmptyObject(res)) return;
+                dataSource = JSON.parse(res);
+            },
+            error: function(errs){ },
+            beforeSend: function(xhr){ },
+            complete: function(xhr, status){ }
+        });
+        // console.log('dataSource：', dataSource)
+        var resultData = typeof dataSource.data == 'undefined' ? dataSource : (dataSource.data.length > 0 ? dataSource.data[0] : {});
+        if($.isEmptyObject(resultData)) {
+            var errTip = '现场位置嵌入页面\n“获取当前业务分配单数据”的接口返回值有误，请联系管理员检查。\n接口返回值如下：' + JSON.stringify(dataSource);
+            // console.error(errTip); // 不要使用console打印信息，否则winform嵌入页面时会不显示页面
+            alert(errTip);
+        }
+
+
+
+        //————————————————————————————————————————————————
+        // 取中心点坐示及显示文本
+        var center_coordinate = resultData["zuobiao"] || ''; // 现场查看坐标。格式：'经度,维度'。eg. '118.595776,24.916136'
+        var center_title = resultData["pgdx"] || ''; // 房屋坐落。eg. '泉州古城' 
+        // console.log('中心点坐标：', center_coordinate, '\n坐标显示文本：', center_title)
+        if(ENABLE_TITLE == false) { // 不展示坐标显示文本时
+            center_title = '';
+        }
+        
 
 
 
@@ -74,85 +150,93 @@
         //                          二、创建百度地图
         //========================================================================================
         //————————————————————————————————————————————————
-        // 取经纬度坐标
-        var pointArr = g_default_coordinate.split(',');
-        var lng = pointArr.length > 0 ? pointArr[0] : '',
-            lat = pointArr.length > 1 ? pointArr[1] : '';
-        // console.log('lng：', lng, '\nlat：', lat)
-        if(lng == '' || lat == '') {
-            alert('经纬度坐标为空，请联系管理员检查！');
+        var pointArr = center_coordinate.split(',');
+        var centerLng = pointArr.length > 0 ? pointArr[0] : '',
+            centerLat = pointArr.length > 1 ? pointArr[1] : '';
+        var isCoordEmpty = (centerLng == '' || centerLat == '') ? true : false; // 经纬度坐标是否为空
+        if(isCoordEmpty) { // 没有中心点坐标时，显示提示信息
+            var infoTip = '现场位置嵌入页面\n经纬度坐标为空，请联系管理员检查！';
+            // console.error(infoTip); // 不要使用console打印信息，否则winform嵌入页面时会不显示页面
+            var tipHtml = [
+                '<p class="title">现场查看坐标为空，无法在地图上展示。</p>',
+                '<p class="description">如需在地图上展示，请到快评手机端【业务收发管理系统】进行现场查看“定位”，再刷新此页面。</p>'
+            ].join('\r\n')
+            $('.graph__tips').empty().append(tipHtml).show().siblings().hide();
         }
+        else { // 有中心点坐标时，展示地图
+            // 第1步，百度地图初始化
+            var map = new BMap.Map('container');  // 创建地图实例
+            var point = new BMap.Point(centerLng, centerLat); // 设置中心点坐标
+            map.centerAndZoom(point, DEFAULT_ZOOM); // 地图初始化，同时设置地图展示级别
+            map.enableScrollWheelZoom(); // 开启滚轮缩放
+            // var viewportOptions = {
+            //     margins: [50, 50, 50, 50] // 地图边缘与坐标点的边距（防止点贴边）
+            // };
+            // map.setViewport(point, viewportOptions); // 根据坐标点自动调整地图视野
+            
 
-        //————————————————————————————————————————————————
-        // 第1步，百度地图初始化
-        var map = new BMap.Map('container');  // 创建地图实例
-        var point = new BMap.Point(lng, lat); // 设置中心点坐标
-        map.centerAndZoom(point, g_default_zoom); // 地图初始化，同时设置地图展示级别
-        map.enableScrollWheelZoom(); // 开启滚轮缩放
-        // var viewportOptions = {
-        //     margins: [50, 50, 50, 50] // 地图边缘与坐标点的边距（防止点贴边）
-        // };
-        // map.setViewport(point, viewportOptions); // 根据坐标点自动调整地图视野
-        
+            // 第2步，创建点标注覆盖物
+            var marker = new BMap.Marker(point); // 创建标注
+            map.addOverlay(marker); // 将点标注添加到地图中
+            // 可拖拽的标注点
+            marker.enableDragging();    
+            marker.addEventListener("dragend", function(e){    
+                // console.log(e.point.lng + ", " + e.point.lat);  
+            })
 
-        // 第2步，创建点标注覆盖物
-        var marker = new BMap.Marker(point); // 创建标注
-        map.addOverlay(marker); // 将点标注添加到地图中
-        // 可拖拽的标注点
-        marker.enableDragging();    
-        marker.addEventListener("dragend", function(e){    
-            // console.log(e.point.lng + ", " + e.point.lat);  
-        })
-
-        // 第3步，创建文本标注覆盖物
-        if(g_default_title.replace(/\s+/g, '') !== '') {
-            var lb_father_class_name = 'ne__bd_lb', // 父节点样式名
-                lb_class_name = 'ne__bd_lb_text'; // 文本节点样式名
-            var lb_text = '<div class="' + lb_class_name + '">' + g_default_title + '</div>';
-            var lb_options = {
-                position: point, // 指定文本标注所在的地理位置
-                // offset: new BMap.Size(30, -30) // 设置文本偏移量
-                width: 0,     // 宽度(220-730) 0 自动调整
-                maxWidth: 500,  // 最大宽度(220-730)
-                height: 0,     // 高度(60-650) 0 自动调整
-                offset: { // 位置偏移
-                    width: -40,
-                    height: -75
-                }
-            }
-            var lbMark = new BMap.Label(lb_text, lb_options);
-            map.addOverlay(lbMark); // 将文本标注添加到地图中
-            lbMark.enableMassClear(); // 允许覆盖物被清除
-            lbMark.name = 'tag_bd_label'; // 标记覆盖物类型，方便清除指定覆盖物时用
-            lbMark.setStyle({
-                padding: '10px',
-                height: '30px',
-                lineHeight: '30px',
-                // backgroundColor: "#fff",
-                borderRadius: '5px',
-                borderColor: '#ccc',
-                color: 'blue',
-                fontSize: '16px',
-                fontFamily: '微软雅黑'
-            });
-
-            // 将文本标注绑定到点标注上
-            marker.setLabel(lbMark);
-            setTimeout(function() {
-                // 重置文本标注外观
-                var lbNodes = utils.getMultipleNodesByIdClassName(lb_class_name);
-                if(lbNodes.length > 0) {
-                    for(var i = 0; i < lbNodes.length; i++) {
-                        var currentNode = lbNodes[i];
-                        var parentNode = currentNode.parentNode;
-                        if(parentNode != null) {
-                            parentNode.classList.add(lb_father_class_name); // 给文本标注父节点添加一个样式名
-                        }
+            // 第3步，创建文本标注覆盖物
+            if(center_title.replace(/\s+/g, '') !== '') {
+                var lb_father_class_name = 'ne__bd_lb', // 父节点样式名
+                    lb_class_name = 'ne__bd_lb_text'; // 文本节点样式名
+                var lb_text = '<div class="' + lb_class_name + '">' + center_title + '</div>';
+                var lb_options = {
+                    position: point, // 指定文本标注所在的地理位置
+                    // offset: new BMap.Size(30, -30) // 设置文本偏移量
+                    width: 0,     // 宽度(220-730) 0 自动调整
+                    maxWidth: 500,  // 最大宽度(220-730)
+                    height: 0,     // 高度(60-650) 0 自动调整
+                    offset: { // 位置偏移
+                        width: -40,
+                        height: -75
                     }
                 }
-            }, 100);
-        }
+                var lbMark = new BMap.Label(lb_text, lb_options);
+                map.addOverlay(lbMark); // 将文本标注添加到地图中
+                lbMark.enableMassClear(); // 允许覆盖物被清除
+                lbMark.name = 'tag_bd_label'; // 标记覆盖物类型，方便清除指定覆盖物时用
+                lbMark.setStyle({
+                    padding: '10px',
+                    height: '30px',
+                    lineHeight: '30px',
+                    // backgroundColor: "#fff",
+                    borderRadius: '5px',
+                    borderColor: '#ccc',
+                    color: 'blue',
+                    fontSize: '16px',
+                    fontFamily: '微软雅黑'
+                });
 
+                // 将文本标注绑定到点标注上
+                marker.setLabel(lbMark);
+                setTimeout(function() {
+                    // 重置文本标注外观
+                    var lbNodes = utils.getMultipleNodesByIdClassName(lb_class_name);
+                    if(lbNodes.length > 0) {
+                        for(var i = 0; i < lbNodes.length; i++) {
+                            var currentNode = lbNodes[i];
+                            var parentNode = currentNode.parentNode;
+                            if(parentNode != null) {
+                                // 给文本标注父节点添加一个样式名
+                                // parentNode.classList.add(lb_father_class_name); // classList 不兼容ie9及以下版本
+                                utils.addClass(parentNode, lb_father_class_name); 
+                            }
+                        }
+                    }
+                }, 100);
+            }
+
+        }
+     
 
 
 
@@ -164,7 +248,7 @@
              * @param {String} ps_classNameId id或class名称的节点（注意：id传字符串，class无需带.）
              * @returns {NodeList} 返回节点集合
              */
-                getMultipleNodesByIdClassName: function(ps_classNameId) {
+            getMultipleNodesByIdClassName: function(ps_classNameId) {
                 var elInputClassId = ps_classNameId.toString().replace(/(\#|\.)/g, '');
                 // 1. 先尝试通过id获取单个节点
                 var elInputNode = document.getElementById(elInputClassId);
@@ -184,6 +268,31 @@
                     }
                 }
                 return nodes;
+            },
+
+            /**
+             * 给元素添加类名，兼容IE6~IE9+所有浏览器
+             * @param {HTMLElement} el DOM元素
+             * @param {String} cls 单个样式类名，不能带空格
+             */
+            addClass: function(el, cls) {
+                if (!el || !cls) return;
+                // 已有该class直接返回
+                if (this.hasClass(el, cls)) return;
+                // 原有className非空加空格分隔
+                el.className = el.className ? el.className + ' ' + cls : cls;
+            },
+
+
+            /**
+             * 判断某个节点是否已有class
+             * @param {HTMLElement} el DOM元素
+             * @param {String} cls 单个样式类名，不能带空格
+             */
+            hasClass: function(el, cls) {
+                if (!el.className) return false;
+                // 前后空格避免匹配部分字符，比如active匹配active1
+                return (' ' + el.className + ' ').indexOf(' ' + cls + ' ') > -1;
             }
         };
 

@@ -19,10 +19,11 @@
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!-- 对话框 -->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"> <!-- 下拉 -->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css"> <!-- 百度地图控件 -->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan_latest.css?v=20260602-1">
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan_latest.css?v=20260604-1">
 </head>
 <body>
     <style>
+        .tangram-suggestion-main { z-index: 999; }
         #s-near { width: 300px; }
     </style>
     <div class="bds">
@@ -177,8 +178,14 @@
                         </div>
                     </div>
                     <div class="bds__search_result_outcome_switch" style="display: none">
+                        
                         <div class="bds__search_result_outcome_switch_operate">
-                            <button type="button" id="btn-save" class="ne-btn has-3d green"  style="display: none">保存</button>
+                            <div class="block__random_char" style="display: none">
+                                <span> 本批次单号：</span>
+                                <input type="text" id="oddNumber" readonly>
+                                <button type="button" id="btn-copy-odd"> 复制 </button>
+                            </div>
+                            <button type="button" id="btn-save" class="ne-btn has-3d green" style="display: none">保存</button>
                         </div>
                         <div class="bds__search_result_outcome_switch_display"></div>
                     </div>
@@ -1458,6 +1465,58 @@
 
 
 
+        //——————————————————————————————————————————
+        // 复制按钮：复制单号
+        $('#btn-copy-odd').on('click', function() {
+            var str = $('#oddNumber').val();
+            copySomeContent(str);
+        });
+
+        /**
+         * 复制某些内容
+         * @param {String} ps_str 要复制的内容
+         */
+        function copySomeContent(ps_str) {
+            if(document.execCommand) {
+                var text = ps_str; // 要复制的文本
+                var input = document.createElement('input');
+                input.value = text;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                var message = '复制成功';
+                if(typeof neuiDialog != 'undefined') {
+                    neuiDialog.notice({
+                        message: message,
+                        theme: 'black',
+                        maskOpacity: 1,
+                        delay: 1300
+                    })
+                }
+                else {
+                    alert(message)
+                }
+
+            }
+            else{
+                var message = '你的浏览器不支持复制功能，请使用支持该功能的浏览器！';
+                if(typeof neuiDialog != 'undefined') {
+                    neuiDialog.alert({
+                        message: message,
+                        buttons: ['确定']
+                    })
+                }
+                else {
+                    alert(message);
+                }
+            }
+        }
+
+
+
+
+
 
 
 
@@ -2058,6 +2117,7 @@
             // 创建“保存结果”切片数据
             create_html_list_of_saved({data: savedArr});
             $('#btn-save').show(); // 显示保存按钮
+            $('.block__random_char').hide(); // 隐藏单号一栏
         }
 
 
@@ -2166,7 +2226,11 @@
                 if(isContinue) {
                     neuiDialog.alert({
                         message: '保存成功',
-                        buttons: ['确定']
+                        buttons: ['确定'],
+                        callBack: function() {
+                            $('.block__random_char').show(); // 显示单号一栏
+                            $('#oddNumber').val(ls_suiji_bh); // 给单号一栏赋值
+                        }
                     })
                 }
 
