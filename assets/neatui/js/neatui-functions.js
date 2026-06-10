@@ -568,93 +568,108 @@ var utilities = {
 
 
     /**
-     * HTML编码：将标签转换成字符串
-     * HTML与字符串互转义
-	 * edit 20240822-1
-     * @param {string} ps_str 含有标签的字符串
-     * @returns {string} 返回不含标签的字符串
-     * eg1.将 < 转义成 &lt; eg2.将 > 转义成 &gt;
-     */
+     * HTML实体转义/HTML编码：将标签转换成字符串
+     * edit 20260610-1
+     * 用途：有2个，如下
+     * 
+        用途1：入库：文章、长文本、富文本等简易排版入库
+        适用：简易文章、公告、留言，需要保留换行分段
+        时机：发布文章提交入库前调用，用来生成 <p> 排版 + HTML 实体转义，存带格式内容。
+        用途2：取库：数据渲染到 HTML 页面，防 XSS（行业标准用法）
+
+        适用：所有从数据库取出、要展示在页面上的内容（不管是普通文本还是文章）
+        时机：取库后 → 渲染到 HTML 前调用，纯实体转义防 XSS。
+    * @param {string} ps_str 原始文本/含HTML标签的字符串
+    * @returns {string} 返回转义并附带排版标签的HTML内容
+    * eg1.将 < 转义成 &lt; eg2.将 > 转义成 &gt;
+    */
     htmlEncode: function(ps_str){
-		if(typeof document != 'undefined'){ // document 对象存在时
-			var temp = document.createElement("div");
-			(temp.textContent != null) ? (temp.textContent = ps_str) : (temp.innerText = ps_str);
-			// 转义替换
-			var output = temp.innerHTML.toString().replace(/\'/g, '&apos;').replace(/\"/g, '&quot;') // 单双引号转义
-			// 回车换行替换成<br>
-			output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
-			output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
-			// <br>替换成<p>
-			if(output.indexOf('<br>') > -1){
-				// 让p标签成对出现
-				output = output.replace(/\<br\>/g, '</p><p>');
-				output = output.replace(/^(?!\<.*)/g, '<p>');
-				output = output.replace(/(?!\>.*)$/g, '</p>');
-				output = output.replace(/(\<p\>\<\/p\>)/g, ''); // 替换中间没有内容的空标签. eg.<p></p>
-			}
-			// 其它替换
-			// 注：部分ios中手写输入时即使过滤掉所有空格了还会出现一个空格，如果把空格转换成&nbsp;的话数据库中会有&nbsp;导致搜索等功能匹配不了。
-			// 故解决思路是：移动端把所有空格替换成空，在pc端把所有空格替换成一个&nbsp;
-			if(typeof checker != 'undefined' && typeof checker.checkIsMobile == 'function' && checker.checkIsMobile()){ // 移动端时
-				output = output.replace(/\t/g, ''); // 制表符替换成空
-				output = output.replace(/([\s]+)/g, ' '); // 多个空格替换成成一个空格
-			}else{ // pc端时
-				output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
-				output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
-			}
-			output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');  // div标签换成p
-			// 字符串化+斜杠处理
-			output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
-			output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
-			output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
-			//
-			temp = null;
-			return output;
-		}
-		
-		else{ // document 对象不存在时
-			var output = ps_str;
-			// 字符串化+斜杠处理
-			// output = output.replace(/<[^<>]+?>/g, ''); // 过滤标签。不行，这里是要转义而非过滤
-			
-			// output = output.replace(/\r/g, ''); // 去掉换行
-			// output = output.replace(/\n/g, ''); // 去掉回车
-			// output = output.replace(/[\r\n]+?/g, ''); // 去掉换行
-			
-			output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
-			output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
-			// <br>替换成<p>
-			if(output.indexOf('<br>') > -1){
-				// 让p标签成对出现
-				output = output.replace(/\<br\>/g, '</p><p>');
-				output = output.replace(/^(?!\<.*)/g, '<p>');
-				output = output.replace(/(?!\>.*)$/g, '</p>');
-				output = output.replace(/(\<p\>\<\/p\>)/g, ''); // 替换中间没有内容的空标签. eg.<p></p>
-			}
-			output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成一个空格
-			output = output.replace(/([\s]+)/g, '&nbsp;'); // 多个空格替换成一个空格
-			output = output.replace(/\'/g, '&apos;'); // 单引号替换成 &apos;
-			output = output.replace(/\"/g, '&quot;'); // 双引号替换成 &quot;
-			output = output.replace(/\&/g, '&amp;'); // 连字符替换成 &amp;
-			output = output.replace(/\</g, '&lt;'); // 左尖括号替换成&lt;
-			output = output.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
-			output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
-		}
+        if(typeof document != 'undefined'){ // document 对象存在时
+            var temp = document.createElement("div");
+            (temp.textContent != null) ? (temp.textContent = ps_str) : (temp.innerText = ps_str);
+            // 转义替换 单双引号
+            var output = temp.innerHTML.toString().replace(/'/g, '&apos;').replace(/"/g, '&quot;');
+            // 补充 & 符号转义，修复实体解析与XSS风险
+            output = output.replace(/&/g, '&amp;');
+            // 回车换行替换成<br>
+            output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
+            output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
+            // <br>替换成<p>
+            if(output.indexOf('<br>') > -1){
+                // 让p标签成对出现
+                output = output.replace(/<br>/g, '</p><p>');
+                output = output.replace(/^(?!<.*)/g, '<p>');
+                output = output.replace(/(?!>.*)$/g, '</p>');
+                output = output.replace(/(<p><\/p>)/g, ''); // 替换中间没有内容的空标签 eg.<p></p>
+            }
+            // 移动端、PC端空格与制表符差异化处理
+            // 增加全局变量容错，避免不存在checker时报错
+            var isMobile = false;
+            if(typeof checker != 'undefined' && typeof checker.checkIsMobile == 'function'){
+                isMobile = checker.checkIsMobile();
+            }
+            if(isMobile){ // 移动端时
+                output = output.replace(/\t/g, ''); // 制表符替换成空
+                output = output.replace(/(\s+)/g, ' '); // 多个空格替换成一个空格
+            }else{ // pc端时
+                output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成空格实体
+                output = output.replace(/(\s+)/g, '&nbsp;'); // 多个空格替换成一个空格实体
+            }
+            // div标签换成p标签
+            output = output.replace(/&lt;div&gt;([\s\S]*?)&lt;\/div&gt;/gi, '&lt;p&gt;$1&lt;/p&gt;');
+            // 反斜杠替换成斜杠
+            output = output.replace(/\\/g, '/');
+            temp = null;
+            return output;
+        }
+        else{ // document 对象不存在时
+            var output = ps_str;
+            output = output.replace(/\r/g, '<br>'); // 换行符替换成<br>
+            output = output.replace(/\n/g, '<br>'); // 回车符替换成<br>
+            // <br>替换成<p>
+            if(output.indexOf('<br>') > -1){
+                output = output.replace(/<br>/g, '</p><p>');
+                output = output.replace(/^(?!<.*)/g, '<p>');
+                output = output.replace(/(?!>.*)$/g, '</p>');
+                output = output.replace(/(<p><\/p>)/g, ''); // 替换中间没有内容的空标签 eg.<p></p>
+            }
+            output = output.replace(/\t/g, '&nbsp;'); // 制表符替换成空格实体
+            output = output.replace(/(\s+)/g, '&nbsp;'); // 多个空格替换成一个空格实体
+            output = output.replace(/'/g, '&apos;'); // 单引号转义
+            output = output.replace(/"/g, '&quot;'); // 双引号转义
+            output = output.replace(/&/g, '&amp;'); // &符号转义
+            output = output.replace(/</g, '&lt;'); // 左尖括号转义
+            output = output.replace(/>/g, '&gt;'); // 右尖括号转义
+            output = output.replace(/\\/g, '/'); // 反斜杠替换成斜杠
+            // 补充返回值，修复undefined问题
+            return output;
+        }
     },
 
 
 
     /**
      * HTML解码：将字符串转换成标签
-     * 字符串与HTMl互转义
-     * @param {string} ps_str 字符串
-     * @returns {string} 返回含有标签的字符串
+     * edit 20260610-1
+     * 用途：把 htmlEncode 存进库的带格式内容，还原为原始纯文本，回显到 textarea / 输入框 供二次编辑。
+     * 使用时机：编辑文章 / 编辑长文本，从库取数据、回填到编辑器时调用。
+     * 禁止：页面直接展示数据时，不要调用它。
+     * @param {string} ps_str 带HTML实体的字符串
+     * @returns {string} 返回解码后的纯文本内容
      * eg1. 将 &lt; 转义成 < eg2.将 &gt; 转义成 >
      */
     htmlDecode: function(ps_str){
+        // 非浏览器环境直接返回原内容，避免报错
+        if(typeof document == 'undefined'){
+            return ps_str;
+        }
+        // 空值兜底
+        if(ps_str == null || ps_str === ''){
+            return '';
+        }
         var temp = document.createElement('div');
         temp.innerHTML = ps_str;
-        var output = temp.innerText ||temp.textContent;
+        var output = temp.innerText || temp.textContent;
         temp = null;
         return output;
     },
@@ -662,7 +677,8 @@ var utilities = {
 
 
     /**
-     * 转义函数：JSON转义特殊字符
+     * 转义函数：JSON/URL 转义特殊字符
+     * 20260610-1
      * 说明：兼容 JSON 特殊字符 + 单/双引号 + 可选 URL 编码
      * @param {String} str 要转义的原始字符串
      * @param {Boolean} needUrlEncode 是否需要URL编码，默认false(可选)。GET请求传参时设为true
@@ -692,21 +708,25 @@ var utilities = {
         // string originalName = 后端反转义（对应上面的 unescapeSpecialChars 逻辑）;
      */
     escapeSpecialChars: function(str, needUrlEncode) {
-        if(typeof needUrlEncode == 'undefined' || needUrlEncode == null) needUrlEncode = false;
-        if (typeof str !== 'string' || str === '') {
+        if(typeof needUrlEncode == 'undefined' || needUrlEncode == null) {
+            needUrlEncode = false;
+        }
+        // 空值、非字符串容错
+        if (str == null || typeof str !== 'string') {
             return '';
         }
-        // 转义 JSON 核心特殊字符（双引号、反斜杠、换行、Tab 等）
+        // 转义 JSON 核心特殊字符
         var escapedStr = str
         .replace(/\\/g, '\\\\')    // 转义反斜杠 \ → \\
         .replace(/"/g, '\\"')      // 转义双引号 " → \"
-        .replace(/'/g, '\\\'')     // 转义单引号 ' → \'（兼容单引号场景）
+        .replace(/'/g, '\\\'')     // 转义单引号 ' → \'
         .replace(/\n/g, '\\n')     // 转义换行符 → \n
         .replace(/\r/g, '\\r')     // 转义回车符 → \r
         .replace(/\t/g, '\\t')     // 转义制表符 → \t
-        .replace(/\f/g, '\\f');     // 转义换页符 → \f
-        // .replace(/\b/g, '\\b');    // 转义退格符 → \b （!!!退格符这个不要，否则会变 \\b内容\\b）
-        // 如果需要 URL 编码（GET 请求/URL 参数），处理 &、=、% 等
+        .replace(/\f/g, '\\f')     // 转义换页符 → \f
+        .replace(/\v/g, '\\v');    // 转义垂直制表符
+    
+        // 如果需要 URL 编码（GET 请求/URL 参数）
         if (needUrlEncode) {
             escapedStr = encodeURIComponent(escapedStr);
         }
@@ -716,33 +736,39 @@ var utilities = {
     
     
     /**
-     * 配套的反转义函数：JSON反转义特殊字符、还原转义后的字符串
+     * 配套的反转义函数：JSON/URL 反转义特殊字符、还原转义后的字符串
+     * 20260610-1
+     * 用途：纯HTML渲染专用，仅用于前端页面展示
      * @param {String} str 转义后的字符串
      * @param {Boolean} needUrlDecode 是否需要先URL解码，默认false(可选)
      * @returns {String} 原始字符串
      */
     unescapeSpecialChars: function(str, needUrlDecode) {
-        if(typeof needUrlDecode == 'undefined' || needUrlDecode == null) needUrlDecode = false;
-        if (typeof str !== 'string' || str === '') {
+        if(typeof needUrlDecode == 'undefined' || needUrlDecode == null) {
+            needUrlDecode = false;
+        }
+        // 空值、非字符串容错
+        if (str == null || typeof str !== 'string') {
             return '';
         }
-        // 如果是 URL 编码的，先解码
         var unescapedStr = str;
+        // 如果是 URL 编码的，先解码
         if (needUrlDecode) {
             unescapedStr = decodeURIComponent(unescapedStr);
         }
-        // 反转义 JSON 特殊字符和单/双引号
+        // 按顺序反转义特殊字符，最后还原反斜杠
         unescapedStr = unescapedStr
         .replace(/\\n/g, '\n')
         .replace(/\\r/g, '\r')
         .replace(/\\t/g, '\t')
         .replace(/\\f/g, '\f')
-        .replace(/\\b/g, '\b')
+        .replace(/\\v/g, '\v')
         .replace(/\\"/g, '"')
         .replace(/\\'/g, "'")
         .replace(/\\\\/g, '\\');
         return unescapedStr;
     },
+
 
 
     /**
@@ -3049,37 +3075,88 @@ var checker = {
 var filter = {
 
     /**
-     * 过滤HTML代码
-     * @param {string} str 原字符串
-     * @param {boolean} isHTML 是否要过滤标签、css、js、换行、空格等多余内容, 默认true(可选). false时虽然不过滤但会将标签转义成字符
-     * @returns {string} 返回新字符串
+     * 通用表单入库清洗器：过滤HTML代码、HTML标签过滤清洗
+     * 用途：通用表单提交入库前数据清洗，提交纯文本给入库，适用于绝大多数业务场景，可防止用户恶意注入HTML/脚本。
+     * 禁止：不要用它处理正式文章、需要保留完整 HTML 段落的内容。
+     * edit 20260610-1
+     * @param {string} ps_str 原字符串
+     * @param {Object} options 可选配置参数，不传则使用默认配置
+     * @returns {string} 返回清洗后的新字符串
      */
-    html: function(ps_str, isHTML){
-        var flag = typeof isHTML == 'undefined' ? true : (isHTML === false ? false : true);
-        ps_str = this.filterDangerousChars(ps_str); // 先过滤危险字符 add 20260520-1
-        if(flag){
-            if(typeof ps_str == 'undefined' || ps_str == null) return '';
-            var ps_str = ps_str.toString().replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); // 过滤css
-            ps_str = ps_str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g, ''); // 过滤js
-            ps_str = ps_str.replace(/<[^<>]+?>/g, ''); // 过滤标签
-            // ps_str = ps_str.replace(/\s+/g,''); // 去掉空白符(空格、制表符、换行符等)
-            ps_str = ps_str.replace(/\ +/g, ''); // 去掉空格
-            ps_str = ps_str.replace(/[\r\n]+?/g, ' '); // 去掉换行(变成一个空格)
-            ps_str = ps_str.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); // 去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格      
+    html: function(ps_str, options) {
+        // 默认配置项
+        var config = {
+            filterHtmlTag: true, // 是否过滤全部HTML标签（含高危标签）
+            filterRiskTag: true, // 是否仅过滤iframe、svg、link等高风险标签，保留普通标签
+            filterControlChar: true, // 是否过滤ASCII 0~31区间不可见控制字符
+            filterFullWidthSpace: true, // 是否将全角空格替换为半角空格
+            escapeNewLine: true, // 是否删除回车、转义换行符，解决JSON解析异常
+            escapeTab: true, // 是否转义制表符\t
+            mergeSpace: true, // 是否将连续多个空格合并为单个空格
+            dangerMode: 'loose' // 危险字符处理模式：loose半角转全角 / strict直接删除字符
+        };
+        // 原生循环合并配置，兼容IE6~IE11
+        var final = {};
+        var key;
+        for(key in config){
+            final[key] = config[key];
         }
-        if(typeof utilities.htmlEncode == 'function') ps_str = utilities.htmlEncode(ps_str); // 标签转化成字符串
-        return ps_str;
+        if(options && typeof options === 'object'){
+            for(key in options){
+                if(options.hasOwnProperty(key)){
+                    final[key] = options[key];
+                }
+            }
+        }
+        if (typeof ps_str === 'undefined' || ps_str == null) {
+            return ''; // 空值兜底，非有效字符串直接返回空
+        }
+        var str = ps_str.toString();
+        if (final.filterControlChar) {
+            str = str.replace(/[\x00-\x1F]/g, ''); // 过滤ASCII不可见控制字符
+        }
+        if (final.filterFullWidthSpace) {
+            str = str.replace(/　/g, ' '); // 全角空格替换为普通半角空格
+        }
+        if (typeof this.dangerousChars === 'function') {
+            str = this.dangerousChars(str, final.dangerMode); // 过滤SQL及数据库高危字符
+        }
+        // 公共处理：脚本、样式、注释、空格实体，统一执行
+        str = str.replace(/<style[\s\S]*>[\s\S]*<\/style>/gi, ''); // 过滤样式代码块
+        str = str.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, ''); // 过滤JS脚本代码块
+        str = str.replace(/<!--[\s\S]*?-->/g, ''); // 过滤HTML注释内容
+        str = str.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); // 清除HTML空格实体
+        // 差异化处理：全量标签过滤 / 仅高危标签过滤
+        if (final.filterHtmlTag) {
+            str = str.replace(/<[^<>]+?>/g, ''); // 清除所有HTML标签
+        } else if (final.filterRiskTag) {
+            str = str.replace(/<(iframe|svg|link|frameset)[\s\S]*?>/gi, ''); // 仅过滤高危标签
+        }
+        // 转义控制字符（换行、制表、反斜杠）
+        str = str.replace(/\\/g, "\\\\"); // 转义反斜杠，避免解析异常
+        if (final.escapeNewLine) {
+            str = str.replace(/\r/g, '').replace(/\n/g, '\\n'); // 处理回车与换行符
+        }
+        if (final.escapeTab) {
+            str = str.replace(/\t/g, "\\t"); // 转义制表符
+        }
+        if (final.mergeSpace) {
+            str = str.replace(/\ +/g, ' '); // 合并连续空格
+        }
+        return str;
     },
 
 
+
     /**
-     * 过滤非法危险字符、过滤不安全字符、SQL危险字符过滤
+     * 处理 SQL 注入高危字符：过滤非法危险字符、过滤不安全字符、SQL危险字符过滤
      * add 20260520-1
      * 说明：这些字符可能是 SQL注入风险字符 + 数据库语法冲突字符
      * @param {String} ps_str 原字符串
      * @param {String} ps_method 替换方式，默认loose。值：loose 宽松模式(仅一小部分字符替换成空,大部分字符会替换成对应的中文字符或全角字符)，strict 严格模式(所有字符皆替换成空)
      * @returns {String} 返回过滤后的新字符串
      * 【要过滤的字符如下】
+        & 连字符，c# sql不允许
         ;  分号，语句结束符，可执行恶意SQL
         '  单引号（字符串边界，最危险的注入字符）
         "  双引号
@@ -3123,50 +3200,65 @@ var filter = {
     },
 
 
+
     /**
-     * 过滤指定字符或代码
-	 * edit 20240822-1
-     * @param {String} ps_str 原字符串
-     * @param {Object}} ps_opts 过滤条件组成的对象
-     * @returns {String} 返回新字符串
+     * 内容强净化过滤函数：过滤指定字符或代码
+     * edit 20260610-1
+     * 用途：批量清理字符串中的 JS脚本、CSS样式、HTML标签、各类空白字符
+     * 适用场景：用户留言、弹幕、公告、第三方导入内容等需要严格净化的文本
+     * 不推荐场景：正规表单录入、需要保留 HTML 排版的文章，不建议使用此函数，建议改用 filter.html或utilities.htmlEncode
+     * 调用说明：
+     *  1. 不传第二个参数，默认开启全部过滤规则
+     *  2. 第二个参数为配置对象，可单独关闭某一项过滤
+     *  3. HTML实体转义请单独使用 htmlEncode 函数，本函数不再提供该功能
+     * @param {String} ps_str 原始待处理字符串
+     * @param {Object} ps_opts 可选 过滤规则配置对象
+     * @returns {String} 返回净化完成后的纯文本字符串
      */
     charCode: function(ps_str, ps_opts){
-        if(typeof ps_str == 'undefined' || ps_str == null) return ps_str;
+        // 空值容错：null、undefined、非字符串 统一返回空字符串，避免代码报错
+        if(ps_str == null || typeof ps_str !== 'string'){
+            return '';
+        }
         var defaults = {
-            javascript: true, // 是否过滤js
-            css: true, // 是否过滤css
-            space: true, // 是否过滤空格
-            html: true, // 是否过滤html
-            lineFeed: true, // 是否过滤换行
-            tab: true, // 是否过滤制表符
-            transferred: true // 标签是否转义成字符. eg. < 转义成 &lt; > 转义成 &gt;
+            javascript: true, // 是否过滤 <script> JS脚本代码块
+            css: true, // 是否过滤 <style> CSS样式代码块
+            space: true, // 是否过滤普通空格 + &nbsp;等空格实体
+            html: true, // 是否过滤所有HTML标签
+            lineFeed: true, // 是否过滤 \r \n 换行符
+            tab: true // 是否过滤 \t 制表符
+        };
+        var settings = {};
+        var key;
+        for(key in defaults){
+            settings[key] = defaults[key]; // 先拷贝默认配置
         }
-        // var settings = $.extend(true, {}, defaults, ps_opts || {});
-		var settings = merge.combine(false, defaults, ps_opts || {});
-        var result = ps_str.toString(),
-			str = ps_str.toString();
-        if(settings.javascript) result = str.replace(/\<script[\s\S]*>[\s\S]*<\/script>/g, ''); // 过滤js
-        if(settings.css) result = result.replace(/\<style[\s\S]*>[\s\S]*<\/style>/g, ''); // 过滤css
+        if(ps_opts && typeof ps_opts === 'object'){
+            for(key in ps_opts){
+                if(ps_opts.hasOwnProperty(key)){
+                    settings[key] = ps_opts[key]; // 覆盖自定义配置
+                }
+            }
+        }
+        var result = ps_str.toString(); // 统一使用 result 链式处理，保证每一步修改都生效
+        if(settings.javascript){
+            result = result.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, ''); // 过滤JS脚本代码块，忽略大小写
+        }
+        if(settings.css){
+            result = result.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, ''); // 过滤CSS样式代码块，忽略大小写
+        }
         if(settings.space){
-            result = result.replace(/\ +/g, ''); // 去掉空格
-            result = result.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); // 去掉 &nbsp; &ensp; &emsp; &thinsp;等转义的空格
+            result = result.replace(/\s+/g, ''); // 清除普通空白字符
+            result = result.replace(/(&nbsp;|&ensp;|&emsp;|&thinsp;)/ig, ''); // 清除各类空格实体
         }
-        if(settings.html) result = result.replace(/<[^<>]+?>/g, ''); // 过滤标签
-        if(settings.lineFeed) result = result.replace(/[\r\n]+?/g, ''); // 去掉换行
-        if(settings.tab) result = result.replace(/\t/g, ''); // 去掉制表符
-        if(settings.transferred){ // 标签转化成字符串
-            if(typeof utilities != 'undefined' && typeof utilities.htmlEncode == 'function') {
-				result = utilities.htmlEncode(result);
-			}
-			else {
-				result = result.replace(/\'/g, '&apos;'); // 单引号替换成 &apos;
-				result = result.replace(/\"/g, '&quot;'); // 双引号替换成 &quot;
-				result = result.replace(/\&/g, '&amp;'); // 连字符替换成 &amp;
-				result = result.replace(/\</g, '&lt;'); // // 左尖括号替换成&lt;
-				result = result.replace(/\>/g, '&gt;'); // 右尖括号替换成&gt;
-				result = result.replace(/\\/g, '/'); // 反斜杠替换成斜杠
-				result = result.replace(/(\s+)/g, '&nbsp;');
-			}
+        if(settings.html){
+            result = result.replace(/<[^<>]+?>/g, ''); // 清除所有HTML标签
+        }
+        if(settings.lineFeed){
+            result = result.replace(/[\r\n]/g, ''); // 清除换行符
+        }
+        if(settings.tab){
+            result = result.replace(/\t/g, ''); // 清除制表符
         }
         return result;
     },
