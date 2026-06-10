@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <!-- 1. 引入jQuery -->
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
+        <!-- 2. 【仅本地开发保留，上线直接注释/删除整段】MockJS 模拟接口 -->
+        <script src="https://cdn.jsdelivr.net/npm/mockjs@1.1.0/dist/mock-min.js"></script>
+        <script>
+            // Mock 拦截逻辑，上线删掉这段就自动走真实接口
+            const paramMap = {
+                101: () => {
+                    // console.log('101有进来')
+                    return Mock.mock({ 
+                        code: 200, 
+                        id: 1, 
+                        username: "张三" 
+                    })
+                },
+                102: () => ({ code: 200, msg: "新增成功" }),
+            };
+            Mock.mock(/^\/api\/common/, function (req) {
+                console.log('req：', req)
+                const query = parseQueryString(req.url);
+                var param = query.param;
+                // console.log('query：', query, '\nparam：', param)
+                return paramMap[param]() || { code: 400 };
+            });
+
+            // 自己写一个 parseQueryString
+            function parseQueryString(url) {
+                const obj = {};
+                const qs = url.split('?')[1];
+                if (!qs) return obj;
+                qs.split('&').forEach(item => {
+                    const [k, v] = item.split('=');
+                    obj[k] = v;
+                });
+                return obj;
+            }
+        </script>
+
+        <!-- 3. 全局封装的Ajax，【开发/上线完全不用改】 -->
+        <script>
+            // 你的通用 ajax 封装，无任何环境判断、无参数处理
+            function myAjax(opt) {
+                return $.ajax(opt);
+            }
+
+            // 业务代码，地址永久带 ?param=xxx，永不修改
+            myAjax({
+                url: "/api/common?param=101",
+                type: "get",
+                data: {
+                    age: '18',
+                    sex: '男'
+                },
+                // processData: true, // type='get'时 是否将data里面的参数拼接成 url 参数，默认true
+                success: (res) => {
+                    console.log('res-x：', JSON.parse(res));
+                }
+            });
+        </script>
+    </body>
+</html>
