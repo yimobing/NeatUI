@@ -32,7 +32,6 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9001", "post", function(v){
 });
 
 
-
 //——————————————————————————————————————————
 // 获取默认搜索关键字(取所有默认搜索组下的所有默认搜索关键字，并去重)
 Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9002", "post", function(v){
@@ -48,6 +47,20 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9002", "post", function(v){
 });
 
 
+//——————————————————————————————————————————
+// 获取上次搜索关键字
+Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9003", "post", function(v){
+    // console.log('后台传过来的参数：', v);
+    return Mock.mock({
+        "return": "ok",
+        "data|1-5":[{ 
+            "guanjianzi_mc|1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
+            "juli|+1": [500, 1500, 2500, 3500, 4500] // 距离，单位：米
+        }]
+    });
+});
+
+
 
 
 //——————————————————————————————————————————
@@ -56,6 +69,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1001", "post", function(v){
     // console.log('后台传过来的参数：', v);
     return Mock.mock({
         "return": "ok",
+        "data2": [],
         "data|3-5":[{ 
             "fenzu_bh": "F@id()", 
             "fenzu_mc|1": ["住宅组", "店铺组", "厂房组", "二手房组", "拆迁组"]
@@ -70,6 +84,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1002", "post", function(v){
     // console.log('后台传过来的参数：', v);
     return Mock.mock({
         "return": "ok",
+        "data2": [],
         "data|3-16":[{ 
             "guanjianzi_bh": "G@id()", 
             "guanjianzi_mc|+1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
@@ -133,7 +148,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2001", "post", function(v){
 
 
 //——————————————————————————————————————————
-// 保存数据
+// 保存结果数据
 var nCount = 0;
 Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2002", "post", function(v){
     // console.log('后台传过来的参数：', v);
@@ -158,5 +173,19 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2002", "post", function(v){
     //         "return": "ok",
     //         "data": "ok"
     //     });
+});
+
+
+
+//——————————————————————————————————————————
+// 保存查询的关键词数据
+Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2003", "post", function(v){
+    // console.log('后台传过来的参数：', v);
+    return Mock.mock({
+        "return": "ok",
+        "data": "ok"
+        // "return": "error",
+        // "data": "操作失误啦111"
+    });
 });
 

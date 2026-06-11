@@ -19,7 +19,7 @@
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!-- 对话框 -->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"> <!-- 下拉 -->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css"> <!-- 百度地图控件 -->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan_latest.css?v=20260604-1">
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan_latest.css?v=20260611-1">
 </head>
 <body>
     <style>
@@ -99,11 +99,11 @@
                                 <div class="bds__words_caption"> 附近项目(关键字) </div>
                                 <div class="bds__words_method">
                                     <div class="bds__words_method_option">
-                                        <input type="radio" id="radio-option-by-group" class="ne-checkbox circle-tick radio-option-method" value="1" style="display: none">
+                                        <input type="radio" id="radio-option-by-group" class="ne-checkbox circle-tick radio-option-method" value="1">
                                         <span> 按分组选关键字 </span>
                                     </div>
-                                    <div class="bds__words_method_option on">
-                                        <input type="radio" id="radio-option-by-word" class="ne-checkbox circle-tick radio-option-method" value="0" checked>
+                                    <div class="bds__words_method_option">
+                                        <input type="radio" id="radio-option-by-word" class="ne-checkbox circle-tick radio-option-method" value="0">
                                         <span> 全部关键字 </span>
                                     </div>
                                 </div>
@@ -221,6 +221,12 @@
         var DEFAULT_CITY = '泉州市'; // 默认中心点城市
         var DEFAULT_COORDINATE = '118.608524,24.896863'; // 默认中心点坐桃城
         var DEFAULT_ZOOM = 13; // 地图默认缩放级别。值：3-19
+        var DEFAULT_NEARBY_TAB_METHOD = 'group'; // 附近项目切片默认显示哪个切片，默认group。值： group 按分组选关键字, word 按全部关键字
+
+        //——————————————————————————————————————————
+        // 全局变量
+        var g_now_tab_method = ''; // 记录当前附近项目切片默认显示哪个切片，默认空。值： group 按分组选关键字, word 按全部关键字
+
 
         //——————————————————————————————————————————
         // 数据请求方式
@@ -326,6 +332,40 @@
 
 
         /**
+         * 获取上次搜索关键字 test2
+         * @returns {Object} 返回数组对象
+         */
+         function get_data_last_time_search_of_keywords(){
+            var dataSource = { data: [] }
+            // START AJAX
+            $.ajax({
+                async: false, // 取数方式. true 异步(默认), false 同步
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_loupan_fujin.ashx?param=9003",
+                data: {
+                    "action": "wh_loupan_fujin_guanjianzi_chaxun_log_list",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>",
+                    "menu_bh": "<%=s_menu_bh%>"
+                },
+                success: function(res){
+                    if(!res || $.isEmptyObject(res)) return;
+                    dataSource = JSON.parse(res);
+                },
+                error: function(errs){ },
+                beforeSend: function(xhr){ },
+                complete: function(xhr, status){ }
+            })
+            // END AJAX
+            // console.log('dataSource：', dataSource)
+            return dataSource;
+        }
+
+
+
+        /**
          * 获取关键字分组下拉数据
          * @returns {Object} 返回数组对象
          */
@@ -425,6 +465,29 @@
         }
 
 
+        //——————————————————————————————————————————
+        /**
+         * 标准格式化上次搜索关键字数据源 test2
+         * @param {Object} 数据源数组对象
+         * @return {Object} 返回标准化后的新数据源。格式: {data: [{"fenzu_bh": "分组编号", "fenzu_mc": "分组名称", "data": [{"guanijanzi_bh": "", "guanjianzi_mc": "", "juli": ""}]}]}
+         */
+        function format_data_of_last_time_search(ps_dataSource) {
+            var defaultSource = { data: [] }
+            if(typeof ps_dataSource.data == 'undefined') return defaultSource;
+            if(ps_dataSource.data.length == 0) return defaultSource;
+            var newSource = {
+                data: [{
+                    "fenzu_bh": "", 
+                    "fenzu_mc": "", 
+                    "data": []
+                }]
+            };
+            $.each(ps_dataSource.data, function(index, item) {
+                newSource.data[0].data.push(item);
+            })
+            return newSource;
+        }
+
 
         //——————————————————————————————————————————
         /**
@@ -448,7 +511,7 @@
             });
             _html += '</ul>';
             if(listData.length == 0) {
-                var noDataHtml = '<div class="noData_tips"> 暂无数据，请先在快评电脑端维护楼盘附近关键字分组。<br>菜单：【楼盘区域附近 -> 附近关键字分类分组】</div>';
+                var noDataHtml = '<div class="noData_tips"> 暂无分组数据。<br>请先在快评电脑端维护楼盘附近关键字分组。<br>菜单：【楼盘区域附近 -> 附近关键字分类分组】</div>';
                 $('.bds__words_record_group_list').empty().append(noDataHtml);
             }
             else {
@@ -498,8 +561,9 @@
             });
             _html += '</ul>';
             if(listData.length == 0) {
-                var noDataHtml = '<div class="noData_tips"> 暂无数据，请先在快评电脑端维护楼盘附近关键字。<br>菜单：【楼盘区域附近 -> 附近关键字维护】</div>';
-                $('.bds__words_record_keyword_list').empty().append(noDataHtml);
+                var noDataHtml = '<div class="noData_tips"> 暂无关键字数据。<br>请先在快评电脑端维护楼盘附近关键字。<br>菜单：【楼盘区域附近 -> 附近关键字维护】</div>';
+                $('.bds__words_record_keyword_list').empty().append(noDataHtml).siblings().hide();
+                $('.bds__words_record_keyword_distance').hide();
             }
             else {
                 $('.bds__words_record_keyword_list').empty().append(_html);
@@ -543,6 +607,7 @@
          * @param {Object} ps_dataSource 数据源对象
          */
         function create_html_list_of_saved(ps_dataSource) {
+            // console.log('ps_dataSource：', ps_dataSource);
             var _html = '';
             $.each(ps_dataSource.data, function(index, item) {
                 var data = item.data;
@@ -586,15 +651,20 @@
         //——————————————————————————————————————————
         // 根据“是否启用默认搜索组或默认搜索关键字功能”进行初始化
         if(IS_ENABLE_DEFAULT_SEARCH_WORD) { // 启用时
-            var initWordData = [];
-            var targetWordListData = []; // 格式eg. [{"team": "", data: [{"keyword": "", "distance": ""}]}]
+            // 取数
             // var defaultWordData = get_data_default_search_of_keywords(); // 获取默认搜索关键字数据
             var defaultGroupData = get_data_default_search_of_group(); // 获取默认搜索组数据
-            if(typeof defaultGroupData.data == 'undefined') {
-                console.error('后端JSON结构异常，已兜底\n', defaultGroupData);
+            var lastTimeWordData = format_data_of_last_time_search(get_data_last_time_search_of_keywords()); // 上次搜索关键字数据
+            // 展示
+            var resultGroupWordData = lastTimeWordData.data.length > 0 ? lastTimeWordData : defaultGroupData; // 如果有上次搜索关键字数据则使用之，否则使用默认搜索组数据
+            // console.log('lastTimeWordData：', lastTimeWordData, '\ndefaultGroupData：', defaultGroupData, '\nresultGroupWordData：', resultGroupWordData)
+            if(typeof resultGroupWordData.data == 'undefined') {
+                console.error('后端JSON结构异常，已兜底\n', resultGroupWordData);
             }
             else {
-                defaultGroupData.data.forEach(function(item){
+                var initWordData = [];
+                var targetWordListData = []; // 格式eg. [{"team": "", data: [{"keyword": "", "distance": ""}]}]
+                resultGroupWordData.data.forEach(function(item){
                     var tmp_fenzu_mc = item["fenzu_mc"];
                     var one = { "team": tmp_fenzu_mc, data: []}
                     item.data.forEach(function(row) {
@@ -1109,29 +1179,51 @@
 
 
         //——————————————————————————————————————————
-        //          附近项目下拉区域 test1
+        //      附近项目下拉区域 +  附件项目切片 test1
         //——————————————————————————————————————————
         //——————————————————————————————————————————
         // 选择附近项目：点击选择按钮、选择关键字、附近项目下拉框
         $('#btn-choose-near').on('click',function(){
             var $nodeWordRoot = $('.bds__words');
-            var $nodeWordList = $('.bds__words_record_keyword_list');
             if($nodeWordRoot.is(':visible')) {
                 $nodeWordRoot.hide();
                 return;
             }
             // 如果列表还没创建，避免重复创建，已勾选的再打开时依然可选中
-            if($nodeWordList.children().find('li').length == 0) {
-                var allWordData = get_data_keywords_of_all();
-                create_html_list_of_word(allWordData, { kind: 'all' });
+            var now_tab_method = DEFAULT_NEARBY_TAB_METHOD; // 当前要显示哪个选项卡
+            if(g_now_tab_method != '') now_tab_method = g_now_tab_method;
+            var idx = 0;
+            if(now_tab_method == 'group') { // 按分组选关键字
+                idx = 0;
+                if($('.bds__words_record_group_list li').length == 0) {
+                    var groupData = get_data_word_group();
+                    create_html_list_of_group(groupData); // 创建分组关键字
+                    $('.bds__words_record_group_title').hide(); // 隐藏标题栏
+                    $('.bds__words_record_keyword_distance').hide(); // 隐藏一键设置半径区域
+                    $('.bds__words_record_group').show().addClass('has-100').siblings().hide();
+                    // 显示第1个分组
+                    if($('.bds__words_record_group_list li').length > 0) {
+                        fn_display_some_group(0);
+                    }
+                }
             }
+            else { // 按全部关键字
+                idx = 1;
+                if($('.bds__words_record_keyword_list li').length == 0) {
+                    var allWordData = get_data_keywords_of_all();
+                    create_html_list_of_word(allWordData, { kind: 'all' });
+                }
+            }
+            var $elSelf = $('.bds__words_method').children().eq(idx);
+            $elSelf.addClass('on').find('input:radio').prop('checked', true).show().parent().siblings().removeClass('on').find('input:radio').prop('checked', false).hide(); // 选项卡状态切换
+
             $nodeWordRoot.show(); // 显示附近项目下拉区域
         });
 
 
 
         //——————————————————————————————————————————
-        // 附近项目下拉切换显示方式
+        // [附件项目切片] 切片切换 (附近项目下拉切换显示方式)
         // 这里要使用 mousedown 才能真实判断radio状态
         $('.bds__words_method_option').on('mousedown', function(e) {
             var $radio = $(this).find('input:radio');
@@ -1139,45 +1231,65 @@
                 isChecked = $radio.prop('checked');
             // console.log(isChecked)
             if(isChecked == false) {
-                $radio.prop('checked', true);
-                $(this).addClass('on').find('input:radio').show().parent().siblings().removeClass('on').find('input:radio').prop('checked', false).hide();
                 if(parseFloat(value) == 1) { // 按分组选关键字
                     var groupData = get_data_word_group();
-                    var _html = create_html_list_of_group(groupData);
+                    create_html_list_of_group(groupData); // 创建分组关键字
                     $('.bds__words_record_group_title').hide(); // 隐藏标题栏
                     $('.bds__words_record_keyword_distance').hide(); // 隐藏一键设置半径区域
                     $('.bds__words_record_group').show().addClass('has-100').siblings().hide();
+                    // 显示第1个分组
+                    if($('.bds__words_record_group_list li').length > 0) {
+                        fn_display_some_group(0);
+                    }
                 }
-                else { // 全部关键字
+                else { // 按全部关键字
                     var allWordData = get_data_keywords_of_all();
-                    create_html_list_of_word(allWordData, { kind: 'all' });
+                    create_html_list_of_word(allWordData, { kind: 'all' }); // 创建全部关键字
                     $('.bds__words_record_keyword_distance').show(); // 显示一键设置半径区域
                     $('.bds__words_record_group').hide().siblings().show().addClass('has-100');
                     $('.bds__words_record_keyword_title').find('input:checkbox').prop('checked', false); // 标题左边的复选框取消打勾
+                    $('.bds__words_record_keyword_list').parent().attr('data-group', ''); // 清空分组名
                 }
+                $(this).addClass('on').find('input:radio').prop('checked', true).show().parent().siblings().removeClass('on').find('input:radio').prop('checked', false).hide(); // 选项卡状态切换
             }
         });
 
-        // 点击关键字分组
+
+
+        //——————————————————————————————————————————
+        // [附件项目切片] 点击分组、点击关键字分组
         $(document).on('click', '.bds__words_record_group_list li', function() {
-            var ls_fenzu_bh = $(this).attr('data-bh'),
-                ls_fenzu_mc = $('span', this).text();
+            var index = $(this).index();
+            fn_display_some_group(index);
+        });
+
+        /**
+         * 显示指定关键字分组
+         * @param {Number} ps_index 分组的索引值
+         */
+        function fn_display_some_group(ps_index){
+            var idx = /^\d+$/.test(ps_index) ? parseInt(ps_index) : 0;
+            var $this = $('.bds__words_record_group_list li').eq(idx);
+            var ls_fenzu_bh = $this.attr('data-bh'),
+                ls_fenzu_mc = $this.find('span').text();
             var groupWordData = get_data_keywords_of_group(ls_fenzu_bh);
             create_html_list_of_word(groupWordData, { kind: 'group' });
 
             // 切换显示状态
             $('.bds__words_record_group_title').show(); // 显示标题栏
-            $(this).addClass('active').siblings().removeClass('active');
-            $(this).find('input:radio').prop('checked', true).parent().siblings().find('input:radio').prop('checked', false); // 高亮切换
+            $this.addClass('active').siblings().removeClass('active');
+            $this.find('input:radio').prop('checked', true).parent().siblings().find('input:radio').prop('checked', false); // 高亮切换
 
             $('.bds__words_record_keyword_distance').show(); // 显示一键设置半径区域
 
-            $('.bds__words_record_group').removeClass('has-100').siblings().show().removeClass('has-100').attr('data-group', ls_fenzu_mc); // 切换分组和关键字显示与隐藏
+            $('.bds__words_record_group').removeClass('has-100').siblings().show().removeClass('has-100').attr('data-group', ls_fenzu_mc); // 切换分组和关键字显示与隐藏，设置分组名
             // $('.bds__words_record_keyword_title').find('input:checkbox').prop('checked', true); // 标题左边的复选框打勾
             // $('.bds__words_record_keyword_list').find('input:checkbox').prop('checked', true); // 所有关键字打勾
-        });
+        }
 
-        // 一键设置半径按钮
+
+
+        // [附件项目切片] 一键设置半径按钮
         $('#btn-set-distance').on('click', function() {
             neui.showAnimate();
             setTimeout(function(){
@@ -1191,7 +1303,7 @@
             }, 100)
         });
 
-        // 点击关键字项
+        // [附件项目切片] 点击关键字项
         // 解决长按鼠标点击输入框并拖到输入框处放手时已选中的复选框会变取消选中的bug
         $('.bds__words_record_keyword_list')
         .on('mousedown', 'li', function(e) {
@@ -1225,7 +1337,7 @@
         });
 
 
-        // 标题左边的复选框打勾和取消打勾时
+        // [附件项目切片] 标题左边的复选框打勾和取消打勾时
         $('.bds__words_record_keyword_title').find('input:checkbox').on('change', function(){
             var isChecked = $(this).prop('checked');
             $('.bds__words_record_keyword_list').find('input:checkbox').prop('checked', isChecked); // 切换关键字复选框打勾状态
@@ -1234,13 +1346,13 @@
 
 
         //——————————————————————————————————————————
-        // 点击下拉框确定按钮
+        // [附件项目切片] 点击下拉框确定按钮
         $('#btn-confirm-word').on('click', function(e) {
             $('.bds__words').hide(); // 隐藏下拉框
             fn_done_word_confirm_event(true);
         });
 
-        // 点击页面其它地方，点击下拉区域以外的地方
+        // [附件项目切片] 点击页面其它地方，点击下拉区域以外的地方
         $(document).on('click', function(e){
             var target = getClosest(e.target, '.bds__words, #btn-choose-near');
             if($(target).length > 0) return;
@@ -1250,14 +1362,14 @@
         });
 
         /**
-         * 关键字勾选确定事件
+         * [附件项目切片] 关键字勾选确定事件
          * @param {Boolean} ps_is_when_close_drop 是否为关闭下拉框操作，默认false(可选)
          */
         function fn_done_word_confirm_event(ps_is_when_close_drop) {
             var checkedSingleArr = [];
             var checkedMultipleArr = [];
             var $elNode = $('.bds__words_record_keyword_list');
-            var tmp_group_mc = $elNode.parent().attr('data-group');
+            var tmp_group_mc = $elNode.parent().attr('data-group'); // 取分组名
             if(typeof tmp_group_mc == 'undefined') tmp_group_mc = '';
             var groupObj = { "team": tmp_group_mc, data: []}
             $elNode.children().find('li').each(function(){
@@ -1296,6 +1408,17 @@
                 else 
                     $('#s-range').attr('disabled', false).parent().siblings().find('input:checkbox').prop('checked', true); // 允许手动输入
             }
+
+            // 全局赋值
+            var index = -1;
+            $('.bds__words_method').children().each(function(idx, item) {
+                if($(this).hasClass('on')) {
+                    index = idx;
+                    return false;
+                }
+            });
+            if(index == 0) g_now_tab_method = 'group';
+            else g_now_tab_method = 'word';
         }
 
 
@@ -1566,7 +1689,7 @@
             // 取值
             var wordStr = $('#s-near').attr('data-word'); // 取 data-word 属性值。附近项目输入框取值
             var wordArr = wordStr.toString().replace(/\s+/g, '') === '' ? [] : JSON.parse(wordStr);
-            var projectArr = [];
+            var projectArr = []; // 关键词。数组格式
             for (var i = 0; i < wordArr.length; i++) {
                 var item = wordArr[i];
                 for (var j = 0; j < item.data.length; j++) {
@@ -1574,10 +1697,8 @@
                 }
             }
             // console.log('wordArr：', wordArr, '\nprojectArr：', projectArr);
-
             var isMoreThanOneKey = projectArr.length > 0 ? true : false; // 关键是否>=1个
-            var myKeys = isMoreThanOneKey ? projectArr : [projectList]; // 关键词。数组格式
-            // console.log('projectArr：', projectArr);
+            // console.log('projectArr：', projectArr, '\nprojectList：', projectList);
 
             // 开始执行
             var resultId_2 = 'panel-result2'; // 详细列表拼接根节点
@@ -1887,10 +2008,74 @@
 
                 }
                 
+
+                fnSaveSearchWordRecord(projectArr); // 保存查询的关键词，方便用户下次打开使用它们直接进行查询
+
                 neui.destroyAnimate();
             }, 100)
         });
 
+
+
+        /**
+         * 保存查询的关键词：记录查询关键词，并发送给后端 test2
+         * @param {Array} ps_keyword_arr 关键词数据源数组
+         */
+        function fnSaveSearchWordRecord(ps_keyword_arr) {
+            // console.log('wordArr：', ps_keyword_arr)
+            var resultArr = { data: [] }
+            ps_keyword_arr.map(function(item) {
+                var one = { 
+                    "guanjianzi_mc": item["keyword"],
+                    "juli": item["distance"]
+                }
+                resultArr.data.push(one);
+            });
+            var ls_json_str = JSON.stringify(resultArr);
+            // console.log('resultArr：', resultArr);
+
+            var ls_data = {
+                "action": "wh_loupan_fujin_guanjianzi_chaxun_log_save",
+                "user": "<%=s_user%>",
+                "sjk": "<%=s_sjk%>",
+                "menu_bh": "<%=s_menu_bh%>",
+                "json_str": ls_json_str 
+            }
+            // console.log('ls_data：', ls_data);
+
+            // 开始执行
+            var flag = '', msg = '保存查询的关键记词成功';
+            // START AJAX
+            $.ajax({
+                async: false, // 取数方式. true 异步(默认), false 同步
+                type: "POST",
+                dataType: "html",
+                cache: false,
+                url: "../fwh_pub/jk_loupan_fujin.ashx?param=2003",
+                data: ls_data,
+                success: function(res){
+                    if(!res || $.isEmptyObject(res)) return;
+                    var result = JSON.parse(res);
+                    if(result.return == 'ok') {
+                        flag = 1;
+                    }
+                    else {
+                        flag = 0;
+                        msg = result.data;
+                    }
+                },
+                error: function(errs){ },
+                beforeSend: function(xhr){ },
+                complete: function(xhr, status){ }
+            });
+            // END AJAX
+
+            neuiDialog.alert({
+                popup: flag == 1 ? false : true, // 成功不弹窗，失败才弹窗
+                message: msg,
+                buttons: ['确定']
+            })
+        }
 
 
 
@@ -2046,11 +2231,12 @@
             区域内有学校：丰泽实验小学、鲤城实难小学、东湖小学、兴光小学等；医院：东南医院、东湖医院、人民医院、第二医院等。
             ②关键词是“公交”时的显示效果
             出入可利用私家车、公交车、自行车及出租车等；周边有“幸福街口”公交站点：有1路、2路等公交线路停靠。
-         * @param {Array} ps_dataSource 数据源数组。数据格式：[{keyword: "关键词", data: [{title: "名称", "address": "地址", "province": "所在省份", "city": "所在城市", "point": "坐标点对象, lng, lat", ... }]}]
-         * @param {Array} 查询关键字列表的数据源数组
+         * @param {Array} ps_poi_data 查询结果数据源数组。数据格式：[{keyword: "关键词", data: [{title: "名称", "address": "地址", "province": "所在省份", "city": "所在城市", "point": "坐标点对象, lng, lat", ... }]}]
+         * @param {Array} 查询关键词数据源数组
          */
-        function fnNearComposeStringToUser(ps_dataSource, ps_targetWordDataSource){
-            // console.log('ps_dataSource：', ps_dataSource)
+        function fnNearComposeStringToUser(ps_poi_data, ps_keyword_data){
+            // console.log('ps_poi_data：', ps_poi_data, '\nps_keyword_data：', ps_keyword_data);
+            // console.log('-----------');
             map.clearOverlays(); // 清空所有覆盖物
             // map.centerAndZoom(point, 13); // 调整视野
             var placeList = [], // 搜索到的地点名称组成的数组。eg. ['a小学', 'b小学', 'a医院', 'b医院']
@@ -2058,8 +2244,8 @@
                 savedArr = [], // 用于保存的数组。eg. [{'title': '学校', data: ['a小学', 'b小学']}, {'title': '医院', data: ['a医院', 'b医院']}]
                 busArr = [], // 公交站点数组
                 busStr = ''; // 公交组成的字符串
-            for(var i = 0; i < ps_dataSource.length; i++) {
-                var one = ps_dataSource[i];
+            for(var i = 0; i < ps_poi_data.length; i++) {
+                var one = ps_poi_data[i];
                 var word = one.keyword,
                     pois = one.data;
                 // console.log('word：', word)
@@ -2075,24 +2261,29 @@
                         // map.addOverlay(marker);
                         // marker.setLabel(new BMap.Label(poi.title, {offset: new BMap.Size(20, -10)}));
                         var title = poi.title, address = poi.address;
+                        // console.log('address：', address)
                         placeList.push(title);
-                        oneSaveObj.data.push(word.indexOf('公交') >= 0 ? title + '站' : title);
+                        var save_title = '';
                         if(word.indexOf('公交') >= 0) {
                             busArr.push(title);
                             busStr += '\r\n“' + title + '”公交站点：';
                             if(address != '') {
-                                busStr += '有' + address.replace(/(\;|\；)/g, '、') + '等公交线路停靠';
+                                busStr += '有' + address.replace(/(\;|\；|、)/g, '、') + '等公交线路停靠';
                                 busStr += ( k == pois.length - 1) ? '。' : '；';
                             }
+                            save_title = title + '站';
+                            save_title += '(' + address.replace(/(\;|\；|、)/g, '|') + ')'; // 这里用竖线分隔符|来分隔,方便保存时改成顿号。注：竖线分隔符用于分隔公交线路
                         }
                         else {
                             titleArr.push(title);
+                            save_title = title;
                         }
+                        oneSaveObj.data.push(save_title);
                     }
                 }
                
                 oneStr += titleArr.join('、');
-                oneStr += titleArr.length == 0 ? '' : ((i == ps_dataSource.length - 1) ? '。' : '等；\r\n\r\n'); 
+                oneStr += titleArr.length == 0 ? '' : ((i == ps_poi_data.length - 1) ? '。' : '等；\r\n\r\n'); 
                 oneStr = (word.indexOf('公交') >= 0 ? '' : (titleArr.length == 0 ? word + '：\r\n\r\n' : word + '：')) + oneStr;
                 composeArr.push(oneStr);
                 savedArr.push(oneSaveObj);
@@ -2111,7 +2302,7 @@
             $('#r-result').val(resultStr);
 
             // 创建当前查询的关键字列表
-            create_html_list_of_search_word(ps_targetWordDataSource);
+            create_html_list_of_search_word(ps_keyword_data);
             $('.bds__search_result_outcome_switch_record').show(); // 显示列表
             $('.bds__search_result_outcome_switch_record_title').text('当前查询的关键字'); // 更改文字
             // 创建“保存结果”切片数据
@@ -2168,7 +2359,8 @@
                     value = value.replace(/\s/g, ','); // 空格替换成逗号
                     value = value.replace(/[,:;!，：；！、。]/g, ','); // 分号等字符转成逗号
                     value = value.replace(/(,){2,}/g, ',').replace(/(.*),$/g, '$1').replace(/^,(.*)/g, '$1'); // 去掉多个逗号等符号，去掉结尾开头的逗号
-                    var ls_guanjianzi_ziduan = filter.dangerousChars(title), ls_neirong = filter.dangerousChars(value);
+                    var ls_guanjianzi_ziduan = filter.dangerousChars(title), 
+                        ls_neirong = filter.dangerousChars(value).replace(/(,)/g, '，').replace(/(\|)/g, '、'); // 英文逗号转成中文逗号，竖线分隔符转成顿号(竖线分隔符用于分隔公交线路)
                     // console.log('title：', title, '\nvalue：', value);
                   
                     // 只提交内容不为空的数据
@@ -2246,7 +2438,7 @@
         //              小区名称关键字提示输入提示词条
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //——————————————————————————————————————————
-        // 百度地图API功能
+        // 百度地图API功能、小区输入框下拉
         function G(id) {
             return document.getElementById(id);
         }
@@ -2315,14 +2507,14 @@
                 e.item.index +
                 "<br />myValue = " +
                 myValue;
-
+            $('#s-community').attr('title', myValue);
             setPlace(_value.business);
         });
 
         // 小区下拉
         function setPlace(ps_title) {
+            // console.log('ps_title：', ps_title, '\nmyValue：', myValue)
             map.clearOverlays(); // 清除地图上所有覆盖物
-
             // // 方法1：使用地点检索。配额不够，1天最多100次。超过配额度时检索不出来
             // function myFun() {
             //     var pp = local.getResults().getPoi(0).point; // 获取第一个智能搜索的结果
