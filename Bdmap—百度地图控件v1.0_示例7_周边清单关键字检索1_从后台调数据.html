@@ -12,7 +12,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title>周边关键字检索</title>
+    <title> 周边关键字检索1 </title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui.min.css"> <!-- 前端框架 -->
@@ -86,10 +86,10 @@
                         <div class="bds__search_form_box_title"> 附近项目 </div>
                         <div class="bds__search_form_box_content">
                             <input type="text" id="s-near" placeholder="关键字，如学校" onblur="this.placeholder='关键字，如学校'" onfocus="this.placeholder=''">
-                            <button type="button" id="btn-choose-near"> 选择 </button>
-                            <div class="bds__search_form_box_drop block__keyword" style="display: none">
-                                <ul class="bds__search_form_box_drop_list block__keyword_list"></ul>
-                                <button type="button" id="btn-word-confirm"> 确定 </button>
+                            <button type="button" id="btn-choose-near">选择</button>
+                            <div class="bds__search_form_box_drop" style="display: none">
+                                <ul class="bds__search_form_box_drop_list"></ul>
+                                <div class="bds__search_form_box_drop_operate">确定</div>
                             </div>
                         </div>
                     </div>
@@ -159,7 +159,7 @@
 
         //——————————————————————————————————————————
         // test: 搜索结果数据获取方式 mock 
-        USE_WEB_API = false;
+        USE_WEB_API = true;
         
         
 
@@ -350,7 +350,7 @@
             // 中心点(可选)
             center: {
                 city: "", // 城市(可选)，默认空。值：空时根据坐标定位,非空时根据城市定位。eg.'泉州市',eg.'泉州市惠安县'。
-                coordinate: "118.608524,24.896863",
+                coordinate: "118.608524,24.896863", // testing
                 // coordinate: "118.595776,24.916136", // 坐标(可选)，默认为首都北京天安门广场的坐标,eg."经度,纬度"。
                 caption: "", // 标题文字(可选)，默认'北京市'。支持HTML
                 describe: "", // 描述文字(可选)，默认空。
@@ -438,7 +438,7 @@
 
 
         //——————————————————————————————————————————
-        // 按关键字选择按钮：附近项目下拉
+        // 附近项目下拉
         $('#btn-choose-near').on('click',function(){
             var $this = $(this);
             // 后台返回 ajax({})
@@ -475,8 +475,7 @@
                     '</li>'
                 ].join('\r\n')
             });
-            var $dropNode = $('.block__keyword');
-            // 如果列表还没创建，避免重复创建，已勾选的再打开时依然可选中
+            var $dropNode = $('.bds__search_form_box_drop');
             if($dropNode.children('ul').find('li').length == 0) {
                 $dropNode.children('ul').empty().append(_html); 
             }
@@ -485,33 +484,30 @@
 
 
         //——————————————————————————————————————————
-        // 点击下拉项：选择某个关键字下拉项
-        $(document).on('click', '.bds__search_form_box_drop li span', function(e){
+        // 选择单个项目时
+        $(document).on('click', '.bds__search_form_box_drop_list li span', function(e){
             var value = $(this).text();
             $('#s-near').val(value);
-            $(this).parents('.bds__search_form_box_drop').hide();
-            $(this).siblings('input:checkbox').prop('checked', true);
-            $(this).parent().siblings().find('input:checkbox').prop('checked', false);
+            $('.bds__search_form_box_drop').hide();
+            $('.bds__search_form_box_drop_list input:checkbox').prop('checked', false);
         });
 
-
         //——————————————————————————————————————————
-        // 点击确定按钮
-        $('#btn-word-confirm').on('click', function(e){
-            // 隐藏附近项目下拉
+        // 点击确定按钮时隐藏附近项目下拉
+        $('.bds__search_form_box_drop_operate').on('click', function(e){
+            // var target = e.target.closest('.bds__search_form_box_drop');
             var target = getClosest(e.target, '.bds__search_form_box_drop');
             // console.log('len：', $(target).length)
-            // console.log('target：', target);
             if($(target).length > 0) {
-                $(target).hide();
+                $('.bds__search_form_box_drop').hide();
                 fn_done_near_drop_close_event();
             }
         });
-        // 点击其它地方隐藏下拉
+        // 点击其它地方隐藏附近项目下拉
         $(document).on('click', function(e) {
+            // var target = e.target.closest('.bds__search_form_box_drop, #btn-choose-near');
             var target = getClosest(e.target, '.bds__search_form_box_drop, #btn-choose-near');
             // console.log('len-x：', $(target).length)
-            // console.log('target：', target)
             if($(target).length == 0) {
                 $('.bds__search_form_box_drop').hide();
                 fn_done_near_drop_close_event();
@@ -520,6 +516,7 @@
 
         /**
          * 附近项目下拉关闭事件
+         * 附近项目：确定按钮
         */
         function fn_done_near_drop_close_event(){
             var checkedArr = [];
@@ -797,10 +794,10 @@
 
 
         //——————————————————————————————————————————
-        // 查询按钮
+        // 查询按钮：周围边关键字搜索
         $('#btn-query').on('click', function(){
             var zuobiao = $('#c-locate').val(), // 坐标
-                xiangmu = $('#s-near').val(), // 附近项目
+                xiangmu = $('#s-near').val(), // 附近项目，关键字
                 banjing = $('#s-range').val(); // 范围，半径
             
             // test1
@@ -826,7 +823,7 @@
                         var ls_guanjianzi_mc = xiangmuArr[i],
                             ls_zuobiao = zuobiao,
                             ls_juli_fanwei_mi = banjing;
-                        // console.log('ls_guanjianzi_mc：', ls_guanjianzi_mc, '\n坐标：', ls_zuobiao, '\n范围：', ls_juli_fanwei_mi);
+                        // console.log('关键字：', ls_guanjianzi_mc, '\n坐标：', ls_zuobiao, '\n范围：', ls_juli_fanwei_mi);
 
                         // 后台返回 ajax({})
                         var outcomeData = { data: [] }
@@ -885,7 +882,7 @@
                 var pagesize = 100; // 每页容量
                 var coordinateArr = zuobiao.split(',');
                 var point = new BMap.Point(coordinateArr[0], coordinateArr[1]); // 中心点
-                var myKeys = xiangmu.indexOf(',') >= 0 ? xiangmu.split(',') : [ xiangmu ]; // 关键词。数组格式
+                var myKeys = xiangmu.indexOf(',') >= 0 ? xiangmu.split(',') : [ xiangmu ]; // 关键字。数组格式
                 var radius = isNaN(parseFloat(banjing)) ? parseFloat(DEFAULT_RANGE) : parseFloat(banjing); // 半径。数值型，不能是字符串，否则会返回空数据
                 var local = new BMap.LocalSearch(point, {
                     renderOptions: {
@@ -894,10 +891,10 @@
                         panel: 'panel-result', // String | HTMLElement 结果列表的HTML容器id或容器元素，提供此参数后，结果列表将在此容器中进行展示。此属性对LocalCity无效。驾车路线规划无效
                         // selectFirstResult: false, // 是否选择第一个检索结果。此属性仅对LocalSearch有效
                     },
-                    pageCapacity: pagesize, // 设置每页容量，取值范围：1 - 100，对于多关键词检索，容量表示每个关键词的数量，如果有2个关键词，则实际检索结果数量范围为：2 - 200
-                    // 检索完成后的回调函数。 参数：results: LocalResult或Array 如果是多关键词检索，回调函数参数返回一个LocalResult的数组，数组中的结果顺序和检索中多关键词数组中顺序一致
+                    pageCapacity: pagesize, // 设置每页容量，取值范围：1 - 100，对于多关键字检索，容量表示每个关键字的数量，如果有2个关键字，则实际检索结果数量范围为：2 - 200
+                    // 检索完成后的回调函数。 参数：results: LocalResult或Array 如果是多关键字检索，回调函数参数返回一个LocalResult的数组，数组中的结果顺序和检索中多关键字数组中顺序一致
                     onSearchComplete: function(results){
-                        // console.log('周边返回结果-results：', results); 
+                        console.log('周边返回结果-results：', results); 
                         var status = local.getStatus();
                         // console.log('local：', local, '\nstatus：', status);
                         // 判断状态是否正确
@@ -954,9 +951,9 @@
          * 根据百度地图附近关键词搜索结果返回的值组成用户所需的字符串
           【说明】
           组成字符串显示在界面上：
-            ①关键词是除“公交”以外的显示效果
+            ①关键字是除“公交”以外的显示效果
             区域内有学校：丰泽实验小学、鲤城实难小学、东湖小学、兴光小学等；医院：东南医院、东湖医院、人民医院、第二医院等。
-            ②关键词是“公交”时的显示效果
+            ②关键字是“公交”时的显示效果
             出入可利用私家车、公交车、自行车及出租车等；周边有“幸福街口”公交站点：有1路、2路等公交线路停靠。
          * @param {Array} ps_dataSource 数据源数组。数据格式：[{keyword: "关键词", data: [{title: "名称", "address": "地址", "province": "所在省份", "city": "所在城市", "point": "坐标点对象, lng, lat", ... }]}]
          */
@@ -972,28 +969,24 @@
                 var word = one.keyword,
                     pois = one.data;
                 var oneStr = '', titleArr = [];
-                // console.log('pois:', pois)
-                // console.log('len:', pois.length)
                 for(var k = 0; k < pois.length; k++) {
-                    var poi = pois[k]; // 不知为何，有些情况下poi会是undefined
+                    var poi = pois[k];
                     // console.log('poi：', poi);
-                    if(typeof poi != 'undefined') {
-                        // 可选：在地图上标注POI
-                        // var marker = new BMap.Marker(poi.point);
-                        // map.addOverlay(marker);
-                        // marker.setLabel(new BMap.Label(poi.title, {offset: new BMap.Size(20, -10)}));
-                        var title = poi.title, address = poi.address;
-                        placeList.push(title);
-                        if(word.indexOf('公交') >= 0) {
-                            busStr += '\r\n“' + title + '”公交站点：';
-                            if(address != '') {
-                                busStr += '有' + address.replace(/(\;|\；)/g, '、') + '等公交线路停靠';
-                                busStr += ( k == pois.length - 1) ? '。' : '，';
-                            }
+                    // 可选：在地图上标注POI
+                    // var marker = new BMap.Marker(poi.point);
+                    // map.addOverlay(marker);
+                    // marker.setLabel(new BMap.Label(poi.title, {offset: new BMap.Size(20, -10)}));
+                    var title = poi.title, address = poi.address;
+                    placeList.push(title);
+                    if(word.indexOf('公交') >= 0) {
+                        busStr += '\r\n“' + title + '”公交站点：';
+                        if(address != '') {
+                            busStr += '有' + address.replace(/(\;|\；)/g, '、') + '等公交线路停靠';
+                            busStr += ( k == pois.length - 1) ? '。' : '，';
                         }
-                        else {
-                            titleArr.push(title);
-                        }
+                    }
+                    else {
+                        titleArr.push(title);
                     }
                 }
                 oneStr += titleArr.join('、');
@@ -1132,7 +1125,8 @@
 
             // 方法2：使用地理编码。配额足够，1天最多5000次
             var address = myValue;
-            var city = '泉州市';
+            var city = $('#c-city').val();
+            if(city.toString().replace(/\s+/g, '') === '') city = '泉州市';
             city = getCityName(city);
             // console.log('city-x：', city,'\nmyValue-x：', myValue);
             getAddressCoordinateByGeoCoder(address, city, function(point) {
@@ -1141,6 +1135,7 @@
                     // 创建标注点
                     map.centerAndZoom(point, 16);
                     map.addOverlay(new BMap.Marker(point)); // 添加标注
+                    $('#c-locate').val(point.lng + ',' + point.lat); // 坐标栏赋值
                 }
             });
         }

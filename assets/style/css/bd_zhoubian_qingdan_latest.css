@@ -3,7 +3,7 @@
 /**
 * 小工具 -> 百度周边清单
 * Date: 2025.12.21
-* Update: 2026.06.11
+* Update: 2026.06.15
 */
 /*+ --------  -------- +*/
 
@@ -45,6 +45,7 @@ body {
 	font-size: 12px;
 }
 
+
 /*+ --------  -------- +*/
 .bds {
 	display: -wekkit-box;
@@ -65,6 +66,10 @@ body {
 	padding: 15px 10px;
 	color: #afa8b0;
 	font-size: 14px;
+}
+button[type="button"][disabled] {
+	background: #adadad!important;
+	border-color: #626262!important;
 }
 
 
@@ -587,6 +592,14 @@ body {
 	font-size: 14px;
 	font-weight: 550;
 }
+.bds__search_result_outcome_switch_display_one_item.has-gap {
+	color: #FF9800;
+}
+.bds__search_result_outcome_switch_display_one_item em {
+	display: block;
+	font-weight: normal;
+	font-size: 13px;
+}
 .bds__search_result_outcome_switch_display_one_list {
 	-webkit-flex: 1;
 	-moz-flex: 1;
@@ -622,6 +635,9 @@ body {
 	color: #666;
 	font-size: 12px;
 	cursor: pointer;
+}
+.bds__search_result_outcome_switch_display_one_list li:nth-child(2n) {
+	background-color: #f7f7f7;
 }
 .bds__search_result_outcome_switch_display_one_list li:hover {
 	background-color: #d9d8d8;

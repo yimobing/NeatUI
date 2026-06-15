@@ -9,7 +9,7 @@
 // mock 模拟数据 从后台获取搜索结果数据
 // 设置延时时长，模拟后端处理或返回数据的时间。
 Mock.setup({
-    timeout: 1000, // 延时n毫秒返回
+    timeout: 100, // 延时n毫秒返回
 });
 
 
@@ -25,7 +25,8 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9001", "post", function(v){
             "data|1-2": [{
                 "guanjianzi_bh": "G@id()", 
                 "guanjianzi_mc|1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
-                "juli|+1": [1000, 2000, 3000, 4000, 5000] // 距离，单位：米
+                "juli|+1": [1000, 2000, 3000, 4000, 5000], // 距离，单位：米
+                "zhongyao_changsuo_dai_julidizhi|0-1": 0 // 重要场所带距离地址
             }]
         }]
     });
@@ -41,7 +42,8 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9002", "post", function(v){
         "data|1-2":[{ 
             "guanjianzi_bh": "G@id()", 
             "guanjianzi_mc|1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
-            "juli|+1": [1000, 2000, 3000, 4000, 5000] // 距离，单位：米
+            "juli|+1": [1000, 2000, 3000, 4000, 5000], // 距离，单位：米
+            "zhongyao_changsuo_dai_julidizhi|0-1": 0 // 重要场所带距离地址
         }]
     });
 });
@@ -55,10 +57,12 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9003", "post", function(v){
         "return": "ok",
         "data|1-5":[{ 
             "guanjianzi_mc|1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
-            "juli|+1": [500, 1500, 2500, 3500, 4500] // 距离，单位：米
+            "juli|+1": [500, 1500, 2500, 3500, 4500], // 距离，单位：米
+            "zhongyao_changsuo_dai_julidizhi|0-1": 0 // 重要场所带距离地址
         }]
     });
 });
+
 
 
 
@@ -89,6 +93,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1002", "post", function(v){
             "guanjianzi_bh": "G@id()", 
             "guanjianzi_mc|+1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
             "juli|+1": [1000, 2000, 3000, 4000, 5000], // 距离，单位：米
+            "zhongyao_changsuo_dai_julidizhi|0-1": 0 // 重要场所带距离地址
         }]
     });
 });
@@ -104,7 +109,8 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1003", "post", function(v){
             "guanjianzi_bh": "G@id()", 
             "guanjianzi_mc|+1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
             "juli|+1": [1000, 2000, 3000, 4000, 5000], // 距离，单位：米
-            "check_moren|0-1": 0 // 是否默认搜索关键字
+            "check_moren|0-1": 0, // 是否默认搜索关键字
+            "zhongyao_changsuo_dai_julidizhi|0-1": 0 // 重要场所带距离地址
         }]
     });
 });
