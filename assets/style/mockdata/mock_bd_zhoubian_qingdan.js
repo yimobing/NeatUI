@@ -26,11 +26,12 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9001", "post", function(v){
                 "guanjianzi_bh": "G@id()", 
                 "guanjianzi_mc|1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
                 "juli|+1": [1000, 2000, 3000, 4000, 5000], // 距离，单位：米
-                "zhongyao_changsuo_dai_julidizhi|0-1": 0 // 重要场所带距离地址
+                "zhongyao_changsuo_dai_julidizhi|1": ["", "1"] // 重要场所带距离地址。非空时表示要带距离，空时表示不带距离
             }]
         }]
     });
 });
+
 
 
 //——————————————————————————————————————————
@@ -43,7 +44,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9002", "post", function(v){
             "guanjianzi_bh": "G@id()", 
             "guanjianzi_mc|1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
             "juli|+1": [1000, 2000, 3000, 4000, 5000], // 距离，单位：米
-            "zhongyao_changsuo_dai_julidizhi|0-1": 0 // 重要场所带距离地址
+            "zhongyao_changsuo_dai_julidizhi|1": ["", "1"] // 重要场所带距离地址。非空时表示要带距离，空时表示不带距离
         }]
     });
 });
@@ -58,7 +59,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=9003", "post", function(v){
         "data|1-5":[{ 
             "guanjianzi_mc|1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
             "juli|+1": [500, 1500, 2500, 3500, 4500], // 距离，单位：米
-            "zhongyao_changsuo_dai_julidizhi|0-1": 0 // 重要场所带距离地址
+            "zhongyao_changsuo_dai_julidizhi|1": ["", "1"] // 重要场所带距离地址。非空时表示要带距离，空时表示不带距离
         }]
     });
 });
@@ -82,6 +83,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1001", "post", function(v){
 });
 
 
+
 //——————————————————————————————————————————
 // 获取全部关键字下拉数据
 Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1002", "post", function(v){
@@ -93,7 +95,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1002", "post", function(v){
             "guanjianzi_bh": "G@id()", 
             "guanjianzi_mc|+1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
             "juli|+1": [1000, 2000, 3000, 4000, 5000], // 距离，单位：米
-            "zhongyao_changsuo_dai_julidizhi|0-1": 0 // 重要场所带距离地址
+            "zhongyao_changsuo_dai_julidizhi|1": ["", "1"] // 重要场所带距离地址。非空时表示要带距离，空时表示不带距离
         }]
     });
 });
@@ -110,10 +112,11 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=1003", "post", function(v){
             "guanjianzi_mc|+1": ["学校", "医院", "公园", "超市", "商场", "公交站", "景点", "体育馆", "电影院", "剧院", "餐厅", "酒店", "便利店", "购物中心", "电影院", "博物馆"],
             "juli|+1": [1000, 2000, 3000, 4000, 5000], // 距离，单位：米
             "check_moren|0-1": 0, // 是否默认搜索关键字
-            "zhongyao_changsuo_dai_julidizhi|0-1": 0 // 重要场所带距离地址
+            "zhongyao_changsuo_dai_julidizhi|1": ["", "1"] // 重要场所带距离地址。非空时表示要带距离，空时表示不带距离
         }]
     });
 });
+
 
 
 
@@ -153,6 +156,8 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2001", "post", function(v){
 
 
 
+
+
 //——————————————————————————————————————————
 // 保存结果数据
 var nCount = 0;
@@ -167,7 +172,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2002", "post", function(v){
     // if(nCount == 1)
     //     return Mock.mock({
     //         "return": "ok",
-    //         "data": "ok"
+    //         "data": "ok1"
     //     });
     // else  if(nCount == 2)
     //     return Mock.mock({
@@ -177,7 +182,7 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2002", "post", function(v){
     // else 
     //     return Mock.mock({
     //         "return": "ok",
-    //         "data": "ok"
+    //         "data": "ok2"
     //     });
 });
 

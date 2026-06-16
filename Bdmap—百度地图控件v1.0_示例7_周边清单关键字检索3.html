@@ -209,7 +209,7 @@
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!-- 对话框-->
     <script src="assets/neatui/js/neatui-bdmap.js"></script> <!-- 百度地图控件 -->
     <script src="assets/neatui/js/neatui-functions.js?v=20260602-1"></script> <!-- 函数库 -->
-
+    <script src="assets/neatui/js/neatui-ajax-pro.js?v=20260616-1"></script> <!-- jq ajax 自定义封装-->
     <!-- mock 模拟数据 -->
     <script src="assets/lib/mock/mock-min.js"></script>
     <script src="assets/style/mockdata/mock_bd_zhoubian_qingdan.js"></script>
@@ -240,7 +240,7 @@
         //——————————————————————————————————————————
         // test: 搜索结果数据请求方式 mock 
         IS_ENABLE_DEFAULT_SEARCH_WORD = true; // 是否启用默认搜索组或默认搜索关键字功能，默认true
-        IS_USE_WEB_API = true;  // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api); false 从前端直接取数据(使用百度地图浏览器版api,即js api)
+        IS_USE_WEB_API = false;  // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api); false 从前端直接取数据(使用百度地图浏览器版api,即js api)
         
         
 
@@ -276,7 +276,7 @@
         function get_data_default_search_of_group(){
             var dataSource = { data: [] }
             // START AJAX
-            $.ajax({
+            var response = Ajax({
                 async: false, // 取数方式. true 异步(默认), false 同步
                 type: "POST",
                 dataType: "html",
@@ -297,6 +297,14 @@
                 complete: function(xhr, status){ }
             })
             // END AJAX
+            // 网络、HTTP错误(断网、404、500、超时等)
+            if (!response.isHttpSuccess) {
+                neui.destroyAnimate();
+                neuiDialog.alert({
+                    message: response.standardErr.message,
+                    buttons: ['确定']
+                })
+            }
             return dataSource;
         }
 
@@ -309,7 +317,7 @@
         function get_data_default_search_of_keywords(){
             var dataSource = { data: [] }
             // START AJAX
-            $.ajax({
+            var response = Ajax({
                 async: false, // 取数方式. true 异步(默认), false 同步
                 type: "POST",
                 dataType: "html",
@@ -330,6 +338,14 @@
                 complete: function(xhr, status){ }
             })
             // END AJAX
+            // 网络、HTTP错误(断网、404、500、超时等)
+            if (!response.isHttpSuccess) {
+                neui.destroyAnimate();
+                neuiDialog.alert({
+                    message: response.standardErr.message,
+                    buttons: ['确定']
+                })
+            }
             return dataSource;
         }
 
@@ -342,7 +358,7 @@
          function get_data_last_time_search_of_keywords(){
             var dataSource = { data: [] }
             // START AJAX
-            $.ajax({
+            var response = Ajax({
                 async: false, // 取数方式. true 异步(默认), false 同步
                 type: "POST",
                 dataType: "html",
@@ -363,6 +379,14 @@
                 complete: function(xhr, status){ }
             })
             // END AJAX
+            // 网络、HTTP错误(断网、404、500、超时等)
+            if (!response.isHttpSuccess) {
+                neui.destroyAnimate();
+                neuiDialog.alert({
+                    message: response.standardErr.message,
+                    buttons: ['确定']
+                })
+            }
             // console.log('dataSource：', dataSource)
             return dataSource;
         }
@@ -376,7 +400,7 @@
         function get_data_word_group(){
             var dataSource = { data: [] }
             // START AJAX
-            $.ajax({
+            var response = Ajax({
                 async: false, // 取数方式. true 异步(默认), false 同步
                 type: "POST",
                 dataType: "html",
@@ -397,6 +421,14 @@
                 complete: function(xhr, status){ }
             })
             // END AJAX
+            // 网络、HTTP错误(断网、404、500、超时等)
+            if (!response.isHttpSuccess) {
+                neui.destroyAnimate();
+                neuiDialog.alert({
+                    message: response.standardErr.message,
+                    buttons: ['确定']
+                })
+            }
             return dataSource;
         }
 
@@ -409,7 +441,7 @@
         function get_data_keywords_of_all(){
             var dataSource = { data: [] }
             // START AJAX
-            $.ajax({
+            var response = Ajax({
                 async: false, // 取数方式. true 异步(默认), false 同步
                 type: "POST",
                 dataType: "html",
@@ -430,6 +462,15 @@
                 complete: function(xhr, status){ }
             })
             // END AJAX
+            // 网络、HTTP错误(断网、404、500、超时等)
+            if (!response.isHttpSuccess) {
+                neui.destroyAnimate();
+                neuiDialog.alert({
+                    message: response.standardErr.message,
+                    buttons: ['确定']
+                })
+            }
+            // console.log('全部关键字下拉：', dataSource);
             return dataSource;
         }
 
@@ -443,7 +484,7 @@
         function get_data_keywords_of_group(ps_fenzu_bh){
             var dataSource = { data: [] }
             // START AJAX
-            $.ajax({
+            var response = Ajax({
                 async: false, // 取数方式. true 异步(默认), false 同步
                 type: "POST",
                 dataType: "html",
@@ -465,6 +506,15 @@
                 complete: function(xhr, status){ }
             })
             // END AJAX
+            // 网络、HTTP错误(断网、404、500、超时等)
+            if (!response.isHttpSuccess) {
+                neui.destroyAnimate();
+                neuiDialog.alert({
+                    message: response.standardErr.message,
+                    buttons: ['确定']
+                })
+            }
+            // console.log('分组对应的关键字下拉数据：', dataSource);
             return dataSource;
         }
 
@@ -547,7 +597,7 @@
                 var tmp_guanjianzi_bh = item["guanjianzi_bh"],
                     tmp_guanjianzi_mc = item["guanjianzi_mc"]
                     tmp_juli_mi = item["juli"] || DEFAULT_RANGE,
-                    tmp_zhongyao_changsuo_dai_julidizhi = item["zhongyao_changsuo_dai_julidizhi"] || "0";
+                    tmp_zhongyao_changsuo_dai_julidizhi = item["zhongyao_changsuo_dai_julidizhi"] || '';
                 var isCheckboxChecked = false;
                 if(settings.kind == 'group') {
                     isCheckboxChecked = item["check_moren"].toString() == '1' ? true : false;
@@ -622,7 +672,7 @@
                     hasGap = item.aboutGap.toString();
 
                 var isBus = title.indexOf('公交') >=0 ? true : false;
-                if(hasGap == "1" && isBus == false) { // 若“重要场所带距离”，且不是公交时
+                if(hasGap.toString().replace(/\s+/g, '') !== '' && isBus == false) { // 非空表示“重要场所带距离” && 不是公交时
                     var attrTitle = title + '2'; // eg. 学校2
                     _html += [
                         '<div class="bds__search_result_outcome_switch_display_one">',
@@ -704,11 +754,11 @@
                     var one = { "team": tmp_fenzu_mc, data: []}
                     item.data.forEach(function(row) {
                         var tmp_guanjianzi_bh = row["guanjianzi_bh"],
-                            tmp_zhongyao_changsuo_dai_julidizhi = row["zhongyao_changsuo_dai_julidizhi"],
+                            tmp_zhongyao_changsuo_dai_julidizhi = row["zhongyao_changsuo_dai_julidizhi"] || '',
                             tmp_guanjianzi_mc = row["guanjianzi_mc"],
                             tmp_juli_mi = row["juli"];
                         if(typeof tmp_guanjianzi_bh == 'undefined') tmp_guanjianzi_bh = '';
-                        if(typeof tmp_zhongyao_changsuo_dai_julidizhi == 'undefined') tmp_zhongyao_changsuo_dai_julidizhi = '0';
+                        if(typeof tmp_zhongyao_changsuo_dai_julidizhi == 'undefined') tmp_zhongyao_changsuo_dai_julidizhi = '';
                         if(isNaN(parseFloat(tmp_juli_mi))) tmp_juli_mi = DEFAULT_RANGE;
                         initWordData.push(tmp_guanjianzi_mc);
                         // 查询时附近项目输入框属性 data-word 属性值统一格式 test1
@@ -1315,6 +1365,7 @@
             var $this = $('.bds__words_record_group_list li').eq(idx);
             var ls_fenzu_bh = $this.attr('data-bh'),
                 ls_fenzu_mc = $this.find('span').text();
+            // console.log('分组编号：', ls_fenzu_bh, '\n分组名称：', ls_fenzu_mc);
             var groupWordData = get_data_keywords_of_group(ls_fenzu_bh);
             create_html_list_of_word(groupWordData, { kind: 'group' });
 
@@ -1423,7 +1474,7 @@
                     var tmp_guanjianzi_bh = $(this).attr('data-bh'),
                         tmp_zhongyao_changsuo_dai_julidizhi = $(this).attr('data-search-width-distance');
                     if(typeof tmp_guanjianzi_bh == 'undefined') tmp_guanjianzi_bh = '';
-                    if(typeof tmp_zhongyao_changsuo_dai_julidizhi == 'undefined') tmp_zhongyao_changsuo_dai_julidizhi = '-';
+                    if(typeof tmp_zhongyao_changsuo_dai_julidizhi == 'undefined') tmp_zhongyao_changsuo_dai_julidizhi = '';
                     var keyword = $span.text().toString().replace(/\s+/g, ''), // 关键字
                         distance = $input.val(); // 距离
                     if(isNaN(parseFloat(distance))) distance = DEFAULT_RANGE;
@@ -1532,7 +1583,7 @@
                         "id": "",
                         "keyword": key, 
                         "distance": DEFAULT_RANGE,
-                        "widthDistance": "0"
+                        "widthDistance": ""
                     });
                 }
             }
@@ -1840,6 +1891,7 @@
                                 var ls_guanjianzi_mc = row["keyword"],
                                     ls_juli_fanwei_mi = row["distance"],
                                     ls_zhongyao_changsuo_dai_julidizhi = row["widthDistance"];
+                                if(typeof ls_zhongyao_changsuo_dai_julidizhi == 'undefined') ls_zhongyao_changsuo_dai_julidizhi = '';
                                 if(isTickRadius) { // 有勾选统一半径复选框时，统一为指定的半径
                                     ls_juli_fanwei_mi = task.unifyRadius;
                                 }
@@ -1859,8 +1911,8 @@
                                 // 后台返回 ajax({})
                                 var outcomeData = { data: [] }
                                 // START AJAX
-                                $.ajax({
-                                    async: true, // 改为异步，移除同步阻塞
+                                var response = Ajax({
+                                    async: true, // 取数方式. true 异步(默认), false 同步。!!!这里改为异步，移除同步阻塞
                                     type: "POST",
                                     dataType: "html",
                                     cache: false,
@@ -1967,11 +2019,25 @@
                                     complete: function(xhr, status){
                                         doingCount--;
                                         finishCount++;
+
+                                        // 异步正确读取插件标准化网络错误 test2
+                                        // 网络、HTTP错误(断网、404、500、超时等)
+                                        var reqState = response._reqResult;
+                                        if (typeof reqState != 'undefined' && !reqState.isHttpSuccess) {
+                                            var errInfo = reqState.standardErr;
+                                            neui.destroyAnimate();
+                                            neuiDialog.alert({
+                                                message: errInfo.message,
+                                                buttons: ['确定']
+                                            });
+                                        }
+
                                         // 继续调度下一个任务
                                         runTask();
                                     }
                                 })
                                 // END AJAX
+    
                             } else {
                                 // 窗口名额用尽，计算延时并执行
                                 var delayTime = TIME_SLICE - (now - currSliceStart);
@@ -2202,7 +2268,7 @@
             // 开始执行
             var flag = '', msg = '保存查询的关键记词成功';
             // START AJAX
-            $.ajax({
+            var response = Ajax({
                 async: false, // 取数方式. true 异步(默认), false 同步
                 type: "POST",
                 dataType: "html",
@@ -2212,19 +2278,21 @@
                 success: function(res){
                     if(!res || $.isEmptyObject(res)) return;
                     var result = JSON.parse(res);
-                    if(result.return == 'ok') {
-                        flag = 1;
-                    }
-                    else {
-                        flag = 0;
-                        msg = result.data;
-                    }
+                    flag = result.return == 'ok' ? 1 : 0;
+                    if(!flag) msg = result.data;
                 },
                 error: function(errs){ },
                 beforeSend: function(xhr){ },
                 complete: function(xhr, status){ }
             });
             // END AJAX
+
+            // 网络、HTTP错误(断网、404、500、超时等)   
+            if (!response.isHttpSuccess) {
+                neui.destroyAnimate();
+                flag = 0;
+                msg = response.standardErr.message;
+            }
 
             neuiDialog.alert({
                 popup: flag == 1 ? false : true, // 成功不弹窗，失败才弹窗
@@ -2522,8 +2590,15 @@
                     value = value.replace(/[,:;!，：；！、。]/g, ','); // 分号等字符转成逗号
                     value = value.replace(/(,){2,}/g, ',').replace(/(.*),$/g, '$1').replace(/^,(.*)/g, '$1'); // 去掉多个逗号等符号，去掉结尾开头的逗号
                     var ls_guanjianzi_ziduan = filter.dangerousChars(title), 
-                        ls_neirong = filter.dangerousChars(value).replace(/(,)/g, '，').replace(/(\|)/g, '、'); // 英文逗号转成中文逗号，竖线分隔符转成顿号(竖线分隔符用于分隔公交线路)
-                    // console.log('title：', title, '\nvalue：', value);
+                        ls_neirong = filter.dangerousChars(value);
+                    // console.log('title：', title, '\nls_neirong：', ls_neirong);
+
+                    // 更改字符串标点符号，组成用户所需的标点符号
+                    var isBus = ls_guanjianzi_ziduan.indexOf('公交') >= 0 ? true : false;
+                    ls_neirong = ls_neirong.replace(/(,)/g, '，').replace(/(\|)/g, '、'); // 英文逗号转成中文逗号，竖线分隔符转成顿号(竖线分隔符用于分隔公交线路)
+                    if(isBus == false) { // 不是公交时，关键词之间的中文逗号改成顿号
+                        ls_neirong = ls_neirong.toString().replace(/(，)/g, '、');
+                    }
                   
                     // 只提交内容不为空的数据
                     if(ls_neirong.toString().replace(/\s+/g, '') !== '') {
@@ -2538,11 +2613,11 @@
                             "xiaoqu_mingcheng": ls_xiaoqu_mingcheng
                         }
                         // console.log('ls_data：', ls_data);
-                        
+
                         var flag = '',  // 是否成功。值： 空值表示未知, 1 是, false 否
                             msg = ''; // 失败时的信息
                         // START AJAX
-                        $.ajax({
+                        var response = Ajax({
                             async: false, // 取数方式. true 异步(默认), false 同步
                             type: "POST",
                             dataType: "html",
@@ -2550,22 +2625,26 @@
                             url: "../fwh_pub/jk_loupan_fujin.ashx?param=2002",
                             data: ls_data,
                             success: function(res){
-                                // console.log('res：', res)
                                 if(!res || $.isEmptyObject(res)) return;
                                 var result = JSON.parse(res);
-                                if(result.return != 'ok') {
-                                    flag = '0';
-                                    msg = result.data;
-                                }
+                                flag = result.return == 'ok' ? 1 : 0;
+                                if(!flag) msg = result.data;
                             },
-                            error: function(errs){ 
-                                neui.destroyAnimate();
-                            },
+                            error: function(errs){ },
                             beforeSend: function(xhr){ },
                             complete: function(xhr, status){ }
-                        })
+                        });
                         // END AJAX
-                        if(flag == '0') {
+
+                        // 网络、HTTP错误(断网、404、500、超时等)
+                        if (!response.isHttpSuccess) {
+                            neui.destroyAnimate();
+                            isContinue = false;
+                            flag = 0;
+                            msg = response.standardErr.message;
+                        }
+
+                        if(!parseInt(flag)) {
                             isContinue = false;
                             neuiDialog.alert({
                                 message: msg,

@@ -2452,10 +2452,8 @@
                                 // console.log('res：', res)
                                 if(!res || $.isEmptyObject(res)) return;
                                 var result = JSON.parse(res);
-                                if(result.return != 'ok') {
-                                    flag = '0';
-                                    msg = result.data;
-                                }
+                                flag = result.return == 'ok' ? 1 : 0;
+                                if(!flag) msg = result.data;
                             },
                             error: function(errs){ 
                                 neui.destroyAnimate();
@@ -2464,7 +2462,7 @@
                             complete: function(xhr, status){ }
                         })
                         // END AJAX
-                        if(flag == '0') {
+                        if(!parseInt(flag)) {
                             isContinue = false;
                             neuiDialog.alert({
                                 message: msg,
