@@ -1,0 +1,46 @@
+// 百度地图API最大并发限制为3
+var maxConcurrent = 3;
+var doingCount = 0; // 当前正在执行的请求数
+var taskQueue = []; // 待执行关键词任务队列
+
+/**
+ * 队列调度方法，控制请求并发数
+ */
+function startTask() {
+    // 并发已满或无任务，直接退出
+    if (doingCount >= maxConcurrent || taskQueue.length === 0) {
+        return;
+    }
+    doingCount++; // 占用一个并发名额
+    var keyword = taskQueue.shift(); // 取出队首关键词
+
+    $.ajax({
+        url: "百度地图接口地址", // 实际接口地址
+        type: "GET",
+        data: { query: keyword }, // 请求参数
+        success: function (res) {
+            console.log("关键词", keyword, "请求成功", res);
+            // 业务逻辑：数据处理、地图打点、拼接页面等
+        },
+        error: function () {
+            console.log("关键词", keyword, "请求失败");
+        },
+        complete: function () {
+            doingCount--; // 释放并发名额
+            startTask(); // 继续执行下一个任务
+        }
+    });
+}
+
+// 模拟20个关键词，替换为项目真实数组
+var keywordList = [];
+for(var i = 1; i <= 20; i++){
+    keywordList.push("关键词" + i);
+}
+
+// 所有关键词加入队列
+for(var j = 0; j < keywordList.length; j++){
+    taskQueue.push(keywordList[j]);
+}
+
+startTask(); // 开始批量请求
