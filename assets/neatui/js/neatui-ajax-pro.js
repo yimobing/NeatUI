@@ -5,7 +5,7 @@
  * 与旧插件区分：旧版：小写 ajax({})  新版：大写 Ajax({}) / Ajax.request({}) 大小写隔离无冲突
  * @version: v1.0.3
  * @date 2026-06-16
- * @pubDate: 2026-06-16
+ * @pubDate: 2026-06-22
 ====================================================================================
 【核心特性清单】
 1. UMD 全兼容：AMD/CMD/CommonJS/浏览器script全局引入
@@ -178,36 +178,57 @@ jqXhr.fail(function() {
     }
 
     // ===================== 私有基础默认配置 =====================
+    // 插件默认参数
     var DEFAULT_BASE_OPT = {
-        cache: false
+        cache: false,
+        throwWrongInterface: true // 报错时是否抛出接口名称，默认true add 20260622-1
     };
 
     /**
      * 私有原生工具：统一解析HTTP/网络错误，输出标准错误结构体
+     * edit 20260622-1
      * @param {XMLHttpRequest} xhr
      * @param {string} errType
      * @param {string} errMsg
+     * @param {Object} options 参数对象
      * @returns {Object} standardErr
      */
-    function parseStandardHttpError(xhr, errType, errMsg) {
-        var status = xhr.status;
-        var message = '';
+    function parseStandardHttpError(xhr, errType, errMsg, options) {
+        var defaults = {
+            throwingInterfaceWhenError: false,  // 报错时是否抛出接口信息，默认true
+            interfaceName: '' // 接口名称
+        }
+        var settings = Object.assign({}, defaults, options);
+        var isThrowError = settings.throwingInterfaceWhenError,
+            actionName = settings.interfaceName;
 
+        var status = xhr.status;
+        var errCode = ''; // 错误状态码
+        var message = '';
         if (status === 0) {
             message = '网络异常，您的网络已断开，请检查网络连接';
+            errCode = 'Network Disconnected';
         } else if (errType === 'timeout') {
             message = '请求超时，请稍后重试';
+            errCode = 'Request Timeout';
         } else if (status === 404) {
             message = '接口地址不存在';
+            errCode = 'HTTP 404';
         } else if (status === 500) {
             message = '服务器内部错误';
+            errCode = 'HTTP 500';
         } else {
             message = '请求失败：' + errMsg;
+            errCode = 'Request Failed';
+        }
+        if(isThrowError && actionName.toString().replace(/\s+/g, '') !== '') {
+            message += '<br>（接口：' + actionName + '）';
         }
 
         return {
             status: status,
             errType: errType,
+            errCode: errCode,
             rawMsg: errMsg,
             message: message,
             isHttpError: true
@@ -238,6 +259,7 @@ jqXhr.fail(function() {
         var userSuccess = ajaxOpts.success;
         var userError = ajaxOpts.error;
         var userComplete = ajaxOpts.complete;
+        var userActionName = typeof ajaxOpts.data == 'undefined' ? '' : (typeof ajaxOpts.data.action == 'undefined' ? '' : ajaxOpts.data.action); // 接口名称 add 20260622-1
 
         // 包装 beforeSend
         ajaxOpts.beforeSend = function (xhr) {
@@ -262,7 +284,11 @@ jqXhr.fail(function() {
         ajaxOpts.error = function (xhr, errType, errMsg) {
             reqResult.isHttpSuccess = false;
             reqResult.xhr = xhr;
-            reqResult.standardErr = parseStandardHttpError(xhr, errType, errMsg);
+            // edit 20260622-1
+            reqResult.standardErr = parseStandardHttpError(xhr, errType, errMsg, {
+                throwingInterfaceWhenError: ajaxOpts.throwWrongInterface,
+                interfaceName: userActionName
+            });
             if (typeof userError === 'function') {
                 userError.call(this, xhr, errType, errMsg);
             }
