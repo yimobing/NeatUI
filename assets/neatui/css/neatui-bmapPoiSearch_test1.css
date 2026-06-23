@@ -533,6 +533,9 @@ body {
     right: 5px;
     top: 5px;
     margin-bottom: 10px;
+    padding: 2px 4px;
+    border: 1px solid #bf7f87;
+    border-radius: 2px;
 }
 .selected-radius-box {
     position: relative;
@@ -542,19 +545,18 @@ body {
 .selected-radius-box input[type="text"] {
     width: 80px;
     padding: 4px 8px;
-    border: 1px solid #bf7f87;
+    border: 1px solid #b8a6a8;
     border-radius: 4px;
     color: #bf7f87;
     font-size: 14px;
 }
 .selected-radius-box input[type="text"]:focus {
-    border-color: #cb1429;
-    color: #cb1429;
+    border-color: #bf7f87;
+    color: #db1b30;
 }
 .selected-radius-box span,
 .selected-radius-box em {
     font-style: normal;
-    color: #bf7f87;
 }
 .selected-radius-box span {
     font-weight: 550;

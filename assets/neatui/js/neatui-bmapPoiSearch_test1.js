@@ -834,8 +834,8 @@
             '</div>' +
             '<div id="errorMessage" class="alert alert-error" style="display: none;"></div>' +
             '<div class="button-group">' +
-            '<button type="button" class="btn btn-primary" id="btn-search">开始搜索</button>' +
-            '<button type="button" class="btn btn-secondary btn-auto" id="btn-clear">清空</button>' +
+            '<button type="button" class="btn btn-primary" id="btn-search"> 🔎 开始搜索 </button>' +
+            '<button type="button" class="btn btn-secondary btn-auto" id="btn-clear"> ⭕ 清空</button>' +
             '</div>' +
             '</div>';
         
@@ -863,7 +863,7 @@
             '<div class="quick-select-section">',
                 '<div class="quick-select-title">',
                     '<span> 快速选择关键词</span>',
-                    '<button type="button" id="btn-must-choose"> 报告模板必选关键词</button>',
+                    '<button type="button" id="btn-must-choose"> 👆 报告模板必选关键词</button>',
                 '</div>'
         ].join('\r\n')
         
@@ -918,11 +918,11 @@
                     '<em> 米 </em>',
                 '</div>',
                 '<div class="selected-radius-box">',
-                    '<button type="button" id="btn-set-radius"> 统一设置半径 </button>',
+                    '<button type="button" id="btn-set-radius"> ✅ 统一设置半径 </button>',
                 '</div>',
             '</div>',
             '<div class="selected-tags" id="selectedTags"></div>',
-            '<button type="button" class="btn-clear-all" id="clearAllBtn">清空所有</button>',
+            '<button type="button" class="btn-clear-all" id="clearAllBtn"> ❌ 清空所有 </button>',
             // '<button type="button" class="btn-filter-categories" id="filterCategoriesBtn" style="display: none;">筛选子分类</button>',
             '</div>'
         ].join('\r\n')
