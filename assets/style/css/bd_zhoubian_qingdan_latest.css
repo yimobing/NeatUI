@@ -3,7 +3,7 @@
 /**
 * 小工具 -> 百度周边清单
 * Date: 2025.12.21
-* Update: 2026.06.15
+* Update: 2026.06.24
 */
 /*+ --------  -------- +*/
 
@@ -70,6 +70,24 @@ body {
 button[type="button"][disabled] {
 	background: #adadad!important;
 	border-color: #626262!important;
+}
+
+/* 按关键词显示坐标点 */
+[data-filter-trigger] {
+	cursor: pointer;
+}
+[data-filter-trigger]:hover {
+	background-color: #e6f7ff;
+	border-radius: 4px;
+	opacity: .8;
+	filter: alpha(opacity = 80);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity = 80);
+}
+[data-filter-trigger].on {
+	padding: 2px 4px;
+	background-color: #e6f7ff;
+	color: #1890ff;
+	border-radius: 4px;
 }
 
 
@@ -268,6 +286,43 @@ button[type="button"][disabled] {
 	color: #1296db;
 	font-size: 16px;
 	display: none;
+}
+.result__list {
+	counter-reset: groupCount; /* 初始化计数器 */
+}
+.result__list_group {
+	position: relative;
+	margin-top: 15px;
+}
+.result__list_group:before {
+	counter-increment: groupCount; /* 每次遇到时，计数器增加 */
+	content: counters(groupCount, "") "."; /* 使用计数器值，并添加前缀和分隔符 */
+	color: #888;
+	font-size: 16px;
+	
+	position: absolute;
+	z-index: 1;
+	top: 0px;
+	left: 0px;
+}
+.result__list_group:first-child {
+	margin-top: 0;
+}
+.result__list_group_title {
+	padding-left: 20px;
+	text-align: left;
+	color: #555;
+	font-size: 16px;
+	font-weight: 550;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #667eea;
+}
+.result__list_group_title em {
+	color: #888;
+	font-size: 14px;
+}
+.result__list_group ul {
+	margin-top: 10px;
 }
 .panel__result ul {
 	height: 100%;
@@ -629,26 +684,30 @@ button[type="button"][disabled] {
 	width: auto;
 	margin: 0 0px 3px 3px;
 	padding: 4px 8px;
-	background-color: #fcfcfc;
-	border: 1px solid #ddd;
-	border-radius: 2px;
-	color: #666;
-	font-size: 12px;
-	cursor: pointer;
+    background: transparent; /* 取消白底，和页面融为一体，减少色块压迫 */
+    border: 1px solid #eee; /* 极浅边框，几乎看不见分割线 */
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #444; /* 更深的灰色，完全避开纯黑刺眼 */
+    word-break: break-all;
+    cursor: pointer;
+    box-shadow: none; /* 彻底删除阴影，减少视觉杂色 */
+    transition: border-color 0.2s;
 }
 .bds__search_result_outcome_switch_display_one_list li:nth-child(2n) {
-	background-color: #f7f7f7;
+	background-color: #fff;
 }
 .bds__search_result_outcome_switch_display_one_list li:hover {
-	background-color: #d9d8d8;
 	opacity: .9;
     filter: alpha(opacity = 90);
     filter: Progid:DXImageTransform.Microsoft.Alpha(opacity = 90);
+	border-color: #ccdfff;
 }
 .bds__search_result_outcome_switch_display_one_list li.on {
-	background-color: #afc396;
-	border: 0;
-	color: #fff;
+	border-color: #4088e0;
+	color: #4088e0;
+    background: transparent; /* 关键：去掉选中浅蓝底色，杜绝大片色块刺眼 */
 }
 
 
@@ -1038,13 +1097,13 @@ button[type="button"][disabled] {
 .ne__bd_lb_text {
     position: relative;
     background-color: #fff;
-    padding: 12px 25px;
+    padding: 5px 5px;
     border: 1px solid #19b6f8;
     border-radius: 3px;
     box-shadow: 0 1px 3px 0px #3291b9;
     color: #0c88e8;
-    font-size: 15px;
-    font-weight: bold;
+    font-size: 12px;
+    font-weight: 300;
     white-space: nowrap;
     text-align: center;
 }
@@ -1053,14 +1112,14 @@ button[type="button"][disabled] {
 .ne__bd_lb_text:before {
     content: '';
     position: absolute;
-    bottom: -8px;
-    left: 15%;
+    bottom: -6px;
+    left: 18%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 8px solid #19b6f8;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 6px solid #19b6f8;
     z-index: 2;
 }
 
@@ -1068,14 +1127,14 @@ button[type="button"][disabled] {
 .ne__bd_lb_text:after {
     content: '';
     position: absolute;
-    bottom: -7px; /* 向上偏移1px，盖住外层箭头的蓝色边框 */
-    left: 15%;
+    bottom: -4px; /* 向上偏移1px，盖住外层箭头的蓝色边框 */
+    left: 18%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
-    border-top: 7px solid #fff;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 5px solid #fff;
     z-index: 3;
 }
 

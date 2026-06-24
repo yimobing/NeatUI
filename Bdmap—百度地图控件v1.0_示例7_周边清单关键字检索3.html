@@ -19,7 +19,7 @@
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dialog.css"> <!-- 对话框 -->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-dropdown.css"> <!-- 下拉 -->
     <link type="text/css" rel="stylesheet" href="assets/neatui/css/neatui-bdmap.css"> <!-- 百度地图控件 -->
-    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan_latest.css?v=20260615-1">
+    <link type="text/css" rel="stylesheet" href="assets/style/css/bd_zhoubian_qingdan_latest.css?v=20260616-1">
 </head>
 <body>
     <style>
@@ -208,7 +208,7 @@
     <script src="assets/neatui/js/neatui-dropdown.js"></script> <!-- 下拉 -->
     <script src="assets/neatui/js/neatui-dialog.js"></script> <!-- 对话框-->
     <script src="assets/neatui/js/neatui-bdmap.js"></script> <!-- 百度地图控件 -->
-    <script src="assets/neatui/js/neatui-functions.js?v=20260602-1"></script> <!-- 函数库 -->
+    <script src="assets/neatui/js/neatui-functions.js?v=20260624-1"></script> <!-- 函数库 -->
     <script src="assets/neatui/js/neatui-ajax-pro.js?v=20260622-1"></script> <!-- jq ajax 自定义封装-->
     <!-- mock 模拟数据 -->
     <script src="assets/lib/mock/mock-min.js"></script>
@@ -240,7 +240,7 @@
         //——————————————————————————————————————————
         // test: 搜索结果数据请求方式 mock 
         IS_ENABLE_DEFAULT_SEARCH_WORD = true; // 是否启用默认搜索组或默认搜索关键字功能，默认true
-        IS_USE_WEB_API = false;  // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api); false 从前端直接取数据(使用百度地图浏览器版api,即js api)
+        IS_USE_WEB_API = true;  // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api); false 从前端直接取数据(使用百度地图浏览器版api,即js api)
         
         
 
@@ -676,7 +676,7 @@
                     var attrTitle = title + '2'; // eg. 学校2
                     _html += [
                         '<div class="bds__search_result_outcome_switch_display_one">',
-                            '<div class="bds__search_result_outcome_switch_display_one_item has-gap">',
+                            '<div class="bds__search_result_outcome_switch_display_one_item has-gap" data-filter-cate="' + title + '" data-filter-trigger>',
                                 title + '<em>(带距离)</em>',
                             '</div>',
                             '<div class="bds__search_result_outcome_switch_display_one_list">',
@@ -699,7 +699,7 @@
                 
                 _html += [
                     '<div class="bds__search_result_outcome_switch_display_one">',
-                        '<div class="bds__search_result_outcome_switch_display_one_item">',
+                        '<div class="bds__search_result_outcome_switch_display_one_item" data-filter-cate="' + title + '" data-filter-trigger>',
                             title,
                         '</div>',
                         '<div class="bds__search_result_outcome_switch_display_one_list">',
@@ -1543,7 +1543,7 @@
             for (var i = 0; i < oldArr.length; i++) {
                 var oldTeam = oldArr[i];
                 // 跳过原始数据中自带的空team分组，防止重复生成
-                if (oldTeam.team === "") {
+                if (oldTeam.team === '') {
                     continue;
                 }
                 var newTeam = {
@@ -1820,12 +1820,12 @@
             // console.log('wordArr：', wordArr, '\nprojectArr：', projectArr, '\nprojectList：', projectList);
 
             // 开始执行
-            var resultId_2 = 'panel-result2'; // 详细列表拼接根节点
-            var allPois = []; // 所有POI点
-            var allBdPoints = []; // 所有坐标点
+            var allPois = [], // 所有POI点
+                allBdPointsByGroup = [], // 点坐标集合(有分组)
+                allBdPointsNotGroup = []; // 点坐标集合(无分组)
+            
             // 先在地图上手动打点
-            map.clearOverlays(); // 清空所有覆盖物
-            document.getElementById(resultId_2).innerHTML = '';
+            // map.clearOverlays(); // 清空所有覆盖物
 
             neui.showAnimate();
             setTimeout(function(){
@@ -1859,8 +1859,7 @@
                                 row: projectArr[q],
                                 zuobiao: zuobiao,
                                 isTickRadius: isTickRadius,
-                                unifyRadius: unifyRadius,
-                                resultId_2: resultId_2
+                                unifyRadius: unifyRadius
                             });
                         }
 
@@ -1886,6 +1885,7 @@
                                 sliceExecCount++;
                                 doingCount++;
                                 var task = taskQueue.shift();
+                                // console.log('task:', task);
                                 var row = task.row;
                                 var ls_zuobiao = task.zuobiao;
                                 var ls_guanjianzi_mc = row["keyword"],
@@ -1896,6 +1896,12 @@
                                     ls_juli_fanwei_mi = task.unifyRadius;
                                 }
                                 // console.log('ls_guanjianzi_mc：', ls_guanjianzi_mc, '\n坐标：', ls_zuobiao, '\n距离范围：', ls_juli_fanwei_mi);
+
+                                var loopIndex = allBdPointsByGroup.length;
+                                allBdPointsByGroup.push({
+                                    "keyword": ls_guanjianzi_mc,
+                                    "data": []
+                                });
 
                                 var ls_data = {
                                     "action": "wh_web_gongye_jizhun_dijia_fujin_list",
@@ -1950,69 +1956,23 @@
                                                 city: shi
                                             });
 
-                                            allBdPoints.push(point);
-                                            listHtml += [
-                                                '<li>',
-                                                '<div class="result__title">' + title + '</div>',
-                                                (function(){
-                                                    var _tmpHtml = address == '' ? '' : 
-                                                    [
-                                                        '<div class="result__detail">',
-                                                        '<div class="result__detail_one">',
-                                                        '<span> 地址：</span>',
-                                                        '<em>' + address + '</em>',
-                                                        '</div>',
-                                                        '</div>'
-                                                    ].join('\r\n');
-                                                    return _tmpHtml;
-                                                })(),
-                                                (function(){
-                                                    var _tmpHtml = distance == '' ? '' : 
-                                                    [
-                                                        '<div class="result__detail">',
-                                                        '<div class="result__detail_one">',
-                                                        '<span> 地址：</span>',
-                                                        '<em>' + distance + '米</em>',
-                                                        '</div>',
-                                                        '</div>'
-                                                    ].join('\r\n');
-                                                    return _tmpHtml;
-                                                })(),
-                                                (function(){
-                                                    var _tmpHtml = phoneNumber == '' ? '' : 
-                                                    [
-                                                        '<div class="result__detail">',
-                                                        '<div class="result__detail_one">',
-                                                        '<span> 电话：</span>',
-                                                        '<em>' + phoneNumber + '</em>',
-                                                        '</div>',
-                                                        '</div>'
-                                                    ].join('\r\n');
-                                                    return _tmpHtml;
-                                                })(),
-                                                '</li>'
-                                            ].join('\r\n')
+                                            allBdPointsByGroup[loopIndex]["data"].push({
+                                                "title": title,
+                                                "point": point,
+                                                "address": address,
+                                                "distance": distance,
+                                                "phoneNumber": phoneNumber
+                                            });
+                                            allBdPointsNotGroup.push(point);
                                         }
 
                                         allPois.push(one);
                                         // console.log('allPois：', allPois)
-                                        // 在地图上手动打点 -> 拼接列表3
-                                        var allHtml = [
-                                            '<div class="result__caption"> 查询结果 </div>',
-                                            '<ul>' + listHtml + '</ul>'
-                                        ].join('\r\n')
-                                        var ulList = document.getElementById(resultId_2).querySelector('ul');
-                                        if(ulList) {
-                                            document.getElementById(resultId_2).querySelector('ul').innerHTML += listHtml;
-                                        }
-                                        else {
-                                            document.getElementById(resultId_2).innerHTML += allHtml;
-                                        }
 
                                         // 在地图上手动打点
                                         // console.log('所有POI点：', allPois)
-                                        // console.log('所有坐标点：', allBdPoints)
-                                        fnAddMarker(allBdPoints);
+                                        // console.log('所有坐标点：', allBdPointsNotGroup)
+                                        fnAddMarker(allBdPointsByGroup, allBdPointsNotGroup);
                                     },
                                     error: function(errs){ },
                                     beforeSend: function(xhr){ },
@@ -2093,6 +2053,12 @@
                                     radius = item["distance"]; // 半径
                                 // console.log('关键词-x：', keys, '\n半径-x：', radius, '\n重要场是否带距离-x：', ls_zhongyao_changsuo_dai_julidizhi);
 
+                                var loopIndex = allBdPointsByGroup.length;
+                                allBdPointsByGroup.push({
+                                    "keyword": keys,
+                                    "data": []
+                                });
+
                                 var local = new BMap.LocalSearch(point, {
                                     // 在地图上自动打点。for循环多个关键词时，这个有毛病
                                     // renderOptions: {
@@ -2136,70 +2102,19 @@
                                                     var distance = fnCalculateDistance(coordinateLng, coordinateLat, p.lng, p.lat);
 
                                                     one.data[j]["distance"] = distance; // one 加一个 distance 属性
-                                                    allBdPoints.push(p);
-                                                    var title_str = title, address_str = address;
-                                                    if(keyword.indexOf('公交') >= 0) {
-                                                        title_str = title + '站';
-                                                        address_str = '公交线路';
-                                                    }
-                                                    listHtml += [
-                                                        '<li>',
-                                                        '<div class="result__title">' + title_str + '</div>',
-                                                        (function(){
-                                                            var _tmpHtml = address == '' ? '' : 
-                                                            [
-                                                                '<div class="result__detail">',
-                                                                '<div class="result__detail_one">',
-                                                                '<span> ' + address_str + '：</span>',
-                                                                '<em>' + address + '</em>',
-                                                                '</div>',
-                                                                '</div>'
-                                                            ].join('\r\n');
-                                                            return _tmpHtml;
-                                                        })(),
-                                                        (function(){
-                                                            var _tmpHtml = distance == '' ? '' : 
-                                                            [
-                                                                '<div class="result__detail">',
-                                                                '<div class="result__detail_one">',
-                                                                '<span> 距离：</span>',
-                                                                '<em>' + distance + '米</em>',
-                                                                '</div>',
-                                                                '</div>'
-                                                            ].join('\r\n');
-                                                            return _tmpHtml;
-                                                        })(),
-                                                        (function(){
-                                                            var _tmpHtml = phoneNumber == '' ? '' : 
-                                                            [
-                                                                '<div class="result__detail">',
-                                                                '<div class="result__detail_one">',
-                                                                '<span> 电话：</span>',
-                                                                '<em>' + phoneNumber + '</em>',
-                                                                '</div>',
-                                                                '</div>'
-                                                            ].join('\r\n');
-                                                            return _tmpHtml;
-                                                        })(),
-                                                        '</li>'
-                                                    ].join('\r\n')
+
+                                                    allBdPointsByGroup[loopIndex]["data"].push({
+                                                        "title": title,
+                                                        "point": p,
+                                                        "address": address,
+                                                        "distance": distance,
+                                                        "phoneNumber": phoneNumber
+                                                    });
+                                                    allBdPointsNotGroup.push(p);
                                                 }
                                             }
 
                                             allPois.push(one);
-
-                                            // 在地图上手动打点 -> 拼接列表3
-                                            var allHtml = [
-                                                '<div class="result__caption"> 查询结果 </div>',
-                                                '<ul>' + listHtml + '</ul>'
-                                            ].join('\r\n')
-                                            var ulList = document.getElementById(resultId_2).querySelector('ul');
-                                            if(ulList) {
-                                                document.getElementById(resultId_2).querySelector('ul').innerHTML += listHtml;
-                                            }
-                                            else {
-                                                document.getElementById(resultId_2).innerHTML += allHtml;
-                                            }
                                         }
 
                                         finishCount++;
@@ -2210,7 +2125,7 @@
                                                 var tip = '抱歉，没有到有找到关键词【' + projectList + '】对应的结果'; // 当前结果集无POI数据
                                                 console.log(tip);
                                             }
-                                            fnAddMarker(allBdPoints);
+                                            fnAddMarker(allBdPointsByGroup, allBdPointsNotGroup);
                                         }
                                         runSearch(); // 继续下一个任务
                                     }
@@ -2335,70 +2250,174 @@
 
 
 
+
         //——————————————————————————————————————————
         /**
          * 在地图上手动打点->添加点标注覆盖物
-         * @param {Array} groupPoint 一组坐标点组成的数组
+         * @param {Array} pointGroup 点坐标集合(有分组)
+         * @param {Array} pointAll 点坐标集合(无分组)
          */
-        function fnAddMarker(groupPoint) {
+        function fnAddMarker(pointGroup, pointAll) {
             // $(".bds__graph_result").removeClass("stretch-in");
-            var list = document.querySelectorAll("#panel-result2 li");
             var tempMarkers = [];
             var tempLabels = [];
-            var titles = [];
-
-            // 先从列表里把标题拿出来
-            for (var i = 0; i < list.length; i++) {
-                var titleNode = list[i].querySelector('.result__title');
-                titles.push(titleNode.innerText || titleNode.textContent);
+            var markerGroupTag = [];
+            var groupPointMap = {};
+            // 初始化分组坐标映射容器
+            for(var g = 0; g < pointGroup.length; g++){
+                groupPointMap[pointGroup[g].keyword] = [];
             }
 
+            // ========== 新增：全局存储当前批次点位数据，无map前缀，避免和地图实例冲突 ==========
+            window.filterDataSet = {
+                tempMarkers: tempMarkers,
+                tempLabels: tempLabels,
+                markerGroupTag: markerGroupTag,
+                groupPointMap: groupPointMap,
+                pointAll: pointAll
+            };
+            window._activeFilterGroup = ''; // 记录当前筛选的分类key，空=全部显示
+            window._activeFilterDom = null; // 记录当前高亮的标题DOM，每次查询重置状态
+
             // 清空旧点
-            map.clearOverlays();
+            map.clearOverlays(); // 清空所有覆盖物
 
             // 临时禁用清空，防止打点闪没
             var originalClear = map.clearOverlays;
             map.clearOverlays = function () { };
 
-            // 添加标注点 + 自定义样式的文字标签
-            // console.log('groupPoint：', groupPoint)
-            for (var p = 0; p < groupPoint.length; p++) {
-                var point = groupPoint[p];
-                if(point instanceof BMap.Point == false) return;
-                var mk = new BMap.Marker(point);
-                map.addOverlay(mk);
-                tempMarkers.push(mk);
+            // 在地图上手动打点 -> 创建详细列表1
+            var resultId_2 = 'panel-result2', // 详细列表拼接根节点
+                detailAllHtml = '', // 拼接内容全部HTML
+                detailListHtml = ''; // 拼接内容内部HTML
+            document.getElementById(resultId_2).innerHTML = '';
 
-                // 添加文本标注
-                var label = new BMap.Label('', {
-                    position: groupPoint[p],
-                    offset: new BMap.Size(0, -85)  // 你调好的，不动
-                });
-                label.setContent(
-                    '<div class="ne__bd_label_wrap">' +
-                        '<div class="ne__bd_lb_text">' + titles[p] + '</div>' +
-                    '</div>'
-                );
-                label.setStyle({
-                    padding: '0',
-                    margin: '0',
-                    border: 'none',
-                    background: 'transparent',
-                    width: 'auto',
-                    textAlign: 'center',
-                    zIndex: 1000,
-                    display: 'none' // 👈 默认隐藏所有标注
-                });
-                map.addOverlay(label);
-                tempLabels.push(label);
-                // 点击点打开弹窗（你保留，自己注释）
-                mk.addEventListener("click", function (idx) {
-                    return function () {
-                        var infoWindow = new BMap.InfoWindow(titles[idx]);
-                        map.openInfoWindow(infoWindow, tempMarkers[idx].getPosition());
-                    };
-                }(p));
+            // 添加标注点 + 自定义样式的文字标签
+            // console.log('pointsArr：', pointGroup);
+            // console.log('----------------')
+            for (var n = 0; n < pointGroup.length; n++) { // 第1层循环取到分组
+                var one = pointGroup[n];
+                var keyword = one["keyword"],
+                    dataArr = one["data"];
+                var color = utilities.getRandomColor(); // 生成随机颜色，每个分组的颜色相同
+                // 在地图上手动打点 -> 创建详细列表2
+                var tmpLiHtml = '';
+                // 循环点
+                var length = dataArr.length;
+                for(var k = 0; k < length; k++) { // 第2层循环取到分组下的点
+                    var row = dataArr[k];
+                    var title = row["title"],
+                        point = row["point"],
+                        address = row["address"],
+                        distance = row["distance"],
+                        phoneNumber = row["phoneNumber"];
+                    if(point instanceof BMap.Point == false) return;
+
+                    // 在地图上手动打点 -> 创建详细列表3
+                    var title_str = title,
+                        address_str = '地址';
+                    if(keyword.indexOf('公交') >= 0) {
+                        title_str += '站';
+                        address_str = '公交线路';
+                    }
+                    tmpLiHtml += [
+                        '<li data-filter-cate="' + keyword + '">',
+                            '<div class="result__title">' + title_str + '</div>',
+                            (function(){
+                                var _tmpHtml = distance == '' ? '' : 
+                                [
+                                    '<div class="result__detail">',
+                                    '<div class="result__detail_one">',
+                                    '<span> 距离：</span>',
+                                    '<em>' + distance + '米</em>',
+                                    '</div>',
+                                    '</div>'
+                                ].join('\r\n');
+                                return _tmpHtml;
+                            })(),
+                            (function(){
+                                var _tmpHtml = address == '' ? '' : 
+                                [
+                                    '<div class="result__detail">',
+                                    '<div class="result__detail_one">',
+                                    '<span>' + address_str + '：</span>',
+                                    '<em>' + address + '</em>',
+                                    '</div>',
+                                    '</div>'
+                                ].join('\r\n');
+                                return _tmpHtml;
+                            })(),
+                            (function(){
+                                var _tmpHtml = phoneNumber == '' ? '' : 
+                                [
+                                    '<div class="result__detail">',
+                                    '<div class="result__detail_one">',
+                                    '<span> 电话：</span>',
+                                    '<em>' + phoneNumber + '</em>',
+                                    '</div>',
+                                    '</div>'
+                                ].join('\r\n');
+                                return _tmpHtml;
+                            })(),
+                        '</li>'
+                    ].join('\r\n')
+
+                    var mk = new BMap.Marker(point);
+                    map.addOverlay(mk);
+                    tempMarkers.push(mk);
+                    markerGroupTag.push(keyword);
+                    groupPointMap[keyword].push(point);
+
+                    // 添加文本标注
+                    var label = new BMap.Label('', {
+                        position: point,
+                        offset: new BMap.Size(5, -60)  // 你调好的，不动
+                    });
+                    label.setContent(
+                        '<div class="ne__bd_label_wrap">' +
+                            '<div class="ne__bd_lb_text" style="border-color: ' + color +'; color: ' + color +'; box-shadow: 0 1px 1px 0px ' + color +'">' + title + '</div>' +
+                        '</div>'
+                    );
+                    label.setStyle({
+                        padding: '0',
+                        margin: '0',
+                        border: 'none',
+                        background: 'transparent',
+                        width: 'auto',
+                        textAlign: 'center',
+                        zIndex: 1000,
+                        display: 'block'
+                    });
+                    map.addOverlay(label);
+                    tempLabels.push(label);
+                    // 点击点打开弹窗（你保留，自己注释）
+                    mk.addEventListener("click", function (idx) {
+                        return function () {
+                            var infoWindow = new BMap.InfoWindow(title);
+                            map.openInfoWindow(infoWindow, tempMarkers[idx].getPosition());
+                        };
+                    }(tempMarkers.length - 1));
+                }
+            
+                // 在地图上手动打点 -> 创建详细列表4
+                // 重点：新增 data-filter-trigger 通用标记，兼容任意class的后续动态列表
+                detailListHtml += [
+                    '<div class="result__list_group">',
+                        '<div class="result__list_group_title" data-filter-cate="' + keyword + '" data-filter-trigger>' + keyword + '（' + length + '个）</div>',
+                        tmpLiHtml == '' ? '' : '<ul>' + tmpLiHtml + '</ul>',
+                    '</div>',
+                ].join('\r\n')
             }
+
+
+            // 在地图上手动打点 -> 创建详细列表5
+            detailAllHtml = [
+                '<div class="result__caption"> 查询结果 </div>',
+                '<div class="result__list">',
+                    detailListHtml,
+                '</div>'
+            ].join('\r\n')
+            document.getElementById(resultId_2).innerHTML = detailAllHtml;
 
             // 恢复地图清空功能
             setTimeout(function () {
@@ -2406,17 +2425,20 @@
             }, 200);
 
             // 自动调整视野
-            if (groupPoint.length > 0) {
-                map.setViewport(groupPoint, {
+            if (pointAll.length > 0) {
+                map.setViewport(pointAll, {
                     zoomFactor: -2 // 缩放级别减N
                 });
             }
 
             // 点击列表联动 —— 点击时只显示当前项标注
-            for (var i = 0; i < list.length; i++) {
-                list[i].onclick = null;
-                list[i].setAttribute("data-index", i);
-                list[i].onclick = function () {
+            var nodes = document.querySelectorAll("#panel-result2 li");
+            for (var n = 0; n < nodes.length; n++) {
+                var _node = nodes[n];
+                // console.log('_node：', _node);
+                _node.onclick = null;
+                _node.setAttribute("data-index", n);
+                _node.onclick = function () {
                     var idx = parseInt(this.getAttribute("data-index"), 10);
                     // 先隐藏所有文本标注
                     for (var k = 0; k < tempLabels.length; k++) {
@@ -2428,7 +2450,7 @@
                     }
                     // 地图移动到点
                     if (tempMarkers[idx]) {
-                        var point = tempMarkers[idx].point;
+                        var point = tempMarkers[idx].getPosition();
                         if(point.lng.toString() != '0' && point.lat.toString() != '0') {
                             map.panTo(tempMarkers[idx].getPosition());
                             map.setZoom(18); // 强行缩放级别。值 3-19
@@ -2440,8 +2462,80 @@
                 };
             }
         }
-        
-        
+
+
+
+        //——————————————————————————————————————————
+        /**
+         * 核心筛选工具函数：切换分组点位显隐、控制标题高亮、自动适配地图视野
+         * 即：坐标点根据分组进行显示，比如点学校只显示学校的那些坐标点
+         * @param {String} targetCateLot 点击标题的分类标识 data-filter-cate 值，分组匹配键
+         * @param {HTMLElement} clickDom 当前点击的标题DOM，用于精准切换高亮
+         * 交互规则：
+         * 1. 新分类：仅展示该分类点位，高亮当前标题，地图适配分组视野
+         * 2. 同分类不同标题：点位不变，仅切换高亮到本次点击DOM
+         * 3. 点击已高亮的同分类标题：取消筛选，恢复全部点位，清空高亮
+         */
+        window.handleCateFilter = function(targetCateLot, clickDom) {
+            var store = window.filterDataSet; // 读取当前批次全部点位数据
+            if (!store || !store.tempMarkers.length) return; // 无点位直接退出，防报错
+
+            var currentActiveCate = window._activeFilterGroup; // 当前激活筛选分类key
+            var currentActiveDom = window._activeFilterDom || null; // 当前高亮标题DOM
+
+            // 更新全局筛选状态
+            if(currentActiveCate === targetCateLot){
+                if(currentActiveDom === clickDom){
+                    window._activeFilterGroup = ''; window._activeFilterDom = null; // 点击自身，取消筛选
+                }else{
+                    window._activeFilterDom = clickDom; // 同分类其他标题，仅切换高亮
+                }
+            }else{
+                window._activeFilterGroup = targetCateLot; window._activeFilterDom = clickDom; // 切换新分类
+            }
+
+            // 控制地图Marker、Label显隐
+            for(var m = 0; m < store.tempMarkers.length; m++){
+                var tag = store.markerGroupTag[m]; var marker = store.tempMarkers[m]; var label = store.tempLabels[m];
+                if(window._activeFilterGroup === ''){
+                    marker.show(); label.setStyle({display: 'block'}); // 无筛选，全部显示
+                }else if(tag === window._activeFilterGroup){
+                    marker.show(); label.setStyle({display: 'block'}); // 当前筛选分组，展示点位
+                }else{
+                    marker.hide(); label.setStyle({display: 'none'}); // 其他分组，隐藏点位
+                }
+            }
+
+            // 统一处理所有标题高亮
+            var allTitles = document.querySelectorAll('[data-filter-trigger]');
+            for(var t = 0; t < allTitles.length; t++){
+                var tDom = allTitles[t]; utilities.removeClass(tDom, 'on');  // 清空全部高亮，全部移除选中class
+            }
+            if(window._activeFilterGroup !== '' && window._activeFilterDom){
+                utilities.addClass(window._activeFilterDom, 'on'); // 仅高亮当前激活标题，给当前激活标题加on类
+            }
+
+            // 自动切换地图视野
+            if(window._activeFilterGroup === ''){
+                if (store.pointAll.length > 0) map.setViewport(store.pointAll, {zoomFactor: -2}); // 取消筛选，恢复全局视野
+            }else{
+                var targetPoints = store.groupPointMap[window._activeFilterGroup];
+                if(targetPoints && targetPoints.length > 0) map.setViewport(targetPoints, {zoomFactor: -2}); // 适配当前分组点位视野
+            }
+        };
+
+        /**
+        * 全局事件委托：监听页面点击，兼容渲染后动态新增的列表标题
+        * 无需反复绑定事件，所有带data-filter-trigger属性的标题自动触发筛选函数
+        * @param {Event} e 全局点击事件对象，用于获取实际点击的DOM元素
+        */
+        document.addEventListener('click', function(e) {
+            var triggerDom = e.target.closest('[data-filter-trigger]'); // 向上匹配筛选标题标记
+            if (!triggerDom) return; // 点击非标题区域，直接终止
+            var cateLot = triggerDom.getAttribute('data-filter-cate'); // 获取分类标识
+            window.handleCateFilter(cateLot, triggerDom); // 调用筛选逻辑
+        });
+
 
 
 
@@ -2697,9 +2791,9 @@
         ac.addEventListener("onhighlight", function (e) {
             // console.log($('#c-locate').val().split(',')[0], $('#c-locate').val().split(',')[1])
             // 鼠标放在下拉列表上的事件
-            var str = "";
+            var str = '';
             var _value = e.fromitem.value;
-            var value = "";
+            var value = '';
             if (e.fromitem.index > -1) {
                 value =
                     _value.province +
@@ -2714,7 +2808,7 @@
                 "<br />value = " +
                 value;
 
-            value = "";
+            value = '';
             if (e.toitem.index > -1) {
                 _value = e.toitem.value;
                 value =
