@@ -1337,6 +1337,33 @@ var utilities = {
 
 
     /**
+     * 给元素添加class，兼容IE9
+     * @param {HTMLElement} el DOM元素
+     * @param {String} cls 类名
+     */
+    addClass: function (el, cls) {
+        if(el.classList) el.classList.add(cls);
+        else if(!hasClass(el, cls)) el.className += ' ' + cls;
+    },
+
+
+    /**
+     * 移除元素指定class，兼容IE9
+     * @param {HTMLElement} el DOM元素
+     * @param {String} cls 类名
+     */
+    removeClass: function (el, cls) {
+        if(el.classList) el.classList.remove(cls);
+        else {
+            var arr = el.className.trim().split(/\s+/);
+            var idx = arr.indexOf(cls);
+            if(idx > -1) arr.splice(idx, 1);
+            el.className = arr.join(' ');
+        }
+    },
+
+
+    /**
      * 原生js获取所有子节点或指定子节点元素集合(不含孙子节点) (兼容ie6+) 
      * 注：已排除文本、空格，换行符
      * @param {HTML DOM} o 当前节点
