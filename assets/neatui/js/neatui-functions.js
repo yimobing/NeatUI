@@ -866,6 +866,149 @@ var utilities = {
     },
 
 
+
+    /**
+     * 数组元素重复检查：检测数组是否存在重复项
+     * 说明：支持简单一维数组及多维数组
+     * 兼容性：兼容IE6+
+     * add 20260625-1
+     * @param {Array} arr 目标数组
+     * @param {Object} opts 用户自定义配置
+     * @param {Boolean} 返回布尔值。true 表示数组中有元素与当前值重复，false 表示数组中没有元素与当前值重复
+     * [举例]eg.
+        var arr = ["第一中学", "第二中学", "第三中学"];
+        var list = [ { keyword: "关键词1", data: [] }, { keyword: "关键词2", data: [] } ];
+        // 场景1：普通一维简单数组
+        var exist1 = utilities.arrayHasDuplicate(arr, { targetItem: "第二中学" }); // true
+        // 场景2：整条对象完全一致才算重复
+        var exist2 = utilities.arrayHasDuplicate(list, { targetItem: { keyword: "关键词1", data: [] }}); // true
+        // 场景3：只比对 keyword 字段，只要keyword字段值相同就算重复
+        var exist13 = utilities.arrayHasDuplicate(list, { key: "keyword", value: "关键词1" }); // true
+     */
+    arrayHasDuplicate: function(arr, opts) {
+        // 默认配置
+        var config = {
+            key: null, // 指定对象属性字段，不为null时开启属性字段匹配模式
+            value: null, // 需要匹配的属性字段值
+            targetItem: null // 整元素比对内容，深度全等模式
+        };
+        // 合并默认配置
+        var finals = {};
+        var p;
+        for (p in config) {
+            if (config.hasOwnProperty(p)) {
+                finals[p] = config[p];
+            }
+        }
+        // 覆盖用户传入参数
+        if (opts && typeof opts === 'object') {
+            for (p in opts) {
+                if (opts.hasOwnProperty(p)) {
+                    finals[p] = opts[p];
+                }
+            }
+        }
+        // 防御：非数组直接返回false（IE兼容容错）
+        if (!arr || Object.prototype.toString.call(arr) !== '[object Array]') {
+            return false;
+        }
+        var len = arr.length;
+        // 模式一：按指定字段匹配
+        if (finals.key !== null) {
+            for (var i = 0; i < len; i++) {
+                var item = arr[i];
+                // IE6/7修复：判断item是对象再取属性，防止null/undefined.xxx报错
+                if (item && typeof item === 'object') {
+                    if (item[finals.key] === finals.value) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        if (finals.targetItem === null) {
+            return false;
+        }
+        // 模式二：整元素深度全等匹配
+        for (var k = 0; k < len; k++) {
+            if (utilities.isValueEqual(arr[k], finals.targetItem)) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+
+
+    /**
+     * 自定义方法：替代Object.keys，兼容IE6+
+     * @param {Object} obj 目标对象
+     * @returns {Array} 对象自身键名集合
+     */
+    getOwnKeys: function (obj) {
+        var keyList = [];
+        var prop;
+        // 容错：非对象直接返回空数组
+        if (!obj || typeof obj !== 'object') {
+            return keyList;
+        }
+        for (prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                keyList.push(prop);
+            }
+        }
+        return keyList;
+    },
+
+
+
+    /**
+     * 深度对比函数：判断两个值是否相同
+     * 兼容性：IE6+
+     * @param {String|Object} a 值a
+     * @param {String|Object} b 值b
+     */
+    isValueEqual: function(a, b) {
+        // 严格相等直接返回true
+        if (a === b) {
+            return true;
+        }
+        var typeA = Object.prototype.toString.call(a);
+        var typeB = Object.prototype.toString.call(b);
+        if (typeA !== typeB) {
+            return false;
+        }
+        // 数字NaN相等判断
+        if (typeA === "[object Number]" && isNaN(a) && isNaN(b)) {
+            return true;
+        }
+        // 数组递归比对
+        if (typeA === "[object Array]") {
+            if (a.length !== b.length) return false;
+            for (var i = 0; i < a.length; i++) {
+                if (!utilities.isValueEqual(a[i], b[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        // 普通对象递归比对
+        if (typeA === "[object Object]") {
+            var keysA = utilities.getOwnKeys(a);
+            var keysB = utilities.getOwnKeys(b);
+            if (keysA.length !== keysB.length) return false;
+            for (var j = 0; j < keysA.length; j++) {
+                var key = keysA[j];
+                if (!utilities.isValueEqual(a[key], b[key])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    },
+
+
     /**
      * 判断字符串是否为数组（兼容ie9-)
      * @param {string|array} ps_str 要检测的字符串或数组
@@ -1234,14 +1377,253 @@ var utilities = {
 
 
     /**
-     * !! 生成随机颜色
-     * @returns 返回16进制的颜色值(带#号)。格式: #RRGGBB 或 #RGB
+     * !!! 生成随机颜色
+     * 说明：生成随机十六进制颜色 #RRGGBB 或 #RGB
+     * 兼容性：兼容IE6+
+     * edit 20260625-1
+     * @param {Object} opt 配置对象(可选)
+     * @param {Number} opt.mode 模式 1/2/3 默认2
+     * @param {String} opt.bgColor 校验模式必填 背景色 #fff/#000
+     * @param {Number} opt.minContrast 最小对比度 默认4.5
+     * @param {Number} opt.minLight 亮度最小值 0-100 默认20
+     * @param {Number} opt.maxLight 亮度最大值 0-100 默认55
+     * @param {Number} opt.count 同色系渐变颜色数量，支持1/2/3；1返回单字符串，2/3返回颜色数组 [深,浅] / [深,中,浅]，默认1
+     * @returns {String | String[]} count=1返回16进制的颜色值(带#号)；count=2/3返回同色系深浅渐变颜色数组
+     * 
+     * [ 随机颜色方案（三合一模式）说明 ]
+     mode=1 方案1
+     纯随机RGB，完全随机颜色
+     什么时候用：无可读性要求，不在乎字看不看得清、只当个色块装饰用
+     缺点：很容易出现文字看不清的情况，特别是浅白浅黄、白背景上字和边框淡到几乎看不见
+
+     mode=2 方案2
+     限定亮度 HSL：HSL限定亮度区间快速生成，深色系颜色随机，性能最优(默认推荐，适用多数场景)
+     什么时候用：页面永远白底、列表一堆标签/边框、头像标色、页面渲染量大且要流畅
+     优点：不会出现浅色颜色，生成的都是深色颜色，文字能一眼看清，生成速度快不卡页面，颜色也好看不发灰
+     缺点：只能适配白色/浅灰色背景，页面切换黑夜模式就会看不见字
+
+     mode=3 
+     WCAG 对比度校验生成：自动生成看得清的安全色、双主题、政务金融无障碍场景
+     什么时候用：页面有白天黑夜双主题、政府/银行系统、小字正文、背景颜色会变、要保证所有人都能看清字
+     优点：不管背景是黑是白，自动生成对比度足够的颜色，完全不用担心看不清
+     缺点：内部会循环多次生成颜色，一次性渲染几百个色块会稍微有点卡
+     
+     * [ 参数 count 说明 ]
+        mode1 不支持同色系，多 count 时返回多个完全随机独立颜色；
+        mode2/mode3 共用一套色相饱和度，视觉统一成套；
+        mode3 自动循环修正每个颜色亮度，保证全部满足背景对比度。
+
+     * [ 举例 ]eg.
+        // ①.获取纯随机颜色（mode1）
+        var singleColor = this.getRandomColor({ mode: 1 });
+        // ②.获取单个深色（mode2默认）
+        var singleColor = this.getRandomColor();
+        // ③.单个mode3无障碍色（mode3）
+        var safeColor = this.getRandomColor({
+            mode: 3,
+            bgColor: '#ffffff'
+        });
+        // ④.获取 2 个同色系：深色、浅色（比如同色系，想要文字颜色较深 + 边框颜色较浅）
+        var twoColorArr = this.getRandomColor({ mode: 2, count: 2 });
+        // twoColorArr[0] 深颜色（文字）
+        // twoColorArr[1] 浅一点（边框）
+        // ⑤.获取 3 个同色系：深、中、浅三级渐变
+        var threeColorArr = this.getRandomColor({ mode: 2, count: 3 });
+        // threeColorArr[0] 最深
+        // threeColorArr[1] 中间色
+        // threeColorArr[2] 最浅
+        // ⑥.mode3 双主题场景，三套合规渐变色
+        var safeThree = this.getRandomColor({ mode: 3, count: 3, bgColor: '#000000', minContrast: 4.5, minLight: 30, maxLight: 70 });
      */
-    getRandomColor: function () {
-        // return '#' + Math.random().toString(16).substr(2, 6).toUpperCase(); // 生成随机颜色
-        return (function(m,s,c){
-            return (c ? arguments.callee(m,s,c-1) : '#') + s[m.floor(m.random() * 16)]
-        })(Math,'0123456789abcdef', 5)
+    getRandomColor: function(opt) {
+        var hexTable = '0123456789ABCDEF';
+        // 默认配置项
+        var defOpt = {
+            mode: 2, // 生成模式 1纯随机RGB / 2限定亮度HSL(默认推荐) / 3WCAG对比度校验合规色
+            count: 1, // 同色系渐变数量：1单颜色，2深浅两套，3深中浅三套
+            minLight: 20, // HSL亮度下限(0-100)，mode2/mode3生成颜色亮度不低于该值
+            maxLight: 55, // HSL亮度上限(0-100)，mode2/mode3生成颜色亮度不高于该值 
+
+            bgColor: '#FFFFFF', // 背景基准色，mode3对比度校验时使用，标准#RRGGBB格式
+            minContrast: 4.5 // WCAG无障碍最小对比度，正文标准4.5，大文本可用3
+        };
+        var cfg = {};
+        // 合并配置，兼容IE6无Object.assign
+        if (opt && typeof opt === 'object') {
+            for (var k in defOpt) {
+                if (opt[k] !== undefined) {
+                    cfg[k] = opt[k];
+                } else {
+                    cfg[k] = defOpt[k];
+                }
+            }
+        } else {
+            cfg = defOpt;
+        }
+
+        // 数值转两位十六进制
+        function toHex(val) {
+            val = Math.round(Math.max(0, Math.min(255, val)));
+            var h1 = Math.floor(val / 16);
+            var h2 = val % 16;
+            return hexTable.charAt(h1) + hexTable.charAt(h2);
+        }
+
+        // HSL颜色转#RRGGBB十六进制
+        function hsl2Hex(h, s, l) {
+            h = h / 360;
+            s = s / 100;
+            l = l / 100;
+            var r, g, b;
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                function hue2rgb(p, q, t) {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                }
+                var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                var p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+            return '#' + toHex(r * 255) + toHex(g * 255) + toHex(b * 255);
+        }
+
+        // #RRGGBB 颜色字符串转rgb数组 [r,g,b]
+        function hex2Rgb(hex) {
+            var str = hex.replace('#', '');
+            var r = parseInt(str.substring(0, 2), 16);
+            var g = parseInt(str.substring(2, 4), 16);
+            var b = parseInt(str.substring(4, 6), 16);
+            return [r, g, b];
+        }
+
+        // 计算WCAG标准相对亮度
+        function getLum(r, g, b) {
+            function calc(x) {
+                x = x / 255;
+                return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+            }
+            return 0.2126 * calc(r) + 0.7152 * calc(g) + 0.0722 * calc(b);
+        }
+
+        // 计算前景与背景对比度比值
+        function getContrast(l1, l2) {
+            var light = Math.max(l1, l2);
+            var dark = Math.min(l1, l2);
+            return (light + 0.05) / (dark + 0.05);
+        }
+
+        // 方案1：原版纯随机RGB
+        function mode1() {
+            var random6 = function(len) {
+                var res = '';
+                for (var i = 0; i < len; i++) {
+                    res += hexTable.charAt(Math.floor(Math.random() * 16));
+                }
+                return res;
+            };
+            return '#' + random6(6);
+        }
+
+        // 方案2：HSL限制亮度快速生成
+        function mode2() {
+            var h = Math.floor(Math.random() * 360);
+            var s = 60 + Math.floor(Math.random() * 30);
+            var l = cfg.minLight + Math.floor(Math.random() * (cfg.maxLight - cfg.minLight + 1));
+            return hsl2Hex(h, s, l);
+        }
+
+        // 方案3：对比度循环校验生成
+        function mode3() {
+            var rgbBg = hex2Rgb(cfg.bgColor);
+            var bgL = getLum(rgbBg[0], rgbBg[1], rgbBg[2]);
+            var color, frgb, fr, fg, fb, fL, cr;
+            var maxRetry = 50; // 最大重试50次
+            var retryCount = 0;
+            do {
+                color = mode2();
+                frgb = hex2Rgb(color);
+                fr = frgb[0];
+                fg = frgb[1];
+                fb = frgb[2];
+                fL = getLum(fr, fg, fb);
+                cr = getContrast(bgL, fL);
+                retryCount++;
+                // 超过重试上限直接返回，给出最低对比度颜色，避免卡死
+                if(retryCount >= maxRetry) break;
+            } while (cr < cfg.minContrast);
+            return color;
+        }
+
+        // 多色同色系渐变逻辑
+        if (cfg.count > 1) {
+            var colorList = [];
+            // mode1无固定色相，直接生成多个独立随机色
+            if (cfg.mode === 1) {
+                for (var i = 0; i < cfg.count; i++) {
+                    colorList.push(mode1());
+                }
+                return colorList;
+            }
+            // mode2 / mode3：固定同一色相、饱和度，仅区分亮度深浅
+            var baseH = Math.floor(Math.random() * 360);
+            var baseS = 60 + Math.floor(Math.random() * 30);
+            var gap = 20; // 深浅亮度差值，可调；数值越大深浅差距越明显，默认18
+            var darkL = Math.max(0, cfg.minLight);
+            var midL = Math.min(100, darkL + gap);
+            var lightL = Math.min(100, midL + gap);
+
+            // 组装数组：[深色, 中间, 浅色]
+            if (cfg.count === 2) {
+                colorList.push(hsl2Hex(baseH, baseS, darkL));
+                colorList.push(hsl2Hex(baseH, baseS, lightL));
+            } else if (cfg.count === 3) {
+                colorList.push(hsl2Hex(baseH, baseS, darkL));
+                colorList.push(hsl2Hex(baseH, baseS, midL));
+                colorList.push(hsl2Hex(baseH, baseS, lightL));
+            }
+
+            // mode3：逐个校验每个颜色和背景对比度，不达标则压低亮度
+            if (cfg.mode === 3) {
+                var rgbBg = hex2Rgb(cfg.bgColor);
+                var bgLum = getLum(rgbBg[0], rgbBg[1], rgbBg[2]);
+                for (var cIdx = 0; cIdx < colorList.length; cIdx++) {
+                    var currHex = colorList[cIdx];
+                    var retry = 0;
+                    var currRgb = hex2Rgb(currHex);
+                    var currLum = getLum(currRgb[0], currRgb[1], currRgb[2]);
+                    var currCr = getContrast(bgLum, currLum);
+                    var currL = [darkL, midL, lightL][cIdx];
+                    while (currCr < cfg.minContrast && retry < 30) {
+                        currL = Math.max(0, currL - 6);
+                        currHex = hsl2Hex(baseH, baseS, currL);
+                        currRgb = hex2Rgb(currHex);
+                        currLum = getLum(currRgb[0], currRgb[1], currRgb[2]);
+                        currCr = getContrast(bgLum, currLum);
+                        retry++;
+                    }
+                    colorList[cIdx] = currHex;
+                }
+            }
+            return colorList;
+        }
+
+        // 根据mode分发对应生成逻辑（原有逻辑完全不变）
+        switch (cfg.mode) {
+            case 1:
+                return mode1();
+            case 3:
+                return mode3();
+            default:
+                return mode2();
+        }
     },
 
 
