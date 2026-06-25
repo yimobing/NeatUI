@@ -138,8 +138,8 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2001", "post", function(v){
             return: "ok",
             data: [
                 { "name": "客运中心站南门", "zuobiao": "118.617007,24.890789", "address": "1路、 4路、 11路、 11路复线、 21路、 24路、 40路、 42路、 305路、 K1路、 K201路、 K301路、 K307路、 K3路、 K501路、 K503路、 K606路、 K702路长线、 K702路短线", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
-                { "name": "海关大楼", "zuobiao": "", "address": "4路、 6路、 15路、 19路、 21路、 23路、 24路、 28路、 33路、 35路、 49路、 60路", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
-                { "name": "刺桐公园", "zuobiao": "", "address": "7路、 32路、 60路、 202路、 305路、 K1路、 K3路、 K604路、 K701路", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"}
+                { "name": "金帝花园", "zuobiao": "118.620392,24.888287", "address": "4路、 6路、 15路、 19路、 21路、 23路、 24路、 28路、 33路、 35路、 49路、 60路", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
+                { "name": "坪山路南段", "zuobiao": "118.617772,24.889102", "address": "7路、 32路、 60路、 202路、 305路、 K1路、 K3路、 K604路、 K701路", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"}
             ]
         }
     else 

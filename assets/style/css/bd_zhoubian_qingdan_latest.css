@@ -3,7 +3,7 @@
 /**
 * 小工具 -> 百度周边清单
 * Date: 2025.12.21
-* Update: 2026.06.24
+* Update: 2026.06.25
 */
 /*+ --------  -------- +*/
 
@@ -508,47 +508,57 @@ button[type="button"][disabled] {
 	font-weight: 550;
 }
 .bds__search_result_outcome {
-	height: auto;
-	overflow-y: auto;
+	/* height: auto; */
+	/* overflow-y: auto; */
 }
 .bds__search_result_outcome_switch {
+	position: relative;
 	padding: 10px;
 	border: 1px solid #ddd;
 	border-top: 0;
 	border-radius: 0 0 4px 4px;
 }
-.bds__search_result_outcome_switch_record {
+.bds__search_prepare {
+	width: 98%;
+	margin: 0 auto 5px auto;
 	border: 1px solid #ddd;
 	border-radius: 2px;
 	text-align: left;
 }
-.bds__search_result_outcome_switch_record_title,
-.bds__search_result_outcome_switch_record_list li {
+.bds__search_prepare_list li {
 	padding: 4px 8px;
 }
-.bds__search_result_outcome_switch_record_title {
+.bds__search_prepare_title {
+	padding: 2px 8px;
 	color: #555;
 	font-size: 14px;
 	font-weight: 550;
 }
-.bds__search_result_outcome_switch_record_list {
+.bds__search_prepare_list {
 }
-.bds__search_result_outcome_switch_record_list li {
+.bds__search_prepare_list li {
 	list-style-type: square;
 	list-style-position: inside;
-	padding: 4px 8px;
+	padding: 3px 8px;
 	border-top: 1px dotted #eaeaea;
 	color: #1296db;
 	font-size: 13px;
 }
-.bds__search_result_outcome_switch_record_list li span {
+.bds__search_prepare_list li span {
 	color: #1296db;
 }
-.bds__search_result_outcome_switch_record_list li em {
+.bds__search_prepare_list li em {
 	margin-left: 2px;
 	color: #777;
 }
 .bds__search_result_outcome_switch_operate {
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	right: 0;
+	width: 100%;
+	margin: 0 auto;
+	background-color: #fff;
 	padding: 10px 15px;
 }
 .bds__search_result_outcome_switch_operate:after {
@@ -593,9 +603,14 @@ button[type="button"][disabled] {
 	filter: Progid:DXImageTransform.Microsoft.Alpha(opacity = 80);
 }
 .bds__search_result_outcome_switch_operate button[type="button"] {
-	width: 100px;
+	width: auto;
 	float: right;
+	margin-left: 5px;
 }
+.bds__search_result_outcome_switch_operate #btn-show-hide-coord {
+	
+}
+
 .bds__search_result_outcome_switch_content, 
 .bds__search_result_outcome_switch_display {
 	
@@ -604,6 +619,11 @@ button[type="button"][disabled] {
 	margin-top: 8px;
 	border: 1px solid #ddd;
 	border-radius: 4px;
+}
+.bds__search_result_outcome_switch_display {
+	padding-top: 55px;
+	height: auto;
+	overflow-y: auto;
 }
 .bds__search_result_outcome_switch_content_title {
 	padding: 5px 8px;
@@ -615,13 +635,15 @@ button[type="button"][disabled] {
 }
 .bds__search_result_outcome_switch_content textarea {
 	width: 100%;
-    height: 500px;
+    height: auto;
+	min-height: 450px;
     line-height: 1.8;
     padding: 6px 8px;
     border-radius: 4px;
     overflow: auto;
     color: #555;
     font-size: 13px;
+	overflow-y: auto;
 }
 .bds__search_result_outcome_switch_display_one {
 	display：-webkit-box;
