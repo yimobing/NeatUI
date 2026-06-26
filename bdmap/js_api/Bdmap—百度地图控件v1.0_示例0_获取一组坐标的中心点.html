@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>获取一组坐标的中心点</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="../../assets/neatui/css/neatui.min.css"> <!--前端框架-->
+    <link type="text/css" rel="stylesheet" href="../../assets/neatui/css/neatui-dialog.css"> <!--对话框-->
+    <link type="text/css" rel="stylesheet" href="../../assets/neatui/css/neatui-bdmap.css?v=20241128-1"> <!--百度地图控件-->
+</head>
+<body>
+    <style>
+        /*+ --------  -------- +*/
+        html, body { width: 99.5%; margin: 0.25% auto; height: 99.5%; overflow: hidden; }
+        /*+ -------- 外层区域：地图容器及父级节点一定要设置height高度，不然地图可能无法显示 -------- +*/
+        .bds { position: relative; width: 100%; height: 99%; margin: 0 auto; padding: 8px; overflow: hidden; zoom: 1; border: 1px solid #cac9c9; border-radius: 10px;  }
+        /*+ -------- 地图容器区域 -------- +*/
+        .bds__map { position: relative; width: 100%; margin: 10px 0 0 0; padding: 3px; border: 1px solid #eaeaea; border-radius: 4px; overflow: hidden; }
+        /*+ -------- 操作区域：表单及按钮 -------- +*/
+        .bds__editor * { margin: 0; padding: 0; -moz-box-sizing: border-box; -o-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; font-size: 14px; }
+        .bds__editor>div { display: inline-block; vertical-align: top; margin-left: 35px; }
+        .bds__editor>div:first-child { margin-left: 0; }
+        .bds__editor label { margin-left: 3px; color: #999; font-size: 10px; }
+        .bds__editor button[type="button"]{ padding: 0 8px; font-size: 13px; }
+        .bds__editor input[type="text"] { min-width: 150px; height: 28px; line-height: 28px\9; margin-left: 10px; padding: 0 5px; background-color: #fcfcfc; border: 1px solid #a59b9b !important; border-radius: 2px; }
+        .bds__editor input[type="text"][readonly],
+        .bds__editor input[type="text"]:read-only{ background-color: #fdfdfd!important; }
+    </style>
+
+    <div class="bds">
+        <div class="bds__editor">
+            <div class="bds__coord">
+                当前坐标点 <input type="text" id="c-locate">
+                <label> (拖动中心点或在地图上任意位置点击可更改坐标) </label>
+            </div><!--/.bds__coord-->
+        </div><!--/.bds__editor-->
+        <div class="bds__map">
+            <div id="map"></div>
+        </div><!--/.bds__map-->
+    </div><!--/.bds-->
+
+    
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
+    <script src="../../assets/libs/bdmap.drawingManager.js"></script> <!--鼠标绘制工具-->
+    <script src="../../assets/libs/jquery-1.8.3.min.js"></script> <!--Jq库-->
+    <script src="../../assets/neatui/js/neatui.min.js"></script> <!--前端框架-->
+    <script src="../../assets/neatui/js/neatui-dialog.js"></script> <!--对话框-->
+    <script src="../../assets/neatui/js/neatui-ajax.js"></script> <!--自定义ajax-->
+    <script src="../../assets/neatui/js/neatui-bdmap.js?v=20241128-1"></script> <!--百度地图控件-->
+    <script>
+        /*+————————————————全局变量————————————————+*/
+
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                                   初始化
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //——————————————————————————————————————————
+        //=====初始化地图宽高
+        // setDituSize();
+        
+        //——————————————————————————————————————————
+        //=====检测窗口变化事件
+        // $(window).on('resize', function(){
+        //     setDituSize();
+        // });
+
+
+        //——————————————————————————————————————————
+        /**
+         * 函数：设置地图宽高
+         * (高度一定要设置,且不可在使用百分比进行设置,不然在.net服务器环境下地图可能不显示)
+         */
+        function setDituSize(){
+            var winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // 浏览器宽
+                winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight; // 浏览器高
+            // 整个区域
+            var eleAll = $('.bds'),
+                allMargLeft = Math.ceil(parseFloat(eleAll.css('marginLeft'))),
+                allMargRight = Math.ceil(parseFloat(eleAll.css('marginRight'))),
+                allPadLeft = Math.ceil(parseFloat(eleAll.css('paddingLeft'))),
+                allPadRight = Math.ceil(parseFloat(eleAll.css('paddingRight'))),
+                allMargTop = Math.ceil(parseFloat(eleAll.css('marginTop'))),
+                allMargBot = Math.ceil(parseFloat(eleAll.css('marginBottom'))),
+                allPadTop = Math.ceil(parseFloat(eleAll.css('paddingTop'))),
+                allPadBot = Math.ceil(parseFloat(eleAll.css('paddingBottom')));
+            //  console.log('整个区域\nMargin左边距：', allMargLeft, '\nMargin右边距：',allMargRight, '\nPadding左边距：',allPadLeft, '\nPadding右边距：',allPadRight, '\nMargin上边距：', allMargTop, '\nMargin下边距：',allMargBot, '\nPadding上边距：',allPadTop, '\nPadding下边距：',allPadBot);
+            // 顶部区域
+            var eleTop = $('.bds__editor'),
+                topHeight = eleTop.outerHeight(true);
+            // 地图区域
+            var eleTu = $('.bds__map'),
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargLeft = Math.ceil(parseFloat(eleTu.css('marginLeft'))),
+                tuMargRight = Math.ceil(parseFloat(eleTu.css('marginRight'))),
+                tuPadLeft = Math.ceil(parseFloat(eleTu.css('paddingLeft'))),
+                tuPadRight = Math.ceil(parseFloat(eleTu.css('paddingRight')));
+                tuMargTop = Math.ceil(parseFloat(eleTu.css('marginTop'))),
+                tuMargBot = Math.ceil(parseFloat(eleTu.css('marginBottom'))),
+                tuPadTop = Math.ceil(parseFloat(eleTu.css('paddingTop'))),
+                tuPadBot = Math.ceil(parseFloat(eleTu.css('paddingBottom')));
+            // 计算宽高
+            var allWidth = $('body').width() - (allMargLeft + allMargRight + allPadLeft + allPadRight),
+                allHeight = $('body').height() -  (allMargTop + allMargBot + allPadTop + allPadBot),
+                tuWidth = allWidth - (tuMargLeft + tuMargRight + tuPadLeft + tuPadRight),
+                tuHeight = allHeight - topHeight - (tuMargTop + tuMargBot + tuPadTop + tuPadBot);
+            // console.log('bodyWidth：', $('body').width(), '\nallMargLeft:',allMargLeft, '\nallMargRight:',allMargRight, '\nallPadLeft:',allPadLeft, '\nallPadRight:', allPadRight);
+            // console.log('tuMargLeft:',tuMargLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadLeft:',tuPadLeft, '\ntuPadRight:',tuPadRight);
+            // console.log('--------------------------------');
+            // 设置地图宽高
+            $('.bds__map').css({
+                width: tuWidth,
+                height: tuHeight
+            })
+            $('#map').css({
+                width: eleTu.width(),
+                height: eleTu.height()
+            })
+        }
+
+
+
+
+        
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //                                          百度地图上展示数据并进行交互操作
+        //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+        //————————————————————————————————————————————————
+        // 地图初始化参数
+        var options = {
+           // 地图大小。width/height参数值：数值型或百分比类型(如1920, 1920px, 90%)表示具体的大小, 字符串型 auto 表示自动调整, fn 表示在setSize/onResize函数中设置。注：百分比值会转化成浏览器视窗大小*百分比值。
+            width: 'auto', // 宽(可选)，默认auto
+            height: 'auto', // 高(可选)，默认auto
+            setSize: function(){ // 初始化设置地图大小的函数(可选)，默认null。优先权大于width/height参数。
+                // setDituSize();
+            },
+            onResize: function(){ // 窗口大小变化时设置地图的函数(可选)，默认null。优先权大于width/height参数。
+                // setDituSize();
+            },
+            zoom: 13, // 地图缩放级别(可选)，默认11。 值：3-19
+            // 中心点(可选)
+            center: {
+                enableDrag: true, // 是否允许拖拽(可选)，默认false
+                // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                dragEnd: function(e){
+                    $('#c-locate').val(e.lng + ',' + e.lat);
+                    var titleStr = '当前坐标点如下：<br>' + e.lng + ',' + e.lat;
+                    neuiBdmap.setCenterPointLabelTitle(titleStr);
+                }
+            }
+        }
+
+
+        //————————————————————————————————————————————————
+        // 创建地图并初始化
+        neuiBdmap('map', options);
+
+
+        //————————————————————————————————————————————————
+        // 根据一组坐标获取到它们的中心点
+        // 118.602675,24.917578
+        // 118.61906,24.904994
+        // 118.609143,24.897783
+        var coorArr = [
+            { lng: 118.602675, lat: 24.917578 }, 
+            { lng: 118.61906, lat: 24.904994 },
+            { lng: 118.609143, lat: 24.897783 },
+        ]
+        var centerPoint = neuiBdmap.getCoordinateCenter(coorArr);
+        var centerCoord = centerPoint.lng + ',' + centerPoint.lat;
+        console.log('中心点：', centerPoint);
+        console.log('中心点坐标：', centerCoord);
+
+        //————————————————————————————————————————————————
+        // 创建多边形
+        var pointsArr = [
+            coorArr
+        ]
+        neuiBdmap.createPolygonOverlays({
+            points: pointsArr, // 多边形覆盖物坐标组成的二维数组，有N个多边形数组就有N个元素。
+            // 格式：
+            // [
+            //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..], // 第1个多边形的N个点
+            //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..],// 第2个多边形的M个点
+            //     [ {lng: '', lat: ''}, {lng: '', lat: ''}, {lng: '', lat: ''}, ..] // 第3个多边形的L个点
+            // ];
+        });
+        
+        //————————————————————————————————————————————————
+        // 设置地图中心点
+        neuiBdmap.setMapCenter(centerCoord, {
+            zoom: 15, // 缩放级别(可选)，默认-1。值不是3到19之间的整数时会自动缩放到合适的级别
+            title: '泉州中心市区', // 标题(可选)，默认为经纬度坐标或城市名。支持HTML
+            describe: '' // 描述信息(可选)，默认空。支持HTML
+        });
+
+    </script>
+</body>
+</html>
