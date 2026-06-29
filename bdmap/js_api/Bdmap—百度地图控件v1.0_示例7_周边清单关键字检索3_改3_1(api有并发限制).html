@@ -12,19 +12,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta http-equiv="Cache-Control" content="no-siteapp">
-    <title> 周边关键字检索3 test </title>
+    <title> 周边关键字检索3 </title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <link type="text/css" rel="stylesheet" href="../../assets/neatui/css/neatui.min.css"> <!-- 前端框架 -->
     <link type="text/css" rel="stylesheet" href="../../assets/neatui/css/neatui-dialog.css"> <!-- 对话框 -->
     <link type="text/css" rel="stylesheet" href="../../assets/neatui/css/neatui-dropdown.css"> <!-- 下拉 -->
     <link type="text/css" rel="stylesheet" href="../../assets/neatui/css/neatui-bdmap.css"> <!-- 百度地图控件 -->
-    <link type="text/css" rel="stylesheet" href="../../assets/style/css/bd_zhoubian_qingdan_latest.css?v=20260629-1">
+    <link type="text/css" rel="stylesheet" href="../../assets/style/css/bd_zhoubian_qingdan_latest.css?v=20260625-1">
 </head>
 <body>
     <style>
         .tangram-suggestion-main { z-index: 999; }
-        #s-near { width: 200px; }
+        #s-near { width: 300px; }
     </style>
     <div class="bds">
         <div class="bds__graph">
@@ -42,7 +42,7 @@
                     <div class="bds__graph_coord_column">
                         <div class="bds__graph_coord_row_title"> 城市 </div>
                         <div class="bds__graph_coord_row_content">
-                            <input type="text" id="c-city" value="福建省-泉州市-丰泽区" placeholder="如泉州市或丰泽区" onblur="this.placeholder='如泉州市或丰泽区'" onfocus="this.placeholder=''">
+                            <input type="text" id="c-city" placeholder="如泉州市或丰泽区" onblur="this.placeholder='如泉州市或丰泽区'" onfocus="this.placeholder=''">
                         </div> 
                     </div> <!--/.bds__graph_coord_column-->
                     <div class="bds__graph_coord_column bds__graph_coord_column_btn">
@@ -152,55 +152,13 @@
                     </div>
                 </div> <!--/.bds__search_form_content-->
                 <div class="bds__search_form_btn">
-                    <button type="button" class="ne-btn has-texture blue" id="btn-query"> 查询 </button>
-                    <button type="button" class="ne-btn green has-bg-square" id="btn-filter"> 筛选数据 </button>
+                    <button type="button" class="ne-btn has-texture blue" id="btn-query"> 查询 </button>    
                 </div>
             </div> <!-- /.bds__search_form-->
 
-            <div class="bds__search_filter" style="display: none">
-                <div class="bds__search_filter_form">
-                    <div class="bds__search_filter_form_group">
-                        <div class="bds__search_filter_form_group_title"> 区县筛选 </div>
-                        <div class="bds__search_filter_form_group_performance">
-                            <div class="bds__search_filter_form_group_performance_box">
-                                <label> 省份 </label>
-                                <input type="text" id="f-province" readonly>
-                            </div>
-                            <div class="bds__search_filter_form_group_performance_box">
-                                <label> 城市 </label>
-                                <input type="text" id="f-city" readonly>
-                            </div>
-                            <div class="bds__search_filter_form_group_performance_box">
-                                <label> 区县 </label>
-                                <input type="text" id="f-county" readonly>
-                            </div>
-                            <div class="bds__search_filter_form_group_performance_box">
-                                <button type="button" class="ne-btn has-3d" id="btn-district-add"> 添加 </button>
-                            </div>
-                        </div>
-                        <div class="bds__search_filter_form_group_result" style="display: none">
-                            <div class="bds__search_filter_form_group_result_title"> 已选中 </div>
-                            <div class="bds__search_filter_form_group_result_list"></div>
-                        </div>
-                    </div>
-                </div> <!--/.bds__search_filter_form-->
-                <div class="bds__search_filter_close">
-                    <button type="button" id="btn-filter-close"> 关闭 </button>
-                </div>
-                <div class="bds__search_filter_btn" style="display: none">
-                    <button type="button" class="ne-btn has-3d brown" id="btn-filter-confirm"> 确定筛选 </button>
-                </div>
-            </div> <!--/.bds__search_filter-->
-
             <div class="bds__search_prepare" style="display: none">
-                <div class="bds__search_prepare_block block__word">
-                    <div class="bds__search_prepare_title"> 预备要查询的关键字 </div>
-                    <div class="bds__search_prepare_list"></div>
-                </div>
-                <div class="bds__search_prepare_block block__district" style="display: none">
-                    <div class="bds__search_prepare_subtitle"> 筛选区县 </div>
-                    <div class="bds__search_prepare_some"></div>
-                </div>
+                <div class="bds__search_prepare_title"> 当前查询的关键字 </div>
+                <div class="bds__search_prepare_list"></div>
             </div> <!--/.bds__search_prepare-->
             
             <div class="bds__search_result">
@@ -246,7 +204,7 @@
     <!-- ================================================================================-->
     <!--                             JAVASCRIPT                                          -->
     <!-- ================================================================================-->
-    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件--> <!-- 正式上线时修改为 ak=<%=s_baidu_ditu_ak_web%> mock -->
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
     <script src="../../assets/libs/jquery-1.8.3.min.js"></script> <!-- Jq库-->
     <script src="../../assets/libs/jquery.chineseDistricts.js"></script> <!-- 省市区数据源 -->
     <script src="../../assets/neatui/js/neatui.min.js"></script> <!-- 前端框架 -->
@@ -292,21 +250,13 @@
         //——————————————————————————————————————————
         // test: 搜索结果数据请求方式 mock 
         IS_ENABLE_DEFAULT_SEARCH_WORD = true; // 是否启用默认搜索组或默认搜索关键字功能，默认true
-        IS_USE_WEB_API = true;  // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api，即web api); false 从前端直接取数据(使用百度地图浏览器版api，即js api)
+        IS_USE_WEB_API = false;  // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api，即web api); false 从前端直接取数据(使用百度地图浏览器版api，即js api)
         
         
 
         
 
         /*+———————————————— FUNCTION ————————————————+*/
-        //——————————————————————————————————————————
-        // IE9兼容：兜底Date.now
-        if (!Date.now) {
-            Date.now = function () {
-                return new Date().getTime();
-            };
-        }
-
         //——————————————————————————————————————————
         var BDTools = { // 通用工具库
             /**
@@ -1288,7 +1238,7 @@
         //                                          系列事件
         //————————————————————————————————————————————————————————————————————————————————————————————————————————————————
         //——————————————————————————————————————————
-        // 初始化设置区域高度
+        // 初始化设置区域宽高
         var windowHeight = $(window).height(),
             formHeight = $('.bds__search_form').height(),
             prepareHeight = $('.bds__search_prepare').height(),
@@ -1301,13 +1251,13 @@
         $('.bds__search_result_outcome_switch_display').css({
             maxHeight: contentHeight
         });
-        $('#r-result, #panel-result2').css({
+        $('#r-result').css({
             height: contentHeight - 50
         });
 
 
         //——————————————————————————————————————————
-        //          快速定位区域事件
+        //          定位区域事件
         //——————————————————————————————————————————
         //——————————————————————————————————————————
         // 复制按钮、复制当前坐标
@@ -1328,7 +1278,7 @@
         
 
         //——————————————————————————————————————————
-        // [快速定位区域] 查询结果伸缩按钮
+        // 查询结果伸缩按钮
         $('.btn-stretch').on('click', function(){
             if($('.bds__graph_result').hasClass('stretch-in')) {
                 $('.bds__graph_result').removeClass('stretch-in');
@@ -1337,6 +1287,115 @@
                 $('.bds__graph_result').addClass('stretch-in');
             }
         });
+
+
+
+        //——————————————————————————————————————————
+        // 城市快速定位按钮
+        $('#btn-pick-locate').on('click', function(){
+            fn_locate_city();
+        });
+        // 定位到某个城市
+        function fn_locate_city(){
+            var ls_city = $('#c-city').val();
+            if(ls_city == '') {
+                // neuiDialog.alert({
+                //     animate: true,
+                //     message: '请填写：城市',
+                //     buttons: ['确定']
+                // })
+                $('#c-city').focus();
+                return;
+            }
+            // 数据过滤，去掉省份自治区及短横线等字符
+            var cityName = ls_city.toString().replace(/(\-|\,|\s+)/g, '');
+            cityName = cityName.indexOf('省') >= 0 || cityName.indexOf('自治区') >= 0 ? cityName.replace(/^(.*?省|自治区)(.*)/g, '$2') : cityName;
+            // console.log("城市：", nowCityName)
+
+            BDTools.clearOverlays(map); // 清空所有覆盖物
+            // map.setCenter(nowCityName); // 定位到指定城市
+
+            // 获取地址坐标
+            var myGeo = new BMap.Geocoder(); // 创建地址解析器实例    
+            myGeo.getPoint(cityName, function(point){ // 将地址解析结果显示在地图上，并调整地图视野
+                // console.log('point：', point)    
+                if (point) {
+                    var lng = point.lng, lat = point.lat;
+                    neuiBdmap.createMarker({
+                        type: 'zhongxin', // 坐标类型(可选)，默认空。值： zhongxin 中心点坐标, 空 表示其它类型。
+                        coordinate: lng + ',' + lat, // 坐标经纬度字符串. eg. '经度,纬度'
+                        title: $('#c-city').val(), // 标题(可选)，默认空。支持HTML
+                        describe: '', // 描述信息(可选)，默认空。支持HTML
+                        message: '', // 信息窗口短信内容(可选)，默认空
+                        autoViewport: true, // 是否自动调整视野，默认true
+                        zoom: 13, // 自动调整视野时地图的缩放级别，默认13。值 3-19
+                        dragable: true, // 是否允许拖拽(可选)，默认false
+                        finishCallback: function(e){ // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                            $('#s-community').val(''); // 小区栏清空
+                            $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值
+                        }, 
+                        dragEndCallback: function(e){ // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+                            $('#s-community').val(''); // 小区栏清空
+                            $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值  
+                        }
+                    })
+                }      
+            }); // , "北京市"
+        }
+
+
+
+
+
+
+
+        //——————————————————————————————————————————
+        //          查询区域表单事件
+        //——————————————————————————————————————————
+        //——————————————————————————————————————————
+        // 范围半径输入事件：限制半径输入的数据类型
+        $(document).on('input', '[data-type="integer[positive]"]', function(e){
+            // 只允许输入正整数
+            var value = $(this).val();
+            value = value.toString().replace(/[^\d]/g,'');
+		    $(this).val(value);
+        });
+
+
+        
+        //——————————————————————————————————————————
+        // 半径下拉
+        $('#s-range').on('click',function(){
+            var $this = $(this);
+            var rangeData = {
+                "data":[
+                    { "value": "500" },
+                    { "value": "1000" },
+                    { "value": "1500" },
+                    { "value": "2000" },
+                    { "value": "2500" },
+                    { "value": "3000" },
+                    { "value": "3500" },
+                    { "value": "4000" },
+                    { "value": "4500" },
+                    { "value": "5000" },
+                    { "value": "5500" },
+                    { "value": "6000" },
+                    { "value": "6500" },
+                    { "value": "7000" },
+                    { "value": "8000" },
+                    { "value": "9000" },
+                    { "value": "9500" },
+                    { "value": "10000" }
+                ]
+            }
+            neuiDropdown({
+                caption: '',
+                json: rangeData,
+                format:["value"]
+            },this) 
+        });
+
 
 
         //——————————————————————————————————————————
@@ -1468,14 +1527,13 @@
                 caption: '',
                 chain: true, // 是否省市区同框联动.默认false
                 level: 3, // 省市区同框联动下拉的级别，值为2或3（仅当chain=true有效)(可缺省)。值：2 两级联动(省份、城市）， 3 三级联动（省份、城市、区县）(默认)
-                // json: districtData, // 数据源不填时，将默认自动调用全国省市区数据源
+                json: districtData, // 数据源不填时，将默认自动调用全国省市区数据源
                 // areaFormat: ["province", "city", "county"], // 地区显示值JSON格式(可缺省)
                 // keyFormat: ["provinceId", "cityId", '"ountyId"], // 地区隐藏值JSON格式(可缺省)
                 
-                
+                // id: '350000-350500-350503',
                 entire:'全部',
                 isEntireRegion: 'county', // 限制默认下拉值添加在哪里(可选). all 省份、城市、区县上都加(默认), province 仅加在省份上, city 仅加在城市上, county 仅加在区县上
-                // id: '350000-350500-350503',
                 value: value,
 
                 isCnClose: true, // 当省市区同框联动,是否点了"全部"选项后就马上填充值并关闭控件(可缺省),默认true
@@ -1494,112 +1552,6 @@
         });
 
 
-
-        //——————————————————————————————————————————
-        // [快速定位区域] 快速定位按钮
-        $('#btn-pick-locate').on('click', function(){
-            fn_locate_city();
-        });
-        // 定位到某个城市
-        function fn_locate_city(){
-            var ls_city = $('#c-city').val();
-            if(ls_city == '') {
-                // neuiDialog.alert({
-                //     animate: true,
-                //     message: '请填写：城市',
-                //     buttons: ['确定']
-                // })
-                $('#c-city').focus();
-                return;
-            }
-            // 数据过滤，去掉省份自治区及短横线等字符
-            var cityName = ls_city.toString().replace(/(\-|\,|\s+)/g, '');
-            cityName = cityName.indexOf('省') >= 0 || cityName.indexOf('自治区') >= 0 ? cityName.replace(/^(.*?省|自治区)(.*)/g, '$2') : cityName;
-            // console.log("城市：", nowCityName)
-
-            BDTools.clearOverlays(map); // 清空所有覆盖物
-            // map.setCenter(nowCityName); // 定位到指定城市
-
-            // 获取地址坐标
-            var myGeo = new BMap.Geocoder(); // 创建地址解析器实例    
-            myGeo.getPoint(cityName, function(point){ // 将地址解析结果显示在地图上，并调整地图视野
-                // console.log('point：', point)    
-                if (point) {
-                    var lng = point.lng, lat = point.lat;
-                    neuiBdmap.createMarker({
-                        type: 'zhongxin', // 坐标类型(可选)，默认空。值： zhongxin 中心点坐标, 空 表示其它类型。
-                        coordinate: lng + ',' + lat, // 坐标经纬度字符串. eg. '经度,纬度'
-                        title: $('#c-city').val(), // 标题(可选)，默认空。支持HTML
-                        describe: '', // 描述信息(可选)，默认空。支持HTML
-                        message: '', // 信息窗口短信内容(可选)，默认空
-                        autoViewport: true, // 是否自动调整视野，默认true
-                        zoom: 13, // 自动调整视野时地图的缩放级别，默认13。值 3-19
-                        dragable: true, // 是否允许拖拽(可选)，默认false
-                        finishCallback: function(e){ // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
-                            $('#s-community').val(''); // 小区栏清空
-                            $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值
-                        }, 
-                        dragEndCallback: function(e){ // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
-                            $('#s-community').val(''); // 小区栏清空
-                            $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值  
-                        }
-                    })
-                }      
-            }); // , "北京市"
-        }
-
-
-
-
-
-
-
-        //——————————————————————————————————————————
-        //          查询区域表单事件
-        //——————————————————————————————————————————
-        //——————————————————————————————————————————
-        // 范围半径输入事件：限制半径输入的数据类型
-        $(document).on('input', '[data-type="integer[positive]"]', function(e){
-            // 只允许输入正整数
-            var value = $(this).val();
-            value = value.toString().replace(/[^\d]/g,'');
-		    $(this).val(value);
-        });
-
-
-        
-        //——————————————————————————————————————————
-        // 半径下拉
-        $('#s-range').on('click',function(){
-            var $this = $(this);
-            var rangeData = {
-                "data":[
-                    { "value": "500" },
-                    { "value": "1000" },
-                    { "value": "1500" },
-                    { "value": "2000" },
-                    { "value": "2500" },
-                    { "value": "3000" },
-                    { "value": "3500" },
-                    { "value": "4000" },
-                    { "value": "4500" },
-                    { "value": "5000" },
-                    { "value": "5500" },
-                    { "value": "6000" },
-                    { "value": "6500" },
-                    { "value": "7000" },
-                    { "value": "8000" },
-                    { "value": "9000" },
-                    { "value": "9500" },
-                    { "value": "10000" }
-                ]
-            }
-            neuiDropdown({
-                caption: '',
-                json: rangeData,
-                format:["value"]
-            },this) 
-        });
 
 
 
@@ -1951,10 +1903,9 @@
             }
         });
 
+       
 
-
-
-
+        
         //——————————————————————————————————————————
         //          保存结果区域
         //——————————————————————————————————————————
@@ -2084,404 +2035,25 @@
 
 
 
-        //——————————————————————————————————————————
-        //          二次筛选区域
-        //——————————————————————————————————————————
-        var $elFilterArea = $('.bds__search_filter'), // 筛选根节点
-            $elFilterResultArea = $('.bds__search_filter_form_group_result'), // 筛选结果节点
-            $elFilterResultListArea = $('.bds__search_filter_form_group_result_list'),  // 筛选列表节点
-            $elFilterOperateBtn = $('#btn-filter'), // 筛选操作按钮节点
-            $elFilerSearchBtn = $('.bds__search_filter_btn'); // 筛选搜索按钮节点
 
         //——————————————————————————————————————————
-        // [二次筛选区域] 筛选数据按钮
-        $elFilterOperateBtn.on('click', function() {
-            if( $elFilterArea.is(':visible')) {
-                $elFilterArea.slideUp();
-                $(this).removeClass('up');
-            }
-            else {
-                $elFilterArea.slideDown();
-                $(this).addClass('up');
-            }
-
-            if($elFilterResultListArea.children().length > 0) {
-                $elFilterResultArea.show();
-                $elFilerSearchBtn.show();
-            }
-        });
-        
-        // [二次筛选区域] 关闭按钮：关闭二次筛选区域
-        $('#btn-filter-close').on('click', function() {
-            $elFilterArea.slideUp();
-            $elFilterOperateBtn.removeClass('up');
-        });
-
-
-        //——————————————————————————————————————————
-        // [二次筛选区域] 省市区县联动下拉
-        var $districtRelatedNode = { "province": "#f-province", "city": "#f-city", "county": "#f-county"}
-		// 省份下拉
-		$('#f-province').neuiDropdown({
-			react: true,
-			region: 'province',
-			relatedNode: $districtRelatedNode, // 联动关联节点
-			id: '350000', // 选择框默认值（隐藏的ID等键值)（可缺省）
-			value: '福建省', // 选择框默认值（显示值）（可缺省）
-			showCloseButton: false,
-            beautifyScrollBar: false // 是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式
-		});
-	
-		// [二次筛选区域] 城市下拉
-		$('#f-city').neuiDropdown({
-			react: true,
-			region: 'city',
-			relatedNode: $districtRelatedNode,
-			id: '350500', 
-			value: '泉州市',
-			showCloseButton: false,
-            beautifyScrollBar: false
-		});
-	
-		// [二次筛选区域] 区县下拉
-		$('#f-county').neuiDropdown({
-			react: true,
-			region: 'county',
-			relatedNode: $districtRelatedNode,
-			id: '350503', 
-			value: '丰泽区',
-			showCloseButton: false,
-            beautifyScrollBar: false,
-            callBack: function(e){
-                // console.log('value：', e);
-                fn_add_one_area();
-            }
-		});
-
-
-
-        //——————————————————————————————————————————
-        // [二次筛选区域] 区县添加按钮
-        $('#btn-district-add').on('click', function() {
-            fn_add_one_area();
-        });
-
-        // 添加一个区县
-        function fn_add_one_area() {
-            var tmp_province = $('#f-province').val(),
-                tmp_city = $('#f-city').val(),
-                tmp_county = $('#f-county').val();
-            // 校验数据完整性
-            var tips = '';
-            if(tmp_province == '') tips += '省份、';
-            if(tmp_city == '') tips += '城市、';
-            if(tmp_county == '') tips += '区县、';
-            if(tips != '') {
-                neuiDialog.alert({
-                    popup: true,
-                    message: '请选择：' + tips.substring(0, tips.length - 1),
-                    buttons: ['确定']
-                })
-                return;
-            }
-            neui.showAnimate();
-            setTimeout(function() {
-
-                // 拼接
-                var all_name = tmp_province + '-' + tmp_city + '-' + tmp_county,
-                    full_name = tmp_city + tmp_county,
-                    short_name = tmp_county;
-                var html = [ 
-                    '<div class="bds__search_filter_form_group_result_list_one" data-all-name="' + all_name + '"  data-full-name="' + full_name + '" data-short-name="' + short_name + '">',
-                        '<input type="checkbox" checked disabled>',
-                        '<label>' + all_name + '</label>',
-                        '<button type="button" class="btn-district-del"> 移除区县 </button>',
-                    '</div>'
-                ].join('\r\n')
-                // 添加到最后面
-                var isExist = false; // 是否已存在
-                $elFilterResultListArea.children().each(function() {
-                    var text = $('label', this).text().toString().replace(/\s+/g, '');
-                    if(text == all_name) {
-                        isExist = true;
-                        return false;
-                    }
-                });
-                if(isExist == false) {
-                    $elFilterResultListArea.append(html);
-                    if($elFilterResultArea.is(':visible') == false) $elFilterResultArea.show();
-                    if($elFilerSearchBtn.is(':visible') == false) $elFilerSearchBtn.show();
-                }
-
-                neui.destroyAnimate();
-            }, 100);
-        }
-
-        
-        //——————————————————————————————————————————
-        // [二次筛选区域] 区县删除按钮：移除区县
-        $(document).on('click', '.btn-district-del', function(){
-            $(this).parent().remove();
-            if($elFilterResultListArea.children().length == 0) {
-                $elFilterResultArea.hide();
-                // $elFilerBtn.hide();
-            }
-        });
-
-
-
-
-
-        //——————————————————————————————————————————
-        //      筛选查询区域
+        //          查询按钮区域
         //——————————————————————————————————————————
         //——————————————————————————————————————————
-        // 全局顶层缓存与公共方法，脱离查询按钮内部，查询、筛选共用
-        var rawAllPois = []; // 原始全量POI缓存，仅点击查询时重置，独立筛选按钮读取此数据
-        var boundsCache = {}; // 方案2区县边界全局缓存，跨查询/筛选复用
-        var wordArrGlobal = []; // 保存当前查询关键词配置，筛选渲染文案用
-
-        //——————————————————————————————————————————
-        // =========================================
-        // [筛选查询区域] 确定筛选按钮
-        // =========================================
-        $('#btn-filter-confirm').on('click', function(){
-            var filterDistrictArr = [];
-            $elFilterResultListArea.children().each(function() {
-                var all_name = $(this).attr('data-all-name'),
-                    full_name = $(this).attr('data-full-name'),
-                    short_name = $(this).attr('data-short-name');
-                filterDistrictArr.push({
-                    "allName": all_name,
-                    "fullName": full_name,
-                    "shortName": short_name
-                })
-            });
-            fn_done_filter(filterDistrictArr);
-        });
-
-
-        /**
-         * [筛选查询区域] 执行筛选操作
-         * @param {Array} ps_filter_district_arr 待筛选区县数组，空数组表示展示全部。格式：[{fullName:"城市区县",shortName:"区县"}]。eg. [{fullName:"泉州市丰泽区",shortName:"丰泽区"}]
-         */
-        function fn_done_filter(ps_filter_district_arr) {
-            // console.log('筛选区县数组：', ps_filter_district_arr);
-            if(rawAllPois.length === 0){
-                neuiDialog.alert({
-                    animate: true,
-                    message: "暂无数据，请先点击【查询按钮】加载数据",
-                    buttons:['确定']
-                });
-                return;
-            }
-            $elFilterArea.slideUp(); // 隐藏二次筛选区域
-            $elFilterOperateBtn.removeClass('up');
-
-            // 展示“筛选区县”区域
-            var districtHtml = '';
-            for(var i = 0; i < ps_filter_district_arr.length; i++) {
-                var item = ps_filter_district_arr[i];
-                districtHtml += [
-                    '<li>' + item["allName"] + '</li>'
-                ].join('\r\n')
-            }
-            if(districtHtml != '') {
-                $('.bds__search_prepare_block.block__district').show();
-                $('.bds__search_prepare_some').empty().append(districtHtml);
-            }
-            else {
-                $('.bds__search_prepare_block.block__district').hide();
-            }
-
-            // 修复：清理冗余边界缓存，只保留本次筛选需要的区县边界，删除历史残留
-            var tempCache = {};
-            for(var i = 0; i < ps_filter_district_arr.length; i++){
-                var sName = ps_filter_district_arr[i].shortName;
-                if(boundsCache[sName]){
-                    tempCache[sName] = boundsCache[sName];
-                }
-            }
-            boundsCache = tempCache; // 覆盖全局缓存，清除无关旧区县
-
-            // 根据取数方案进行筛选
-            if(IS_USE_WEB_API){
-                // 方案1 WebAPI专属逻辑：无边界逻辑，直接过滤渲染
-                // console.log('aaa1');
-                var filterRes = buildViewData(rawAllPois, ps_filter_district_arr);
-                fnAddMarker(filterRes.allBdPointsByCate, filterRes.allBdPointsNotCate);
-                fnNearComposeStringToUser(filterRes.allPois, wordArrGlobal);
-                return;
-            }
-            
-            else {
-                
-                // 方案2：JSAPI专属逻辑
-                var boundary = new BMap.Boundary();
-                var needLoadDis = [];
-                for(var d = 0; d < ps_filter_district_arr.length; d++){
-                    var sName = ps_filter_district_arr[d].shortName;
-                    if(!boundsCache[sName]){
-                        needLoadDis.push(ps_filter_district_arr[d]);
-                    }
-                }
-
-                // 存在未缓存区县，异步加载边界后渲染
-                if(needLoadDis.length > 0){
-                    var loadCnt = 0;
-                    var totalLoad = needLoadDis.length;
-                    // console.log('aaa1');
-                    for(var l = 0; l < needLoadDis.length; l++){
-                        var disItem = needLoadDis[l];
-                        boundary.get(disItem.fullName, function(rs){
-                            loadCnt++;
-                            var pathStr = rs.boundaries[0];
-                            var pointArr = pathStr.split(";");
-                            var disBounds = null;
-                            for(var pIdx = 0; pIdx < pointArr.length; pIdx++){
-                                var lnglatStr = pointArr[pIdx].split(",");
-                                var pt = new BMap.Point(lnglatStr[0], lnglatStr[1]);
-                                if(disBounds == null){
-                                    disBounds = new BMap.Bounds(pt, pt);
-                                }else{
-                                    disBounds.extend(pt);
-                                }
-                            }
-                            var currShort = disItem.shortName;
-                            boundsCache[currShort] = disBounds;
-                            if(loadCnt === totalLoad){
-                                var res = buildViewData(rawAllPois, ps_filter_district_arr);
-                                fnAddMarker(res.allBdPointsByCate, res.allBdPointsNotCate);
-                                fnNearComposeStringToUser(res.allPois, wordArrGlobal);
-                            }
-                        });
-                    }
-                    return;
-                }
-
-                // 边界全部缓存完毕，直接渲染
-                // console.log('aaa2');
-                var filterRes = buildViewData(rawAllPois, ps_filter_district_arr);
-                fnAddMarker(filterRes.allBdPointsByCate, filterRes.allBdPointsNotCate);
-                fnNearComposeStringToUser(filterRes.allPois, wordArrGlobal);
-            }
-        }
-
-
-        //——————————————————————————————————————————
-        /**
-         * =========================================
-         * [筛选查询区域] 通用方法：根据原始全集 + 指定区县数组生成视图渲染数据
-         * =========================================
-         */
-        function buildViewData(sourceRawList, targetDistrictArr){
-            var viewPois = [];
-            var viewCatePoints = [];
-            var viewNoCatePoints = [];
-            if(!sourceRawList || sourceRawList.length === 0){
-                return {allPois:viewPois, allBdPointsByCate:viewCatePoints, allBdPointsNotCate:viewNoCatePoints};
-            }
-            // 区分方案1 WebAPI / 方案2 JSAPI 两套过滤规则
-            if(IS_USE_WEB_API){
-                // 方案1：依据接口返回 qu 字段匹配区县
-                for(var k = 0; k < sourceRawList.length; k++){
-                    var oneItem = sourceRawList[k];
-                    var newOne = {keyword:oneItem.keyword, isNeedGap:oneItem.isNeedGap, data:[]};
-                    var cateGroup = {keyword:oneItem.keyword, data:[]};
-                    var rawDataList = oneItem.data;
-                    for(var m = 0; m < rawDataList.length; m++){
-                        var poiItem = rawDataList[m];
-                        var pass = false;
-                        if(targetDistrictArr.length === 0){
-                            pass = true; // 无区县，全部放行
-                        }else{
-                            // 遍历本次筛选传入的区县数组匹配 qu 字段
-                            for(var n = 0; n < targetDistrictArr.length; n++){
-                                var disShort = targetDistrictArr[n].shortName;
-                                if(poiItem.qu === disShort){
-                                    pass = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if(pass){
-                            newOne.data.push(poiItem);
-                            cateGroup.data.push({
-                                "title": poiItem.title,
-                                "point": poiItem.point,
-                                "address": poiItem.address,
-                                "distance": poiItem.distance,
-                                "phoneNumber": poiItem.phoneNumber
-                            });
-                            viewNoCatePoints.push(poiItem.point);
-                        }
-                    }
-                    viewPois.push(newOne);
-                    viewCatePoints.push(cateGroup);
-                }
-            }else{
-                // 方案2：仅循环【本次传入的筛选区县数组】，不再遍历全部缓存边界（修复核心bug）
-                for(var k = 0; k < sourceRawList.length; k++){
-                    var oneItem = sourceRawList[k];
-                    var newOne = {keyword:oneItem.keyword, isNeedGap:oneItem.isNeedGap, data:[]};
-                    var cateGroup = {keyword:oneItem.keyword, data:[]};
-                    var rawDataList = oneItem.data;
-                    for(var m = 0; m < rawDataList.length; m++){
-                        var outcome = rawDataList[m];
-                        var p = outcome.point;
-                        var address = typeof outcome.address == 'undefined' ? '' : outcome.address;
-                        var passFilter = false;
-                        if(targetDistrictArr.length === 0){
-                            passFilter = true; // 无勾选区县，不做过滤全部放行
-                        }else{
-                            // 只循环当前筛选传入的区县，而非全部缓存边界
-                            for(var n = 0; n < targetDistrictArr.length; n++){
-                                var disShortName = targetDistrictArr[n].shortName;
-                                var disBounds = boundsCache[disShortName];
-                                if(!disBounds) continue;
-                                var pointInDis = disBounds.containsPoint(p); // 条件1：POI坐标落在区县矩形边界内
-                                var addrMatch = address.indexOf(disShortName) > -1;  // 条件2：POI地址包含区县短名，兜底坐标误差
-                                if(pointInDis && addrMatch){
-                                    passFilter = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if(passFilter){
-                            newOne.data.push(outcome);
-                            cateGroup.data.push({
-                                "title": outcome.title,
-                                "point": p,
-                                "address": address,
-                                "distance": outcome.distance,
-                                "phoneNumber": outcome.phoneNumber
-                            });
-                            viewNoCatePoints.push(p);
-                        }
-                    }
-                    viewPois.push(newOne);
-                    viewCatePoints.push(cateGroup);
-                }
-            }
-            return {
-                allPois: viewPois,
-                allBdPointsByCate: viewCatePoints,
-                allBdPointsNotCate: viewNoCatePoints
+        // IE9兼容：兜底Date.now
+        if (!Date.now) {
+            Date.now = function () {
+                return new Date().getTime();
             };
         }
 
-
-
         //——————————————————————————————————————————
-        // =========================================
-        // [筛选查询区域] 查询按钮
-        // =========================================
+        // 查询按钮
         $('#btn-query').on('click', function(){
-            $elFilterArea.slideUp(); // 隐藏二次筛选区域
-            $elFilterOperateBtn.removeClass('up');
             // 按钮置灰，禁止重复点击
             var $queryBtn = $(this);
             $queryBtn.prop('disabled', true);
+
             var zuobiao = $('#c-locate').val(), // 坐标
                 xiaoqu_mingcheng = filter.dangerousChars($('#s-community').val()),
                 projectList = filter.dangerousChars($('#s-near').val()); // 附近项目
@@ -2508,12 +2080,14 @@
                 var oldStr = $('#s-near').attr('data-word'); // 取 data-word 属性值。附近项目输入框取值
                 if(typeof oldStr == 'undefined') oldStr = '';
                 var oldArr = oldStr.toString().replace(/\s+/g, '') == '' ? [] : JSON.parse(oldStr);
+                // console.log('oldStr：', oldStr, '\noldArr：', oldArr);
                 for (var i = 0; i < oldArr.length; i++) {
                     var item = oldArr[i];
                     for (var j = 0; j < item.data.length; j++) {
                         item.data[j].distance = unifyRadius;
                     }
                 }
+                // console.log('oldArr：', oldArr)
                 // 更新 data-word 属性值
                 $('#s-near').attr('data-word', JSON.stringify(oldArr));  // 设 data-word 属性值。附近项目输入框赋值 
             }
@@ -2521,7 +2095,6 @@
             // 取值
             var wordStr = $('#s-near').attr('data-word'); // 取 data-word 属性值。附近项目输入框取值
             var wordArr = wordStr.toString().replace(/\s+/g, '') === '' ? [] : JSON.parse(wordStr);
-            wordArrGlobal = wordArr; // 存入全局，供独立筛选按钮渲染文案
             var projectArr = []; // 关键词。数组格式
             for (var i = 0; i < wordArr.length; i++) {
                 var item = wordArr[i];
@@ -2530,11 +2103,10 @@
                 }
             }
             var isMoreThanOneKey = projectArr.length > 0 ? true : false; // 关键是否>=1个
+            // console.log('wordArr：', wordArr, '\nprojectArr：', projectArr, '\nprojectList：', projectList);
 
-            // 每次查询清空全局原始缓存与边界缓存
-            rawAllPois = []; // 重置全量原始缓存
-            boundsCache = {}; // 清空区县边界缓存
-            var allPois = [], // 所有POI点（视图渲染用）
+            // 开始执行
+            var allPois = [], // 所有POI点
                 allBdPointsByCate = [], // 点坐标集合(有分类)
                 allBdPointsNotCate = []; // 点坐标集合(无分类)
             neui.showAnimate();
@@ -2547,31 +2119,21 @@
                     isFinishExec = false; // 标记收尾逻辑是否已执行，防止重复执行
                 var currSliceStart = Date.now(), // 当前时间窗口起始时间戳
                     sliceExecCount = 0; // 当前时间窗口内已发起的请求个数
-                var queryDistrictArr = []; // 查询直筛区县数组，原有查询直接过滤逻辑保留
-                var boundary = new BMap.Boundary(); // 方案2边界实例
-
-                // 统一收尾处理：恢复按钮+执行最终视图过滤渲染
+                // 统一收尾处理：恢复按钮+执行最终逻辑
                 function handleAllFinish(){
                     if(isFinishExec) return;
                     isFinishExec = true;
-                    // 根据查询直筛数组生成页面视图
-                    var viewResult = buildViewData(rawAllPois, queryDistrictArr);
-                    allPois = viewResult.allPois;
-                    allBdPointsByCate = viewResult.allBdPointsByCate;
-                    allBdPointsNotCate = viewResult.allBdPointsNotCate;
                     // 统一处理最终结果
                     $queryBtn.prop('disabled', false); // 恢复查询按钮可用
                     fnSaveSearchWordRecord(projectArr); // 保存查询的关键词，方便用户下次打开使用它们直接进行查询
                     fnAddMarker(allBdPointsByCate, allBdPointsNotCate);
-                    fnNearComposeStringToUser(allPois, wordArrGlobal);
+                    fnNearComposeStringToUser(allPois, wordArr);
+                    // console.log('allBdPointsByCate：', allBdPointsByCate, '\nallBdPointsNotCate：', allBdPointsNotCate);
                     neui.destroyAnimate();
                 }
 
-                // 根据取数方案进行查询
                 if(IS_USE_WEB_API) {
-                    // =======================================================
                     // 方案1：从后台取数据(使用百度地图服务端版api，即web api)
-                    // =======================================================
                     if(isMoreThanOneKey) {
                         // 所有任务先入队列
                         for(var q = 0; q < projectArr.length; q++){
@@ -2605,6 +2167,7 @@
                                 sliceExecCount++;
                                 doingCount++;
                                 var task = taskQueue.shift();
+                                // console.log('task:', task);
                                 var row = task.row;
                                 var ls_zuobiao = task.zuobiao;
                                 var ls_guanjianzi_mc = row["keyword"],
@@ -2614,6 +2177,7 @@
                                 if(isTickRadius) { // 有勾选统一半径复选框时，统一为指定的半径
                                     ls_juli_fanwei_mi = task.unifyRadius;
                                 }
+                                // console.log('ls_guanjianzi_mc：', ls_guanjianzi_mc, '\n坐标：', ls_zuobiao, '\n距离范围：', ls_juli_fanwei_mi);
 
                                 var loopIndex = allBdPointsByCate.length;
                                 allBdPointsByCate.push({
@@ -2630,7 +2194,9 @@
                                     "zuobiao": ls_zuobiao,
                                     "juli_fanwei_mi": ls_juli_fanwei_mi
                                 }
+                                // console.log('ls_data：', ls_data);
 
+                                // 后台返回 ajax({})
                                 var outcomeData = { data: [] }
                                 // START AJAX
                                 var response = Ajax({
@@ -2645,40 +2211,58 @@
                                         outcomeData = JSON.parse(res);
 
                                         var one = { keyword: ls_guanjianzi_mc, isNeedGap: ls_zhongyao_changsuo_dai_julidizhi, data: []}
+                                        var listHtml = ''; // 在地图上手动打点 -> 拼接列表1
+                                        // IE9 兼容：替换 forEach 为原生for
                                         var dataArr = outcomeData.data;
                                         for(var d = 0; d < dataArr.length; d++){
                                             var item = dataArr[d];
+                                            // console.log('item：', item)
                                             var zuobiao = item.zuobiao,
                                                 title = item.name,
                                                 address = typeof item.address == 'undefined' ? '' : item.address,
                                                 distance = typeof item.juli_mi == 'undefined' ? '' : item.juli_mi,
                                                 phoneNumber = typeof item.telephone == 'undefined' ? '' : item.telephone,
                                                 sheng = item.sheng,
-                                                shi = item.shi,
-                                                qu = item.qu;
+                                                shi = item.shi;
                                             var arr = zuobiao.split(','),
                                                 lng = arr.length > 0 ? arr[0] : '',
                                                 lat = arr.length > 1 ? arr[1] : '';
                                             var point = new BMap.Point(lng, lat);
-                                            var rawItem = {
+                                            one.data.push({
                                                 title: title,
                                                 point: point,
                                                 address: address,
                                                 distance: distance,
                                                 phoneNumber: phoneNumber,
                                                 province: sheng,
-                                                city: shi,
-                                                qu: qu
-                                            };
-                                            one.data.push(rawItem); // 存入当前关键词分组
+                                                city: shi
+                                            });
+
+                                            allBdPointsByCate[loopIndex]["data"].push({
+                                                "title": title,
+                                                "point": point,
+                                                "address": address,
+                                                "distance": distance,
+                                                "phoneNumber": phoneNumber
+                                            });
+                                            allBdPointsNotCate.push(point);
                                         }
-                                        rawAllPois.push(one); // 存入全局原始缓存，完整保留所有数据
+
+                                        allPois.push(one);
+                                        // console.log('allPois：', allPois)
+
+                                        // 在地图上手动打点
+                                        // console.log('所有POI点：', allPois)
+                                        // console.log('所有坐标点：', allBdPointsNotCate)
+                                        // fnAddMarker(allBdPointsByCate, allBdPointsNotCate);
                                     },
                                     error: function(errs){ },
                                     beforeSend: function(xhr){ },
                                     complete: function(xhr, status){
                                         finishCount++;
                                         doingCount--;
+                                        // 异步正确读取插件标准化网络错误 test2
+                                        // 网络、HTTP错误(断网、404、500、超时等)
                                         var reqState = response._reqResult;
                                         if (typeof reqState != 'undefined' && !reqState.isHttpSuccess) {
                                             var errInfo = reqState.standardErr;
@@ -2688,36 +2272,32 @@
                                                 buttons: ['确定']
                                             });
                                         }
-                                        runTask(); // 继续调度下一个任务
+
+                                        // 继续调度下一个任务
+                                        runTask();
                                     }
                                 })
                                 // END AJAX
-                            } else {
+    
+                            } else { 
                                 var delayTime = TIME_SLICE - (now - currSliceStart); // 窗口名额用尽，计算延时并执行
                                 if(delayTime <= 0) delayTime = 10; // 修复临界值：延时小于等于0则设为最小间隔
+                                // console.log('delayTime：', delayTime, '\nnow：', now, '\ncurrSliceStart：', currSliceStart, '\n相减：', (now - currSliceStart));
+                                // console.log('-------------------')
                                 setTimeout(runTask, delayTime);
                             }
                         }
+                        // 启动队列执行
                         runTask();
                     }
                 }
                 else {
-                    // =======================================================
                     // 方案2：从前端直接取数据(使用百度地图浏览器版api，即js api)
-                    // =======================================================
                     var pagesize = 100; // 每页容量
                     var coordinateArr = zuobiao.split(',');
                     var coordinateLng = coordinateArr[0],
                         coordinateLat = coordinateArr[1];
                     var point = new BMap.Point(coordinateLng, coordinateLat); // 中心点
-
-                    // 多区县配置：空数组表示不限制，非空数组将过滤掉不在配置中的数据
-                    queryDistrictArr = [
-                        // { fullName: "泉州市丰泽区", shortName: "丰泽区" },
-                        // { fullName: "泉州市晋江市", shortName: "晋江市" }
-                    ];
-                    var loadedDistrictCount = 0; // 已完成边界加载的区县计数
-                    var totalDistrictCount = queryDistrictArr.length;
 
                     // 任务入队
                     for(var q = 0; q < projectArr.length; q++){
@@ -2726,106 +2306,126 @@
 
                     // 队列调度函数
                     function runSearch(){
+                        // 优先判断：是否跨时间窗口，跨窗口则重置计数与起始时间
                         var now = Date.now();
                         if (now - currSliceStart >= TIME_SLICE) {
                             currSliceStart = now;
                             sliceExecCount = 0;
                         }
+
                         if (doingCount >= MAX_CONCURRENT || taskQueue.length === 0) {
+                            // 队列为空且无活跃请求，执行收尾
                             if(taskQueue.length === 0 && doingCount === 0){
                                 handleAllFinish();
                             }
                             return;
                         }
+
+                        // 当前窗口有剩余名额，立即执行任务
                         if (sliceExecCount < MAX_CONCURRENT) {
                             sliceExecCount++;
                             doingCount++;
                             var currentItem = taskQueue.shift();
+
+                            // 因为 BMap.LocalSearch 是异步，故要创建闭包，锁定当前循环的 item，不然循环会乱套
                             (function(item){
                                 var isNeedGap = item["widthDistance"];
-                                var keys = item["keyword"],
-                                    radius = item["distance"];
+                                var keys = item["keyword"], // 关键词
+                                    radius = item["distance"]; // 半径
+                                // console.log('关键词-x：', keys, '\n半径-x：', radius);
+
                                 var loopIndex = allBdPointsByCate.length;
                                 allBdPointsByCate.push({
                                     "keyword": keys,
                                     "data": []
                                 });
-                                var local = new BMap.LocalSearch(point, {});
-                                local.setPageCapacity(pagesize);
-                                local.setSearchCompleteCallback(function(results){
-                                    var status = local.getStatus();
-                                    if(status !== BMAP_STATUS_SUCCESS) {
-                                        zeroCount++;
-                                    }
-                                    var outcomes = Array.isArray(results) ? results : [ results ];
-                                    for(var i = 0; i < outcomes.length; i++) {
-                                        var poi = outcomes[i];
-                                        var keyword = poi.keyword,
-                                            total = poi.getNumPois();
-                                        var oneRaw = { keyword: keyword, isNeedGap: isNeedGap, data: []}
-                                        for (var j = 0; j < total; j++) {
-                                            var outcome = poi.getPoi(j);
-                                            if(typeof outcome != 'undefined') {
-                                                var p = outcome.point,
-                                                    address = typeof outcome.address == 'undefined' ? '' : outcome.address;
-                                                var distance = fnCalculateDistance(coordinateLng, coordinateLat, p.lng, p.lat);
-                                                outcome.distance = distance; // 给原始POI挂载距离字段，修复下标不存在报错
-                                                oneRaw.data.push(outcome); // 原始数据全部存入，不做过滤
+
+                                var local = new BMap.LocalSearch(point, {
+                                    // 在地图上自动打点。for循环多个关键词时，这个有毛病
+                                    // renderOptions: {
+                                    //     map: map, // 展现结果的地图实例。当指定此参数后，搜索结果的标注、线路等均会自动添加到此地图上
+                                    //     autoViewport: true, // 检索结束后是否自动调整地图视野。此属性对LocalCity无效
+                                    //     // 百度地图自带 panel 的点击联动地图标点
+                                    //     panel: resultId, // String | HTMLElement 结果列表的HTML容器id或容器元素，提供此参数后，结果列表将在此容器中进行展示。此属性对LocalCity无效。驾车路线规划无效
+                                    //     // selectFirstResult: false, // 是否选择第一个检索结果。此属性仅对LocalSearch有效
+                                    // },
+                                    pageCapacity: pagesize, // 设置每页容量，取值范围：1 - 100，对于多关键词检索，容量表示每个关键词的数量，如果有2个关键词，则实际检索结果数量范围为：2 - 100
+                                    onSearchComplete: function(results){  // 检索完成后的回调函数。 参数：results：LocalResult或Array 如果是多关键词检索，回调函数参数返回一个LocalResult的数组，数组中的顺序和检索结果一致
+                                        var status = local.getStatus();
+                                        // console.log('关键词-y：', keys, '\n半径-y：', radius, '\nlocal：', local, '\nstatus：', status);
+                                        // console.log('周边返回结果：', results); 
+                                        if(status !== 0) {
+                                            zeroCount++;
+                                        }
+
+                                        var outcomes = Array.isArray(results) ? results : [ results ];
+                                        for(var i = 0; i < outcomes.length; i++) {
+                                            var poi = outcomes[i];
+                                            // console.log('poi：', poi)
+                                            var keyword = poi.keyword,
+                                                total = poi.getNumPois();
+                                            var one = { keyword: keyword, isNeedGap: isNeedGap, data: []}
+                                            var listHtml = ''; // 在地图上手动打点 -> 拼接列表1
+                                            for (var j = 0; j < total; j++) {
+                                                var outcome = poi.getPoi(j);
+                                                // console.log('outcome：', outcome)
+                                                one.data.push(outcome);
+                                                if(typeof outcome != 'undefined') {
+                                                    var p = outcome.point, 
+                                                        title = outcome.title,
+                                                        address = typeof outcome.address == 'undefined' ? '' : outcome.address,
+                                                        phoneNumber = typeof outcome.phoneNumber == 'undefined' ? '' : outcome.phoneNumber;
+                                                    var distance = fnCalculateDistance(coordinateLng, coordinateLat, p.lng, p.lat);
+
+                                                    one.data[j]["distance"] = distance; // one 加一个 distance 属性
+
+                                                    allBdPointsByCate[loopIndex]["data"].push({
+                                                        "title": title,
+                                                        "point": p,
+                                                        "address": address,
+                                                        "distance": distance,
+                                                        "phoneNumber": phoneNumber
+                                                    });
+                                                    allBdPointsNotCate.push(p);
+                                                }
                                             }
+
+                                            allPois.push(one);
                                         }
-                                        rawAllPois.push(oneRaw); // 存入全局完整原始缓存
-                                    }
-                                    finishCount++;
-                                    doingCount--;
-                                    if(finishCount === totalCount){
-                                        if(zeroCount == totalCount) {
-                                            var tip = '抱歉，没有到有找到关键词【' + projectList + '】对应的结果'; // 当前结果集无POI数据
-                                            console.log(tip);
+
+                                        finishCount++;
+                                        doingCount--;
+
+                                        // 全部检索完成提示
+                                        if(finishCount === totalCount){
+                                            if(zeroCount == totalCount) {
+                                                var tip = '抱歉，没有到有找到关键词【' + projectList + '】对应的结果'; // 当前结果集无POI数据
+                                                console.log(tip);
+                                            }
+                                            // fnAddMarker(allBdPointsByCate, allBdPointsNotCate);
                                         }
+                                        runSearch(); // 继续下一个任务
                                     }
-                                    runSearch();
                                 });
-                                local.searchNearby(keys, point, radius);
+                                local.searchNearby(keys, point, radius);  // 单个关键词单独指定半径
+                                local.setPageCapacity(pagesize); // 设置每页容量
                             })(currentItem);
                         } else {
-                            var delayTime = TIME_SLICE - (now - currSliceStart);
-                            if(delayTime <= 0) delayTime = 10;
+                            var delayTime = TIME_SLICE - (now - currSliceStart); // 窗口名额用尽，计算延时并执行
+                            if(delayTime <= 0) delayTime = 10; // 修复临界值：延时小于等于0则设为最小间隔
+                            // console.log('delayTime：', delayTime, '\nnow：', now, '\ncurrSliceStart：', currSliceStart, '\n相减：', (now - currSliceStart));
+                            // console.log('-------------------')
                             setTimeout(runSearch, delayTime);
                         }
                     }
-
-                    // 前置加载所有区县边界，全部加载完成后启动关键词检索队列
-                    for(var disIdx = 0; disIdx < queryDistrictArr.length; disIdx++){
-                        var disItem = queryDistrictArr[disIdx];
-                        boundary.get(disItem.fullName, function(rs){
-                            loadedDistrictCount = loadedDistrictCount + 1;
-                            var pathStr = rs.boundaries[0];
-                            var pointArr = pathStr.split(";");
-                            var disBounds = null;
-                            for(var pIdx = 0; pIdx < pointArr.length; pIdx++){
-                                var lnglatStr = pointArr[pIdx].split(",");
-                                var pt = new BMap.Point(lnglatStr[0], lnglatStr[1]);
-                                if(disBounds == null){
-                                    disBounds = new BMap.Bounds(pt, pt);
-                                }else{
-                                    disBounds.extend(pt);
-                                }
-                            }
-                            var currDisShort = queryDistrictArr[loadedDistrictCount - 1].shortName;
-                            boundsCache[currDisShort] = disBounds;
-                            if(loadedDistrictCount === totalDistrictCount){
-                                runSearch();
-                            }
-                        });
-                    }
-                    // 新增兜底：区县数组为空时边界循环不会执行，手动启动检索队列解决卡住无数据问题
-                    if(totalDistrictCount === 0){
-                        runSearch();
-                    }
+                    // 启动队列执行
+                    runSearch();
                 }
+
+                // fnSaveSearchWordRecord(projectArr); // 保存查询的关键词，方便用户下次打开使用它们直接进行查询
+                // neui.destroyAnimate();
             }, 100)
         });
-
 
 
 
@@ -3060,7 +2660,7 @@
                                 return _tmpHtml;
                             })(),
                             (function(){
-                                var _tmpHtml = phoneNumber == '' || typeof phoneNumber == 'undefined' ? '' : 
+                                var _tmpHtml = phoneNumber == '' ? '' : 
                                 [
                                     '<div class="result__detail">',
                                         '<div class="result__detail_one">',
@@ -3243,7 +2843,7 @@
 
         //——————————————————————————————————————————
         /**
-         * 创建“查询结果”、“保存结果”切片数据
+         * 创建切片数据
          * 即：根据百度地图附近关键词搜索结果返回的值组成用户所需的字符串
           【说明】
           组成字符串显示在界面上：
@@ -3312,26 +2912,23 @@
                 composeArr.push(oneStr);
                 savedArr.push(oneSaveObj);
             }
-
             // console.log('地点名称数组：', placeList, '\n结果组合数组：', composeArr, '\n要保存的数组：', savedArr);
             var serviceStr = '区域内有\r\n\r\n' + composeArr.join('');
             busStr = busStr == '' ? '' : ('\r\n出入可利用交通工具：\r\n出入可利用私家车、公交车、自行车及出租车等；周边有“' + busArr.join('、') + '”' + busArr.length + '个公交站点，公交线路如下：\r\n' + busStr);
-
             // 如果最后一个字符是分号则转化为句号
             var index = serviceStr.lastIndexOf('；'), length = serviceStr.length;
             if(index == length - 1) {
                 serviceStr = serviceStr.substring(0, index) + '。';
             }
 
-            // 创建“当前查询的关键字”列表
-            create_html_list_of_search_word(ps_keyword_data);
-            $('.bds__search_prepare').show(); // 显示列表
-            $('.bds__search_prepare_title').text('当前查询的关键字'); // 更改文字
-
-            // 创建“查询结果”切片数据：
+            // 结果输入到“查询结果”切片指定位置
             var resultStr = serviceStr + '\r\n' + busStr;
             $('#r-result').val(resultStr);
 
+            // 创建当前查询的关键字列表
+            create_html_list_of_search_word(ps_keyword_data);
+            $('.bds__search_prepare').show(); // 显示列表
+            $('.bds__search_prepare_title').text('当前查询的关键字'); // 更改文字
             // 创建“保存结果”切片数据
             create_html_list_of_saved({data: savedArr});
             $('#btn-save, #btn-show-hide-coord').show(); // 显示保存按钮

@@ -146,8 +146,13 @@ Mock.mock("../fwh_pub/jk_loupan_fujin.ashx?param=2001", "post", function(v){
         var result = {
             return: "ok",
             data: [
-                { "name": "丰泽区泉秀实验小学", "zuobiao": "118.60499,24.891375", "address": "福建省泉州市丰泽区泉秀街道浦西路18号x1", "telephone": "0595-230458103111", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"},
-                { "name": "泉州现代中学", "zuobiao": "118.602556,24.894243", "address": "泉州市丰泽区田安南路371号x2", "telephone": "", "sheng": "", "shi": "", "qu": "", "juli_mi": "1000"}
+                { "name": "丰泽区泉秀实验小学", "zuobiao": "118.60499,24.891375", "address": "福建省泉州市丰泽区泉秀街道浦西路18号x1", "telephone": "0595-230458103111", "sheng": "福建省", "shi": "泉州市", "qu": "丰泽区", "juli_mi": "1000"},
+                { "name": "泉州现代中学", "zuobiao": "118.602556,24.894243", "address": "泉州市丰泽区田安南路371号x2", "telephone": "", "sheng": "福建省", "shi": "泉州市", "qu": "丰泽区", "juli_mi": "1000"},
+
+                { "name": "泉州市晋江市溜滨中心小学", "zuobiao": "118.60097,24.873446", "address": "泉州市晋江市留滨路", "telephone": "", "sheng": "福建省", "shi": "泉州市", "qu": "晋江市", "juli_mi": "1000"},
+                { "name": "泉州市晋江市泉州师范学院第三附属小学(祟德校区)", "zuobiao": "118.594936,24.876128", "address": "泉州市晋江市江湾路", "telephone": "", "sheng": "福建省", "shi": "泉州市", "qu": "晋江市", "juli_mi": "1000"},
+                { "name": "泉州市晋江市泉州中远学校", "zuobiao": "118.5923,24.872251", "address": "泉州市晋江市凤池东路", "telephone": "", "sheng": "福建省", "shi": "泉州市", "qu": "晋江市", "juli_mi": "1000"}
+                
             ]
         }
 

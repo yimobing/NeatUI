@@ -3,7 +3,7 @@
 /**
 * 小工具 -> 百度周边清单
 * Date: 2025.12.21
-* Update: 2026.06.25
+* Update: 2026.06.29
 */
 /*+ --------  -------- +*/
 
@@ -111,7 +111,7 @@ button[type="button"][disabled] {
 	-o-flex: 1;
 	flex: 1;
 	width: 100%;
-    width: 53%\9;
+	width: 53%\9;
 	width: 53%\9\0;
 	height: 100%;
 	border-left: 1px solid #cac9c9;
@@ -287,6 +287,9 @@ button[type="button"][disabled] {
 	font-size: 16px;
 	display: none;
 }
+#panel-result2 {
+	overflow-y: auto;
+}
 .result__list {
 	counter-reset: groupCount; /* 初始化计数器 */
 }
@@ -461,9 +464,15 @@ button[type="button"][disabled] {
 .bds__search_form_btn {
     margin-left: 5px;
 }
+#btn-filter:before {
+	content: '↓↓'
+}
+#btn-filter.up:before {
+	content: '⬆️⬆️';
+}
 .bds__search_result {
     padding: 8px 8px;
-    border-top: 1px solid #e7e7e7;
+    border-top: 1px solid #cac9c9;
     text-align: center;
 }
 .bds__search_result_tab {
@@ -505,6 +514,7 @@ button[type="button"][disabled] {
 .bds__search_result_tab_one.on {
 	background-color: #fff;
 	border-bottom: 0;
+	font-size: 16px;
 	font-weight: 550;
 }
 .bds__search_result_outcome {
@@ -519,9 +529,9 @@ button[type="button"][disabled] {
 	border-radius: 0 0 4px 4px;
 }
 .bds__search_prepare {
-	width: 98%;
-	margin: 0 auto 5px auto;
-	border: 1px solid #ddd;
+	width: 100%;
+	margin: 5px auto 0 auto;
+	border-top: 1px solid #cac9c9;
 	border-radius: 2px;
 	text-align: left;
 }
@@ -529,11 +539,14 @@ button[type="button"][disabled] {
 	padding: 4px 8px;
 }
 .bds__search_prepare_title {
-	padding: 2px 8px;
-	color: #555;
-	font-size: 14px;
-	font-weight: 550;
+	padding: 5px 8px;
+	background-color: #f5f5f5;
+	border-bottom: 1px solid #eaeaea;
+	color: #666;
+	font-size: 16px;
+	font-weight: bold;
 }
+
 .bds__search_prepare_list {
 }
 .bds__search_prepare_list li {
@@ -550,6 +563,49 @@ button[type="button"][disabled] {
 .bds__search_prepare_list li em {
 	margin-left: 2px;
 	color: #777;
+}
+
+.bds__search_prepare_subtitle {
+	padding: 4px 8px;
+	border-style: solid;
+	border-color: #eaeaea;
+	border-width: 1px 0 1px 0;
+	color: #5050ed;
+	font-size: 14px;
+	font-weight: 550;
+}
+.bds__search_prepare_subtitle:before {
+	content: '';
+	display: inline-block;
+	vertical-align: middle;
+	width: 8px;
+	height: 8px;
+	border-radius: 2px;
+	background-color: #5050ed;
+}
+.bds__search_prepare_some {
+	padding: 5px 5px 2px;
+}
+.bds__search_prepare_some:after,
+.bds__search_prepare_some ul:after {
+	content: '';
+	display: block;
+	clear: both;
+}
+.bds__search_prepare_some li {
+	float: left;
+	margin: 0 0 3px;
+	padding-left: 15px;
+	color: #8787e0;
+	font-size: 13px;
+}
+.bds__search_prepare_some li:before {
+	content: '、';
+	margin-left: -10px;
+}
+.bds__search_prepare_some li:first-child:before {
+	content: '';
+	margin-left: 0;
 }
 .bds__search_result_outcome_switch_operate {
 	position: absolute;
@@ -688,13 +744,17 @@ button[type="button"][disabled] {
 	margin-left: 10px;
 	margin-top: 2px;
 	text-align: left;
+	counter-reset: resultCount; /* 初始化计数器 */
 }
 .bds__search_result_outcome_switch_display_one_list input[type="text"],
 .bds__search_result_outcome_switch_display_one_list textarea {
 	width: 100%;
 	padding: 8px 10px;
 	border: 1px solid #9f9999;
+	border-color: #4e5eb7;
 	border-radius: 4px;
+	color: #313235;
+	font-size: 14px;
 }
 .bds__search_result_outcome_switch_display_one_list ul:after {
 	content: '';
@@ -706,16 +766,22 @@ button[type="button"][disabled] {
 	width: auto;
 	margin: 0 0px 3px 3px;
 	padding: 4px 8px;
-    background: transparent; /* 取消白底，和页面融为一体，减少色块压迫 */
-    border: 1px solid #eee; /* 极浅边框，几乎看不见分割线 */
+    background: transparent; 
+    border: 1px solid #eee;
     border-radius: 4px;
     font-size: 13px;
     line-height: 1.5;
-    color: #444; /* 更深的灰色，完全避开纯黑刺眼 */
+    color: #444;
     word-break: break-all;
     cursor: pointer;
-    box-shadow: none; /* 彻底删除阴影，减少视觉杂色 */
+    box-shadow: none;
     transition: border-color 0.2s;
+}
+.bds__search_result_outcome_switch_display_one_list li:before {
+	counter-increment: resultCount; /* 每次遇到时，计数器增加 */
+	content: counters(resultCount, "") "."; /* 使用计数器值，并添加前缀和分隔符 */
+	color: #888;
+	font-size: 12px;
 }
 .bds__search_result_outcome_switch_display_one_list li:nth-child(2n) {
 	background-color: #fff;
@@ -727,12 +793,196 @@ button[type="button"][disabled] {
 	border-color: #ccdfff;
 }
 .bds__search_result_outcome_switch_display_one_list li.on {
+	background: transparent;
 	border-color: #4088e0;
 	color: #4088e0;
-    background: transparent; /* 关键：去掉选中浅蓝底色，杜绝大片色块刺眼 */
+}
+
+.bds__search_result_outcome_switch_display_one_item.has-gap +
+.bds__search_result_outcome_switch_display_one_list input[type="text"],
+.bds__search_result_outcome_switch_display_one_item.has-gap +
+.bds__search_result_outcome_switch_display_one_list textarea {
+	border-color: #FF9800;
+}
+.bds__search_result_outcome_switch_display_one_item.has-gap +
+.bds__search_result_outcome_switch_display_one_list li.on {
+	border-color: #dcb781;
+	color: #bc7710;
 }
 
 
+/*+---------------- 二次筛选区域 ----------------+*/
+.bds__search_filter {
+	position: relative;
+	width: 100%;
+	margin: 5px auto 0 auto;
+	border-top: 1px solid #cac9c9;
+}
+.bds__search_filter_form {
+	
+}
+.bds__search_filter_form_group {
+	
+}
+.bds__search_filter_form_group_title,
+.bds__search_filter_form_group_performance {
+	padding: 5px 8px;
+}
+.bds__search_filter_form_group_title {
+	background-color: #f5f5f5;
+	border-bottom: 1px solid #eaeaea;
+	color: #666;
+	font-size: 16px;
+	font-weight: bold;
+}
+.bds__search_filter_form_group_performance {
+	margin-top: 5px;
+	border-bottom: 1px solid #eaeaea;
+}
+.bds__search_filter_form_group_performance_box {
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0 5px 5px;
+}
+.bds__search_filter_form_group_performance_box label {
+	color: #777;
+	font-size: 14px;
+}
+.bds__search_filter_form_group_performance_box label,
+.bds__search_filter_form_group_performance_box input[type="text"] {
+	display: inline-block;
+}
+.bds__search_filter_form_group_performance_box input[type="text"] {
+	width: 120px;
+	padding: 6px 16px;
+	border: 1px solid #eaeaea;
+	border-radius: 4px;
+}
+.bds__search_filter_form_group_result {
+	padding: 0!important;
+	border-style: solid;
+	border-color: #e1dfdf;
+	border-width: 0 0 1px 0;
+}
+.bds__search_filter_form_group_result_title {
+	padding: 3px 8px;
+	border-bottom: 1px solid #eaeaea;
+	color: #888;
+	font-size: 14px;
+	font-weight: 550;
+}
+.bds__search_filter_form_group_result_list_one {
+	position: relative;
+	padding: 0px 8px;
+	border-top: 1px solid #e1dfdf;
+}
+.bds__search_filter_form_group_result_list_one:first-child {
+	border-top: 0;
+}
+.bds__search_filter_form_group_result_list_one:hover {
+	background-color: #fbfbfb;
+}
+.bds__search_filter_form_group_result_list_one input[type="checkbox"] {
+	
+}
+.bds__search_filter_form_group_result_list_one > * {
+	display: inline-block;
+	vertical-align: middle;
+}
+.bds__search_filter_form_group_result_list_one label {
+	color: #777;
+	font-size: 14px;
+}
+.bds__search_filter_form_group_result_list_one button[type="button"] {
+	position: absolute;
+	z-index: 1;
+	left: 300px;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+	-moz-transform: translateY(-50%);
+	-o-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+	text-indent: -9999px;
+	width: 18px;
+	height: 18px;
+	background: #FF5722;
+	border-style: solid;
+	border-color: #ddd;
+	border-width: 0;
+	border-radius: 2px;
+	cursor: pointer;
+}
+.bds__search_filter_form_group_result_list_one button[type="button"]:before,
+.bds__search_filter_form_group_result_list_one button[type="button"]:after {
+	content: '';
+	position: absolute;
+	z-index: 1;
+	left: 8px;
+	top: 50%;
+	display: inline-block;
+	width: 1px;
+	height: 14px;
+	background-color: #fff;
+}
+.bds__search_filter_form_group_result_list_one button[type="button"]:before {
+	-webkit-transform: translateY(-50%) rotate(45deg);
+	-moz-transform: translateY(-50%) rotate(45deg);
+	-o-transform: translateY(-50%) rotate(45deg);
+	-ms-transform: translateY(-50%) rotate(45deg);
+	transform: translateY(-50%) rotate(45deg);
+}
+.bds__search_filter_form_group_result_list_one button[type="button"]:after {
+	-webkit-transform: translateY(-50%) rotate(-45deg);
+	-moz-transform: translateY(-50%) rotate(-45deg);
+	-o-transform: translateY(-50%) rotate(-45deg);
+	-ms-transform: translateY(-50%) rotate(-45deg);
+	transform: translateY(-50%) rotate(-45deg);
+}
+.bds__search_filter_form_group_result_list_one button[type="button"]:hover {
+	opacity: .6;
+	filter: alpha(opacity = 60);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity = 60);
+}
+.bds__search_filter_form_group_result_list_one button[type="button"]:hover:before,
+.bds__search_filter_form_group_result_list_one button[type="button"]:hover:after {
+	background-color: #fdeb1c;
+}
+.bds__search_filter_btn {
+	padding: 6px 10px;
+	text-align: right;
+}
+.bds__search_filter_btn button[type="button"] {
+	width: 100px;
+}
+.bds__search_filter_close {
+	
+}
+.bds__search_filter_close button[type="button"] {
+	position: absolute;
+	z-index: 1;
+	top: 0px;
+	right: 0px;
+	background: #9b6cec;
+	padding: 4px 8px;
+	border-style: solid;
+	border-color: #9b6cec;
+	border-width: 0 0 1px 1px;
+	border-radius: 0 0 0 8px;
+	color: #fff;
+	cursor: pointer;
+}
+.bds__search_filter_close button[type="button"]:hover {
+	opacity: .7;
+	filter: alpha(opacity = 70);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+}
+.bds__search_filter_close button[type="button"]:before {
+	
+}
+.bds__search_filter_close button[type="button"]:after {
+	
+}
 
 /*+---------------- 关键字下拉选择1 ----------------+*/
 .bds__search_form_box_drop {
@@ -1164,7 +1414,7 @@ button[type="button"][disabled] {
 /*+ -------- 媒体查询 -------- +*/
 @media screen and (max-width: 1600px) {
 	.bds__search_form_content {
-		width: 88%;
+		width: 78%;
 	}
 	.bds__search_form_box {
 		margin-left: 1px;
@@ -1198,7 +1448,7 @@ button[type="button"][disabled] {
 }
 @media screen and (max-width: 1400px) {
 	.bds__search_form_content {
-		width: 85%;
+		width: 75%;
 	}
 }
 
@@ -1237,7 +1487,7 @@ button[type="button"][disabled] {
 	    width: 45%;
 	}
 	.bds__search_form_content {
-		width: 82%;
+		width: 70%;
 	}
 }
 @media screen and (max-width: 1000px) {
@@ -1245,7 +1495,7 @@ button[type="button"][disabled] {
 	    width: 55%;
 	}
 	.bds__search_form_content {
-		width: 80%;
+		width: 65%;
 	}
 }
 @media screen and (max-width: 800px) {
