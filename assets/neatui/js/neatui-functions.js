@@ -1628,6 +1628,90 @@ var utilities = {
 
 
 
+
+    /**
+     * 获取去重后的地区分组数组
+     * 即：对省市区县数组进行去掉并分组，最后返回结构化的分组数据，返回格式： [{ province: "省份", data: [{city: "城市": data: [{ county: "区县"}]}] }]
+     * add 20260630-1
+     * @param {Array} list 原始省市区对象数组。格式参考示例
+     * @returns {Array} 返回 省->市->区县 嵌套结构化数组。格式参考示例
+     * [示例] eg. 
+        原始数组
+        var sourceArr = [
+            {"province": "福建省","city": "泉州市","county": "丰泽区"},
+            {"province": "福建省","city": "泉州市","county": "鲤城区"},
+            {"province": "福建省","city": "泉州市","county": "晋江市"},
+            {"province": "福建省","city": "泉州市","county": "晋江市"},
+            {"province": "福建省","city": "泉州市","county": "鲤城区"},
+            {"province": "福建省","city": "泉州市","county": "丰泽区"}
+        ];
+        var result = getAreaDistinctGroup(sourceArr);
+        最后得到的数组 result ： [ { "province": "福建省", "data": [ { "city": "泉州市", "data": [ { "county": "丰泽区" }, { "county": "鲤城区" }, { "county": "晋江市" } ] } ] } ]
+     */
+    getAreaDistinctGroup: function(list) {
+        var result = [];
+        // 省缓存key:省名称，值：省对象
+        var provinceMap = {};
+        if(this.isArray(list) == false) {
+            var tips = '函数：' + arguments.callee.name + '() 传入的参数不是数组格式，请检查！'
+            alert(tips);
+            return;
+        }
+        for (var i = 0; i < list.length; i++) {
+            var item = list[i];
+            var pName = item.province;
+            var cName = item.city;
+            var countyName = item.county;
+
+            // 1. 处理省份，不存在则新增省份节点
+            if (!provinceMap[pName]) {
+                var provinceNode = {
+                    province: pName,
+                    data: []
+                };
+                provinceMap[pName] = provinceNode;
+                result.push(provinceNode);
+            }
+            var currProvince = provinceMap[pName];
+
+            // 2. 查找当前省下对应城市，带缓存快速匹配
+            var cityNode = null;
+            var cityMap = {};
+            // 构建当前省下城市缓存
+            for (var m = 0; m < currProvince.data.length; m++) {
+                var tempCity = currProvince.data[m];
+                cityMap[tempCity.city] = tempCity;
+            }
+            // 城市不存在则新建
+            if (!cityMap[cName]) {
+                cityNode = {
+                    city: cName,
+                    data: []
+                };
+                currProvince.data.push(cityNode);
+            } else {
+                cityNode = cityMap[cName];
+            }
+
+            // 3. 区县去重
+            var hasCounty = false;
+            for (var n = 0; n < cityNode.data.length; n++) {
+                if (cityNode.data[n].county === countyName) {
+                    hasCounty = true;
+                    break;
+                }
+            }
+            if (!hasCounty && countyName.toString().replace(/\s+/g, '') !== '') {
+                cityNode.data.push({
+                    county: countyName
+                });
+            }
+        }
+        return result;
+    },
+
+
+
     /**
      * 提取电话号码，包括固话或手机号
      * 注：只提取第一次出现的电话号码
