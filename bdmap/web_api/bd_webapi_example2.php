@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <meta charset="utf-8">
-    <title>百度地图 web api 接口调试 test2（前后端不分离）</title>
+    <title> 百度地图 web api 接口调试 - 前后端不分离版 + 有表单版 </title>
     <style>
         * {
             box-sizing: border-box;
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="form-item">
                 <label>关键词 ：</label>
-                <input type="text" name="query" value="<?php echo htmlspecialchars($query, ENT_QUOTES); ?>">
+                <input type="text" name="query" value="<?php echo htmlspecialchars($query, ENT_QUOTES); ?>"  placeholder="请输入关键词">
             </div>
             <div class="form-item">
                 <label>半径(m) ：</label>

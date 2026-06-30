@@ -198,7 +198,7 @@
                     <div class="bds__search_prepare_list"></div>
                 </div>
                 <div class="bds__search_prepare_block block__district" style="display: none">
-                    <div class="bds__search_prepare_subtitle"> 筛选区县 </div>
+                    <div class="bds__search_prepare_subtitle"> 区县筛选 </div>
                     <div class="bds__search_prepare_some"></div>
                 </div>
             </div> <!--/.bds__search_prepare-->
@@ -253,7 +253,7 @@
     <script src="../../assets/neatui/js/neatui-dropdown.js"></script> <!-- 下拉 -->
     <script src="../../assets/neatui/js/neatui-dialog.js"></script> <!-- 对话框-->
     <script src="../../assets/neatui/js/neatui-bdmap.js"></script> <!-- 百度地图控件 -->
-    <script src="../../assets/neatui/js/neatui-functions.js?v=20260625-1"></script> <!-- 函数库 -->
+    <script src="../../assets/neatui/js/neatui-functions.js?v=20260630-1"></script> <!-- 函数库 -->
     <script src="../../assets/neatui/js/neatui-ajax-pro.js?v=20260622-1"></script> <!-- jq ajax 自定义封装-->
     <!-- mock 模拟数据 -->
     <script src="../../assets/lib/mock/mock-min.js"></script>
@@ -2085,7 +2085,7 @@
 
 
         //——————————————————————————————————————————
-        //          二次筛选区域
+        //          二次筛选区域（区县筛选区域）
         //——————————————————————————————————————————
         var $elFilterArea = $('.bds__search_filter'), // 筛选根节点
             $elFilterResultArea = $('.bds__search_filter_form_group_result'), // 筛选结果节点
@@ -2094,8 +2094,155 @@
             $elFilerSearchBtn = $('.bds__search_filter_btn'); // 筛选搜索按钮节点
 
         //——————————————————————————————————————————
+        // [二次筛选区域] 省市区县联动下拉
+        var $districtRelatedNode = { "province": "#f-province", "city": "#f-city", "county": "#f-county"}
+		// 省份下拉
+        $('#f-province').on('click', function(){
+            var areaData = { data: districtSearchDropGlobal }
+            // console.log('areaData：', areaData);
+            var isNotOneCounty = false; // 是否一个区县也没有，默认false
+            if(areaData.data.length == 1) {
+                var oneData = areaData.data[0];
+                if(oneData.data.length == 1) {
+                    var twoData = oneData.data[0];
+                    // console.log('twoData：', twoData)
+                    if(twoData.data.length == 0) isNotOneCounty = true;
+                }
+            }
+
+            neuiDropdown({
+                react: true,
+                region: 'province',
+                json: areaData.data.length == 0 || isNotOneCounty ? [] : areaData,
+                relatedNode: $districtRelatedNode, // 联动关联节点
+                // id: '350000', // 选择框默认值（隐藏的ID等键值)（可缺省）
+                // value: '福建省', // 选择框默认值（显示值）（可缺省）
+                showCloseButton: true,
+                beautifyScrollBar: false // 是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式
+            }, this);
+        });
+
+
+		
+		// [二次筛选区域] 城市下拉
+		$('#f-city').on('click', function() {
+            var areaData = { data: districtSearchDropGlobal }
+            // console.log('areaData：', areaData);
+            var isNotOneCounty = false; // 是否一个区县也没有，默认false
+            if(areaData.data.length == 1) {
+                var oneData = areaData.data[0];
+                if(oneData.data.length == 1) {
+                    var twoData = oneData.data[0];
+                    // console.log('twoData：', twoData)
+                    if(twoData.data.length == 0) isNotOneCounty = true;
+                }
+            }
+
+            neuiDropdown({
+                react: true,
+                region: 'city',
+                json: areaData.data.length == 0 || isNotOneCounty ? [] : areaData,
+                relatedNode: $districtRelatedNode,
+                // id: '350500', 
+                // value: '泉州市',
+                showCloseButton: true,
+                beautifyScrollBar: false
+            }, this); 
+        });
+	
+		// [二次筛选区域] 区县下拉
+		$('#f-county').on('click', function() {
+            var areaData = { data: districtSearchDropGlobal }
+            // console.log('areaData：', areaData);
+            var isNotOneCounty = false; // 是否一个区县也没有，默认false
+            if(areaData.data.length == 1) {
+                var oneData = areaData.data[0];
+                if(oneData.data.length == 1) {
+                    var twoData = oneData.data[0];
+                    // console.log('twoData：', twoData)
+                    if(twoData.data.length == 0) isNotOneCounty = true;
+                }
+            }
+            
+            neuiDropdown({
+                react: true,
+                region: 'county',
+                json: areaData.data.length == 0 || isNotOneCounty ? [] : areaData,
+                relatedNode: $districtRelatedNode,
+                // id: '350503', 
+                // value: '丰泽区',
+                showCloseButton: true,
+                beautifyScrollBar: false,
+                callBack: function(e){
+                    // console.log('value：', e);
+                    var ls_sheng = $('#f-province').val(),
+                        ls_shi = $('#f-city').val(),
+                        ls_qu = e.value;
+                    // 添加N个区县
+                    fn_add_some_area([{
+                        "province": ls_sheng,
+                        "city": ls_shi,
+                        "county": ls_qu
+                    }]);
+                }
+            }, this);
+        });
+
+        
+
+        //——————————————————————————————————————————
         // [二次筛选区域] 筛选数据按钮
         $elFilterOperateBtn.on('click', function() {
+            var clickTimes = $(this).attr('data-click-times');
+            if(typeof clickTimes == 'undefined') clickTimes = 0;
+            // · 给区县筛选区域赋值
+            if(parseInt(clickTimes) == 0) {
+                $(this).attr('data-click-times', 1); // 点击次数置为1
+                var ls_sheng = '', ls_shi = '', ls_qu = '';
+                var oldAreaArr = districtSearchDropGlobal,
+                    newAreaArr = [];
+                for(var i = 0; i < oldAreaArr.length; i++) {
+                    var item_one = oldAreaArr[i];
+                    var province = item_one["province"],
+                        oneData = item_one["data"];
+                    if(i == 0) ls_sheng = province;
+                    for(var j = 0; j < oneData.length; j++) {
+                        var item_two = oneData[j];
+                        var city = item_two["city"],
+                            twoData = item_two["data"];
+                        if(j == 0) ls_shi = city;
+                        for(var k = 0; k < twoData.length; k++) {
+                            var item_three = twoData[k];
+                            var county = item_three["county"];
+                            if(k == 0) ls_qu = county;
+                            if(province != '' && city != '' && county != '') {
+                                newAreaArr.push({
+                                    "province": province,
+                                    "city": city,
+                                    "county": county
+                                })
+                            }
+                        }
+                    }
+                }
+                // console.log('newAreaArr:', newAreaArr);
+                // 添加N个区县
+                if(newAreaArr.length > 0) {
+                    fn_add_some_area(newAreaArr);
+                }
+                else {
+                    $elFilterResultListArea.empty();
+                    $elFilterResultArea.hide();
+                    $elFilerSearchBtn.hide();
+                }
+
+                // 地区下拉赋默认值
+                $('#f-province').val(ls_sheng);
+                $('#f-city').val(ls_shi);
+                $('#f-county').val(ls_qu);
+            }
+
+            // · 展开
             if( $elFilterArea.is(':visible')) {
                 $elFilterArea.slideUp();
                 $(this).removeClass('up');
@@ -2104,10 +2251,15 @@
                 $elFilterArea.slideDown();
                 $(this).addClass('up');
             }
-
             if($elFilterResultListArea.children().length > 0) {
                 $elFilterResultArea.show();
                 $elFilerSearchBtn.show();
+            }
+            else { // 没有点“查询”按钮或坐标点返回的数据没有区县数据时
+                // 地区下拉赋默认值
+                $('#f-province').val('福建省');
+                $('#f-city').val('泉州市');
+                $('#f-county').val('丰泽区');
             }
         });
         
@@ -2118,56 +2270,10 @@
         });
 
 
-        //——————————————————————————————————————————
-        // [二次筛选区域] 省市区县联动下拉
-        var $districtRelatedNode = { "province": "#f-province", "city": "#f-city", "county": "#f-county"}
-		// 省份下拉
-		$('#f-province').neuiDropdown({
-			react: true,
-			region: 'province',
-			relatedNode: $districtRelatedNode, // 联动关联节点
-			id: '350000', // 选择框默认值（隐藏的ID等键值)（可缺省）
-			value: '福建省', // 选择框默认值（显示值）（可缺省）
-			showCloseButton: false,
-            beautifyScrollBar: false // 是否美化滚动条样式，默认true。 false时将使用传统的滚动条样式
-		});
-	
-		// [二次筛选区域] 城市下拉
-		$('#f-city').neuiDropdown({
-			react: true,
-			region: 'city',
-			relatedNode: $districtRelatedNode,
-			id: '350500', 
-			value: '泉州市',
-			showCloseButton: false,
-            beautifyScrollBar: false
-		});
-	
-		// [二次筛选区域] 区县下拉
-		$('#f-county').neuiDropdown({
-			react: true,
-			region: 'county',
-			relatedNode: $districtRelatedNode,
-			id: '350503', 
-			value: '丰泽区',
-			showCloseButton: false,
-            beautifyScrollBar: false,
-            callBack: function(e){
-                // console.log('value：', e);
-                fn_add_one_area();
-            }
-		});
-
-
 
         //——————————————————————————————————————————
         // [二次筛选区域] 区县添加按钮
         $('#btn-district-add').on('click', function() {
-            fn_add_one_area();
-        });
-
-        // 添加一个区县
-        function fn_add_one_area() {
             var tmp_province = $('#f-province').val(),
                 tmp_city = $('#f-city').val(),
                 tmp_county = $('#f-county').val();
@@ -2184,31 +2290,52 @@
                 })
                 return;
             }
+            fn_add_some_area([{
+                "province": tmp_province,
+                "city": tmp_city,
+                "county": tmp_county
+            }]);
+        });
+
+
+        /**
+         * 添加N个区县
+         * @param {Array} ps_area_arr 省市区县数组。eg. [{province: "省份", city: "城市", county: "区县"}]
+         */
+        function fn_add_some_area(ps_area_arr) {
             neui.showAnimate();
             setTimeout(function() {
-
-                // 拼接
-                var all_name = tmp_province + '-' + tmp_city + '-' + tmp_county,
-                    full_name = tmp_city + tmp_county,
-                    short_name = tmp_county;
-                var html = [ 
-                    '<div class="bds__search_filter_form_group_result_list_one" data-all-name="' + all_name + '"  data-full-name="' + full_name + '" data-short-name="' + short_name + '">',
-                        '<input type="checkbox" checked disabled>',
-                        '<label>' + all_name + '</label>',
-                        '<button type="button" class="btn-district-del"> 移除区县 </button>',
-                    '</div>'
-                ].join('\r\n')
-                // 添加到最后面
-                var isExist = false; // 是否已存在
-                $elFilterResultListArea.children().each(function() {
-                    var text = $('label', this).text().toString().replace(/\s+/g, '');
-                    if(text == all_name) {
-                        isExist = true;
-                        return false;
+                for(var i = 0; i < ps_area_arr.length; i++) {
+                    var item = ps_area_arr[i];
+                    var tmp_province = item["province"],
+                        tmp_city = item["city"],
+                        tmp_county = item["county"];
+                    // 拼接
+                    var all_name = tmp_province + '-' + tmp_city + '-' + tmp_county,
+                        full_name = tmp_city + tmp_county,
+                        short_name = tmp_county;
+                    var html = [ 
+                        '<div class="bds__search_filter_form_group_result_list_one" data-all-name="' + all_name + '"  data-full-name="' + full_name + '" data-short-name="' + short_name + '">',
+                            '<input type="checkbox" checked disabled>',
+                            '<label>' + all_name + '</label>',
+                            '<button type="button" class="btn-district-del"> 移除区县 </button>',
+                        '</div>'
+                    ].join('\r\n')
+                    // 添加到最后面
+                    var isExist = false; // 是否已存在
+                    $elFilterResultListArea.children().each(function() {
+                        var text = $('label', this).text().toString().replace(/\s+/g, '');
+                        if(text == all_name) {
+                            isExist = true;
+                            return false;
+                        }
+                    });
+                    if(isExist == false) {
+                        $elFilterResultListArea.append(html);
                     }
-                });
-                if(isExist == false) {
-                    $elFilterResultListArea.append(html);
+                }
+
+                if(ps_area_arr.length > 0) {
                     if($elFilterResultArea.is(':visible') == false) $elFilterResultArea.show();
                     if($elFilerSearchBtn.is(':visible') == false) $elFilerSearchBtn.show();
                 }
@@ -2240,6 +2367,7 @@
         var rawAllPois = []; // 原始全量POI缓存，仅点击查询时重置，独立筛选按钮读取此数据
         var boundsCache = {}; // 方案2区县边界全局缓存，跨查询/筛选复用
         var wordArrGlobal = []; // 保存当前查询关键词配置，筛选渲染文案用
+        var districtSearchDropGlobal = []; // 区县筛选地区下拉数组(查询后所有地区组成的数组)。格式： [{"value": "省份-城市-区县"}]
 
         //——————————————————————————————————————————
         // =========================================
@@ -2266,7 +2394,7 @@
          * @param {Array} ps_filter_district_arr 待筛选区县数组，空数组表示展示全部。格式：[{fullName:"城市区县",shortName:"区县"}]。eg. [{fullName:"泉州市丰泽区",shortName:"丰泽区"}]
          */
         function fn_done_filter(ps_filter_district_arr) {
-            // console.log('筛选区县数组：', ps_filter_district_arr);
+            // console.log('区县数组：', ps_filter_district_arr);
             if(rawAllPois.length === 0){
                 neuiDialog.alert({
                     animate: true,
@@ -2278,7 +2406,7 @@
             $elFilterArea.slideUp(); // 隐藏二次筛选区域
             $elFilterOperateBtn.removeClass('up');
 
-            // 展示“筛选区县”区域
+            // 展示查询关键词区县筛选区域
             var districtHtml = '';
             for(var i = 0; i < ps_filter_district_arr.length; i++) {
                 var item = ps_filter_district_arr[i];
@@ -2373,6 +2501,8 @@
          * =========================================
          * [筛选查询区域] 通用方法：根据原始全集 + 指定区县数组生成视图渲染数据
          * =========================================
+         * @param {Array} sourceRawList 原始全量POI缓存
+         * @param {Array} targetDistrictArr 指定区县数组。格式：[{fullName:"城市区县",shortName:"区县"}]。eg. [{fullName:"泉州市丰泽区",shortName:"丰泽区"}]
          */
         function buildViewData(sourceRawList, targetDistrictArr){
             var viewPois = [];
@@ -2398,7 +2528,7 @@
                             // 遍历本次筛选传入的区县数组匹配 qu 字段
                             for(var n = 0; n < targetDistrictArr.length; n++){
                                 var disShort = targetDistrictArr[n].shortName;
-                                if(poiItem.qu === disShort){
+                                if(poiItem["county"] === disShort){
                                     pass = true;
                                     break;
                                 }
@@ -2420,7 +2550,7 @@
                     viewCatePoints.push(cateGroup);
                 }
             }else{
-                // 方案2：仅循环【本次传入的筛选区县数组】，不再遍历全部缓存边界（修复核心bug）
+                // 方案2：仅循环【本次传入的区县数组】，不再遍历全部缓存边界（修复核心bug）
                 for(var k = 0; k < sourceRawList.length; k++){
                     var oneItem = sourceRawList[k];
                     var newOne = {keyword:oneItem.keyword, isNeedGap:oneItem.isNeedGap, data:[]};
@@ -2477,11 +2607,7 @@
         // [筛选查询区域] 查询按钮
         // =========================================
         $('#btn-query').on('click', function(){
-            $elFilterArea.slideUp(); // 隐藏二次筛选区域
-            $elFilterOperateBtn.removeClass('up');
-            // 按钮置灰，禁止重复点击
             var $queryBtn = $(this);
-            $queryBtn.prop('disabled', true);
             var zuobiao = $('#c-locate').val(), // 坐标
                 xiaoqu_mingcheng = filter.dangerousChars($('#s-community').val()),
                 projectList = filter.dangerousChars($('#s-near').val()); // 附近项目
@@ -2501,6 +2627,13 @@
                 $queryBtn.prop('disabled', false); // 校验失败，恢复按钮
                 return;
             }
+
+            // 界面状态操作
+            $elFilterArea.slideUp();
+            $elFilterOperateBtn.removeClass('up'); // 隐藏二次筛选区域
+            $queryBtn.prop('disabled', true); // 按钮置灰，禁止重复点击
+            $('#btn-filter').attr('data-click-times', 0); // “筛选数据”按钮点击次数重置为0
+            
 
             // 有勾选统一半径复选框时
             if(isTickRadius) {
@@ -2534,6 +2667,9 @@
             // 每次查询清空全局原始缓存与边界缓存
             rawAllPois = []; // 重置全量原始缓存
             boundsCache = {}; // 清空区县边界缓存
+            districtSearchDropGlobal = []; // 重置区县筛选地区下拉数组
+            
+            // 当前集合
             var allPois = [], // 所有POI点（视图渲染用）
                 allBdPointsByCate = [], // 点坐标集合(有分类)
                 allBdPointsNotCate = []; // 点坐标集合(无分类)
@@ -2552,14 +2688,24 @@
 
                 // 统一收尾处理：恢复按钮+执行最终视图过滤渲染
                 function handleAllFinish(){
+                    // console.log('rawAllPois：', rawAllPois);
                     if(isFinishExec) return;
                     isFinishExec = true;
+
                     // 根据查询直筛数组生成页面视图
                     var viewResult = buildViewData(rawAllPois, queryDistrictArr);
                     allPois = viewResult.allPois;
                     allBdPointsByCate = viewResult.allBdPointsByCate;
                     allBdPointsNotCate = viewResult.allBdPointsNotCate;
+
+                    // 区县筛选地区下拉数组去重
+                    var repeatedAreaArr = JSON.parse(JSON.stringify(districtSearchDropGlobal)),
+                        distinctAreaArr = utilities.getAreaDistinctGroup(repeatedAreaArr); // 获取去重后的地区分组数组
+                    // console.log('区县下拉数组去重前：', repeatedAreaArr, '\n区县下拉数组去重并分组后：', distinctAreaArr);
+                    districtSearchDropGlobal = distinctAreaArr; // 存入全局，供区县筛选地区下拉数组用
+
                     // 统一处理最终结果
+                    // console.log('projectArr：', projectArr);
                     $queryBtn.prop('disabled', false); // 恢复查询按钮可用
                     fnSaveSearchWordRecord(projectArr); // 保存查询的关键词，方便用户下次打开使用它们直接进行查询
                     fnAddMarker(allBdPointsByCate, allBdPointsNotCate);
@@ -2644,10 +2790,15 @@
                                         if(!res || $.isEmptyObject(res)) return;
                                         outcomeData = JSON.parse(res);
 
-                                        var one = { keyword: ls_guanjianzi_mc, isNeedGap: ls_zhongyao_changsuo_dai_julidizhi, data: []}
+                                        var oneRaw = { 
+                                            "keyword": ls_guanjianzi_mc, 
+                                            "isNeedGap": ls_zhongyao_changsuo_dai_julidizhi, 
+                                            "data": []
+                                        };
                                         var dataArr = outcomeData.data;
                                         for(var d = 0; d < dataArr.length; d++){
                                             var item = dataArr[d];
+                                            // console.log('item：', item);
                                             var zuobiao = item.zuobiao,
                                                 title = item.name,
                                                 address = typeof item.address == 'undefined' ? '' : item.address,
@@ -2661,18 +2812,25 @@
                                                 lat = arr.length > 1 ? arr[1] : '';
                                             var point = new BMap.Point(lng, lat);
                                             var rawItem = {
-                                                title: title,
-                                                point: point,
-                                                address: address,
-                                                distance: distance,
-                                                phoneNumber: phoneNumber,
-                                                province: sheng,
-                                                city: shi,
-                                                qu: qu
+                                                "title": title,
+                                                "point": point,
+                                                "address": address,
+                                                "distance": distance,
+                                                "phoneNumber": phoneNumber,
+                                                "province": sheng,
+                                                "city": shi,
+                                                "county": qu
                                             };
-                                            one.data.push(rawItem); // 存入当前关键词分组
+
+                                            oneRaw.data.push(rawItem); // 存入当前关键词分组
+                                            //  存入全局，供区县筛选地区下拉数组用
+                                            districtSearchDropGlobal.push({
+                                                "province": sheng,
+                                                "city": shi,
+                                                "county": qu
+                                            });
                                         }
-                                        rawAllPois.push(one); // 存入全局原始缓存，完整保留所有数据
+                                        rawAllPois.push(oneRaw); // 存入全局原始缓存，完整保留所有数据
                                     },
                                     error: function(errs){ },
                                     beforeSend: function(xhr){ },
@@ -2762,15 +2920,32 @@
                                         var poi = outcomes[i];
                                         var keyword = poi.keyword,
                                             total = poi.getNumPois();
-                                        var oneRaw = { keyword: keyword, isNeedGap: isNeedGap, data: []}
+                                        var oneRaw = { 
+                                            "keyword": keyword,
+                                            "isNeedGap": isNeedGap, 
+                                            data: []
+                                        };
                                         for (var j = 0; j < total; j++) {
                                             var outcome = poi.getPoi(j);
                                             if(typeof outcome != 'undefined') {
                                                 var p = outcome.point,
-                                                    address = typeof outcome.address == 'undefined' ? '' : outcome.address;
+                                                    address = typeof outcome.address == 'undefined' ? '' : outcome.address,
+                                                    sheng = typeof outcome.province == 'undefined' ? '' : outcome.province,
+                                                    shi = typeof outcome.city == 'undefined' ? '' : outcome.city;
+                                                var qu = ''; // 区县。这里为空，因为JSAPI没有返回此属性，压根不知道坐标点属于哪个区县
                                                 var distance = fnCalculateDistance(coordinateLng, coordinateLat, p.lng, p.lat);
-                                                outcome.distance = distance; // 给原始POI挂载距离字段，修复下标不存在报错
-                                                oneRaw.data.push(outcome); // 原始数据全部存入，不做过滤
+
+                                                // 手动添加几个属性：给原始POI挂载几个字段，修复下标不存在报错
+                                                outcome["distance"] = distance; // 给原始POI挂载距离字段，修复下标不存在报错
+                                                outcome["county"] = qu; // 区县字段
+                                                
+                                                oneRaw.data.push(outcome); // 存入当前关键词分组
+                                                //  存入全局，供区县筛选地区下拉数组用
+                                                districtSearchDropGlobal.push({
+                                                    "province": sheng,
+                                                    "city": shi,
+                                                    "county": qu
+                                                });
                                             }
                                         }
                                         rawAllPois.push(oneRaw); // 存入全局完整原始缓存

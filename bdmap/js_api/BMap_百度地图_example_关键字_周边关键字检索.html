@@ -1,0 +1,55 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<script type="text/javascript" src="//api.map.baidu.com/api?type=webgl&v=1.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script>
+    <title>周边检索</title>
+    <style type="text/css">
+		body, html,#allmap {width: 100%;height: 100%; margin:0;font-family:"微软雅黑";}
+		#l-map{height:500px;width:100%;}
+		#r-result{width:100%; font-size: 14px; line-height: 20px;}
+	</style>
+</head>
+<body>
+	<div id="l-map"></div>
+	<div id="r-result"></div>
+</body>
+</html>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMapGL.Map("l-map");        
+	map.centerAndZoom(new BMapGL.Point(118.596208,24.915566), 14);
+
+	var options = {
+		renderOptions: {
+			map: map, // 展现结果的地图实例。当指定此参数后，搜索结果的标注、线路等均会自动添加到此地图上
+			// panel: '', // String | HTMLElement 结果列表的HTML容器id或容器元素，提供此参数后，结果列表将在此容器中进行展示。此属性对LocalCity无效。驾车路线规划无效
+			// selectFirstResult: false, // 是否选择第一个检索结果。此属性仅对LocalSearch有效
+			autoViewport: true, // 检索结束后是否自动调整地图视野。此属性对LocalCity无效
+		},
+		// pageCapacity: 100, // 设置每页容量，取值范围：1 - 100，对于多关键字检索，容量表示每个关键字的数量，如果有2个关键字，则实际检索结果数量范围为：2 - 200
+		
+		// 检索完成后的回调函数。 参数：results: LocalResult或Array 如果是多关键字检索，回调函数参数返回一个LocalResult的数组，数组中的结果顺序和检索中多关键字数组中顺序一致
+		onSearchComplete: function(results){
+            console.log('周边医院返回结果：results：', results);
+			// 判断状态是否正确
+			if (local.getStatus() == BMAP_STATUS_SUCCESS){
+				var s = [];
+				for (var i = 0; i < results.getCurrentNumPois(); i++){
+					// getPoi() 的 LocalResultPoi 参数
+					var result = results.getPoi(i);
+					s.push(result.title + ", " + result.address + "，电话：" + result.phoneNumber + "，省市：" + result.province + result.city + ",坐标：" + result.point.lng + ',' + result.point.lat);
+				}
+				document.getElementById("r-result").innerHTML = s.join("<br/>");
+			}
+		}
+	};
+    var point = new BMapGL.Point(118.596208, 24.915566); // 泉州古城
+
+	var local = new BMapGL.LocalSearch(point, options);
+    var keywords = '医院'; // 检索关键词
+	// local.search(keywords);
+    // local.searchNearby(keyword: String | Array<String>, center: LocalResultPoi | String | Point , radius: Number, option: Object)
+    local.searchNearby(keywords, point, 0.5); // 设置半径. radius 表示半径
+    local.setPageCapacity(100); // 设置每页容量
+</script>

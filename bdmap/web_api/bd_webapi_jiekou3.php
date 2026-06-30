@@ -1,0 +1,74 @@
+<?php
+    // 百度地图 web api 接口调试 - 前后端分离版 的接口地址文件
+    header("Content-Type: application/json; charset=utf-8");
+    header("Cache-Control: no-cache, must-revalidate");
+    // 允许跨域，本地调试用，生产改为指定域名
+    header("Access-Control-Allow-Origin: *");
+
+    // 统一返回封装函数
+    function returnJson($code, $msg, $data = array()){
+        $res = array(
+            'code' => $code,
+            'msg'  => $msg,
+            'data' => $data
+        );
+        echo json_encode($res);
+        exit;
+    }
+
+    // 接收前端AJAX传参
+    $ak = trim(isset($_REQUEST['ak']) ? $_REQUEST['ak'] : '');
+    $url = trim(isset($_REQUEST['url']) ? $_REQUEST['url'] : '');
+    $output = trim(isset($_REQUEST['output']) ? $_REQUEST['output'] : '');
+    $location = trim(isset($_REQUEST['location']) ? $_REQUEST['location'] : '');
+    $query = trim(isset($_REQUEST['query']) ? $_REQUEST['query'] : '');
+    $radius = trim(isset($_REQUEST['radius']) ? $_REQUEST['radius'] : '');
+    $region = trim(isset($_REQUEST['region']) ? $_REQUEST['region'] : '');
+    $pagesize = trim(isset($_REQUEST['pagesize']) ? $_REQUEST['pagesize'] : '');
+    $region_limit = trim(isset($_REQUEST['region_limit']) ? $_REQUEST['region_limit'] : '');
+    $city_limit = trim(isset($_REQUEST['city_limit']) ? $_REQUEST['city_limit'] : '');
+    $coord_type = trim(isset($_REQUEST['coord_type']) ? $_REQUEST['coord_type'] : '');
+
+    // 参数校验
+    if(empty($ak)){
+        returnJson(1001, 'AK密钥不能为空');
+    }
+    if(empty($region)){
+        returnJson(1002, '区域参数不能为空');
+    }
+    if(!is_numeric($radius) || $radius <= 0){
+        returnJson(1003, '半径必须是大于0的数字');
+    }
+
+    // 拼接百度地图接口
+    $apiUrl = 'http://api.map.baidu.com/place/v2/search';
+    $params = array(
+        'ak' => $ak,
+        'output' => $output,
+        'location' => $location,
+        'query' => $query,
+        'radius' => $radius,
+        'region' => $region,
+        'pagesize' => $pagesize,
+        'region_limit' => $region_limit,
+        'city_limit' => $city_limit,
+        'coord_type' => $coord_type
+    );
+    $queryStr = http_build_query($params);
+    $fullUrl = $apiUrl . '?' . $queryStr;
+
+    // PHP5.3 请求第三方接口
+    $opts = array(
+        'http' => array('timeout' => 10)
+    );
+    $context = stream_context_create($opts);
+    $response = @file_get_contents($fullUrl, false, $context);
+
+    if($response === false){
+        returnJson(500, '请求第三方接口失败');
+    }
+    $originData = json_decode($response, true);
+
+    // 返回数据给前端JS
+    returnJson(0, '请求成功', $originData);
+?>

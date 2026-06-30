@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+	<meta charset="UTF-8">
+	<title> 百度地图获取公交线路（GL版） </title>
+	<base target="_blank" />
+</head>
+<body>
+	<style>
+		* { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+		html, body{
+			width: 100%;
+			margin: 0;
+			padding: 10px 10px;
+		 	font-family:"微软雅黑";
+		}
+		/*+---------------- 表单区域 ----------------+*/
+		.grid{
+			width: 600px;
+			margin: 0 auto;
+			padding: 15px 20px;
+			border: 3px solid blue;
+			border-radius: 8px;
+		}
+		.grid__caption_title{
+			color: #555;
+			text-align: center;
+			font-size: 28px;
+			font-weight: 550;
+		}
+		.grid__caption_title p,
+		.grid__caption_title em{
+			display: block;
+			padding: 10px;
+			font-style: normal;
+			font-size: 12px;
+			font-weight: normal;
+		}
+		.grid__caption_subtitle{
+			margin-top: 20px;
+			font-size: 14px;
+		}
+		.grid__caption_subtitle p{
+			margin-top: 5px;
+			text-align: center;
+		}
+		.grid__caption_subtitle p:first-child{
+			margin-top: 0;
+		}
+		.grid__form{
+			margin-top: 15px;
+			padding: 30px;
+			border: 2px solid #999;
+			border-radius: 4px;
+		}
+		.grid__form_row{
+			margin-top: 10px;
+		}
+		.grid__form_row:first-child{
+			margin-top: 0;
+		}
+		.grid__form_row label{ margin-right: 8px; font-size: 16px; }
+		.grid__form_row input[type="text"]{
+			width: 300px;
+			padding: 8px 16px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+		}
+		.grid__operate{
+			margin-top: 35px;
+			text-align: center;
+		}
+		.grid__operate button{
+			padding: 10px 15px;
+			background: #4fbf83;
+			background: #1296db;
+			color: #fff;
+			border: 0;
+			border-radius: 4px;
+			
+			cursor: pointer;
+		}
+		.grid__operate button:hover{
+			opacity: .6;
+			filter: alpha(opacity = 60);
+		}
+
+		/*+---------------- 地图区域 ----------------+*/
+		.papers{
+			width: 100%;
+			margin-top: 25px;
+			margin-bottom: 25px;
+			padding: 8px 12px;
+			border: 3px solid green;
+			border-radius: 8px;
+		}
+		.papers__caption_title{
+			color: #555;
+			text-align: center;
+			font-size: 28px;
+			font-weight: 550;
+		}
+		.papers__caption_title p,
+		.papers__caption_title em{
+			display: block;
+			padding: 10px;
+			font-style: normal;
+			font-size: 12px;
+			font-weight: normal;
+		}
+		.papers__caption_title pre{
+			padding: 8px;
+			color: #777;
+			text-align: left;
+			font-size: 14px;
+		}
+		.papers__content{
+			width: 100%; 
+			height: 800px;
+			border: 2px solid #ddd;
+		}
+		#l-map{
+            height:100%;
+            width:100%;
+		}
+		#driving_way{
+			position: fixed;
+            top: 430px;
+            right: 20px;
+            width: 270px;
+            height: 450px;
+            background: #fff;
+            box-shadow: 0 2px 6px 0 rgba(27, 142, 236, 0.5);
+            border-radius: 7px;
+			z-index: 99;
+			padding: 10px
+		}
+		#result{
+			height: 400px;
+            overflow-y: auto;
+		}
+	</style>
+
+
+	<!-- [================ 表单区域 ================] -->
+	<div class="grid">
+		<div class="grid__caption">
+			<div class="grid__caption_title">
+				百度地图 WEB API 获取公交线路（GL版）：根据起终点经纬度查询公交换乘
+				<em>参考：https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-lwrouteplanapi/transit</em>
+			</div>
+			<div class="grid__caption_subtitle">
+				<p>
+					请通过以下工具获取经纬度坐标，然后把坐标粘帖到下面的输入框内
+				</p>
+				<p>
+					<a href="https://api.map.baidu.com/lbsapi/getpoint/index.html">百度地图坐标拾取工具</a>
+				</p>
+			</div>
+		</div>
+		<div class="grid__form">
+			<div class="grid__form_row">
+				<label>出发地</label>
+				<input type="text" id="origion" value="118.593277,24.917104" placeholder="出发地经纬度坐标" onblur="this.placeholder='出发地经纬度坐标'" onfocus="this.placeholder=''">
+			</div>
+			<div class="grid__form_row">
+				<label>目的地</label>
+				<input type="text" id="destination" value="118.656518,24.917104" placeholder="目的地经纬度坐标" onblur="this.placeholder='目的地经纬度坐标'" onfocus="this.placeholder=''">
+			</div>
+		</div><!--/.grid__form-->
+		<div class="grid__operate">
+			<button type="button" id="submit"> 获取公交线路 (提交给PHP后台处理，F12 控制台查看返回结果)</button>
+		</div>
+	</div><!--/.grid-->
+
+
+	<!-- [================ 地图区域 ================] -->
+	<div class="papers">
+		<div class="papers__caption">
+			<div class="papers__caption_title">
+				百度地图 JS API 获取公交线路（GL版）
+				<pre>
+					JSAPI WegGL 文档：https://lbsyun.baidu.com/index.php?title=jspopularGL
+					JSAPI WebGL v1.0 类参考 https://mapopen-pub-jsapi.bj.bcebos.com/jsapi/reference/jsapi_webgl_1_0.html
+					JSAPI WebGL v1.0 示例中心：https://lbsyun.baidu.com/jsdemo.htm#sCaculateDriveTime
+				</pre>
+			</div>
+		</div>
+		<div class="papers__content">
+			<div id="l-map"></div>
+			<div id="driving_way">
+				<select>
+					<option value="0">推荐方案</option>
+					<option value="1">最少时间</option>
+					<option value="2">最少换乘</option>
+					<option value="3">最少步行</option>
+					<option value="4">不乘地铁</option>
+					<option value='5'>优先地铁</option>
+				</select>
+				<button id='search'>查询</button>
+				<p id='result'></p>
+			</div>
+		</div><!--/.papers__content-->
+	</div><!--/.papers-->
+</body>
+
+
+<script src="//api.map.baidu.com/api?type=webgl&v=1.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script>
+<script src="../../assets/libs/jquery-1.8.3.min.js"></script>
+<script>
+
+	// var origion = $('#origion').val(); // 起点坐标值
+	// var destination = $('#destination').val(); // 终点坐标值
+	// var startArr = origion.split(',');
+	// var endArr = destination.split(',');
+	// var origLng = startArr[0], origLat = startArr[1];
+	// var destLng = endArr[0], destLat = endArr[1];
+
+	//————————————————————————————————————————————————
+	// 全局变量
+	var isPringBackInfo = false; // 是否将百度地图JS API公交线路回调函数信息打印出来。默认true
+
+	//————————————————————————————————————————————————
+	/**
+	 * 函数：获取起始点坐标
+	 * @param {String} ps_start_value 起点经纬度坐标值
+	 * @param {String} ps_end_value 终点经纬度坐标值
+	 * @returns {Object} 返回由起始及终点坐标组成的对象。格式: { begin: "起点坐标", end: "终点坐标" }
+	 */
+	function getBeginEndPoints(ps_start_value, ps_end_value){
+		var arr1 = ps_start_value.split(','),
+			arr2 = ps_end_value.split(',');
+		var begin = new BMapGL.Point(arr1[0], arr1[1]),
+			end = new BMapGL.Point(arr2[0], arr2[1]);
+		return {
+			begin,
+			end
+		}
+	}
+
+
+
+	//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+	//	百度地图 JS API 接口
+	//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+	//————————————————————————————————————————————————
+	// 百度地图API功能
+	var map = new BMapGL.Map("l-map");         
+	map.centerAndZoom(new BMapGL.Point(118.596207, 24.916922), 14); // 中心点坐标
+	// var start = new BMapGL.Point(118.593277, 24.917104)   // "泉州古城";
+	// var end = new BMapGL.Point(118.656518, 24.917104);  // "中骏世界城";
+	// var start = new BMapGL.Point(origLng, origLat)   // "泉州古城";
+	// var end = new BMapGL.Point(destLng, destLat);  // "中骏世界城";
+	var routePolicy = [BMAP_TRANSIT_POLICY_RECOMMEND,BMAP_TRANSIT_POLICY_LEAST_TIME,BMAP_TRANSIT_POLICY_LEAST_TRANSFER,BMAP_TRANSIT_POLICY_LEAST_WALKING,BMAP_TRANSIT_POLICY_AVOID_SUBWAYS,BMAP_TRANSIT_POLICY_FIRST_SUBWAYS];
+	var transit = new BMapGL.TransitRoute(map, {
+			renderOptions: {map: map, panel: 'result'},
+            policy: 0,
+            // 检索完成后的回调函数。参数：results: TransitRouteResult，公交导航结果
+            onSearchComplete: function(results){
+				if(isPringBackInfo){
+					console.log('e1-onSearchComplete');
+					console.log('results：', results);
+					console.log('-------------------');
+				}
+            },
+            // 标注添加完成后的回调函数。参数：pois: Array ，起点和目的地数组。transfers: Array ，公交车站数组
+            onMarkersSet: function(pois, transfers){
+				if(isPringBackInfo){
+					console.log('e2-onMarkersSet');
+					console.log('pois：', transfers);
+					console.log('transfers：', transfers)
+					console.log('-------------------');
+				}
+            },
+            // 气泡内容创建后的回调函数。参数：poi: LocalResultPoi，表示当前气泡对应的点（可以是起点、终点或换乘车站）html: HTMLElement，气泡内的DOM元素
+            onInfoHtmlSet: function(poi, html){
+				if(isPringBackInfo){
+					console.log('e3-onInfoHtmlSet');
+					console.log('poi：', poi);
+					console.log('html：', html);
+					console.log('-------------------');
+				}
+            },
+            // 折线添加完成后的回调函数。参数：lines: Array ，公交线路数组。routes: Array ，步行线路数组，通过Route.getPolyline()方法可得到对应的折线覆盖物
+            onPolylinesSet: function(lines, routes){
+				if(isPringBackInfo){
+					console.log('e4-onPolylinesSet');
+					console.log('e4-routes：', lines);
+					console.log('-------------------');
+				}
+            },
+            // 结果列表添加完成后的回调函数。参数：container: 结果列表所用的HTML元素
+            onResultsHtmlSet: function(container){
+				if(isPringBackInfo){
+					console.log('e5-onResultsHtmlSet');
+					console.log('container：', container);
+					console.log('-------------------');
+				}
+            }
+	});
+
+
+	//————————————————————————————————————————————————
+	/**
+	 * 查询公交乘车方案
+	 * @param {Point} ps_start 起始坐标点
+	 * @param {Point} ps_end 结束坐标点
+	 * @param {TransitPolicy} ps_route 市内公交的策略参数
+	 	市内公交的策略参数值如下：
+	 	BMAP_TRANSIT_POLICY_RECOMMEND	推荐方案
+		BMAP_TRANSIT_POLICY_LEAST_TIME	最少时间
+		BMAP_TRANSIT_POLICY_LEAST_TRANSFER	最少换乘
+		BMAP_TRANSIT_POLICY_LEAST_WALKING	最少步行
+		BMAP_TRANSIT_POLICY_AVOID_SUBWAYS	不乘地铁
+		BMAP_TRANSIT_POLICY_FIRST_SUBWAYS	优先地铁
+	 */
+	function fnQuery(ps_start, ps_end, ps_route){ 
+		transit.setPolicy(ps_route);
+		transit.search(ps_start, ps_end);
+	}
+
+
+    //————————————————————————————————————————————————
+    // 查询按钮
+	$("#search").click(function(){
+		var origion = $('#origion').val(), // 起点坐标值
+			destination = $('#destination').val(); // 终点坐标值
+		var obj = getBeginEndPoints(origion, destination);
+		var start = obj.begin, 
+			end = obj.end;
+		// 地图上显示对应公交线路
+		map.clearOverlays(); 
+		var i= $("#driving_way select").val();
+		fnQuery(start, end, routePolicy[i]); 
+	});
+
+
+
+
+
+
+	//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+	//	百度地图 WEB API 接口
+	//————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+	//————————————————————————————————————————————————
+	// 百度地图 WEB API 获取公交线路（GL版）
+	$('#submit').click(function () {
+		var origion = $('#origion').val(), // 起点坐标值
+			destination = $('#destination').val(); // 终点坐标值
+		var message = '';
+		if(origion.toString().replace(/\s+/g, '') === '') message += '出发地、';
+		if(destination.toString().replace(/\s+/g, '') === '') message += '目的地、';
+		if(message != ''){
+			alert('请填写：' + message.substring(0, message.length - 1) + '经纬度坐标');
+			return;
+		}
+		// PHP AJAX 请求数据，F12 控制台可查看具体返回的数据都包含哪些字段
+		$.ajax({
+			type: "POST",
+			url: "../web_api/bd_web_api_bus_route.php", // 接口文件，请求链接地址，提交给php后台
+			data: { // 提交到demo.php的数据  
+				"origion": origion,
+				"destination": destination
+			},
+			dataType: "json", // 回调函数接收数据的数据格式  
+			success: function (res) {
+				// var data = '';
+				// if (res != '') {
+				// 	data = eval("(" + res + ")");
+				// }
+				console.log('————————————————————————————————');
+				console.log('WEB API接口返回的数据：', res);
+				console.log('————————————————————————————————');
+			},
+			error: function (errs) {
+				console.log('error:', errs);
+			}
+		});
+
+		// 取起始终点坐标
+		var obj = getBeginEndPoints(origion, destination);
+		var start = obj.begin, 
+			end = obj.end;
+		// 地图上显示对应公交线路
+		map.clearOverlays(); 
+		var i= $("#driving_way select").val();
+		fnQuery(start, end, routePolicy[i]); 
+	});
+
+
+</script>
+</html>

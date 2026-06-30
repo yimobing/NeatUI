@@ -1,6 +1,8 @@
 <?php 
+
+    // 百度地图 web api 接口调试 - 前后端不分离版 + 无表单版
+
     header("Content-Type: text/html; charset=UTF-8");
-    // 百度地图 web api 接口调试 test1 （前后端不分离）
 
     // 此处填写你在控制台-应用管理-创建应用后获取的AK
     $ak = '2COzFaICuIyVj7V3VetKfmdRVnX8BhVr';

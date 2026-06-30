@@ -197,7 +197,7 @@
         image: { //自定义坐标标注点图标及其它属性(可选)
             draged: false, //图标是否可拖动,默认false(可选)
             enable: true, //是否开启自定义图标, 默认false(可选)
-            path: 'assets/neatui/img/', //图片文件夹相对静态文件html位置,仅当enable=true时有效(可选)
+            path: '../../assets/neatui/img/', //图片文件夹相对静态文件html位置,仅当enable=true时有效(可选)
             icon: 'bmap_locate_green.png' //图标文件名,仅当enable=true时有效(可选)
         }
         //..

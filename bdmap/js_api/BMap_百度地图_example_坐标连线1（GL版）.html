@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>百度地图坐标连线</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+<body>
+
+    <style>
+        html{ height:100%; }    
+        body{ height:100%; margin: 0px; padding: 0px; }
+        .wrap{ width: 100%; height: 100%; }
+        #container{
+            width: 100%; height:100%;
+        }   
+    </style>
+
+    <div class="wrap">
+        <div id="container"></div>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&&type=webgl&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X">
+    </script>
+    <script type="text/javascript">
+        /*+————————————————全局变量————————————————+*/
+        // 设置地图中心点城市及缩放级别
+        var city = '北京市';
+        var zoom = 15; // 缩放级别 3-19
+
+
+
+        /*+————————————————FUNCTION————————————————+*/
+        //——————————————————————————————————————————
+        /**
+         *  获取地点数据
+         * @param a 
+         * @returns 返回数组对象
+         */
+        function get_data_address(){
+            // 字段： lng 经度, lat 纬度
+            // 后台返回
+            var json = {
+                return: "ok",
+                data: [
+                    {"lng":"116.387112", "lat":"39.920977"},
+                    {"lng":"116.385243", "lat":"39.913063"},
+                    {"lng":"116.394226", "lat":"39.917988"},
+                    {"lng":"116.401772", "lat":"39.921364"},
+                    {"lng":"116.41248", "lat":"39.927893"}
+                ]
+            }
+            /*
+            // START AJAX
+            var json = {}
+            $.ajax({
+                async: false, // 取数方式. true 异步(默认), false 同步
+                type: "GET",
+                dataType: "html",
+                cache: false,
+                url: "",
+                data: {
+                    "action": "",
+                    "user": "<%=s_user%>",
+                    "sjk": "<%=s_sjk%>"
+                },
+                success: function(res){
+                    if(!res || $.isEmptyObject(res)) return;
+                    json = JSON.parse(res);
+                },
+                error: function(res){ },
+                beforeSend: function(XMLHttpRequest){ },
+                complete: function(XMLHttpRequest, textStatus){ }
+            })
+            // END AJAX
+            */
+            return json;
+        }
+
+
+
+        //——————————————————————————————————————————
+        /**
+         * 添加标注及文本
+         * @param {ps_bmap} 百度地图实例化对象
+         * @param {ps_coord_obj} 标注经纬度坐标对象
+         * @param {ps_coord_label} 标注文本(可选)
+         */
+        function bd_create_marker(ps_bmp, ps_coord_obj, ps_coord_label){  
+            // 添加标注
+            var lng = ps_coord_obj["lng"],
+                lat = ps_coord_obj["lat"];
+            var point = new BMapGL.Point(lng, lat);
+            // 添加标注，并自定义标注图标
+            var myIcon = new BMapGL.Icon("markers.png", new BMapGL.Size(23, 25), {   
+                // 指定定位位置。  
+                // 当标注显示在地图上时，其所指向的地理位置距离图标左上   
+                // 角各偏移10像素和25像素。您可以看到在本例中该位置即是  
+                // 图标中央下端的尖角位置。   
+                anchor: new BMapGL.Size(10, 25),   
+                // 设置图片偏移。  
+                // 当您需要从一幅较大的图片中截取某部分作为标注图标时，您  
+                // 需要指定大图的偏移位置，此做法与css sprites技术类似。   
+                imageOffset: new BMapGL.Size(0, 0 - 25)   // 设置图片偏移   
+            });
+            // var markOptions = {
+            //     icon: myIcon
+            // }
+            var markOptions = { }
+            var marker = new BMapGL.Marker(point, markOptions);
+            ps_bmp.addOverlay(marker); // 将标注添加到地图中
+
+            // 给标注添加文本
+            if(typeof ps_coord_label != 'undefined' && ps_coord_label == ''){
+                var label = new BMapGL.Label(ps_coord_label, { // 创建文本标注
+                    position: point, // 设置标注的地理位置
+                    offset: new BMapGL.Size(10, 20) // 设置标注的偏移量
+                });
+                label.setStyle({
+                    color: 'blue',
+                    borderRadius: '5px',
+                    borderColor: '#ccc',
+                    padding: '10px',
+                    fontSize: '16px',
+                    height: '30px',
+                    lineHeight: '30px',
+                    fontFamily: '微软雅黑'
+                });
+                ps_bmp.addOverlay(label);
+            }
+            // 监听标注事件
+            // marker.addEventListener("click", function(){   
+            //     alert("您点击了标注");   
+            // });
+        }
+
+
+        
+        /**
+         * 创建折线
+         * @param {object} ps_bmp 百度地图实例化对象
+         * @param {ps_point_arr} 坐标点数组。格式 [{lng:"经度", lat:"纬度"}. {lng:"经度", lat:"纬度"}]
+         */
+        function bd_create_polyline(ps_bmp, ps_coord_arr){
+            // 添加折线
+            var pArr = [];
+            for(var i = 0; i < ps_coord_arr.length; i++){
+                var one = ps_coord_arr[i];
+                var lng = one["lng"], lat = one["lat"];
+                pArr.push(new BMapGL.Point(lng, lat));
+            }
+            var pLine = new BMapGL.Polyline(pArr, {
+                strokeColor: "blue", 
+                strokeWeight: 5, 
+                strokeOpacity:0.8
+            });
+   
+            ps_bmp.addOverlay(pLine);
+        }
+
+
+
+
+        //——————————————————————————————————————————
+        // 获取地点数据
+        var coordSource = get_data_address();
+        var coordArr = coordSource.data; // 坐标点数组
+
+
+
+        //——————————————————————————————————————————
+        // 创建地图实例
+        var map = new BMapGL.Map("container");
+
+
+
+        //——————————————————————————————————————————
+        // 设置中心点坐标
+        if(coordArr.length != 0){
+            map.setViewport(coordArr); // 根据提供的地理区域或坐标设置地图视野，调整后的视野会保证包含提供的地理区域或坐标
+        }
+        else{
+            // var point = new BMapGL.Point(116.404, 39.915);
+            // map.centerAndZoom(point, 15); // 设置中心点坐标和地图级别
+            map.centerAndZoom(city, zoom); // 设置中心点城市和地图级别
+        }
+
+
+        
+        //——————————————————————————————————————————
+        // 添加标注
+        for(var i = 0; i < coordArr.length; i++){
+            bd_create_marker(map, coordArr[i]);
+        }
+
+
+
+        //——————————————————————————————————————————
+        // 添加折线
+        bd_create_polyline(map, coordArr);
+
+
+
+        //——————————————————————————————————————————
+        // 添加多边形，可自定义点线面可配置图标
+        // var nodeT =  new BMapGL.Icon('http://maponline0.bdimg.com/sty/map_icons2x/MapRes/ditie_beijing_2.png', new BMapGL.Size(11, 11), {
+        //     offset: new BMapGL.Size(5, 5)
+        // });
+        // var node =  new BMapGL.Icon('http://maponline0.bdimg.com/sty/map_icons2x/MapRes/zhongheyiyuan.png', new BMapGL.Size(11, 11), {
+        //     offset: new BMapGL.Size(5, 5)
+        // });
+        // var polygon = new BMapGL.Polygon([
+        //     new BMapGL.Point(116.387112, 39.920977),
+        //     new BMapGL.Point(116.385243, 39.913063),
+        //     new BMapGL.Point(116.394226, 39.917988),
+        //     new BMapGL.Point(116.401772, 39.921364),
+        //     new BMapGL.Point(116.41248, 39.927893)
+        // ], {
+        //     node: node, // 线节点
+        //     nodeT: nodeT, // 线段中间节点
+        //     strokeStyle:'solid',
+        //     strokeColor: 'blue',
+        //     strokeWeight: 3,
+        //     strokeOpacity: 0.8,
+        // });
+        // map.addOverlay(polygon);
+        
+    </script>
+
+
+</body>
+</html>

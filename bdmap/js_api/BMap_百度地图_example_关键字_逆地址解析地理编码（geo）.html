@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+        <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="application-name" content="网站名称">
+        <meta name="applicable-device" content="pc,mobile">
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta http-equiv="Cache-Control" content="no-transform">
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <title> 逆地址解析，解析出地址的坐标 </title>
+        <meta name="keywords" content="">
+        <meta name="description" content="">
+    </head>
+    <body>
+       
+        <style type="text/css">
+            body, html {
+                width: 100%;
+                height: 100%;
+            }
+            .wrap {
+                width: 100%;
+                height: 100%;
+            }
+            .maper {
+                width: 100%;
+                height: 100%;
+            }
+            #allmap {
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                margin: 0;
+                font-family: "微软雅黑";
+            }
+        </style>
+        
+        <div class="wrap">
+            <div class="search">
+                <div class="search__form">
+                    <p>
+                        <span>中心点坐标 </span>
+                        <input type="text" id="s-coordinate" value="118.595776,24.916136">
+                    </p>
+                    <p>
+                        <span> 城市 </span>
+                        <input type="text" id="s-city" value="泉州市">
+                    </p>
+                    <p> 
+                        <span>地址</span>
+                        <input type="text" id="s-address" value="浦西万达广场">
+                    </p>
+                </div>
+                <div class="search__btn">
+                    <button type="button" id="btn-query"> 查询 </button>
+                </div>
+            </div> <!--/.search-->
+            <div class="maper">
+                <div id="allmap"></div>
+            </div>
+        </div>
+
+        <!-- ================================================================================-->
+        <!--                             JAVASCRIPT                                          -->
+        <!-- ================================================================================-->
+        <script src="../../assets/libs/jquery-1.8.3.min.js"></script> <!-- Jq库-->
+        <script src="http://api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
+        <script>
+
+            
+            var coordinate = $('#s-coordinate').val();
+            var coorArr = coordinate.split(',');
+            var lng = coorArr.length > 0 ? coorArr[0] : '',
+                lat = coorArr.length > 1 ? coorArr[1] : '';
+            console.log('lng：', lng, ',lat：', lat)
+            // 百度地图API功能
+            var map = new BMap.Map("allmap");
+            var point = new BMap.Point(lng, lat);
+            map.centerAndZoom(point, 12);
+
+            // 查询按钮
+            $('#btn-query').on('click', function(){
+                var city = $('#s-city').val(),
+                    address = $('#s-address').val();
+                console.log('地址：', address);
+
+                // 使用地理编码。配额足够，1天最多5000次
+                var myGeo = new BMap.Geocoder(); // 创建地理编码、地址解析器实例
+                // 对指定的地址进行解析：将地址解析结果显示在地图上,并调整地图视野
+                myGeo.getPoint(address, function(point){
+                    console.log('point：', point)
+                    if (point) {
+                        // 解析成功：返回坐标
+                        map.centerAndZoom(point, 16);
+                        map.addOverlay(new BMap.Marker(point));
+                    }else{
+                        // 解析失败
+                        alert("您选择地址没有解析到结果!");
+                    }
+                }, city);   
+            });
+
+
+
+            //————————————————————————————————————————————————
+            /**
+             * [封装函数] 获取位置坐标：使用地理编码服务
+             * 说明：
+             * 1、返回值只有坐标、没有地址、电话、邮编等信息
+             * 2、配额足够，1天最多5000次
+             * @param {String} address 位置名称、地点名称
+             * @param {String} city 指定城市
+             * @param {Function} callback 回调函数。参数格式：{"point类型的坐标"}
+             */
+            function getAddressCoordinateByGeoCoder(address, city, callback){
+                var geo = new BMap.Geocoder(); // 创建地理编码实例
+                // 对指定的地址进行解析
+                geo.getPoint(address, function(point) {
+                    if (point) {
+                        // 解析成功：返回坐标
+                        callback(point);
+                    } else {
+                        // 解析失败
+                        callback(null);
+                    }
+                }, city);
+            }
+
+
+
+            //————————————————————————————————————————————————
+            // 封装函数调用方式
+            // // var address = '泉州市丰泽区万达广场(泉州浦西店)', city = '泉州市';
+
+            // // // 方法1：使用地点检索。配额不够，1天最多100次。超过配额度时检索不出来
+            // // function myFun() {
+            // //     var pp = local.getResults().getPoi(0).point; // 获取第一个智能搜索的结果
+            // //     // console.log('pp：', pp);
+            // //     var lng = pp.lng, lat = pp.lat;
+            // //     neuiBdmap.createMarker({
+            // //         type: 'zhongxin', // 坐标类型(可选)，默认空。值： zhongxin 中心点坐标, 空 表示其它类型。
+            // //         coordinate: lng + ',' + lat, // 坐标经纬度字符串. eg. '经度,纬度'
+            // //         title: ps_title, // 标题(可选)，默认空。支持HTML
+            // //         describe: '', // 描述信息(可选)，默认空。支持HTML
+            // //         message: '', // 信息窗口短信内容(可选)，默认空
+            // //         autoViewport: true, // 是否自动调整视野，默认true
+            // //         zoom: 13, // 自动调整视野时地图的缩放级别，默认13。值 3-19
+            // //         dragable: true, // 是否允许拖拽(可选)，默认false
+            // //         finishCallback: function(e){ // 创建完成回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}             
+            // //             var lng = e.lng, lat = e.lat;
+            // //             $('#c-locate').val(lng + ',' + lat); // 坐标栏赋值
+            // //         }, 
+            // //         dragEndCallback: function(e){ // 拖拽结束回调(可选)，默认null。返回值e为当前点标记的经纬度 { lng: 经度, lat : 纬度}
+            // //             $('#s-community').val(''); // 小区栏清空
+            // //             $('#c-locate').val(e.lng + ',' + e.lat); // 坐标栏赋值  
+            // //         }
+            // //     })
+            // // }
+            // // var local = new BMap.LocalSearch(map, {
+            // //     // 智能搜索
+            // //     onSearchComplete: myFun,
+            // // });
+            // // local.search(myValue);
+
+
+            // // 方法2：使用地理编码。配额足够，1天最多5000次
+            // getAddressCoordinateByGeoCoder(address, city, function(point) {
+            //     // console.log('point：', point)
+            //     if(point) {
+            //         var lng = point.lng, lat = point.lat;
+            //         // 创建中心点标注及文本标注
+            //         var centerMarker = new BMap.Marker(point);
+            //         var centerLabel = BDTools.createLabel({ point: point, title: address });
+            //         map.addOverlay(centerMarker); // 添加点标注
+            //         map.centerAndZoom(point, 16); // 调整视野
+            //         map.addOverlay(centerLabel); // 添加文本标注
+            //     }
+            // });
+
+            
+
+        </script>
+    </body>
+</html>

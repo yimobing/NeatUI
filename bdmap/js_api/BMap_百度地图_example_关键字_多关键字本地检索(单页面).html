@@ -8,7 +8,7 @@
 		#r-result{width:100%;}
 	</style>
 	<script type="text/javascript" src="//api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script>
-	<title>根据多关键字本地搜索</title>
+	<title>根据多关键词本地搜索</title>
 </head>
 <body>
 	<div id="l-map"></div>
@@ -21,7 +21,8 @@
     var point = new BMap.Point(118.605089,24.887662);
   	var radius = 1500;
 	map.centerAndZoom(point, 13);
-	var myKeys = ["小学"];
+	
+	var myKeys = ["小学", "医院"]; // 多关键词组成的数组
 	var local = new BMap.LocalSearch(map, {
 		renderOptions:{map: map, panel:"r-result"},
 		pageCapacity:5

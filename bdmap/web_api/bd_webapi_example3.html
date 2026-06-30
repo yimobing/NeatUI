@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title> 百度地图 web api 接口调试 - 前后端分离版 </title>
+        <!-- jQuery1.12.4 兼容老旧浏览器 -->
+        <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <style>
+            .box {
+                width: 90%;
+                max-width: 900px;
+                margin: 30px auto;
+            }
+            .item {
+                margin: 12px 0;
+            }
+            label {
+                display: inline-block;
+                width: 160px;
+            }
+            input {
+                padding: 6px;
+                width: 320px;
+            }
+            #submit {
+                padding: 8px 22px;
+                background: #0066cc;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+            }
+            #err {
+                color: red;
+                margin: 10px 0;
+            }
+            #poiBox {
+                margin: 20px 0;
+                line-height: 1.8;
+            }
+            #jsonBox {
+                margin-top: 20px;
+            }
+            pre {
+                background: #f4f4f4;
+                padding: 15px;
+                max-height: 600px;
+                overflow: auto;
+                white-space: pre-wrap;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="box">
+            <h3>接口调试前端页面（纯HTML，无PHP）</h3>
+            <div class="item">
+                <label>AK密钥：</label>
+                <input
+                    type="text"
+                    id="ak"
+                    value="2COzFaICuIyVj7V3VetKfmdRVnX8BhVr"
+                />
+            </div>
+            <div class="item">
+                <label>请求地址：</label>
+                <input
+                    type="text"
+                    id="url"
+                    value="https://api.map.baidu.com/place/v2/search"
+                />
+            </div>
+            <div class="item">
+                <label>输出方式：</label>
+                <input type="text" id="output" value="json" />
+            </div>
+            <div class="item">
+                <label>中心点坐标：</label>
+                <input type="text" id="location" value="24.887662,118.605089" />
+            </div>
+            <div class="item">
+                <label>关键词：</label>
+                <input type="text" id="query" value="" placeholder="请输入关键词"/>
+            </div>
+            <div class="item">
+                <label>半径(m)：</label>
+                <input type="text" id="radius" value="1000" />
+            </div>
+            <div class="item">
+                <label>区域：</label>
+                <input type="text" id="region" value="泉州市" />
+            </div>
+            <div class="item">
+                <label>每页记录数：</label>
+                <input type="text" id="pagesize" value="20" />
+            </div>
+            <div class="item">
+                <label>是否限制区县：</label>
+                <input type="text" id="region_limit" value="false" />
+            </div>
+            <div class="item">
+                <label>是否限制城市：</label>
+                <input type="text" id="city_limit" value="false" />
+            </div>
+            <div class="item">
+                <label>坐标类型：</label>
+                <input type="text" id="coord_type" value="3" />
+            </div>
+            <div class="item">
+                <button id="submit">异步请求接口</button>
+            </div>
+            <div id="err"></div>
+
+            <!-- 格式化POI展示区域 -->
+            <div id="poiBox"></div>
+            <!-- 原始JSON展示 -->
+            <div id="jsonBox"></div>
+        </div>
+
+        <script>
+            $(function () {
+                $("#submit").click(function () {
+                    // 清空上次内容
+                    $("#err").text("");
+                    $("#poiBox").html("");
+                    $("#jsonBox").html("");
+
+                    // 获取所有输入值
+                    let dataParam = {
+                        ak: $("#ak").val().trim(),
+                        url: $("#url").val().trim(),
+                        output: $("#output").val().trim(),
+                        location: $("#location").val().trim(),
+                        query: $("#query").val().trim(),
+                        radius: $("#radius").val().trim(),
+                        region: $("#region").val().trim(),
+                        pagesize: $("#pagesize").val().trim(),
+                        region_limit: $("#region_limit").val().trim(),
+                        city_limit: $("#city_limit").val().trim(),
+                        coord_type: $("#coord_type").val().trim(),
+                    };
+
+                    // AJAX 请求后端 php 接口
+                    $.ajax({
+                        url: "bd_webapi_jiekou3.php", // ajax 接口地址
+                        type: "POST",
+                        data: dataParam,
+                        dataType: "json",
+                        success: function (res) {
+                            // res 是JS解析好的对象
+                            if (res.code !== 0) {
+                                $("#err").text(res.msg);
+                                return;
+                            }
+                            let originData = res.data;
+                            let poiList = originData.results || [];
+
+                            // 1、格式化输出POI列表
+                            let poiHtml = "<h4>POI 列表（JS渲染）</h4>";
+                            if (poiList.length > 0) {
+                                $.each(poiList, function (index, item) {
+                                    let name = item.name || "";
+                                    let address = item.address || "";
+                                    let province = item.province || "";
+                                    let city = item.city || "";
+                                    let area = item.area || "";
+                                    let town = item.street_id || "";
+                                    poiHtml +=
+                                        "第 " +
+                                        (index + 1) +
+                                        " 个：" +
+                                        name +
+                                        "<br>";
+                                    poiHtml += "地址：" + address + "<br>";
+                                    poiHtml += "省份：" + province + "<br>";
+                                    poiHtml += "城市：" + city + "<br>";
+                                    poiHtml += "区县：" + area + "<br>";
+                                    poiHtml += "城镇：" + town + "<br><br>";
+                                });
+                            } else {
+                                poiHtml += "暂无POI数据";
+                            }
+                            $("#poiBox").html(poiHtml);
+
+                            // 2、格式化展示原始JSON
+                            let formatJson = JSON.stringify(
+                                originData,
+                                null,
+                                4
+                            );
+                            $("#jsonBox").html(
+                                "<h4>接口原始JSON数据：</h4><pre>" +
+                                    formatJson +
+                                    "</pre>"
+                            );
+                        },
+                        error: function () {
+                            $("#err").text(
+                                "请求后端api.php失败，请检查文件路径、服务器是否允许外网访问"
+                            );
+                        },
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
