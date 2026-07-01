@@ -1,5 +1,8 @@
 <?php
-    // 百度地图 web api 接口调试 - 前后端分离版 的接口地址文件
+    /**
+     * 页面名称： 后端接口地址文件
+     * 功能及版本： 百度地图WebAPI接口调试 - 前后端分离版（有表单）
+     */
     header("Content-Type: application/json; charset=utf-8");
     header("Cache-Control: no-cache, must-revalidate");
     // 允许跨域，本地调试用，生产改为指定域名
@@ -28,6 +31,7 @@
     $region_limit = trim(isset($_REQUEST['region_limit']) ? $_REQUEST['region_limit'] : '');
     $city_limit = trim(isset($_REQUEST['city_limit']) ? $_REQUEST['city_limit'] : '');
     $coord_type = trim(isset($_REQUEST['coord_type']) ? $_REQUEST['coord_type'] : '');
+    $scope = trim(isset($_REQUEST['scope']) ? $_REQUEST['scope'] : '');
 
     // 参数校验
     if(empty($ak)){
@@ -52,7 +56,8 @@
         'pagesize' => $pagesize,
         'region_limit' => $region_limit,
         'city_limit' => $city_limit,
-        'coord_type' => $coord_type
+        'coord_type' => $coord_type,
+        'scope' => $scope
     );
     $queryStr = http_build_query($params);
     $fullUrl = $apiUrl . '?' . $queryStr;

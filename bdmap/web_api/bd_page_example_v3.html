@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title> 百度地图 web api 接口调试 - 前后端分离版 </title>
+        <title> 百度地图WebAPI接口调试 - 前后端分离版（有表单） </title>
         <!-- jQuery1.12.4 兼容老旧浏览器 -->
         <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <style>
@@ -40,6 +40,13 @@
             #jsonBox {
                 margin-top: 20px;
             }
+            span.field{
+                display: inline-block;
+                margin-left: 10px;
+                color: #555;
+                font-size: 13px;
+                font-style: normal;
+            }
             pre {
                 background: #f4f4f4;
                 padding: 15px;
@@ -51,9 +58,9 @@
     </head>
     <body>
         <div class="box">
-            <h3>接口调试前端页面（纯HTML，无PHP）</h3>
+            <h3> 接口参数提交工具 </h3>
             <div class="item">
-                <label>AK密钥：</label>
+                <label> AK密钥： </label>
                 <input
                     type="text"
                     id="ak"
@@ -61,7 +68,7 @@
                 />
             </div>
             <div class="item">
-                <label>请求地址：</label>
+                <label> 请求地址： </label>
                 <input
                     type="text"
                     id="url"
@@ -69,46 +76,61 @@
                 />
             </div>
             <div class="item">
-                <label>输出方式：</label>
+                <label> 输出方式： </label>
                 <input type="text" id="output" value="json" />
             </div>
             <div class="item">
-                <label>中心点坐标：</label>
+                <label> 中心点坐标： </label>
                 <input type="text" id="location" value="24.887662,118.605089" />
+                <em> 格式：纬度, 经度 </em>
             </div>
             <div class="item">
-                <label>关键词：</label>
+                <label> 关键词： </label>
                 <input type="text" id="query" value="" placeholder="请输入关键词"/>
+                <button type="button" id="btn-change-keyword-has-gate">查小区包含大门</button>
             </div>
             <div class="item">
-                <label>半径(m)：</label>
+                <label> 半径(m)： </label>
                 <input type="text" id="radius" value="1000" />
             </div>
             <div class="item">
-                <label>区域：</label>
+                <label> 区域： </label>
                 <input type="text" id="region" value="泉州市" />
             </div>
             <div class="item">
-                <label>每页记录数：</label>
+                <label> 每页记录数： </label>
                 <input type="text" id="pagesize" value="20" />
             </div>
             <div class="item">
-                <label>是否限制区县：</label>
+                <label> 是否限制区县： </label>
                 <input type="text" id="region_limit" value="false" />
             </div>
             <div class="item">
-                <label>是否限制城市：</label>
+                <label> 是否限制城市： </label>
                 <input type="text" id="city_limit" value="false" />
             </div>
             <div class="item">
-                <label>坐标类型：</label>
-                <input type="text" id="coord_type" value="3" />
+                <label> 坐标类型： </label>
+                <input type="text" id="coord_type" value="3" placeholder="传入的坐标类型，1（wgs84ll即GPS经纬度），2（gcj02ll即国测局经纬度坐标），3（bd09ll即百度经纬度坐标），4（bd09mc即百度米制坐标）"/>
             </div>
             <div class="item">
-                <button id="submit">异步请求接口</button>
+                <label> 检索结果详细程度： </label>
+                <input type="text" id="scope" value="2" placeholder="检索结果详细程度。取值为1 或空，则返回基本信息；取值为2，返回检索POI详细信息"/>
+            </div>
+            <div class="item">
+                <button id="submit"> 异步请求接口 </button>
             </div>
             <div id="err"></div>
 
+            <div class="description">
+<pre>
+    region // 检索行政区划区域，可以是城市名或城市名区县。eg. '泉州市' 或 '泉州市丰泽区'。注：v2 版本region传城市区县不起作用，因为它以 location 为优先, region传城市区县时并不会过滤出相应数据；v3 版本传城市区县会起作用，因为它会过滤出指定location+region的数据。
+    
+    region_limit // 区域数据召回限制，为true时，仅召回region对应区域内数据。取值为'true'，仅返回region中指定城市检索结果
+    city_limit // 指定的区域的返回结果加权，可能返回其他城市高权重结果。若要对返回结果区域严格限制，请使用city_limit参数
+    scope  // 检索结果详细程度。取值为1 或空，则返回基本信息；取值为2，返回检索POI详细信息(返回值"detail_info"不为空)
+</pre>
+            </div>
             <!-- 格式化POI展示区域 -->
             <div id="poiBox"></div>
             <!-- 原始JSON展示 -->
@@ -117,6 +139,40 @@
 
         <script>
             $(function () {
+                //————————————————————————————————————————————————
+                // 表单每一行添加参数名en
+                $('.box .item').each(function() {
+                    var $label = $('label', this),
+                        $input = $('input:text', this);
+                    var inputId = $input.attr('id'),
+                        labeText = $label.text();
+                    var text = '<span class="field">(' + inputId + ')</span>';
+                    $input.after(text);
+                });
+
+
+                //————————————————————————————————————————————————
+                // 查小区包含大门按钮
+                $('#btn-change-keyword-has-gate').on('click', function() {
+                    var query = $('#query').val();
+                    if(query.trim() == '') {
+                        alert('请先填写：关键词');
+                        return;
+                    }
+                    var gateKeywords = ['大门', '出入口', '北门', '南门', '东门', '西门', '西北门', '西南门', '东北门', '东南门'];
+                    var arr = [];
+                    gateKeywords.forEach(function(item) {
+                        var one = query + item + '|';
+                        arr.push(one);
+                    });
+                    console.log('arr：', arr);
+                    var new_quer = arr.join('');
+                    $('#query').val(new_quer.substring(0, new_quer.length - 1));
+                });
+
+
+                //————————————————————————————————————————————————
+                // 提交按钮、确定按钮
                 $("#submit").click(function () {
                     // 清空上次内容
                     $("#err").text("");
@@ -136,11 +192,19 @@
                         region_limit: $("#region_limit").val().trim(),
                         city_limit: $("#city_limit").val().trim(),
                         coord_type: $("#coord_type").val().trim(),
+                        scope: $('#scope').val().trim()
                     };
+
+                    var tips = '';
+                    if($("#query").val().trim() == '') tips += '关键词、';
+                    if(tips != '') {
+                        alert('请填写：' + tips.substring(0, tips.length - 1));
+                        return;
+                    }
 
                     // AJAX 请求后端 php 接口
                     $.ajax({
-                        url: "bd_webapi_jiekou3.php", // ajax 接口地址
+                        url: "bd_jiekou_example.php", // ajax 后端接口地址文件
                         type: "POST",
                         data: dataParam,
                         dataType: "json",
@@ -162,7 +226,7 @@
                                     let province = item.province || "";
                                     let city = item.city || "";
                                     let area = item.area || "";
-                                    let town = item.street_id || "";
+                                    let town = item.town || "";
                                     poiHtml +=
                                         "第 " +
                                         (index + 1) +

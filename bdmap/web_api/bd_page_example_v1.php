@@ -1,7 +1,9 @@
 <?php 
-
-    // 百度地图 web api 接口调试 - 前后端不分离版 + 无表单版
-
+     /**
+     * 页面名称： 前端页面+后端接口地址文件
+     * 功能及版本： 百度地图WebAPI接口调试 - 前后端不分离版（无表单）
+     */
+    
     header("Content-Type: text/html; charset=UTF-8");
 
     // 此处填写你在控制台-应用管理-创建应用后获取的AK
@@ -38,8 +40,8 @@
   
     // $url = 'https://api.map.baidu.com/place/v2/search?query=银行&location=39.915,116.404&radius=2000&output=json&ak=您的密钥';
 
-    $url = 'https://api.map.baidu.com/place/v2/search';
-    // $url = 'https://api.map.baidu.com/place/v3/region';
+    // $url = 'https://api.map.baidu.com/place/v2/search';
+    $url = 'https://api.map.baidu.com/place/v3/region';
     
     $param['ak']   = $ak;
     

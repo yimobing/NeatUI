@@ -1,7 +1,9 @@
 <?php 
 
-    /**
-     * 百度地图公交线路（WEB API）
+     /**
+     * 页面名称： 后端接口地址文件
+     * 功能及版本： 百度地图WebAPI公交线路
+     * 前端页面为：../js_api/BMap_百度地图_example_公交_公交路线.html
      * 参考：https://lbsyun.baidu.com/faq/api?title=webapi/guide/webservice-lwrouteplanapi/transit
      */
     header('Content-type:text/json;charset=utf-8');
@@ -18,7 +20,7 @@
 
 
     //----------------------------------------
-    // 百度地图WEB API 调用
+    // 百度地图WebAPI调用
     // 此处填写你在控制台-应用管理-创建应用后获取的AK
     $ak = '2COzFaICuIyVj7V3VetKfmdRVnX8BhVr'; // 您的百度地图AK。
     // 发起一个http get请求，并返回请求的结果

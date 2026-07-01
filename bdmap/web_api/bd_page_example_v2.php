@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * 页面名称： 前端页面+后端接口地址文件
+ * 功能及版本： 百度地图WebAPI接口调试 - 前后端不分离版（有表单）
+ */
+
 // PHP5.3 解除JSON中文\u转义，全局可用函数（挪到最顶部！）
 function json_unescape_unicode($str)
 {
@@ -94,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <meta charset="utf-8">
-    <title> 百度地图 web api 接口调试 - 前后端不分离版 + 有表单版 </title>
+    <title> 百度地图WebAPI接口调试 - 前后端不分离版（有表单） </title>
     <style>
         * {
             box-sizing: border-box;
@@ -140,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="box">
-        <h3>接口参数提交工具</h3>
+        <h3> 接口参数提交工具 </h3>
         <form method="post" action="">
             <div class="form-item">
                 <label>AK密钥 ：</label>
@@ -214,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $province = isset($item['province']) ? $item['province'] : '';
                 $city = isset($item['city']) ? $item['city'] : '';
                 $area = isset($item['area']) ? $item['area'] : '';
-                $town = isset($item['street_id']) ? $item['street_id'] : '';
+                $town = isset($item['town']) ? $item['town'] : '';
 
                 echo "第 " . ($index + 1) . " 个：{$name} <br>";
                 echo "地址：{$address}<br>";
