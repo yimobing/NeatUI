@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="网站名称">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title> </title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link type="text/css" rel="stylesheet" href="">
+    <link type="images/x-icon" rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript">if(top.location != self.location){ top.location = self.location; }</script>
+</head>
+<body>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none;}
+        .street {
+            width: 90%;
+            margin: 0 auto;
+        }
+        ul, li { list-style-type: none; }
+        li { 
+            margin-top: 15px;
+            padding: 10px 15px; 
+            background-color:beige;
+            border-radius: 4px;
+            color: #666;
+            font-size: 18px;
+        }
+        li:first-child {
+            margin-top: 15px;
+        }
+    </style>
+
+    <div class="wrap">
+       <div class="street">
+            <div class="street__title">街道演示示例</div>
+            <div class="street__list">
+                <ul>
+                    <li id="l-fengze"><span>丰泽街道</span></li>
+                    <li id="l-licheng"><span>北峰街道</span></li>
+                    <li id="l-luojiang"><span>双阳街道</span></li>
+                </ul>
+            </div>
+       </div>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <script src="../../assets/neatui/js/neatui-bmap.js"></script>
+    <script>
+
+        //  方法1：构造函数当成普通函数使用
+        NeExample('#l-fengze', {
+            intervals: 1000,
+            backgroundColor: 'blue',
+            color: 'purple',
+            fontSize: 28
+        });
+
+        NeExample('#l-licheng', {
+            intervals: 2000,
+            backgroundColor: 'green',
+            color: 'orange',
+            fontSize: 32
+        })
+
+
+        // 方法2：构造函数使用 new 实例化
+        // 使用 new 创建实例并调用原型方法（支持链式调用）
+        var example = new NeExample();
+        example.init('#l-luojiang', {
+            intervals: 3000,
+            backgroundColor: 'red',
+            color: 'brown',
+            fontSize: 36
+        });
+        example.changeColor();
+
+
+    </script>
+
+
+</body>
+</html>
