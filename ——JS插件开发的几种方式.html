@@ -1,618 +1,1165 @@
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-// JS插件开发的几种方式
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-/**
-*  参考文档：
-    JavaScript中new一个函数和直接调用函数的区别：https://www.cnblogs.com/vicky-li/p/8669549.html
-    JavaScript中call()、apply()、bind() 的用法：https://www.runoob.com/w3cnote/js-call-apply-bind.html
-    JS中关于为什么调用构造函数要使用new的详细解读：https://blog.csdn.net/2301_79858914/article/details/141089368
-    Javascript函数执行、new机制以及继承: https://segmentfault.com/a/1190000011452776
-    JavaScript 如何不使用`new` ： https://cloud.tencent.com/developer/information/JavaScript%3A%E5%A5%BD%E7%9A%84%E9%83%A8%E5%88%86%20-%20%E5%A6%82%E4%BD%95%E4%B8%8D%E4%BD%BF%E7%94%A8%60new%60
-
-    插件的封装方式：https://www.cnblogs.com/joyco773/p/10769293.html
-
-    如何开发原生的 JavaScript 插件(知识点+写法)：https://www.cnblogs.com/cboyce/p/6029782.html
-    JS封装——构建自己的jQuery插件： https://www.jianshu.com/p/7e6c25563685
-    原生js插件的封装写法： https://www.cnblogs.com/wgb1234/articles/16640397.html
-*
-*/
-
-//========================================================================================================================
-//                    jQuery extend 封装控件1
-//========================================================================================================================
-// jQuery 插件开发
-;(function ($) {
-
-    var defaults = {
-        // 这里是控件默认参数
-    };
-
-    var settings = {};
-
-    // 定义methods对象
-    var methods = {
-        init: function(options){
-            var _this = this; // 控件元素对象
-            var defaults = {
-                // 这里是控件默认参数
-            }
-            settings = $.extend(true, {}, defaults, options || {});
-   
-            //...
-
-            return this.each(function(){
-                var $this = $(this); // 控件元素对象
-            })
-        },
-        event1: function(source, options){ // 函数1
-            //...
-        },
-        event2: function(userName, userSex, userAge){ // 函数2
-            //...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> JS 插件开发的几种方式 </title>
+</head>
+<body>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        pre {
+            background-color: #fff;
         }
-    };
-
-    // 内部对象，对象中的函数仅供内部使用，故用下划线_开头表示私有函数
-    var helpers = {
-        _aaa: function(){
-
-        },
-        _bbb: function(){
-
-        },
-        _ccc: function(){
-
+        pre.pre-code {
+            width: 95%;
+            margin: 0 auto;
+            background: #282c34;
+            color: #abb2bf;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
         }
-    };
-
-    //...
-
-    //对外暴露接口
-    $.fn.jeDate = function(method){
-        if(methods[method]){
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        }else if(typeof method === 'object' || !method){
-            return methods.init.apply(this, arguments);
-        }else{
-            $.error('Method ' + method + ' does not exist in jQuery');
-        }
-    }
-
-})(jQuery);
-
-
-//=====前台调用示例
-//eg1.
-$('#id').jeDate('init', opts); // 调用控件内部init函数,并传递参数opts
-//eg2.
-$('#id').jeDate('event1', source, opts); // 调用控件内部event1函数，并传递对应的两个参数source, opts
-//eg3.
-$('#id').jeDate('event2', userName, userSex, userAge); // 调用控件内部event2函数，并传递对应的三个参数：userName, userSex, userAge
-
-
-
-
-
-//========================================================================================================================
-//                    jQuery extend 封装控件2
-//========================================================================================================================
-// jQuery 插件开发
-;(function ($) {
-
-    //...
-
-    $.fn.NeDate = function(options){
-        return new MyJet(this, options); // 实例化 MyJet 函数
-    };
-
-    // 定义一个函数(其实该函数也是一个对象) MyJet
-    var MyJet = function(element, options){
-        var me = this;
-        me.$element = element;
-        //后面可设置一堆内部变量
-        me.aa = '';
-        me.bb = '';
-
-        //...
-
-        me.init(options);
-    };
-
-    // 给 MyJet 添加函数或对象
-    MyJet.prototype.init = function(options){
-        var me = this;
-        var defaults = {
-
-        }
-        var settings = $.extend(true, {}, defaults, options || {});
-        me.opts = settings;
-        //...
-    };
-
-    MyJet.prototype.event1 = function(){ // 函数1
-        //..
-    };
-    MyJet.prototype.event2 = function(){ // 函数2
-        //..
-    };
-
-    //...
-
-})(jQuery);
-
-
-
-//=====前台调用示例
-$('#id').NeDate(opts); // opts是一个对象
-
-
-
-
-
-
-
-
-//========================================================================================================================
-//                    原生JS封装控件
-// [参考]
-// https://www.cnblogs.com/linyuxuan/p/14708647.html
-// https://www.cnblogs.com/netWild/p/15685653.html
-//========================================================================================================================
-
-//————————————————————————————————————————————————————————————————————————————————————
-//            封装方法1： 暴露独立函数
-//————————————————————————————————————————————————————————————————————————————————————
-; (function (root, factory) {
-    if (typeof define === 'function' && define.amd) {        // AMD
-        define(['jquery', 'underscore'], factory);
-    } else if (typeof exports === 'object') {        // Node, CommonJS之类的
-        module.exports = factory(require('jquery'), require('underscore'));
-    } else { // 浏览器全局变量(root 即 window)
-        root.NeMapExample = factory(root.jQuery, root._); // returnExports 是函数名称
-    }
-})(this, function ($, _) { // 方法
-    function a() { };   // 私有方法，因为它没被返回 (见下面)
-    function b() { };  // 公共方法，因为被返回了
-    function c() { };  // 公共方法，因为被返回了
-
-    //  暴露公共方法
-    return { b: b, c: c }
-});
-//========注：匿名函数马上执行有两种格式：
-// 格式1
-(function () { }());
-// 格式2
-(function () { })();
-
-
-// 前端调用方式：
-NeMapExample.b();
-NeMapExample.c();
-
-
-
-
-//————————————————————————————————————————————————————————————————————————————————————
-//            封装方法2：暴露构造函数 (调用原型链)
-//————————————————————————————————————————————————————————————————————————————————————
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        define(['jquery', 'underscore'], factory);
-    } else if (typeof exports === 'object') {
-        module.exports = factory(require('jquery'), require('underscore'));
-    } else {
-        root.NeMapExample = factory(root.jQuery, root._);
-    }
-})(this, function ($, _) {
-    // 1. 定义构造函数（核心：原型链的基础）
-    function NeMapExample(options) {
-        // 构造函数初始化逻辑（比如接收配置参数）
-        this.options = options || {};
-        this.init(); // 初始化方法
-    }
-
-    // 2. 私有函数（仅插件内部可访问）
-    function a() {
-        console.log('私有函数a，外部无法调用');
-    }
-
-    // 3. 原型链方法（核心：挂载到构造函数的 prototype 上）
-    NeMapExample.prototype = {
-        // 重置构造函数指向（避免原型重写后 constructor 丢失）
-        constructor: NeMapExample,
-        
-        // 初始化方法（原型方法）
-        init: function () {
-            a(); // 内部可调用私有函数
-            console.log('初始化完成，配置：', this.options);
-        },
-        
-        // 原型方法 b（对应原插件的 b 函数）
-        b: function () {
-            console.log('原型方法b执行');
-            return this; // 支持链式调用
-        },
-        
-        // 原型方法 c（对应原插件的 c 函数）
-        c: function () {
-            console.log('原型方法c执行，依赖jQuery：', $);
-            console.log('依赖underscore：', _);
-            return this;
-        }
-    };
-
-    // 4. 暴露构造函数（而非普通对象）
-    return NeMapExample;
-});
-
-
-// 前端调用方式：
-// 1. 实例化插件（可传配置参数）
-var example = new NeMapExample({
-    key: '百度地图key',
-    zoom: 10
-});
-// 2. 调用原型链方法（支持链式调用）
-example.b(); // 输出：原型方法b执行
-example.c(); // 输出：原型方法c执行，依赖jQuery/underscore
-example.b().c(); // 链式调用
-
-
-
-
-//————————————————————————————————————————————————————————————————————————————————————
-//            封装方法3： 公用函数 + 露构造函数
-//————————————————————————————————————————————————————————————————————————————————————
-;(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        define(['jquery', 'underscore'], factory);
-    } else if (typeof exports === 'object') {
-        module.exports = factory(require('jquery'), require('underscore'));
-    } else {
-        // 全局环境下，挂载到 root（window）上
-        root.NeMapExample = factory(root.jQuery, root._);
-    }
-})(this, function ($, _) {
-    // --------------------------
-    // 1. 私有函数（仅内部可访问）
-    // --------------------------
-    function a() {
-        console.log('私有函数a，仅内部调用');
-        return '私有逻辑执行';
-    }
-
-    // --------------------------
-    // 2. 构造函数（用于实例化，挂载原型方法）
-    // --------------------------
-    function Widget(options) {
-        // 实例初始化配置
-        this.options = options || { zoom: 10, key: '' };
-        // 初始化逻辑
-        this.init();
-    }
-
-    // 给构造函数挂载原型方法
-    Widget.prototype = {
-        constructor: Widget, // 修复原型链指向
-        // 原型方法：初始化
-        init: function () {
-            a(); // 内部调用私有函数
-            console.log('实例初始化，配置：', this.options);
-        },
-        // 原型方法：业务逻辑1
-        protoB: function () {
-            console.log('原型方法protoB执行，依赖jQuery：', $.fn.jquery);
-            return this; // 支持链式调用
-        },
-        // 原型方法：业务逻辑2
-        protoC: function () {
-            console.log('原型方法protoC执行，依赖underscore：', _.VERSION);
-            return this;
-        }
-    };
-
-    // --------------------------
-    // 3. 独立函数（直接暴露，无需实例化）
-    // --------------------------
-    function b() {
-        console.log('独立函数b执行（无实例）');
-        // 可调用私有函数/依赖
-        a();
-        return 'b的返回值';
-    }
-
-    function c() {
-        console.log('独立函数c执行（无实例）');
-        // 可直接使用依赖
-        console.log('c函数中使用underscore：', _.isEmpty({}));
-        return 'c的返回值';
-    }
-
-    // --------------------------
-    // 4. 混合暴露：构造函数 + 独立函数
-    // --------------------------
-    return {
-        MapPlugin: Widget, // 暴露构造函数（支持实例化）
-        b: b,                     // 暴露独立函数b
-        c: c                      // 暴露独立函数c
-    };
-});
-
-
-// 前端调用方式
-// ------------- 方式1：直接调用独立函数（无需实例化）-------------
-NeMapExample.b(); // 输出：独立函数b执行（无实例）
-NeMapExample.c(); // 输出：独立函数c执行（无实例）
-
-// ------------- 方式2：实例化构造函数，调用原型方法 -------------
-// 1. 创建实例（传配置）
-var example = new NeMapExample.MapPlugin({
-    key: '百度地图key',
-    zoom: 15
-});
-// 2. 调用原型方法（支持链式调用）
-example.protoB(); // 输出：原型方法protoB执行
-example.protoC(); // 输出：原型方法protoC执行
-example.protoB().protoC(); // 链式调用
-
-
-
-
-
-
-
-//————————————————————————————————————————————————————————————————————————————————————
-//            封装实例1：控件对象只能当函数使用
-//————————————————————————————————————————————————————————————————————————————————————
-; (function (root, factory) { 
-    if (typeof define === 'function' && define.amd) { // AMD规范
-        define(factory);
-    }
-    else if (typeof exports === 'object') { // CommonJS规范
-        module.exports = factory();
-    }
-    else { // 浏览器全局变量(root 即 window)
-        root.NeDate = factory();
-    }
-})(this, function () {
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //  一、开始调用
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // [注] 实例属性(因为是独立的, 不共享)建议使用“构造函数模式”进行定义; 实例方法(因为要共享)建议使用“原型模式”进行定义
-    /**
-     * !! 构造函数
-     * @param {HTML DOM Node} elem 绑定的元素。eg. '#ID节点', '.类名节点'
-     * @param {Ojbect} options 参数配置项
-     */
-    function MyPlugin(elem, options) {
-        // “构造函数模式”定义实例属性，这些属性是独立的，即改变某个实例的属性并不影响其它实例的属性
-        // this.a = '';
-        // this.b = '';
-        // this.c = '';
-        var opts = typeof (options) === "function" ? options() : options;
-        if (typeof elem != 'undefined' && typeof options != 'undefined') { // 构造函数当成普通函数使用时
-            return new DateInitialize(this, elem, opts);
-        }
-    };
-
-
-
-    /**
-     * !!! 控件对象初始化
-     * @param {Object} me 构造函数对象，一般为 this 
-     * @param {HTML DOM} elem 绑定的元素。eg. '#ID节点', '.类名节点'
-     * @param {Ojbect} options 参数配置项
-     */
-    function DateInitialize(me, elem, options) {
-        var defaults = {
-            name: "穆桂英",
-            sex: 18,
-            age: "女"
-        }
-        var settings = utils.extend(true, {}, defaults, options || {}); // 合并对象
-        me.$defaults = defaults;
-        me.$opts = settings; // 方便其它地方直接调用
-        //...
-    };
-
-
-    
-    // “原型模式”定义实例方法，这些方法是共享的
-    /**
-     * !! 初始化
-     * @param {HTML DOM Node} o 绑定的元素。eg. '#ID节点', '.类名节点'
-     * @param {Object} opts 参数配置项
-     */
-     MyPlugin.prototype.init = function (o, opts) {
-        new DateInitialize(this, o, opts);
-    };
-
-
-
-    /**
-     * !! 加载中
-     * @param {string} value1 参数1
-     * @param {string} value2 参数2
-     * @param {string} value3 参数3
-     */
-     MyPlugin.prototype.load = function (value1, value2, value3) {
-        console.log('城市', value1, value2, value3);
-        console.log('默认参数：', this.$defaults);
-        console.log('配置参数：', this.$opts);
-        helpers._getCity();
-    };
-
-    //...
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //  二、内置函数库
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    var helpers = {
-        _getCity: function () {
+        code {
             
+            font-family: "Fira Code", "Source Code Pro", Consolas, Monaco, monospace;
         }
-    }; 
+        h1, h2, h3 {
+            padding: 10px 15px;
+            text-align: center;
+            font-weight: bold;
+            border-style: solid;
+        }
+        h1 {
+            color: blue;
+            background-color: lightblue;
+            font-size: 36px;
+            border-color: blue;
+            border-width: 3px 0 3px 0;
+        }
+        h2 {
+            width: 95%;
+            margin: 0 auto;
+            background-color: lightgray;
+            color: lightseagreen;
+            font-size: 30px;
+            border-color: lightseagreen;
+            border-width: 2px 0 2px 0;
+        }
+        h3 {
+            width: 60%;
+            margin-left: 50px;
+            background-color: #fec99f;
+            text-align: left;
+            color: lightseagreen;
+            font-size: 24px;
+            border-color: lightseagreen;
+            border-width: 1px 0 1px 0;
+        }
 
+        h4, h5 {
+            display: inline-block;
+            padding: 10px 15px;
+          
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        h4 {
+            background-color: lightyellow;
+            color: brown;
+            font-size: 22px;
+        }
+        h5 {
+            background-color: #f1f9de;
+            color: lightskyblue;
+            font-size: 18px;
+        }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //  三、工具库
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    var utils = {
+        .hide { 
+            display: none;
+        }
+        .description {
+            text-align: center;
+            color: #888;
+            font-size: 16px;
+            font-style: italic;
+        }
+    </style>
+    <pre>
+    
+
+        <h1> JS插件开发的几种方式 </h1>
+        
         /**
-        * 原生JS合并对象
+        *  参考文档：
+            JavaScript中new一个函数和直接调用函数的区别：https://www.cnblogs.com/vicky-li/p/8669549.html
+            JavaScript中call()、apply()、bind() 的用法：https://www.runoob.com/w3cnote/js-call-apply-bind.html
+            JS中关于为什么调用构造函数要使用new的详细解读：https://blog.csdn.net/2301_79858914/article/details/141089368
+            Javascript函数执行、new机制以及继承: https://segmentfault.com/a/1190000011452776
+            JavaScript 如何不使用`new` ： https://cloud.tencent.com/developer/information/JavaScript%3A%E5%A5%BD%E7%9A%84%E9%83%A8%E5%88%86%20-%20%E5%A6%82%E4%BD%95%E4%B8%8D%E4%BD%BF%E7%94%A8%60new%60
+
+            插件的封装方式：https://www.cnblogs.com/joyco773/p/10769293.html
+
+            如何开发原生的 JavaScript 插件(知识点+写法)：https://www.cnblogs.com/cboyce/p/6029782.html
+            JS封装——构建自己的jQuery插件： https://www.jianshu.com/p/7e6c25563685
+            原生js插件的封装写法： https://www.cnblogs.com/wgb1234/articles/16640397.html
+        *
         */
-        extend: function () {
-            // eg.
-            return {}
+
+  
+        <div class="hide">//========================================================================================================================</div>
+       <h1> 一、jQuery 封装控件 </h1>
+       <div class="hide">//========================================================================================================================</div>
+
+       <div class="hide">*******************************************************************************************</div>
+       <h2> jQuery extend 封装控件1 </h2>
+       <div class="hide">*******************************************************************************************</div>
+        <pre class="pre-code"><code>
+            // jQuery 插件开发
+            ;(function ($) {
+
+                var defaults = {
+                    // 这里是控件默认参数
+                };
+
+                var settings = {};
+
+                // 定义methods对象
+                var methods = {
+                    init: function(options){
+                        var _this = this; // 控件元素对象
+                        var defaults = {
+                            // 这里是控件默认参数
+                        }
+                        settings = $.extend(true, {}, defaults, options || {});
+            
+                        //...
+
+                        return this.each(function(){
+                            var $this = $(this); // 控件元素对象
+                        })
+                    },
+                    event1: function(source, options){ // 函数1
+                        //...
+                    },
+                    event2: function(userName, userSex, userAge){ // 函数2
+                        //...
+                    }
+                };
+
+                // 内部对象，对象中的函数仅供内部使用，故用下划线_开头表示私有函数
+                var helpers = {
+                    _aaa: function(){
+
+                    },
+                    _bbb: function(){
+
+                    },
+                    _ccc: function(){
+
+                    }
+                };
+
+                //...
+
+                //对外暴露接口
+                $.fn.jeDate = function(method){
+                    if(methods[method]){
+                        return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+                    }else if(typeof method === 'object' || !method){
+                        return methods.init.apply(this, arguments);
+                    }else{
+                        $.error('Method ' + method + ' does not exist in jQuery');
+                    }
+                }
+
+            })(jQuery);
+
+        </code></pre>
+
+        //=====前台调用示例
+        //eg1.
+        $('#id').jeDate('init', opts); // 调用控件内部init函数,并传递参数opts
+        //eg2.
+        $('#id').jeDate('event1', source, opts); // 调用控件内部event1函数，并传递对应的两个参数source, opts
+        //eg3.
+        $('#id').jeDate('event2', userName, userSex, userAge); // 调用控件内部event2函数，并传递对应的三个参数：userName, userSex, userAge
+
+
+
+
+
+        <div class="hide">*******************************************************************************************</div>
+                    <h2> jQuery extend 封装控件2 </h2>
+       <div class="hide">*******************************************************************************************</div>
+        <pre class="pre-code"><code>
+            // jQuery 插件开发
+            ;(function ($) {
+
+                //...
+
+                $.fn.NeDate = function(options){
+                    return new MyJet(this, options); // 实例化 MyJet 函数
+                };
+
+                // 定义一个函数(其实该函数也是一个对象) MyJet
+                var MyJet = function(element, options){
+                    var me = this;
+                    me.$element = element;
+                    //后面可设置一堆内部变量
+                    me.aa = '';
+                    me.bb = '';
+
+                    //...
+
+                    me.init(options);
+                };
+
+                // 给 MyJet 添加函数或对象
+                MyJet.prototype.init = function(options){
+                    var me = this;
+                    var defaults = {
+
+                    }
+                    var settings = $.extend(true, {}, defaults, options || {});
+                    me.opts = settings;
+                    //...
+                };
+
+                MyJet.prototype.event1 = function(){ // 函数1
+                    //..
+                };
+                MyJet.prototype.event2 = function(){ // 函数2
+                    //..
+                };
+
+                //...
+
+            })(jQuery);
+
+        </code></pre>
+
+
+        //=====前台调用示例
+        $('#id').NeDate(opts); // opts是一个对象
+
+
+
+
+
+
+
+        <div class="hide"> //======================================================================================================================== </div>
+        <h1> 二、原生JS封装控件 </h1>
+        // [参考]
+        // https://www.cnblogs.com/linyuxuan/p/14708647.html
+        // https://www.cnblogs.com/netWild/p/15685653.html
+        <div class="hide">======================================================================================================================== </div>
+
+
+
+        <div class="hide">*******************************************************************************************</div>
+                            <h2> 1、封装模板 </h2>
+            <div class="description"> 前端独立 JS 插件最通用、最基础的标准化封装模板（模板一、模板二） </div>
+        <div class="hide">*******************************************************************************************</div>
+
+        下面两套封闭模板是传统前端 JS 插件最基础、标准的 UMD 封装模板，兼顾模块化与浏览器直接使用；
+        开发纯原生工具插件，推荐使用模板一，减少外部依赖限制。
+
+        <div class="hide">---------------------------------------------------------</div>
+            <h3> 模板一：无依赖原生 JS 插件模板（纯原生，不依赖任何第三方库） </h3>
+        <div class="hide">---------------------------------------------------------</div>
+        适用场景：纯原生工具类、日期处理、工具函数、独立组件，无需 jQuery/Underscore 等外部库
+
+        <h4> · 极简注释版 </h4>
+        <pre class="pre-code"><code>
+            ;(function (root, factory) {
+                if (typeof define === 'function' && define.amd) { // AMD规范
+                    define(factory);
+                } 
+                else if (typeof exports === 'object' && typeof module !== 'undefined') { // UMD规范：Node, CommonJS规范（标准环境）
+                    module.exports = factory();
+                } 
+                else if (typeof exports === 'object') { // UMD规范：Node, CommonJS规范（兜底环境）
+                    exports.NeExample = factory();
+                } 
+                else { // 浏览器全局变量(root 即 window)
+                    root.NeExample = factory(); // 全局环境下，挂载到 root（window）上
+                }
+            })(this, function () {
+                // MyPlugin 是临时变量，可以是任何名称，也可命名为跟 root.NeExample同名的 NeExample 
+                var MyPlugin = {
+                    init: function () {
+                        console.log('初始化');
+                    }
+                };
+                return MyPlugin;
+            });
+
+        </code></pre>
+
+        <h5> 日常常见的可精简成如下（没有commonJS兜底环境，少一个else 判断） </h5>
+        <pre class="pre-code"><code>
+            ;(function (root, factory) { // AMD规范
+                if (typeof define === 'function' && define.amd) {
+                    define(factory);
+                } 
+                else if (typeof exports === 'object') { // Node, CommonJS规范
+                    module.exports = factory();
+                } 
+                else { // 浏览器全局变量(root 即 window)
+                    root.NeExample = factory(); // 全局环境下，挂载到 root（window）上
+                }
+            })(this, function () {
+                var MyPlugin = {
+                    init: function () {
+                        console.log('初始化');
+                    }
+                };
+                return MyPlugin;
+            });
+
+        </code></pre>
+
+        <h4> · 全注释版 </h4>
+        <pre class="pre-code"><code>
+            ;(function (root, factory) {
+                // ①.AMD规范：RequireJS 模块化（无依赖，无需传依赖数组）
+                if (typeof define === 'function' && define.amd) {
+                    define(factory);
+                }
+                // ②.UMD规范：CommonJS规范：Node、打包工具(Webpack、Vite)、浏览器ESM环境(如原生type="module")
+                // 标准环境：同时存在module与exports
+                else if (typeof exports === 'object' && typeof module !== 'undefined') {
+                    module.exports = factory();
+                }
+                // 兜底环境：仅存在exports、无module对象的轻量（极少场景）。老式极简 CommonJS 模拟环境、非常老旧的打包工具才会出现，日常开发几乎碰不到。
+                else if (typeof exports === 'object') {
+                    exports.NeExample = factory(); // 将插件挂载到exports对象上
+                }
+                // ③.普通浏览器原生环境：挂载全局window
+                else {
+                    root.NeExample = factory(); // root = this，外层this指向window，挂载全局变量直接调用
+                }
+            })(this, function () {
+                var MyPlugin = {
+                    init: function () {
+                        console.log('初始化');
+                    }
+                };
+                return MyPlugin;
+            });
+
+        </code></pre>
+
+        模板使用注意事项：
+        （1）HTML 页面直接 script 引入即可，无需提前加载任何第三方库；
+        （2）RequireJS、Node 环境均不会强制加载额外依赖，无缺失报错；
+        （3）内部仅可使用原生 DOM、原生 JS 语法，不可使用$、_.xxx()。
+
+
+
+
+        <div class="hide">---------------------------------------------------------</div>
+            <h3> 模板二：带外部依赖插件模板（依赖 jQuery、Underscore） </h3>
+        <div class="hide">---------------------------------------------------------</div>
+        适用场景：插件需要依赖第三方库（JQ、工具库 Underscore/Lodash 等）
+
+        <pre class="pre-code"><code>
+            ;(function (root, factory) {
+                if (typeof define === 'function' && define.amd) {
+                    define(['jquery', 'underscore'], factory);
+                } else if (typeof exports === 'object' && typeof module !== 'undefined') {
+                    module.exports = factory(require('jquery'), require('underscore'));
+                } else if (typeof exports === 'object') {
+                    exports.NeExample = factory();
+                } else {
+                    root.NeExample = factory(root.jQuery, root._);
+                }
+            })(this, function ($, _) {
+                var MyPlugin = {
+                    init: function () {
+                        console.log('初始化', $, _);
+                    }
+                };
+                return MyPlugin;
+            });
+
+        </code></pre>
+
+        模板使用注意事项：
+        （1）浏览器直接引入时，必须先加载 jQuery、Underscore，再引入本插件；
+        （2）RequireJS 环境会自动加载 jquery、underscore 模块，未配置模块路径会报错；
+        （3）Node 项目需提前安装依赖：npm install jquery underscore；
+        （4）插件内部代码可直接使用 $（jQuery）、_（Underscore）。
+
+
+        ~~~~~~~~~~~~~~~~~~~~~~
+        <h4> 【前端页面调用方式】 </h4>
+        ~~~~~~~~~~~~~~~~~~~~~~
+        <pre class="pre-code"><code>
+                
+            · 场景 A：Vite/Webpack 工程内部导入（ESM 项目）
+            // 工程内任意js文件
+            import NeExample from './插件名称.js';
+            NeExample.init();
+            
+            · 场景 B：老旧 HTML 页面 / RequireJS
+            
+            1、普通 html 直接引入
+            <!-- 无依赖插件直接引入 -->
+            &lt;script src="插件名称.js"&gt;&lt;/script&gt;
+            &lt;script>
+                NeExample.init();
+            &lt;/script&gt;
+            
+            <!-- 带依赖插件需先引入jquery、underscore -->
+            &lt;script src="jquery.js"&gt;&lt;/script&gt;
+            &lt;script src="underscore.js"&gt;&lt;/script&gt;
+            &lt;script src="插件名称.js"&gt;&lt;/script&gt;
+            &lt;script>
+                NeExample.init();
+            &lt;/script&gt;
+            
+            2、浏览器ESM环境（原生ES Module脚本）
+            &lt;script type="module"&gt;
+                import NeExample from './插件名称.js'; // 导入UMD插件
+                NeExample.init(); // 调用插件方法
+            &lt;/script&gt;
+            
+            3、RequireJS 使用
+            require(['NeExample'], function(NeExample) {
+                NeExample.init();
+            });
+
+        </code></pre>
+
+
+        <div class="hide">*******************************************************************************************</div>
+                           <h2>  2、通用封装方法（开发插件时可直接复制过去） </h2>
+        <div class="hide">*******************************************************************************************</div>
+        <pre class="pre-code"><code>
+            
+            ;(function(root, factory) {
+                if(typeof define === 'function' && define.amd) {
+                    define(factory);
+                }
+                else if(typeof exports === 'object') {
+                    module.exports = factory();
+                }
+                else {
+                    root.NeExample = factory();
+                }
+            })(this, function () {
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 1. 定义构造函数（核心：原型链的基础）
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                function MyPlugin(elem, options) {
+                    var me = this;
+                    // 用户不使用 new 进行实例化时
+                    if(! (this instanceof MyPlugin)) {
+                        return new MyPlugin(elem, options); // 自动使用 new 进行实例并返回
+                    }
+                    // 用户有使用 new 进行实例化时
+                    if(arguments.length > 0) {
+                        if(typeof elem != 'undefined' && typeof options != 'undefined') {
+                            me.init(elem, options); // 初始化
+                        }
+                    }
+                };
+
+
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 2. 原型链方法（核心：挂载到构造函数的 prototype 上）
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 初始化
+                MyPlugin.prototype.init = function (element, options) {
+                    var me = this;
+                    // console.log('初始化');
+                    var defaults = {
+                        intervals: 100,
+                        backgroundColor: 'beige',
+                        color: '#000',
+                        fontSize: 16
+                    }
+                    var settings = utils.merge(true, {}, defaults, options || {});
+                    me.$element = element;
+                    me.$defaults = defaults;
+                    me.$settings = settings;
+                    me.changeColor(); // 改变颜色
+                };
+
+                // 改变颜色
+                MyPlugin.prototype.changeColor = function () {
+                    var me = this;
+                    var bgColor = me.$settings.backgroundColor,
+                        fontColor = me.$settings.color,
+                        fontSize = me.$settings.fontSize;
+                    var selector = me.$element.toString().replace(/(\#|\.)/g, '');
+                    var elDom = document.getElementById(selector);
+                    if(elDom != null) {
+                        setTimeout(function() {
+                            elDom.style.backgroundColor = bgColor;
+                            elDom.style.color = fontColor;
+                            elDom.style.fontSize = fontSize + 'px';
+                        }, me.$settings.intervals);
+                    }
+                };
+
+
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 3、私有函数：供内部调用
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                var helpers = {
+                    _fn1: function () {
+                        
+                    },
+                    _fn2: function () {
+                        
+                    }
+                };
+
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 4、工具库：通用工具
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                var utils = {
+                    
+                    /**
+                    * 原生JS对象合并
+                    * 兼容IE6+，支持深浅合并，不污染原对象
+                    * @param {Boolean} [deep] 可选，是否开启深拷贝；true深合并，false浅合并，不传默认false
+                    * @param {Object} target 必传，合并基准目标对象
+                    * @param {Object} source1 必传，待合并源对象1
+                    * @param {Object} [source2,...sourceN] 可选，多个待合并源对象，支持无限个
+                    * @returns {Object} 返回全新合并后的对象
+                    * @usage
+                    * 浅合并（第一层覆盖，嵌套对象直接替换）
+                    * var res1 = utils.merge(false, {a:1}, {b:2}, {a:99});
+                    * 深合并（嵌套对象递归合并，数组/日期/正则直接覆盖）
+                    * var defaults = {name:"默认",info:{age:18}};
+                    * var userOpts = {name:"张三",info:{sex:"男"}};
+                    * var res2 = utils.merge(true, {}, defaults, userOpts);
+                    */
+                    merge: function () {
+                        var deep = false;
+                        var args = Array.prototype.slice.call(arguments);
+                        // 判断第一个参数是否为布尔值，代表是否深拷贝
+                        if (typeof args[0] === 'boolean') {
+                            deep = args.shift();
+                        }
+                        // 没有传入需要合并的对象，直接返回空对象
+                        if (args.length === 0) {
+                            return {};
+                        }
+                        // 取出目标对象，手动浅拷贝一层，不污染原始入参
+                        var target = args.shift();
+                        var copyTarget = {};
+                        for (var k in target) {
+                            if (Object.prototype.hasOwnProperty.call(target, k)) {
+                                copyTarget[k] = target[k];
+                            }
+                        }
+                        target = copyTarget;
+                        // 循环所有待合并源对象
+                        for (var i = 0; i < args.length; i++) {
+                            var source = args[i];
+                            // 跳过null、undefined、基础类型
+                            if (!source || typeof source !== 'object') {
+                                continue;
+                            }
+                            // 遍历源对象自有属性
+                            for (var key in source) {
+                                if (!Object.prototype.hasOwnProperty.call(source, key)) {
+                                    continue;
+                                }
+                                var srcVal = source[key];
+                                var tarVal = target[key];
+                                // 判断是否是纯普通对象：排除数组、Date、RegExp、null
+                                var isPlainObj = srcVal !== null
+                                    && typeof srcVal === 'object'
+                                    && !Array.isArray(srcVal)
+                                    && !(srcVal instanceof Date)
+                                    && !(srcVal instanceof RegExp);
+                                // 深合并逻辑：仅普通对象递归
+                                if (deep && isPlainObj) {
+                                    target[key] = this.merge(true, {}, tarVal || {}, srcVal);
+                                } else {
+                                    // 数组、日期、正则、基础类型直接覆盖
+                                    target[key] = srcVal;
+                                }
+                            }
+                        }
+                        return target;
+                    }
+                };
+
+
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 5、暴露公共方法，供用户调用
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                return MyPlugin; // 返回对象：暴露构造函数（而非普通对象）
+            });
+        </code></pre>
+
+        <h5> 【调用方法】 </h5>
+        //  方法1：构造函数当成普通函数使用
+        <pre class="pre-code"><code>
+            NeExample('#l-fengze', {
+                intervals: 1000,
+                backgroundColor: 'blue',
+                color: 'purple',
+                fontSize: 28
+            });
+    
+            NeExample('#l-licheng', {
+                intervals: 2000,
+                backgroundColor: 'green',
+                color: 'orange',
+                fontSize: 32
+            })    
+        </code></pre>
+
+
+        // 方法2：构造函数使用 new 实例化
+        // 使用 new 创建实例并调用原型方法（支持链式调用）
+        <pre class="pre-code"><code>
+            var example = new NeExample();
+            example.init('#l-luojiang', {
+                intervals: 3000,
+                backgroundColor: 'red',
+                color: 'brown',
+                fontSize: 36
+            });
+            example.changeColor();
+        </code></pre>
+
+
+
+
+
+
+        <div class="hide">*******************************************************************************************</div>
+                            <h2> 3、特殊封装方法 </h2>
+        <div class="hide">*******************************************************************************************</div>
+
+        <div class="hide"> ———————————————————————————————————————————————————————————————————————————————————— </div>
+                   <h3>  封装方法1： 暴露独立函数 </h3>
+        <div class="hide"> ———————————————————————————————————————————————————————————————————————————————————— </div>
+        <pre class="pre-code"><code>
+            ; (function (root, factory) {
+                if (typeof define === 'function' && define.amd) { // AMD规范
+                    define(['jquery', 'underscore'], factory);
+                } else if (typeof exports === 'object') {        // Node, CommonJS规范
+                    module.exports = factory(require('jquery'), require('underscore'));
+                } else { // 浏览器全局变量(root 即 window)
+                    root.NeExample = factory(root.jQuery, root._); // returnExports 是函数名称
+                }
+            })(this, function ($, _) { // 方法
+                function a() { };   // 私有方法，因为它没被返回 (见下面)
+                function b() { };  // 公共方法，因为被返回了
+                function c() { };  // 公共方法，因为被返回了
+
+                //  暴露公共方法
+                return { b: b, c: c }
+            });
+
+        </code></pre>
+
+        //========注：匿名函数马上执行有两种格式：
+        // 格式1
+        (function () { }());
+        // 格式2
+        (function () { })();
+
+
+        // 前端调用方式：
+        NeExample.b(); // 调用公共方法B
+        NeExample.c(); // 调用公共方法C
+
+
+
+
+        <div class="hide"> ———————————————————————————————————————————————————————————————————————————————————— </div>
+                    <h3> 封装方法2：暴露构造函数 (调用原型链) </h3>
+        <div class="hide"> ———————————————————————————————————————————————————————————————————————————————————— </div>
+        <pre class="pre-code"><code>
+
+            ;(function (root, factory) {
+                if (typeof define === 'function' && define.amd) { // AMD规范
+                    define(['jquery', 'underscore'], factory);
+                } else if (typeof exports === 'object') { // Node, CommonJS规范
+                    module.exports = factory(require('jquery'), require('underscore'));
+                } else { // 浏览器全局变量(root 即 window)
+                    root.NeExample = factory(root.jQuery, root._);
+                }
+            })(this, function ($, _) {
+                // 1. 定义构造函数（核心：原型链的基础）
+                function MyPlugin(options) {
+                    // 构造函数初始化逻辑（比如接收配置参数）
+                    this.options = options || {};
+                    this.init(); // 初始化方法
+                }
+
+                // 2. 私有函数（仅插件内部可访问）
+                function a() {
+                    console.log('私有函数a，外部无法调用');
+                }
+
+                // 3. 原型链方法（核心：挂载到构造函数的 prototype 上）
+                MyPlugin.prototype = {
+                    // 重置构造函数指向（避免原型重写后 constructor 丢失）
+                    constructor: MyPlugin,
+                    
+                    // 初始化方法（原型方法）
+                    init: function () {
+                        a(); // 内部可调用私有函数
+                        console.log('初始化完成，配置：', this.options);
+                    },
+                    
+                    // 原型方法 b（对应原插件的 b 函数）
+                    protoB: function () {
+                        console.log('原型方法b执行');
+                        return this; // 支持链式调用
+                    },
+                    
+                    // 原型方法 c（对应原插件的 c 函数）
+                    protoC: function () {
+                        console.log('原型方法c执行，依赖jQuery：', $);
+                        console.log('依赖underscore：', _);
+                        return this;
+                    }
+                };
+
+                // 4. 暴露构造函数（而非普通对象）
+                return MyPlugin;
+            });
+
+        </code></pre>
+
+        <h5> 前端调用方式：</h5>
+        // 实例化构造函数，调用原型方法
+        // 使用 new 创建实例并调用原型方法（支持链式调用）
+        var example = new NeExample({
+            key: '百度地图key',
+            zoom: 10
+        });
+        example.protoB(); // 调用原型方法B
+        example.protoC(); // 调用原型方法C。依赖jQuery/underscore
+        example.protoB().protoC(); // 链式调用
+
+
+
+
+        <div class="hide"> ———————————————————————————————————————————————————————————————————————————————————— </div>
+                    <h3> 封装方法3： 公用函数 + 露构造函数 </h3> 
+        <div class="hide"> //———————————————————————————————————————————————————————————————————————————————————— </div>
+        <pre class="pre-code"><code>
+            ;(function (root, factory) {
+                if (typeof define === 'function' && define.amd) { // AMD规范
+                    define(['jquery', 'underscore'], factory);
+                } else if (typeof exports === 'object') { // Node, CommonJS规范
+                    module.exports = factory(require('jquery'), require('underscore'));
+                } else { // 浏览器全局变量(root 即 window)
+                    // 全局环境下，挂载到 root（window）上
+                    root.NeExample = factory(root.jQuery, root._);
+                }
+            })(this, function ($, _) {
+                // --------------------------
+                // 1. 私有函数（仅内部可访问）
+                // --------------------------
+                function a() {
+                    console.log('私有函数a，仅内部调用');
+                    return '私有逻辑执行';
+                }
+
+                // --------------------------
+                // 2. 构造函数（用于实例化，挂载原型方法）
+                // --------------------------
+                function Widget(options) {
+                    // 实例初始化配置
+                    this.options = options || { zoom: 10, key: '' };
+                    // 初始化逻辑
+                    this.init();
+                }
+
+                // 给构造函数挂载原型方法
+                Widget.prototype = {
+                    constructor: Widget, // 修复原型链指向
+                    // 原型方法：初始化
+                    init: function () {
+                        a(); // 内部调用私有函数
+                        console.log('实例初始化，配置：', this.options);
+                    },
+                    // 原型方法：业务逻辑1
+                    protoB: function () {
+                        console.log('原型方法protoB执行，依赖jQuery：', $.fn.jquery);
+                        return this; // 支持链式调用
+                    },
+                    // 原型方法：业务逻辑2
+                    protoC: function () {
+                        console.log('原型方法protoC执行，依赖underscore：', _.VERSION);
+                        return this;
+                    }
+                };
+
+                // --------------------------
+                // 3. 独立函数（直接暴露，无需实例化）
+                // --------------------------
+                function b() {
+                    console.log('独立函数b执行（无实例）');
+                    // 可调用私有函数/依赖
+                    a();
+                    return 'b的返回值';
+                }
+
+                function c() {
+                    console.log('独立函数c执行（无实例）');
+                    // 可直接使用依赖
+                    console.log('c函数中使用underscore：', _.isEmpty({}));
+                    return 'c的返回值';
+                }
+
+                // jQuery 静态方法调用（代码要放在return前）
+                if ($) {
+                    $.generateMap = function(opts) {
+                        return new Widget(opts);
+                    }
+                }
+
+                // --------------------------
+                // 4. 混合暴露：构造函数 + 独立函数
+                // --------------------------
+                return {
+                    MapPlugin: Widget, // 暴露构造函数（支持实例化）
+                    b: b, // 暴露独立函数b
+                    c: c, // 暴露独立函数c
+
+                    // 新增工厂方法，隐藏new
+                    createMap: function(opts) {
+                        return new Widget(opts);
+                    }
+
+                };
+            });
+        
+        </code></pre>
+
+
+        <h5>【前端调用方式】 </h5>
+        // · 直接调用独立函数（无需实例化）
+        NeExample.b(); // 输出：独立函数b执行（无实例）
+        NeExample.c(); // 输出：独立函数c执行（无实例）
+
+        // · 实例化构造函数，调用原型方法
+        // 方法1：使用 new 创建实例并调用原型方法（支持链式调用）
+        var example = new NeExample.MapPlugin({
+            key: '百度地图key',
+            zoom: 15
+        });
+        example.protoB(); // 调用方法B
+        example.protoC(); // 调用方法C
+        example.protoB().protoC(); // 链式调用
+
+        // 方法2：不用new，而是使用工厂直接返回实例
+        var example = NeExample.createMap({
+            key: '百度地图key', 
+            zoom: 15
+        });
+        example.protoB(); // 调用原型方法B
+        example.protoC(); // 调用原型方法C
+        example.protoB().protoC(); // 链式调用
+
+
+        // 方法3：使用 jQuery 静态方法调用
+        var example = $.generateMap({
+            key: '百度地图key', 
+            zoom: 15
+        });
+        example.protoB(); // 调用原型方法B
+        example.protoC(); // 调用原型方法C
+        example.protoB().protoC(); // 链式调用
+
+
+
+
+
+
+        <div class="hide">*******************************************************************************************</div>
+                            <h2> 4、封装实例 </h2>
+        <div class="hide">*******************************************************************************************</div>
+        <div class="hide"> //———————————————————————————————————————————————————————————————————————————————————— </div>
+        <h3> 封装实例1：控件对象只能当函数使用 </h3>
+        <div class="hide"> //———————————————————————————————————————————————————————————————————————————————————— </div>
+        <pre class="pre-code"><code>
+                
+            ; (function (root, factory) { 
+                if (typeof define === 'function' && define.amd) { // AMD规范
+                    define(factory);
+                }
+                else if (typeof exports === 'object') { // Node, CommonJS规范
+                    module.exports = factory();
+                }
+                else { // 浏览器全局变量(root 即 window)
+                    root.NeDate = factory();
+                }
+            })(this, function () {
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                //  一、开始调用
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // [注] 实例属性(因为是独立的, 不共享)建议使用“构造函数模式”进行定义; 实例方法(因为要共享)建议使用“原型模式”进行定义
+                /**
+                * !! 构造函数
+                * @param {HTML DOM Node} elem 绑定的元素。eg. '#ID节点', '.类名节点'
+                * @param {Ojbect} options 参数配置项
+                */
+                function MyPlugin(elem, options) {
+                    // 核心修复：判断是否使用 new，无new则自动new实例返回，保证拥有原型方法
+                    if (!(this instanceof MyPlugin)) {
+                        return new MyPlugin(elem, options);
+                    }
+            
+                    // “构造函数模式”定义实例属性，这些属性是独立的，即改变某个实例的属性并不影响其它实例的属性
+                    // this.a = '';
+                    // this.b = '';
+                    // this.c = '';
+                    var opts = typeof (options) === "function" ? options() : options;
+                    if (typeof elem != 'undefined' && typeof options != 'undefined') {
+                        // 不再return裸对象，在当前实例上执行初始化
+                        DateInitialize(this, elem, opts);
+                    }
+                };
+            
+            
+                /**
+                * !!! 控件对象初始化
+                * @param {Object} me 构造函数对象，一般为 this 
+                * @param {HTML DOM} elem 绑定的元素。eg. '#ID节点', '.类名节点'
+                * @param {Ojbect} options 参数配置项
+                */
+                function DateInitialize(me, elem, options) {
+                    var defaults = {
+                        name: "穆桂英",
+                        sex: 18,
+                        age: "女"
+                    }
+                    var settings = utils.extend(true, {}, defaults, options || {}); // 合并对象（仅示例，extend空实现不管）
+                    me.$defaults = defaults;
+                    me.$opts = settings; // 方便其它地方直接调用
+                    //...
+                };
+            
+            
+                // “原型模式”定义实例方法，这些方法是共享的
+                /**
+                * !! 初始化
+                * @param {HTML DOM Node} o 绑定的元素。eg. '#ID节点', '.类名节点'
+                * @param {Object} opts 参数配置项
+                */
+                MyPlugin.prototype.init = function (o, opts) {
+                    DateInitialize(this, o, opts);
+                };
+            
+            
+                /**
+                * !! 加载中
+                * @param {string} value1 参数1
+                * @param {string} value2 参数2
+                * @param {string} value3 参数3
+                */
+                MyPlugin.prototype.load = function (value1, value2, value3) {
+                    console.log('城市', value1, value2, value3);
+                    console.log('默认参数：', this.$defaults);
+                    console.log('配置参数：', this.$opts);
+                    helpers._getCity();
+                };
+            
+                //...
+            
+            
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                //  二、内置函数库
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                var helpers = {
+                    _getCity: function () {
+                        
+                    }
+                }; 
+            
+            
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                //  三、工具库
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                var utils = {
+                    /**
+                    * 原生JS合并对象
+                    */
+                    extend: function () {
+                        // eg.
+                        return {}
+                    }
+                };
+            
+            
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                //  四、返回对象
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                return MyPlugin;
+            });
+
+        </code></pre>
+
+
+        <h5> 前台调用示例 </h5>
+        var options = {
+            name: '张三',
+            sex: '男',
+            age: 18
         }
-    };
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //  四、返回对象
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    return MyPlugin;
-});
-
-
-
-//========前台调用示例
-var options = {
-    name: '张三',
-    sex: '男',
-    age: 18
-}
-// 方法1：构造函数当成普通函数使用
-NeDate('#dom1', options);
-// 方法2：构造函数使用 new 实例化
-var date = new NeDate();
-date.init('#dom1', options); // 初始化
-date.load('泉州市', '福建省份GDP第一的城市', '362600'); // 调用控件里提供的某些方法
+        // 方法1：构造函数当成普通函数使用
+        NeDate('#dom1', options);
+        // 方法2：构造函数使用 new 实例化
+        var date = new NeDate();
+        date.init('#dom1', options); // 初始化
+        date.load('泉州市', '福建省份GDP第一的城市', '362600'); // 调用控件里提供的某些方法
 
 
 
 
-//————————————————————————————————————————————————————————————————————————————————————
-// 封装实例2：控件对象既可当函数使用，又可当对象使用。
-//  !!! 弊病(缺点)说明： 这种方式 var aaa = createNewInstace() 中 aaa 相当于是一个实例化的对象(即实例化插件构造函数）
-// 如果同一个页面多处调用插件的话，插件绑定的根元素指向会指向最后一个绑定的元素。
-//————————————————————————————————————————————————————————————————————————————————————
-;(function(root, factory){
-    if (typeof define === 'function' && define.amd) { // amd
-        define(factory);
-    } else if (typeof exports === 'object') { // umd
-        module.exports = factory();
-    } else {
-        window.NDate = factory();
-    }
-})(this, function(){
+        <div class="hide"> //———————————————————————————————————————————————————————————————————————————————————— </div>
+        <h3> 封装实例2：控件对象既可当函数使用，又可当对象使用。 </h3>
+        <h5> 
+            !!! 弊病(缺点)说明： 这种方式 var aaa = createNewInstace() 中 aaa 相当于是一个实例化的对象(即实例化插件构造函数）
+            如果同一个页面多处调用插件的话，插件绑定的根元素指向会指向最后一个绑定的元素。
+        </h5>
+        <div class="hide"> //———————————————————————————————————————————————————————————————————————————————————— </div>
+        <pre class="pre-code"><code>
+            ;(function(root, factory){
+                if (typeof define === 'function' && define.amd) { // amd
+                    define(factory);
+                } else if (typeof exports === 'object') { // umd
+                    module.exports = factory();
+                } else {
+                    window.NDate = factory();
+                }
+            })(this, function(){
 
-    //================================================================
-    // 构造函数
-    //================================================================
-    function Widget(elem, options){
-        this.defaults = {
+                //================================================================
+                // 构造函数
+                //================================================================
+                function Widget(elem, options){
+                    this.defaults = {
+                        method: "GET",
+                        data: {
+
+                        }
+                    }
+                };
+
+                //================================================================
+                // 原型模式定义实例方法
+                //================================================================
+                Widget.prototype = {
+                    init: function(elem, options){
+                        this.settings = utils.extend(true, {}, this.defaults, options || {});
+                    },
+                    load: function(elem, options){
+                        this.settings = utils.extend(true, {}, this.defaults, options || {});
+                    }
+                };
+
+                //================================================================
+                // 函数库，供内部调用
+                //================================================================
+                var helpers = {
+                    _fn1: function () {
+                        
+                    },
+
+                    _fn2: function () {
+                        
+                    }
+                };
+
+
+                //================================================================
+                // 工具库
+                //================================================================
+                var utils = {
+                
+                    /**
+                    * 原生JS合并对象
+                    */
+                    extend: function(){
+                        
+                    }  
+                };
+
+
+                //================================================================
+                // 返回对象
+                //================================================================
+                return Widget;
+                
+            });
+
+
+            //————————————————————————————————————————————————————————————————————————————————————
+            //                              创建“既是函数又是对象”的实例
+            //————————————————————————————————————————————————————————————————————————————————————
+            function createNewInstace(element, config){
+                // 说明：bind()就是将函数绑定到某个对象上。 例如：f.bind(obj)，实际上可以理解为 obj.f()
+                // 实例化一个对像
+                var context = new NDate(element, config); // context 是一个实例化的对象，只能当对象使用，不能当函数使用。
+                // 创建请求函数
+                var instance = NDate.prototype.init.bind(context); // instance 是一个函数，由 bind 返回的一个新函数，可以调用 instance()。
+                // 将 对象原型链 prototype 对象中的方法添加到 instance 函数对象中
+                // 为了实现能够将 instance 函数作为对象使用，我们就要将 对象原型链 prototype 对象中的方法添加给 instance 。毕竟函数也一个对象，也能够添加方法。
+                Object.keys(NDate.prototype).forEach(function(item){
+                    instance[item] = NDate.prototype[item].bind(context);
+                });
+                // 为 instance 函数对象添加属性
+                Object.keys(context).forEach(function(item){
+                    instance[item] = context[item];
+                })
+                return instance;
+            }
+            var neuiDate = createNewInstace();
+
+        </code></pre>
+
+
+
+        <h5> 前台调用示例 </h5>
+        // 控件对象当作函数用
+        neuiDate("#app", {
             method: "GET",
             data: {
-
+                name: "小明",
+                grade: "三年级",
+                sex: "男",
+                age: 10
             }
-        }
-    };
+        });
 
-    //================================================================
-    // 原型模式定义实例方法
-    //================================================================
-    Widget.prototype = {
-        init: function(elem, options){
-            this.settings = utils.extend(true, {}, this.defaults, options || {});
-        },
-        load: function(elem, options){
-            this.settings = utils.extend(true, {}, this.defaults, options || {});
-        }
-    };
+        // 控件对象当作对象用 ^_^
+        neuiDate.load("#app", {
+            method: "POST",
+            data: {
+                name: "小王",
+                grade: "五年级",
+                sex: "女",
+                age: 12
+            }
+        });
 
-    //================================================================
-    // 函数库，供内部调用
-    //================================================================
-    var helpers = {
-        _fn1: function () {
-            
-        },
-
-        _fn2: function () {
-            
-        }
-    };
-
-
-    //================================================================
-    // 工具库
-    //================================================================
-    var utils = {
-    
-        /**
-        * 原生JS合并对象
-        */
-        extend: function(){
-            
-        }  
-    };
-
-
-    //================================================================
-    // 返回对象
-    //================================================================
-    return Widget;
-    
-});
-
-
-//————————————————————————————————————————————————————————————————————————————————————
-//                              创建“既是函数又是对象”的实例
-//————————————————————————————————————————————————————————————————————————————————————
-function createNewInstace(element, config){
-    // 说明：bind()就是将函数绑定到某个对象上。 例如：f.bind(obj)，实际上可以理解为 obj.f()
-    // 实例化一个对像
-    var context = new NDate(element, config); // context 是一个实例化的对象，只能当对象使用，不能当函数使用。
-    // 创建请求函数
-    var instance = NDate.prototype.init.bind(context); // instance 是一个函数，由 bind 返回的一个新函数，可以调用 instance()。
-    // 将 对象原型链 prototype 对象中的方法添加到 instance 函数对象中
-    // 为了实现能够将 instance 函数作为对象使用，我们就要将 对象原型链 prototype 对象中的方法添加给 instance 。毕竟函数也一个对象，也能够添加方法。
-    Object.keys(NDate.prototype).forEach(function(item){
-        instance[item] = NDate.prototype[item].bind(context);
-    });
-    // 为 instance 函数对象添加属性
-    Object.keys(context).forEach(function(item){
-        instance[item] = context[item];
-    })
-    return instance;
-}
-var neuiDate = createNewInstace();
-
-
-
-
-//=====前台调用示例
-// 控件对象当作函数用
-neuiDate("#app", {
-    method: "GET",
-    data: {
-        name: "小明",
-        grade: "三年级",
-        sex: "男",
-        age: 10
-    }
-});
-
-// 控件对象当作对象用 ^_^
-neuiDate.load("#app", {
-    method: "POST",
-    data: {
-        name: "小王",
-        grade: "五年级",
-        sex: "女",
-        age: 12
-    }
-});
+    </pre>
+</body>
+</html>

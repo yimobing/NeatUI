@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> JS插件开发原型链说明 </title>
+</head>
+<body>
+    <style>
+        pre {
+            background-color: #fff;
+        }
+        pre.pre-code {
+            width: 95%;
+            margin: 0 auto;
+            background: #282c34;
+            color: #abb2bf;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        code {
+            
+            font-family: "Fira Code", "Source Code Pro", Consolas, Monaco, monospace;
+        }
+    </style>
+
+    <pre>
+        // =============================================================================
+        //              三种原型定义方式
+        // =============================================================================
+        // 公共基础代码（三种方式共用）
+        <pre class="pre-code"><code>
+            
+            function innerFn() {
+                console.log("执行内部私有逻辑");
+            }
+            
+            function Widget(options) {
+                this.options = options || { zoom: 10 };
+                this.init();
+            }
+
+        </code></pre>
+        
+        *******************************************************************************************
+        // 方式1：字面量覆盖（字面量整体覆盖） prototype
+        // 特点：
+        // 1. 使用字面量对象直接完整替换原生 prototype 对象
+        // 2. 原生自带 constructor 属性被销毁，必须手动声明 constructor 修复指向
+        // 3. 所有实例方法收拢在同一对象内，代码集中美观
+        // 4. 会清空原型上原有全部属性、方法，存在覆盖风险
+        // 适用场景：插件内部一次性定义完所有原型方法，统一管理
+        *******************************************************************************************
+        <pre class="pre-code"><code>
+            Widget.prototype = {
+                constructor: Widget, // 修复原型构造器指向，必不可少
+                init: function () {
+                    innerFn();
+                    console.log("初始化，配置：", this.options);
+                },
+                protoB: function () {
+                    console.log("执行原型方法 protoB");
+                    return this; // 支持链式调用
+                },
+                protoC: function () {
+                    console.log("执行原型方法 protoC");
+                    return this;
+                }
+            };
+        </code></pre>
+        
+        *******************************************************************************************
+        // 方式2：逐个追加原型方法
+        // 特点：
+        // 1. 不替换原生 prototype 对象，仅单独挂载单个方法
+        // 2. 原生 constructor 自动保留，无需手动维护，无类型判断隐患
+        // 3. 不会覆盖原型原有属性，安全性高，支持外部动态扩展
+        // 4. 代码分散，方法较多时视觉上比较零散，存在重复书写前缀
+        // 适用场景：需要分次动态扩展原型、老旧IE极致兼容项目
+        *******************************************************************************************
+
+        <pre class="pre-code"><code>
+            Widget.prototype.init = function () {
+                innerFn();
+                console.log("初始化，配置：", this.options);
+            };
+            
+            Widget.prototype.protoB = function () {
+                console.log("执行原型方法 protoB");
+                return this;
+            };
+            
+            Widget.prototype.protoC = function () {
+                console.log("执行原型方法 protoC");
+                return this;
+            };
+
+        </code></pre>
+        
+        *******************************************************************************************
+        // 方式3：Object.assign 合并赋值原型
+        // 特点：
+        // 1. 不替换原生 prototype，仅将方法对象合并追加到原有原型上
+        // 2. 原生 constructor 完整保留，无需手动修复
+        // 3. 兼顾代码集中排版与原型安全，综合最优写法
+        // 4. IE6~IE10 不支持 Object.assign，低版本浏览器需补充polyfill
+        // 适用场景：现代浏览器项目、通用可复用JS插件
+        *******************************************************************************************
+
+        <pre class="pre-code"><code>
+            Object.assign(Widget.prototype, {
+                init: function () {
+                    innerFn();
+                    console.log("初始化，配置：", this.options);
+                },
+                protoB: function () {
+                    console.log("执行原型方法 protoB");
+                    return this;
+                },
+                protoC: function () {
+                    console.log("执行原型方法 protoC");
+                    return this;
+                }
+            });
+
+        </code></pre>
+
+
+        *******************************************************************************************
+        //                      汇总说明
+        *******************************************************************************************
+        字面量覆盖：代码整洁，但必须手动维护constructor，会清空原有原型；
+        逐个追加：兼容性拉满、无隐性 bug，但代码分散冗余；
+        Object.assign 合并：兼顾整洁与安全，现代项目首选，仅低版本 IE 存在兼容问题。
+        注意：实际开发中三种写法只能任选其一同时保留，文档仅做对比全部列出。
+
+
+        // 测试验证代码
+        <pre class="pre-code"><code>
+            const ins = new Widget({ zoom: 15 });
+            ins.protoB().protoC();
+            console.log("实例构造器校验：", ins.constructor === Widget);
+        </code></pre>
+
+    </pre>
+</body>
+</html>

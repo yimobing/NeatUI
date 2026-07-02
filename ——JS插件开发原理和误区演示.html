@@ -597,32 +597,32 @@
         //————————————————————————
         // 调用方式1：直接调用函数
         // 丰泽区、鲤城区
-        MyCounty('#fengze', {
-            backgroundColor: 'tomato',
-            intervals: 2000 // 多少毫秒后文字变大
-        });
-        MyCounty('#licheng', {
-            backgroundColor: 'palevioletred',
-            intervals: 2000 // 多少毫秒后文字变大
-        });
+        // MyCounty('#fengze', {
+        //     backgroundColor: 'tomato',
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
+        // MyCounty('#licheng', {
+        //     backgroundColor: 'palevioletred',
+        //     intervals: 2000 // 多少毫秒后文字变大
+        // });
 
         //————————————————————————
         // 调用方式2：先实例化函数，拿着实例化对象调用原型上的方法
         // 洛江区、泉港区
         var bds1 = new MyCounty();
-        var bds2 = new MyCounty();
         bds1.init('#luojiang', {
             backgroundColor: 'rebeccapurple', // 背景色
             intervals: 2000 // 多少毫秒后文字变大
         });
+        var bds2 = new MyCounty();
         bds2.init('#quangang', {
             backgroundColor: 'mediumpurple',
             intervals: 2000 // 多少毫秒后文字变大
         });
         // 安溪县、德化县
         var bds3 = new MyCounty();
-        var bds4 = new MyCounty();
         bds3.changeBackground('#anxi', 'limegreen');
+        var bds4 = new MyCounty();
         bds4.changeBackground('#dehua', 'mediumseagreen');
     </script>
 
