@@ -1,0 +1,65 @@
+/**
+* BMap 百度地图控件
+* @Date: 2026.07.03
+* @PubDate: 2026.07.03
+*/
+
+@charset "utf-8";
+
+/*+ ---------------- 文本标注 ---------------- +*/
+/* 外层容器：让气泡在地图Label里居中 */
+.BMapLabel.ne-bd__label {
+    border: 0 !important;
+    background: transparent !important;
+}
+.ne-bd__label_wrap {
+     border: 0 !important;
+    background: transparent !important;
+    width: auto;
+	margin-left: -25px;
+}
+
+/* 你的气泡样式 */
+.ne-bd__label_text {
+    position: relative;
+    background-color: #fff;
+    padding: 5px 5px;
+    border: 1px solid #19b6f8;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px 0px #3291b9;
+    color: #0c88e8;
+    font-size: 12px;
+    font-weight: 300;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* 外层箭头：画边框，实现和气泡一致的蓝色边框 */
+.ne-bd__label_text:before {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 18%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 6px solid #19b6f8;
+    z-index: 2;
+}
+
+/* 内层箭头：白色背景，盖住外层箭头的上半部分，露出蓝色边框 */
+.ne-bd__label_text:after {
+    content: '';
+    position: absolute;
+    bottom: -4px; /* 向上偏移1px，盖住外层箭头的蓝色边框 */
+    left: 18%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 5px solid #fff;
+    z-index: 3;
+}

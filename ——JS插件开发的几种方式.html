@@ -207,7 +207,7 @@
                 // 定义一个函数(其实该函数也是一个对象) MyJet
                 var MyJet = function(element, options){
                     var me = this;
-                    me.$element = element;
+                    me.element = element;
                     //后面可设置一堆内部变量
                     me.aa = '';
                     me.bb = '';
@@ -457,16 +457,16 @@
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // 1. 定义构造函数（核心：原型链的基础）
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                function MyPlugin(elem, options) {
+                function MyPlugin(element, options) {
                     var me = this;
                     // 用户不使用 new 进行实例化时
                     if(! (this instanceof MyPlugin)) {
-                        return new MyPlugin(elem, options); // 自动使用 new 进行实例并返回
+                        return new MyPlugin(element, options); // 自动使用 new 进行实例并返回
                     }
                     // 用户有使用 new 进行实例化时
                     if(arguments.length > 0) {
-                        if(typeof elem != 'undefined' && typeof options != 'undefined') {
-                            me.init(elem, options); // 初始化
+                        if(typeof element != 'undefined' && typeof options != 'undefined') {
+                            me.init(element, options); // 初始化
                         }
                     }
                 };
@@ -487,26 +487,26 @@
                         fontSize: 16
                     }
                     var settings = utils.merge(true, {}, defaults, options || {});
-                    me.$element = element;
-                    me.$defaults = defaults;
-                    me.$settings = settings;
+                    me.element = element;
+                    me.defaults = defaults;
+                    me.settings = settings;
                     me.changeColor(); // 改变颜色
                 };
 
                 // 改变颜色
                 MyPlugin.prototype.changeColor = function () {
                     var me = this;
-                    var bgColor = me.$settings.backgroundColor,
-                        fontColor = me.$settings.color,
-                        fontSize = me.$settings.fontSize;
-                    var selector = me.$element.toString().replace(/(\#|\.)/g, '');
+                    var bgColor = me.settings.backgroundColor,
+                        fontColor = me.settings.color,
+                        fontSize = me.settings.fontSize;
+                    var selector = me.element.toString().replace(/(\#|\.)/g, '');
                     var elDom = document.getElementById(selector);
                     if(elDom != null) {
                         setTimeout(function() {
                             elDom.style.backgroundColor = bgColor;
                             elDom.style.color = fontColor;
                             elDom.style.fontSize = fontSize + 'px';
-                        }, me.$settings.intervals);
+                        }, me.settings.intervals);
                     }
                 };
 
@@ -951,7 +951,7 @@
                         age: "女"
                     }
                     var settings = utils.extend(true, {}, defaults, options || {}); // 合并对象（仅示例，extend空实现不管）
-                    me.$defaults = defaults;
+                    me.defaults = defaults;
                     me.$opts = settings; // 方便其它地方直接调用
                     //...
                 };
