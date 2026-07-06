@@ -50,13 +50,21 @@
                 coordinate: '116.404177, 39.909652', // 中心点经纬度坐标，默认为北京市的坐标(可选)。优先权高于 city 
                 city: '北京市', // 中心点城市，默认北京市(可选)
                 zoom: 16, // 缩放级别，默认16(可选)。值：3-19
-                title: '北京市天安门广场', // 中心点名称(可选)。值不为空时将创建中心点文本标注
-                enableScrollWheelZoom: true, // 是否开启滚轮缩放，默认true(可选)
+                title: '北京市天安门广场', // 中心点名称(可选)。值不为空时有显示文本，空值时无显示名称
+                size: { // 地图大小(可选)
+                    width: "auto", // 地图宽度，默认auto(可选)
+                    height: "auto" // 地图高度，默认auto(可选)
+                },
+                
                 enableDragging: false, // 中心点是否可拖拽，默认false(可选)
-                onDragend: null // 中心点拖拽结束事件(可选)
+                onDragend: null, // 中心点拖拽结束事件(可选)
+               
+                draft: { // 地图底图功能(可选)
+                    enableScrollWheelZoom: true, // 是否开启滚轮缩放，默认true(可选)
+                }
             }
             var settings = utils.merge(true, {}, defaults, options || {});
-            
+            // 全局赋值
             me.defaults = defaults;
             me.settings = settings;
             me.element = element;
@@ -77,9 +85,9 @@
                 utils.dialog(tips);
                 return;
             }
-            var selector = me.element.toString().replace(/(\#|\.)/g, '');
-            console.log('selector：', selector)
-            if(utils.isDomExist(selector) == false) {
+            var containerSelector = me.element.toString().replace(/(\#|\.)/g, ''); // 地图容器根节点
+            // console.log('selector：', selector)
+            if(utils.isDomExist(containerSelector) == false) {
                 var tips = '地图容器节点不存在，请检查参数 container 的值' + me.settings.container;
                 utils.dialog(tips);
                 return;
@@ -89,26 +97,38 @@
             var coordObj = helpers._convertCoordinateStringToObject(coordinate);
                 centLng = coordObj.lng,  centLat = coordObj.lat;
             // 地图初始化
-            var map = new BMap.Map(selector); // 创建地图实例
+            var map = new BMap.Map(containerSelector); // 创建地图实例
             var point = new BMap.Point(centLng, centLat); // 设置中心点坐标
             map.centerAndZoom(point, zoom); // 地图初始化并设置地图展示级别
-            if(me.settings.enableScrollWheelZoom) {
+            if(me.settings.draft.enableScrollWheelZoom) {
                 map.enableScrollWheelZoom(); // 开启滚轮缩放
             }
             // var viewportOptions = {
             //     margins: [50, 50, 50, 50] // 地图边缘与坐标点的边距（防止点贴边）
             // };
             // map.setViewport(point, viewportOptions); // 根据坐标点自动调整地图视野
-            
+
+            // 对地图容器根节点元素进行操作
+            var elRoot = utils.getDom(containerSelector); // 地图容器根节点元素
+            utils.addClass(elRoot, 'ne-bd__container'); // 添加一个样式名
+            var width = me.settings.size.width,
+                height = me.settings.size.height;
+            // 80% , 80 => 80px,  80px, 90px
+            var pureNumberReg = /^\d+$/;
+            if(pureNumberReg.test(width)) width += 'px';
+            if(pureNumberReg.test(height)) height += 'px';
+            var baseStyle = 'width: ' + width + ';height: ' + height;
+            elRoot.setAttribute('width', baseStyle); // 设置地图大小
+
             // 全局赋值
-            me.$opts.$maper = map; // 地图实例化对象
-            me.$opts.$element = utils.getDom(selector); // 容器节点对象
+            me.$opts.$map = map; // 地图实例化对象
+            me.$opts.$container = elRoot; // 容器节点对象
             
             // 创建中心点标注
             me.createMarker(point, {
-                enableDragging: me.settings.enableDragging,
+                category: 'center',
                 enableMassClear: false,
-                overLayName: 'overlay-center-mark',
+                enableDragging: me.settings.enableDragging,
                 onDragend: me.settings.onDragend,
                 label: {
                     content: me.settings.title
@@ -128,32 +148,31 @@
             var map = me.getMap();
             var original = {
                 category: 'normal', // 坐标点类型，默认normal。值：normal 普通点标注, center 中心点标注, polygon 多边形标注, line 折线标注。
-                enableDragging: false, // 是否可拖拽
                 enableMassClear: true, // 是否允许覆盖物被清除，默认true(可选)
+                enableDragging: false, // 是否可拖拽
                 onDragend: null, // 拖拽结束事件(可选)。仅当 enableDragging 为 true 有效
                 label: { // 文本标注
                     content: '', // 文本标注显示信息，默认空(可选)。值为空时不创建文本标注
-                    style: { // 文本标注的样式
-                        padding: '10px',
-                        height: '30px',
-                        lineHeight: '30px',
-                        // backgroundColor: "#fff",
-                        borderRadius: '5px',
-                        borderColor: '#ccc',
-                        color: 'blue',
-                        fontSize: '16px',
-                        fontFamily: '微软雅黑'
+                    style: { // 文本标注的样式(可选)
+                        display: 'block',
+                        width: 'auto',
+                        margin: '0',
+                        padding: '0',
+                        background: 'transparent',
+                        zIndex: 1000,
+                        border: 'none',
+                        textAlign: 'center'
                     },
-                    option: { // 文本标注可选参数
+                    option: { // 文本标注可选参数(可选)
                         position: point, // 指定文本标注所在的地理位置
-                        // offset: new BMap.Size(30, -30) // 设置文本偏移量
-                        width: 0, // 宽度(220-730) 0 自动调整
-                        maxWidth: 500, // 最大宽度(220-730)
-                        height: 0, // 高度(60-650) 0 自动调整
                         offset: { // 位置偏移
-                            width: -40,
-                            height: -75
+                            width: 15,
+                            height: -40
                         }
+                        // ,offset: new BMap.Size(30, -30) // 设置文本偏移量
+                        // ,width: 0, // 宽度(220-730) 0 自动调整
+                        // maxWidth: 500, // 最大宽度(220-730)
+                        // height: 0 // 高度(60-650) 0 自动调整
                     }
                 }
             }
@@ -241,7 +260,7 @@
         getMap: function () {
             var me = this;
             if(!helpers._examineIsInstantiate(me, arguments.callee.name)) return null;
-            return me.$opts.$maper;
+            return me.$opts.$map;
         }
 
 
@@ -273,7 +292,7 @@
 
         /**
          * 校验地图是否已初始化和实例化
-         * 用于：在调用地图实例化对象me.$opts.$maper之前要进行校验，防止出错
+         * 用于：在调用地图实例化对象me.$opts.$map之前要进行校验，防止出错
          * @param {Object} me 当前插件对象
          * @param {String} fnName 某个函数名。用函数内可使用  arguments.callee.name 来获取函数名
          * @returns {Boolean} 返回布尔值true或false。
@@ -285,7 +304,7 @@
                 utils.dialog(tips);
                 return false;
             }
-            if (me.$opts.$maper == null) {
+            if (me.$opts.$map == null) {
                 var tips = '地图尚未实例化，无法使用函数' + fnName + '()' + F12Info;
                 utils.dialog(tips);
                 return false;

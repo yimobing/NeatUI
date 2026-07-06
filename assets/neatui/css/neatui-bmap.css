@@ -9,12 +9,11 @@
 /*+ ---------------- 文本标注 ---------------- +*/
 /* 外层容器：让气泡在地图Label里居中 */
 .BMapLabel.ne-bd__label {
-    border: 0 !important;
     background: transparent !important;
+    line-height: 1!important;
+    border: 0 !important;
 }
 .ne-bd__label_wrap {
-     border: 0 !important;
-    background: transparent !important;
     width: auto;
 	margin-left: -25px;
 }
@@ -23,7 +22,7 @@
 .ne-bd__label_text {
     position: relative;
     background-color: #fff;
-    padding: 5px 5px;
+    padding: 7px 5px;
     border: 1px solid #19b6f8;
     border-radius: 3px;
     box-shadow: 0 1px 3px 0px #3291b9;
