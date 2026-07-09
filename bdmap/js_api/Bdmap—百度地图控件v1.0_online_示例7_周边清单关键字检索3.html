@@ -292,7 +292,7 @@
         //——————————————————————————————————————————
         // test: 搜索结果数据请求方式 mock 
         IS_ENABLE_DEFAULT_SEARCH_WORD = true; // 是否启用默认搜索组或默认搜索关键字功能，默认true
-        IS_USE_WEB_API = true;  // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api，即web api); false 从前端直接取数据(使用百度地图浏览器版api，即js api)
+        IS_USE_WEB_API = false;  // 搜索结果数据请求方式，默认true。 值：true 从后台取数据(使用百度地图服务端版api，即web api); false 从前端直接取数据(使用百度地图浏览器版api，即js api)
         
         
 
@@ -3372,16 +3372,31 @@
                 utilities.addClass(window._activeFilterDom, 'on'); // 仅高亮当前激活标题，给当前激活标题加on类
             }
 
-            // 自动切换地图视野
-            if(window._activeFilterGroup === ''){
-                if (store.pointNotCategorize.length > 0) map.setViewport(store.pointNotCategorize, {zoomFactor: -2}); // 取消筛选，恢复全局视野
+            // 点击关键词时按关键词显示坐标点，并自动切换地图视野
+            if(window._activeFilterGroup === ''){ // 显示所有坐标点
+                if (store.pointNotCategorize.length > 0) {
+                     // 取消筛选，恢复全局视野
+                    // map.setViewport(store.pointNotCategorize, {zoomFactor: -2});
+                    lockZoomSetViewport(store.pointNotCategorize, {
+                        minZoom: 10,
+                        maxZoom: 15
+                    });
+                }
                 // 当是“显示所有坐标点按钮”时
                 if(domId == btnId) {
                     clickDom.innerText = '隐藏所有坐标点';
                 }
-            }else{ 
+            }
+            else {  // 显示某个关键词的坐标点
                 var targetPoints = store.pointCateObj[window._activeFilterGroup];
-                if(targetPoints && targetPoints.length > 0) map.setViewport(targetPoints, {zoomFactor: -2}); // 适配当前分类点位视野
+                if(targetPoints && targetPoints.length > 0) {
+                    // 适配当前分类点位视野
+                    // map.setViewport(targetPoints, {zoomFactor: -2});
+                    lockZoomSetViewport(targetPoints, {
+                        minZoom: 10,
+                        maxZoom: 15
+                    });
+                }
 
                 // 当是“隐藏所有坐标点按钮”时
                 if(domId == btnId) {
@@ -3392,10 +3407,8 @@
                     var lng = coordArr.length > 0 ? coordArr[0] : '',
                         lat = coordArr.length > 1 ? coordArr[1] : '';
                     if(lng != '' && lat != '') {
-                        map.setViewport({
-                            center: new BMap.Point(lng, lat),
-                            zoom: 17
-                        });
+                        // console.log('ccc我跳到中心点：');
+                        map.centerAndZoom(new BMap.Point(lng, lat), 17);
                     }
                 }
             }
@@ -3413,6 +3426,63 @@
             window.handleCateFilter(cateLot, triggerDom); // 调用筛选逻辑
         });
 
+
+
+       /**
+         * 受限版setViewport 切换点位防止缩放剧烈跳动
+         * 作用：替代原生 map.setViewport()，限制自动缩放区间，减少视图跳动
+         * 解决的问题：因为使用原生的 setViewport() 缩放级别完全自动计算不受控制，多个聚集点切换显示时地图缩放会剧烈跳动
+         * @param {Array<BMap.Point>} points 点位数组
+         * @param {Object} [options] 外部传入配置
+         * @property {Number} minZoom 最低缩放级别
+         * @property {Number} maxZoom 最高缩放级别
+         */
+        function lockZoomSetViewport(points, options) {
+            var originalConfig = {
+                minZoom: 10, // 最低缩放级别
+                maxZoom: 15 // 最高缩放级别
+            };
+            // getViewport原生参数默认值
+            var vpOpts = {
+                margins: [20, 20, 20, 20],
+                enableAnimation: true,
+                delay: 180
+            }; 
+            var config = $.extend(true, {}, originalConfig, options || {}); // 深度合并外层配置
+            if (!points || points.length === 0) {
+                return;
+            }
+            // 预计算目标视野
+            var targetVP = map.getViewport(points, vpOpts);
+            
+            // 级别钳位
+            var finalZoom = Math.max(config.minZoom, Math.min(targetVP.zoom, config.maxZoom));
+
+            var currCenter = map.getCenter();
+            var currZoom = map.getZoom();
+            var tol = 0.0002;
+            var diffLng = Math.abs(targetVP.center.lng - currCenter.lng);
+            var diffLat = Math.abs(targetVP.center.lat - currCenter.lat);
+            var diffZoom = Math.abs(finalZoom - currZoom);
+
+            var needMove = diffLng > tol || diffLat > tol || diffZoom > 0.3;
+            if (!needMove) {
+                return;
+            }
+            // console.log('当前缩放级别：', currZoom, '\n最小级别：', config.minZoom, '\n最大级别：', config.maxZoom, '\n最后定的缩放级别：', finalZoom); // test2
+
+            // 动画参数直接取自合并后的vpOpts
+            var animOpt = {
+                enableAnimation: vpOpts.enableAnimation
+            };
+            if (vpOpts.delay !== undefined) {
+                animOpt.delay = vpOpts.delay;
+            }
+            // v2.0 centerAndZoom不支持动画参数，拆分平移+缩放实现动画效果
+            // map.panTo(targetVP.center, animOpt);
+            // map.setZoom(finalZoom, animOpt);
+            map.centerAndZoom(targetVP.center, finalZoom);
+        }
 
 
 

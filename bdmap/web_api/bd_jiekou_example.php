@@ -27,6 +27,7 @@
     $query = trim(isset($_REQUEST['query']) ? $_REQUEST['query'] : '');
     $radius = trim(isset($_REQUEST['radius']) ? $_REQUEST['radius'] : '');
     $region = trim(isset($_REQUEST['region']) ? $_REQUEST['region'] : '');
+    $tag = trim(isset($_REQUEST['tag']) ? $_REQUEST['tag'] : '');
     $pagesize = trim(isset($_REQUEST['pagesize']) ? $_REQUEST['pagesize'] : '');
     $region_limit = trim(isset($_REQUEST['region_limit']) ? $_REQUEST['region_limit'] : '');
     $city_limit = trim(isset($_REQUEST['city_limit']) ? $_REQUEST['city_limit'] : '');
@@ -45,7 +46,11 @@
     }
 
     // 拼接百度地图接口
-    $apiUrl = 'http://api.map.baidu.com/place/v2/search';
+    // 地点检索接口地址
+    // v2： http://api.map.baidu.com/place/v2/search
+    // v3： http://api.map.baidu.com/place/v3/region
+    $apiUrl = $url; 
+
     $params = array(
         'ak' => $ak,
         'output' => $output,
@@ -53,6 +58,7 @@
         'query' => $query,
         'radius' => $radius,
         'region' => $region,
+        'tag' => $tag,
         'pagesize' => $pagesize,
         'region_limit' => $region_limit,
         'city_limit' => $city_limit,

@@ -72,7 +72,7 @@
                 <input
                     type="text"
                     id="url"
-                    value="https://api.map.baidu.com/place/v2/search"
+                    value="http://api.map.baidu.com/place/v2/search"
                 />
             </div>
             <div class="item">
@@ -96,6 +96,10 @@
             <div class="item">
                 <label> 区域： </label>
                 <input type="text" id="region" value="泉州市" />
+            </div>
+            <div class="item">
+                <label> 标签： </label>
+                <input type="text" id="tag" value="" />
             </div>
             <div class="item">
                 <label> 每页记录数： </label>
@@ -188,6 +192,7 @@
                         query: $("#query").val().trim(),
                         radius: $("#radius").val().trim(),
                         region: $("#region").val().trim(),
+                        tag: $("#tag").val().trim(),
                         pagesize: $("#pagesize").val().trim(),
                         region_limit: $("#region_limit").val().trim(),
                         city_limit: $("#city_limit").val().trim(),
