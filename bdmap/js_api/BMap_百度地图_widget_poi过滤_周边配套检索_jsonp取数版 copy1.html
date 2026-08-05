@@ -399,7 +399,7 @@
 
         // 使用Place API搜索地点（替代地理编码API）
         async function searchLocation(address) {
-            const url = `http://api.map.baidu.com/place/v2/search?query=${encodeURIComponent(address)}&region=泉州市&output=json&ak=${BAIDU_MAP_AK}&page_size=1`;
+            const url = `//api.map.baidu.com/place/v2/search?query=${encodeURIComponent(address)}&region=泉州市&output=json&ak=${BAIDU_MAP_AK}&page_size=1`;
             console.log('搜索地点URL:', url);
             const data = await jsonp(url, 10000);
             console.log('搜索地点返回:', data);
@@ -408,7 +408,7 @@
 
         // 周边检索API v2.0
         async function searchNearby(location, keyword, radius) {
-            const url = `http://api.map.baidu.com/place/v2/search?query=${encodeURIComponent(keyword)}&location=${location}&radius=${radius}&output=json&ak=${BAIDU_MAP_AK}&page_size=10&page_num=0`;
+            const url = `//api.map.baidu.com/place/v2/search?query=${encodeURIComponent(keyword)}&location=${location}&radius=${radius}&output=json&ak=${BAIDU_MAP_AK}&page_size=10&page_num=0`;
             console.log('周边检索URL:', url);
             const data = await jsonp(url, 10000);
             console.log('周边检索返回:', data);

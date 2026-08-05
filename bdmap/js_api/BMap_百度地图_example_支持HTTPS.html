@@ -3,7 +3,7 @@
 把http项目迁到https下，百度地图不显示了。
 
 是因为在线生成的百度地图代码不支持https导致的，直接把
-<script type="text/javascript" src="http://api.map.baidu.com/api?key=&v=1.1&s=1"></script>
+<script type="text/javascript" src="//api.map.baidu.com/api?key=&v=1.1&s=1"></script>
 改成：
 <script type="text/javascript" src="../../https://api.map.baidu.com/api?key=&v=1.1&s=1"></script>
 会发现虽然地图显示 却是一个静态的页面，没有功能，标注也没有显示。
