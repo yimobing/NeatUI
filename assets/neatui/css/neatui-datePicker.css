@@ -1,0 +1,557 @@
+/**
+ * ============================================================================
+ * NeDatePicker 样式文件
+ * ============================================================================
+ * 
+ * 兼容IE9+、移动端、PC端
+ * 
+ * @version 1.1.0
+ * @author NeDatePicker Team
+ * @create 2024-01-01
+ * @pubdate 2025-03-12
+ * ============================================================================
+ */
+
+/* ========== 容器基础样式 ========== */
+.ne-dp-container {
+    width: 280px;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    /* IE9 不支持 opacity 动画，直接显示 */
+    opacity: 1;
+    /* 禁止文本选择 */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* ========== 头部样式 ========== */
+.ne-dp-header {
+    position: relative; /* 为绝对定位提供参考 */
+    *zoom: 1; /* IE6/7 hasLayout */
+    padding: 12px 40px; /* 左右留出箭头空间 */
+    text-align: center; /* 标题居中 */
+    /* 渐变背景 - IE9 使用 filter */
+    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF667EEA', endColorstr='#FF764BA2', GradientType=1);
+    border-radius: 4px 4px 0 0;
+    color: #fff;
+}
+
+/* 头部按钮 - 使用绝对定位 */
+.ne-dp-header-btn {
+    position: absolute;
+    top: 50%;
+    margin-top: -14px; /* 高度的一半，垂直居中 */
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.ne-dp-header-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    /* IE9 透明度替代 */
+    background: #7d8fec\9; /* IE9 hack */
+}
+
+/* 左侧箭头 */
+.ne-dp-prev-year {
+    left: 10px;
+}
+
+.ne-dp-prev-month {
+    left: 40px;
+}
+
+/* 右侧箭头 */
+.ne-dp-next-month {
+    right: 40px;
+}
+
+.ne-dp-next-year {
+    right: 10px;
+}
+
+/* 头部标题 - 自动居中 */
+.ne-dp-header-title {
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 500;
+    *display: inline; /* IE7 */
+    *zoom: 1; /* IE7 */
+}
+
+.ne-dp-year-btn,
+.ne-dp-month-btn {
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.ne-dp-year-btn:hover,
+.ne-dp-month-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    /* IE9 透明度替代 */
+    background: #7d8fec\9; /* IE9 hack */
+}
+
+/* ========== 主体样式 ========== */
+.ne-dp-body {
+    padding: 10px;
+}
+
+/* ========== 周标题 ========== */
+.ne-dp-weeks {
+    *zoom: 1;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 8px;
+}
+
+.ne-dp-weeks:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.ne-dp-week {
+    float: left;
+    width: 36px;
+    margin: 0 1px;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    height: 26px;
+    line-height: 26px;
+}
+
+.ne-dp-weekend {
+    color: #ff6b6b;
+}
+
+/* ========== 日期格子 ========== */
+.ne-dp-days {
+    *zoom: 1;
+}
+
+.ne-dp-days:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.ne-dp-day {
+    float: left;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 1px;
+    font-size: 14px;
+}
+
+.ne-dp-day:hover {
+    background: #f5f7fa;
+    color: #667eea;
+}
+
+/* 非本月日期 */
+.ne-dp-other-month {
+    color: #ccc;
+}
+
+/* 周末 */
+.ne-dp-weekend {
+    color: #ff6b6b;
+}
+
+.ne-dp-weekend:hover {
+    color: #ff6b6b;
+    background: #fff5f5;
+}
+
+/* 今天 */
+.ne-dp-today {
+    background: #f0f4ff;
+    color: #667eea;
+    font-weight: bold;
+}
+
+/* 选中日期 */
+.ne-dp-selected {
+    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF667EEA', endColorstr='#FF764BA2', GradientType=1);
+    color: #fff !important;
+}
+
+.ne-dp-selected:hover {
+    background: #5a6fd6;
+    background: linear-gradient(135deg, #5a6fd6 0%, #693d91 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF5A6FD6', endColorstr='#FF693D91', GradientType=1);
+    color: #fff !important;
+}
+
+/* 禁用日期 */
+.ne-dp-disabled {
+    color: #ddd !important;
+    cursor: not-allowed;
+    background: none !important;
+}
+
+.ne-dp-disabled:hover {
+    background: none !important;
+    color: #ddd !important;
+}
+
+/* 移动端hover效果 */
+.ne-dp-hover {
+    background: #e8ecff !important;
+}
+
+/* ========== 底部按钮 ========== */
+.ne-dp-footer {
+    *zoom: 1;
+    padding: 10px;
+    border-top: 1px solid #f0f0f0;
+    background: #fafafa;
+    border-radius: 0 0 4px 4px;
+    text-align: right; /* 右对齐 */
+}
+
+.ne-dp-footer:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.ne-dp-btn {
+    display: inline-block;
+    padding: 6px 16px;
+    margin-left: 8px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    outline: none;
+    *display: inline; /* IE7 inline-block */
+    *zoom: 1; /* IE7 inline-block */
+}
+
+/* 清空按钮 */
+.ne-dp-btn-clear {
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    color: #666;
+}
+
+.ne-dp-btn-clear:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+/* 今天按钮 */
+.ne-dp-btn-today {
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    color: #666;
+}
+
+.ne-dp-btn-today:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+/* 确定按钮 */
+.ne-dp-btn-ok {
+    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF667EEA', endColorstr='#FF764BA2', GradientType=1);
+    color: #fff;
+    border: none;
+}
+
+.ne-dp-btn-ok:hover {
+    opacity: 0.9;
+    filter: alpha(opacity=90);
+}
+
+/* ========== 选择器样式 ========== */
+.ne-dp-selector {
+    padding: 10px;
+}
+
+.ne-dp-selector-header {
+    *zoom: 1;
+    padding: 10px 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: center;
+}
+
+.ne-dp-selector-header:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.ne-dp-selector-title {
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+}
+
+.ne-dp-selector-prev {
+    float: left;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 3px;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.ne-dp-selector-next {
+    float: right;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 3px;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.ne-dp-selector-prev:hover,
+.ne-dp-selector-next:hover {
+    background: #f5f7fa;
+}
+
+.ne-dp-selector-body {
+    *zoom: 1;
+}
+
+.ne-dp-selector-body:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.ne-dp-selector-item {
+    float: left;
+    width: 60px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 3px;
+}
+
+.ne-dp-selector-item:hover {
+    background: #f5f7fa;
+    color: #667eea;
+}
+
+.ne-dp-selector-item.ne-dp-selected {
+    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF667EEA', endColorstr='#FF764BA2', GradientType=1);
+    color: #fff;
+}
+
+/* ========== 响应式设计 ========== */
+
+/* 平板设备 */
+@media screen and (max-width: 768px) {
+    .ne-dp-container {
+        width: 300px;
+    }
+    
+    .ne-dp-day {
+        width: 38px;
+        height: 38px;
+        line-height: 38px;
+    }
+    
+    .ne-dp-week {
+        width: 38px;
+    }
+    
+    .ne-dp-selector-item {
+        width: 65px;
+        height: 44px;
+        line-height: 44px;
+    }
+}
+
+/* 移动端 */
+@media screen and (max-width: 480px) {
+    .ne-dp-container {
+        width: 100%;
+        max-width: 320px;
+        left: 50% !important;
+        margin-left: -160px;
+    }
+    
+    .ne-dp-header {
+        padding: 15px 12px;
+    }
+    
+    .ne-dp-header-btn {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        font-size: 18px;
+    }
+    
+    .ne-dp-header-title {
+        font-size: 16px;
+    }
+    
+    .ne-dp-day {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 15px;
+    }
+    
+    .ne-dp-week {
+        width: 40px;
+    }
+    
+    .ne-dp-btn {
+        padding: 8px 20px;
+        font-size: 14px;
+    }
+    
+    .ne-dp-selector-item {
+        width: 70px;
+        height: 48px;
+        line-height: 48px;
+        font-size: 15px;
+    }
+}
+
+/* 小屏手机 */
+@media screen and (max-width: 360px) {
+    .ne-dp-container {
+        max-width: 280px;
+        margin-left: -140px;
+    }
+    
+    .ne-dp-day {
+        width: 34px;
+        height: 34px;
+        line-height: 34px;
+    }
+    
+    .ne-dp-week {
+        width: 34px;
+    }
+    
+    .ne-dp-selector-item {
+        width: 60px;
+        height: 42px;
+        line-height: 42px;
+    }
+}
+
+/* 高分辨率设备 */
+@media screen and (-webkit-min-device-pixel-ratio: 2),
+       screen and (min-resolution: 192dpi) {
+    .ne-dp-container {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .ne-dp-day {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+    }
+    
+    .ne-dp-week {
+        width: 40px;
+    }
+    
+    .ne-dp-header-btn {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+    }
+    
+    .ne-dp-btn {
+        padding: 10px 24px;
+    }
+}
+
+/* 横屏模式 */
+@media screen and (max-height: 400px) and (orientation: landscape) {
+    .ne-dp-container {
+        width: 280px;
+    }
+    
+    .ne-dp-header {
+        padding: 8px 10px;
+    }
+    
+    .ne-dp-day {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+    }
+    
+    .ne-dp-week {
+        width: 32px;
+    }
+    
+    .ne-dp-footer {
+        padding: 6px 10px;
+    }
+}
+
+/* ========== 打印样式 ========== */
+@media print {
+    .ne-dp-container {
+        display: none !important;
+    }
+}
+
+/* ========== 无障碍访问 ========== */
+.ne-dp-day:focus,
+.ne-dp-btn:focus,
+.ne-dp-header-btn:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 1px;
+}
+
+/* 高对比度模式 */
+@media screen and (-ms-high-contrast: active) {
+    .ne-dp-container {
+        border: 2px solid;
+    }
+    
+    .ne-dp-selected {
+        border: 2px solid;
+    }
+}
