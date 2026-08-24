@@ -60,7 +60,7 @@
     <!--                            JAVASCRIPT                                          -->
     <!--================================================================================-->
     <script src="../../assets/libs/jquery-1.8.3.min.js"></script>
-    <script src="//api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
+    <script src="//api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件--> <!-- ak 这里要改为后端cs里配置的ak值 mock -->
     <!-- mock 模拟数据 -->
     <script src="../../assets/lib/mock/mock-min.js"></script>
 
@@ -114,7 +114,7 @@
             cache: false,
             url: "../yewu_fenpei/jk/fwh_pub/jk_yewu_fenpei.ashx",
             data: {
-                "action": "sel_yewu_fenpei_one",
+                "action": "sel_yewu_fenpei_one_noqx",
                 "user": "<%=s_user%>",
                 "sjk": "<%=s_sjk%>",
                 "yewu_fenpei_lsh_id": "<%=s_yewu_fenpei_lsh_id%>"

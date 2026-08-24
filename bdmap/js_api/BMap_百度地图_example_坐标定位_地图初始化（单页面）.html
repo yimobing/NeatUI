@@ -61,9 +61,6 @@
     <!--================================================================================-->
     <script src="../../assets/libs/jquery-1.8.3.min.js"></script>
     <script src="//api.map.baidu.com/api?v=2.0&ak=KmYpNYDatEVqdNvwvDXsbbOvQhTvPg9X"></script> <!--百度地图api文件-->
-    <!-- mock 模拟数据 -->
-    <script src="../../assets/lib/mock/mock-min.js"></script>
-
     <script>
         //========================================================================================
         //                          一、默认参数设置
@@ -75,77 +72,13 @@
         var ENABLE_TITLE = false; // 要不要展示显示坐标点的文本，默认false
 
 
-        
         //————————————————————————————————————————————————
-        // test 更改默认值 mock
-        ENABLE_TITLE = true; // 要不要展示显示坐标点的文本，默认false
-
-
-
-        /*+———————————————— mock 模拟数据 ————————————————+*/
-        //——————————————————————————————————————————
-        // 设置延时时长，模拟后端处理或返回数据的时间。
-        Mock.setup({
-            timeout: 1000, // 延时n毫秒返回
-        });
-        // 获取默认搜索组(取所有默认搜索组及对应的默认搜索关键字)
-        Mock.mock("../yewu_fenpei/jk/fwh_pub/jk_yewu_fenpei.ashx", "post", function(v){
-            // console.log('后台传过来的参数：', v);
-            return Mock.mock({
-                // "return": "ok",
-                "zuobiao": "118.602531,24.888294", // "118.602531,24.888294"
-                "pgdx": "福建省泉州市丰泽区浦西万达广场住宅A幢1205室"
-                // "return": "error",
-                // "data": "操作失败，您无权限"
-            });
-        });
-
-
-
-        //————————————————————————————————————————————————
-        // 获取中心点坐标：通过业务分配流水号获取房屋坐标和现场查看坐标位置(定位位置) 
-        var isEverythingOk = true;
-        var infoCaption = '', infoDescribe = '';
-        var dataSource = {};
-        $.ajax({
-            async: false, // 取数方式. true 异步(默认), false 同步
-            type: "POST", // mock 项目正式上线时，请将 POST 改为 GET
-            dataType: "html",
-            cache: false,
-            url: "../yewu_fenpei/jk/fwh_pub/jk_yewu_fenpei.ashx",
-            data: {
-                "action": "sel_yewu_fenpei_one",
-                "user": "<%=s_user%>",
-                "sjk": "<%=s_sjk%>",
-                "yewu_fenpei_lsh_id": "<%=s_yewu_fenpei_lsh_id%>"
-            },
-            success: function(res){
-                if(!res || $.isEmptyObject(res)) return;
-                var result = JSON.parse(res);
-                if(typeof result.return != 'undefined' && result.return != 'ok') {
-                    isEverythingOk = false;
-                    infoCaption = result.return;
-                    infoDescribe = result.data;
-                    alert(result.data);
-                    return;
-                }
-                dataSource = JSON.parse(res);
-            },
-            error: function(errs){ },
-            beforeSend: function(xhr){ },
-            complete: function(xhr, status){ }
-        });
-
-        // console.log('dataSource：', dataSource)
-        var resultData = typeof dataSource.data == 'undefined' ? dataSource : (dataSource.data.length > 0 ? dataSource.data[0] : {});
-        if(isEverythingOk) {
-            if($.isEmptyObject(resultData)) {
-                var errTip = '现场位置嵌入页面\n“获取当前业务分配单数据”的接口返回值有误，请联系管理员检查。\n接口返回值如下：' + JSON.stringify(dataSource);
-                // console.error(errTip); // 不要使用console打印信息，否则winform嵌入页面时会不显示页面
-                alert(errTip);
-            }
+        // 获取中心点坐标
+        var resultData = {
+            "return": "ok",
+            "zuobiao": "118.602531,24.888294", // "118.602531,24.888294"
+            "pgdx": "福建省泉州市丰泽区浦西万达广场住宅A幢1205室"
         }
-
 
 
         //————————————————————————————————————————————————
