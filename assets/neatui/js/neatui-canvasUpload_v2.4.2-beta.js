@@ -1,21 +1,12 @@
 /**
  * 图片压缩上传插件 neuiCanvasUpload
+ * Version: v2.4.2-beta
+ * Author: Mufeng
+ * Date: 2020.05.07 (初始)、2023.05.19 (迭代)
+ * pubdate: 2026.03.17 (v2.4.2-beta 修复 IE9 中 Blob 未定义错误)
  * 兼容性：IE10+、Chrome、Firefox、Edge；依赖 jQuery 1.8+
- * @Version: v2.5.0-beta
- * @Author: Mufeng
- * @Date: 2023.05.19 (迭代)、2020.05.07 (初始)
- * @PubDate: 2026.09.09
  * 
- *【更新历史】
- * v2.5.0-beta 更新说明： (edit 2026.09.09)
- * 修复 Edge 解码超大图片失败
- * 1. 图片解码失败（img.onerror / 解码超时）不再直接报"文件损坏"
- *    - 自动降级链路：createImageBitmap 缩放解码 → URL.createObjectURL 重载 → 明确提示
- * 2. 新增 parseImageSize（JPEG/PNG 文件头尺寸解析）、decodeViaImageBitmap、decodeViaObjectURL
- * 3. IE10 无 createImageBitmap，能力检测后自动保持原 img 路径，兼容不受影响
- * 
- * v2.4.2-beta 更新说明：(2026.03.17)
- * 修复 IE9 中 Blob 未定义错误
+ * v2.4.2-beta 更新说明：
  * 1. 修复 IE9 中 "Blob 未定义" 错误
  *    - 使用 typeof Blob !== 'undefined' 替代 Blob && 避免引用错误
  * 
@@ -891,6 +882,7 @@
          */
         compressFile: function(file, index, total, isCompressMode, callback) {
             var me = this;
+            
             // 文件类型校验（空数组表示不限制）
             var fileName = file.name || '';
             var fileExt = fileName.split('.').pop().toLowerCase();
@@ -909,13 +901,13 @@
                 var nonImageFileSizeKB = (file.size || 0) / 1024;
                 var nonImageFileSize = me.convertSizeUnit(nonImageFileSizeKB);
                 var nonImageMaxSize = me.convertSizeUnit(me.opt.maxSize);
-
+                
                 if (nonImageFileSizeKB > me.opt.maxSize) {
                     me.instanceAlert('文件体积' + nonImageFileSize.value + nonImageFileSize.unit + '超过限制' + nonImageMaxSize.value + nonImageMaxSize.unit, false);
                     callback(null);
                     return;
                 }
-
+                
                 // 返回非图片文件结果
                 callback({
                     file: file,
@@ -932,94 +924,12 @@
             }
 
             // 以下为图片文件处理流程
-            // 体积/像素超限判断统一在 processCompressedImage 内完成 edit 20260909-1
-            
-            // 加载图片获取真实尺寸 (解码失败/超时自动进入降级链路 edit 20260909-1)
-            var img = new Image();
-            var reader = new FileReader();
-            var timeoutId = null;
-
-            reader.onload = function(e) {
-                img.onload = function() {
-                    clearTimeout(timeoutId);
-                    // IE10 兼容：优先使用 naturalWidth/naturalHeight，这是图片的真实尺寸
-                    // IE10 中 img.width/height 有时在 onload 时还未正确设置
-                    var realWidth = img.naturalWidth || img.width || 0;
-                    var realHeight = img.naturalHeight || img.height || 0;
-
-                    // 如果仍然无法获取尺寸，尝试延迟获取
-                    if (realWidth === 0 || realHeight === 0) {
-                        // IE10 延迟检测：等待渲染完成
-                        setTimeout(function() {
-                            realWidth = img.naturalWidth || img.width || 0;
-                            realHeight = img.naturalHeight || img.height || 0;
-
-                            if (realWidth === 0 || realHeight === 0) {
-                                me.instanceAlert('无法获取图片尺寸，请检查图片是否有效', false);
-                                callback(null);
-                                return;
-                            }
-
-                            // 继续处理
-                            me.processCompressedImage(realWidth, realHeight, img, file, index, isCompressMode, callback);
-                        }, 100);
-                        return;
-                    }
-
-                    // 正常处理流程 (压缩主流程已提取为 processCompressedImage edit 20260909-1)
-                    me.processCompressedImage(realWidth, realHeight, img, file, index, isCompressMode, callback);
-                };
-
-                // 解码失败不再直接报错，进入降级链路 edit 20260909-1
-                img.onerror = function() {
-                    clearTimeout(timeoutId);
-                    me.handleImageDecodeFailure(file, index, isCompressMode, callback, false);
-                };
-
-                // 图片加载超时 (超时也进入降级链路，全部失败才提示 edit 20260909-1)
-                timeoutId = setTimeout(function() {
-                    if (!img.complete) {
-                        img.src = '';
-                        img.onload = null;
-                        img.onerror = null;
-                        me.handleImageDecodeFailure(file, index, isCompressMode, callback, true);
-                    }
-                }, me.opt.decodeTimeout);
-
-                img.src = e.target.result;
-            };
-
-            reader.onerror = function() {
-                me.instanceAlert('文件读取失败', false);
-                callback(null);
-            };
-
-            reader.readAsDataURL(file);
-        },
-
-        /**
-         * 图片压缩主流程（canvas 缩放绘制 → toDataURL 循环压缩 → blob/file）
-         * 由原 compressFile 内的 processImage 提取为独立方法
-         * 支持 img 与 ImageBitmap 两种解码源，供主路径与降级路径共用
-         * add 20260909-1
-         * @param {Number} realWidth  原图真实宽度
-         * @param {Number} realHeight 原图真实高度
-         * @param {Image|ImageBitmap} source 已解码的图像源
-         * @param {File} file 文件对象
-         * @param {Number} index 文件索引
-         * @param {Boolean} isCompressMode 是否压缩模式
-         * @param {Function} callback 处理回调
-         */
-        processCompressedImage: function(realWidth, realHeight, source, file, index, isCompressMode, callback) {
-            var me = this;
-            var realTotalPixels = realWidth * realHeight;
-            var realPixelWH = realWidth + '*' + realHeight;
 
             // 体积校验
             var fileSizeKB = (file.size || 0) / 1024;
             var fileSize = me.convertSizeUnit(fileSizeKB);
             var maxSize = me.convertSizeUnit(me.opt.maxSize);
-
+            
             // 像素限制
             var actualMaxPixels;
             if (me.opt.maxTotalPixels !== undefined && me.opt.maxTotalPixels !== null) {
@@ -1030,439 +940,262 @@
             }
             var limitPixelWH = Math.sqrt(actualMaxPixels).toFixed(0) + '*' + Math.sqrt(actualMaxPixels).toFixed(0);
 
-            // 超限判断
-            var isOverLimit = false;
-            var tip = '';
-
-            if (fileSizeKB > me.opt.maxSize) {
-                tip = '图片体积' + fileSize.value + fileSize.unit + '超过限制' + maxSize.value + maxSize.unit;
-                isOverLimit = true;
-            }
-
-            if (!isOverLimit && realTotalPixels > actualMaxPixels) {
-                tip = '图片像素' + realPixelWH + 'px超过限制' + limitPixelWH + 'px';
-                isOverLimit = true;
-            }
-
-            if (fileSizeKB > me.opt.maxSize && realTotalPixels > actualMaxPixels) {
-                tip = '图片体积' + fileSize.value + fileSize.unit + '超过限制' + maxSize.value + maxSize.unit + '，像素' + realPixelWH + 'px超过限制' + limitPixelWH + 'px';
-                isOverLimit = true;
-            }
-
-            if (!isCompressMode) {
-                // 拦截模式：超限直接提示
-                if (isOverLimit) {
-                    me.instanceAlert(tip, false);
-                    callback(null);
-                    return;
-                }
-                // 不超限：也经过 canvas 处理，统一生成 base64 和 file 对象
-            }
-
-            // 以下逻辑：所有图片都经过 canvas 处理（拦截模式不超限 + 压缩模式）
-            // 与原始代码逻辑一致
-
-            var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext('2d');
-
-            // IE10 严格防御：重新获取并验证所有尺寸参数
-            // source 可能是 img 或 ImageBitmap，统一取真实尺寸 add 20260909-1
-            var srcWidth = realWidth || (source && (source.naturalWidth || source.width)) || 0;
-            var srcHeight = realHeight || (source && (source.naturalHeight || source.height)) || 0;
-
-            // 最终检查：源尺寸必须有效
-            if (!srcWidth || !srcHeight || srcWidth <= 0 || srcHeight <= 0) {
-                me.instanceAlert('无法获取图片源尺寸，请检查图片是否有效', false);
-                callback(null);
-                return;
-            }
-
-            // 计算缩放比例（与原始代码逻辑一致）
-            var width = srcWidth;
-            var height = srcHeight;
-            var rate = 1;
-
-            if (width >= height) {
-                if (width > me.opt.maxWidth) {
-                    rate = me.opt.maxWidth / width;
-                }
-            } else {
-                if (height > me.opt.maxWidth) {
-                    rate = me.opt.maxWidth / height;
-                }
-            }
-
-            var imageWidth = Math.floor(width * rate);
-            var imageHeight = Math.floor(height * rate);
-
-            // IE10 防御：确保目标尺寸有效
-            if (!imageWidth || !imageHeight || imageWidth <= 0 || imageHeight <= 0) {
-                me.instanceAlert('图片目标尺寸计算异常', false);
-                callback(null);
-                return;
-            }
-
-            canvas.width = imageWidth;
-            canvas.height = imageHeight;
-            // test1
-            // console.log('me.opt.maxWidth：', me.opt.maxWidth)
-            // console.log('imgW-x：', imageWidth, '\nimgH-y：', imageHeight)
-
-            // IE10 兼容：使用 drawImage 的完整参数形式
-            try {
-                ctx.drawImage(source, 0, 0, imageWidth, imageHeight);
-            } catch (drawError) {
-                // IE10 降级：使用简单的 3 参数形式
-                try {
-                    ctx.drawImage(source, 0, 0);
-                } catch (e) {
-                    me.instanceAlert('图片绘制失败，请重试', false);
-                    callback(null);
-                    return;
-                }
-            }
-
-            // 确定输出格式
-            // forceConvertFormat: true 时，使用 targetFormat 强制转换格式
-            // forceConvertFormat: false 时，保持原图格式
-            var cType;
-            var outputFileName = file.name;
-            if (me.opt.forceConvertFormat && me.opt.targetFormat) {
-                cType = me.opt.targetFormat;
-                // 根据目标格式修改文件扩展名
-                var formatExtMap = {
-                    'image/jpeg': '.jpg',
-                    'image/png': '.png',
-                    'image/gif': '.gif',
-                    'image/webp': '.webp',
-                    'image/bmp': '.bmp'
-                };
-                var newExt = formatExtMap[me.opt.targetFormat] || '.jpg';
-                var originalName = file.name || 'image';
-                var baseName = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
-                outputFileName = baseName + newExt;
-            } else {
-                cType = file.type || 'image/jpeg';
-            }
-            var quality = me.opt.quality;
-            var base64 = canvas.toDataURL(cType, quality);
-
-            // 循环压缩逻辑（与原始代码一致）
-            // 高于最大质量时，动态调整 quality
-            while (base64.length / 1024 > me.opt.maxSize) {
-                quality -= 0.01;
-                if (quality <= 0) {
-                    quality = 0.01;
-                    break;
-                }
-                base64 = canvas.toDataURL(cType, quality);
-            }
-            // 低于最小质量时，提高 quality
-            while (base64.length / 1024 < me.opt.minSize) {
-                quality += 0.001;
-                if (quality >= 1) {
-                    quality = 1;
-                    break;
-                }
-                base64 = canvas.toDataURL(cType, quality);
-            }
-
-            // 将 base64 转换为 blob，再转换为 file 对象（与原始代码一致）
-            var blob = me.dataURLtoBlob(base64);
-            var processedFile = me.blobToFile(blob, outputFileName, cType);
-
-            if (me.opt.showThumb) {
-                me.appendThumb(base64);
-            }
-
-            // 判断是否为压缩模式超限
-            if (isCompressMode && isOverLimit) {
-                // 压缩模式超限：返回压缩后的结果，oldFiles 有值
-                callback({
-                    file: processedFile,
-                    index: index,
-                    url: base64,
-                    files: processedFile,
-                    oldFiles: file,
-                    originSize: file.size,
-                    compressedSize: blob.size,
-                    originWidth: srcWidth,
-                    compressedWidth: imageWidth,
-                    originHeight: srcHeight,
-                    compressedHeight: imageHeight,
-                    originPixels: srcWidth * srcHeight,
-                    compressedPixels: imageWidth * imageHeight,
-                    quality: quality,
-                    isImage: true
-                });
-            } else {
-                // 拦截模式不超限 或 压缩模式不超限：返回处理后的结果，oldFiles 为 null
-                callback({
-                    file: processedFile,
-                    index: index,
-                    url: base64,
-                    files: processedFile,
-                    oldFiles: null,
-                    originSize: file.size,
-                    compressedSize: blob.size,
-                    originWidth: srcWidth,
-                    compressedWidth: imageWidth,
-                    originHeight: srcHeight,
-                    compressedHeight: imageHeight,
-                    originPixels: srcWidth * srcHeight,
-                    compressedPixels: imageWidth * imageHeight,
-                    quality: quality,
-                    isImage: true
-                });
-            }
-        },
-
-        /**
-         * 图片解码失败/超时降级处理
-         * add 20260909-1
-         * img 全尺寸解码失败时，依次尝试
-         * 1. createImageBitmap 缩放解码（仅现代浏览器，解码即缩放，内存占用大幅降低）
-         * 2. URL.createObjectURL + img 重载（排除大字符串 dataURL 因素）
-         * 3. 全部失败才提示（区分"文件损坏"与"图片过大/浏览器资源限制"）
-         * IE10 无 createImageBitmap，自动保持原路径与原有提示，兼容不受影响
-         * @param {File} file 文件对象
-         * @param {Number} index 文件索引
-         * @param {Boolean} isCompressMode 是否压缩模式
-         * @param {Function} callback 处理回调
-         * @param {Boolean} isTimeout 是否由解码超时触发
-         */
-        handleImageDecodeFailure: function(file, index, isCompressMode, callback, isTimeout) {
-            var me = this;
-
-            // 现代浏览器：createImageBitmap 缩放解码
-            if (typeof createImageBitmap === 'function') {
-                me.parseImageSize(file, function(size) {
-                    if (size && size.width > 0 && size.height > 0) {
-                        // 按 maxWidth 等比计算缩放目标尺寸
-                        var rate = 1;
-                        if (size.width >= size.height) {
-                            if (size.width > me.opt.maxWidth) {
-                                rate = me.opt.maxWidth / size.width;
-                            }
-                        } else {
-                            if (size.height > me.opt.maxWidth) {
-                                rate = me.opt.maxWidth / size.height;
-                            }
-                        }
-                        var targetW = Math.floor(size.width * rate);
-                        var targetH = Math.floor(size.height * rate);
-                        if (targetW < 1) targetW = 1;
-                        if (targetH < 1) targetH = 1;
-
-                        me.decodeViaImageBitmap(file, targetW, targetH, function(bitmap) {
-                            if (bitmap) {
-                                me.processCompressedImage(size.width, size.height, bitmap, file, index, isCompressMode, callback);
+            // 加载图片获取真实尺寸
+            var img = new Image();
+            var reader = new FileReader();
+            
+            reader.onload = function(e) {
+                img.onload = function() {
+                    // IE10 兼容：优先使用 naturalWidth/naturalHeight，这是图片的真实尺寸
+                    // IE10 中 img.width/height 有时在 onload 时还未正确设置
+                    var realWidth = img.naturalWidth || img.width || 0;
+                    var realHeight = img.naturalHeight || img.height || 0;
+                    
+                    // 如果仍然无法获取尺寸，尝试延迟获取
+                    if (realWidth === 0 || realHeight === 0) {
+                        // IE10 延迟检测：等待渲染完成
+                        setTimeout(function() {
+                            realWidth = img.naturalWidth || img.width || 0;
+                            realHeight = img.naturalHeight || img.height || 0;
+                            
+                            if (realWidth === 0 || realHeight === 0) {
+                                me.instanceAlert('无法获取图片尺寸，请检查图片是否有效', false);
+                                callback(null);
                                 return;
                             }
-                            // 降级2：objectURL 重载
-                            me.tryObjectURLFallback(file, index, isCompressMode, callback, isTimeout);
+                            
+                            // 继续处理
+                            processImage(realWidth, realHeight);
+                        }, 100);
+                        return;
+                    }
+                    
+                    // 正常处理流程
+                    processImage(realWidth, realHeight);
+                };
+                
+                // 图片处理核心逻辑
+                function processImage(realWidth, realHeight) {
+                    var realTotalPixels = realWidth * realHeight;
+                    var realPixelWH = realWidth + '*' + realHeight;
+                    
+                    // 超限判断
+                    var isOverLimit = false;
+                    var tip = '';
+
+                    if (fileSizeKB > me.opt.maxSize) {
+                        tip = '图片体积' + fileSize.value + fileSize.unit + '超过限制' + maxSize.value + maxSize.unit;
+                        isOverLimit = true;
+                    }
+
+                    if (!isOverLimit && realTotalPixels > actualMaxPixels) {
+                        tip = '图片像素' + realPixelWH + 'px超过限制' + limitPixelWH + 'px';
+                        isOverLimit = true;
+                    }
+
+                    if (fileSizeKB > me.opt.maxSize && realTotalPixels > actualMaxPixels) {
+                        tip = '图片体积' + fileSize.value + fileSize.unit + '超过限制' + maxSize.value + maxSize.unit + '，像素' + realPixelWH + 'px超过限制' + limitPixelWH + 'px';
+                        isOverLimit = true;
+                    }
+
+                    if (!isCompressMode) {
+                        // 拦截模式：超限直接提示
+                        if (isOverLimit) {
+                            me.instanceAlert(tip, false);
+                            callback(null);
+                            return;
+                        }
+                        // 不超限：也经过 canvas 处理，统一生成 base64 和 file 对象
+                    }
+                    
+                    // 以下逻辑：所有图片都经过 canvas 处理（拦截模式不超限 + 压缩模式）
+                    // 与原始代码逻辑一致
+                    
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    
+                    // IE10 严格防御：重新获取并验证所有尺寸参数
+                    var srcWidth = img.naturalWidth || img.width || realWidth || 0;
+                    var srcHeight = img.naturalHeight || img.height || realHeight || 0;
+                    
+                    // 最终检查：源尺寸必须有效
+                    if (!srcWidth || !srcHeight || srcWidth <= 0 || srcHeight <= 0) {
+                        me.instanceAlert('无法获取图片源尺寸，请检查图片是否有效', false);
+                        callback(null);
+                        return;
+                    }
+                    
+                    // 计算缩放比例（与原始代码逻辑一致）
+                    var width = srcWidth;
+                    var height = srcHeight;
+                    var rate = 1;
+                    
+                    if (width >= height) {
+                        if (width > me.opt.maxWidth) {
+                            rate = me.opt.maxWidth / width;
+                        }
+                    } else {
+                        if (height > me.opt.maxWidth) {
+                            rate = me.opt.maxWidth / height;
+                        }
+                    }
+                    
+                    var imageWidth = Math.floor(width * rate);
+                    var imageHeight = Math.floor(height * rate);
+                    
+                    // IE10 防御：确保目标尺寸有效
+                    if (!imageWidth || !imageHeight || imageWidth <= 0 || imageHeight <= 0) {
+                        me.instanceAlert('图片目标尺寸计算异常', false);
+                        callback(null);
+                        return;
+                    }
+
+                    canvas.width = imageWidth;
+                    canvas.height = imageHeight;
+                    
+                    // IE10 兼容：使用 drawImage 的完整参数形式
+                    try {
+                        ctx.drawImage(img, 0, 0, imageWidth, imageHeight);
+                    } catch (drawError) {
+                        // IE10 降级：使用简单的 3 参数形式
+                        try {
+                            ctx.drawImage(img, 0, 0);
+                        } catch (e) {
+                            me.instanceAlert('图片绘制失败，请重试', false);
+                            callback(null);
+                            return;
+                        }
+                    }
+                    
+                    // 确定输出格式
+                    // forceConvertFormat: true 时，使用 targetFormat 强制转换格式
+                    // forceConvertFormat: false 时，保持原图格式
+                    var cType;
+                    var outputFileName = file.name;
+                    if (me.opt.forceConvertFormat && me.opt.targetFormat) {
+                        cType = me.opt.targetFormat;
+                        // 根据目标格式修改文件扩展名
+                        var formatExtMap = {
+                            'image/jpeg': '.jpg',
+                            'image/png': '.png',
+                            'image/gif': '.gif',
+                            'image/webp': '.webp',
+                            'image/bmp': '.bmp'
+                        };
+                        var newExt = formatExtMap[me.opt.targetFormat] || '.jpg';
+                        var originalName = file.name || 'image';
+                        var baseName = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
+                        outputFileName = baseName + newExt;
+                    } else {
+                        cType = file.type || 'image/jpeg';
+                    }
+                    var quality = me.opt.quality;
+                    var base64 = canvas.toDataURL(cType, quality);
+                    
+                    // 循环压缩逻辑（与原始代码一致）
+                    // 高于最大质量时，动态调整 quality
+                    while (base64.length / 1024 > me.opt.maxSize) {
+                        quality -= 0.01;
+                        if (quality <= 0) {
+                            quality = 0.01;
+                            break;
+                        }
+                        base64 = canvas.toDataURL(cType, quality);
+                    }
+                    // 低于最小质量时，提高 quality
+                    while (base64.length / 1024 < me.opt.minSize) {
+                        quality += 0.001;
+                        if (quality >= 1) {
+                            quality = 1;
+                            break;
+                        }
+                        base64 = canvas.toDataURL(cType, quality);
+                    }
+                    
+                    // 将 base64 转换为 blob，再转换为 file 对象（与原始代码一致）
+                    var blob = me.dataURLtoBlob(base64);
+                    var processedFile = me.blobToFile(blob, outputFileName, cType);
+                    
+                    if (me.opt.showThumb) {
+                        me.appendThumb(base64);
+                    }
+                    
+                    // 判断是否为压缩模式超限
+                    if (isCompressMode && isOverLimit) {
+                        // 压缩模式超限：返回压缩后的结果，oldFiles 有值
+                        callback({
+                            file: processedFile,
+                            index: index,
+                            url: base64,
+                            files: processedFile,
+                            oldFiles: file,
+                            originSize: file.size,
+                            compressedSize: blob.size,
+                            originWidth: srcWidth,
+                            compressedWidth: imageWidth,
+                            originHeight: srcHeight,
+                            compressedHeight: imageHeight,
+                            originPixels: srcWidth * srcHeight,
+                            compressedPixels: imageWidth * imageHeight,
+                            quality: quality,
+                            isImage: true
                         });
                     } else {
-                        // 解析不出尺寸：直接尝试 objectURL 重载（onload 可拿到真实尺寸）
-                        me.tryObjectURLFallback(file, index, isCompressMode, callback, isTimeout);
+                        // 拦截模式不超限 或 压缩模式不超限：返回处理后的结果，oldFiles 为 null
+                        callback({
+                            file: processedFile,
+                            index: index,
+                            url: base64,
+                            files: processedFile,
+                            oldFiles: null,
+                            originSize: file.size,
+                            compressedSize: blob.size,
+                            originWidth: srcWidth,
+                            compressedWidth: imageWidth,
+                            originHeight: srcHeight,
+                            compressedHeight: imageHeight,
+                            originPixels: srcWidth * srcHeight,
+                            compressedPixels: imageWidth * imageHeight,
+                            quality: quality,
+                            isImage: true
+                        });
                     }
-                });
-                return;
-            }
-
-            // IE10 等不支持 createImageBitmap：保持原有提示文案，行为不变
-            me.instanceAlert(isTimeout ? '图片加载超时' : '图片加载失败，请检查文件是否损坏或图片像素是否超过8192px，如超过请使用Chrome/360等现代浏览器打开重试', false);
-            callback(null);
-        },
-
-        /**
-         * 降级2：URL.createObjectURL + img 重载
-         * add 20260909-1
-         */
-        tryObjectURLFallback: function(file, index, isCompressMode, callback, isTimeout) {
-            var me = this;
-            me.decodeViaObjectURL(file, function(img2, w, h) {
-                if (img2 && w > 0 && h > 0) {
-                    me.processCompressedImage(w, h, img2, file, index, isCompressMode, callback);
-                    return;
                 }
-                // 降级全部失败
-                if (isTimeout) {
-                    me.instanceAlert('图片加载超时，请降低图片分辨率后重试，或使用Chrome/360等现代浏览器打开重试', false);
-                } else {
-                    me.instanceAlert('图片加载失败，请检查文件是否损坏；若文件正常，可能是图片尺寸过大或浏览器资源限制，请降低分辨率后重试，或在Chrome/360等现代浏览器中打开重试', false);
-                }
-                callback(null);
-            });
-        },
+                // processImage 函数结束
 
-        /**
-         * createImageBitmap 缩放解码（现代浏览器专用）
-         * 解码时直接缩放到目标尺寸，避免全尺寸位图（如 8912万像素≈340MB）分配失败
-         * add 20260909-1
-         * @param {File} file 文件对象
-         * @param {Number} targetW 目标宽度
-         * @param {Number} targetH 目标高度
-         * @param {Function} callback 成功返回 ImageBitmap，失败返回 null
-         */
-        decodeViaImageBitmap: function(file, targetW, targetH, callback) {
-            var me = this;
-            if (typeof createImageBitmap !== 'function') {
-                callback(null);
-                return;
-            }
-            try {
-                var promise = createImageBitmap(file, {
-                    resizeWidth: targetW,
-                    resizeHeight: targetH,
-                    resizeQuality: 'high'
-                });
-                if (promise && typeof promise.then === 'function') {
-                    promise.then(function(bitmap) {
-                        callback(bitmap);
-                    }, function() {
+                img.onerror = function() {
+                    me.instanceAlert('图片加载失败，请检查文件是否损坏', false);
+                    callback(null);
+                };
+
+                // 图片加载超时
+                var timeoutId = setTimeout(function() {
+                    if (!img.complete) {
+                        img.src = '';
+                        img.onload = null;
+                        img.onerror = null;
+                        me.instanceAlert('图片加载超时', false);
                         callback(null);
-                    });
-                } else {
-                    // 个别实现同步返回或异常
-                    callback(null);
-                }
-            } catch (e) {
-                callback(null);
-            }
-        },
-
-        /**
-         * URL.createObjectURL + img 重载解码
-         * 避开大字符串 dataURL，改用对象 URL
-         * add 20260909-1
-         * @param {File} file 文件对象
-         * @param {Function} callback 成功返回 (img, 宽, 高)，失败返回 (null)
-         */
-        decodeViaObjectURL: function(file, callback) {
-            var me = this;
-            if (!window.URL || typeof window.URL.createObjectURL !== 'function') {
-                callback(null);
-                return;
-            }
-            var img2 = new Image();
-            var objectUrl = null;
-            var done = false;
-            try {
-                objectUrl = window.URL.createObjectURL(file);
-            } catch (e) {
-                callback(null);
-                return;
-            }
-            img2.onload = function() {
-                if (done) return;
-                done = true;
-                if (objectUrl) window.URL.revokeObjectURL(objectUrl);
-                callback(img2, img2.naturalWidth || img2.width || 0, img2.naturalHeight || img2.height || 0);
-            };
-            img2.onerror = function() {
-                if (done) return;
-                done = true;
-                if (objectUrl) window.URL.revokeObjectURL(objectUrl);
-                callback(null);
-            };
-            // 超时保护，避免降级路径卡死
-            setTimeout(function() {
-                if (!done) {
-                    done = true;
-                    if (objectUrl) window.URL.revokeObjectURL(objectUrl);
-                    callback(null);
-                }
-            }, me.opt.decodeTimeout);
-            img2.src = objectUrl;
-        },
-
-        /**
-         * 解析图片文件头获取真实尺寸（不触发整图解码）
-         * 支持 JPEG（SOFn 段）与 PNG（IHDR），其余格式返回 null
-         * add 20260909-1
-         * @param {File} file 文件对象
-         * @param {Function} callback 成功返回 {width, height}，失败返回 null
-         */
-        parseImageSize: function(file, callback) {
-            var me = this;
-            if (!window.FileReader || typeof FileReader.prototype.readAsArrayBuffer !== 'function') {
-                callback(null);
-                return;
-            }
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    var bytes = new Uint8Array(e.target.result);
-                    var size = null;
-
-                    // PNG：8字节签名 + IHDR（宽高在偏移16/20）
-                    if (bytes.length >= 24 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) {
-                        size = {
-                            width: ((bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19]) >>> 0,
-                            height: ((bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23]) >>> 0
-                        };
                     }
-                    // JPEG：FFD8 开头，扫描段找 SOFn 标记
-                    else if (bytes.length >= 4 && bytes[0] === 0xFF && bytes[1] === 0xD8) {
-                        size = me.parseJpegSizeFromBytes(bytes);
-                    }
+                }, me.opt.decodeTimeout);
 
-                    callback(size);
-                } catch (err) {
-                    callback(null);
-                }
+                // 清理超时定时器
+                var originalOnload = img.onload;
+                img.onload = function() {
+                    clearTimeout(timeoutId);
+                    originalOnload.apply(this, arguments);
+                };
+
+                img.src = e.target.result;
             };
+            
             reader.onerror = function() {
+                me.instanceAlert('文件读取失败', false);
                 callback(null);
             };
-            reader.readAsArrayBuffer(file);
+            
+            reader.readAsDataURL(file);
         },
-
-        /**
-         * JPEG 头解析（扫描段标记，定位 SOF0/1/2 等）
-         * add 20260909-1
-         */
-        parseJpegSizeFromBytes: function(bytes) {
-            var i = 2;
-            var len = bytes.length;
-            while (i + 9 <= len) {
-                if (bytes[i] !== 0xFF) {
-                    i++;
-                    continue;
-                }
-                var marker = bytes[i + 1];
-                // EOI 结束仍未找到 SOF
-                if (marker === 0xD9) {
-                    return null;
-                }
-                // SOF0-SOF15（排除 DHT/C4、JPG/C8、DAC/CC）
-                if (marker >= 0xC0 && marker <= 0xCF && marker !== 0xC4 && marker !== 0xC8 && marker !== 0xCC) {
-                    // 结构：FF xx [长度2字节] 精度1字节 高2字节 宽2字节
-                    return {
-                        height: (bytes[i + 5] << 8) | bytes[i + 6],
-                        width: (bytes[i + 7] << 8) | bytes[i + 8]
-                    };
-                }
-                // 无长度字段的独立标记：TEM/SOI/RSTn/填充FF
-                if (marker === 0x01 || marker === 0xD8 || (marker >= 0xD0 && marker <= 0xD7) || marker === 0xFF) {
-                    i += 2;
-                    continue;
-                }
-                // 普通段：2字节长度（含自身），跳到下一标记
-                if (i + 4 <= len) {
-                    var segLen = (bytes[i + 2] << 8) | bytes[i + 3];
-                    if (segLen < 2) {
-                        return null;
-                    }
-                    i += 2 + segLen;
-                } else {
-                    return null;
-                }
-            }
-            return null;
-        },
-
 
         /**
          * 重置input
