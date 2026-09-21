@@ -63,17 +63,18 @@ h5{font-size:20px;color:#0ce;border-bottom:1px solid #0ce;padding-bottom:8px;}
 	$(function(){
 		
 		/*日期控件调用方法
-		*	方法1：neuiCalendar.neDate(obj,json,callBack); 
-		* 方法2（兼容旧版）：neuiCalendar.neDate(obj,false); 
+		*	方法1：neuiCalendar.neDate(obj, json, callBack, onSuccess); 
+		* 方法2（兼容旧版）：neuiCalendar.neDate(obj, false); 
 		*	@param obj 当前所在标签对象或#ID或.className(必须).eg. $('#date') 或 '#date' 或 '.date'
-		*	@param json json对象(可缺省)，格式：{"empty":false,"theme":"green","format":"YYYY-MM-DD hh:mm:ss"} 
-			empty 标签默认日期是否为空(可缺省),true|空,false|不空(默认当天日期); 
-			theme 日历控件主题(可缺省), green|绿色,blue|蓝色，默认green 
-			format 日期格式(可缺省), 一般有几个值:"YYYY-MM-DD"、 "YYYY-MM-DD hh:mm:ss"、 "YYYY-MM-DD hh:mm"，默认 "YYYY-MM-DD"(eg.2018-07-25)
-			minDate 最小日期(可缺省),格式必须与format参数一样,否则会出错!
-			maxDate 最大日期(可缺省),格式必须与format参数一样,否则会出错!
+		*	@param json json对象(可选)，格式：{"empty":false,"theme":"green","format":"YYYY-MM-DD hh:mm:ss"} 
+			empty 标签默认日期是否为空(可选),true|空,false|不空(默认当天日期); 
+			theme 日历控件主题(可选), green|绿色,blue|蓝色，默认green 
+			format 日期格式(可选), 一般有几个值:"YYYY-MM-DD"、 "YYYY-MM-DD hh:mm:ss"、 "YYYY-MM-DD hh:mm"，默认 "YYYY-MM-DD"(eg.2018-07-25)
+			minDate 最小日期(可选),格式必须与format参数一样,否则会出错!
+			maxDate 最大日期(可选),格式必须与format参数一样,否则会出错!
 			其中 YYYY 年, MM 月, DD 天, hh 小时(24小时制), mm 分, ss 秒
-		* @param callBack 回调函数(可缺省)
+		* @param callBack 回调函数(可选)，选择完日期后触发
+		* @param onSuccess 日历弹窗渲染完成后触发(可选)
 		
 		注意：调用日历控件的标签如input标签不能有value属性，如：<input type="text" value="2018-07-25">，不然会报错
 		eg1. 多个标签调用日历控件<=>含有class="neDate"的标签都调用日历控件
@@ -83,10 +84,17 @@ h5{font-size:20px;color:#0ce;border-bottom:1px solid #0ce;padding-bottom:8px;}
 			//neuiCalendar.neDate($(this),{"empty":true,"theme":"blue"}); //默认日期为当天，主题为蓝色
 
 			neuiCalendar.neDate($(this),{},callBack); //默认日期当天，主题为默认主题，且选择完日期后有回调函数
-			neuiCalendar.neDate($(this),{"empty":false,"theme":"blue"},callBack); //默认日期为空，主题为蓝色，且选择完日期后有回调函数
+			neuiCalendar.neDate($(this),{"empty":false,"theme":"blue"}, callBack, onSuccess); //默认日期为空，主题为蓝色，且选择完日期后有回调函数
+
+			// 选择完日期后触发
 			function callBack(e){
 				//console.log('返回日期值：',e.value);
 				alert('我是日历回调函数');
+			}
+
+			//  日历弹窗渲染完成后触发
+			function onSuccess(elem) {
+				console.log('elem:', elem); // 日期控件DOM
 			}
 		})
 		

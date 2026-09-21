@@ -4,7 +4,7 @@
 * 说明：本控件是基于jedate日历控件进行封装，故需在本控件前引入jedate.js
 * Author: ChenMufeng
 * Date: 2018.8.30
-* Update: 2021.03.09 
+* Update: 2026.09.21
 */
 
 ///================================================================================================
@@ -38,10 +38,15 @@ var calendarUi = {
 * 日历控件
 */
 var neuiCalendar = {
-	/*
-	* 控件调用
-	*/	
-	neDate:function(element,params,callBack){ 
+    /**
+     * 控件调用
+     * @param {*} element 
+     * @param {*} params 
+     * @param {*} callBack 选择日期后触发
+     * @param {*} onSuccess 日历弹窗渲染完成后触发
+     * @returns 
+     */
+	neDate:function(element, params, callBack, onSuccess){ 
 			var selector = calendarUi.getClassID(element);
 			var obj = element instanceof jQuery ? (typeof(selector)=='object' ? selector : $(selector)) : $(element); // 判断是dom对象还是jq对象
 			var boolean = true,
@@ -80,6 +85,12 @@ var neuiCalendar = {
 			 minDate:minDate, //最小时间值
 			 maxDate:maxDate, //最大时间值
 			 onClose:false, //选中后是否立即关闭 false 马上关闭 true点击确定才关闭
+             success:function(elem) { // 日历弹窗渲染完成后触发 add 20260921
+                // console.log('ele:', elem)
+                // jedate弹窗外层class是 .jedatebox
+                // var $box = $('.jedatebox');
+                if(typeof(onSuccess) == 'function') onSuccess(elem);
+            },
 			 okfun:function(obj){ //回调函数
 			 	//console.log(obj.elem); //当前输入框id
 				//console.log(obj.val); //日期生成的值，如2018-04-06
