@@ -55,10 +55,18 @@
                     Mock.js 内置了多个方法，但常用的方法如下：
                     · Mock.setup(timeout) 用于设置延时时长，模拟后端处理或返回数据的时间。
                         timeout 单位是毫秒，整数或字符串类型，整数类型表示一个具体的时间，字符串类型用"m-n"的方式表示随机 m到n毫秒。
-                    · Mock.mock(url, type, function(v){}); // 拦截ajax请求并返回数据。 
+
+                    ·  Mock.mock(url, type, object or function);  拦截ajax请求并返回数据
+                    常见的Mock模拟数据写法有2个：
+                    Mock.mock(url, type, {});
+                    Mock.mock(url, type, function(v){ return Mock.mock({})});
+
+                    其中：
                         url 请求地址，要同 ajax 中的 url 参数保持一致, 
                         type 请求方式，值为 get 或 post。若 ajax 有发送到服务器的数据(即有 data 参数)，则 type必须为post而不能为get，否则拦截失效(模拟数据失败)
-                        function(v){} 一个函数返回模拟的数据，也可写成 (v) => {}
+                        object or function 可为对象或函数
+                        为函数时 function(v){} 时，表示一个函数返回模拟的数据，也可写成 (v) => {}。eg. function(v) { return Mock.mock(){}}
+                        为对象 {} 时，里面直接写模拟数据即可。eg. { code: "200", message: "success", data: []}
 
                     BUG 说明：在 Mock.setup(timeout) 对 ajax 貌似无效，但对 axios 却是有效的。
                     特别注意：因为实际项目中同一个页面可能会有好几个接口，但URL请求地址是一样的，为了让不同接口分别能模拟获取到数据，url一般会加上后辍 '?param=1', '?param=2', ?param=3'... 这种格式。eg. '/jk/get_user_info.ashx?param=1'

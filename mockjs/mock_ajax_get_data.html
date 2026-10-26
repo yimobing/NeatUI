@@ -21,6 +21,15 @@
         <h5>
             让Mock支持 $.ajax GET 请求使用data参数传递数据
         </h5>
+        <pre>
+            Mock模拟数据：
+            Mock.mock(url, type, object or function);  拦截ajax请求并返回数据
+            常见的Mock模拟数据写法有2个：
+            Mock.mock(url, type, {});
+            Mock.mock(url, type, function(v){ return Mock.mock({})});
+        </pre>
+        <h3> 默认的Mock.js，type 请求方式值为 get 或 post。若 ajax 有发送到服务器的数据(即有 data 参数)，则 type必须为post而不能为get，否则拦截失效(模拟数据失败) ！</h3>
+        <h3> 引入 mock-ajax-get.js 后，即使请求方式值为type = 'get', ajax也可传递 data 参数，mock 也能正常拦截，不会失败。 </h3>
     </div><!--/.wrap-->
 
 
@@ -40,7 +49,7 @@
         Mock.mock("/api/test?param=1", "get", {
             code: 200,
             msg: "GET 成功！",
-            data: { id: 1, name: "测试数据" }
+            data: { id: 1, name: "测试返回数据GET" }
         });
 
         $.ajax({
@@ -66,7 +75,8 @@
         // ==========================
         Mock.mock("/api/post", "post", {
             code: 200,
-            msg: "POST 成功！"
+            msg: "POST 成功！",
+            data: { id: 2, name: "测试返回数据POST"}
         });
 
         $.ajax({
