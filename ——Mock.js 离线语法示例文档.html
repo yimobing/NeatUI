@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Mock.js 语法示例离线文档（mockjs.com/examples.html 离线备份）</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/Mock.js/1.0.0/mock-min.js"></script>
+    <style>
+        *{box-sizing:border-box;}
+        body{font-family:"Microsoft Yahei",sans-serif;max-width:1100px;margin:0 auto;padding:20px;background:#f7f8fa;}
+        h1{font-size:24px;color:#222;}
+        h2{font-size:20px;margin-top:36px;color:#2c3e50;border-left:4px solid #3498db;padding-left:12px;}
+        h3{font-size:17px;margin-top:24px;color:#34495e;}
+        pre{background:#2d2d2d;color:#ccc;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:14px;line-height:1.5;}
+        .result{background:#eef2f7;padding:12px 16px;border-radius:6px;margin:6px 0 20px 0;border:1px solid #dde3ec;white-space:pre-wrap;}
+        .tip{background:#fff3cd;border:1px solid #ffeeba;padding:10px 14px;border-radius:6px;margin:10px 0;}
+    </style>
+</head>
+<body>
+<h1>Mock.js 离线语法示例文档</h1>
+<div class="tip">备份来源：http://mockjs.com/examples.html<br>本地打开即可查阅所有模板语法、占位符示例；可复制代码到控制台测试 Mock.mock()</div>
+<div class="tip">
+    💡 使用小技巧：打开浏览器F12控制台，直接复制示例代码执行 Mock.mock({...}) 即可看输出结果。<br>
+    离线备份，防止官网 mockjs.com 失效；CDN使用bootcdn公共库。
+    </div>
+    
+<h2>数据模板定义 Data Template</h2>
+
+<h3>String 字符串</h3>
+    <pre>// 'name|min-max': string
+    Mock.mock({
+    "string|1-10": "★"
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "string": "★★★★★★★★"
+    }</div>
+
+    <pre>// 'name|count': string
+    Mock.mock({
+    "string|3": "★★★"
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "string": "★★★★★★★★★"
+    }</div>
+
+    <h3>Number 数字</h3>
+    <pre>// 'name|+1': number
+    Mock.mock({
+    "number|+1": 202
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "number": 201
+    }</div>
+
+    <pre>// 'name|min-max': number
+    Mock.mock({
+    "number|1-100": 100
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "number": 37
+    }</div>
+
+    <pre>// 'name|min-max.dmin-dmax': number
+    Mock.mock({
+    "number|1-100.1-10": 1
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "number": 2.198
+    }</div>
+
+    <pre>Mock.mock({
+    "number|123.1-10": 1
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "number": 123.56726
+    }</div>
+
+    <pre>Mock.mock({
+    "number|123.3": 1
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "number": 123.404
+    }</div>
+
+    <pre>Mock.mock({
+    "number|123.10": 1.123
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "number": 123.1233383403
+    }</div>
+
+    <h3>Boolean 布尔</h3>
+    <pre>// 'name|1': boolean
+    Mock.mock({
+    "boolean|1": true
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "boolean": false
+    }</div>
+
+    <pre>// 'name|min-max': boolean
+    Mock.mock({
+    "boolean|1-2": true
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "boolean": false
+    }</div>
+
+    <h3>Object 对象</h3>
+    <pre>// 'name|count': object
+    Mock.mock({
+    "object|2": {
+    "310000": "上海市",
+    "320000": "江苏省",
+    "330000": "浙江省",
+    "340000": "安徽省"
+    }
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "object": {
+    "310000": "上海市",
+    "330000": "浙江省"
+    }
+    }</div>
+
+    <pre>// 'name|min-max': object
+    Mock.mock({
+    "object|2-4": {
+    "110000": "北京市",
+    "120000": "天津市",
+    "130000": "河北省",
+    "140000": "山西省"
+    }
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "object": {
+    "110000": "北京市",
+    "120000": "天津市",
+    "130000": "河北省"
+    }
+    }</div>
+
+    <h3>Array 数组</h3>
+    <pre>// 'name|1': array
+    Mock.mock({
+    "array|1": [
+    "AMD",
+    "CMD",
+    "UMD"
+    ]
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "array": "CMD"
+    }</div>
+
+    <pre>// 'name|+1': array
+    Mock.mock({
+    "array|+1": [
+    "AMD",
+    "CMD",
+    "UMD"
+    ]
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "array": "AMD"
+    }</div>
+
+    <pre>Mock.mock({
+    "array|1-10": [
+    {
+    "name|+1": [
+    "Hello",
+    "Mock.js",
+    "!"
+    ]
+    }
+    ]
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "array": [
+    {
+    "name": "Hello"
+    },
+    {
+    "name": "Mock.js"
+    },
+    {
+    "name": "!"
+    }
+    ]
+    }</div>
+
+    <pre>Mock.mock({
+    "array|1-10": [
+    "Mock.js"
+    ]
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "array": [
+    "Mock.js",
+    "Mock.js",
+    "Mock.js",
+    "Mock.js",
+    "Mock.js",
+    "Mock.js",
+    "Mock.js",
+    "Mock.js",
+    "Mock.js",
+    "Mock.js"
+    ]
+    }</div>
+
+    <pre>Mock.mock({
+    "array|1-10": [
+    "Hello",
+    "Mock.js",
+    "!"
+    ]
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "array": [
+    "Hello",
+    "Mock.js",
+    "!",
+    "Hello",
+    "Mock.js",
+    "!",
+    "Hello",
+    "Mock.js",
+    "!",
+    "Hello",
+    "Mock.js",
+    "!"
+    ]
+    }</div>
+
+    <pre>Mock.mock({
+    "array|3": [
+    "Mock.js"
+    ]
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "array": [
+    "Mock.js",
+    "Mock.js",
+    "Mock.js"
+    ]
+    }</div>
+
+    <pre>Mock.mock({
+    "array|3": [
+    "Hello",
+    "Mock.js",
+    "!"
+    ]
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "array": [
+    "Hello",
+    "Mock.js",
+    "!",
+    "Hello",
+    "Mock.js",
+    "!",
+    "Hello",
+    "Mock.js",
+    "!"
+    ]
+    }</div>
+
+    <h3>Function 函数</h3>
+    <pre>// 'name': function
+    Mock.mock({
+    'foo': 'Syntax Demo',
+    'name': function() {
+    return this.foo
+    }
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "foo": "Syntax Demo",
+    "name": "Syntax Demo"
+    }</div>
+
+    <h3>RegExp 正则</h3>
+    <pre>// 'name': regexp
+    Mock.mock({
+    'regexp': /[a-z][A-Z][0-9]/
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "regexp": "tA0"
+    }</div>
+
+    <pre>Mock.mock({
+    'regexp': /\w\W\s\S\d\D/
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "regexp": "S%\rs2X"
+    }</div>
+
+    <pre>Mock.mock({
+    'regexp': /\d{5,10}/
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "regexp": "923667"
+    }</div>
+
+    <pre>Mock.mock({
+    'regexp|3': /\d{5,10}\-/
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "regexp": "242657-3842578-718707712-"
+    }</div>
+
+    <pre>Mock.mock({
+    'regexp|1-5': /\d{5,10}\-/
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "regexp": "57124537-384010-"
+    }</div>
+
+    <h3>Path 路径引用</h3>
+    <pre>// Absolute Path
+    Mock.mock({
+    "foo": "Hello",
+    "nested": {
+    "a": {
+    "b": {
+    "c": "Mock.js"
+    }
+    }
+    },
+    "absolutePath": "@/foo @/nested/a/b/c"
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "foo": "Hello",
+    "nested": {
+    "a": {
+    "b": {
+    "c": "Mock.js"
+    }
+    }
+    },
+    "absolutePath": "Hello Mock.js"
+    }</div>
+
+    <pre>// Relative Path
+    Mock.mock({
+    "foo": "Hello",
+    "nested": {
+    "a": {
+    "b": {
+    "c": "Mock.js"
+    }
+    }
+    },
+    "relativePath": {
+    "a": {
+    "b": {
+    "c": "@../../../foo @../../../nested/a/b/c"
+    }
+    }
+    }
+    })
+    </pre>
+    <div class="result">Result
+    {
+    "foo": "Hello",
+    "nested": {
+    "a": {
+    "b": {
+    "c": "Mock.js"
+    }
+    }
+    },
+    "relativePath": {
+    "a": {
+    "b": {
+    "c": "Hello Mock.js"
+    }
+    }
+    }
+    }</div>
+
+    <h2>数据占位符定义 Placeholder（Random.* / @xxx）</h2>
+    <h3>Basic 基础</h3>
+    <pre>
+    // Random.boolean( min?, max?, current? )
+    Random.boolean()
+    Mock.mock('@boolean')
+    Mock.mock('@boolean()')
+
+    // Random.boolean( min, max, current )
+    Random.boolean(1, 9, true)
+    Mock.mock('@boolean(1, 9, true)')
+
+    // Random.natural( min?, max? )
+    Random.natural()
+    Mock.mock('@natural')
+    Mock.mock('@natural()')
+    Random.natural(10000)
+    Mock.mock('@natural(10000)')
+    Random.natural(60, 100)
+    Mock.mock('@natural(60, 100)')
+
+    // Random.integer( min?, max? )
+    Random.integer()
+    Mock.mock('@integer')
+    Mock.mock('@integer()')
+    Random.integer(10000)
+    Mock.mock('@integer(10000)')
+    Random.integer(60, 100)
+    Mock.mock('@integer(60, 100)')
+
+    // Random.float( min?, max?, dmin?, dmax? )
+    Random.float()
+    Mock.mock('@float')
+    Mock.mock('@float()')
+    Random.float(0)
+    Mock.mock('@float(0)')
+    Random.float(60, 100)
+    Mock.mock('@float(60, 100)')
+    Random.float(60, 100, 3)
+    Mock.mock('@float(60, 100, 3)')
+    Random.float(60, 100, 3, 5)
+    Mock.mock('@float(60, 100, 3, 5)')
+
+    // Random.character( pool? )
+    Random.character()
+    Mock.mock('@character')
+    Mock.mock('@character()')
+    Random.character('lower')
+    Random.character('upper')
+    Random.character('number')
+    Random.character('symbol')
+    Mock.mock('@character("lower")')
+    Mock.mock('@character("upper")')
+    Mock.mock('@character("number")')
+    Mock.mock('@character("symbol")')
+    Random.character('aeiou')
+    Mock.mock('@character("aeiou")')
+
+    // Random.string( pool?, min?, max? )
+    Random.string()
+    Mock.mock('@string')
+    Mock.mock('@string()')
+    Random.string(5)
+    Mock.mock('@string(5)')
+    Random.string('lower', 5)
+    Random.string('upper',5)
+    Random.string('number',5)
+    Random.string('symbol',5)
+    Random.string('aeiou',5)
+    Mock.mock('@string("lower", 5)')
+    Mock.mock('@string("upper", 5)')
+    Mock.mock('@string("number", 5)')
+    Mock.mock('@string("symbol", 5)')
+    Mock.mock('@string("aeiou", 5)')
+    Random.string(7,10)
+    Mock.mock('@string(7,10)')
+    Random.string('lower',1,3)
+    Random.string('upper',1,3)
+    Random.string('number',1,3)
+    Random.string('symbol',1,3)
+    Random.string('aeiou',1,3)
+    Mock.mock('@string("lower", 1, 3)')
+    Mock.mock('@string("upper", 1, 3)')
+    Mock.mock('@string("number", 1, 3)')
+    Mock.mock('@string("symbol", 1, 3)')
+    Mock.mock('@string("aeiou", 1, 3)')
+
+    // Random.range(start?, stop, step?)
+    Random.range(10)
+    Mock.mock('@range(10)')
+    Random.range(3,7)
+    Mock.mock('@range(3, 7)')
+    Random.range(1,10,2)
+    Random.range(1,10,3)
+    Mock.mock('@range(1, 10, 2)')
+    Mock.mock('@range(1, 10, 3)')
+    </pre>
+
+    <h3>Date 日期时间</h3>
+    <pre>
+    // Random.date( format? )
+    Random.date()
+    Mock.mock('@date')
+    Mock.mock('@date()')
+    Random.date('yyyy-MM-dd')
+    Random.date('yy-MM-dd')
+    Random.date('y-MM-dd')
+    Random.date('y-M-d')
+    Mock.mock('@date("yyyy-MM-dd")')
+    Mock.mock('@date("yy-MM-dd")')
+    Mock.mock('@date("y-MM-dd")')
+    Mock.mock('@date("y-M-d")')
+    Mock.mock('@date("yyyy yy y MM M dd d")')
+
+    // Random.time( format? )
+    Random.time()
+    Mock.mock('@time')
+    Mock.mock('@time()')
+    Random.time('A HH:mm:ss')
+    Random.time('a HH:mm:ss')
+    Random.time('HH:mm:ss')
+    Random.time('H:m:s')
+    Mock.mock('@time("A HH:mm:ss")')
+    Mock.mock('@time("a HH:mm:ss")')
+    Mock.mock('@time("HH:mm:ss")')
+    Mock.mock('@time("H:m:s")')
+
+    // Random.datetime( format? )
+    Random.datetime()
+    Mock.mock('@datetime')
+    Mock.mock('@datetime()')
+    Random.datetime('yyyy-MM-dd A HH:mm:ss')
+    Random.datetime('yy-MM-dd a HH:mm:ss')
+    Random.datetime('y-MM-dd HH:mm:ss')
+    Random.datetime('y-M-d H:m:s')
+    Mock.mock('@datetime("yyyy-MM-dd A HH:mm:ss")')
+    Mock.mock('@datetime("yy-MM-dd a HH:mm:ss")')
+    Mock.mock('@datetime("y-MM-dd HH:mm:ss")')
+    Mock.mock('@datetime("y-M-d H:m:s")')
+
+    // Random.now( unit?, format? )
+    Random.now()
+    Mock.mock('@now')
+    Mock.mock('@now()')
+    Random.now('year')
+    Random.now('month')
+    Random.now('week')
+    Random.now('day')
+    Random.now('hour')
+    Random.now('minute')
+    Random.now('second')
+    Random.now('yyyy-MM-dd HH:mm:ss SS')
+    Random.now('day', 'yyyy-MM-dd HH:mm:ss SS')
+    </pre>
+
+    <h3>Image 图片</h3>
+    <pre>
+    // Random.image( size?, background?, foreground?, format?, text? )
+    Random.image()
+    Random.image('200x100')
+    Random.image('200x100', '#FF6600')
+    Random.image('200x100', '#4A7BF7', 'Hello')
+    Random.image('200x100', '#50B347', '#FFF', 'Mock.js')
+    Random.image('200x100', '#894FC4', '#FFF', 'png', '!')
+
+    // Random.dataImage( size?, text? )
+    Random.dataImage()
+    Random.dataImage('200x100')
+    Random.dataImage('200x100', 'Hello Mock.js!')
+    </pre>
+
+    <h3>Color 颜色</h3>
+    <pre>
+    Random.color()
+    Mock.mock('@color')
+    Mock.mock('@color()')
+
+    Random.hex()
+    Mock.mock('@hex')
+    Mock.mock('@hex()')
+
+    Random.rgb()
+    Mock.mock('@rgb')
+    Mock.mock('@rgb()')
+
+    Random.rgba()
+    Mock.mock('@rgba')
+    Mock.mock('@rgba()')
+
+    Random.hsl()
+    Mock.mock('@hsl')
+    Mock.mock('@hsl()')
+    </pre>
+
+    <h3>Text 文本（中英文段落、句子、词语、标题）</h3>
+    <pre>
+    // Random.paragraph( min?, max? )
+    Random.paragraph()
+    Mock.mock('@paragraph')
+    Mock.mock('@paragraph()')
+    Random.paragraph(2)
+    Mock.mock('@paragraph(2)')
+    Random.paragraph(1,3)
+    Mock.mock('@paragraph(1, 3)')
+
+    // Random.sentence( min?, max? )
+    Random.sentence()
+    Mock.mock('@sentence')
+    Mock.mock('@sentence()')
+    Random.sentence(5)
+    Mock.mock('@sentence(5)')
+    Random.sentence(3,5)
+    Mock.mock('@sentence(3, 5)')
+
+    // Random.word( min?, max? )
+    Random.word()
+    Mock.mock('@word')
+    Mock.mock('@word()')
+    Random.word(5)
+    Mock.mock('@word(5)')
+    Random.word(3,5)
+    Mock.mock('@word(3, 5)')
+
+    // Random.title( min?, max? )
+    Random.title()
+    Mock.mock('@title')
+    Mock.mock('@title()')
+    Random.title(5)
+    Mock.mock('@title(5)')
+    Random.title(3,5)
+    Mock.mock('@title(3, 5)')
+
+    // Random.cparagraph 中文段落
+    Random.cparagraph()
+    Mock.mock('@cparagraph')
+    Mock.mock('@cparagraph()')
+    Random.cparagraph(2)
+    Mock.mock('@cparagraph(2)')
+    Random.cparagraph(1,3)
+    Mock.mock('@cparagraph(1, 3)')
+
+    // Random.csentence 中文句子
+    Random.csentence()
+    Mock.mock('@csentence')
+    Mock.mock('@csentence()')
+    Random.csentence(5)
+    Mock.mock('@csentence(5)')
+    Random.csentence(3,5)
+    Mock.mock('@csentence(3, 5)')
+
+    // Random.cword 中文汉字
+    Random.cword()
+    Mock.mock('@cword')
+    Mock.mock('@cword()')
+    Random.cword('零一二三四五六七八九十')
+    Mock.mock('@cword("零一二三四五六七八九十")')
+    Random.cword(3)
+    Mock.mock('@cword(3)')
+    Random.cword('零一二三四五六七八九十',3)
+    Mock.mock('@cword("零一二三四五六七八九十", 3)')
+    Random.cword(3,5)
+    Mock.mock('@cword(3, 5)')
+    Random.cword('零一二三四五六七八九十',5,7)
+    Mock.mock('@cword("零一二三四五六七八九十", 5, 7)')
+
+    // Random.ctitle 中文标题
+    Random.ctitle()
+    Mock.mock('@ctitle')
+    Mock.mock('@ctitle()')
+    Random.ctitle(5)
+    Mock.mock('@ctitle(5)')
+    Random.ctitle(3,5)
+    Mock.mock('@ctitle(3, 5)')
+    </pre>
+
+    <h3>Name 姓名（中英文）</h3>
+    <pre>
+    Random.first()
+    Mock.mock('@first')
+    Mock.mock('@first()')
+
+    Random.last()
+    Mock.mock('@last')
+    Mock.mock('@last()')
+
+    Random.name()
+    Mock.mock('@name')
+    Mock.mock('@name()')
+    Random.name(true)
+    Mock.mock('@name(true)')
+
+    Random.cfirst()
+    Mock.mock('@cfirst')
+    Mock.mock('@cfirst()')
+
+    Random.clast()
+    Mock.mock('@clast')
+    Mock.mock('@clast()')
+
+    Random.cname()
+    Mock.mock('@cname')
+    Mock.mock('@cname()')
+    </pre>
+
+    <h3>Web 网络相关（url、域名、邮箱、IP）</h3>
+    <pre>
+    Random.url()
+    Mock.mock('@url')
+    Mock.mock('@url()')
+
+    Random.domain()
+    Mock.mock('@domain')
+    Mock.mock('@domain()')
+
+    Random.protocol()
+    Mock.mock('@protocol')
+    Mock.mock('@protocol()')
+
+    Random.tld()
+    Mock.mock('@tld')
+    Mock.mock('@tld()')
+
+    Random.email()
+    Mock.mock('@email')
+    Mock.mock('@email()')
+
+    Random.ip()
+    Mock.mock('@ip')
+    Mock.mock('@ip()')
+    </pre>
+
+    <h3>Address 地址 省市区县邮编</h3>
+    <pre>
+    Random.region()
+    Mock.mock('@region')
+    Mock.mock('@region()')
+
+    Random.province()
+    Mock.mock('@province')
+    Mock.mock('@province()')
+
+    Random.city()
+    Mock.mock('@city')
+    Mock.mock('@city()')
+    Random.city(true)
+    Mock.mock('@city(true)')
+
+    Random.county()
+    Mock.mock('@county')
+    Mock.mock('@county()')
+    Random.county(true)
+    Mock.mock('@county(true)')
+
+    Random.zip()
+    Mock.mock('@zip')
+    Mock.mock('@zip()')
+    </pre>
+
+    <h3>Helper 工具方法</h3>
+    <pre>
+    Random.capitalize('hello')
+    Mock.mock('@capitalize("hello")')
+
+    Random.upper('hello')
+    Mock.mock('@upper("hello")')
+
+    Random.lower('HELLO')
+    Mock.mock('@lower("HELLO")')
+
+    Random.pick(['a','e','i','o','u'])
+    Mock.mock('@pick(["a", "e", "i", "o", "u"])')
+
+    Random.shuffle(['a','e','i','o','u'])
+    Mock.mock('@shuffle(["a", "e", "i", "o", "u"])')
+    </pre>
+
+    <h3>Miscellaneous 其他：guid、id、自增</h3>
+    <pre>
+    Random.guid()
+    Mock.mock('@guid')
+    Mock.mock('@guid()')
+
+    Random.id()
+    Mock.mock('@id')
+    Mock.mock('@id()')
+
+    Random.increment()
+    Mock.mock('@increment')
+    Mock.mock('@increment()')
+    Random.increment(100)
+    Mock.mock('@increment(100)')
+    Random.increment(1000)
+    Mock.mock('@increment(1000)')
+    </pre>
+
+
+</body>
+</html>

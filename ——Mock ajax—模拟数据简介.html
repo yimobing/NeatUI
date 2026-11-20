@@ -31,11 +31,17 @@
         .grid__form_row:first-child{ margin-top: 0; }
         .grid__form_row label{ display: inline-block; width: 80px; }
         .grid__form_row input{ width: 300px; padding: 8px 15px; border: 1px solid #ddd; border-radius: 4px; }
+        .red { color: red; font-weight: 550; }
+        .blue { color: #1296db; }
+        .code {
+            color: #1296db;
+        }
     </style>
 
     <div class="wrap">
         <div class="grid">
-            <div class="grid__title">ajax使用mock.js模拟后端数据</div>
+            <h1> Mock.js 模拟数据简介</h1>
+            <div class="grid__title"> ajax使用mock.js模拟后端数据 </div>
             <div class="grid__code">
                 <div class="grid__code_caption">Mock.js 总述</div>
                 <pre>
@@ -62,11 +68,38 @@
                     Mock.mock(url, type, function(v){ return Mock.mock({})});
 
                     其中：
-                        url 请求地址，要同 ajax 中的 url 参数保持一致, 
-                        type 请求方式，值为 get 或 post。若 ajax 有发送到服务器的数据(即有 data 参数)，则 type必须为post而不能为get，否则拦截失效(模拟数据失败)
-                        object or function 可为对象或函数
+                        · url 请求地址，要同 ajax 中的 url 参数保持一致, 
+                        · object or function 可为对象或函数
                         为函数时 function(v){} 时，表示一个函数返回模拟的数据，也可写成 (v) => {}。eg. function(v) { return Mock.mock(){}}
                         为对象 {} 时，里面直接写模拟数据即可。eg. { code: "200", message: "success", data: []}
+                        <span class="red"> · type 请求方式，值为 get 或 post。若 ajax 有发送到服务器的数据(即有 data 参数)，则 type必须为post而不能为get，否则拦截失效(模拟数据失败)。但可通过引入自定义的 mock-ajax-get.js 文件(补丁)来解决此原生bug。 </span>
+                        <span class="code">
+                            比如下面这段 ajax 使用 get 方式，但是传了 data 参数 data: { id: 123, name: "Zhang San" }。Mock.js 就会拦截失效，导致无法使用模拟数据。
+                            Mock.mock("/api/test?param=1", "get", { code: 200, msg: "GET 成功！", data: { id: 1, name: "测试返回数据GET" } });
+                            $.ajax({
+                                url: "/api/test?param=1",
+                                type: "GET",
+                                data: { id: 123, name: "Zhang San" }, // 重点：GET 还传 data
+                                success: function (res) {
+                                    console.log("✅ 成功：", res);
+                                },
+                                error: function (xhr) {
+                                    console.log("❌ 错误：", xhr);
+                                }
+                            });
+
+                            ## 现象：Mock.js 拦截失效，直接走到真实网络请求。**
+                            说明： 不是 Mock.js 的 bug，是 jQuery 的行为 + XHR 规范共同造成。
+                            ## jQuery $.ajax GET 时的 data 做了什么
+                            当 `type:"GET"`，jQuery **不会把 data 放进 request body**，而是把 `data:{id:123,name:"Zhang San"}` 序列化成查询字符串拼到 URL 后面。
+                            请求最终真实 URL 变成：/api/test?param=1&id=123&name=Zhang%20San
+                            ##  关键：
+                            你 Mock 注册匹配的地址是固定字符串：`"/api/test?param=1"`。
+                            但实际发起请求 URL 多了 `&id=123&name=Zhang%20San`，**URL 完全对不上，Mock 匹配规则直接匹配失败，就放过请求走真实网络**。
+                        </span>
+                        <span class="red">
+                            ！！！要解决上述问题，只要引入mock.js后，再引入 mock-ajax-get.js 即可解决问题！这样就不用在本地测试时把 type: "GET" 改成 type: "POST"，上线后又改回 type: "GET"，避免真实项目上线后忘记修改或改错。
+                        </span>
 
                     BUG 说明：在 Mock.setup(timeout) 对 ajax 貌似无效，但对 axios 却是有效的。
                     特别注意：因为实际项目中同一个页面可能会有好几个接口，但URL请求地址是一样的，为了让不同接口分别能模拟获取到数据，url一般会加上后辍 '?param=1', '?param=2', ?param=3'... 这种格式。eg. '/jk/get_user_info.ashx?param=1'

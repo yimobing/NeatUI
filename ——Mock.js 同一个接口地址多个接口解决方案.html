@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh‑CN">
+<head>
+<meta charset="UTF‑8">
+<title>Mock.js 单URL多action(ashx通用方案)示例</title>
+<script src="https://cdn.bootcdn.net/ajax/libs/Mock.js/1.0.0/mock-min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<style>
+    *{box-sizing:border-box;}
+    body{font-family:Microsoft Yahei,sans-serif;max-width:1100px;margin:0 auto;padding:20px;background:#f7f8fa;}
+    h1{font-size:24px;color:#222;}
+    h2{font-size:20px;margin-top:32px;color:#2c3e50;border-left:4px solid #3498db;padding-left:10px;}
+    h3{font-size:17px;margin-top:22px;color:#34495e;}
+    pre{background:#2d2d2d;color:#ccc;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:14px;line-height:1.5;}
+    .demo-box{background:#fff;padding:16px;border-radius:8px;border:1px solid #dde3ec;margin:12px 0;}
+    .btn{padding:6px 14px;font-size:14px;margin-right:8px;cursor:pointer;}
+    .log{background:#000;color:#0f0;padding:12px;border-radius:6px;min-height:120px;white-space:pre-wrap;}
+    .tip{background:#fff3cd;border:1px solid #ffeeba;padding:10px 14px;border-radius:6px;margin:10px 0;}
+    </style>
+</head>
+<body>
+<h1>Mock.js 同一个URL多action 解决方案（适配 .ashx / .net单入口接口）</h1>
+<div class="tip">
+场景说明：后端只有一个接口地址例如 /handler.ashx，依靠请求参数里面 action 区分不同业务；<br>
+不修改前端url，不需要本地加临时query参数，上线无需删除代码。
+</div>
+
+<h2>原理</h2>
+<p>Mock.mock 第二个参数method，第三个参数传入函数，函数接收options对象，可以读取请求body/url查询参数，内部根据action分支返回不同模拟数据。</p>
+
+<h2>完整mock注册代码示例（POST JSON，action在body里面）</h2>
+<pre>
+// 模拟 .ashx 单入口，同一个url，不同action返回不同mock数据
+var mockActionMap = {
+    getStudentList: function () {
+        return Mock.mock({
+            code: "0",
+            message: "success",
+            data: {
+                "records|4": [
+                    {
+                        "xuesheng_bh": "@id()",
+                        "xuesheng_mc": "@cname()"
+                    }
+                ]
+            }
+        });
+    },
+    getActivityList: function () {
+        return Mock.mock({
+            code: "0",
+            message: "success",
+            data: {
+                "records|2": [
+                    {
+                        "huodong_bh": "@id()",
+                        "huodong_mc": "@ctitle(8,20)"
+                    }
+                ]
+            }
+        });
+    },
+    saveData: function () {
+        return {
+            code: "0",
+            message: "保存成功",
+            data: {}
+        };
+    }
+};
+
+// url使用正则匹配，防止query干扰匹配
+Mock.mock(/^\/handler\.ashx/, "post", function (options) {
+    // options.body 是post请求原始字符串
+    var reqBody = JSON.parse(options.body);
+    var action = reqBody.action;
+
+    var handlerFn = mockActionMap[action];
+    if (typeof handlerFn === "function") {
+        return handlerFn();
+    }
+    // 未知action返回错误
+    return {
+        code: "90000",
+        message: "未知action：" + action,
+        data: {}
+    };
+});
+</pre>
+
+<h2>前端业务调用示例（url全部相同，仅data内action不同）</h2>
+<pre>
+// 获取学生列表
+$.ajax({
+    url: "/handler.ashx",
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+        action: "getStudentList"
+    })
+}).done(function (res) {
+    console.log("学生列表结果：", res);
+});
+
+// 获取活动列表
+$.ajax({
+    url: "/handler.ashx",
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+        action: "getActivityList"
+    })
+}).done(function (res) {
+    console.log("活动列表结果：", res);
+});
+
+// 保存数据
+$.ajax({
+    url: "/handler.ashx",
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+        action: "saveData"
+    })
+}).done(function (res) {
+    console.log("保存结果：", res);
+});
+</pre>
+
+<h2>如果是GET请求，action放在url query参数的写法</h2>
+<pre>
+Mock.mock(/^\/handler\.ashx/, "get", function (options) {
+    // 解析url中的query参数
+    var urlObj = new URL(options.url, location.origin);
+    var action = urlObj.searchParams.get("action");
+
+    var handlerFn = mockActionMap[action];
+    if (typeof handlerFn === "function") {
+        return handlerFn();
+    }
+    return {
+        code: "90000",
+        message: "未知action：" + action,
+        data: {}
+    };
+});
+
+// 前端调用示例
+// $.ajax({url:"/handler.ashx?action=getStudentList",type:"GET"})
+</pre>
+
+<h2>在线演示（下面按钮点击直接执行，看日志输出）</h2>
+<div class="demo‑box">
+    <button class="btn" id="btnStudent">调用 action=getStudentList</button>
+    <button class="btn" id="btnActivity">调用 action=getActivityList</button>
+    <button class="btn" id="btnSave">调用 action=saveData</button>
+    <button class="btn" id="btnUnknown">调用 不存在的action</button>
+    <div>运行日志输出：</div>
+    <div id="logBox" class="log"></div>
+</div>
+
+<script>
+// ---------------------- mock注册代码 ----------------------
+var mockActionMap = {
+    getStudentList: function () {
+        return Mock.mock({
+            code: "0",
+            message: "success",
+            data: {
+                "records|4": [
+                    {
+                        "xuesheng_bh": "@id()",
+                        "xuesheng_mc": "@cname()"
+                    }
+                ]
+            }
+        });
+    },
+    getActivityList: function () {
+        return Mock.mock({
+            code: "0",
+            message: "success",
+            data: {
+                "records|2": [
+                    {
+                        "huodong_bh": "@id()",
+                        "huodong_mc": "@ctitle(8,20)"
+                    }
+                ]
+            }
+        });
+    },
+    saveData: function () {
+        return {
+            code: "0",
+            message: "保存成功",
+            data: {}
+        };
+    }
+};
+
+Mock.mock(/^\/handler\.ashx/, "post", function (options) {
+    var reqBody = JSON.parse(options.body);
+    var action = reqBody.action;
+    var handlerFn = mockActionMap[action];
+    if (typeof handlerFn === "function") {
+        return handlerFn();
+    }
+    return {
+        code: "90000",
+        message: "未知action：" + action,
+        data: {}
+    };
+});
+
+// ---------------------- 页面演示逻辑 ----------------------
+var $log = $("#logBox");
+function appendLog(text){
+    $log.append(new Date().toLocaleTimeString() + " > " + JSON.stringify(text,null,2) + "\n");
+    $log.scrollTop($log[0].scrollHeight);
+}
+
+$("#btnStudent").on("click",function(){
+    $.ajax({
+        url:"/handler.ashx",
+        type:"POST",
+        contentType:"application/json",
+        data:JSON.stringify({action:"getStudentList"})
+    }).done(function(res){
+        appendLog("✅getStudentList 返回：" + JSON.stringify(res));
+    }).fail(function(xhr){
+        appendLog("❌请求失败：" + xhr.status);
+    });
+});
+
+$("#btnActivity").on("click",function(){
+    $.ajax({
+        url:"/handler.ashx",
+        type:"POST",
+        contentType:"application/json",
+        data:JSON.stringify({action:"getActivityList"})
+    }).done(function(res){
+        appendLog("✅getActivityList 返回：" + JSON.stringify(res));
+    });
+});
+
+$("#btnSave").on("click",function(){
+    $.ajax({
+        url:"/handler.ashx",
+        type:"POST",
+        contentType:"application/json",
+        data:JSON.stringify({action:"saveData"})
+    }).done(function(res){
+        appendLog("✅saveData 返回：" + JSON.stringify(res));
+    });
+});
+
+$("#btnUnknown").on("click",function(){
+    $.ajax({
+        url:"/handler.ashx",
+        type:"POST",
+        contentType:"application/json",
+        data:JSON.stringify({action:"xxx_not_exist"})
+    }).done(function(res){
+        appendLog("⚠️未知action 返回：" + JSON.stringify(res));
+    });
+});
+</script>
+
+<h2>方案对比小结</h2>
+<table border="1" cellpadding="8" cellspacing="0">
+<tbody>
+<tr><th>方案</th><th>说明</th><th>缺点</th></tr>
+<tr>
+<td>url拼接临时?action=xxx</td>
+<td>mock区分接口</td>
+<td>上线必须删除拼接参数，极易漏改，不推荐</td>
+</tr>
+<tr>
+<td>多次Mock.mock注册同一个url</td>
+<td>多个mock注册相同url</td>
+<td>后面注册覆盖前面，完全失效，不可用</td>
+</tr>
+<tr>
+<td><strong>mock回调函数读取action分支</strong></td>
+<td>url保持原样，读取请求体内action做分支</td>
+<td>前端代码完全不用改动，本地mock、线上后端一套代码，<strong>强烈推荐</strong></td>
+</tr>
+</tbody>
+</table>
+
+<div class="tip">
+关键点提醒：<br>
+1. options.body拿到的是字符串，必须 JSON.parse()；<br>
+2. url尽量使用正则匹配，避免query参数导致匹配失败；<br>
+3. 此方案对应小程序那套mockMap思想；小程序wx.request不能被mockjs拦截，需要自己在request.js内部读取data.action分支。
+</div>
+
+</body>
+</html>
