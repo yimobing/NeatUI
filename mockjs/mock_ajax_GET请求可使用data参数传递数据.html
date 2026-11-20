@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="">
+    <meta name="applicable-device" content="pc,mobile">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title> Mock Ajax 可使用 GET + Data </title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+</head>
+<body>
+    <style>
+        h6 { color: orange; font-size: 18px; font-weight: 550; }
+    </style>
+
+    <div class="wrap">
+        <h5>
+            让Mock支持 $.ajax GET 请求使用data参数传递数据
+        </h5>
+        <h6>请按F12，在控制台中查看模拟值结果</h6>
+<pre>
+Mock模拟数据：
+Mock.mock(url, type, object or function);  拦截ajax请求并返回数据
+常见的Mock模拟数据写法有2个：
+Mock.mock(url, type, {});
+Mock.mock(url, type, function(v){ return Mock.mock({})});
+</pre>
+        <h3> 默认的Mock.js，type 请求方式值为 get 或 post。若 ajax 有发送到服务器的数据(即有 data 参数)，则 type必须为post而不能为get，否则拦截失效(模拟数据失败) ！</h3>
+        <h3> 引入 mock-ajax-get.js 后，即使请求方式值为type = 'get', ajax也可传递 data 参数，mock 也能正常拦截，不会失败。 </h3>
+    </div><!--/.wrap-->
+
+
+    <!--================================================================================-->
+    <!--                            JAVASCRIPT                                          -->
+    <!--================================================================================-->
+    <!-- jQuery 1.x-4.x 版本皆兼容 -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/4.1.0/jquery.min.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+
+    <!-- 模拟数据 -->
+    <script src="../assets/lib/mock/mock-min.js"></script>
+    <script src="../assets/lib/mock/mock-ajax-get.js"></script>
+    <script>
+
+        // ====================================================
+        //          MOCK模拟数据 格式示例
+        // ====================================================
+        // 延时
+        // Mock.setup({
+        //     timeout: '100-1000' // 延时时间为N到M毫秒.要加引号不然不起作用
+        // });
+        // 在拦截器中添加延时
+        // Mock.XHR.setup({
+        //    timeout: 1000 // 全局设置超时时间为1000毫秒
+        // });
+
+        // Mock.XHR.prototype.open = function(method, url){
+        //     this._method = method;
+        //     this._url = url.split('?')[0]; // 关键：砍掉 ? 后面所有内容
+        //   };
+
+        // 获取数据
+        // Mock.mock("/api/xxx", "get", function(options) {
+        //     // var body = JSON.parse(options.body);
+        //     // console.log('body：', body); // body 即为post请求时传来的数据
+        //     return Mock.mock({
+        //         "code": "200",
+        //         "return": "ok",
+        //         "user_name": "@cname()",
+        //         "user_sex|1": ["男", "女"]
+        //     })
+        // });
+
+
+
+        // ====================================================
+        //          1. Mock GET 接口定义
+        // ====================================================
+        Mock.mock("/api/demo-get", "get", {
+            code: 200,
+            msg: "GET 成功！",
+            data: { id: 1, name: "测试返回数据GET" }
+        });
+
+        //————————————————————————————————————————————————
+        // 1.1 GET：不写 dataType（自动推断）
+        $.ajax({
+            url: "/api/demo-get",
+            type: "get",
+            type: "GET",
+            data: { id: 123, name: "Zhang San" },
+            // dataType: 不设置
+            cache: false,
+            success: function (res) {
+                console.log('✅ GET【不写dataType】成功');
+                console.log('返回值：', res);
+                console.log('返回值类型：', typeof res);
+                console.log('--------------------------');
+            },
+            error: function (xhr) {
+                console.log("❌ GET【不写dataType】错误：", xhr);
+            }
+        });
+
+
+        //————————————————————————————————————————————————
+        // 1.2 GET：dataType="json"
+        $.ajax({
+            url: "/api/demo-get",
+            type: "GET",
+            data: { id: 123, name: "Zhang San" },
+            dataType: "json",
+            cache: false,
+            success: function (res) {
+                console.log('✅ GET【dataType:"json"】成功');
+                console.log('返回值：', res);
+                console.log('返回值类型：', typeof res);
+                console.log('--------------------------');
+            },
+            error: function (xhr) {
+                console.log("❌ GET【dataType:\"json\"】错误：", xhr);
+            }
+        });
+
+
+        //————————————————————————————————————————————————
+        // 1.3 GET：dataType="html"
+        $.ajax({
+            url: "/api/demo-get",
+            type: "GET",
+            data: { id: 123, name: "Zhang San" },
+            dataType: "html",
+            cache: false,
+            success: function (res) {
+                console.log('✅ GET【dataType:"html"】成功');
+                console.log('返回值：', res);
+                console.log('返回值类型：', typeof res);
+                console.log('--------------------------');
+            },
+            error: function (xhr) {
+                console.log("❌ GET【dataType:\"html\"】错误：", xhr);
+            }
+        });
+
+
+        //————————————————————————————————————————————————
+        // 1.4 GET：dataType="text"
+        $.ajax({
+            url: "/api/demo-get",
+            type: "GET",
+            data: { id: 123, name: "Zhang San" },
+            dataType: "text",
+            cache: false,
+            success: function (res) {
+                console.log('✅ GET【dataType:"text"】成功');
+                console.log('返回值：', res);
+                console.log('返回值类型：', typeof res);
+                console.log('--------------------------');
+            },
+            error: function (xhr) {
+                console.log("❌ GET【dataType:\"text\"】错误：", xhr);
+            }
+        });
+
+
+
+
+        // 注：这里故意延迟下，让POST示例打印输出，永远在GET示例打印输出后面，这样控制台看起来就不会杂乱无章
+        setTimeout(function() {
+          
+    
+            // ====================================================
+            //          2. Mock POST 接口定义
+            // ====================================================
+            Mock.mock("/api/demo-post", "post", {
+                code: 200,
+                msg: "POST 成功！",
+                data: { id: 2, name: "测试返回数据POST" }
+            });
+
+
+            //————————————————————————————————————————————————
+            // 2.1 POST：不写 dataType（自动推断）
+            $.ajax({
+                url: "/api/demo-post",
+                type: "post",
+                data: { id: 456, name: "Li Si" },
+                // dataType: 不设置
+                cache: false,
+                success: function (res) {
+                    console.log('✅ POST【不写dataType】成功x');
+                    console.log('返回值：', res);
+                    console.log('返回值类型：', typeof res);
+                    console.log('--------------------------');
+                },
+                error: function (xhr) {
+                    console.log("❌ POST【不写dataType】错误：", xhr);
+                }
+            });
+
+
+            //————————————————————————————————————————————————
+            // 2.2 POST：dataType="json"
+            $.ajax({
+                url: "/api/demo-post",
+                type: "POST",
+                data: { id: 456, name: "Li Si" },
+                dataType: "json",
+                cache: false,
+                success: function (res) {
+                    console.log('✅ POST【dataType:"json"】成功');
+                    console.log('返回值：', res);
+                    console.log('返回值类型：', typeof res);
+                    console.log('--------------------------');
+                },
+                error: function (xhr) {
+                    console.log("❌ POST【dataType:\"json\"】错误：", xhr);
+                }
+            });
+
+
+            //————————————————————————————————————————————————
+            // 2.3 POST：dataType="html"
+            $.ajax({
+                url: "/api/demo-post",
+                type: "POST",
+                data: { id: 456, name: "Li Si" },
+                dataType: "html",
+                cache: false,
+                success: function (res) {
+                    console.log('✅ POST【dataType:"html"】成功');
+                    console.log('返回值：', res);
+                    console.log('返回值类型：', typeof res);
+                    console.log('--------------------------');
+                },
+                error: function (xhr) {
+                    console.log("❌ POST【dataType:\"html\"】错误：", xhr);
+                }
+            });
+
+
+            //————————————————————————————————————————————————
+            // 2.4 POST：dataType="text"
+            $.ajax({
+                url: "/api/demo-post",
+                type: "POST",
+                data: { id: 456, name: "Li Si" },
+                dataType: "text",
+                cache: false,
+                success: function (res) {
+                    console.log('✅ POST【dataType:"text"】成功');
+                    console.log('返回值：', res);
+                    console.log('返回值类型：', typeof res);
+                    console.log('--------------------------');
+                },
+                error: function (xhr) {
+                    console.log("❌ POST【dataType:\"text\"】错误：", xhr);
+                }
+            });
+
+
+
+        }, 1000);
+
+        
+    </script>
+
+
+</body>
+</html>
