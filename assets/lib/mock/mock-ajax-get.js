@@ -5,8 +5,13 @@
  * [功能描述]：解决Mock原生兼容问题，支持jQuery ajax发起GET请求时通过data参数传递数据，Mock可正常拦截匹配并返回模拟接口数据。
  * @Author: ChenMuFeng
  * @Date: 2026.05.06
+<<<<<<< HEAD
  * @Version: 1.1.3
  * @PubDate: 2026.11.20
+=======
+ * @Version: 1.1.2
+ * @Pubdate: 2026.11.19
+>>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
 
  * [使用说明]
     使用之前请先引入 mock.js
@@ -29,8 +34,11 @@
     ✅ URL 不会拼接 $.ajax GET 的 data 参数（在 $.ajax 层直接摘除，不依赖事后剔除）
     ✅ Mock 地址不会 404
     ✅ GET / POST 完全兼容
+<<<<<<< HEAD
     ✅ Mock.mock 的类型大小写不敏感：get / GET、post / POST 均可命中
     ✅ $.ajax 的 type 大小写不敏感（jQuery 内部本就归一化为大写）
+=======
+>>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
     ✅ Mock 路由继续使用字符串，无需改写成正则
     ✅ 业务 ajax 无需删除 cache:false，也无需改写 url
     ✅ cache:false 追加的 _=时间戳 会自动剔除（仅针对已注册 Mock 的请求）
@@ -53,9 +61,12 @@
     - 拦截判定：使用 this.match（Mock open 内匹配成功后置 true）。Mock 源码中并不存在 _isMock。
     - 响应头注入：this.match 为 true 时补 Content-Type: application/json; charset=utf-8。
     - 响应解析：不劫持 responseJSON，完全交由 jQuery 原生 dataType + Content-Type 逻辑。
+<<<<<<< HEAD
     - 注册类型归一化：Mock 内部只对请求侧 options.type 做 toLowerCase，注册侧的 rtype 原样全等比较
       （源码 find 中 match(item.rtype, options.type.toLowerCase())），故大写注册永不命中。
       本文件在 Mock.mock 入口把字符串类型的小写化，并对已注册的 _mocked 做一次存量归一化。
+=======
+>>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
 
  * [使用约定]
     Mock.mock("/api/demo", "get", function (opt) {
@@ -86,9 +97,13 @@
     12.URL 无查询串时跳过规则遍历；同名参数收集为数组，避免多值丢失。
     13.重新梳理头部注释结构：以「GET 传 data」为唯一主功能，cache:false / dataType / 真实请求透传
        降级为附带解决的问题，实现细节单列「实现要点」，避免主次混淆。
+<<<<<<< HEAD
     14.注册类型大小写兼容：包装 Mock.mock 把字符串类型的 rtype 归一化为小写，并对脚本加载前已注册的
        规则做一次存量归一化；willMatch 的类型比较同步收敛为与 Mock 内部一致的字符串全等 / 正则匹配。
  */
+=======
+*/
+>>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
 
 (function (window) {
     var $ = window.$;
@@ -191,6 +206,7 @@
         return data;
     }
 
+<<<<<<< HEAD
     // 类型比较：与 Mock 内部 find 的 match() 保持一致（字符串全等 / 正则 test）
     function typeMatch(item, type) {
         if (!item.rtype) {
@@ -206,6 +222,8 @@
         return false;
     }
 
+=======
+>>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
     // 预判某个 url 能否命中已注册的 Mock 规则（与 Mock 内部 find 判定保持一致）
     function willMatch(url, method) {
         var mocked = window.Mock && window.Mock._mocked;
@@ -231,13 +249,18 @@
             if (!urlOk) {
                 continue;
             }
+<<<<<<< HEAD
             if (typeMatch(item, type)) {
+=======
+            if (!item.rtype || String(item.rtype).toLowerCase() === type) {
+>>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
                 return true;
             }
         }
         return false;
     }
 
+<<<<<<< HEAD
     // 注册类型归一化
     // Mock 内部只把请求侧 options.type 转小写，注册侧的 rtype 原样参与全等比较，
     // 因此 Mock.mock(url, "GET", ...) 永远命中不了。这里统一把字符串类型降为小写。
@@ -260,6 +283,8 @@
     // 处理脚本加载前已注册的大写规则
     normalizeMockTypes();
 
+=======
+>>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
     // 得到用于 Mock 路由匹配的 url；未命中任何规则时保留原始 url
     function resolveMockUrl(url, method, fullyStripped) {
         var cacheStripped = stripCacheOnly(url);
@@ -415,6 +440,7 @@
 
     install();
 
+<<<<<<< HEAD
     // ============================================================
     // 4. 包装 Mock.mock：注册时归一化类型，同时兜底安装原型补丁
     //    原先仅在「脚本早于 Mock.mock 加载」时才包装，导致大写注册无法被纠正
@@ -436,6 +462,20 @@
         };
         wrappedMock.__mockAjaxGetWrapped = true;
         window.Mock.mock = wrappedMock;
+=======
+    // 若脚本先于 Mock.mock() 加载，全局 XHR 尚未替换，此处兜底：注册完成后再挂一次
+    if (window.Mock.XHR !== window.XMLHttpRequest && typeof window.Mock.mock === "function") {
+        var originalMock = window.Mock.mock;
+        if (!originalMock.__mockAjaxGetWrapped) {
+            var wrappedMock = function () {
+                var ret = originalMock.apply(this, arguments);
+                install();
+                return ret;
+            };
+            wrappedMock.__mockAjaxGetWrapped = true;
+            window.Mock.mock = wrappedMock;
+        }
+>>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
     }
 })(window);
     
