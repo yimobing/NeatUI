@@ -53,11 +53,7 @@ Mock.mock(url, type, function(v){ return Mock.mock({})});
     <script>
 
         // ====================================================
-<<<<<<< HEAD
         //          MOCK模拟数据 格式示例
-=======
-        //          MOCK模拟数据 格式
->>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
         // ====================================================
         // 延时
         // Mock.setup({
@@ -100,10 +96,7 @@ Mock.mock(url, type, function(v){ return Mock.mock({})});
         // 1.1 GET：不写 dataType（自动推断）
         $.ajax({
             url: "/api/demo-get",
-<<<<<<< HEAD
             type: "get",
-=======
->>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
             type: "GET",
             data: { id: 123, name: "Zhang San" },
             // dataType: 不设置
@@ -182,7 +175,6 @@ Mock.mock(url, type, function(v){ return Mock.mock({})});
 
 
 
-<<<<<<< HEAD
         // 注：这里故意延迟下，让POST示例打印输出，永远在GET示例打印输出后面，这样控制台看起来就不会杂乱无章
         setTimeout(function() {
           
@@ -281,98 +273,6 @@ Mock.mock(url, type, function(v){ return Mock.mock({})});
         }, 1000);
 
         
-=======
-        // ====================================================
-        //          2. Mock POST 接口定义
-        // ====================================================
-        Mock.mock("/api/demo-post", "post", {
-            code: 200,
-            msg: "POST 成功！",
-            data: { id: 2, name: "测试返回数据POST" }
-        });
-
-
-        //————————————————————————————————————————————————
-        // 2.1 POST：不写 dataType（自动推断）
-        $.ajax({
-            url: "/api/demo-post",
-            type: "POST",
-            data: { id: 456, name: "Li Si" },
-            // dataType: 不设置
-            cache: false,
-            success: function (res) {
-                console.log('✅ POST【不写dataType】成功x');
-                console.log('返回值：', res);
-                console.log('返回值类型：', typeof res);
-                console.log('--------------------------');
-            },
-            error: function (xhr) {
-                console.log("❌ POST【不写dataType】错误：", xhr);
-            }
-        });
-
-
-        //————————————————————————————————————————————————
-        // 2.2 POST：dataType="json"
-        $.ajax({
-            url: "/api/demo-post",
-            type: "POST",
-            data: { id: 456, name: "Li Si" },
-            dataType: "json",
-            cache: false,
-            success: function (res) {
-                console.log('✅ POST【dataType:"json"】成功');
-                console.log('返回值：', res);
-                console.log('返回值类型：', typeof res);
-                console.log('--------------------------');
-            },
-            error: function (xhr) {
-                console.log("❌ POST【dataType:\"json\"】错误：", xhr);
-            }
-        });
-
-
-        //————————————————————————————————————————————————
-        // 2.3 POST：dataType="html"
-        $.ajax({
-            url: "/api/demo-post",
-            type: "POST",
-            data: { id: 456, name: "Li Si" },
-            dataType: "html",
-            cache: false,
-            success: function (res) {
-                console.log('✅ POST【dataType:"html"】成功');
-                console.log('返回值：', res);
-                console.log('返回值类型：', typeof res);
-                console.log('--------------------------');
-            },
-            error: function (xhr) {
-                console.log("❌ POST【dataType:\"html\"】错误：", xhr);
-            }
-        });
-
-
-        //————————————————————————————————————————————————
-        // 2.4 POST：dataType="text"
-        $.ajax({
-            url: "/api/demo-post",
-            type: "POST",
-            data: { id: 456, name: "Li Si" },
-            dataType: "text",
-            cache: false,
-            success: function (res) {
-                console.log('✅ POST【dataType:"text"】成功');
-                console.log('返回值：', res);
-                console.log('返回值类型：', typeof res);
-                console.log('--------------------------');
-            },
-            error: function (xhr) {
-                console.log("❌ POST【dataType:\"text\"】错误：", xhr);
-            }
-        });
-
-
->>>>>>> 4a2c061db53b799ba80027e38aea521fa3ad797a
     </script>
 
 
