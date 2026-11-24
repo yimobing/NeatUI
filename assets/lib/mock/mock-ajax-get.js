@@ -5,8 +5,8 @@
  * [功能描述]：解决Mock原生兼容问题，支持jQuery ajax发起GET请求时通过data参数传递数据，Mock可正常拦截匹配并返回模拟接口数据。
  * @Author: ChenMuFeng
  * @Date: 2026.05.06
- * @Version: 1.1.3
- * @PubDate: 2026.11.20
+ * @Version: 1.1.4
+ * @Pubdate: 2026.11.24
 
  * [使用说明]
     使用之前请先引入 mock.js
@@ -40,6 +40,7 @@
         dataType:"html" / "text" → 返回 JSON 字符串
         dataType:"json"           → 返回对象
         不传 dataType             → 依据伪造的 Content-Type 自动推断为对象
+    ✅ Mock 拦截成功的 JSON 响应体归一化为单行紧凑文本（html / text 通道不再带缩进换行）
     ✅ 本脚本仅在开发调试页面引入，生产环境不加载，真实接口的 cache:false 完全原生
     ✅ 兼容 IE9 + jQuery 1.x ~ 4.x
 
@@ -56,6 +57,9 @@
     - 注册类型归一化：Mock 内部只对请求侧 options.type 做 toLowerCase，注册侧的 rtype 原样全等比较
       （源码 find 中 match(item.rtype, options.type.toLowerCase())），故大写注册永不命中。
       本文件在 Mock.mock 入口把字符串类型的小写化，并对已注册的 _mocked 做一次存量归一化。
+    - 响应体紧凑化：Mock 原生以 JSON.stringify(..., null, 4) 输出 4 空格缩进的多行文本，
+      在 dispatchEvent 派发至 jQuery 之前，把可解析为对象 / 数组的响应体重序列化为单行；
+      非 JSON 文本与原始值原样保留。
 
  * [使用约定]
     Mock.mock("/api/demo", "get", function (opt) {
@@ -88,8 +92,9 @@
        降级为附带解决的问题，实现细节单列「实现要点」，避免主次混淆。
     14.注册类型大小写兼容：包装 Mock.mock 把字符串类型的 rtype 归一化为小写，并对脚本加载前已注册的
        规则做一次存量归一化；willMatch 的类型比较同步收敛为与 Mock 内部一致的字符串全等 / 正则匹配。
+    15.响应体紧凑化：包装 dispatchEvent，在响应派发至 jQuery 之前，把 Mock 生成的多行缩进 JSON
+       重序列化为单行紧凑文本，responseText 与 response 同步；parse 失败或为原始值时原样保留。
  */
-
 (function (window) {
     var $ = window.$;
     if (!$ || !$.ajax) {
@@ -260,6 +265,30 @@
     // 处理脚本加载前已注册的大写规则
     normalizeMockTypes();
 
+    // 将 Mock 拦截生成的多行格式化 JSON 归一化为单行紧凑文本；
+    // 非 JSON 文本、原始值（字符串 / 数字 / 布尔 / null）原样保留
+    function compactMockResponse(xhr) {
+        if (!xhr || xhr.match !== true || xhr.readyState !== 4) {
+            return;
+        }
+        var text = xhr.responseText;
+        if (typeof text !== "string" || text === "") {
+            return;
+        }
+        var parsed;
+        try {
+            parsed = JSON.parse(text);
+        } catch (e) {
+            return;
+        }
+        if (parsed === null || typeof parsed !== "object") {
+            return;
+        }
+        var compact = JSON.stringify(parsed);
+        xhr.responseText = compact;
+        xhr.response = compact;
+    }
+
     // 得到用于 Mock 路由匹配的 url；未命中任何规则时保留原始 url
     function resolveMockUrl(url, method, fullyStripped) {
         var cacheStripped = stripCacheOnly(url);
@@ -401,6 +430,14 @@
             }
             return originalGetAllResponseHeaders.apply(this, arguments);
         };
+
+        // 响应体紧凑化必须在事件派发之前：Mock 的 done() 写完 responseText 后才 dispatchEvent，
+        // jQuery 回调在原 dispatchEvent 内读取响应，故包装层先归一化再交原方法派发
+        var originalDispatchEvent = proto.dispatchEvent;
+        proto.dispatchEvent = function (event) {
+            compactMockResponse(this);
+            return originalDispatchEvent.apply(this, arguments);
+        };
     }
 
     function install() {
@@ -438,4 +475,3 @@
         window.Mock.mock = wrappedMock;
     }
 })(window);
-    

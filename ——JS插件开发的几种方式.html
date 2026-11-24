@@ -273,23 +273,98 @@
         <div class="hide">---------------------------------------------------------</div>
         适用场景：纯原生工具类、日期处理、工具函数、独立组件，无需 jQuery/Underscore 等外部库
 
-        <h4> · 极简注释版 </h4>
+        <h4> · 2026年全注释版 </h4>
+        <pre class="pre-code"><code>
+            【说明】：
+            `globalThis` 是 **ES2020 新增的标准 “全局对象” 引用**—— 一个跨环境统一的入口，不管你在哪跑，都能拿到那个最顶层的全局对象。
+            · 现代环境（Chrome/Node）→ 直接命中 `globalThis`，零判断成本；
+            · 老浏览器（IE9-11）→ `globalThis` 探测失败，退到 `self`；
+            · 极端环境（既无 globalThis 又无 self）→ 退到 `this`，非严格模式脚本里它就是全局对象。
+
+            【代码】：
+            /**
+            * 单文件插件 UMD 模板（无构建、无依赖）
+            * NeExample 换成你的插件名
+            */
+            ;(function (root, factory) {
+                // ① AMD（RequireJS）：零依赖传空数组
+                if (typeof define === 'function' && define.amd) {
+                    define([], factory);
+                }
+                // ② CommonJS（Node / 老 webpack / browserify）
+                //    判据用 module.exports，不用 exports —— exports 只是它的别名，
+                //    "有 exports 无 module"、"有 module 无 exports" 的畸形环境都存在
+                else if (
+                    typeof module === 'object' &&
+                    module !== null &&
+                    typeof module.exports === 'object'
+                ) {
+                    module.exports = factory();
+                }
+                // ③ 全局（浏览器 script 标签 / type=module）
+                else {
+                    if (!root) {
+                        throw new Error('[NeExample] 无法定位全局对象，请改用 script 标签或模块系统引入');
+                    }
+                    // 幂等：重复引入时不覆盖已有实例；若希望后加载的版本顶掉旧的，去掉 || 即可
+                    root.NeExample = root.NeExample || factory();
+                }
+            })(
+                // root 解析：ESM / 严格模式下 this 是 undefined，必须先试 globalThis、再试 self
+                typeof globalThis !== 'undefined'
+                    ? globalThis
+                    : (typeof self !== 'undefined' ? self : this),
+                function () {
+                    'use strict';
+
+                    // ===== 插件正文 =====
+                    // 这里不碰 DOM、不读全局配置，全部延迟到 init()
+
+                    var defaults = {};
+
+                    function NeExample(options) {
+                        if (!(this instanceof NeExample)) {
+                            return new NeExample(options);
+                        }
+                        this.options = options || {};
+                    }
+
+                    NeExample.prototype.init = function () {
+                        // DOM 操作放这里
+                    };
+
+                    NeExample.defaults = defaults;
+
+                    return NeExample;
+                    // ===== 插件正文结束 =====
+                }
+            );
+        </code></pre>
+
+
+        <h4> · 2015-2020年 全注释版 </h4>
         <pre class="pre-code"><code>
             ;(function (root, factory) {
-                if (typeof define === 'function' && define.amd) { // AMD规范
+                // ①.AMD规范：RequireJS 模块化（无依赖，无需传依赖数组）
+                if (typeof define === 'function' && define.amd) {
                     define(factory);
-                } 
-                else if (typeof exports === 'object' && typeof module !== 'undefined') { // UMD规范：Node, CommonJS规范（标准环境）
+                }
+
+                // ②.UMD规范：Node, CommonJS规范（标准环境）
+                // Node、打包工具(Webpack、Vite)、浏览器ESM环境(如原生type="module")
+                else if (typeof exports === 'object' && typeof module !== 'undefined') { // 标准环境：同时存在module与exports
                     module.exports = factory();
-                } 
-                else if (typeof exports === 'object') { // UMD规范：Node, CommonJS规范（兜底环境）
-                    exports.NeExample = factory();
-                } 
-                else { // 浏览器全局变量(root 即 window)
-                    root.NeExample = factory(); // 全局环境下，挂载到 root（window）上
+                }
+                // ③.UMD规范：Node, CommonJS规范（兜底环境）
+                // 仅存在exports、无module对象的轻量（极少场景）。老式极简 CommonJS 模拟环境、非常老旧的打包工具才会出现，日常开发几乎碰不到。
+                else if (typeof exports === 'object') {
+                    exports.NeExample = factory(); // 将插件挂载到exports对象上
+                }
+                // ④.普通浏览器原生环境：挂载全局window（浏览器全局变量，root 即 window）
+                else {
+                    root.NeExample = factory(); // root = this，外层this指向window，挂载全局变量直接调用
                 }
             })(this, function () {
-                // MyPlugin 是临时变量，可以是任何名称，也可命名为跟 root.NeExample同名的 NeExample 
                 var MyPlugin = {
                     init: function () {
                         console.log('初始化');
@@ -300,7 +375,7 @@
 
         </code></pre>
 
-        <h5> 日常常见的可精简成如下（没有commonJS兜底环境，少一个else 判断） </h5>
+        <h5> 2015-2020年 精简版：日常常见的可精简成如下（没有commonJS兜底环境，少一个else 判断） </h5>
         <pre class="pre-code"><code>
             ;(function (root, factory) { // AMD规范
                 if (typeof define === 'function' && define.amd) {
@@ -323,36 +398,7 @@
 
         </code></pre>
 
-        <h4> · 全注释版 </h4>
-        <pre class="pre-code"><code>
-            ;(function (root, factory) {
-                // ①.AMD规范：RequireJS 模块化（无依赖，无需传依赖数组）
-                if (typeof define === 'function' && define.amd) {
-                    define(factory);
-                }
-                // ②.UMD规范：CommonJS规范：Node、打包工具(Webpack、Vite)、浏览器ESM环境(如原生type="module")
-                // 标准环境：同时存在module与exports
-                else if (typeof exports === 'object' && typeof module !== 'undefined') {
-                    module.exports = factory();
-                }
-                // 兜底环境：仅存在exports、无module对象的轻量（极少场景）。老式极简 CommonJS 模拟环境、非常老旧的打包工具才会出现，日常开发几乎碰不到。
-                else if (typeof exports === 'object') {
-                    exports.NeExample = factory(); // 将插件挂载到exports对象上
-                }
-                // ③.普通浏览器原生环境：挂载全局window
-                else {
-                    root.NeExample = factory(); // root = this，外层this指向window，挂载全局变量直接调用
-                }
-            })(this, function () {
-                var MyPlugin = {
-                    init: function () {
-                        console.log('初始化');
-                    }
-                };
-                return MyPlugin;
-            });
-
-        </code></pre>
+        
 
         模板使用注意事项：
         （1）HTML 页面直接 script 引入即可，无需提前加载任何第三方库；
